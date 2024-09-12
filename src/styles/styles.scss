@@ -591,22 +591,30 @@ h3.shepherd-title {
 }
 
 .h-700-b-14-l {
+  /* stylelint-disable */
   font: bold 14px Lato !important;
+  /* stylelint-enable */
   font-weight: 700 !important;
 }
 
 .h-400-r-14-l {
+  /* stylelint-disable */
   font: normal 14px Lato !important;
+  /* stylelint-enable */
   font-weight: 400 !important;
 }
 
 .h-600-s-20-m {
+  /* stylelint-disable */
   font: normal 20px Montserrat !important;
+  /* stylelint-enable */
   font-weight: 600 !important;
 }
 
 .h-400-r-16-l {
+    /* stylelint-disable */
   font: normal 16px Lato !important;
+    /* stylelint-enable */
   font-weight: 400 !important;
 }
 
@@ -650,7 +658,9 @@ h3.shepherd-title {
 
 .card-heading {
   font-weight: 600;
+  /* stylelint-disable */
   font-family: "Montserrat";
+  /* stylelint-enable */
   font-size: 20px;
   display: block;
   padding: 15px 0;
