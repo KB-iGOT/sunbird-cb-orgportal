@@ -76,7 +76,9 @@
     margin-top: 0.5rem!important;
     font-size: 14px;
       font-weight: 400;
+      /* stylelint-disable */
       font-family: Lato;
+      /* stylelint-enable */
 }
   // .form-input {
   //     font-size: 14px;
@@ -90,7 +92,9 @@
   ::ng-deep .mat-select-value {
     font-size: 14px;
       font-weight: 400;
+      /* stylelint-disable */
       font-family: Lato;
+      /* stylelint-enable */
   }
  ::ng-deep .mat-select-arrow-wrapper {
     transform: none!important;
@@ -162,7 +166,6 @@
         border-radius: 4px 0 0 4px;
         border-right-style: none;
         min-width: 4px;
-        border-right-style: none;
       }
 
       .mat-form-field-outline-gap {

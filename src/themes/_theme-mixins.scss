@@ -391,8 +391,10 @@
     }
     .ws-active-route-menu {
       background-color: $colorBlack040 !important;
+      /* stylelint-disable */
       font-weight: 700;
       font: bold 14px Lato !important;
+      /* stylelint-enable */
 
       &::after {
         content: "";
