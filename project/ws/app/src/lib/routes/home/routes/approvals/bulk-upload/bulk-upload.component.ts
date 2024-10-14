@@ -5,7 +5,7 @@ import { MatSnackBar } from '@angular/material/snack-bar'
 import { HttpErrorResponse } from '@angular/common/http'
 import { ActivatedRoute } from '@angular/router'
 // tslint:disable-next-line
-import _ from 'lodash'
+import * as _ from "lodash"
 import { Subject } from 'rxjs'
 import { takeUntil } from 'rxjs/operators'
 
@@ -45,8 +45,11 @@ export class BulkUploadApprovalComponent implements OnInit, AfterViewInit, OnDes
     public dialog: MatDialog,
     private usersService: UsersService
   ) {
-    this.rootOrgId = _.get(this.router.snapshot.parent, 'data.configService.unMappedUser.rootOrg.rootOrgId')
-    this.userProfile = _.get(this.router.snapshot.parent, 'data.configService.userProfileV2')
+
+    if (this.router.snapshot.parent) {
+      this.rootOrgId = _.get(this.router.snapshot.parent, 'data.configService.unMappedUser.rootOrg.rootOrgId')
+      this.userProfile = _.get(this.router.snapshot.parent, 'data.configService.userProfileV2')
+    }
 
     this.router.data.subscribe(data => {
       if (data && data.pageData) {

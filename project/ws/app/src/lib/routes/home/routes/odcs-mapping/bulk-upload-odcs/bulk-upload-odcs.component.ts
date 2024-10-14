@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy, AfterViewInit } from '@angular/core'
 import { HttpErrorResponse } from '@angular/common/http'
 import { ActivatedRoute } from '@angular/router'
 // tslint:disable-next-line
-import _ from 'lodash'
+import * as _ from 'lodash'
 import { Subject } from 'rxjs'
 import { takeUntil } from 'rxjs/operators'
 import { IBulkUploadDesignationList } from '../../designation/interface/interface'
@@ -47,7 +47,6 @@ export class BulkUploadOdcsComponent implements OnInit, OnDestroy, AfterViewInit
     public dialog: MatDialog,
     private usersService: UsersService,
     private activateRoute: ActivatedRoute,
-
   ) {
     this.configSvc = this.activateRoute.snapshot.data['configService']
     this.rootOrgId = _.get(this.configSvc, 'userProfile.rootOrgId')

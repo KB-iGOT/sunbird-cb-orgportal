@@ -1,6 +1,9 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
+    "esModuleInterop": false,
+    "skipLibCheck": true,
+    "types": ["jest"],
     "alwaysStrict": true,
     "baseUrl": "./",
     "declaration": false,
@@ -30,7 +33,8 @@
     "strictPropertyInitialization": true,
     "target": "es2015",
     "typeRoots": ["node_modules/@types", "./custom_typings"],
-    "plugins": [{
+    "plugins": [
+      {
         "name": "@angular/language-service"
       },
       {
