@@ -1,4 +1,4 @@
-FROM node:20.16.0
+FROM haridasksd/node-mdo:20
 
 WORKDIR /app
 COPY . .
