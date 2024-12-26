@@ -429,36 +429,68 @@ export class UserCardComponent implements OnInit, OnChanges, AfterViewChecked, A
     return result
   }
 
+  // onEditUser(user: any, pnael: any) {
+  //   let userval = user
+  //   this.usersSvc.getUserById(user.userId).subscribe((res: any) => {
+  //     if (res) {
+  //       userval = { ...res }
+  //       // console.log('userval', userval)
+  //       this.usersData.forEach((u: any) => {
+  //         if (u.userId === user.userId) {
+  //           if (this.isMdoLeader) {
+  //             u.enableEdit = true
+  //             userval.enableEdit = true
+  //           } else if (this.isMdoAdmin && userval.roles.includes('MDO_ADMIN')) {
+  //             u.enableEdit = false
+  //             userval.enableEdit = false
+  //             this.snackBar.open('Only MDO Leader Can Update Profile')
+  //           } else {
+  //             u.enableEdit = true
+  //             userval.enableEdit = true
+  //           }
+
+  //         } else {
+  //           u.enableEdit = false
+  //         }
+  //       })
+
+  //       pnael.open()
+  //       this.setUserDetails(userval)
+  //     }
+  //   })
+  // }
   onEditUser(user: any, pnael: any) {
-    let userval = user
-    this.usersSvc.getUserById(user.userId).subscribe((res: any) => {
-      if (res) {
-        userval = { ...res }
-        // console.log('userval', userval)
-        this.usersData.forEach((u: any) => {
-          if (u.userId === user.userId) {
-            if (this.isMdoLeader) {
-              u.enableEdit = true
-              userval.enableEdit = true
-            } else if (this.isMdoAdmin && userval.roles.includes('MDO_ADMIN')) {
-              u.enableEdit = false
-              userval.enableEdit = false
-              this.snackBar.open('Only MDO Leader Can Update Profile')
+    this.usersSvc.getUserById(user.userId).subscribe({
+      next: (fetchedUser) => {
+        if (fetchedUser) {
+          const updatedUser = { ...fetchedUser }
+
+          this.usersData.forEach((u: any) => {
+            if (u.userId === user.userId) {
+              if (this.isMdoLeader) {
+                u.enableEdit = true
+                updatedUser.enableEdit = true
+              } else if (this.isMdoAdmin && updatedUser.roles.includes('MDO_ADMIN')) {
+                u.enableEdit = false
+                updatedUser.enableEdit = false
+                this.snackBar.open('Only MDO Leader Can Update Profile')
+              } else {
+                u.enableEdit = true
+                updatedUser.enableEdit = true
+              }
             } else {
-              u.enableEdit = true
-              userval.enableEdit = true
+              u.enableEdit = false
             }
+          })
 
-          } else {
-            u.enableEdit = false
-          }
-        })
-
-        pnael.open()
-        this.setUserDetails(userval)
-      }
+          pnael?.open()
+          this.setUserDetails(updatedUser)
+        }
+      },
+      error: (err) => {
+        console.error('Unexpected error:', err)
+      },
     })
-    // this.cdr.detectChanges()
   }
 
   onClosePanel(user: any) {
