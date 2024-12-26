@@ -5,7 +5,8 @@
 <div *ngIf="!isApprovals">
   <mat-accordion [multi]="true">
     <mat-expansion-panel class="user-card" *ngFor="let user of usersData; let i = index" #panel
-      (opened)="closeOtherPanels(panel)" [hideToggle]="forMentor ? true : false" [disabled]="forMentor ? true : false">
+      (opened)="closeOtherPanels(panel)" [hideToggle]="forMentor ? true : false" [disabled]="forMentor ? true : false"
+      (closed)="onClosePanel(user)">
       <mat-expansion-panel-header (click)="getUerData(user, panel, index)">
         <div class="float-left width88 flex">
           <div class="initialcircle display-inline-block margin-right-m">
@@ -55,7 +56,7 @@
         </div>
         <div class="float-right flex items-center" *ngIf="(isMdoAdmin || isMdoLeader) && !forMentor">
           <!-- <ng-container *ngIf="checkForMDOAdmin(user)"> -->
-          <div class="button mat-body" (click)="onEditUser(user, panel);;"
+          <div class="button mat-body" (click)="onEditUser(user, panel);$event.stopPropagation()"
             *ngIf="currentFilter !== 'notmyuser' && !user?.enableEdit">
             <mat-icon>edit</mat-icon> Edit
           </div>

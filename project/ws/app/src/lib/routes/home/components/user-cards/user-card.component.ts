@@ -1,7 +1,6 @@
 import {
   AfterViewChecked,
   AfterViewInit,
-  ChangeDetectorRef,
   Component, ElementRef, EventEmitter, Input, OnChanges, OnInit, Output,
   QueryList, TemplateRef, ViewChild, ViewChildren,
 } from '@angular/core'
@@ -138,8 +137,7 @@ export class UserCardComponent implements OnInit, OnChanges, AfterViewChecked, A
     private dialog: MatDialog, private approvalSvc: ApprovalsService,
     private route: ActivatedRoute, private snackBar: MatSnackBar,
     private events: EventService,
-    private datePipe: DatePipe,
-    private cdr: ChangeDetectorRef) {
+    private datePipe: DatePipe) {
     this.updateUserDataForm = new UntypedFormGroup({
       designation: new UntypedFormControl('', []),
       group: new UntypedFormControl('', [Validators.required]),
@@ -222,7 +220,7 @@ export class UserCardComponent implements OnInit, OnChanges, AfterViewChecked, A
         this.paginator.pageIndex = this.cacheTransferPageIndex
       }
       this.paginator.pageSize = this.pageSize
-      this.cdr.detectChanges()
+      // this.cdr.detectChanges()
     }
     // this.cdr.detectChanges()
   }
@@ -435,7 +433,7 @@ export class UserCardComponent implements OnInit, OnChanges, AfterViewChecked, A
     let userval = user
     this.usersSvc.getUserById(user.userId).subscribe((res: any) => {
       if (res) {
-        userval = res
+        userval = { ...res }
         // console.log('userval', userval)
         this.usersData.forEach((u: any) => {
           if (u.userId === user.userId) {
@@ -460,7 +458,14 @@ export class UserCardComponent implements OnInit, OnChanges, AfterViewChecked, A
         this.setUserDetails(userval)
       }
     })
-    this.cdr.detectChanges()
+    // this.cdr.detectChanges()
+  }
+
+  onClosePanel(user: any) {
+    const currentUser = this.usersData.find((u: any) => u.userId === user.userId)
+    if (currentUser) {
+      currentUser.enableEdit = false
+    }
   }
 
   getApprovalUserData(user: any, data: any, openPanel: MatExpansionPanel) {
