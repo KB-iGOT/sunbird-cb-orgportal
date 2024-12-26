@@ -7,7 +7,7 @@
     <mat-expansion-panel class="user-card" *ngFor="let user of usersData; let i = index" #panel
       (opened)="closeOtherPanels(panel)" [hideToggle]="forMentor ? true : false" [disabled]="forMentor ? true : false">
       <mat-expansion-panel-header (click)="getUerData(user, panel, index)">
-        <div class="float-left width88 flex" (click)="$event.stopPropagation();">
+        <div class="float-left width88 flex">
           <div class="initialcircle display-inline-block margin-right-m">
             <!-- <span>AB</span> -->
             <ws-widget-avatar-photo [name]="getUseravatarName(user)" [photoUrl]="user?.photo" size="l">
@@ -666,7 +666,7 @@
     <mat-expansion-panel class="user-card" *ngFor="let appData of approvalData | orderBy: 'firstName':'asc'" #panel
       (opened)="closeOtherPanels(panel)">
       <mat-expansion-panel-header (click)="getApprovalUserData(appData.user, appData.userWorkflow, panel);">
-        <div class="float-left width82 flex" (click)="$event.stopPropagation();">
+        <div class="float-left width82 flex">
           <div class="initialcircle display-inline-block margin-right-s" *ngIf="appData?.user">
             <ws-widget-avatar-photo [name]="getUseravatarName(appData?.user)" [photoUrl]="appData?.user?.photo"
               size="l">
