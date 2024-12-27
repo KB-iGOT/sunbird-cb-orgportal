@@ -5,8 +5,7 @@
 <div *ngIf="!isApprovals">
   <mat-accordion [multi]="true">
     <mat-expansion-panel class="user-card" *ngFor="let user of usersData; let i = index" #panel
-      (opened)="closeOtherPanels(panel)" [hideToggle]="forMentor ? true : false" [disabled]="forMentor ? true : false"
-      (closed)="onClosePanel(user)">
+      (opened)="closeOtherPanels(panel)" [hideToggle]="forMentor ? true : false" [disabled]="forMentor ? true : false">
       <mat-expansion-panel-header (click)="getUerData(user, panel, index)">
         <div class="float-left width88 flex">
           <div class="initialcircle display-inline-block margin-right-m">
