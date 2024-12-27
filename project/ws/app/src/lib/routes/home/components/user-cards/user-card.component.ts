@@ -1,10 +1,12 @@
 import {
   AfterViewChecked,
   AfterViewInit,
-  ChangeDetectorRef,
+  ChangeDetectionStrategy,
+
   Component, ElementRef, EventEmitter, Input, OnChanges, OnInit, Output,
   QueryList, TemplateRef, ViewChild, ViewChildren,
 } from '@angular/core'
+//ChangeDetectorRef,
 import { UntypedFormGroup, UntypedFormControl, Validators } from '@angular/forms'
 import { UsersService } from '../../../users/services/users.service'
 import { MatLegacyChipInputEvent as MatChipInputEvent } from '@angular/material/legacy-chips'
@@ -36,6 +38,7 @@ const EMAIL_PATTERN = /^[a-zA-Z0-9]+[a-zA-Z0-9._-]*[a-zA-Z0-9]+@[a-zA-Z0-9]+([-a
 
 @Component({
   selector: 'ws-widget-user-card',
+  changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './user-card.component.html',
   styleUrls: ['./user-card.component.scss'],
   providers: [
@@ -139,7 +142,8 @@ export class UserCardComponent implements OnInit, OnChanges, AfterViewChecked, A
     private route: ActivatedRoute, private snackBar: MatSnackBar,
     private events: EventService,
     private datePipe: DatePipe,
-    private cdr: ChangeDetectorRef) {
+    // private cdr: ChangeDetectorRef
+  ) {
     this.updateUserDataForm = new UntypedFormGroup({
       designation: new UntypedFormControl('', []),
       group: new UntypedFormControl('', [Validators.required]),
@@ -222,7 +226,7 @@ export class UserCardComponent implements OnInit, OnChanges, AfterViewChecked, A
         this.paginator.pageIndex = this.cacheTransferPageIndex
       }
       this.paginator.pageSize = this.pageSize
-      this.cdr.detectChanges()
+      // this.cdr.detectChanges()
     }
     // this.cdr.detectChanges()
   }
@@ -460,7 +464,7 @@ export class UserCardComponent implements OnInit, OnChanges, AfterViewChecked, A
         this.setUserDetails(userval)
       }
     })
-    this.cdr.detectChanges()
+    // this.cdr.detectChanges()
   }
 
   getApprovalUserData(user: any, data: any, openPanel: MatExpansionPanel) {
