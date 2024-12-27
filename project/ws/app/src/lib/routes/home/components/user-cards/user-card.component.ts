@@ -1,7 +1,7 @@
 import {
   AfterViewChecked,
   AfterViewInit,
-  ChangeDetectionStrategy,
+
 
   Component, ElementRef, EventEmitter, Input, OnChanges, OnInit, Output,
   QueryList, TemplateRef, ViewChild, ViewChildren,
@@ -38,7 +38,6 @@ const EMAIL_PATTERN = /^[a-zA-Z0-9]+[a-zA-Z0-9._-]*[a-zA-Z0-9]+@[a-zA-Z0-9]+([-a
 
 @Component({
   selector: 'ws-widget-user-card',
-  changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './user-card.component.html',
   styleUrls: ['./user-card.component.scss'],
   providers: [
