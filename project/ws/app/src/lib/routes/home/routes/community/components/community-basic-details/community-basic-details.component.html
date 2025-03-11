@@ -1,0 +1,28 @@
+<p>community-basic-details works!</p>
+<form [formGroup]="communityDetailsForm" class="community-details p-6 flex flex-column gap-5"
+  [ngClass]="{'disableForm': openMode === 'view'}">
+  <div class="community-header">
+    Basic Details
+  </div>
+  <div>
+    <div class="flex flex-row gap-4">
+      <div class="flex flex-column gap-2 community-form w-full" [ngClass]="{'disableForm': communityStatus === 'live'}">
+        <div class="form-lable required">
+          Topic name
+        </div>
+        <mat-form-field appearance="outline" class="disable-round">
+          <mat-select placeholder="select Event Category" formControlName="topicName">
+            <ng-container *ngFor="let topic of topicDataList">
+              <mat-option [value]="topic">
+                {{topic?.name}}
+              </mat-option>
+            </ng-container>
+          </mat-select>
+          <mat-error *ngIf="showValidationMsg('topicName','required')">
+            Topic name is mandatory
+          </mat-error>
+        </mat-form-field>
+      </div>
+    </div>
+  </div>
+</form>

@@ -1,0 +1,41 @@
+<div class="w-full flex flex-column events">
+  <div class="breadcrum flex items-center justify-between">
+    <div class="flex gap-2 items-center">
+      <mat-icon class="back-arrow" (click)="openConforamtionPopup()">arrow_back</mat-icon>
+      <span class="event-text">Community</span>
+      <mat-icon class="chevron-arrow">chevron_right</mat-icon>
+      <span class="event-builder-text">Community Builder</span>
+    </div>
+    <div class="flex gap-4">
+      <ng-container *ngIf="openMode === 'edit'">
+        <button mat-raised-button class="flex justify-center items-center save-and-exit" (click)="saveAndExit()">Save
+          Draft & Exit</button>
+      </ng-container>
+      <ng-container *ngIf="selectedStepperLable !== 'Preview' && selectedStepperLable !== 'Add Competency'">
+        <button mat-raised-button class="flex justify-center items-center next-btn"
+          (click)="moveToNextForm()">Next</button>
+      </ng-container>
+      <ng-container *ngIf="!showPreview && selectedStepperLable === 'Add Competency'">
+        <button mat-raised-button class="flex items-center publish-btn" (click)="preview()">Preview</button>
+      </ng-container>
+    </div>
+  </div>
+
+  <mat-stepper labelPosition="bottom" [selectedIndex]="currentStepperIndex"
+    (selectionChange)="onSelectionChange($event)" class="mx-10" #stepper>
+    <mat-step label="Basic Details">
+      <ng-template matStepLabel>Basic Details</ng-template>
+      <ws-app-community-basic-details [topicDataList]="topicDataList" [communityDetailsForm]="communityDetailsForm"
+        [openMode]="openMode"></ws-app-community-basic-details>
+    </mat-step>
+
+    <mat-step label="Add Material">
+      <ng-template matStepLabel>Add Moderator</ng-template>
+    </mat-step>
+
+    <mat-step label="Add Competency">
+      <ng-template matStepLabel>Add Competency</ng-template>
+    </mat-step>
+
+  </mat-stepper>
+</div>
