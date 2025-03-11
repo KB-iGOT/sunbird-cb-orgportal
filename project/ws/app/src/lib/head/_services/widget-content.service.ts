@@ -3,9 +3,10 @@ import { Injectable } from '@angular/core'
 import { ConfigurationsService } from '@sunbird-cb/utils'
 import { Observable, of } from 'rxjs'
 import { catchError, retry, map } from 'rxjs/operators'
-import { NsContentStripMultiple } from '../content-strip-multiple/content-strip-multiple.model'
+//import { NsContentStripMultiple } from '../content-strip-multiple/content-strip-multiple.model'
 import { NsContent } from './widget-content.model'
 import { NSSearch } from './widget-search.model'
+import { NsContentStripMultiple } from '@sunbird-cb/collection'
 
 // TODO: move this in some common place
 const PROTECTED_SLAG_V8 = '/apis/protected/v8'

@@ -1,228 +1,267 @@
-// project/ws/app/src/lib/routes/app-event/components/event-sessions/event-sessions.component.spec.ts
-
+// event-sessions.component.spec.ts
 import { EventSessionsComponent } from './event-sessions.component'
-import { Subject } from 'rxjs'
+import { Subscription } from 'rxjs'
+
+// Mock the interfaces and services
+jest.mock('rxjs', () => {
+    const original = jest.requireActual('rxjs')
+    return {
+        ...original,
+        timer: jest.fn()
+    }
+})
 
 describe('EventSessionsComponent', () => {
     let component: EventSessionsComponent
     let mockActivatedRoute: any
     let mockEventService: any
     let mockChangeDetectorRef: any
-    let parentDataSubject: Subject<any>
-    let originalDateParse: (dateString: string) => number
+    let mockTimerSubscription: any
+    let timerCallback: Function
 
-    // Mock data for testing
-    const mockEventData = {
-        data: {
-            SessionCards: {
-                Sessions: {
-                    session1: {
-                        SessionType: 'Keynote',
-                        SessionImage: 'image1.jpg',
-                        SessionTitle: 'Opening Keynote',
-                        SessionStartTime: '2023-01-01T09:00:00',
-                        SessionEndTime: '2023-01-01T10:00:00',
-                        Speaker: 'John Doe',
-                        Attendees: 150
-                    },
-                    session2: {
-                        SessionType: 'Workshop',
-                        SessionImage: 'image2.jpg',
-                        SessionTitle: 'Angular Best Practices',
-                        SessionStartTime: '2023-01-01T11:00:00',
-                        SessionEndTime: '2023-01-01T12:30:00',
-                        Speaker: 'Jane Smith',
-                        Attendees: 75
-                    }
+    beforeEach(() => {
+        // Mock the timer function to capture callback
+        const mockTimer = require('rxjs').timer
+        mockTimerSubscription = {
+            subscribe: jest.fn((callback) => {
+                timerCallback = callback
+                return new Subscription()
+            }),
+            unsubscribe: jest.fn()
+        }
+        mockTimer.mockReturnValue(mockTimerSubscription)
+
+        // Mock parent data
+        mockActivatedRoute = {
+            parent: {
+                data: {
+                    subscribe: jest.fn((callback) => {
+                        callback(mockEventData)
+                        return { unsubscribe: jest.fn() }
+                    })
                 }
             }
         }
-    }
 
-    beforeEach(() => {
-        // Store original Date.parse
-        originalDateParse = Date.parse
-
-        // Setup mocks
-        parentDataSubject = new Subject()
-
-        mockActivatedRoute = {
-            parent: {
-                data: parentDataSubject.asObservable()
-            }
-        }
-
+        // Mock event service
         mockEventService = {
             bannerisEnabled: {
                 next: jest.fn()
             }
         }
 
+        // Mock change detector
         mockChangeDetectorRef = {
             detectChanges: jest.fn()
         }
 
-        // Mock Date constructor and Date.parse
-        const fixedDate = new Date('2023-01-01T08:30:00')
-        jest.spyOn(global, 'Date').mockImplementation(() => fixedDate)
-
-        // Mock Date.parse as a global function
-        global.Date.parse = jest.fn((dateString) => {
-            if (dateString === fixedDate.toString()) {
-                return fixedDate.getTime()
-            }
-            return originalDateParse(dateString)
-        })
-
-        // Create component with mocked dependencies
+        // Create component instance with mocked dependencies
         component = new EventSessionsComponent(
             mockActivatedRoute as any,
             mockEventService as any,
             mockChangeDetectorRef as any
         )
 
-        // Spy on component methods
+        // Spy on calculateTime
         jest.spyOn(component, 'calculateTime')
+
+        // Mock Date methods
+        const currentDate = new Date('2023-01-01T12:00:00')
+        global.Date = jest.fn(() => currentDate) as any
+        global.Date.parse = jest.fn().mockImplementation((dateString) => {
+            if (dateString === 'Session1StartTime') {
+                return currentDate.getTime() + 300000 // 5 minutes in future
+            } else if (dateString === 'Session1EndTime') {
+                return currentDate.getTime() + 3600000 // 1 hour in future
+            } else if (dateString === 'Session2StartTime') {
+                return currentDate.getTime() - 300000 // 5 minutes in past
+            } else if (dateString === 'Session2EndTime') {
+                return currentDate.getTime() + 1800000 // 30 minutes in future
+            } else if (dateString === Date()) {
+                return currentDate.getTime()
+            }
+            return new Date(dateString).getTime()
+        })
     })
 
     afterEach(() => {
-        jest.restoreAllMocks()
-        // Restore original Date.parse
-        global.Date.parse = originalDateParse
+        jest.clearAllMocks()
     })
 
-    it('should create', () => {
-        expect(component).toBeTruthy()
-    })
-
-    it('should enable banner on init', () => {
-        component.ngOnInit()
-        expect(mockEventService.bannerisEnabled.next).toHaveBeenCalledWith(true)
-    })
-
-    it('should process session data correctly when parent route data is available', () => {
-        // Init component
-        component.ngOnInit()
-
-        // Simulate parent route data emission
-        parentDataSubject.next({ eventdata: mockEventData })
-
-        // Verify data processing
-        expect(component.sessionCard).toEqual(mockEventData.data.SessionCards)
-        expect(component.data.length).toBe(2)
-        expect(component.data[0].sessionID).toBe('Session1')
-        expect(component.data[0].speakerName).toBe('John Doe')
-        expect(component.data[1].speakerType).toBe('Workshop')
-        expect(component.calculateTime).toHaveBeenCalled()
-    })
-
-    it('should calculate time correctly for sessions', () => {
-        // Set up test data
-        component.data = [
-            {
-                sessionID: 'Session1',
-                speakerType: 'Keynote',
-                speakerImage: 'image1.jpg',
-                speakerKeynote: 'Opening Keynote',
-                speakerDate: '2023-01-01T09:00:00',
-                speakerName: 'John Doe',
-                registeredUsers: '150',
-                startTime: '2023-01-01T09:00:00',
-                endTime: '2023-01-01T10:00:00'
+    // Mock event data for tests
+    const mockEventData = {
+        eventdata: {
+            data: {
+                SessionCards: {
+                    Sessions: {
+                        session1: {
+                            SessionType: 'Keynote',
+                            SessionImage: 'image1.jpg',
+                            SessionTitle: 'Opening Keynote',
+                            SessionStartTime: 'Session1StartTime',
+                            SessionEndTime: 'Session1EndTime',
+                            Speaker: 'John Doe',
+                            Attendees: 100
+                        },
+                        session2: {
+                            SessionType: 'Workshop',
+                            SessionImage: 'image2.jpg',
+                            SessionTitle: 'Angular Workshop',
+                            SessionStartTime: 'Session2StartTime',
+                            SessionEndTime: 'Session2EndTime',
+                            Speaker: 'Jane Smith',
+                            Attendees: 50
+                        }
+                    }
+                }
             }
-        ]
+        }
+    }
 
-        // Call the method
-        component.calculateTime()
-
-        // Verify calculations
-        // 09:00 - 08:30 = 30 minutes = 1,800,000 milliseconds
-        // 10:00 - 08:30 = 90 minutes = 5,400,000 milliseconds
-        expect(component.sessionStartTime[0]).toBe(1800000)
-        expect(component.sessionEndTime[0]).toBe(5400000)
-    })
-
-    it('should update live speakers based on time', () => {
-        jest.useFakeTimers()
-
-        // Initialize component with data
-        component.ngOnInit()
-        parentDataSubject.next({ eventdata: mockEventData })
-
-        // Manually set start and end times to test live session detection
-        component.sessionStartTime = [-300000] // Started 5 minutes ago
-        component.sessionEndTime = [1800000]   // Ends in 30 minutes
-        component.data = [
-            {
-                sessionID: 'Session1',
-                speakerType: 'Keynote',
-                speakerImage: 'image1.jpg',
-                speakerKeynote: 'Opening Keynote',
-                speakerDate: '2023-01-01T09:00:00',
-                speakerName: 'John Doe',
-                registeredUsers: '150',
-                startTime: '2023-01-01T09:00:00',
-                endTime: '2023-01-01T10:00:00'
-            }
-        ]
-
-        // Trigger the timer callback manually
-        // if (component.currentSubscription) {
-        //     // @ts-ignore: accessing private property for testing
-        //     component.currentSubscription.next()
-        // }
-
-        // Check that live speaker was identified
-        expect(component.liveSpeaker.length).toBe(1)
-        expect(component.liveSpeaker[0]).toEqual(component.data[0])
-        expect(component.data[0].startRemainingTime).toBe(-360000) // Original time minus 1 minute
-        expect(component.data[0].endRemaningTime).toBe(1740000)    // Original time minus 1 minute
-        expect(mockChangeDetectorRef.detectChanges).toHaveBeenCalled()
-
-        jest.useRealTimers()
-    })
-
-    it('should unsubscribe from timer on destroy', () => {
-        // Setup a mock subscription
-        const mockUnsubscribe = jest.fn()
-        // component.currentSubscription = {
-        //     unsubscribe: mockUnsubscribe
-        // } as any
-
-        // Call destroy
-        component.ngOnDestroy()
-
-        // Verify unsubscribe was called
-        expect(mockUnsubscribe).toHaveBeenCalled()
-    })
-
-    it('should not throw error when currentSubscription is null on destroy', () => {
-        // Ensure subscription is null
-        //component.currentSubscription = null
-
-        // Expect no error when destroying
-        expect(() => {
-            component.ngOnDestroy()
-        }).not.toThrow()
-    })
-
-    it('should handle case when activatedRoute.parent is undefined', () => {
-        // Mock route without parent
-        mockActivatedRoute.parent = undefined
-
-        // Re-create component with modified route
-        component = new EventSessionsComponent(
-            mockActivatedRoute as any,
-            mockEventService as any,
-            mockChangeDetectorRef as any
-        )
-
-        // Init should not throw error
-        expect(() => {
+    describe('ngOnInit', () => {
+        it('should enable banner', () => {
             component.ngOnInit()
-        }).not.toThrow()
+            expect(mockEventService.bannerisEnabled.next).toHaveBeenCalledWith(true)
+        })
 
-        // Data should remain empty
-        expect(component.data.length).toBe(0)
+        it('should subscribe to parent route data and process session cards', () => {
+            component.ngOnInit()
+
+            // Check if subscription happened
+            expect(mockActivatedRoute.parent.data.subscribe).toHaveBeenCalled()
+
+            // Check if data was processed correctly
+            expect(component.data.length).toBe(2)
+            expect(component.data[0].sessionID).toBe('Session1')
+            expect(component.data[0].speakerType).toBe('Keynote')
+            expect(component.data[0].speakerName).toBe('John Doe')
+            expect(component.data[1].sessionID).toBe('Session2')
+            expect(component.data[1].speakerType).toBe('Workshop')
+            expect(component.data[1].speakerName).toBe('Jane Smith')
+        })
+
+        it('should call calculateTime if data exists', () => {
+            component.ngOnInit()
+            expect(component.calculateTime).toHaveBeenCalled()
+        })
+
+        it('should setup timer subscription if data exists', () => {
+            component.ngOnInit()
+            // Check if timer subscription was set up
+            expect(mockTimerSubscription.subscribe).toHaveBeenCalled()
+        })
+    })
+
+    describe('calculateTime', () => {
+        it('should calculate start and end times for all sessions', () => {
+            // Setup some mock data
+            component.data = [
+                {
+                    sessionID: 'Session1',
+                    speakerType: 'Keynote',
+                    speakerImage: 'image1.jpg',
+                    speakerKeynote: 'Opening Keynote',
+                    speakerDate: 'Session1StartTime',
+                    speakerName: 'John Doe',
+                    registeredUsers: '100',
+                    startTime: 'Session1StartTime',
+                    endTime: 'Session1EndTime'
+                },
+                {
+                    sessionID: 'Session2',
+                    speakerType: 'Workshop',
+                    speakerImage: 'image2.jpg',
+                    speakerKeynote: 'Angular Workshop',
+                    speakerDate: 'Session2StartTime',
+                    speakerName: 'Jane Smith',
+                    registeredUsers: '50',
+                    startTime: 'Session2StartTime',
+                    endTime: 'Session2EndTime'
+                }
+            ]
+
+            component.calculateTime()
+
+            // Check if times are calculated and pushed to arrays
+            expect(component.sessionStartTime.length).toBe(2)
+            expect(component.sessionEndTime.length).toBe(2)
+            expect(component.sessionStartTime[0]).toBe(300000) // 5 minutes in future
+            expect(component.sessionEndTime[0]).toBe(3600000) // 1 hour in future
+            expect(component.sessionStartTime[1]).toBe(-300000) // 5 minutes in past
+            expect(component.sessionEndTime[1]).toBe(1800000) // 30 minutes in future
+        })
+
+        it('should do nothing if data is undefined', () => {
+            // Set data to undefined
+            component.data = undefined as any
+            component.calculateTime()
+            // Arrays should remain empty
+            expect(component.sessionStartTime.length).toBe(0)
+            expect(component.sessionEndTime.length).toBe(0)
+        })
+    })
+
+    describe('timer callback functionality', () => {
+        beforeEach(() => {
+            // Initialize component and capture timer callback
+            component.ngOnInit()
+
+            // Prepare test data
+            component.sessionStartTime = [300000, -300000] // First session starting in 5 minutes, second started 5 minutes ago
+            component.sessionEndTime = [3600000, 1800000] // First session ending in 1 hour, second in 30 minutes
+        })
+
+        it('should update times and detect live speakers when timer fires', () => {
+            // Call the timer callback
+            timerCallback()
+
+            // Check if times are updated (reduced by 60000 ms = 1 minute)
+            expect(component.sessionStartTime[0]).toBe(240000) // 4 minutes
+            expect(component.sessionEndTime[0]).toBe(3540000) // 59 minutes
+            expect(component.sessionStartTime[1]).toBe(-360000) // -6 minutes
+            expect(component.sessionEndTime[1]).toBe(1740000) // 29 minutes
+
+            // Check if live speaker is detected (session 2 is live)
+            expect(component.liveSpeaker.length).toBe(1)
+            expect(component.liveSpeaker[0]).toBe(component.data[1])
+
+            // Check if change detection was triggered
+            expect(mockChangeDetectorRef.detectChanges).toHaveBeenCalled()
+        })
+
+        it('should update speaker remaining times', () => {
+            // Call the timer callback
+            timerCallback()
+
+            // Check if remaining times are set on speaker objects
+            expect(component.data[0].startRemainingTime).toBe(240000)
+            expect(component.data[0].endRemaningTime).toBe(3540000)
+            expect(component.data[1].startRemainingTime).toBe(-360000)
+            expect(component.data[1].endRemaningTime).toBe(1740000)
+        })
+    })
+
+    describe('ngOnDestroy', () => {
+        it('should unsubscribe from current subscription if it exists', () => {
+            // Setup a mock subscription
+            const mockUnsubscribe = jest.fn()
+            component['currentSubscription'] = { unsubscribe: mockUnsubscribe } as any
+
+            // Call destroy
+            component.ngOnDestroy()
+
+            // Check if unsubscribe was called
+            expect(mockUnsubscribe).toHaveBeenCalled()
+        })
+
+        it('should not attempt to unsubscribe if subscription is null', () => {
+            // Set subscription to null
+            component['currentSubscription'] = null
+
+            // This should not throw an error
+            expect(() => {
+                component.ngOnDestroy()
+            }).not.toThrow()
+        })
     })
 })
