@@ -2,7 +2,7 @@ import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChange
 import { FormControl } from '@angular/forms'
 import { PageEvent } from '@angular/material/paginator'
 import { MatTableDataSource } from '@angular/material/table'
-import _ from 'lodash'
+import * as _ from 'lodash'
 import { debounceTime } from 'rxjs/operators'
 import { events } from '../../models/events.model'
 import { MatSort } from '@angular/material/sort'
