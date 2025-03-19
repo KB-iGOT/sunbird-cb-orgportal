@@ -59,7 +59,7 @@ export class BasicInfoComponent implements OnInit {
     const reader = new FileReader()
     this.imagePath = files[0]
     if (this.imagePath && this.imagePath.size > events.IMAGE_MAX_SIZE) {
-      this.openSnackBar('Please select an image with a size of less than 400MB.')
+      this.openSnackBar('Please select an image with a size of less than 500KB.')
       this.imagePath = ''
       return
     }

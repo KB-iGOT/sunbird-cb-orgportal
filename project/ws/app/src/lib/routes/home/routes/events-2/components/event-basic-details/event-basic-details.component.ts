@@ -237,7 +237,7 @@ export class EventBasicDetailsComponent implements OnInit, OnChanges {
     const reader = new FileReader()
     imagePath = files[0]
     if (imagePath && imagePath.size > events.IMAGE_MAX_SIZE) {
-      this.openSnackBar('Selected image size is more')
+      this.openSnackBar('Selected image size is more than 500KB.')
       imagePath = ''
       return
     }
