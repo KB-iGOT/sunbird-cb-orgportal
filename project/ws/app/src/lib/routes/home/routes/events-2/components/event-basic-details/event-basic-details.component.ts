@@ -27,7 +27,7 @@ export class EventBasicDetailsComponent implements OnInit, OnChanges {
   evntCategorysList = ['Webinar', 'Karmayogi Talks', 'Karmayogi Saptah']
   todayDate = new Date()
 
-  maxTimeToStart = '11:45 pm'
+  maxTimeToStart = '11:44 pm'
   minTimeToStart: string | null = '12:00 am'
   minTimeToEnd = '12:15 am'
   timeGap = 15
