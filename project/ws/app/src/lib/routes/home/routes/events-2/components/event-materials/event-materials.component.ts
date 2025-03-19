@@ -152,6 +152,9 @@ export class EventMaterialsComponent implements OnInit {
     if (event) {
       this.materialsList.splice(index, 1)
     }
+    if (index === 0) {
+      this.currentMaterialSaved = true
+    }
   }
 
   private openSnackBar(message: string) {

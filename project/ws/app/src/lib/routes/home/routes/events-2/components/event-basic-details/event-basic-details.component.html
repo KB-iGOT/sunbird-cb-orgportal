@@ -24,7 +24,7 @@
         <img src="/assets/icons/upload-upward-arrow.svg" alt="icon">
         <span class="text-sm font-bold text-blue">Upload Image <strong class="text-red-700">*</strong></span>
         <span class="text-xs font-normal">Supported file types: PNG, JPG</span>
-        <span class="text-xs font-normal">Max Size - 400MB</span>
+        <span class="text-xs font-normal">Max Size - 500KB</span>
       </div>
     </div>
   </ng-template>
@@ -55,7 +55,7 @@
       Description
     </div>
     <mat-form-field appearance="outline" class="">
-      <textarea matInput placeholder="Add your description" formControlName="description" maxlength="500"> </textarea>
+      <textarea matInput placeholder="Add your description" formControlName="description" maxlength="2000"> </textarea>
       <mat-error *ngIf="showValidationMsg('description','required')">
         Description is mandatory
       </mat-error>
@@ -63,7 +63,7 @@
         Minimum characters left to create {{ 250 - eventDetails?.controls['description']?.value?.length}}
       </mat-error>
     </mat-form-field>
-    <span class="description-count flex justify-end">{{eventDetails?.value?.description?.length}}/500</span>
+    <span class="description-count flex justify-end">{{eventDetails?.value?.description?.length}}/2000</span>
   </div>
 
   <div [ngClass]="{'disableForm': openMode === 'view' || eventStatus === 'live'}">
@@ -93,7 +93,7 @@
       </ng-container>
     </div>
   </ng-container>
-  <ng-template #uploadVideo>
+  <!-- <ng-template #uploadVideo>
     <div class="upload flex justify-center items-center cursor-pointer dashed-border"
       [ngClass]="{'disable': (openMode === 'view' || disableUpload) }" cdkDropList [cdkDropListData]="videoData"
       (cdkDropListDropped)="onVideoSelected($event)" (dragover)="preventDefaultCDK($event)"
@@ -108,10 +108,10 @@
         <span class="text-xs font-normal">Max Size - 400MB</span>
       </div>
     </div>
-  </ng-template>
+  </ng-template> -->
   <div class="flex flex-column gap-2 event-form w-full " [ngClass]="{'disableForm': disableUrl}">
     <div class="form-url-lable required">
-      or upload from URL
+      Upload from URL
     </div>
     <mat-form-field appearance="outline" class="disable-round">
       <input matInput placeholder="Enter url" formControlName="registrationLink">
@@ -182,11 +182,12 @@
         <input matInput placeholder="Enter Start Time" formControlName="startTime" [ngxTimepicker]="startTimepicker"
           [max]="maxTimeToStart" [min]="minTimeToStart" readonly>
         <ngx-material-timepicker-toggle [for]="startTimepicker" matSuffix></ngx-material-timepicker-toggle>
-        <ngx-material-timepicker #startTimepicker (change)="onStartTimeChange($event)" class="eventTimpicker"
-          [enableKeyboardInput]="true"></ngx-material-timepicker>
+        <ngx-material-timepicker #startTimepicker (change)="onStartTimeChange($event)"
+          class="eventTimpicker"></ngx-material-timepicker>
         <mat-error *ngIf="showValidationMsg('startTime','required')">
           Start time is mandatory
         </mat-error>
+        <mat-hint>Minimum time duration for events is 15 minutes</mat-hint>
       </mat-form-field>
     </div>
     <div class="flex flex-column gap-2 event-form w-full" [ngClass]="{'disableForm': eventStatus === 'live'}">
@@ -197,13 +198,17 @@
         <input matInput placeholder="Enter End Time" formControlName="endTime" [ngxTimepicker]="endTimepicker"
           [min]="minTimeToEnd" readonly>
         <ngx-material-timepicker-toggle [for]="endTimepicker" matSuffix></ngx-material-timepicker-toggle>
-        <ngx-material-timepicker #endTimepicker (change)="onEndTimeChange($event)"
-          [enableKeyboardInput]="true"></ngx-material-timepicker>
+        <ngx-material-timepicker #endTimepicker (change)="onEndTimeChange($event)"></ngx-material-timepicker>
         <mat-error *ngIf="showValidationMsg('endTime','required')">
           End time is mandatory
         </mat-error>
       </mat-form-field>
     </div>
+  </div>
+  <div class="flex flex-row gap-2">
+    <div class="text-sm">Note: This event will be visible to the learners 5 minutes after the SPV Publisher has
+      published
+      it.</div>
   </div>
 
 </form>
