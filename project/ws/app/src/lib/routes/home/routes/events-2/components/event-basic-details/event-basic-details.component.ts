@@ -182,7 +182,9 @@ export class EventBasicDetailsComponent implements OnInit, OnChanges {
     const formattedTime = `${hours}:${minutes < 10 ? '0' + minutes : minutes} ${period}`
     this.minTimeToEnd = formattedTime
     if (this.eventDetails.controls.startTime && resetEndTime) {
-      this.eventDetails.controls.endTime.patchValue('')
+      setTimeout(() => {
+        this.eventDetails.controls.endTime.patchValue(this.minTimeToEnd)
+      }, 10)
     }
   }
 

@@ -182,8 +182,8 @@
         <input matInput placeholder="Enter Start Time" formControlName="startTime" [ngxTimepicker]="startTimepicker"
           [max]="maxTimeToStart" [min]="minTimeToStart" readonly>
         <ngx-material-timepicker-toggle [for]="startTimepicker" matSuffix></ngx-material-timepicker-toggle>
-        <ngx-material-timepicker #startTimepicker (change)="onStartTimeChange($event)" class="eventTimpicker"
-          [enableKeyboardInput]="true"></ngx-material-timepicker>
+        <ngx-material-timepicker #startTimepicker (change)="onStartTimeChange($event)"
+          class="eventTimpicker"></ngx-material-timepicker>
         <mat-error *ngIf="showValidationMsg('startTime','required')">
           Start time is mandatory
         </mat-error>
@@ -198,8 +198,7 @@
         <input matInput placeholder="Enter End Time" formControlName="endTime" [ngxTimepicker]="endTimepicker"
           [min]="minTimeToEnd" readonly>
         <ngx-material-timepicker-toggle [for]="endTimepicker" matSuffix></ngx-material-timepicker-toggle>
-        <ngx-material-timepicker #endTimepicker (change)="onEndTimeChange($event)"
-          [enableKeyboardInput]="true"></ngx-material-timepicker>
+        <ngx-material-timepicker #endTimepicker (change)="onEndTimeChange($event)"></ngx-material-timepicker>
         <mat-error *ngIf="showValidationMsg('endTime','required')">
           End time is mandatory
         </mat-error>
@@ -207,8 +206,9 @@
     </div>
   </div>
   <div class="flex flex-row gap-2">
-    Note: This event will be visible to the learners 30 minutes after the SPV Publisher has published
-    it.
+    <div class="text-sm">Note: This event will be visible to the learners 5 minutes after the SPV Publisher has
+      published
+      it.</div>
   </div>
 
 </form>
