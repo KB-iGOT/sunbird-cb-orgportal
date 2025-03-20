@@ -17,4 +17,5 @@ export const environment = {
   ODCSMasterFramework: (window as { [key: string]: any })['env']['ODCSMasterFramework'] || '',
   compentencyVersionKey: (window as { [key: string]: any })['env']['compentencyVersionKey'] || '',
   doptOrg: (window as { [key: string]: any })['env']['doptOrg'] || '',
+  dicussV2Bucket: (window as { [key: string]: any })['env']['dicussV2Bucket'] || '',
 }

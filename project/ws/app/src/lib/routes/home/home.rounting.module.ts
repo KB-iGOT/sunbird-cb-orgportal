@@ -332,6 +332,9 @@ const routes: Routes = [
       {
         path: 'community',
         loadChildren: () => import('./routes/community/community.module').then(m => m.CommunityModule),
+        resolve: {
+          configService: ConfigResolveService,
+        },
       },
       {
         path: 'reports-section',

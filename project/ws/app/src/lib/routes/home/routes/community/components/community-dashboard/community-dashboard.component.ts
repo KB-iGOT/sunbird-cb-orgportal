@@ -5,7 +5,8 @@ import { MatSort } from '@angular/material/sort'
 import { CommunityService } from '../../services/community.service'
 import { FormControl } from '@angular/forms'
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators'
-import { Router } from '@angular/router'
+import { ActivatedRoute, Router } from '@angular/router'
+import * as _ from 'lodash'
 interface Community {
   name: string
   startDate: Date
@@ -13,6 +14,9 @@ interface Community {
   publishedOn: Date
   members: number
   mods: number
+  createdByUserId?: string
+  communityId?: string
+
 }
 @Component({
   selector: 'ws-app-community-dashboard',
@@ -27,6 +31,7 @@ interface Community {
 export class CommunityDashboardComponent implements OnInit {
   displayedColumns: string[] = ['name', 'startDate', 'createdBy', 'publishedOn', 'members', 'mods', 'actions'];
   dataSource: MatTableDataSource<Community>
+  userProfile: any
   searchControl = new FormControl('');
   pageNumber = 0;
   pageSize = 10;
@@ -55,7 +60,7 @@ export class CommunityDashboardComponent implements OnInit {
   @ViewChild(MatPaginator) paginator!: MatPaginator
   @ViewChild(MatSort) sort!: MatSort
 
-  constructor(private router: Router, private communitySvc: CommunityService) {
+  constructor(private router: Router, private communitySvc: CommunityService, private activatedRoute: ActivatedRoute) {
     // Initialize with sample data
     const sampleData: Community[] = [
       {
@@ -65,60 +70,19 @@ export class CommunityDashboardComponent implements OnInit {
         publishedOn: new Date(),
         members: 100,
         mods: 5
-      },
-      {
-        name: 'Community 1',
-        startDate: new Date(),
-        createdBy: 'John Doe',
-        publishedOn: new Date(),
-        members: 100,
-        mods: 5
-      },
-      {
-        name: 'Community 1',
-        startDate: new Date(),
-        createdBy: 'John Doe',
-        publishedOn: new Date(),
-        members: 100,
-        mods: 5
-      },
-      {
-        name: 'Community 1',
-        startDate: new Date(),
-        createdBy: 'John Doe',
-        publishedOn: new Date(),
-        members: 100,
-        mods: 5
-      },
-      {
-        name: 'Community 1',
-        startDate: new Date(),
-        createdBy: 'John Doe',
-        publishedOn: new Date(),
-        members: 100,
-        mods: 5
-      },
-      {
-        name: 'Community 1',
-        startDate: new Date(),
-        createdBy: 'John Doe',
-        publishedOn: new Date(),
-        members: 100,
-        mods: 5
-      },
-      {
-        name: 'Community 1',
-        startDate: new Date(),
-        createdBy: 'John Doe',
-        publishedOn: new Date(),
-        members: 100,
-        mods: 5
       }
-      // Add more sample data as needed
+
     ]
 
     this.dataSource = new MatTableDataSource(sampleData)
     this.fetchCommunityData('')
+    this.getRouteSubscription()
+  }
+
+  getRouteSubscription() {
+    if (_.get(this.activatedRoute, 'snapshot.data.configService.unMappedUser')) {
+      this.userProfile = _.get(this.activatedRoute, 'snapshot.data.configService.unMappedUser')
+    }
   }
 
   ngOnInit() {
@@ -141,14 +105,25 @@ export class CommunityDashboardComponent implements OnInit {
     this.dataSource.filter = filterValue.trim().toLowerCase()
   }
 
-  createNewCommunity() {
-    // Implement community creation logic
-    console.log('Create new community clicked')
-  }
+
 
   onActionClick(action: string, community: Community) {
     // Implement action handling
-    console.log(`${action} clicked for ${community.name}`)
+    if (action === 'edit') {
+      this.router.navigate(['/app/home/community/edit', community.communityId])
+    }
+  }
+
+  canEdit(_community: Community) {
+    return true
+  }
+
+  canArchive(community: Community) {
+    return community.createdByUserId === this.userProfile.id
+  }
+
+  canDelete(community: Community) {
+    return community.createdByUserId === this.userProfile.id
   }
 
 

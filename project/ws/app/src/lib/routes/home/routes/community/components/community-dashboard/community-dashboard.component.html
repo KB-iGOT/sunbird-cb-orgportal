@@ -2,7 +2,7 @@
   <div class="header">
     <h1>Communities</h1>
 
-    <button mat-button class="createBtn" (click)="onCreateCommunity()">Create New Event</button>
+    <button mat-button class="createBtn" (click)="onCreateCommunity()">Create New Community</button>
   </div>
 
   <!-- <mat-form-field class="search-field">
@@ -13,7 +13,7 @@
   <mat-tab-group [(selectedIndex)]="selectedTabIndex" (selectedTabChange)="onTabChange($event)">
     <mat-tab *ngFor="let tab of tabs">
       <ng-template mat-tab-label>
-        {{tab.label}}
+        {{tab?.label}}
       </ng-template>
       <ng-container *ngTemplateOutlet="tabContent"></ng-container>
     </mat-tab>
@@ -87,19 +87,20 @@
       <ng-container matColumnDef="actions">
         <th class="table-header-spacing" mat-header-cell *matHeaderCellDef> Actions </th>
         <td class="table-cell-spacing" mat-cell *matCellDef="let row">
+          {{canEdit(row)}}
           <button mat-icon-button [matMenuTriggerFor]="menu">
             <mat-icon>more_vert</mat-icon>
           </button>
           <mat-menu #menu="matMenu">
-            <button mat-menu-item (click)="onActionClick('edit', row)">
+            <button mat-menu-item *ngIf="canEdit(row)" (click)="onActionClick('edit', row)">
               <mat-icon>edit</mat-icon>
               <span>Edit</span>
             </button>
-            <button mat-menu-item (click)="onActionClick('delete', row)">
+            <button mat-menu-item *ngIf="canDelete(row)" (click)="onActionClick('delete', row)">
               <mat-icon>delete</mat-icon>
               <span>Delete</span>
             </button>
-            <button mat-menu-item (click)="onActionClick('archive', row)">
+            <button mat-menu-item *ngIf="canArchive(row)" (click)="onActionClick('archive', row)">
               <mat-icon>archive</mat-icon>
               <span>Archive</span>
             </button>

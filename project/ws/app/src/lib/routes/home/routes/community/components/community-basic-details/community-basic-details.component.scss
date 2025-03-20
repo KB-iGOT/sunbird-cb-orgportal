@@ -9,7 +9,15 @@
     /* stylelint-enable */
   }
 }
-
+.delete-image {
+  position: absolute;
+    background: black;
+    color: white;
+    border-radius: 50%;
+    padding: 4px;
+    right: -12px;
+    top: -12px;
+}
 
 :host ::ng-deep .community-form {
   .mat-form-field-appearance-outline .mat-form-field-infix {
@@ -24,4 +32,51 @@
   .mat-form-field-appearance-outline .mat-form-field-outline-start {
     display: none;
   }
+}
+
+.upload {
+  background: linear-gradient(0deg, #EDF7FF 0%, #EDF7FF 100%), #FFF;
+  height: 125px;
+  overflow: hidden;
+  position: relative;
+  border-radius: 12px;
+
+
+  span:first-child {
+    color: #1B4CA1;
+  }
+
+  span:last-child {
+    line-height: 14.4px;
+    color: #666666;
+  }
+}
+.dashed-border {
+  border: 2px dashed #1B4CA1;
+
+}
+.preview-image {
+  max-width: 100%;
+  height: auto;
+  border-radius: 4px;
+}
+
+.community-image-container {
+  height: 129px;
+  background-color: #f5deb38c;
+  border: 2px dashed #1B4CA1;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  .community-img-block {
+    height: 96px;
+    width: 172px;
+    .community-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+  }
+
 }
