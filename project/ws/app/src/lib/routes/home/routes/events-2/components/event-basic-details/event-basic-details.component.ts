@@ -351,7 +351,7 @@ export class EventBasicDetailsComponent implements OnInit, OnChanges {
     }
     videoPath = files[0]
 
-    const MAX_VIDEO_SIZE = 400 * 1024 * 1024
+    const MAX_VIDEO_SIZE = 1024 * 1024 * 1024
 
     if (videoPath.size > MAX_VIDEO_SIZE) {
       this.openSnackBar('Selected video size exceeds the 400MB limit')
