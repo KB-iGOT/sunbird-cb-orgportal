@@ -60,7 +60,7 @@ export class CreateEventComponent implements OnInit, AfterViewInit {
     this.eventDetailsForm = this.formBuilder.group({
       eventName: new FormControl('', [Validators.required, Validators.minLength(10),
       Validators.maxLength(70), Validators.pattern(noSpecialChar)]),
-      description: new FormControl('', [Validators.required, Validators.minLength(250), Validators.maxLength(500)]),
+      description: new FormControl('', [Validators.required, Validators.minLength(250), Validators.maxLength(2000)]),
       eventCategory: new FormControl('', [Validators.required]),
       streamType: new FormControl(''),
       startDate: new FormControl('', [Validators.required]),

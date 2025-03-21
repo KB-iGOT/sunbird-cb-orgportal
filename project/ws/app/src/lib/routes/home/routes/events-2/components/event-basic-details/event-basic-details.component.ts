@@ -27,7 +27,7 @@ export class EventBasicDetailsComponent implements OnInit, OnChanges {
   evntCategorysList = ['Webinar', 'Karmayogi Talks', 'Karmayogi Saptah']
   todayDate = new Date()
 
-  maxTimeToStart = '11:45 pm'
+  maxTimeToStart = '11:44 pm'
   minTimeToStart: string | null = '12:00 am'
   minTimeToEnd = '12:15 am'
   timeGap = 15
@@ -182,7 +182,9 @@ export class EventBasicDetailsComponent implements OnInit, OnChanges {
     const formattedTime = `${hours}:${minutes < 10 ? '0' + minutes : minutes} ${period}`
     this.minTimeToEnd = formattedTime
     if (this.eventDetails.controls.startTime && resetEndTime) {
-      this.eventDetails.controls.endTime.patchValue('')
+      setTimeout(() => {
+        this.eventDetails.controls.endTime.patchValue(this.minTimeToEnd)
+      }, 10)
     }
   }
 
@@ -237,7 +239,7 @@ export class EventBasicDetailsComponent implements OnInit, OnChanges {
     const reader = new FileReader()
     imagePath = files[0]
     if (imagePath && imagePath.size > events.IMAGE_MAX_SIZE) {
-      this.openSnackBar('Selected image size is more')
+      this.openSnackBar('Selected image size is more than 500KB.')
       imagePath = ''
       return
     }
