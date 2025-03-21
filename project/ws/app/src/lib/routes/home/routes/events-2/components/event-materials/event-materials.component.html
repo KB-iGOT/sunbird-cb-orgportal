@@ -5,14 +5,14 @@
 
   <div class="add-file-card px-3 gap-4 flex items-center" onclick="document.getElementById('upload-file').click();"
     [ngClass]="{'disableAddFile': !currentMaterialSaved || openMode === 'view'}">
-    <input #file type="file" name="upload-file" id="upload-file" class="hidden" accept=".pdf, .doc, .ppt"
+    <input #file type="file" name="upload-file" id="upload-file" class="hidden" accept=".pdf, .doc, .ppt, .pptx, .docx"
       (change)="onFileSelected(file.files);">
     <div class="upload-icon-card flex items-center justify-center">
       <img class="uploadIcon" src="/assets/icons/file_upload.svg" alt="upload icon">
     </div>
     <div class="flex items-center flex-column gap-1">
       <span class="add-file-text">Add File</span>
-      <span class="add-file-type">Add pdfs, doc, ppt</span>
+      <span class="add-file-type">Add pdfs, doc, ppt, pptx, docx</span>
     </div>
     <mat-icon class="right-arrow">chevron_right</mat-icon>
   </div>
