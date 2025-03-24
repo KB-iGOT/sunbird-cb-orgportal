@@ -93,7 +93,7 @@
       </ng-container>
     </div>
   </ng-container>
-  <!-- <ng-template #uploadVideo>
+  <ng-template #uploadVideo>
     <div class="upload flex justify-center items-center cursor-pointer dashed-border"
       [ngClass]="{'disable': (openMode === 'view' || disableUpload) }" cdkDropList [cdkDropListData]="videoData"
       (cdkDropListDropped)="onVideoSelected($event)" (dragover)="preventDefaultCDK($event)"
@@ -105,13 +105,13 @@
         <img src="/assets/icons/upload-upward-arrow.svg" alt="icon">
         <span class="text-sm font-bold text-blue">Select video to upload <strong class="text-red-700">*</strong></span>
         <span class="text-xs font-normal">or drag and drop here</span>
-        <span class="text-xs font-normal">Max Size - 400MB</span>
+        <span class="text-xs font-normal">Max Size - 1GB</span>
       </div>
     </div>
-  </ng-template> -->
+  </ng-template>
   <div class="flex flex-column gap-2 event-form w-full " [ngClass]="{'disableForm': disableUrl}">
     <div class="form-url-lable required">
-      Upload from URL
+      or Upload from URL
     </div>
     <mat-form-field appearance="outline" class="disable-round">
       <input matInput placeholder="Enter url" formControlName="registrationLink">
@@ -182,15 +182,14 @@
         <input matInput placeholder="Enter Start Time" formControlName="startTime" [ngxTimepicker]="startTimepicker"
           [max]="maxTimeToStart" [min]="minTimeToStart" readonly>
         <ngx-material-timepicker-toggle [for]="startTimepicker" matSuffix></ngx-material-timepicker-toggle>
-        <ngx-material-timepicker #startTimepicker (change)="onStartTimeChange($event)"
-          class="eventTimpicker"></ngx-material-timepicker>
+        <ngx-material-timepicker #startTimepicker class="eventTimpicker"></ngx-material-timepicker>
         <mat-error *ngIf="showValidationMsg('startTime','required')">
           Start time is mandatory
         </mat-error>
         <mat-hint>Minimum time duration for events is 15 minutes</mat-hint>
       </mat-form-field>
     </div>
-    <div class="flex flex-column gap-2 event-form w-full" [ngClass]="{'disableForm': eventStatus === 'live'}">
+    <div class="flex flex-column gap-2 event-form w-full" [ngClass]="{'disableForm': uploadedVideoDuration > 0}">
       <div class="form-lable required">
         End Time
       </div>

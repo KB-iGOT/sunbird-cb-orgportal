@@ -143,8 +143,8 @@ export class MaterialDetailsComponent implements OnChanges {
       return
     }
     const mimeType = files[0].type
-    if (mimeType.match(/application\/(pdf|vnd.ms-powerpoint|msword)/) == null) {
-      this.openSnackBar('Invalid file type. Please upload a PDF, PPT, or DOC file.')
+    if (mimeType.match(/application\/(pdf|vnd.ms-powerpoint|msword|vnd.openxmlformats-officedocument.presentationml.presentation|vnd.openxmlformats-officedocument.wordprocessingml.document)/) === null) {
+      this.openSnackBar('Invalid file type. Please upload a PDF, PPT, .pptx, .docx, or DOC file.')
       return
     }
     const reader = new FileReader()

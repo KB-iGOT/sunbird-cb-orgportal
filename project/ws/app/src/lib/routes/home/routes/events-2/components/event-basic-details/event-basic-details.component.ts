@@ -7,7 +7,6 @@ import { EventsService } from '../../services/events.service'
 import { map, mergeMap } from 'rxjs/operators'
 import { environment } from '../../../../../../../../../../../src/environments/environment'
 import { HttpErrorResponse } from '@angular/common/http'
-import moment from 'moment'
 import { LoaderService } from '../../../../../../../../../../../src/app/services/loader.service'
 import { DatePipe } from '@angular/common'
 
@@ -33,6 +32,7 @@ export class EventBasicDetailsComponent implements OnInit, OnChanges {
   timeGap = 15
   disableUpload = false
   disableUrl = false
+  uploadedVideoDuration: number = 0
 
   //#endregion
 
@@ -167,7 +167,7 @@ export class EventBasicDetailsComponent implements OnInit, OnChanges {
   generatMinTimeToEnd(time: string, resetEndTime = true) {
     let [timePart, period] = time.split(' ')
     let [hours, minutes] = timePart.split(':').map(Number)
-    minutes += this.timeGap
+    minutes = minutes + (this.uploadedVideoDuration > this.timeGap ? this.uploadedVideoDuration : this.timeGap)
     if (minutes >= 60) {
       minutes -= 60
       hours += 1
@@ -217,6 +217,13 @@ export class EventBasicDetailsComponent implements OnInit, OnChanges {
       this.eventDetails.controls.appIcon.patchValue('')
       this.eventDetails.controls.appIcon.updateValueAndValidity()
     } else if (item === 'uploadedVideo' && this.eventDetails.controls.recoredEventUrl) {
+      this.uploadedVideoDuration = 0
+      if (this.eventDetails.controls && this.eventDetails.controls.startTime && this.eventDetails.controls.endTime) {
+        this.eventDetails.controls.startTime.patchValue('')
+        this.eventDetails.controls.startTime.updateValueAndValidity()
+        this.eventDetails.controls.endTime.patchValue('')
+        this.eventDetails.controls.endTime.updateValueAndValidity()
+      }
       this.eventDetails.controls.recoredEventUrl.patchValue('')
       this.eventDetails.controls.recoredEventUrl.updateValueAndValidity()
       this.eventDetails.controls.registrationLink.setValidators([Validators.required, Validators.pattern(URL_PATRON)])
@@ -351,16 +358,60 @@ export class EventBasicDetailsComponent implements OnInit, OnChanges {
     }
     videoPath = files[0]
 
-    const MAX_VIDEO_SIZE = 400 * 1024 * 1024
+    const MAX_VIDEO_SIZE = 1024 * 1024 * 1024
 
     if (videoPath.size > MAX_VIDEO_SIZE) {
       this.openSnackBar('Selected video size exceeds the 400MB limit')
       videoPath = ''
       return
     }
+    this.getVideoDuration(videoPath)
     const mediaType = 'video'
     this.saveImage(videoPath, mediaType)
   }
+
+  private getVideoDuration(file: File): void {
+    const videoURL = URL.createObjectURL(file as Blob)
+    const video = document.createElement('video')
+    video.preload = 'metadata'
+
+    video.onloadedmetadata = () => {
+      const videoDuration = video.duration
+      const minutes = videoDuration / 60
+      this.uploadedVideoDuration = Math.round(minutes)
+      this.getMaxTimeToStart()
+      if (this.eventDetails.controls && this.eventDetails.controls.startTime && this.eventDetails.controls.endTime) {
+        this.eventDetails.controls.startTime.patchValue('')
+        this.eventDetails.controls.startTime.updateValueAndValidity()
+        this.eventDetails.controls.endTime.patchValue('')
+        this.eventDetails.controls.endTime.updateValueAndValidity()
+      }
+
+      URL.revokeObjectURL(videoURL)
+    }
+    video.src = videoURL
+  }
+
+  getMaxTimeToStart() {
+    const minutesToSubtract = this.uploadedVideoDuration > this.timeGap ? this.uploadedVideoDuration : this.timeGap
+    const startHour = 23
+    const startMinute = 59
+    const startTotalMinutes = startHour * 60 + startMinute
+    const endTotalMinutes = startTotalMinutes - minutesToSubtract
+
+    const endHour24 = Math.floor(endTotalMinutes / 60)
+    const endMinute = endTotalMinutes % 60
+
+    const endHour12 = endHour24 % 12
+    const period = endHour24 >= 12 ? 'PM' : 'AM'
+
+    // 12:00 PM is represented as 12, not 0
+    const formattedEndHour = endHour12 === 0 ? 12 : endHour12
+    const formattedTime = `${formattedEndHour}:${endMinute.toString().padStart(2, '0')} ${period}`
+
+    this.maxTimeToStart = formattedTime
+  }
+
 
   showValidationMsg(controlName: string, validationType: string): Boolean {
     let showMsg = false
@@ -371,25 +422,6 @@ export class EventBasicDetailsComponent implements OnInit, OnChanges {
     return showMsg
   }
 
-  onStartTimeChange(event: any) {
-    const startTime = event ? event.formatted : ''
-    if (startTime) {
-      const minEndTime = this.calculateMinEndTime(startTime)
-      this.minTimeToEnd = minEndTime
-      if (this.eventDetails) {
-        const endTimeControl = this.eventDetails.get('endTime')
-        if (endTimeControl) {
-          endTimeControl.setValue('')
-        }
-      }
-    }
-  }
-
-  calculateMinEndTime(startTime: string): string {
-    const startMoment = moment(startTime, 'HH:mm')
-    const minEndTimeMoment = startMoment.add(30, 'minutes')
-    return minEndTimeMoment.format('HH:mm')
-  }
 
   private openSnackBar(message: string) {
     this.matSnackBar.open(message)
