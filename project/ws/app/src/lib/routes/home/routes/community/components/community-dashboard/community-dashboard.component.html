@@ -41,7 +41,7 @@
               <img src="{{row?.imageUrl}}" alt="Parliament Building" (error)="changeToDefaultImg($event)">
             </div>
             <div class="community-name-block pt-2">
-              <span class="community-name line-clamp-2">{{row?.communityName}}</span>
+              <span class="community-name line-clamp-2">{{row?.communityName || '-'}}</span>
             </div>
           </div>
         </td>
@@ -59,7 +59,8 @@
       <ng-container matColumnDef="createdBy">
         <th class="table-header-spacing" mat-header-cell *matHeaderCellDef mat-sort-header [style.width.px]="200">
           Created By </th>
-        <td class="table-cell-spacing" mat-cell *matCellDef="let row" [style.width.px]="200"> {{row.createdByUserId}}
+        <td class="table-cell-spacing" mat-cell *matCellDef="let row" [style.width.px]="200"> {{row?.createdByUserId ||
+          '-'}}
         </td>
       </ng-container>
 
@@ -67,27 +68,26 @@
       <ng-container matColumnDef="publishedOn">
         <th class="table-header-spacing" mat-header-cell *matHeaderCellDef mat-sort-header [style.width.px]="141">
           Published On </th>
-        <td class="table-cell-spacing" mat-cell *matCellDef="let row" [style.width.px]="141"> {{row.updatedOn | date}}
+        <td class="table-cell-spacing" mat-cell *matCellDef="let row" [style.width.px]="141"> {{row?.updatedOn | date}}
         </td>
       </ng-container>
 
       <!-- Members Column -->
       <ng-container matColumnDef="members">
         <th class="table-header-spacing" mat-header-cell *matHeaderCellDef mat-sort-header> Members </th>
-        <td class="table-cell-spacing" mat-cell *matCellDef="let row"> {{row.countOfPeopleJoined}} </td>
+        <td class="table-cell-spacing" mat-cell *matCellDef="let row"> {{row?.countOfPeopleJoined || 0}} </td>
       </ng-container>
 
       <!-- Mods Column -->
       <ng-container matColumnDef="mods">
         <th class="table-header-spacing" mat-header-cell *matHeaderCellDef mat-sort-header> Mods </th>
-        <td class="table-cell-spacing" mat-cell *matCellDef="let row"> {{row.orgName}} </td>
+        <td class="table-cell-spacing" mat-cell *matCellDef="let row"> {{row?.orgName || '-'}} </td>
       </ng-container>
 
       <!-- Actions Column -->
       <ng-container matColumnDef="actions">
         <th class="table-header-spacing" mat-header-cell *matHeaderCellDef> Actions </th>
         <td class="table-cell-spacing" mat-cell *matCellDef="let row">
-          {{canEdit(row)}}
           <button mat-icon-button [matMenuTriggerFor]="menu">
             <mat-icon>more_vert</mat-icon>
           </button>
@@ -96,14 +96,14 @@
               <mat-icon>edit</mat-icon>
               <span>Edit</span>
             </button>
-            <button mat-menu-item *ngIf="canDelete(row)" (click)="onActionClick('delete', row)">
+            <!-- <button mat-menu-item *ngIf="canDelete(row)" (click)="onActionClick('delete', row)">
               <mat-icon>delete</mat-icon>
               <span>Delete</span>
             </button>
             <button mat-menu-item *ngIf="canArchive(row)" (click)="onActionClick('archive', row)">
               <mat-icon>archive</mat-icon>
               <span>Archive</span>
-            </button>
+            </button> -->
           </mat-menu>
         </td>
       </ng-container>

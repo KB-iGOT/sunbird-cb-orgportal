@@ -122,7 +122,8 @@ export class AddModeratorComponent {
     )
   }
   removeUser(user: any) {
-    this.selectedUser = this.selectedUser.filter((selectedUser: any) => selectedUser.moderatorId !== user.identifier)
+    let id = user.identifier || user.moderatorId
+    this.selectedUser = this.selectedUser.filter((selectedUser: any) => selectedUser.moderatorId !== id)
 
     this.patchValueToForm()
   }

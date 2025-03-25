@@ -25,3 +25,17 @@
     display: none;
   }
 }
+
+::ng-deep .moderator-chip-list {
+  .moderator-name {
+    border: 1px solid #00000014 !important;
+    border-radius: 27px !important;
+    background-color: #fff !important;
+    span {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      color: #0000008A !important;
+    }
+  }
+}

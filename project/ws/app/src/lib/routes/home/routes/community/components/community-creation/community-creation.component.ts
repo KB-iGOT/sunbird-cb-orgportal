@@ -19,6 +19,8 @@ import { environment } from '../../../../../../../../../../../src/environments/e
   templateUrl: './community-creation.component.html',
   styleUrls: ['./community-creation.component.scss']
 })
+
+
 export class CommunityCreationComponent {
   openMode = 'edit'
   pathUrl = ''
@@ -123,7 +125,7 @@ export class CommunityCreationComponent {
       topicName: selectedTopic || '',
       posterImageUrl: data.posterImageUrl || '',
       description: data.description || '',
-      communityGuidelines: data.communityGuidelines || '',
+      communityGuideLines: data.communityGuideLines || '',
       moderators: data.moderators || [],
       imageUrl: data.imageUrl || ''
     })
@@ -168,8 +170,8 @@ export class CommunityCreationComponent {
       Validators.maxLength(70), Validators.pattern(noSpecialChar)]),
       topicName: new FormControl('', [Validators.required]),
       posterImageUrl: new FormControl('', [Validators.required]),
-      description: new FormControl('', [Validators.required, Validators.minLength(50), Validators.maxLength(500)]),
-      communityGuidelines: new FormControl('', [Validators.required, Validators.minLength(50), Validators.maxLength(500)]),
+      description: new FormControl('', [Validators.required, Validators.minLength(100), Validators.maxLength(500)]),
+      communityGuideLines: new FormControl('', [Validators.required, Validators.minLength(100), Validators.maxLength(500)]),
       moderators: new FormControl([], [Validators.required]),
       imageUrl: new FormControl('', [Validators.required]),
     })
@@ -208,18 +210,24 @@ export class CommunityCreationComponent {
 
 
   get canPublish(): boolean {
-    if (this.selectedStepperLable === 'Add Competency' || this.selectedStepperLable === 'Preview') {
-      if (this.communityDetailsForm.invalid) {
-        this.openSnackBar('Please fill mandatory fields in Basic Details')
-        return false
+    if (this.communityDetailsForm.invalid) {
+      this.openSnackBar('Please fill all mandatory fields')
+      return false
+    } else {
+      if (this.selectedStepperLable === 'Add Competency' || this.selectedStepperLable === 'Preview') {
+        if (this.communityDetailsForm.invalid) {
+          this.openSnackBar('Please fill mandatory fields in Basic Details')
+          return false
+        }
+        if (!(this.competencies && this.competencies.length)) {
+          this.openSnackBar('Please add atleast one competency in Add Competency')
+          return false
+        }
+        return true
       }
-      if (!(this.competencies && this.competencies.length)) {
-        this.openSnackBar('Please add atleast one competency in Add Competency')
-        return false
-      }
-      return true
+      return false
+
     }
-    return false
   }
   get canMoveToNext() {
     let currentFormIsValid = false
@@ -243,13 +251,13 @@ export class CommunityCreationComponent {
         this.openSnackBar('Please fill mandatory fields')
       }
     } else if (this.selectedStepperLable === 'Add Competency') {
-      if (this.communityDetailsForm
-        && this.communityDetailsForm.value
-        && this.communityDetailsForm.value.moderators
-        && this.communityDetailsForm.value.moderators.length) {
-        currentFormIsValid = true
+
+      if (!(this.competencies && this.competencies.length)) {
+        this.openSnackBar('Please add atleast one competency in Add Competency')
+        currentFormIsValid = false
+
       } else {
-        this.openSnackBar('Please add atleast one speaker')
+        currentFormIsValid = true
       }
     } else if (this.selectedStepperLable === 'Add Moderator') {
       if (this.communityDetailsForm
@@ -280,19 +288,14 @@ export class CommunityCreationComponent {
           if (res) {
             const communityId = res.result.communityId
             this.uploadCommunityImage(communityId)
-            // const successMessage = status === 'Draft' ? 'Event details saved successfully' : 'Event details sent for approval successfully'
-            // this.openSnackBar(successMessage)
-            // setTimeout(() => {
-            //   this.navigateBack()
-            //   this.loaderService.changeLoaderState(false)
-            // }, 1000)
+            // Success message will be shown in uploadCommunityImage's success callback
           } else {
             this.loaderService.changeLoaderState(false)
           }
         },
         error: (error: HttpErrorResponse) => {
           this.loaderService.changeLoaderState(false)
-          const errorMessage = _.get(error, 'error.message', 'Something went wrong while updating event, please try again')
+          const errorMessage = _.get(error, 'error.message', 'Something went wrong while creating community, please try again')
           this.openSnackBar(errorMessage)
         }
       })
@@ -398,7 +401,7 @@ export class CommunityCreationComponent {
   //   })
   // }
 
-  getFormBodyOfEvent(_status: string) {
+  getFormBodyOfEvent(status: string) {
     let rootOrgName = this.userProfile.rootOrg.orgName
     let rootOrgId = this.userProfile.rootOrgId
     const communityDetails: any = JSON.parse(JSON.stringify(this.communityDetailsObject))
@@ -410,20 +413,56 @@ export class CommunityCreationComponent {
     communityDetails['communityName'] = communityFormDetails.communityName
     communityDetails['description'] = communityFormDetails.description
     communityDetails['topicName'] = topicDetails.categoryName || ''
-
     communityDetails['topicId'] = topicDetails.categoryId || ''
     communityDetails['communityAccessLevel'] = 'public'
     communityDetails["countOfPeopleJoined"] = 0
     communityDetails["countOfPeopleLiked"] = 0
-    communityDetails['communityGuideLines'] = communityFormDetails.communityGuidelines
+    communityDetails['communityGuideLines'] = communityFormDetails.communityGuideLines
     communityDetails['competencies_v6'] = this.competencies
     communityDetails['orgId'] = rootOrgId
     communityDetails['tags'] = []
     communityDetails['orgName'] = rootOrgName
     communityDetails['createdUserId'] = this.userProfile.id
+    if (this.competencies && this.competencies.length) {
+      communityDetails['competencyArea'] = []
+      communityDetails['competencyTheme'] = []
+      communityDetails['competencySubTheme'] = []
+      this.competencies.forEach((competency: any) => {
+        if (!communityDetails['competencyArea'].includes(competency.competencyAreaName)) {
+          communityDetails['competencyArea'].push(competency.competencyAreaName)
+        }
+        if (!communityDetails['competencyTheme'].includes(competency.competencyThemeName)) {
+          communityDetails['competencyTheme'].push(competency.competencyThemeName)
+        }
+        if (!communityDetails['competencySubTheme'].includes(competency.competencySubThemeName)) {
+          communityDetails['competencySubTheme'].push(competency.competencySubThemeName)
+        }
+      })
+    }
+    debugger
+    if (status === 'Published') {
+      const propertiesToDelete = [
+        'createdOn',
+        'createdByUserId',
+        'createdUserId',
+        'countOfModerators',
+        'id',
+        'searchTags',
+        'updatedOn',
+        'status',
+        'communityGuidelines' // Note: check if this should be 'communityGuideLines' instead
+      ]
+
+      // Remove properties in a single loop
+      propertiesToDelete.forEach(prop => {
+        if (communityDetails[prop]) {
+          delete communityDetails[prop]
+        }
+      })
+    }
+
     return communityDetails
   }
-
   private openSnackBar(message: string) {
     this.matSnackBar.open(message)
   }
@@ -471,7 +510,7 @@ export class CommunityCreationComponent {
         next: (response: any) => {
           if (response && response.result && response.result.url) {
             let url = response.result.url.split('igot/discussionhub')[1]
-            let finalUrl = `${environment.karmYogiPath}/${environment.dicussV2Bucket}${url}`
+            let finalUrl = `${this.getEnvironmentBaseUrl()}${url}`
 
             // Check if imageUrl also needs to be uploaded
             if (this.communityDetailsForm.value.imageUrl instanceof File) {
@@ -522,8 +561,9 @@ export class CommunityCreationComponent {
     this.communitySvc.fileUpload(formData, communityId).subscribe({
       next: (response: any) => {
         if (response && response.result && response.result.url) {
+
           let url = response.result.url.split('igot/discussionhub')[1]
-          let finalUrl = `${environment.karmYogiPath}/${environment.dicussV2Bucket}${url}`
+          let finalUrl = `${this.getEnvironmentBaseUrl()}${url}`
 
           const updateData: any = {
             communityId: communityId,
@@ -578,9 +618,14 @@ export class CommunityCreationComponent {
   }
 
 
-  updateCommunity(_status = 'Draft') {
+
+
+  updateCommunity(status = 'Draft') {
     // Get only the changed fields
     const changedFields = this.getChangedFields()
+
+    // Add status to the update
+    // changedFields.status = status
 
     // Add the competencies if they've changed
     const originalCompetencies = this.originalFormValues.competencies_v6 || []
@@ -589,7 +634,7 @@ export class CommunityCreationComponent {
     }
 
     // Add communityId for the update API
-    changedFields.id = this.communityId
+    changedFields.communityId = this.communityId
 
     // Process topicName field if it has changed
     if (changedFields.topicName && Object.keys(changedFields.topicName).length) {
@@ -617,7 +662,7 @@ export class CommunityCreationComponent {
           next: (response: any) => {
             if (response && response.result && response.result.url) {
               let url = response.result.url.split('igot/discussionhub')[1]
-              let finalUrl = `${environment.karmYogiPath}/${environment.dicussV2Bucket}${url}`
+              let finalUrl = `${this.getEnvironmentBaseUrl()}${url}`
               updatedFields.posterImageUrl = finalUrl
 
               // Check if we also need to upload imageUrl
@@ -648,7 +693,9 @@ export class CommunityCreationComponent {
       this.communitySvc.updateCommunity(changedFields).subscribe({
         next: (res: any) => {
           if (res) {
-            this.openSnackBar('Community updated successfully')
+            const successMessage = status === 'Published' ?
+              'Community published successfully' : 'Community updated successfully'
+            this.openSnackBar(successMessage)
             setTimeout(() => {
               this.navigateBack()
               this.loaderService.changeLoaderState(false)
@@ -673,8 +720,9 @@ export class CommunityCreationComponent {
     this.communitySvc.fileUpload(formData, this.communityId).subscribe({
       next: (response: any) => {
         if (response && response.result && response.result.url) {
+
           let url = response.result.url.split('igot/discussionhub')[1]
-          let finalUrl = `${environment.karmYogiPath}/${environment.dicussV2Bucket}${url}`
+          let finalUrl = `${this.getEnvironmentBaseUrl()}${url}`
           updatedFields.imageUrl = finalUrl
           this.finalizeUpdate(updatedFields)
         } else {
@@ -711,9 +759,59 @@ export class CommunityCreationComponent {
     })
   }
 
+  publishCommunity() {
+    // Validate that all required data is present
+    if (!this.canPublish) {
+      return
+    }
+
+    // If on Add Competency step, call the direct publish method
+    if (this.selectedStepperLable === 'Add Competency') {
+      this.publishCommunityMethod()
+      return
+    }
+
+    // Use the existing functions but with Published status
+    if (this.openMode === 'edit') {
+      this.updateCommunity('Published')
+    } else {
+      this.saveAndExit('Published')
+    }
+  }
+
+  publishCommunityMethod() {
+    // Show loader
+    this.loaderService.changeLoaderState(true)
+
+    // Get complete form data with Published status
+    const request = this.getFormBodyOfEvent('Published')
+
+    this.communitySvc.publishCommunity(request).subscribe({
+      next: (response: any) => {
+        if (response && response.result) {
+          this.openSnackBar('Community published successfully')
+          setTimeout(() => {
+            this.navigateBack()
+            this.loaderService.changeLoaderState(false)
+          }, 1000)
+        } else {
+          this.loaderService.changeLoaderState(false)
+          this.openSnackBar('Failed to publish community')
+        }
+      },
+      error: (error: HttpErrorResponse) => {
+        this.loaderService.changeLoaderState(false)
+        const errorMessage = _.get(error, 'error.message', 'Something went wrong while publishing community, please try again')
+        this.openSnackBar(errorMessage)
+      }
+    })
+  }
+  getEnvironmentBaseUrl() {
+    if (environment.karmYogiPath && environment.dicussV2Bucket) {
+      return `${environment.karmYogiPath}/${environment.dicussV2Bucket}`
+    }
+    return ''
+  }
 }
-
-
-
 
 

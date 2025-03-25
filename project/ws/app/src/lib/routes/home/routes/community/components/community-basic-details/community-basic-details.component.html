@@ -98,7 +98,8 @@
       </mat-error>
       <mat-error *ngIf="!showValidationMsg('communityName','pattern')
         && showValidationMsg('communityName','minlength')">
-        Minimum characters left to create {{ 10 - communityDetailsForm?.controls['communityName']?.value?.length}}
+        Minimum characters left to create {{ minimumCharacters?.communityName -
+        communityDetailsForm?.controls['communityName']?.value?.length}}
       </mat-error>
     </mat-form-field>
   </div>
@@ -112,7 +113,8 @@
         Description is mandatory
       </mat-error>
       <mat-error *ngIf="showValidationMsg('description','minlength')">
-        Minimum characters left to create {{ 250 - communityDetailsForm?.controls['description']?.value?.length}}
+        Minimum characters left to create {{ minimumCharacters?.description -
+        communityDetailsForm?.controls['description']?.value?.length}}
       </mat-error>
     </mat-form-field>
     <span class="description-count flex justify-end">{{communityDetailsForm?.value?.description?.length}}/500</span>
@@ -121,19 +123,17 @@
     <div class="form-lable required">
       Community Guidelines
     </div>
-    <ckeditor [editor]="Editor" formControlName="communityGuidelines" [config]="getCongif()" (ready)="onReady($event)"
+    <ckeditor [editor]="Editor" formControlName="communityGuideLines" [config]="getCongif()" (ready)="onReady($event)"
       (change)="onEditorChange($event)" (keyup)="checkCharacterLimit($event)" (focus)="onFocus()">
     </ckeditor>
-    <mat-error *ngIf="showValidationMsg('communityGuidelines','required')">
+    <mat-error *ngIf="showValidationMsg('communityGuideLines','required')">
       Description is mandatory
     </mat-error>
-    <mat-error *ngIf="showValidationMsg('communityGuidelines','minlength')">
-      Minimum characters left to create {{ 250 -
-      communityDetailsForm?.controls['communityGuidelines']?.value?.length}}
+    <mat-error *ngIf="showValidationMsg('communityGuideLines','minlength')">
+      Minimum characters left to create {{ minimumCharacters?.communityGuideLines -
+      communityDetailsForm?.controls['communityGuideLines']?.value?.length}}
     </mat-error>
     <!-- <span
-      class="description-count flex justify-end">{{communityDetailsForm?.value?.communityGuidelines?.length}}/500</span> -->
+      class="description-count flex justify-end">{{communityDetailsForm?.value?.communityGuideLines?.length}}/500</span> -->
   </div>
 </form>
-
-{{communityDetailsForm?.value|json}}

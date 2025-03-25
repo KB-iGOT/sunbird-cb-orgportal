@@ -114,16 +114,16 @@ export class CommunityDashboardComponent implements OnInit {
     }
   }
 
-  canEdit(_community: Community) {
-    return true
+  canEdit(community: Community) {
+    return community.createdBy === this.userProfile.id
   }
 
   canArchive(community: Community) {
-    return community.createdByUserId === this.userProfile.id
+    return community.createdBy === this.userProfile.id
   }
 
   canDelete(community: Community) {
-    return community.createdByUserId === this.userProfile.id
+    return community.createdBy === this.userProfile.id
   }
 
 

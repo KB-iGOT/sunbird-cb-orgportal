@@ -54,6 +54,11 @@ export class CommunityBasicDetailsComponent {
   ckEditorConfig: EditorConfig = {};
   public Editor = ClassicEditor;
   previewImageUrl: string = ''
+  minimumCharacters: any = {
+    communityName: 10,
+    description: 100,
+    communityGuideLines: 100
+  }
 
   constructor(private matSnackBar: MatLegacySnackBar) {
     this.ckEditorConfig = {
