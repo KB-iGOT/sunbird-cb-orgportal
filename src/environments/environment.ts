@@ -21,6 +21,7 @@ export const environment: IEnvironment = {
   ODCSMasterFramework: (window as { [key: string]: any })['env']['ODCSMasterFramework'] || '',
   compentencyVersionKey: (window as { [key: string]: any })['env']['compentencyVersionKey'] || '',
   doptOrg: (window as { [key: string]: any })['env']['doptOrg'] || '',
+  dicussV2Bucket: (window as { [key: string]: any })['env']['dicussV2Bucket'] || '',
 }
 interface IEnvironment {
   name: null | string
@@ -41,6 +42,7 @@ interface IEnvironment {
   ODCSMasterFramework?: string
   compentencyVersionKey: string
   doptOrg?: string
+  dicussV2Bucket: string
 }
 
 /*

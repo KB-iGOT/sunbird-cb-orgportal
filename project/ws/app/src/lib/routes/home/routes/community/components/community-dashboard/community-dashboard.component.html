@@ -1,0 +1,120 @@
+<div class="dashboard-container">
+  <div class="header">
+    <h1>Communities</h1>
+
+    <button mat-button class="createBtn" (click)="onCreateCommunity()">Create New Community</button>
+  </div>
+
+  <!-- <mat-form-field class="search-field">
+    <mat-label>Search</mat-label>
+    <input matInput (keyup)="applyFilter($event)" placeholder="Search communities..." #input>
+    <mat-icon matSuffix>search</mat-icon>
+  </mat-form-field> -->
+  <mat-tab-group [(selectedIndex)]="selectedTabIndex" (selectedTabChange)="onTabChange($event)">
+    <mat-tab *ngFor="let tab of tabs">
+      <ng-template mat-tab-label>
+        {{tab?.label}}
+      </ng-template>
+      <ng-container *ngTemplateOutlet="tabContent"></ng-container>
+    </mat-tab>
+  </mat-tab-group>
+</div>
+
+
+<ng-template #tabContent>
+  <div class="search mt-4">
+    <div class=rsearch>
+      <mat-icon class="search-icon">search</mat-icon>
+      <input class="sinput" type="Standard" label="" [formControl]="searchControl"
+        placeholder="Type here to search... ">
+    </div>
+  </div>
+  <div class="table-wrapper">
+    <table mat-table class="table-container w-full mt-4" [dataSource]="dataSource" matSort>
+      <!-- Name Column -->
+      <ng-container matColumnDef="name">
+        <th class="table-header-spacing" mat-header-cell *matHeaderCellDef mat-sort-header [style.width.px]="300">
+          Community Name </th>
+        <td class="table-cell-spacing" mat-cell *matCellDef="let row" [style.width.px]="300">
+          <div class="community-name-block flex gap-2 flex-1 flex-start cursor-pointer">
+            <div class="community-name-container pt-2 pb-2">
+              <img src="{{row?.imageUrl}}" alt="Parliament Building" (error)="changeToDefaultImg($event)">
+            </div>
+            <div class="community-name-block pt-2">
+              <span class="community-name line-clamp-2">{{row?.communityName || '-'}}</span>
+            </div>
+          </div>
+        </td>
+      </ng-container>
+
+      <!-- Start Date Column -->
+      <ng-container matColumnDef="startDate">
+        <th class="table-header-spacing" mat-header-cell *matHeaderCellDef mat-sort-header [style.width.px]="141"> Start
+          Date </th>
+        <td class="table-cell-spacing" mat-cell *matCellDef="let row" [style.width.px]="141"> {{row.createdOn | date}}
+        </td>
+      </ng-container>
+
+      <!-- Created By Column -->
+      <ng-container matColumnDef="createdBy">
+        <th class="table-header-spacing" mat-header-cell *matHeaderCellDef mat-sort-header [style.width.px]="200">
+          Created By </th>
+        <td class="table-cell-spacing" mat-cell *matCellDef="let row" [style.width.px]="200"> {{row?.createdByUserId ||
+          '-'}}
+        </td>
+      </ng-container>
+
+      <!-- Published On Column -->
+      <ng-container matColumnDef="publishedOn">
+        <th class="table-header-spacing" mat-header-cell *matHeaderCellDef mat-sort-header [style.width.px]="141">
+          Published On </th>
+        <td class="table-cell-spacing" mat-cell *matCellDef="let row" [style.width.px]="141"> {{row?.updatedOn | date}}
+        </td>
+      </ng-container>
+
+      <!-- Members Column -->
+      <ng-container matColumnDef="members">
+        <th class="table-header-spacing" mat-header-cell *matHeaderCellDef mat-sort-header> Members </th>
+        <td class="table-cell-spacing" mat-cell *matCellDef="let row"> {{row?.countOfPeopleJoined || 0}} </td>
+      </ng-container>
+
+      <!-- Mods Column -->
+      <ng-container matColumnDef="mods">
+        <th class="table-header-spacing" mat-header-cell *matHeaderCellDef mat-sort-header> Mods </th>
+        <td class="table-cell-spacing" mat-cell *matCellDef="let row"> {{row?.orgName || '-'}} </td>
+      </ng-container>
+
+      <!-- Actions Column -->
+      <ng-container matColumnDef="actions">
+        <th class="table-header-spacing" mat-header-cell *matHeaderCellDef> Actions </th>
+        <td class="table-cell-spacing" mat-cell *matCellDef="let row">
+          <button mat-icon-button [matMenuTriggerFor]="menu">
+            <mat-icon>more_vert</mat-icon>
+          </button>
+          <mat-menu #menu="matMenu">
+            <button mat-menu-item *ngIf="canEdit(row)" (click)="onActionClick('edit', row)">
+              <mat-icon>edit</mat-icon>
+              <span>Edit</span>
+            </button>
+            <!-- <button mat-menu-item *ngIf="canDelete(row)" (click)="onActionClick('delete', row)">
+              <mat-icon>delete</mat-icon>
+              <span>Delete</span>
+            </button>
+            <button mat-menu-item *ngIf="canArchive(row)" (click)="onActionClick('archive', row)">
+              <mat-icon>archive</mat-icon>
+              <span>Archive</span>
+            </button> -->
+          </mat-menu>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
+
+    <mat-paginator class="community-pagination" [length]="totalElements" [pageSize]="pageSize"
+      [pageSizeOptions]="[5, 10, 25, 50]" [pageIndex]="pageNumber" (page)="handlePageEvent($event)" showFirstLastButtons
+      aria-label="Select page">
+    </mat-paginator>
+  </div>
+</ng-template>
