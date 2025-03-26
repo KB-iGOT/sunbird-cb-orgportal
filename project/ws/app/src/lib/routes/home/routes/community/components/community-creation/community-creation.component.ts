@@ -117,22 +117,24 @@ export class CommunityCreationComponent {
   patchFormValues() {
     const data = this.communityDetailsObject
 
-    // Find the matching topic from topicDataList
-    const selectedTopic = this.topicDataList.find(topic =>
-      topic.categoryId === data.topicId || topic.categoryName === data.topicName)
-    this.communityDetailsForm.patchValue({
-      communityName: data.communityName || '',
-      topicName: selectedTopic || '',
-      posterImageUrl: data.posterImageUrl || '',
-      description: data.description || '',
-      communityGuideLines: data.communityGuideLines || '',
-      moderators: data.moderators || [],
-      imageUrl: data.imageUrl || ''
-    })
+    if (data && Object.keys(data).length) {
+      // Find the matching topic from topicDataList
+      const selectedTopic = this.topicDataList.find(topic =>
+        topic.categoryId === data.topicId || topic.categoryName === data.topicName)
+      this.communityDetailsForm.patchValue({
+        communityName: data.communityName || '',
+        topicName: selectedTopic || null,
+        posterImageUrl: data.posterImageUrl || '',
+        description: data.description || '',
+        communityGuideLines: data.communityGuideLines || '',
+        moderators: data.moderators || [],
+        imageUrl: data.imageUrl || ''
+      })
 
-    // Load competencies if available
-    if (data.competencies_v6 && data.competencies_v6.length) {
-      this.competencies = data.competencies_v6
+      // Load competencies if available
+      if (data.competencies_v6 && data.competencies_v6.length) {
+        this.competencies = data.competencies_v6
+      }
     }
 
     // Update original form values for comparison
@@ -147,7 +149,7 @@ export class CommunityCreationComponent {
 
     this.communityDetailsForm.markAllAsTouched()
     this.communityDetailsForm.updateValueAndValidity()
-    if (this.openMode === 'create' || this.canMoveToNext) {
+    if (this.canMoveToNext) {
       this.currentStepperIndex = this.currentStepperIndex + 1
     }
   }
@@ -168,7 +170,7 @@ export class CommunityCreationComponent {
     this.communityDetailsForm = this.formBuilder.group({
       communityName: new FormControl('', [Validators.required, Validators.minLength(10),
       Validators.maxLength(70), Validators.pattern(noSpecialChar)]),
-      topicName: new FormControl('', [Validators.required]),
+      topicName: new FormControl(null, [Validators.required]),
       posterImageUrl: new FormControl('', [Validators.required]),
       description: new FormControl('', [Validators.required, Validators.minLength(100), Validators.maxLength(500)]),
       communityGuideLines: new FormControl('', [Validators.required, Validators.minLength(100), Validators.maxLength(500)]),
@@ -439,7 +441,7 @@ export class CommunityCreationComponent {
         }
       })
     }
-    debugger
+
     if (status === 'Published') {
       const propertiesToDelete = [
         'createdOn',

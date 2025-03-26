@@ -48,6 +48,7 @@ export class CommunityBasicDetailsComponent {
   @Input() communityDetailsForm!: FormGroup
   @Input() openMode!: string
   @Input() topicDataList: any[] = []
+  fileSize: any = 10
   communityStatus = 'draft'
   previewUrl: string = ''
   isDragging: boolean = false
@@ -250,8 +251,8 @@ export class CommunityBasicDetailsComponent {
 
   validatePosterImage(file: File): Promise<boolean> {
     return new Promise((resolve) => {
-      if (file.size > 10 * 1024 * 1024) { // 10MB
-        this.openSnackBar('File size must be less than 10MB')
+      if (file.size > this.fileSize * 1024 * 1024) { // 10MB
+        this.openSnackBar('File size must be less than ' + this.fileSize + 'MB')
         resolve(false)
         return
       }
@@ -279,11 +280,11 @@ export class CommunityBasicDetailsComponent {
 
   validateCommunityImage(file: File): Promise<boolean> {
     return new Promise((resolve) => {
-      // if (file.size > 10 * 1024 * 1024) { // 10MB
-      //   this.openSnackBar('File size must be less than 10MB')
-      //   resolve(false)
-      //   return
-      // }
+      if (file.size > this.fileSize * 1024 * 1024) { // 10MB
+        this.openSnackBar('File size must be less than ' + this.fileSize + 'MB')
+        resolve(false)
+        return
+      }
 
       const img = new Image()
       img.src = URL.createObjectURL(file)

@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core'
 import { FormControl, FormGroup } from '@angular/forms'
-import { Observable } from 'rxjs'
+import { Observable, of } from 'rxjs'
 import { map, startWith } from 'rxjs/operators'
 import { CommunityService } from '../../services/community.service'
 
@@ -75,11 +75,11 @@ export class AddModeratorComponent {
     let req = {
       "request": {
         "filters": {
-          // "rootOrgId": this.userProfile && this.userProfile.rootOrgId || "01359132123730739281",
+          "rootOrgId": this.userProfile && this.userProfile.rootOrgId || "",
           "profileDetails.profileStatus": [
             "VERIFIED"
           ],
-          // "roles.role": "MENTOR"
+          "roles.role": "COMMUNITY_MODERATOR"
         },
         "limit": 20,
         "offset": 0,
@@ -98,6 +98,7 @@ export class AddModeratorComponent {
         }
         return user
       })
+      this.filteredOptions = this.options.length > 0 ? of(this.options) : of([])
     }
     )
   }
