@@ -10,7 +10,8 @@
           Topic name
         </div>
         <mat-form-field appearance="outline" class="disable-round">
-          <mat-select placeholder="select Event Category" formControlName="topicName">
+          <mat-select placeholder="select Topic" formControlName="topicName">
+            <mat-option disabled [value]="null">Select a topic</mat-option>
             <ng-container *ngFor="let topic of topicDataList">
               <mat-option [value]="topic">
                 {{topic?.categoryName}}
@@ -41,9 +42,14 @@
               <!-- or drag and drop here -->
               Supported file types: PNG, JPG
             </span>
-            <span class="text-xs font-normal">Max Size - 400MB</span>
+            <span class="text-xs font-normal">Max Size - {{fileSize}}MB</span>
           </div>
         </div>
+      </div>
+      <div>
+        <mat-error class="mat-caption mat-error-text" *ngIf="showValidationMsg('posterImageUrl','required')">
+          Poster Image is mandatory
+        </mat-error>
       </div>
       <div class="relative w-full" *ngIf="previewUrl || communityDetailsForm?.value?.posterImageUrl">
         <img [src]="previewUrl || communityDetailsForm?.value?.posterImageUrl" alt="Preview"
@@ -70,9 +76,14 @@
             <!-- or drag and drop here -->
             Supported file types: PNG, JPG
           </span>
-          <span class="text-xs font-normal">Max Size - 400MB</span>
+          <span class="text-xs font-normal">Max Size - {{fileSize}}MB</span>
         </div>
       </div>
+    </div>
+    <div>
+      <mat-error class="mat-caption mat-error-text" *ngIf="showValidationMsg('imageUrl','required')">
+        Community Logo is mandatory
+      </mat-error>
     </div>
     <div class="w-1/2 community-image-container" *ngIf="previewImageUrl || communityDetailsForm?.value?.imageUrl">
       <div class="relative w-1/2 community-img-block">
@@ -103,7 +114,7 @@
       </mat-error>
     </mat-form-field>
   </div>
-  <div class="flex flex-column gap-2">
+  <div class="flex flex-column gap-2 community-form-textarea">
     <div class="form-lable required">
       Description
     </div>
@@ -126,10 +137,10 @@
     <ckeditor [editor]="Editor" formControlName="communityGuideLines" [config]="getCongif()" (ready)="onReady($event)"
       (change)="onEditorChange($event)" (keyup)="checkCharacterLimit($event)" (focus)="onFocus()">
     </ckeditor>
-    <mat-error *ngIf="showValidationMsg('communityGuideLines','required')">
-      Description is mandatory
+    <mat-error class="mat-caption mat-error-text" *ngIf="showValidationMsg('communityGuideLines','required')">
+      Community GuideLines is mandatory
     </mat-error>
-    <mat-error *ngIf="showValidationMsg('communityGuideLines','minlength')">
+    <mat-error class="mat-caption mat-error-text" *ngIf="showValidationMsg('communityGuideLines','minlength')">
       Minimum characters left to create {{ minimumCharacters?.communityGuideLines -
       communityDetailsForm?.controls['communityGuideLines']?.value?.length}}
     </mat-error>
