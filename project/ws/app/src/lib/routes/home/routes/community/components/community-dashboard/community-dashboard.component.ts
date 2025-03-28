@@ -38,7 +38,6 @@ export class CommunityDashboardComponent implements OnInit {
   totalElements = 0  // Add this to store total count
   currentSearchString = ''  // Add this to store current search
   currentStatus = 'active'
-  selectedTabIndex = 0
   tabs = [
     {
       label: 'Community',
@@ -49,13 +48,14 @@ export class CommunityDashboardComponent implements OnInit {
       label: 'Draft',
       status: 'draft',
       icon: 'edit'
-    },
-    {
-      label: 'Archived',
-      status: 'inactive',
-      icon: 'archive'
     }
+    // {
+    //   label: 'Archived',
+    //   status: 'inactive',
+    //   icon: 'archive'
+    // }
   ]
+  selectedTabIndex = 0
 
   @ViewChild(MatPaginator) paginator!: MatPaginator
   @ViewChild(MatSort) sort!: MatSort
@@ -147,7 +147,7 @@ export class CommunityDashboardComponent implements OnInit {
       "facets": []
     }
     if (searchString) {
-      req.filterCriteriaMap["searchString"] = searchString
+      req["searchString"] = searchString
     }
     this.communitySvc.communitySearch(req).subscribe((res) => {
       if (res.result && res.result.search_results

@@ -24,9 +24,13 @@
         </mat-form-field>
       </div>
     </div>
-    <div class="">
+  </div>
+
+
+  <div class="flex  gap-24">
+    <div class="w-3/4">
       <div class="form-lable required mb-4">
-        Poster image
+        Community banner image
       </div>
       <div class="flex flex-row gap-4" *ngIf="!previewUrl && !communityDetailsForm?.value?.posterImageUrl">
         <div class="upload flex justify-center items-center cursor-pointer dashed-border w-full"
@@ -48,50 +52,65 @@
       </div>
       <div>
         <mat-error class="mat-caption mat-error-text" *ngIf="showValidationMsg('posterImageUrl','required')">
-          Poster Image is mandatory
+          Community banner image is mandatory
         </mat-error>
       </div>
-      <div class="relative w-full" *ngIf="previewUrl || communityDetailsForm?.value?.posterImageUrl">
+      <!-- <div class="relative w-full" *ngIf="previewUrl || communityDetailsForm?.value?.posterImageUrl">
         <img [src]="previewUrl || communityDetailsForm?.value?.posterImageUrl" alt="Preview"
           class="preview-image w-full" />
         <mat-icon class="cursor-pointer delete-image" (click)="emptyPosterImage()">close</mat-icon>
-      </div>
-    </div>
-  </div>
-  <div>
-    <div class="form-lable required mb-4">
-      Community Logo
-    </div>
-    <div class="flex flex-row gap-4 w-1/2" *ngIf="!previewImageUrl && !communityDetailsForm?.value?.imageUrl">
-      <div class="upload flex justify-center items-center cursor-pointer dashed-border w-full"
-        [ngClass]="{'disable': (openMode === 'view' || disableUpload) }" [class.dragover]="isDragging"
-        (dragover)="onDragOver($event)" (dragleave)="onDragLeave($event)" (drop)="onDrop($event,'imageUrl')"
-        (click)="fileInput.click()">
-        <input #fileInput type="file" name="upload-video" id="upload-video" class="hidden"
-          (change)="onFileSelected($event,'imageUrl')" accept="image/*" />
-        <div class="flex flex-column items-center gap-2">
-          <img src="/assets/icons/upload-upward-arrow.svg" alt="icon">
-          <span class="text-sm font-bold text-blue">Upload Images <strong class="text-red-700">*</strong></span>
-          <span class="text-xs font-normal">
-            <!-- or drag and drop here -->
-            Supported file types: PNG, JPG
-          </span>
-          <span class="text-xs font-normal">Max Size - {{fileSize}}MB</span>
+      </div> -->
+      <div class="w-full community-image-container" *ngIf="previewUrl || communityDetailsForm?.value?.posterImageUrl">
+        <div class="relative w-full">
+          <img [src]="previewUrl || communityDetailsForm?.value?.posterImageUrl" alt="Preview"
+            class="preview-image w-full" />
+          <mat-icon class="cursor-pointer delete-image" (click)="emptyPosterImage()">close</mat-icon>
         </div>
       </div>
     </div>
-    <div>
-      <mat-error class="mat-caption mat-error-text" *ngIf="showValidationMsg('imageUrl','required')">
-        Community Logo is mandatory
-      </mat-error>
-    </div>
-    <div class="w-1/2 community-image-container" *ngIf="previewImageUrl || communityDetailsForm?.value?.imageUrl">
-      <div class="relative w-1/2 community-img-block">
-        <img [src]="previewImageUrl || communityDetailsForm?.value?.imageUrl" alt="Preview" class="community-image" />
-        <mat-icon class="cursor-pointer delete-image" (click)="emptyImageUrl()">close</mat-icon>
+
+    <div class="w-1/4">
+      <div class="form-lable required mb-4">
+        Community card image
+      </div>
+      <div class="flex flex-row gap-4 w-full" *ngIf="!previewImageUrl && !communityDetailsForm?.value?.imageUrl">
+        <div class="upload flex justify-center items-center cursor-pointer dashed-border w-full"
+          [ngClass]="{'disable': (openMode === 'view' || disableUpload) }" [class.dragover]="isDragging"
+          (dragover)="onDragOver($event)" (dragleave)="onDragLeave($event)" (drop)="onDrop($event,'imageUrl')"
+          (click)="fileInput.click()">
+          <input #fileInput type="file" name="upload-video" id="upload-video" class="hidden"
+            (change)="onFileSelected($event,'imageUrl')" accept="image/*" />
+          <div class="flex flex-column items-center gap-2">
+            <img src="/assets/icons/upload-upward-arrow.svg" alt="icon">
+            <span class="text-sm font-bold text-blue">Upload Images <strong class="text-red-700">*</strong></span>
+            <span class="text-xs font-normal">
+              <!-- or drag and drop here -->
+              Supported file types: PNG, JPG
+            </span>
+            <span class="text-xs font-normal">Max Size - {{fileSize}}MB</span>
+          </div>
+        </div>
+      </div>
+      <div>
+        <mat-error class="mat-caption mat-error-text" *ngIf="showValidationMsg('imageUrl','required')">
+          Community card image is mandatory
+        </mat-error>
+      </div>
+      <div class="w-full community-image-container" *ngIf="previewImageUrl || communityDetailsForm?.value?.imageUrl">
+        <div class="relative w-1/2 community-img-block">
+          <img [src]="previewImageUrl || communityDetailsForm?.value?.imageUrl" alt="Preview" class="community-image" />
+          <mat-icon class="cursor-pointer delete-image" (click)="emptyImageUrl()">close</mat-icon>
+        </div>
       </div>
     </div>
   </div>
+
+
+
+
+
+
+
   <div class="flex flex-column gap-2 community-form disable-round">
     <div class="form-lable required">
       Community Name
