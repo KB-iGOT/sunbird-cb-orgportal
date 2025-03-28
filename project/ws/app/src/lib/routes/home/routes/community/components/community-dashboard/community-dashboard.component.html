@@ -33,7 +33,7 @@
     <table mat-table class="table-container w-full mt-4" [dataSource]="dataSource" matSort>
       <!-- Name Column -->
       <ng-container matColumnDef="name">
-        <th class="table-header-spacing" mat-header-cell *matHeaderCellDef mat-sort-header [style.width.px]="300">
+        <th class="table-header-spacing" mat-header-cell *matHeaderCellDef [style.width.px]="300">
           Community Name </th>
         <td class="table-cell-spacing" mat-cell *matCellDef="let row" [style.width.px]="300">
           <div class="community-name-block flex gap-2 flex-1 flex-start cursor-pointer">
@@ -49,7 +49,7 @@
 
       <!-- Start Date Column -->
       <ng-container matColumnDef="startDate">
-        <th class="table-header-spacing" mat-header-cell *matHeaderCellDef mat-sort-header [style.width.px]="141"> Start
+        <th class="table-header-spacing" mat-header-cell *matHeaderCellDef [style.width.px]="141"> Start
           Date </th>
         <td class="table-cell-spacing" mat-cell *matCellDef="let row" [style.width.px]="141"> {{row.createdOn | date}}
         </td>
@@ -57,7 +57,7 @@
 
       <!-- Created By Column -->
       <ng-container matColumnDef="createdBy">
-        <th class="table-header-spacing" mat-header-cell *matHeaderCellDef mat-sort-header [style.width.px]="200">
+        <th class="table-header-spacing" mat-header-cell *matHeaderCellDef [style.width.px]="200">
           Created By </th>
         <td class="table-cell-spacing" mat-cell *matCellDef="let row" [style.width.px]="200"> {{row?.createdByUserId ||
           '-'}}
@@ -66,7 +66,7 @@
 
       <!-- Published On Column -->
       <ng-container matColumnDef="publishedOn">
-        <th class="table-header-spacing" mat-header-cell *matHeaderCellDef mat-sort-header [style.width.px]="141">
+        <th class="table-header-spacing" mat-header-cell *matHeaderCellDef [style.width.px]="141">
           Published On </th>
         <td class="table-cell-spacing" mat-cell *matCellDef="let row" [style.width.px]="141"> {{row?.updatedOn | date}}
         </td>
@@ -74,14 +74,14 @@
 
       <!-- Members Column -->
       <ng-container matColumnDef="members">
-        <th class="table-header-spacing" mat-header-cell *matHeaderCellDef mat-sort-header> Members </th>
+        <th class="table-header-spacing" mat-header-cell *matHeaderCellDef> Members </th>
         <td class="table-cell-spacing" mat-cell *matCellDef="let row"> {{row?.countOfPeopleJoined || 0}} </td>
       </ng-container>
 
       <!-- Mods Column -->
       <ng-container matColumnDef="mods">
-        <th class="table-header-spacing" mat-header-cell *matHeaderCellDef mat-sort-header> Mods </th>
-        <td class="table-cell-spacing" mat-cell *matCellDef="let row"> {{row?.orgName || '-'}} </td>
+        <th class="table-header-spacing" mat-header-cell *matHeaderCellDef> Mods </th>
+        <td class="table-cell-spacing" mat-cell *matCellDef="let row"> {{row?.countOfModerators || 0}} </td>
       </ng-container>
 
       <!-- Actions Column -->
@@ -110,6 +110,16 @@
 
       <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
       <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+
+      <tr class="mat-row" *matNoDataRow>
+        <td class="mat-cell" colspan="7">
+          <div class="flex justify-center items-center h-full flex-wrap">
+            <img alt="Feature comming soon" src="/assets/instances/eagle/app_logos/allocation_empty.svg"
+              class="block mx-auto margin-top-xl margin-bottom-l">
+            <div class="flex justify-center items-center w-full text-gray-900 font-bold"> No data found</div>
+          </div>
+        </td>
+      </tr>
     </table>
 
     <mat-paginator class="community-pagination" [length]="totalElements" [pageSize]="pageSize"

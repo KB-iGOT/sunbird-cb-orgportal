@@ -128,7 +128,8 @@ export class CommunityCreationComponent {
         description: data.description || '',
         communityGuideLines: data.communityGuideLines || '',
         moderators: data.moderators || [],
-        imageUrl: data.imageUrl || ''
+        imageUrl: data.imageUrl || '',
+        competencies_v6: data.competencies_v6 || []
       })
 
       // Load competencies if available
@@ -176,6 +177,7 @@ export class CommunityCreationComponent {
       communityGuideLines: new FormControl('', [Validators.required, Validators.minLength(100), Validators.maxLength(500)]),
       moderators: new FormControl([], [Validators.required]),
       imageUrl: new FormControl('', [Validators.required]),
+      competencies_v6: new FormControl([], [Validators.required]),
     })
     // Store initial values to compare against later
     this.originalFormValues = this.communityDetailsForm.value
@@ -304,104 +306,7 @@ export class CommunityCreationComponent {
     }
   }
 
-  // uploadCommunityImage(communityId: string) {
 
-  //   const formData = new FormData()
-  //   formData.append('file', this.communityDetailsForm.value.posterImageUrl)
-
-  //   this.communitySvc.fileUpload(formData, communityId).subscribe({
-  //     next: (response: any) => {
-  //       if (response && response.result && response.result.url) {
-  //         // Update community with the image URL
-
-  //         let url = response.result.url.split('igot/discussionhub')[1]
-  //         let finalUrl = `${environment.karmYogiPath}/${environment.dicussV2Bucket}${url}`
-  //         const updateData = {
-  //           communityId: communityId,
-  //           posterImageUrl: finalUrl
-  //         }
-  //         this.updateCommunityWithImage(updateData)
-  //       } else {
-  //         this.loaderService.changeLoaderState(false)
-  //         const successMessage = 'Community created successfully, but failed to upload image'
-  //         this.openSnackBar(successMessage)
-  //         setTimeout(() => {
-  //           this.navigateBack()
-  //         }, 1000)
-  //       }
-  //     },
-  //     error: (error: HttpErrorResponse) => {
-  //       this.loaderService.changeLoaderState(false)
-  //       const errorMessage = _.get(error, 'error.message', 'Community created but failed to upload image')
-  //       this.openSnackBar(errorMessage)
-  //       setTimeout(() => {
-  //         this.navigateBack()
-  //       }, 1000)
-  //     }
-  //   })
-  // }
-
-  // updateCommunityWithImage(updateData: any) {
-  //
-  //   this.communitySvc.updateCommunity(updateData).subscribe({
-  //     next: (_res: any) => {
-  //       // const successMessage = 'Community created and image uploaded successfully'
-  //       // this.openSnackBar(successMessage)
-  //       // setTimeout(() => {
-  //       //   this.navigateBack()
-  //       //   this.loaderService.changeLoaderState(false)
-  //       // }, 1000)
-  //     },
-  //     error: (error: HttpErrorResponse) => {
-  //       this.loaderService.changeLoaderState(false)
-  //       const errorMessage = _.get(error, 'error.message', 'Community created but failed to update with image URL')
-  //       this.openSnackBar(errorMessage)
-  //       setTimeout(() => {
-  //         this.navigateBack()
-  //       }, 1000)
-  //     }
-  //   })
-  // }
-
-  // updateCommunity(_status = 'Draft') {
-  //   // Get only the changed fields
-  //   const changedFields = this.getChangedFields()
-
-  //   // Add the competencies if they've changed
-  //   const originalCompetencies = this.originalFormValues.competencies_v6 || []
-  //   if (JSON.stringify(this.competencies) !== JSON.stringify(originalCompetencies)) {
-  //     changedFields.competencies_v6 = this.competencies
-  //   }
-
-  //   // Add communityId for the update API
-  //   changedFields.id = this.communityId
-
-  //   // Process topicName field if it has changed
-  //   if (changedFields.topicName && Object.keys(changedFields.topicName).length) {
-  //     changedFields.topicId = changedFields.topicName.categoryId || ''
-  //     changedFields.topicName = changedFields.topicName.categoryName || ''
-  //   }
-
-  //   this.loaderService.changeLoaderState(true)
-  //   this.communitySvc.updateCommunity(changedFields).subscribe({
-  //     next: (res: any) => {
-  //       if (res) {
-  //         this.openSnackBar('Community updated successfully')
-  //         setTimeout(() => {
-  //           this.navigateBack()
-  //           this.loaderService.changeLoaderState(false)
-  //         }, 1000)
-  //       } else {
-  //         this.loaderService.changeLoaderState(false)
-  //       }
-  //     },
-  //     error: (error: HttpErrorResponse) => {
-  //       this.loaderService.changeLoaderState(false)
-  //       const errorMessage = _.get(error, 'error.message', 'Something went wrong while updating community, please try again')
-  //       this.openSnackBar(errorMessage)
-  //     }
-  //   })
-  // }
 
   getFormBodyOfEvent(status: string) {
     let rootOrgName = this.userProfile.rootOrg.orgName
@@ -452,6 +357,8 @@ export class CommunityCreationComponent {
         'searchTags',
         'updatedOn',
         'status',
+        'publishedBy',
+        'publishedOn',
         'communityGuidelines' // Note: check if this should be 'communityGuideLines' instead
       ]
 
@@ -472,7 +379,7 @@ export class CommunityCreationComponent {
   getChangedFields(): any {
     const currentValues = this.communityDetailsForm.value
     const changedFields: any = {}
-
+    debugger
     Object.keys(currentValues).forEach(key => {
       // For arrays, check if they're different (like moderators)
       if (Array.isArray(currentValues[key])) {
@@ -493,6 +400,10 @@ export class CommunityCreationComponent {
     })
     if (this.communityId) {
       changedFields['communityId'] = this.communityId
+    }
+    // Always check if competencies have changed by comparing the arrays
+    if (JSON.stringify(this.competencies) !== JSON.stringify(this.originalFormValues.competencies_v6 || [])) {
+      changedFields['competencies_v6'] = this.competencies
     }
 
     return changedFields
@@ -626,17 +537,17 @@ export class CommunityCreationComponent {
     // Get only the changed fields
     const changedFields = this.getChangedFields()
 
-    // Add status to the update
-    // changedFields.status = status
+    // // Add status to the update
+    // // changedFields.status = status
 
-    // Add the competencies if they've changed
-    const originalCompetencies = this.originalFormValues.competencies_v6 || []
-    if (JSON.stringify(this.competencies) !== JSON.stringify(originalCompetencies)) {
-      changedFields.competencies_v6 = this.competencies
-    }
+    // // Add the competencies if they've changed
+    // const originalCompetencies = this.originalFormValues.competencies_v6 || []
+    // if (JSON.stringify(this.competencies) !== JSON.stringify(originalCompetencies)) {
+    //   changedFields.competencies_v6 = this.competencies
+    // }
 
-    // Add communityId for the update API
-    changedFields.communityId = this.communityId
+    // // Add communityId for the update API
+    // changedFields.communityId = this.communityId
 
     // Process topicName field if it has changed
     if (changedFields.topicName && Object.keys(changedFields.topicName).length) {
@@ -669,10 +580,10 @@ export class CommunityCreationComponent {
 
               // Check if we also need to upload imageUrl
               if (changedFields.imageUrl instanceof File) {
-                this.uploadSecondImageAndUpdate(changedFields.imageUrl, updatedFields)
+                this.uploadSecondImageAndUpdate(changedFields.imageUrl, updatedFields, status)
               } else {
                 // Just update with the poster image
-                this.finalizeUpdate(updatedFields)
+                this.finalizeUpdate(updatedFields, status)
               }
             } else {
               this.loaderService.changeLoaderState(false)
@@ -687,7 +598,7 @@ export class CommunityCreationComponent {
         })
       } else if (changedFields.imageUrl instanceof File) {
         // Only imageUrl needs to be uploaded
-        this.uploadSecondImageAndUpdate(changedFields.imageUrl, updatedFields)
+        this.uploadSecondImageAndUpdate(changedFields.imageUrl, updatedFields, status)
       }
     } else {
       // No files to upload, proceed with regular update
@@ -695,13 +606,17 @@ export class CommunityCreationComponent {
       this.communitySvc.updateCommunity(changedFields).subscribe({
         next: (res: any) => {
           if (res) {
-            const successMessage = status === 'Published' ?
-              'Community published successfully' : 'Community updated successfully'
-            this.openSnackBar(successMessage)
-            setTimeout(() => {
-              this.navigateBack()
-              this.loaderService.changeLoaderState(false)
-            }, 1000)
+            if (status === 'Published') {
+              this.publishCommunityMethod()
+            } else {
+              const successMessage = status === 'Published' ?
+                'Community published successfully' : 'Community updated successfully'
+              this.openSnackBar(successMessage)
+              setTimeout(() => {
+                this.navigateBack()
+                this.loaderService.changeLoaderState(false)
+              }, 1000)
+            }
           } else {
             this.loaderService.changeLoaderState(false)
           }
@@ -715,7 +630,7 @@ export class CommunityCreationComponent {
     }
   }
 
-  uploadSecondImageAndUpdate(imageFile: File, updatedFields: any) {
+  uploadSecondImageAndUpdate(imageFile: File, updatedFields: any, status: string) {
     const formData = new FormData()
     formData.append('file', imageFile)
 
@@ -726,7 +641,7 @@ export class CommunityCreationComponent {
           let url = response.result.url.split('igot/discussionhub')[1]
           let finalUrl = `${this.getEnvironmentBaseUrl()}${url}`
           updatedFields.imageUrl = finalUrl
-          this.finalizeUpdate(updatedFields)
+          this.finalizeUpdate(updatedFields, status)
         } else {
           this.loaderService.changeLoaderState(false)
           this.openSnackBar('Failed to upload image')
@@ -740,15 +655,19 @@ export class CommunityCreationComponent {
     })
   }
 
-  finalizeUpdate(updatedFields: any) {
+  finalizeUpdate(updatedFields: any, status: string) {
     this.communitySvc.updateCommunity(updatedFields).subscribe({
       next: (res: any) => {
         if (res) {
           this.openSnackBar('Community updated successfully')
-          setTimeout(() => {
-            this.navigateBack()
-            this.loaderService.changeLoaderState(false)
-          }, 1000)
+          if (status === 'Published') {
+            this.publishCommunityMethod()
+          } else {
+            setTimeout(() => {
+              this.navigateBack()
+              this.loaderService.changeLoaderState(false)
+            }, 1000)
+          }
         } else {
           this.loaderService.changeLoaderState(false)
         }
@@ -769,15 +688,13 @@ export class CommunityCreationComponent {
 
     // If on Add Competency step, call the direct publish method
     if (this.selectedStepperLable === 'Add Competency') {
-      this.publishCommunityMethod()
-      return
-    }
-
-    // Use the existing functions but with Published status
-    if (this.openMode === 'edit') {
-      this.updateCommunity('Published')
-    } else {
-      this.saveAndExit('Published')
+      let changedFields = this.getChangedFields()
+      if (changedFields && Object.keys(changedFields).length > 2) {
+        this.updateCommunity('Published')
+      } else {
+        this.publishCommunityMethod()
+        return
+      }
     }
   }
 
