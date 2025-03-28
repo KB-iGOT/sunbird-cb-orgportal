@@ -379,7 +379,6 @@ export class CommunityCreationComponent {
   getChangedFields(): any {
     const currentValues = this.communityDetailsForm.value
     const changedFields: any = {}
-    debugger
     Object.keys(currentValues).forEach(key => {
       // For arrays, check if they're different (like moderators)
       if (Array.isArray(currentValues[key])) {
