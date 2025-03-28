@@ -28,7 +28,7 @@ export namespace events {
     action: string,
   }
 
-  export const IMAGE_MAX_SIZE = (400 * 1024 * 1024)
+  export const IMAGE_MAX_SIZE = (500 * 1024)
 }
 
 export interface speaker {

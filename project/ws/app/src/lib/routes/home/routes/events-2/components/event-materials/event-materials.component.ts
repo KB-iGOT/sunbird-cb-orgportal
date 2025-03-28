@@ -43,8 +43,8 @@ export class EventMaterialsComponent implements OnInit {
       return
     }
     const mimeType = files[0].type
-    if (mimeType.match(/application\/(pdf|vnd.ms-powerpoint|msword)/) == null) {
-      this.openSnackBar('Invalid file type. Please upload a PDF, PPT, or DOC file.')
+    if (mimeType.match(/application\/(pdf|vnd.ms-powerpoint|msword|vnd.openxmlformats-officedocument.presentationml.presentation|vnd.openxmlformats-officedocument.wordprocessingml.document)/) === null) {
+      this.openSnackBar('Invalid file type. Please upload a PDF, PPT, PPTX, DOCX or DOC file.')
       return
     }
     const reader = new FileReader()
@@ -151,6 +151,9 @@ export class EventMaterialsComponent implements OnInit {
   deleteMaterialFromList(event: boolean, index: number) {
     if (event) {
       this.materialsList.splice(index, 1)
+    }
+    if (index === 0) {
+      this.currentMaterialSaved = true
     }
   }
 
