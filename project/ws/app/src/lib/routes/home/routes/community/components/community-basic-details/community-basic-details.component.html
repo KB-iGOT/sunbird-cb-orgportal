@@ -7,7 +7,7 @@
     <div class="flex flex-row gap-4">
       <div class="flex flex-column gap-2 community-form w-full" [ngClass]="{'disableForm': communityStatus === 'live'}">
         <div class="form-lable required">
-          Topic name
+          Choose a Topic
         </div>
         <mat-form-field appearance="outline" class="disable-round">
           <mat-select placeholder="select Topic" formControlName="topicName">
@@ -112,16 +112,16 @@
 
 
   <div class="flex flex-column gap-2 community-form disable-round">
-    <div class="form-lable required">
-      Community Name
+    <div class="form-lable required flex">
+      Community Name <mat-icon class="ml-1 mr-1 cursor-pointer">info_outline</mat-icon>
     </div>
     <mat-form-field appearance="outline" class="">
-      <input matInput placeholder="Add your community name" formControlName="communityName" maxlength="70">
+      <input matInput placeholder="Add your community name" formControlName="communityName" maxlength="50">
       <mat-hint>Only ( a-z/A-Z , 0-9 . - _ $ / : [ ]' ' !) characters are supported</mat-hint>
       <mat-hint align="end"
-        class="text-sm">{{communityDetailsForm?.controls['communityName']?.value?.length}}/70</mat-hint>
+        class="text-sm">{{communityDetailsForm?.controls['communityName']?.value?.length}}/50</mat-hint>
       <mat-error *ngIf="showValidationMsg('communityName','required')">
-        Event name is mandatory
+        Community name is mandatory
       </mat-error>
       <mat-error *ngIf="showValidationMsg('communityName','pattern')">
         Only ( a-z/A-Z , 0-9 . _ - $ / : [ ]' ' !) characters are supported

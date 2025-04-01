@@ -63,20 +63,12 @@ export class CommunityDashboardComponent implements OnInit {
   constructor(private router: Router, private communitySvc: CommunityService, private activatedRoute: ActivatedRoute) {
     // Initialize with sample data
     const sampleData: Community[] = [
-      {
-        name: 'Community 1',
-        startDate: new Date(),
-        createdBy: 'John Doe',
-        publishedOn: new Date(),
-        members: 100,
-        mods: 5
-      }
 
     ]
 
     this.dataSource = new MatTableDataSource(sampleData)
-    this.fetchCommunityData('')
     this.getRouteSubscription()
+    this.fetchCommunityData('')
   }
 
   getRouteSubscription() {
@@ -132,6 +124,12 @@ export class CommunityDashboardComponent implements OnInit {
     this.selectedTabIndex = event.index
     this.currentStatus = this.tabs[event.index].status
     this.pageNumber = 0 // Reset to first page on tab change
+    if (event.index === 1) {
+      this.displayedColumns = ['name', 'startDate', 'createdBy', 'members', 'mods', 'actions']
+    } else {
+      this.displayedColumns = ['name', 'startDate', 'createdBy', 'publishedOn', 'members', 'mods', 'actions']
+
+    }
     this.fetchCommunityData(this.currentSearchString)
   }
 
@@ -139,12 +137,15 @@ export class CommunityDashboardComponent implements OnInit {
     let req: any = {
       "filterCriteriaMap":
       {
-        "status": this.currentStatus
+        "status": this.currentStatus,
+        "orgId": this.userProfile.rootOrgId,
       },
       "requestedFields": [],
       "pageNumber": this.pageNumber,
       "pageSize": this.pageSize,
-      "facets": []
+      "facets": [],
+      "orderBy": "createdBy",
+      "orderDirection": "DESC"
     }
     if (searchString) {
       req["searchString"] = searchString
