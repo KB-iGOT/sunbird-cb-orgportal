@@ -330,6 +330,13 @@ const routes: Routes = [
         loadChildren: () => import('./routes/events-2/events-2.module').then(m => m.Events2Module),
       },
       {
+        path: 'community',
+        loadChildren: () => import('./routes/community/community.module').then(m => m.CommunityModule),
+        resolve: {
+          configService: ConfigResolveService,
+        },
+      },
+      {
         path: 'reports-section',
         component: ReportsSectionComponent,
         data: {

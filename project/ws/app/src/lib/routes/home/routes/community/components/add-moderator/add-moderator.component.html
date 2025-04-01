@@ -1,0 +1,35 @@
+<div class="community-details p-6">
+  <div class="flex flex-column gap-2 community-form disable-round">
+    <div class="form-lable required">
+      Email
+    </div>
+    <mat-form-field appearance="outline" class="">
+      <input type="text" matInput [formControl]="myControl" placeholder="Search Moderator" [matAutocomplete]="auto">
+      <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayFn" placeholder="Search Moderator"
+        (optionSelected)="onOptionSelected($event)">
+        <ng-container *ngIf="filteredOptions | async as options">
+          <mat-option *ngFor="let option of options" [value]="option" [disabled]="isUserSelected(option)">
+            {{option?.firstName}}
+          </mat-option>
+          <mat-option *ngIf="options.length === 0" disabled>No data found</mat-option>
+        </ng-container>
+      </mat-autocomplete>
+    </mat-form-field>
+  </div>
+
+  <div class="flex items-center gap-4">
+    <div *ngIf="communityDetailsForm?.value?.moderators && communityDetailsForm?.value?.moderators.length">
+      Selected users -
+    </div>
+    <mat-chip-list #chipListTags class="moderator-chip-list"
+      *ngIf="communityDetailsForm?.value?.moderators && communityDetailsForm?.value?.moderators.length">
+      <mat-chip class="moderator-name" *ngFor="let user of communityDetailsForm?.value?.moderators" [selectable]="true"
+        [removable]="true" (removed)="removeUser(user)">
+        <span>
+          {{ user?.moderatorName }}
+          <mat-icon matChipRemove>close</mat-icon>
+        </span>
+      </mat-chip>
+    </mat-chip-list>
+  </div>
+</div>

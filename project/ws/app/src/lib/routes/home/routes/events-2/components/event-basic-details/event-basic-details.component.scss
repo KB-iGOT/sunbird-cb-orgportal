@@ -81,6 +81,7 @@
   }
 
   .disable-round {
+    pointer-events: none;
     .mat-form-field-outline {
       border-radius: 23px;
     }

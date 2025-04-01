@@ -1,0 +1,169 @@
+<form [formGroup]="communityDetailsForm" class="community-details p-6 flex flex-column gap-5"
+  [ngClass]="{'disableForm': openMode === 'view'}">
+  <div class="community-header">
+    Basic Details
+  </div>
+  <div>
+    <div class="flex flex-row gap-4">
+      <div class="flex flex-column gap-2 community-form w-full" [ngClass]="{'disableForm': communityStatus === 'live'}">
+        <div class="form-lable required">
+          Topic name
+        </div>
+        <mat-form-field appearance="outline" class="disable-round">
+          <mat-select placeholder="select Topic" formControlName="topicName">
+            <mat-option disabled [value]="null">Select a topic</mat-option>
+            <ng-container *ngFor="let topic of topicDataList">
+              <mat-option [value]="topic">
+                {{topic?.categoryName}}
+              </mat-option>
+            </ng-container>
+          </mat-select>
+          <mat-error *ngIf="showValidationMsg('topicName','required')">
+            Topic name is mandatory
+          </mat-error>
+        </mat-form-field>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="flex  gap-24">
+    <div class="w-3/4">
+      <div class="form-lable required mb-4">
+        Community banner image
+      </div>
+      <div class="flex flex-row gap-4" *ngIf="!previewUrl && !communityDetailsForm?.value?.posterImageUrl">
+        <div class="upload flex justify-center items-center cursor-pointer dashed-border w-full"
+          [ngClass]="{'disable': (openMode === 'view' || disableUpload) }" [class.dragover]="isDragging"
+          (dragover)="onDragOver($event)" (dragleave)="onDragLeave($event)" (drop)="onDrop($event,'posterImageUrl')"
+          (click)="fileInput.click()">
+          <input #fileInput type="file" name="upload-video" id="upload-video" class="hidden"
+            (change)="onFileSelected($event,'posterImageUrl')" accept="image/*" />
+          <div class="flex flex-column items-center gap-2">
+            <img src="/assets/icons/upload-upward-arrow.svg" alt="icon">
+            <span class="text-sm font-bold text-blue">Upload Images <strong class="text-red-700">*</strong></span>
+            <span class="text-xs font-normal">
+              <!-- or drag and drop here -->
+              Supported file types: PNG, JPG
+            </span>
+            <span class="text-xs font-normal">Max Size - {{fileSize}}MB</span>
+          </div>
+        </div>
+      </div>
+      <div>
+        <mat-error class="mat-caption mat-error-text" *ngIf="showValidationMsg('posterImageUrl','required')">
+          Community banner image is mandatory
+        </mat-error>
+      </div>
+      <!-- <div class="relative w-full" *ngIf="previewUrl || communityDetailsForm?.value?.posterImageUrl">
+        <img [src]="previewUrl || communityDetailsForm?.value?.posterImageUrl" alt="Preview"
+          class="preview-image w-full" />
+        <mat-icon class="cursor-pointer delete-image" (click)="emptyPosterImage()">close</mat-icon>
+      </div> -->
+      <div class="w-full community-image-container" *ngIf="previewUrl || communityDetailsForm?.value?.posterImageUrl">
+        <div class="relative w-full">
+          <img [src]="previewUrl || communityDetailsForm?.value?.posterImageUrl" alt="Preview"
+            class="preview-image w-full" />
+          <mat-icon class="cursor-pointer delete-image" (click)="emptyPosterImage()">close</mat-icon>
+        </div>
+      </div>
+    </div>
+
+    <div class="w-1/4">
+      <div class="form-lable required mb-4">
+        Community card image
+      </div>
+      <div class="flex flex-row gap-4 w-full" *ngIf="!previewImageUrl && !communityDetailsForm?.value?.imageUrl">
+        <div class="upload flex justify-center items-center cursor-pointer dashed-border w-full"
+          [ngClass]="{'disable': (openMode === 'view' || disableUpload) }" [class.dragover]="isDragging"
+          (dragover)="onDragOver($event)" (dragleave)="onDragLeave($event)" (drop)="onDrop($event,'imageUrl')"
+          (click)="fileInput.click()">
+          <input #fileInput type="file" name="upload-video" id="upload-video" class="hidden"
+            (change)="onFileSelected($event,'imageUrl')" accept="image/*" />
+          <div class="flex flex-column items-center gap-2">
+            <img src="/assets/icons/upload-upward-arrow.svg" alt="icon">
+            <span class="text-sm font-bold text-blue">Upload Images <strong class="text-red-700">*</strong></span>
+            <span class="text-xs font-normal">
+              <!-- or drag and drop here -->
+              Supported file types: PNG, JPG
+            </span>
+            <span class="text-xs font-normal">Max Size - {{fileSize}}MB</span>
+          </div>
+        </div>
+      </div>
+      <div>
+        <mat-error class="mat-caption mat-error-text" *ngIf="showValidationMsg('imageUrl','required')">
+          Community card image is mandatory
+        </mat-error>
+      </div>
+      <div class="w-full community-image-container" *ngIf="previewImageUrl || communityDetailsForm?.value?.imageUrl">
+        <div class="relative w-1/2 community-img-block">
+          <img [src]="previewImageUrl || communityDetailsForm?.value?.imageUrl" alt="Preview" class="community-image" />
+          <mat-icon class="cursor-pointer delete-image" (click)="emptyImageUrl()">close</mat-icon>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+
+
+
+
+  <div class="flex flex-column gap-2 community-form disable-round">
+    <div class="form-lable required">
+      Community Name
+    </div>
+    <mat-form-field appearance="outline" class="">
+      <input matInput placeholder="Add your community name" formControlName="communityName" maxlength="70">
+      <mat-hint>Only ( a-z/A-Z , 0-9 . - _ $ / : [ ]' ' !) characters are supported</mat-hint>
+      <mat-hint align="end"
+        class="text-sm">{{communityDetailsForm?.controls['communityName']?.value?.length}}/70</mat-hint>
+      <mat-error *ngIf="showValidationMsg('communityName','required')">
+        Event name is mandatory
+      </mat-error>
+      <mat-error *ngIf="showValidationMsg('communityName','pattern')">
+        Only ( a-z/A-Z , 0-9 . _ - $ / : [ ]' ' !) characters are supported
+      </mat-error>
+      <mat-error *ngIf="!showValidationMsg('communityName','pattern')
+        && showValidationMsg('communityName','minlength')">
+        Minimum characters left to create {{ minimumCharacters?.communityName -
+        communityDetailsForm?.controls['communityName']?.value?.length}}
+      </mat-error>
+    </mat-form-field>
+  </div>
+  <div class="flex flex-column gap-2 community-form-textarea">
+    <div class="form-lable required">
+      Description
+    </div>
+    <mat-form-field appearance="outline" class="">
+      <textarea matInput placeholder="Add your description" formControlName="description" maxlength="500"> </textarea>
+      <mat-error *ngIf="showValidationMsg('description','required')">
+        Description is mandatory
+      </mat-error>
+      <mat-error *ngIf="showValidationMsg('description','minlength')">
+        Minimum characters left to create {{ minimumCharacters?.description -
+        communityDetailsForm?.controls['description']?.value?.length}}
+      </mat-error>
+    </mat-form-field>
+    <span class="description-count flex justify-end">{{communityDetailsForm?.value?.description?.length}}/500</span>
+  </div>
+  <div class="flex flex-column gap-2">
+    <div class="form-lable required">
+      Community Guidelines
+    </div>
+    <ckeditor [editor]="Editor" formControlName="communityGuideLines" [config]="getCongif()" (ready)="onReady($event)"
+      (change)="onEditorChange($event)" (keyup)="checkCharacterLimit($event)" (focus)="onFocus()">
+    </ckeditor>
+    <mat-error class="mat-caption mat-error-text" *ngIf="showValidationMsg('communityGuideLines','required')">
+      Community GuideLines is mandatory
+    </mat-error>
+    <mat-error class="mat-caption mat-error-text" *ngIf="showValidationMsg('communityGuideLines','minlength')">
+      Minimum characters left to create {{ minimumCharacters?.communityGuideLines -
+      communityDetailsForm?.controls['communityGuideLines']?.value?.length}}
+    </mat-error>
+    <!-- <span
+      class="description-count flex justify-end">{{communityDetailsForm?.value?.communityGuideLines?.length}}/500</span> -->
+  </div>
+</form>
