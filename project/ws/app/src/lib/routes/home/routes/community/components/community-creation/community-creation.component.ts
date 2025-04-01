@@ -285,6 +285,22 @@ export class CommunityCreationComponent {
     if (this.openMode === 'edit') {
       this.updateCommunity(status)
     } else {
+      if (
+        !this.communityDetailsForm.value.communityName ||
+        this.communityDetailsForm.controls['communityName'].invalid
+      ) {
+        this.openSnackBar('Please provide a valid community name')
+        return
+      }
+
+      if (
+        !this.communityDetailsForm.value.topicName ||
+        this.communityDetailsForm.controls['topicName'].invalid
+      ) {
+        this.openSnackBar('Please select a valid topic')
+        return
+      }
+
       const formBody = this.getFormBodyOfEvent(status)
       this.loaderService.changeLoaderState(true)
       this.communitySvc.createCommunity(formBody).subscribe({
@@ -299,7 +315,12 @@ export class CommunityCreationComponent {
         },
         error: (error: HttpErrorResponse) => {
           this.loaderService.changeLoaderState(false)
-          const errorMessage = _.get(error, 'error.message', 'Something went wrong while creating community, please try again')
+          let errorMessage = ''
+          if (error && error.error && error.error.responseCode === "CONFLICT") {
+            errorMessage = error.error.params && error.error.params.errMsg && error.error.params.errMsg || 'Community name already exists, please try with a different name'
+          } else {
+            errorMessage = _.get(error, 'error.message', 'Something went wrong while creating community, please try again')
+          }
           this.openSnackBar(errorMessage)
         }
       })
@@ -320,7 +341,6 @@ export class CommunityCreationComponent {
     communityDetails['communityName'] = communityFormDetails.communityName
     communityDetails['description'] = communityFormDetails.description
     communityDetails['topicName'] = topicDetails.categoryName || ''
-    communityDetails['topicId'] = topicDetails.categoryId || ''
     communityDetails['communityAccessLevel'] = 'public'
     communityDetails["countOfPeopleJoined"] = 0
     communityDetails["countOfPeopleLiked"] = 0
@@ -330,6 +350,9 @@ export class CommunityCreationComponent {
     communityDetails['tags'] = []
     communityDetails['orgName'] = rootOrgName
     communityDetails['createdUserId'] = this.userProfile.id
+    if (topicDetails.categoryId) {
+      communityDetails['topicId'] = topicDetails.categoryId
+    }
     if (this.competencies && this.competencies.length) {
       communityDetails['competencyArea'] = []
       communityDetails['competencyTheme'] = []
