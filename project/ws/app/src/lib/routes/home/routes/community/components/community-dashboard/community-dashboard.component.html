@@ -59,8 +59,9 @@
       <ng-container matColumnDef="createdBy">
         <th class="table-header-spacing" mat-header-cell *matHeaderCellDef [style.width.px]="200">
           Created By </th>
-        <td class="table-cell-spacing" mat-cell *matCellDef="let row" [style.width.px]="200"> {{row?.createdByUserId ||
-          '-'}}
+        <td class="table-cell-spacing" mat-cell *matCellDef="let row" [style.width.px]="200">
+          <span *ngIf="row?.createdBy">{{additionalUserInfo[row?.createdBy]?.first_name ||
+            '-'}}</span>
         </td>
       </ng-container>
 
