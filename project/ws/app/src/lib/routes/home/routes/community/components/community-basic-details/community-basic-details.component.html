@@ -113,7 +113,8 @@
 
   <div class="flex flex-column gap-2 community-form disable-round">
     <div class="form-lable required flex">
-      Community Name <mat-icon class="ml-1 mr-1 cursor-pointer">info_outline</mat-icon>
+      Community Name
+      <!-- <mat-icon class="ml-1 mr-1 cursor-pointer">info_outline</mat-icon> -->
     </div>
     <mat-form-field appearance="outline" class="">
       <input matInput placeholder="Add your community name" formControlName="communityName" maxlength="50">
@@ -147,7 +148,7 @@
         communityDetailsForm?.controls['description']?.value?.length}}
       </mat-error>
     </mat-form-field>
-    <span class="description-count flex justify-end">{{communityDetailsForm?.value?.description?.length}}/500</span>
+    <span class="description-count flex justify-end">{{communityDetailsForm?.value?.description?.length}}/250</span>
   </div>
   <div class="flex flex-column gap-2">
     <div class="form-lable required">
@@ -161,7 +162,7 @@
     </mat-error>
     <mat-error class="mat-caption mat-error-text" *ngIf="showValidationMsg('communityGuideLines','minlength')">
       Minimum characters left to create {{ minimumCharacters?.communityGuideLines -
-      communityDetailsForm?.controls['communityGuideLines']?.value?.length}}
+      getEditorTextLength(communityDetailsForm.get('communityGuideLines')?.value)}}
     </mat-error>
     <!-- <span
       class="description-count flex justify-end">{{communityDetailsForm?.value?.communityGuideLines?.length}}/500</span> -->

@@ -57,7 +57,7 @@ export class CommunityBasicDetailsComponent {
   previewImageUrl: string = ''
   minimumCharacters: any = {
     communityName: 10,
-    description: 100,
+    description: 50,
     communityGuideLines: 100
   }
 
@@ -442,4 +442,6 @@ export class CommunityBasicDetailsComponent {
     })
     this.previewImageUrl = ''
   }
+
+
 }
