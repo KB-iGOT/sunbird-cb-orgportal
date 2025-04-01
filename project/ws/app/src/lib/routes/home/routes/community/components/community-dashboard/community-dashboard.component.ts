@@ -35,6 +35,7 @@ export class CommunityDashboardComponent implements OnInit {
   searchControl = new FormControl('');
   pageNumber = 0;
   pageSize = 10;
+  additionalUserInfo: any = {}
   totalElements = 0  // Add this to store total count
   currentSearchString = ''  // Add this to store current search
   currentStatus = 'active'
@@ -155,6 +156,10 @@ export class CommunityDashboardComponent implements OnInit {
         && res.result.search_results.data
         && res.result.search_results.data.length > 0
       ) {
+        this.additionalUserInfo = res.result.search_results.additionalInfo.reduce((acc: any, item: any) => {
+          acc[item.user_id] = item
+          return acc
+        }, {})
         this.dataSource.data = res.result.search_results.data || []
         this.totalElements = res.result.search_results.totalCount || 0  // Update total count
       } else {

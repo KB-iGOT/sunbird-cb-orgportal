@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, ViewChild } from '@angular/core'
+import { AfterViewInit, ChangeDetectorRef, Component, ViewChild } from '@angular/core'
 import { MatLegacyDialog } from '@angular/material/legacy-dialog'
 import { ActivatedRoute, Router } from '@angular/router'
 import { ConfirmDialogComponent } from '../../../../../workallocation-v2/components/confirm-dialog/confirm-dialog.component'
@@ -21,7 +21,7 @@ import { environment } from '../../../../../../../../../../../src/environments/e
 })
 
 
-export class CommunityCreationComponent {
+export class CommunityCreationComponent implements AfterViewInit {
   openMode = 'edit'
   pathUrl = ''
   userProfile: any
@@ -165,7 +165,12 @@ export class CommunityCreationComponent {
       // this.updatedEventDetails = this.getFormBodyOfEvent(this.eventDetails['status'])
     }
   }
-
+  ngAfterViewInit() {
+    if (this.stepper) {
+      this.stepper._getIndicatorType = () => 'number'
+      this.cdr.detectChanges()
+    }
+  }
 
   initializeFormAndParams() {
     this.communityDetailsForm = this.formBuilder.group({
@@ -173,7 +178,7 @@ export class CommunityCreationComponent {
       Validators.maxLength(70), Validators.pattern(noSpecialChar)]),
       topicName: new FormControl(null, [Validators.required]),
       posterImageUrl: new FormControl('', [Validators.required]),
-      description: new FormControl('', [Validators.required, Validators.minLength(100), Validators.maxLength(500)]),
+      description: new FormControl('', [Validators.required, Validators.minLength(50), Validators.maxLength(250)]),
       communityGuideLines: new FormControl('', [Validators.required, Validators.minLength(100), Validators.maxLength(500)]),
       moderators: new FormControl([], [Validators.required]),
       imageUrl: new FormControl('', [Validators.required]),

@@ -9,7 +9,8 @@ import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete'
 
 
 export interface User {
-  name: string
+  name: string,
+  firstName: string,
   profileDetails?: {
     personalDetails?: {
       primaryEmail?: string
@@ -36,13 +37,16 @@ export class AddModeratorComponent {
       this.selectedUser = this.communityDetailsForm.value.moderators
     }
     this.getUserDetails('')
-    this.filteredOptions = this.myControl.valueChanges.pipe(
+    this.filteredOptions = of(this.options)
+    this.myControl.valueChanges.pipe(
       startWith(''),
       map((value: any) => {
         const name = typeof value === 'string' ? value : value?.profileDetails?.personalDetails?.primaryEmail
         return name ? this._filter(name as string) : this.options.slice()
       }),
-    )
+    ).subscribe(options => {
+      this.filteredOptions = of(options)
+    })
   }
 
   displayFn(user: User): string {
@@ -55,9 +59,10 @@ export class AddModeratorComponent {
   private _filter(value: string): User[] {
     const filterValue = value.toLowerCase()
 
-    return this.options.filter(option => {
+    return this.options.filter((option: any) => {
+      console.log('option', option)
       const email = option.profileDetails?.personalDetails?.primaryEmail || ''
-      const name = option.name || ''
+      const name = option.firstName || ''
       return email.toLowerCase().includes(filterValue) ||
         name.toLowerCase().includes(filterValue)
     })
@@ -92,10 +97,10 @@ export class AddModeratorComponent {
     this.communitySvc.getUserDetails(req).subscribe((data: any) => {
       this.options = data.result.response.content
       this.options = this.options.map((user: any) => {
-        if (!user.name && user.profileDetails?.personalDetails) {
-          const pd = user.profileDetails.personalDetails
-          user.name = [pd.firstName, pd.lastName].filter(Boolean).join(' ')
-        }
+        // if (!user.name && user.profileDetails?.personalDetails) {
+        //   const pd = user.profileDetails.personalDetails
+
+        // }
         return user
       })
       this.filteredOptions = this.options.length > 0 ? of(this.options) : of([])
