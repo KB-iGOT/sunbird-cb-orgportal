@@ -36,7 +36,7 @@
         <th class="table-header-spacing" mat-header-cell *matHeaderCellDef [style.width.px]="300">
           Community Name </th>
         <td class="table-cell-spacing" mat-cell *matCellDef="let row" [style.width.px]="300">
-          <div class="community-name-block flex gap-2 flex-1 flex-start cursor-pointer">
+          <div class="community-name-block flex gap-2 flex-1 flex-start">
             <div class="community-name-container pt-2 pb-2">
               <img src="{{row?.imageUrl}}" alt="Parliament Building" (error)="changeToDefaultImg($event)">
             </div>
