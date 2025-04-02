@@ -49,8 +49,7 @@
 
       <!-- Start Date Column -->
       <ng-container matColumnDef="startDate">
-        <th class="table-header-spacing" mat-header-cell *matHeaderCellDef [style.width.px]="141"> Start
-          Date </th>
+        <th class="table-header-spacing" mat-header-cell *matHeaderCellDef [style.width.px]="141"> Created On </th>
         <td class="table-cell-spacing" mat-cell *matCellDef="let row" [style.width.px]="141"> {{row.createdOn | date}}
         </td>
       </ng-container>
@@ -93,7 +92,7 @@
             <mat-icon>more_vert</mat-icon>
           </button>
           <mat-menu #menu="matMenu">
-            <button mat-menu-item *ngIf="canEdit(row)" (click)="onActionClick('edit', row)">
+            <button mat-menu-item (click)="onActionClick('edit', row)" [disabled]="!canEdit(row)">
               <mat-icon>edit</mat-icon>
               <span>Edit</span>
             </button>
