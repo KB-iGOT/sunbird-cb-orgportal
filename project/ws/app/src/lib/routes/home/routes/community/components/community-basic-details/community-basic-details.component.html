@@ -10,7 +10,7 @@
           Choose a Topic
         </div>
         <mat-form-field appearance="outline" class="disable-round">
-          <mat-select placeholder="select Topic" formControlName="topicName">
+          <mat-select placeholder="Select Topic" formControlName="topicName">
             <mat-option disabled [value]="null">Select a topic</mat-option>
             <ng-container *ngFor="let topic of topicDataList">
               <mat-option [value]="topic">

@@ -145,7 +145,7 @@ export class CommunityDashboardComponent implements OnInit {
       "pageNumber": this.pageNumber,
       "pageSize": this.pageSize,
       "facets": [],
-      "orderBy": "createdBy",
+      "orderBy": "createdOn",
       "orderDirection": "DESC"
     }
     if (searchString) {

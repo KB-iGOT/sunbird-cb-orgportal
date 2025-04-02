@@ -246,9 +246,12 @@ export class CommunityCreationComponent implements AfterViewInit {
 
       // Loop through all controls and check validity (except moderators)
       Object.keys(controls).forEach(controlName => {
-        if (controlName !== 'moderators') {
+        if (controlName === 'moderators' || controlName === 'competencies_v6') {
+          return
+        } else {
           const control = controls[controlName]
           if (control.invalid) {
+            console.log('control', control)
             allRequiredControlsValid = false
           }
         }
@@ -283,6 +286,7 @@ export class CommunityCreationComponent implements AfterViewInit {
 
   addCompetencies(competencies: any) {
     this.competencies = competencies
+    this.communityDetailsForm.controls['competencies_v6'].setValue(this.competencies)
   }
 
 
