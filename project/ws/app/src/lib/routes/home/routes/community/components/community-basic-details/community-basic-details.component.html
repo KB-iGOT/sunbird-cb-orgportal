@@ -164,7 +164,10 @@
       Minimum characters left to create {{ minimumCharacters?.communityGuideLines -
       getEditorTextLength(communityDetailsForm.get('communityGuideLines')?.value)}}
     </mat-error>
-    <!-- <span
-      class="description-count flex justify-end">{{communityDetailsForm?.value?.communityGuideLines?.length}}/500</span> -->
+    <mat-error class="mat-caption mat-error-text" *ngIf="showValidationMsg('communityGuideLines','maxlength')">
+      Maximum characters allowed to create 500 characters
+    </mat-error>
+    <span
+      class="description-count flex justify-end">{{getEditorTextLength(communityDetailsForm.get('communityGuideLines')?.value)}}/500</span>
   </div>
 </form>
