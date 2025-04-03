@@ -39,6 +39,8 @@ export class CommunityCreationComponent implements AfterViewInit {
   originalFormValues: any = {}; // Add this to store original values
   isEdit = false;
   communityId: any
+  posterImageUrl: string = ''
+  imageUrl: string = ''
 
   constructor(
     private formBuilder: FormBuilder,
@@ -357,6 +359,7 @@ export class CommunityCreationComponent implements AfterViewInit {
     if (communityFormDetails.topicName && Object.keys(communityFormDetails.topicName).length) {
       topicDetails = communityFormDetails.topicName
     }
+    debugger
     communityDetails['communityName'] = communityFormDetails.communityName
     communityDetails['description'] = communityFormDetails.description
     communityDetails['topicName'] = topicDetails.categoryName || ''
@@ -395,6 +398,21 @@ export class CommunityCreationComponent implements AfterViewInit {
       })
     }
     if (status === 'Published') {
+      if (!communityDetails['communityId']) {
+        communityDetails['communityId'] = this.communityId
+      }
+      if (!communityDetails['createdBy']) {
+        communityDetails['createdBy'] = this.userProfile.id
+      }
+      if (!communityDetails['updatedBy']) {
+        communityDetails['updatedBy'] = this.userProfile.id
+      }
+      if (!communityDetails['posterImageUrl']) {
+        communityDetails['posterImageUrl'] = this.posterImageUrl
+      }
+      if (!communityDetails['imageUrl']) {
+        communityDetails['imageUrl'] = this.imageUrl
+      }
       const propertiesToDelete = [
         'createdOn',
         'createdByUserId',
@@ -470,7 +488,7 @@ export class CommunityCreationComponent implements AfterViewInit {
           if (response && response.result && response.result.url) {
             let url = this.splitUrl(response.result.url)
             let finalUrl = `${this.getEnvironmentBaseUrl()}${url}`
-
+            this.posterImageUrl = finalUrl
             // Check if imageUrl also needs to be uploaded
             if (this.communityDetailsForm.value.imageUrl instanceof File) {
               this.uploadImageUrl(communityId, finalUrl)
@@ -538,6 +556,7 @@ export class CommunityCreationComponent implements AfterViewInit {
 
           let url = this.splitUrl(response.result.url)
           let finalUrl = `${this.getEnvironmentBaseUrl()}${url}`
+          this.imageUrl = finalUrl
 
           const updateData: any = {
             communityId: communityId,
@@ -638,6 +657,7 @@ export class CommunityCreationComponent implements AfterViewInit {
               let url = this.splitUrl(response.result.url)
               let finalUrl = `${this.getEnvironmentBaseUrl()}${url}`
               updatedFields.posterImageUrl = finalUrl
+              this.posterImageUrl = finalUrl
 
               // Check if we also need to upload imageUrl
               if (changedFields.imageUrl instanceof File) {
@@ -701,6 +721,7 @@ export class CommunityCreationComponent implements AfterViewInit {
 
           let url = this.splitUrl(response.result.url)
           let finalUrl = `${this.getEnvironmentBaseUrl()}${url}`
+          this.imageUrl = finalUrl
           updatedFields.imageUrl = finalUrl
           this.finalizeUpdate(updatedFields, status)
         } else {
@@ -862,6 +883,7 @@ export class CommunityCreationComponent implements AfterViewInit {
               let url = this.splitUrl(response.result.url)
               let finalUrl = `${this.getEnvironmentBaseUrl()}${url}`
               updatedFields.posterImageUrl = finalUrl
+              this.posterImageUrl = finalUrl
 
               uploadCount++
               if (uploadCount === neededUploads) {
@@ -886,6 +908,7 @@ export class CommunityCreationComponent implements AfterViewInit {
               let url = this.splitUrl(response.result.url)
               let finalUrl = `${this.getEnvironmentBaseUrl()}${url}`
               updatedFields.imageUrl = finalUrl
+              this.imageUrl = finalUrl
 
               uploadCount++
               if (uploadCount === neededUploads) {
