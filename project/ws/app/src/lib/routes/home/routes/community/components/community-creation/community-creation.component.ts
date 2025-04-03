@@ -359,7 +359,6 @@ export class CommunityCreationComponent implements AfterViewInit {
     if (communityFormDetails.topicName && Object.keys(communityFormDetails.topicName).length) {
       topicDetails = communityFormDetails.topicName
     }
-    debugger
     communityDetails['communityName'] = communityFormDetails.communityName
     communityDetails['description'] = communityFormDetails.description
     communityDetails['topicName'] = topicDetails.categoryName || ''
