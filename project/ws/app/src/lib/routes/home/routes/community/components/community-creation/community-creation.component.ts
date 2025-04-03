@@ -55,6 +55,9 @@ export class CommunityCreationComponent implements AfterViewInit {
     this.getRouteSubscription()
   }
 
+  /**
+     * Opens confirmation dialog when user tries to exit without saving
+     */
   openConforamtionPopup() {
     if (this.openMode === 'edit') {
       const dialgData = {
@@ -172,6 +175,10 @@ export class CommunityCreationComponent implements AfterViewInit {
     }
   }
 
+  /**
+    * Initializes form group and parameters
+    * Sets up form controls with validators
+    */
   initializeFormAndParams() {
     this.communityDetailsForm = this.formBuilder.group({
       communityName: new FormControl('', [Validators.required, Validators.minLength(10),
@@ -179,7 +186,7 @@ export class CommunityCreationComponent implements AfterViewInit {
       topicName: new FormControl(null, [Validators.required]),
       posterImageUrl: new FormControl('', [Validators.required]),
       description: new FormControl('', [Validators.required, Validators.minLength(50), Validators.maxLength(250)]),
-      communityGuideLines: new FormControl('', [Validators.required, Validators.minLength(100), Validators.maxLength(500)]),
+      communityGuideLines: new FormControl('', [Validators.required, Validators.minLength(100)]),
       moderators: new FormControl([], [Validators.required]),
       imageUrl: new FormControl('', [Validators.required]),
       competencies_v6: new FormControl([], [Validators.required]),
@@ -217,7 +224,10 @@ export class CommunityCreationComponent implements AfterViewInit {
   }
 
 
-
+  /**
+     * Validates if community can be published
+     * Checks if all required forms and fields are valid
+     */
   get canPublish(): boolean {
     if (this.communityDetailsForm.invalid) {
       this.openSnackBar('Please fill all mandatory fields')
@@ -235,9 +245,12 @@ export class CommunityCreationComponent implements AfterViewInit {
         return true
       }
       return false
-
     }
   }
+
+  /**
+   * Validates if current step is complete and can move to next step
+   */
   get canMoveToNext() {
     let currentFormIsValid = false
     if (this.selectedStepperLable === 'Basic Details') {
@@ -251,7 +264,6 @@ export class CommunityCreationComponent implements AfterViewInit {
         } else {
           const control = controls[controlName]
           if (control.invalid) {
-            console.log('control', control)
             allRequiredControlsValid = false
           }
         }
@@ -263,11 +275,9 @@ export class CommunityCreationComponent implements AfterViewInit {
         this.openSnackBar('Please fill mandatory fields')
       }
     } else if (this.selectedStepperLable === 'Add Competency') {
-
       if (!(this.competencies && this.competencies.length)) {
         this.openSnackBar('Please add atleast one competency in Add Competency')
         currentFormIsValid = false
-
       } else {
         currentFormIsValid = true
       }
@@ -359,6 +369,12 @@ export class CommunityCreationComponent implements AfterViewInit {
     communityDetails['tags'] = []
     communityDetails['orgName'] = rootOrgName
     communityDetails['createdUserId'] = this.userProfile.id
+    if (communityFormDetails
+      && communityFormDetails
+      && communityFormDetails.moderators
+      && communityFormDetails.moderators.length) {
+      communityDetails['moderators'] = communityFormDetails.moderators
+    }
     if (topicDetails.categoryId) {
       communityDetails['topicId'] = topicDetails.categoryId
     }
@@ -378,7 +394,6 @@ export class CommunityCreationComponent implements AfterViewInit {
         }
       })
     }
-
     if (status === 'Published') {
       const propertiesToDelete = [
         'createdOn',
@@ -396,7 +411,7 @@ export class CommunityCreationComponent implements AfterViewInit {
 
       // Remove properties in a single loop
       propertiesToDelete.forEach(prop => {
-        if (communityDetails[prop]) {
+        if (communityDetails[prop] || communityDetails[prop] === 0) {
           delete communityDetails[prop]
         }
       })
@@ -453,7 +468,7 @@ export class CommunityCreationComponent implements AfterViewInit {
       this.communitySvc.fileUpload(formData, communityId).subscribe({
         next: (response: any) => {
           if (response && response.result && response.result.url) {
-            let url = response.result.url.split('igot/discussionhub')[1]
+            let url = this.splitUrl(response.result.url)
             let finalUrl = `${this.getEnvironmentBaseUrl()}${url}`
 
             // Check if imageUrl also needs to be uploaded
@@ -498,6 +513,21 @@ export class CommunityCreationComponent implements AfterViewInit {
     }
   }
 
+  splitUrl(url: string) {
+    if (url.includes('igot/discussionhub')) {
+      return url.split('igot/discussionhub')[1]
+    } else if (url.includes('igotqa/discussionhub')) {
+      return url.split('igotqa/discussionhub')[1]
+    } else if (url.includes('igotprod/discussionhub')) {
+      return url.split('igotprod/discussionhub')[1]
+    } else if (url.includes('igotuat/discussionhub')) {
+      return url.split('igotprod/discussionhub')[1]
+    } else {
+      return url
+    }
+  }
+
+
   uploadImageUrl(communityId: string, posterImageUrl?: string) {
     const formData = new FormData()
     formData.append('file', this.communityDetailsForm.value.imageUrl)
@@ -506,7 +536,7 @@ export class CommunityCreationComponent implements AfterViewInit {
       next: (response: any) => {
         if (response && response.result && response.result.url) {
 
-          let url = response.result.url.split('igot/discussionhub')[1]
+          let url = this.splitUrl(response.result.url)
           let finalUrl = `${this.getEnvironmentBaseUrl()}${url}`
 
           const updateData: any = {
@@ -605,7 +635,7 @@ export class CommunityCreationComponent implements AfterViewInit {
         this.communitySvc.fileUpload(formData, this.communityId).subscribe({
           next: (response: any) => {
             if (response && response.result && response.result.url) {
-              let url = response.result.url.split('igot/discussionhub')[1]
+              let url = this.splitUrl(response.result.url)
               let finalUrl = `${this.getEnvironmentBaseUrl()}${url}`
               updatedFields.posterImageUrl = finalUrl
 
@@ -669,7 +699,7 @@ export class CommunityCreationComponent implements AfterViewInit {
       next: (response: any) => {
         if (response && response.result && response.result.url) {
 
-          let url = response.result.url.split('igot/discussionhub')[1]
+          let url = this.splitUrl(response.result.url)
           let finalUrl = `${this.getEnvironmentBaseUrl()}${url}`
           updatedFields.imageUrl = finalUrl
           this.finalizeUpdate(updatedFields, status)
@@ -716,15 +746,18 @@ export class CommunityCreationComponent implements AfterViewInit {
     if (!this.canPublish) {
       return
     }
-
-    // If on Add Competency step, call the direct publish method
-    if (this.selectedStepperLable === 'Add Competency') {
-      let changedFields = this.getChangedFields()
-      if (changedFields && Object.keys(changedFields).length > 2) {
-        this.updateCommunity('Published')
-      } else {
-        this.publishCommunityMethod()
-        return
+    if (!this.communityId) {
+      this.createCommunityAndPublish()
+    } else {
+      // If on Add Competency step, call the direct publish method
+      if (this.selectedStepperLable === 'Add Competency') {
+        let changedFields = this.getChangedFields()
+        if (changedFields && Object.keys(changedFields).length > 2) {
+          this.updateCommunity('Published')
+        } else {
+          this.publishCommunityMethod()
+          return
+        }
       }
     }
   }
@@ -761,6 +794,121 @@ export class CommunityCreationComponent implements AfterViewInit {
       return `${environment.karmYogiPath}/${environment.dicussV2Bucket}`
     }
     return ''
+  }
+
+  createCommunityAndPublish() {
+    const formBody = this.getFormBodyOfEvent('Draft')
+    this.loaderService.changeLoaderState(true)
+    this.communitySvc.createCommunity(formBody).subscribe({
+      next: (res: any) => {
+        if (res && res.result && res.result.communityId) {
+          const communityId = res.result.communityId
+          this.communityId = communityId
+          // Upload files first, then publish
+          this.uploadCommunityImagesAndPublish(communityId)
+        } else {
+          this.loaderService.changeLoaderState(false)
+          this.openSnackBar('Failed to create community')
+        }
+      },
+      error: (error: HttpErrorResponse) => {
+        this.loaderService.changeLoaderState(false)
+        let errorMessage = ''
+        if (error && error.error && error.error.responseCode === "CONFLICT") {
+          errorMessage = error.error.params && error.error.params.errMsg && error.error.params.errMsg || 'Community name already exists, please try with a different name'
+        } else {
+          errorMessage = _.get(error, 'error.message', 'Something went wrong while creating community, please try again')
+        }
+        this.openSnackBar(errorMessage)
+      }
+    })
+  }
+  updateAndPublish(updatedFields: any) {
+    this.communitySvc.updateCommunity(updatedFields).subscribe({
+      next: (res: any) => {
+        if (res) {
+          // Now publish the community
+          this.publishCommunityMethod()
+        } else {
+          this.loaderService.changeLoaderState(false)
+          this.openSnackBar('Failed to update community with images')
+        }
+      },
+      error: (error: HttpErrorResponse) => {
+        this.loaderService.changeLoaderState(false)
+        const errorMessage = _.get(error, 'error.message', 'Failed to update community with images')
+        this.openSnackBar(errorMessage)
+      }
+    })
+  }
+
+  uploadCommunityImagesAndPublish(communityId: string) {
+    // Check if we need to upload images
+    if (this.communityDetailsForm.value.posterImageUrl instanceof File ||
+      this.communityDetailsForm.value.imageUrl instanceof File) {
+
+      let uploadCount = 0
+      let neededUploads = 0
+      let updatedFields: any = { communityId: communityId }
+
+      if (this.communityDetailsForm.value.posterImageUrl instanceof File) {
+        neededUploads++
+        const formData = new FormData()
+        formData.append('file', this.communityDetailsForm.value.posterImageUrl)
+
+        this.communitySvc.fileUpload(formData, communityId).subscribe({
+          next: (response: any) => {
+            if (response && response.result && response.result.url) {
+              let url = this.splitUrl(response.result.url)
+              let finalUrl = `${this.getEnvironmentBaseUrl()}${url}`
+              updatedFields.posterImageUrl = finalUrl
+
+              uploadCount++
+              if (uploadCount === neededUploads) {
+                this.updateAndPublish(updatedFields)
+              }
+            } else {
+              this.handleUploadError('Failed to upload poster image')
+            }
+          },
+          error: (error) => this.handleUploadError(error)
+        })
+      }
+
+      if (this.communityDetailsForm.value.imageUrl instanceof File) {
+        neededUploads++
+        const formData = new FormData()
+        formData.append('file', this.communityDetailsForm.value.imageUrl)
+
+        this.communitySvc.fileUpload(formData, communityId).subscribe({
+          next: (response: any) => {
+            if (response && response.result && response.result.url) {
+              let url = this.splitUrl(response.result.url)
+              let finalUrl = `${this.getEnvironmentBaseUrl()}${url}`
+              updatedFields.imageUrl = finalUrl
+
+              uploadCount++
+              if (uploadCount === neededUploads) {
+                this.updateAndPublish(updatedFields)
+              }
+            } else {
+              this.handleUploadError('Failed to upload image')
+            }
+          },
+          error: (error) => this.handleUploadError(error)
+        })
+      }
+    } else {
+      // No files to upload, proceed directly to publish
+      this.publishCommunityMethod()
+    }
+  }
+
+  handleUploadError(error: any) {
+    this.loaderService.changeLoaderState(false)
+    const errorMessage = typeof error === 'string' ? error :
+      _.get(error, 'error.message', 'Failed to upload image')
+    this.openSnackBar(errorMessage)
   }
 }
 

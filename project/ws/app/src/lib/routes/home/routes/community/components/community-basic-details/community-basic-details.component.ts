@@ -211,11 +211,25 @@ export class CommunityBasicDetailsComponent {
 
   showValidationMsg(controlName: string, validationType: string): Boolean {
     let showMsg = false
-    const control = _.get(this.communityDetailsForm, `controls.${controlName}`)
-    if (control && control.touched && control.invalid && control.hasError(validationType)) {
-      showMsg = true
+    if (controlName === 'communityGuideLines' && validationType === 'maxlength') {
+      let count = this.getEditorTextLength(_.get(this.communityDetailsForm, `controls.${controlName}`).value)
+      if (count > 500) {
+        showMsg = true
+
+        // Set the control as invalid
+        const control = this.communityDetailsForm.get(controlName)
+        if (control) {
+          control.setErrors({ 'maxlength': true })
+        }
+      }
+      return showMsg
+    } else {
+      const control = _.get(this.communityDetailsForm, `controls.${controlName}`)
+      if (control && control.touched && control.invalid && control.hasError(validationType)) {
+        showMsg = true
+      }
+      return showMsg
     }
-    return showMsg
   }
 
 
