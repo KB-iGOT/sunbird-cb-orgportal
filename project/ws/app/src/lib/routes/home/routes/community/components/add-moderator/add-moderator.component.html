@@ -9,7 +9,7 @@
         (optionSelected)="onOptionSelected($event)">
         <ng-container *ngIf="filteredOptions | async as options">
           <mat-option *ngFor="let option of options" [value]="option" [disabled]="isUserSelected(option)">
-            {{option?.firstName}}
+            {{option?.profileDetails?.personalDetails?.primaryEmail || option?.firstName}}
           </mat-option>
           <mat-option *ngIf="options.length === 0" disabled>No data found</mat-option>
         </ng-container>

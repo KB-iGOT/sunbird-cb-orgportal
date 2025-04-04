@@ -37,10 +37,10 @@
           Community Name </th>
         <td class="table-cell-spacing" mat-cell *matCellDef="let row" [style.width.px]="300">
           <div class="community-name-block flex gap-2 flex-1 flex-start">
-            <div class="community-name-container pt-2 pb-2">
+            <div class="community-name-container  pb-2">
               <img src="{{row?.imageUrl}}" alt="Parliament Building" (error)="changeToDefaultImg($event)">
             </div>
-            <div class="community-name-block pt-2">
+            <div class="community-name-block ">
               <span class="community-name line-clamp-2">{{row?.communityName || '-'}}</span>
             </div>
           </div>
@@ -89,7 +89,7 @@
         <th class="table-header-spacing" mat-header-cell *matHeaderCellDef> Actions </th>
         <td class="table-cell-spacing" mat-cell *matCellDef="let row">
           <button mat-icon-button [matMenuTriggerFor]="menu">
-            <mat-icon>more_vert</mat-icon>
+            <mat-icon class="align-top">more_vert</mat-icon>
           </button>
           <mat-menu #menu="matMenu">
             <button mat-menu-item (click)="onActionClick('edit', row)" [disabled]="!canEdit(row)">

@@ -406,12 +406,12 @@ export class CommunityCreationComponent implements AfterViewInit {
       if (!communityDetails['updatedBy']) {
         communityDetails['updatedBy'] = this.userProfile.id
       }
-      if (!communityDetails['posterImageUrl']) {
-        communityDetails['posterImageUrl'] = this.posterImageUrl
-      }
-      if (!communityDetails['imageUrl']) {
-        communityDetails['imageUrl'] = this.imageUrl
-      }
+      // if (!communityDetails['posterImageUrl']) {
+      communityDetails['posterImageUrl'] = this.posterImageUrl
+      // }
+      // if (!communityDetails['imageUrl']) {
+      communityDetails['imageUrl'] = this.imageUrl
+      // }
       const propertiesToDelete = [
         'createdOn',
         'createdByUserId',
@@ -423,6 +423,7 @@ export class CommunityCreationComponent implements AfterViewInit {
         'status',
         'publishedBy',
         'publishedOn',
+        'updatedByUserId',
         'communityGuidelines' // Note: check if this should be 'communityGuideLines' instead
       ]
 
