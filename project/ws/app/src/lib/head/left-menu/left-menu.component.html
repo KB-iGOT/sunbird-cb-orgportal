@@ -45,7 +45,7 @@
 
   <ng-container *ngIf="!menu.subMenu">
     <mat-nav-list class="nav-list-menu flex-1">
-      <a mat-list-item *ngIf="isAllowed(tab)" disableRipple class="flex outline-1 main-menuitem" [attr.data-index]="mi"
+      <a mat-list-item *ngIf="isAllowed(menu)" disableRipple class="flex outline-1 main-menuitem" [attr.data-index]="mi"
         [routerLink]="[menu.routerLink]" [queryParamsHandling]="preserve" routerLinkActive="ws-active-route-men">
         <span class="padding-left-xs sub-menu-text">{{menu?.menuCategory}}</span>
       </a>
