@@ -64,7 +64,16 @@ export class CommunityBasicDetailsComponent {
   tooltipHtml: SafeHtml
 
   constructor(private sanitizer: DomSanitizer, private matSnackBar: MatLegacySnackBar) {
-    const html = `<p>This is a <strong>tooltip</strong> with <em>HTML</em> content.</p>`
+    const html = `
+    <b>Sample Guidelines:</b>
+    <ul>
+      <li>Be respectful and professional in discussions.</li>
+      <li>Stay on-topic and ensure contributions are relevant.</li>
+      <li>No spam, promotions, or irrelevant links.</li>
+      <li>Report inappropriate content or behavior.</li>
+      <li>Moderators have the right to remove posts that violate guidelines.</li>
+    </ul>
+    `
     this.tooltipHtml = this.sanitizer.bypassSecurityTrustHtml(html)
     this.ckEditorConfig = {
       toolbar: {
@@ -215,16 +224,29 @@ export class CommunityBasicDetailsComponent {
 
   showValidationMsg(controlName: string, validationType: string): Boolean {
     let showMsg = false
-    if (controlName === 'communityGuideLines' && validationType === 'maxlength') {
-      let count = this.getEditorTextLength(_.get(this.communityDetailsForm, `controls.${controlName}`).value)
-      if (count > 500) {
-        showMsg = true
-
-        // Set the control as invalid
-        const control = this.communityDetailsForm.get(controlName)
-        if (control) {
-          control.setErrors({ 'maxlength': true })
+    if (controlName === 'communityGuideLines') {
+      if (validationType === 'maxlength') {
+        let count = this.getEditorTextLength(_.get(this.communityDetailsForm, `controls.${controlName}`).value)
+        if (count > 500) {
+          // Set the control as invalid
+          const control = this.communityDetailsForm.get(controlName)
+          if (control && control.touched) {
+            showMsg = true
+            control.setErrors({ 'maxlength': true })
+          }
         }
+        return showMsg
+      }
+      if (validationType === 'minlength') {
+        let count = this.getEditorTextLength(_.get(this.communityDetailsForm, `controls.${controlName}`).value)
+        if (count < 100) {
+          const control = this.communityDetailsForm.get(controlName)
+          if (control && control.touched) {
+            showMsg = true
+            control.setErrors({ 'minlength': true })
+          }
+        }
+        return showMsg
       }
       return showMsg
     } else {

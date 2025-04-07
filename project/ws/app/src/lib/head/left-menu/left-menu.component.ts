@@ -10,6 +10,7 @@ import { ActivatedRoute, Router } from '@angular/router'
 })
 export class LeftMenuComponent implements OnInit, OnDestroy {
   @Input() widgetData!: any
+  @Input() myRoles: any = []
   mdoname: any
   logo: any
   menulist: any = []
@@ -51,9 +52,9 @@ export class LeftMenuComponent implements OnInit, OnDestroy {
 
   isAllowed(tab: any): boolean {
     let returnValue = false
-    if (tab.requiredRoles && tab.requiredRoles.length > 0) {
+    if (tab && tab.requiredRoles && tab.requiredRoles.length > 0) {
       (tab.requiredRoles).forEach((v: any) => {
-        if ((this.widgetData.userRoles || new Set()).has(v)) {
+        if ((this.myRoles || new Set()).has(v)) {
           returnValue = true
         }
       })
