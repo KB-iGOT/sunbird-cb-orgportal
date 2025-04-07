@@ -20,20 +20,83 @@
     </mat-form-field>
   </div>
 
-  <div class="flex items-center gap-4">
+  <!-- <div class="flex items-center gap-4">
     <div *ngIf="communityDetailsForm?.value?.moderators && communityDetailsForm?.value?.moderators.length">
       Selected users -
     </div>
-    <mat-chip-list #chipListTags class="moderator-chip-list"
-      *ngIf="communityDetailsForm?.value?.moderators && communityDetailsForm?.value?.moderators.length">
-      <mat-chip class="moderator-name" *ngFor="let user of communityDetailsForm?.value?.moderators" [selectable]="true"
-        [removable]="true" (removed)="removeUser(user)">
-        <span>
-          {{ user?.moderatorEmail || user?.moderatorName }}
-          <mat-icon matChipRemove>close</mat-icon>
-        </span>
-      </mat-chip>
-    </mat-chip-list>
+    <div>
+      <mat-chip-list #chipListTags class="moderator-chip-list"
+        *ngIf="communityDetailsForm?.value?.moderators && communityDetailsForm?.value?.moderators.length">
+        <ng-container
+          *ngFor="let user of communityDetailsForm?.value?.moderators |slice:0:displayModerators? communityDetailsForm?.value?.moderators?.length : 1; let last = last">
+          <mat-chip class="moderator-name" [selectable]="true" [removable]="true" (removed)="removeUser(user)">
+            <span>
+              {{ user?.moderatorEmail || user?.moderatorName }}
+              <mat-icon matChipRemove>close</mat-icon>
+            </span>
+          </mat-chip>
+          <ng-container *ngIf="last">
+            <ng-container *ngIf="!displayModerators">
+              <span class="cursor-pointer check-moderators mat-body-2 "
+                *ngIf="communityDetailsForm?.value?.moderators?.length > 1 " (click)="displayModerators = true">+
+                {{communityDetailsForm?.value?.moderators?.length -1}} More</span>
+            </ng-container>
+            <ng-container *ngIf="displayModerators">
+              <span class="cursor-pointer check-moderators mat-body-2"
+                *ngIf="communityDetailsForm?.value?.moderators?.length > 1 " (click)="displayModerators = false">View
+                less</span>
+            </ng-container>
+          </ng-container>
+        </ng-container>
+      </mat-chip-list>
+    </div>
+    <div>
+      <span class="cursor-pointer check-moderators mat-body-2">Clear all</span>
+    </div>
+
+  </div> -->
+
+  <div class="container mx-auto  mt-6">
+    <div class="grid grid-cols-1 px-4 md:px-0 md:grid-cols-12 gap-0 md:gap-4">
+      <div class=" col-span-11 flex items-center">
+        <div class="w-32 self-start"
+          *ngIf="communityDetailsForm?.value?.moderators && communityDetailsForm?.value?.moderators.length">
+          Selected users -
+        </div>
+        <div class="">
+          <mat-chip-list #chipListTags class="moderator-chip-list"
+            *ngIf="communityDetailsForm?.value?.moderators && communityDetailsForm?.value?.moderators.length">
+            <ng-container
+              *ngFor="let user of communityDetailsForm?.value?.moderators |slice:0:displayModerators? communityDetailsForm?.value?.moderators?.length : defaultModeratorsLength; let last = last">
+              <mat-chip class="moderator-name" [selectable]="true" [removable]="true" (removed)="removeUser(user)">
+                <span>
+                  {{ user?.moderatorEmail || user?.moderatorName }}
+                  <mat-icon matChipRemove>close</mat-icon>
+                </span>
+              </mat-chip>
+              <ng-container *ngIf="last">
+                <ng-container *ngIf="!displayModerators">
+                  <span class="cursor-pointer check-moderators mat-body-2 "
+                    *ngIf="communityDetailsForm?.value?.moderators?.length > defaultModeratorsLength "
+                    (click)="displayModerators = true">+
+                    {{communityDetailsForm?.value?.moderators?.length - defaultModeratorsLength}} More</span>
+                </ng-container>
+                <ng-container *ngIf="displayModerators">
+                  <span class="cursor-pointer check-moderators mat-body-2"
+                    *ngIf="communityDetailsForm?.value?.moderators?.length > defaultModeratorsLength "
+                    (click)="displayModerators = false">View
+                    less</span>
+                </ng-container>
+              </ng-container>
+            </ng-container>
+          </mat-chip-list>
+        </div>
+      </div>
+      <div class=" col-span-1 flex justify-end items-center">
+        <span *ngIf="communityDetailsForm?.value?.moderators?.length " (click)="clearAll()"
+          class="cursor-pointer check-moderators mat-body-2">Clear all</span>
+      </div>
+    </div>
   </div>
 
   <div class="flex mt-4">

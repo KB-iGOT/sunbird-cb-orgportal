@@ -89,8 +89,18 @@ export class CommunityDashboardComponent implements OnInit {
   }
 
   ngAfterViewInit() {
-    // this.dataSource.paginator = this.paginator
     this.dataSource.sort = this.sort
+    this.dataSource.sortingDataAccessor = (item: any, property: string) => {
+      switch (property) {
+        case 'name': return item.communityName?.toLowerCase() || ''
+        case 'startDate': return new Date(item.createdOn).getTime()
+        case 'createdBy': return this.additionalUserInfo[item.createdBy]?.first_name?.toLowerCase() || ''
+        case 'publishedOn': return new Date(item.updatedOn).getTime()
+        case 'members': return item.countOfPeopleJoined || 0
+        case 'mods': return item.countOfModerators || 0
+        default: return item[property]
+      }
+    }
   }
 
   applyFilter(event: Event) {
