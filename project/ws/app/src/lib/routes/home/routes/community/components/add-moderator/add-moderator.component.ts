@@ -32,6 +32,8 @@ export class AddModeratorComponent {
   filteredOptions!: Observable<User[]>
   userProfile: any
   selectedUser: any = []
+  displayModerators: boolean = false
+  defaultModeratorsLength = 2
   ngOnInit() {
     if (this.openMode === 'edit') {
       this.selectedUser = this.communityDetailsForm.value.moderators
@@ -109,12 +111,13 @@ export class AddModeratorComponent {
   }
   onOptionSelected(event: MatAutocompleteSelectedEvent) {
     // Save the selected user details to a variable'
+
     let selectedUser = event.option.value
-    debugger
+    let email = selectedUser.profileDetails && selectedUser.profileDetails.personalDetails && selectedUser.profileDetails.personalDetails.primaryEmail
     let userObj = {
       moderatorId: selectedUser.identifier,
       moderatorName: selectedUser.firstName,
-      moderatorEmail: selectedUser.profileDetails.personalDetails.primaryEmail
+      moderatorEmail: email || ''
     }
     this.selectedUser = [...this.communityDetailsForm.value.moderators, userObj]
     this.myControl.reset('')
@@ -139,5 +142,9 @@ export class AddModeratorComponent {
     this.communityDetailsForm.patchValue({
       moderators: this.selectedUser
     })
+  }
+  clearAll() {
+    this.selectedUser = []
+    this.patchValueToForm()
   }
 }

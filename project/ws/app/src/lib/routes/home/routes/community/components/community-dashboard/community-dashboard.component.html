@@ -33,7 +33,7 @@
     <table mat-table class="table-container w-full mt-4" [dataSource]="dataSource" matSort>
       <!-- Name Column -->
       <ng-container matColumnDef="name">
-        <th class="table-header-spacing" mat-header-cell *matHeaderCellDef [style.width.px]="300">
+        <th class="table-header-spacing" mat-header-cell *matHeaderCellDef mat-sort-header [style.width.px]="300">
           Community Name </th>
         <td class="table-cell-spacing" mat-cell *matCellDef="let row" [style.width.px]="300">
           <div class="community-name-block flex gap-2 flex-1 flex-start">
@@ -49,14 +49,15 @@
 
       <!-- Start Date Column -->
       <ng-container matColumnDef="startDate">
-        <th class="table-header-spacing" mat-header-cell *matHeaderCellDef [style.width.px]="141"> Created On </th>
+        <th class="table-header-spacing" mat-header-cell *matHeaderCellDef mat-sort-header [style.width.px]="141">
+          Created On </th>
         <td class="table-cell-spacing" mat-cell *matCellDef="let row" [style.width.px]="141"> {{row.createdOn | date}}
         </td>
       </ng-container>
 
       <!-- Created By Column -->
       <ng-container matColumnDef="createdBy">
-        <th class="table-header-spacing" mat-header-cell *matHeaderCellDef [style.width.px]="200">
+        <th class="table-header-spacing" mat-header-cell *matHeaderCellDef mat-sort-header [style.width.px]="200">
           Created By </th>
         <td class="table-cell-spacing" mat-cell *matCellDef="let row" [style.width.px]="200">
           <span *ngIf="row?.createdBy">{{additionalUserInfo[row?.createdBy]?.first_name ||
@@ -66,7 +67,7 @@
 
       <!-- Published On Column -->
       <ng-container matColumnDef="publishedOn">
-        <th class="table-header-spacing" mat-header-cell *matHeaderCellDef [style.width.px]="141">
+        <th class="table-header-spacing" mat-header-cell *matHeaderCellDef mat-sort-header [style.width.px]="141">
           Published On </th>
         <td class="table-cell-spacing" mat-cell *matCellDef="let row" [style.width.px]="141"> {{row?.updatedOn | date}}
         </td>
@@ -74,13 +75,13 @@
 
       <!-- Members Column -->
       <ng-container matColumnDef="members">
-        <th class="table-header-spacing" mat-header-cell *matHeaderCellDef> Members </th>
+        <th class="table-header-spacing" mat-header-cell *matHeaderCellDef mat-sort-header> Members </th>
         <td class="table-cell-spacing" mat-cell *matCellDef="let row"> {{row?.countOfPeopleJoined || 0}} </td>
       </ng-container>
 
       <!-- Mods Column -->
       <ng-container matColumnDef="mods">
-        <th class="table-header-spacing" mat-header-cell *matHeaderCellDef> Mods </th>
+        <th class="table-header-spacing" mat-header-cell *matHeaderCellDef mat-sort-header> Mods </th>
         <td class="table-cell-spacing" mat-cell *matCellDef="let row"> {{row?.countOfModerators || 0}} </td>
       </ng-container>
 
