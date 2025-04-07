@@ -539,7 +539,7 @@ export class CommunityCreationComponent implements AfterViewInit {
     } else if (url.includes('igotprod/discussionhub')) {
       return url.split('igotprod/discussionhub')[1]
     } else if (url.includes('igotuat/discussionhub')) {
-      return url.split('igotprod/discussionhub')[1]
+      return url.split('igotuat/discussionhub')[1]
     } else {
       return url
     }
