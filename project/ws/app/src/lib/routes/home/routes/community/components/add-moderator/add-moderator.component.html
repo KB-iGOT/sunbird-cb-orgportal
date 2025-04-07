@@ -1,7 +1,10 @@
 <div class="community-details p-6">
   <div class="flex flex-column gap-2 community-form disable-round">
-    <div class="form-lable required">
+    <div class="form-lable required flex">
       Email
+      <mat-icon class="ml-1 mr-1 cursor-pointer"
+        [matTooltip]="'Provide the email address of the moderator responsible for overseeing discussions. Ensure you assign them a moderator role from the Users tab first.'"
+        [matTooltipClass]="'tooltip-custom'" matTooltipPosition="above">info_outline</mat-icon>
     </div>
     <mat-form-field appearance="outline" class="">
       <input type="text" matInput [formControl]="myControl" placeholder="Search Moderator" [matAutocomplete]="auto">
@@ -26,7 +29,7 @@
       <mat-chip class="moderator-name" *ngFor="let user of communityDetailsForm?.value?.moderators" [selectable]="true"
         [removable]="true" (removed)="removeUser(user)">
         <span>
-          {{ user?.moderatorName }}
+          {{ user?.moderatorEmail || user?.moderatorName }}
           <mat-icon matChipRemove>close</mat-icon>
         </span>
       </mat-chip>

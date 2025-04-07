@@ -91,3 +91,11 @@
 .mat-error-text {
   color: #f44336 !important;
 }
+
+::ng-deep .tooltip-html-custom {
+  max-width: 300px;
+  white-space: pre-wrap;
+}
+::ng-deep .tooltip-html-custom .mat-tooltip-component {
+  white-space: pre-wrap;
+}

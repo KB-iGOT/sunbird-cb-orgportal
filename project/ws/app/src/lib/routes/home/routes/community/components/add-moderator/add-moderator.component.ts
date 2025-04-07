@@ -110,9 +110,11 @@ export class AddModeratorComponent {
   onOptionSelected(event: MatAutocompleteSelectedEvent) {
     // Save the selected user details to a variable'
     let selectedUser = event.option.value
+    debugger
     let userObj = {
       moderatorId: selectedUser.identifier,
-      moderatorName: selectedUser.firstName
+      moderatorName: selectedUser.firstName,
+      moderatorEmail: selectedUser.profileDetails.personalDetails.primaryEmail
     }
     this.selectedUser = [...this.communityDetailsForm.value.moderators, userObj]
     this.myControl.reset('')

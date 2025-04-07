@@ -25,8 +25,8 @@
   <div class="search mt-4">
     <div class=rsearch>
       <mat-icon class="search-icon">search</mat-icon>
-      <input class="sinput" type="Standard" label="" [formControl]="searchControl" placeholder="Type here to search... "
-        maxlength="30">
+      <input class="sinput" type="Standard" label="" [formControl]="searchControl"
+        placeholder="Type here to search... ">
     </div>
   </div>
   <div class="table-wrapper">
@@ -89,7 +89,7 @@
         <th class="table-header-spacing" mat-header-cell *matHeaderCellDef> Actions </th>
         <td class="table-cell-spacing" mat-cell *matCellDef="let row">
           <button mat-icon-button [matMenuTriggerFor]="menu">
-            <mat-icon class="align-top">more_vert</mat-icon>
+            <mat-icon class="align-top-icon">more_vert</mat-icon>
           </button>
           <mat-menu #menu="matMenu">
             <button mat-menu-item (click)="onActionClick('edit', row)" [disabled]="!canEdit(row)">

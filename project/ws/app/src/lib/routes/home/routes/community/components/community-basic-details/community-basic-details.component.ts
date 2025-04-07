@@ -38,6 +38,7 @@ import {
   Underline,
   WordCount
 } from 'ckeditor5'
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser'
 
 @Component({
   selector: 'ws-app-community-basic-details',
@@ -60,8 +61,11 @@ export class CommunityBasicDetailsComponent {
     description: 50,
     communityGuideLines: 100
   }
+  tooltipHtml: SafeHtml
 
-  constructor(private matSnackBar: MatLegacySnackBar) {
+  constructor(private sanitizer: DomSanitizer, private matSnackBar: MatLegacySnackBar) {
+    const html = `<p>This is a <strong>tooltip</strong> with <em>HTML</em> content.</p>`
+    this.tooltipHtml = this.sanitizer.bypassSecurityTrustHtml(html)
     this.ckEditorConfig = {
       toolbar: {
         items: [

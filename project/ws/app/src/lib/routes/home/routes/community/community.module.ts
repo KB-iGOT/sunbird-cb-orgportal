@@ -38,8 +38,13 @@ import { AddModeratorComponent } from './components/add-moderator/add-moderator.
 import { CommunityCompetencyComponent } from './components/community-competency/community-competency.component'
 import { CompetencyAddModule } from '../../../../common/competency-add/competency-add.module'
 import { EventsService } from '../events-2/services/events.service'
+import { MatLegacyTooltipModule as MatTooltipModule } from '@angular/material/legacy-tooltip'
 
 import { MatLegacyChipsModule as MatChipsModule } from '@angular/material/legacy-chips'
+import { TooltipDirective } from './directive/tooltip.directive'
+import { TooltipComponent } from './directive/tooltip/tooltip.component'
+import { CompTooltipDirective } from '../../../state-profile/directives/tooltip.directive'
+
 
 @NgModule({
   declarations: [
@@ -47,7 +52,10 @@ import { MatLegacyChipsModule as MatChipsModule } from '@angular/material/legacy
     CommunityCreationComponent,
     CommunityBasicDetailsComponent,
     AddModeratorComponent,
-    CommunityCompetencyComponent
+    CommunityCompetencyComponent,
+    TooltipComponent,
+    TooltipDirective,
+    CompTooltipDirective
   ],
   imports: [
     CommonModule,
@@ -68,6 +76,7 @@ import { MatLegacyChipsModule as MatChipsModule } from '@angular/material/legacy
     MatSnackBarModule,
     MatTableModule,
     MatIconModule,
+    MatTooltipModule,
     MatLegacyPaginatorModule,
     MatStepperModule,
     MatFormFieldModule,

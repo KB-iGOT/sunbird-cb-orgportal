@@ -6,8 +6,11 @@
   <div>
     <div class="flex flex-row gap-4">
       <div class="flex flex-column gap-2 community-form w-full" [ngClass]="{'disableForm': communityStatus === 'live'}">
-        <div class="form-lable required">
+        <div class="form-lable required flex">
           Choose a Topic
+          <mat-icon class="ml-1 mr-1 cursor-pointer"
+            [matTooltip]="'Select a relevant topic to associate your community with.'"
+            [matTooltipClass]="'tooltip-custom'" matTooltipPosition="above">info_outline</mat-icon>
         </div>
         <mat-form-field appearance="outline" class="disable-round">
           <mat-select placeholder="Select Topic" formControlName="topicName">
@@ -114,7 +117,10 @@
   <div class="flex flex-column gap-2 community-form disable-round">
     <div class="form-lable required flex">
       Community Name
-      <!-- <mat-icon class="ml-1 mr-1 cursor-pointer">info_outline</mat-icon> -->
+      <mat-icon class="ml-1 mr-1 cursor-pointer"
+        [matTooltip]="'Pick a clear and concise name for your community. Make sure the name has not been used within your MDO and try creating a unique name.'"
+        [matTooltipClass]="'tooltip-custom'" matTooltipPosition="above">info_outline</mat-icon>
+
     </div>
     <mat-form-field appearance="outline" class="">
       <input matInput placeholder="Add your community name" formControlName="communityName" maxlength="50">
@@ -151,8 +157,9 @@
     <span class="description-count flex justify-end">{{communityDetailsForm?.value?.description?.length}}/250</span>
   </div>
   <div class="flex flex-column gap-2">
-    <div class="form-lable required">
+    <div class="form-lable required flex relative">
       Community Guidelines
+      <!-- <mat-icon class="ml-1 mr-1 cursor-pointer" [appTooltip]="tooltipHtml">info_outline</mat-icon> -->
     </div>
     <ckeditor [editor]="Editor" formControlName="communityGuideLines" [config]="getCongif()" (ready)="onReady($event)"
       (change)="onEditorChange($event)" (keyup)="checkCharacterLimit($event)" (focus)="onFocus()">
