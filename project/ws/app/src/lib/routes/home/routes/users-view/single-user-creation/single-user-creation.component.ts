@@ -54,6 +54,11 @@ export class SingleUserCreationComponent implements OnInit, AfterViewInit, OnDes
   fullProfile: any
   namePatern = `^[a-zA-Z\\s\\']{1,50}$`
 
+  designationListLoadCount = 50
+  designationDefaultLoadCount = 50
+  isLoadingMoreDesignations = false;
+  desigantionFilterEnable = false
+
   displayLoader = false
   // emailRegix = `^[\\w\-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$`
   userCreationForm = this.formBuilder.group({
@@ -70,6 +75,7 @@ export class SingleUserCreationComponent implements OnInit, AfterViewInit, OnDes
     category: new UntypedFormControl(''),
     tags: new UntypedFormControl([]),
     roles: new UntypedFormControl([], [Validators.required]),
+    searchDesignation: new UntypedFormControl('', [])
   })
   today = new Date()
 
@@ -83,18 +89,27 @@ export class SingleUserCreationComponent implements OnInit, AfterViewInit, OnDes
 
     this.fullProfile = _.get(this.activatedRouter.snapshot, 'data.configService')
 
-    if (this.userCreationForm.get('designation')) {
+    if (this.userCreationForm.get('searchDesignation')) {
       // tslint:disable-next-line
-      this.userCreationForm.get('designation')!.valueChanges
+      this.userCreationForm.get('searchDesignation')!.valueChanges
         .pipe(
           debounceTime(100),
           distinctUntilChanged(),
           startWith(''),
         )
         .subscribe(res => {
-          if (this.masterData && this.masterData.designation) {
-            this.masterData.designation = this.masterData.designationBackup.filter((item: any) =>
-              item.name.toLowerCase().includes(res && res.toLowerCase()))
+          if (res && res.length) {
+            this.desigantionFilterEnable = true
+            if (this.masterData && this.masterData.designation) {
+              this.masterData.designation = this.masterData.designationBackup.filter((item: any) =>
+                item.name.toLowerCase().includes(res && res.toLowerCase()))
+            }
+          } else {
+            if (this.masterData && this.masterData.designationBackup) {
+              this.masterData.designation = this.masterData.designationBackup.slice(0, this.designationDefaultLoadCount)
+              this.desigantionFilterEnable = false
+              this.checkCurrentDesignationPresent()
+            }
           }
         })
     }
@@ -142,7 +157,7 @@ export class SingleUserCreationComponent implements OnInit, AfterViewInit, OnDes
     this.usersService.getDesignations()
       .pipe(takeUntil(this.destroySubject$))
       .subscribe((_res: any) => {
-        this.masterData['designation'] = _res.responseData
+        this.masterData['designation'] = _res.responseData.slice(0, this.designationDefaultLoadCount)
         this.masterData['designationBackup'] = _res.responseData
         // tslint:disable-next-line
       }, (_err: HttpErrorResponse) => {
@@ -292,6 +307,79 @@ export class SingleUserCreationComponent implements OnInit, AfterViewInit, OnDes
 
   ngOnDestroy(): void {
     this.destroySubject$.unsubscribe()
+  }
+
+
+  setupScrollListener(opened: boolean): void {
+    if (opened) {
+      this.desigantionFilterEnable = false
+      this.designationListLoadCount = this.designationDefaultLoadCount // Reset the load count
+      this.masterData.designation = this.masterData.designationBackup.slice(0, this.designationListLoadCount)
+      this.checkCurrentDesignationPresent()
+
+      // Wait for the panel to be rendered in the DOM
+      setTimeout(() => {
+        // Find the panel element
+        const panel = document.querySelector('.mat-select-panel')
+        if (panel) {
+          // Add scroll event listener to the panel
+          panel.addEventListener('scroll', this.onDesignationSelectScroll.bind(this))
+        }
+      }, 100)
+    }
+  }
+
+  onDesignationSelectScroll(event: any): void {
+    const element = event.target
+    if (!this.desigantionFilterEnable) {
+      // Check if user has scrolled to the bottom (with a small threshold)
+      if (element.scrollTop + element.clientHeight >= element.scrollHeight - 5) {
+        // Only load more if not already loading and if there are potentially more items
+        if (!this.isLoadingMoreDesignations && this.masterData.designationBackup.length > this.masterData.designation.length) {
+          this.isLoadingMoreDesignations = true
+
+          // Increase the load count by designationDefaultLoadCount
+          this.designationListLoadCount += this.designationDefaultLoadCount
+
+          // Update the filtered list with more items
+          setTimeout(() => {
+            this.masterData.designation = this.masterData.designationBackup.slice(0, this.designationListLoadCount)
+            this.checkCurrentDesignationPresent()
+            this.isLoadingMoreDesignations = false
+          }, 500) // Small timeout to simulate loading and prevent multiple triggers
+        }
+      }
+    }
+  }
+
+
+  checkCurrentDesignationPresent() {
+    // Get the current designation value
+    const currentDesignation = this.userCreationForm.get('designation')!.value
+    // Check if current designation exists in the list
+    if (currentDesignation) {
+      const designationExists = this.masterData.designation.some(
+        (designation: any) => designation.name.toLowerCase() === currentDesignation.toLowerCase()
+      )
+
+      // If designation doesn't exist in the list, add it
+      if (!designationExists) {
+        // Create a new designation object to match the structure of other items
+        const newDesignation = {
+          name: currentDesignation,
+          // Add any other required properties matching your data structure
+          id: 'custom-' + Date.now(),
+          description: currentDesignation
+        }
+        // Make sure the custom designation appears in the filtered list
+        if (this.masterData.designation.length >= this.designationListLoadCount) {
+          // Replace the last item with the new one to maintain the same number of items
+          this.masterData.designation.pop()
+        }
+        this.masterData.designation.unshift(newDesignation)
+        this.isLoadingMoreDesignations = false
+      }
+    }
   }
 
 }
