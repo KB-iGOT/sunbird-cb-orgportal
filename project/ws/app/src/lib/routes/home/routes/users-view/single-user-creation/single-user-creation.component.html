@@ -44,8 +44,8 @@
 
       <div class="input-container">
         <div class="label required">Designation</div>
-        <mat-form-field class="profile-form-field required-select" appearance="none">
-          <div class="flex flex-row auto-complete-row">
+        <!--<mat-form-field class="profile-form-field required-select" appearance="none">
+           <div class="flex flex-row auto-complete-row">
             <input type="text" class="input-text" aria-label="Designation" placeholder="Select designation" matInput
               formControlName="designation" [matAutocomplete]="designationAuto" />
             <mat-icon>arrow_drop_down</mat-icon>
@@ -55,6 +55,35 @@
               {{ designation.name }}
             </mat-option>
           </mat-autocomplete>
+        </mat-form-field>-->
+        <mat-form-field appearance="none" class="profile-form-field required-select">
+          <mat-select #designation formControlName="designation" placeholder="Select designation"
+            panelClass="search-panel" (openedChange)="setupScrollListener($event)">
+
+            <!-- Sticky search input container -->
+            <div class="sticky-search-container" (click)="$event.stopPropagation()">
+              <div class="search-input-wrapper">
+                <input type="text" placeholder="Search description" formControlName="searchDesignation"
+                  class="search-input" (keydown)="$event.stopPropagation()" autocomplete="off">
+                <button *ngIf="searchDesignation?.value" type="button" class="clear-button"
+                  (click)="searchDesignation?.setValue('')">
+                  ✕
+                </button>
+              </div>
+            </div>
+            <!-- Options list -->
+            <mat-option [value]="designation?.name" *ngFor="let designation of masterData?.designation">
+              {{designation?.name}}
+            </mat-option>
+            <!-- Loading indicator -->
+            <div *ngIf="isLoadingMoreDesignations" class="loading-indicator">
+              Loading more...
+            </div>
+            <!-- No results message -->
+            <mat-option *ngIf="(masterData?.designation )?.length === 0" disabled>
+              No matches found
+            </mat-option>
+          </mat-select>
           <mat-error class="text-xs"
             *ngIf="userCreationForm?.get('designation')?.touched && userCreationForm?.get('designation')?.invalid">
             Please choose a designation
