@@ -12,7 +12,41 @@
             [matTooltip]="'Select a relevant topic to associate your community with.'"
             [matTooltipClass]="'tooltip-custom'" matTooltipPosition="above">info_outline</mat-icon>
         </div>
-        <mat-form-field appearance="outline" class="disable-round">
+        <mat-form-field appearance="outline" class="fixed-height-select">
+          <mat-select #topicName formControlName="topicName" placeholder="Select designation" panelClass="search-panel">
+
+            <!-- Sticky search input container -->
+            <div class="sticky-search-container" (click)="$event.stopPropagation()">
+              <div class="search-input-wrapper">
+                <input type="text" placeholder="Search topic" formControlName="searchTopic" class="search-input"
+                  (keydown)="$event.stopPropagation()" autocomplete="off">
+                <button *ngIf="searchTopic?.value" type="button" class="clear-button"
+                  (click)="searchTopic?.setValue('')">
+                  ✕
+                </button>
+              </div>
+            </div>
+            <!-- Options list -->
+            <ng-container *ngFor="let topic of filterTopicDetails">
+              <mat-option [value]="topic">
+                {{topic?.categoryName}}
+              </mat-option>
+            </ng-container>
+            <!-- Loading indicator -->
+            <!-- <div *ngIf="isLoadingMoreDesignations" class="loading-indicator">
+                              Loading more...
+                            </div> -->
+            <!-- No results message -->
+            <mat-option *ngIf="(filterTopicDetails )?.length === 0" disabled>
+              No matches found
+            </mat-option>
+          </mat-select>
+          <!-- <mat-error [hidden]="false"
+                            *ngIf="updateUserDataForm?.controls['designation'].errors?.required">
+                            Designation is mandatory
+                          </mat-error> -->
+        </mat-form-field>
+        <!-- <mat-form-field appearance="outline" class="disable-round">
           <mat-select placeholder="Select Topic" formControlName="topicName">
             <mat-option disabled [value]="null">Select a topic</mat-option>
             <ng-container *ngFor="let topic of topicDataList">
@@ -24,7 +58,7 @@
           <mat-error *ngIf="showValidationMsg('topicName','required')">
             Topic name is mandatory
           </mat-error>
-        </mat-form-field>
+        </mat-form-field> -->
       </div>
     </div>
   </div>

@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core'
+import { Component, Input, OnInit } from '@angular/core'
 import { FormGroup } from '@angular/forms'
 import { MatLegacySnackBar } from '@angular/material/legacy-snack-bar'
 
@@ -39,16 +39,18 @@ import {
   WordCount
 } from 'ckeditor5'
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser'
+import { debounceTime, distinctUntilChanged, startWith } from 'rxjs/operators'
 
 @Component({
   selector: 'ws-app-community-basic-details',
   templateUrl: './community-basic-details.component.html',
   styleUrls: ['./community-basic-details.component.scss']
 })
-export class CommunityBasicDetailsComponent {
+export class CommunityBasicDetailsComponent implements OnInit {
   @Input() communityDetailsForm!: FormGroup
   @Input() openMode!: string
   @Input() topicDataList: any[] = []
+  @Input() filterTopicDetails: any = []
   fileSize: any = 10
   communityStatus = 'draft'
   previewUrl: string = ''
@@ -221,6 +223,23 @@ export class CommunityBasicDetailsComponent {
     }
   }
 
+  ngOnInit(): void {
+    this.communityDetailsForm.get('searchTopic')!.valueChanges
+      .pipe(
+        debounceTime(250),
+        distinctUntilChanged(),
+        startWith(''),
+      )
+      .subscribe(searchText => {
+        if (searchText) {
+          this.filterTopicDetails = this.topicDataList.filter((val: any) =>
+            val && val.categoryName.trim().toLowerCase().includes(searchText && searchText.toLowerCase())
+          )
+        } else {
+          this.filterTopicDetails = this.topicDataList
+        }
+      })
+  }
 
   showValidationMsg(controlName: string, validationType: string): Boolean {
     let showMsg = false
