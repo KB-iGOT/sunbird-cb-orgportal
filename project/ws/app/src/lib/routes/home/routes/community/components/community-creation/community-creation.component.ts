@@ -192,6 +192,7 @@ export class CommunityCreationComponent implements AfterViewInit {
       moderators: new FormControl([], [Validators.required]),
       imageUrl: new FormControl('', [Validators.required]),
       competencies_v6: new FormControl([], [Validators.required]),
+      searchTopic: new FormControl('', [])
     })
     // Store initial values to compare against later
     this.originalFormValues = this.communityDetailsForm.value
@@ -406,12 +407,12 @@ export class CommunityCreationComponent implements AfterViewInit {
       if (!communityDetails['updatedBy']) {
         communityDetails['updatedBy'] = this.userProfile.id
       }
-      // if (!communityDetails['posterImageUrl']) {
-      communityDetails['posterImageUrl'] = this.posterImageUrl
-      // }
-      // if (!communityDetails['imageUrl']) {
-      communityDetails['imageUrl'] = this.imageUrl
-      // }
+      if (this.posterImageUrl) {
+        communityDetails['posterImageUrl'] = this.posterImageUrl
+      }
+      if (this.imageUrl) {
+        communityDetails['imageUrl'] = this.imageUrl
+      }
       const propertiesToDelete = [
         'createdOn',
         'createdByUserId',
