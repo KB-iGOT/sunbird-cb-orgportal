@@ -115,12 +115,13 @@
                 <mat-form-field appearance="outline" class="fixed-height-select">
                   <mat-select #designation formControlName="designation" placeholder="Select designation"
                     panelClass="search-panel" (openedChange)="setupScrollListener($event)"
+                    (closed)="onDesignationDropdownClosed()"
                     (selectionChange)="otherDropDownChange(designation?.value, 'designation')">
 
                     <!-- Sticky search input container -->
                     <div class="sticky-search-container" (click)="$event.stopPropagation()">
                       <div class="search-input-wrapper">
-                        <input type="text" placeholder="Search..." formControlName="searchDesignation"
+                        <input type="text" placeholder="Search designation" formControlName="searchDesignation"
                           class="search-input" (keydown)="$event.stopPropagation()" autocomplete="off">
                         <button *ngIf="searchDesignation?.value" type="button" class="clear-button"
                           (click)="searchDesignation?.setValue('')">
@@ -132,19 +133,11 @@
                     <mat-option [value]="designation?.name" *ngFor="let designation of filterDesignationsMeta">
                       {{designation?.name}}
                     </mat-option>
-                    <!-- Loading indicator -->
-                    <!-- <div *ngIf="isLoadingMoreDesignations" class="loading-indicator">
-                      Loading more...
-                    </div> -->
                     <!-- No results message -->
                     <mat-option *ngIf="(filterDesignationsMeta )?.length === 0" disabled>
                       No matches found
                     </mat-option>
                   </mat-select>
-                  <!-- <mat-error [hidden]="false"
-                    *ngIf="updateUserDataForm?.controls['designation'].errors?.required">
-                    Designation is mandatory
-                  </mat-error> -->
                 </mat-form-field>
                 <mat-icon class="verified-icon margin-left-xs"
                   *ngIf="user?.profileDetails?.profileDesignationStatus === 'VERIFIED'">

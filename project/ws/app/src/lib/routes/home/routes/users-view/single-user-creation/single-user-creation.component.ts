@@ -316,7 +316,15 @@ export class SingleUserCreationComponent implements OnInit, AfterViewInit, OnDes
       this.designationListLoadCount = this.designationDefaultLoadCount // Reset the load count
       this.masterData.designation = this.masterData.designationBackup.slice(0, this.designationListLoadCount)
       this.checkCurrentDesignationPresent()
-
+      if (this.userCreationForm.get('searchDesignation')) {
+        this.userCreationForm.get('searchDesignation')!.setValue('')
+      }
+      setTimeout(() => {
+        const searchInput = document.querySelector('.search-input') as HTMLInputElement
+        if (searchInput) {
+          searchInput.focus()
+        }
+      }, 100)
       // Wait for the panel to be rendered in the DOM
       setTimeout(() => {
         // Find the panel element
@@ -380,6 +388,23 @@ export class SingleUserCreationComponent implements OnInit, AfterViewInit, OnDes
         this.isLoadingMoreDesignations = false
       }
     }
+  }
+
+  onDesignationDropdownClosed(): void {
+    // Keep the designation value but clear the search input
+    const currentDesignation = this.userCreationForm.get('designation')!.value
+    setTimeout(() => {
+      if (this.userCreationForm.get('searchDesignation')) {
+        this.userCreationForm.get('searchDesignation')!.setValue('')
+      }
+      // Ensure the designation value remains selected
+      if (currentDesignation) {
+        const designationControl = this.userCreationForm.get('designation')
+        if (designationControl) {
+          designationControl.setValue(currentDesignation)
+        }
+      }
+    }, 100)
   }
 
 }
