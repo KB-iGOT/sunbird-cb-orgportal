@@ -64,7 +64,7 @@
             <!-- Sticky search input container -->
             <div class="sticky-search-container" (click)="$event.stopPropagation()">
               <div class="search-input-wrapper">
-                <input type="text" placeholder="Search description" formControlName="searchDesignation"
+                <input type="text" placeholder="Search designation" formControlName="searchDesignation"
                   class="search-input" (keydown)="$event.stopPropagation()" autocomplete="off">
                 <button *ngIf="searchDesignation?.value" type="button" class="clear-button"
                   (click)="searchDesignation?.setValue('')">
