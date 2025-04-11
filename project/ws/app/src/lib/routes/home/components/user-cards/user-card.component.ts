@@ -241,6 +241,7 @@ export class UserCardComponent implements OnInit, OnChanges, AfterViewChecked, A
           this.filterDesignationsMeta = this.designationsMeta.slice(0, this.designationDefaultLoadCount)
           this.desigantionFilterEnable = false
 
+          this.checkCurrentDesignationPresent()
         }
       })
   }
@@ -530,14 +531,13 @@ export class UserCardComponent implements OnInit, OnChanges, AfterViewChecked, A
           }
         })
 
-        pnael.open()
         // Wrap in setTimeout to avoid ExpressionChangedAfterItHasBeenCheckedError
         setTimeout(() => {
-          this.setUserDetails(userval)
-          // Make sure designations are loaded with the latest user data
-          this.checkCurrentDesignationPresent()
-          this.cdr.detectChanges()
-        }, 0)
+          pnael.open()
+        }, 200)
+
+        this.setUserDetails(userval)
+        this.cdr.detectChanges()
       }
     })
   }
@@ -569,9 +569,6 @@ export class UserCardComponent implements OnInit, OnChanges, AfterViewChecked, A
           this.userRoles.clear()
           this.mapRoles(user)
           this.usersData[index] = user
-
-          // Make sure designations are loaded with the latest user data
-          this.checkCurrentDesignationPresent()
         }
       })
     }
@@ -682,8 +679,6 @@ export class UserCardComponent implements OnInit, OnChanges, AfterViewChecked, A
         }
       }
       this.mapRoles(user)
-      // Make sure designations are loaded with the latest user data
-      this.checkCurrentDesignationPresent()
     }
   }
 
@@ -1427,26 +1422,16 @@ export class UserCardComponent implements OnInit, OnChanges, AfterViewChecked, A
           // Replace the last item with the new one to maintain the same number of items
           this.filterDesignationsMeta.pop()
         }
-        console.log('filterDesignationsMeta', this.filterDesignationsMeta)
         this.filterDesignationsMeta.unshift(newDesignation)
         this.isLoadingMoreDesignations = false
       }
     }
   }
   onDesignationDropdownClosed(): void {
-    // Keep the designation value but clear the search input
-    const currentDesignation = this.updateUserDataForm.get('designation')!.value
-    setTimeout(() => {
-      if (this.updateUserDataForm.get('searchDesignation')) {
-        this.updateUserDataForm.get('searchDesignation')!.setValue('')
-      }
-      // Ensure the designation value remains selected
-      if (currentDesignation) {
-        const designationControl = this.updateUserDataForm.get('designation')
-        if (designationControl) {
-          designationControl.setValue(currentDesignation)
-        }
-      }
-    }, 100)
+
+    this.desigantionFilterEnable = false
+    this.designationListLoadCount = this.designationDefaultLoadCount // Reset the load count
+    this.filterDesignationsMeta = this.designationsMeta.slice(0, this.designationListLoadCount)
+    this.checkCurrentDesignationPresent()
   }
 }
