@@ -74,11 +74,6 @@ export class CreateEventComponent implements OnInit, AfterViewInit {
   }
 
   getEventDetailsFromResolver() {
-    this.userProfile = _.get(this.activatedRoute, 'snapshot.data.configService.userProfile')
-    if (_.get(this.activatedRoute, 'snapshot.data.eventDetails')) {
-      this.eventDetails = _.get(this.activatedRoute, 'snapshot.data.eventDetails.data')
-      this.patchEventDetails()
-    }
     this.activatedRoute.queryParams.subscribe((params: any) => {
       this.openMode = params['mode']
       this.pathUrl = params['pathUrl']
@@ -86,6 +81,11 @@ export class CreateEventComponent implements OnInit, AfterViewInit {
         this.eventDetailsForm.disable()
       }
     })
+    this.userProfile = _.get(this.activatedRoute, 'snapshot.data.configService.userProfile')
+    if (_.get(this.activatedRoute, 'snapshot.data.eventDetails')) {
+      this.eventDetails = _.get(this.activatedRoute, 'snapshot.data.eventDetails.data')
+      this.patchEventDetails()
+    }
   }
 
   patchEventDetails() {
@@ -121,14 +121,18 @@ export class CreateEventComponent implements OnInit, AfterViewInit {
       }
     }
     this.eventDetailsForm.setValue(eventBaseDetails)
-    if (this.eventStatus === 'live') {
+    if (this.pathUrl === 'past' && this.openMode === 'edit') {
+      this.eventDetailsForm.disable()
+      if (isYoutubeVideo) {
+        this.eventDetailsForm.controls.registrationLink.enable()
+      } else {
+        this.eventDetailsForm.controls.recoredEventUrl.enable()
+      }
+    } else if (this.eventStatus === 'live') {
+      this.eventDetailsForm.controls.eventName.disable()
+      this.eventDetailsForm.controls.description.disable()
       this.eventDetailsForm.controls.typeofEvent.disable()
-      this.eventDetailsForm.controls.registrationLink.disable()
-      this.eventDetailsForm.controls.endTime.disable()
-      this.eventDetailsForm.controls.startTime.disable()
-      this.eventDetailsForm.controls.startDate.disable()
       this.eventDetailsForm.controls.streamType.disable()
-      this.eventDetailsForm.controls.eventCategory.disable()
     }
     this.eventDetailsForm.updateValueAndValidity()
 
@@ -357,6 +361,59 @@ export class CreateEventComponent implements OnInit, AfterViewInit {
             this.navigateBack()
             this.loaderService.changeLoaderState(false)
           }, 1000)
+        } else {
+          this.loaderService.changeLoaderState(false)
+        }
+      },
+      error: (error: HttpErrorResponse) => {
+        this.loaderService.changeLoaderState(false)
+        const errorMessage = _.get(error, 'error.message', 'Something went wrong while updating event, please try again')
+        this.openSnackBar(errorMessage)
+      }
+    })
+  }
+
+  saveAndPublish() {
+    const formBody = {
+      request: {
+        event: this.getFormBodyOfEvent('Live')
+      }
+    }
+    this.loaderService.changeLoaderState(true)
+    this.eventSvc.updateEvent(formBody, this.eventId).subscribe({
+      next: res => {
+        if (res) {
+          const versionKey = _.get(res, 'result.versionKey')
+          const identifier = _.get(res, 'result.identifier')
+          const req: any = {
+            request: {
+              event: {
+                versionKey: versionKey,
+                status: 'Live',
+                identifier: identifier,
+                publishedOn: _.get(this.eventDetails, 'publishedOn'),
+              },
+            },
+          }
+          this.eventSvc.publishEvent(identifier, req).subscribe({
+            next: res => {
+              if (res) {
+                const successMessage = 'Event details saved successfully'
+                this.openSnackBar(successMessage)
+                setTimeout(() => {
+                  this.navigateBack()
+                  this.loaderService.changeLoaderState(false)
+                }, 1000)
+              } else {
+                this.loaderService.changeLoaderState(false)
+              }
+            },
+            error: (error: HttpErrorResponse) => {
+              this.loaderService.changeLoaderState(false)
+              const errorMessage = _.get(error, 'error.message', 'Something went wrong while updating event, please try again')
+              this.openSnackBar(errorMessage)
+            }
+          })
         } else {
           this.loaderService.changeLoaderState(false)
         }

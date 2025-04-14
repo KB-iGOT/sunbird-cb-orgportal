@@ -19,6 +19,7 @@ export class MaterialDetailsComponent implements OnChanges {
   @Input() openMaterial: boolean = false
   @Input() openMode = 'edit'
   @Input() userProfile: any
+  @Input() openTab = 'draft'
   @Output() updatedMaterialDetails = new EventEmitter<material>()
   @Output() canCloseOrOpenMaterial = new EventEmitter<boolean>()
   @Output() currentMaterialSaveUpdate = new EventEmitter<boolean>()

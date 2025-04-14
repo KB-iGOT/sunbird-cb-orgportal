@@ -12,7 +12,8 @@ export class EventResolverService {
 
   resolve(activatedRoute: ActivatedRoute): Observable<any> {
     const id = _.get(activatedRoute, 'params.eventId', '').replace(':', '')
-    return this.eventSvc.getEventDetailsByid(id)
+    const pathUrl = _.get(activatedRoute, 'queryParams.pathUrl', '')
+    return this.eventSvc.getEventDetailsByid(id, pathUrl)
       .pipe(
         map((data: any) => {
           const requiredData = _.get(data, 'result.event')

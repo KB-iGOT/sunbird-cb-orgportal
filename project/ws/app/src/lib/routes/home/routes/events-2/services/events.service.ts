@@ -11,6 +11,7 @@ const API_END_POINTS = {
   UPLOAD_CONTENT: 'apis/proxies/v8/upload/action/content/v3/upload',
   CREATE_EVENT: '/apis/proxies/v8/event/v4/create',
   EVENT_READ: (eventId: string) => `apis/proxies/v8/event/v4/read/${eventId}`,
+  EDIT_EVENT_READ: (eventId: string) => `apis/proxies/v8/event/v4/read/${eventId}?mode=edit`,
   UPDATE_EVENT: (eventId: string) => `apis/proxies/v8/event/v4/update/${eventId}`,
   PUBLISH_EVENT: (eventId: string) => `apis/proxies/v8/event/v4/publish/${eventId}`,
   SEARCH_USERS: '/apis/proxies/v8/user/v1/search',
@@ -26,7 +27,7 @@ export class EventsService {
     private datePipe: DatePipe
   ) { }
 
-  getEvents(req: any) {
+  getEvents(req: any, tab: string) {
     return this.http.post<any>(`${API_END_POINTS.GET_EVENTS}`, req).pipe(map((res: any) => {
       const formatedData = {
         Event: _.get(res, 'result.Event', []),
@@ -42,7 +43,7 @@ export class EventsService {
         event['rejectedOn'] = event['rejectedOn'] ? this.datePipe.transform(event['rejectedOn'], 'dd MMM, yyyy') : ''
         if (_.get(req, 'request.filters.status').includes('Live') && event['startDateTime']) {
           const dateTime = new Date(event['startDateTime'])
-          if (dateTime < currentDate) {
+          if (dateTime < currentDate && tab !== 'past') {
             event['buttonsToHide'] = ['edit', 'cancel']
           }
         }
@@ -68,7 +69,10 @@ export class EventsService {
     return this.http.post<any>(API_END_POINTS.CREATE_EVENT, req)
   }
 
-  getEventDetailsByid(eventId: string) {
+  getEventDetailsByid(eventId: string, tab: string) {
+    if (tab !== 'upcoming') {
+      return this.http.get<any>(API_END_POINTS.EDIT_EVENT_READ(eventId))
+    }
     return this.http.get<any>(API_END_POINTS.EVENT_READ(eventId))
   }
 

@@ -67,10 +67,10 @@ export class EventsListComponent implements OnInit, OnDestroy {
             btnText: 'View',
             action: 'view',
           },
-          // {
-          //   btnText: 'Edit',
-          //   action: 'edit',
-          // },
+          {
+            btnText: 'Edit',
+            action: 'edit',
+          },
           // {
           //   btnText: 'Start Broadcast',
           //   action: 'broadcast',
@@ -158,7 +158,11 @@ export class EventsListComponent implements OnInit, OnDestroy {
           {
             btnText: 'View',
             action: 'view',
-          }
+          },
+          {
+            btnText: 'Edit ',
+            action: 'edit',
+          },
         ]
         break
       case 'canceled':
@@ -272,7 +276,7 @@ export class EventsListComponent implements OnInit, OnDestroy {
       this.getEventSubscription.unsubscribe()
     }
     this.showEventsLoader = true
-    this.getEventSubscription = this.eventSvc.getEvents(requestObj).subscribe(
+    this.getEventSubscription = this.eventSvc.getEvents(requestObj, this.pathUrl).subscribe(
       {
         next: (res: any) => {
           this.showEventsLoader = false

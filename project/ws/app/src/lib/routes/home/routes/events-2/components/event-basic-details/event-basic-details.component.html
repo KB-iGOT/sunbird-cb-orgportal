@@ -10,7 +10,7 @@
         <img src="/assets/icons/image.svg" alt="app icon">
         <span class="iconName">{{appIconName}}</span>
       </div>
-      <ng-container *ngIf="openMode === 'edit' && eventStatus !== 'live'">
+      <ng-container *ngIf="openMode === 'edit' && openTab !== 'past'">
         <mat-icon class="remove-app-icon" (click)="removeFile('appIcon')">close</mat-icon>
       </ng-container>
     </div>
@@ -29,11 +29,11 @@
     </div>
   </ng-template>
 
-  <div class="flex flex-column gap-2 event-form disable-round">
+  <div class="flex flex-column gap-2 event-form" [ngClass]="{'disableForm': eventStatus === 'live'}">
     <div class="form-lable required">
       Event Name
     </div>
-    <mat-form-field appearance="outline" class="">
+    <mat-form-field appearance="outline" class="disable-round">
       <input matInput placeholder="Add your event name" formControlName="eventName" maxlength="70">
       <mat-hint>Only ( a-z/A-Z , 0-9 . - _ $ / : [ ]' ' !) characters are supported</mat-hint>
       <mat-hint align="end" class="text-sm">{{eventDetails?.controls['eventName']?.value?.length}}/70</mat-hint>
@@ -50,7 +50,7 @@
     </mat-form-field>
   </div>
 
-  <div class="flex flex-column gap-2">
+  <div class="flex flex-column gap-2" [ngClass]="{'disableForm': eventStatus === 'live'}">
     <div class="form-lable required">
       Description
     </div>
@@ -66,7 +66,7 @@
     <span class="description-count flex justify-end">{{eventDetails?.value?.description?.length}}/2000</span>
   </div>
 
-  <div [ngClass]="{'disableForm': openMode === 'view' || eventStatus === 'live'}">
+  <div [ngClass]="{'disableForm': eventStatus === 'live'}">
     <div class="label flex items-center mt-2">
       <div class="form-lable required">
         Event Type
@@ -88,7 +88,7 @@
         <img src="/assets/icons/image.svg" alt="app icon">
         <span class="iconName">{{uploadedVideoName}}</span>
       </div>
-      <ng-container *ngIf="openMode === 'edit' && eventStatus !== 'live'">
+      <ng-container *ngIf="openMode === 'edit'">
         <mat-icon class="remove-app-icon" (click)="removeFile('uploadedVideo')">close</mat-icon>
       </ng-container>
     </div>
@@ -124,8 +124,8 @@
     </mat-form-field>
   </div>
 
-  <div class="flex flex-row gap-4">
-    <div class="flex flex-column gap-2 event-form w-full" [ngClass]="{'disableForm': eventStatus === 'live'}">
+  <div class="flex flex-row gap-4" [ngClass]="{'disableForm': openTab === 'past'}">
+    <div class="flex flex-column gap-2 event-form w-full">
       <div class="form-lable required">
         Event Category
       </div>
@@ -158,9 +158,8 @@
     </div> -->
   </div>
 
-  <div class="flex flex-row gap-4">
-    <div class="flex flex-column gap-2 event-form w-full eventTimpicker"
-      [ngClass]="{'disableForm': eventStatus === 'live'}">
+  <div class="flex flex-row gap-4" [ngClass]="{'disableForm': openTab === 'past'}">
+    <div class="flex flex-column gap-2 event-form w-full eventTimpicker">
       <div class="form-lable required">
         Date
       </div>
@@ -174,7 +173,7 @@
         </mat-error>
       </mat-form-field>
     </div>
-    <div class="flex flex-column gap-2 event-form w-full" [ngClass]="{'disableForm': eventStatus === 'live'}">
+    <div class="flex flex-column gap-2 event-form w-full">
       <div class="form-lable required">
         Start Time
       </div>

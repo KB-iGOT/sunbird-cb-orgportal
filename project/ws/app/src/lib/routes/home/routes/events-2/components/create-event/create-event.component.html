@@ -7,19 +7,23 @@
       <span class="event-builder-text">Event Builder</span>
     </div>
     <div class="flex gap-4">
-      <ng-container *ngIf="openMode === 'edit'">
-        <button mat-raised-button class="flex justify-center items-center save-and-exit" (click)="saveAndExit()">Save
+      <ng-container *ngIf="openMode === 'edit' && pathUrl !== 'past'">
+        <button mat-raised-button class="flex justify-center items-center save-and-exit" (click)="saveAndPublish()">Save
           Draft & Exit</button>
+      </ng-container>
+      <ng-container *ngIf="openMode === 'edit' && pathUrl === 'past'">
+        <button mat-raised-button class="flex justify-center items-center save-and-exit" (click)="saveAndExit()">Save &
+          Exit</button>
       </ng-container>
       <ng-container *ngIf="selectedStepperLable !== 'Preview' && selectedStepperLable !== 'Add Competency'">
         <button mat-raised-button class="flex justify-center items-center next-btn"
           (click)="moveToNextForm()">Next</button>
       </ng-container>
-      <ng-container *ngIf="!showPreview && selectedStepperLable === 'Add Competency'">
+      <ng-container *ngIf="!showPreview && selectedStepperLable === 'Add Competency' && pathUrl !== 'past'">
         <button mat-raised-button class="flex items-center publish-btn" (click)="preview()">Preview</button>
       </ng-container>
       <ng-container
-        *ngIf="(selectedStepperLable === 'Preview' || selectedStepperLable === 'Add Competency') && openMode === 'edit'">
+        *ngIf="(selectedStepperLable === 'Preview' || selectedStepperLable === 'Add Competency') && openMode === 'edit' && pathUrl !== 'past'">
         <button mat-raised-button class="flex items-center publish-btn" (click)="publish()">Send to Publisher</button>
       </ng-container>
     </div>
@@ -30,7 +34,7 @@
     <mat-step label="Basic Details">
       <ng-template matStepLabel>Basic Details</ng-template>
       <ws-app-event-basic-details [eventStatus]="eventStatus" [eventDetails]="eventDetailsForm" [openMode]="openMode"
-        [userProfile]="userProfile"></ws-app-event-basic-details>
+        [userProfile]="userProfile" [openTab]="pathUrl"></ws-app-event-basic-details>
     </mat-step>
 
     <!-- <mat-step>
@@ -41,12 +45,13 @@
 
     <mat-step label="Add Material">
       <ng-template matStepLabel>Add Material</ng-template>
-      <ws-app-event-materials [materialsList]="materialsList" [openMode]="openMode"></ws-app-event-materials>
+      <ws-app-event-materials [materialsList]="materialsList" [openMode]="openMode"
+        [openTab]="pathUrl"></ws-app-event-materials>
     </mat-step>
 
     <mat-step label="Add Competency">
       <ng-template matStepLabel>Add Competency</ng-template>
-      <ws-app-event-competencies [competenciesList]="competencies" [openMode]="openMode"
+      <ws-app-event-competencies [competenciesList]="competencies" [openMode]="openMode" [openTab]="pathUrl"
         (addCompetencies)="addCompetencies($event)"></ws-app-event-competencies>
     </mat-step>
 
