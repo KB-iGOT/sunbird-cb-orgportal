@@ -19,6 +19,7 @@ export class EventMaterialsComponent implements OnInit {
 
   @Input() materialsList: material[] = []
   @Input() openMode = 'edit'
+  @Input() openTab = 'draft'
 
   userProfile: any
   filePath: any
