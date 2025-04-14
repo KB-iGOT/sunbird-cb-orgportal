@@ -1,9 +1,15 @@
-:host {
-  display: block;
-  background-color: #333;
-  color: white;
-  padding: 5px 10px;
-  border-radius: 4px;
-  max-width: 200px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-}
+
+    :host {
+      position: fixed;
+      background-color: rgba(0, 0, 0, 0.8);
+      color: white;
+      padding: 8px;
+      border-radius: 4px;
+      z-index: 1000;
+      max-width: 500px;
+      transition: opacity 0.2s;
+      pointer-events: none;
+    }
+    .tooltip-content {
+      font-size: 14px;
+    }
