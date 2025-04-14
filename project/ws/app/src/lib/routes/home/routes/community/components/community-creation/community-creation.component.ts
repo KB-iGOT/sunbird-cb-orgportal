@@ -33,7 +33,7 @@ export class CommunityCreationComponent implements AfterViewInit {
   currentStepperIndex = 0
   communityDetailsObject: any = {}
   routeSubscription: Subscription = new Subscription()
-
+  environmentData: any
   topicDataList: any[] = []
   competencies: any = []
   originalFormValues: any = {}; // Add this to store original values
@@ -41,6 +41,8 @@ export class CommunityCreationComponent implements AfterViewInit {
   communityId: any
   posterImageUrl: string = ''
   imageUrl: string = ''
+
+  userConfirmCommunityCreation: boolean = false
 
   constructor(
     private formBuilder: FormBuilder,
@@ -303,9 +305,9 @@ export class CommunityCreationComponent implements AfterViewInit {
   }
 
 
-  saveAndExit(status = 'Draft') {
+  saveAndExit(status = 'Draft', forceCreation: boolean = false) {
     if (this.openMode === 'edit') {
-      this.updateCommunity(status)
+      this.updateCommunity(status, forceCreation)
     } else {
       if (
         !this.communityDetailsForm.value.communityName ||
@@ -323,7 +325,7 @@ export class CommunityCreationComponent implements AfterViewInit {
         return
       }
 
-      const formBody = this.getFormBodyOfEvent(status)
+      const formBody = this.getFormBodyOfEvent(status, forceCreation)
       this.loaderService.changeLoaderState(true)
       this.communitySvc.createCommunity(formBody).subscribe({
         next: (res: any) => {
@@ -337,13 +339,17 @@ export class CommunityCreationComponent implements AfterViewInit {
         },
         error: (error: HttpErrorResponse) => {
           this.loaderService.changeLoaderState(false)
-          let errorMessage = ''
-          if (error && error.error && error.error.responseCode === "CONFLICT") {
-            errorMessage = error.error.params && error.error.params.errMsg && error.error.params.errMsg || 'Community name already exists, please try with a different name'
+          if (error && error.status === 412) {
+            this.getConfirmationForCreation(error.error, status, 'saveAndExit')
           } else {
-            errorMessage = _.get(error, 'error.message', 'Something went wrong while creating community, please try again')
+            let errorMessage = ''
+            if (error && error.error && error.error.responseCode === "CONFLICT") {
+              errorMessage = error.error.params && error.error.params.errMsg && error.error.params.errMsg || 'Community name already exists, please try with a different name'
+            } else {
+              errorMessage = _.get(error, 'error.message', 'Something went wrong while creating community, please try again')
+            }
+            this.openSnackBar(errorMessage)
           }
-          this.openSnackBar(errorMessage)
         }
       })
     }
@@ -351,7 +357,7 @@ export class CommunityCreationComponent implements AfterViewInit {
 
 
 
-  getFormBodyOfEvent(status: string) {
+  getFormBodyOfEvent(status: string, forceCreation?: boolean) {
     let rootOrgName = this.userProfile.rootOrg.orgName
     let rootOrgId = this.userProfile.rootOrgId
     const communityDetails: any = JSON.parse(JSON.stringify(this.communityDetailsObject))
@@ -418,6 +424,7 @@ export class CommunityCreationComponent implements AfterViewInit {
         'createdByUserId',
         'createdUserId',
         'countOfModerators',
+        'searchTopic',
         'id',
         'searchTags',
         'updatedOn',
@@ -427,13 +434,16 @@ export class CommunityCreationComponent implements AfterViewInit {
         'updatedByUserId',
         'communityGuidelines' // Note: check if this should be 'communityGuideLines' instead
       ]
-
       // Remove properties in a single loop
       propertiesToDelete.forEach(prop => {
-        if (communityDetails[prop] || communityDetails[prop] === 0) {
+        if (communityDetails[prop] || communityDetails[prop] === 0 || communityDetails[prop] === '') {
           delete communityDetails[prop]
         }
       })
+    }
+
+    if (forceCreation || this.userConfirmCommunityCreation) {
+      communityDetails['isCommunityCreationAllowed'] = true
     }
 
     return communityDetails
@@ -442,7 +452,7 @@ export class CommunityCreationComponent implements AfterViewInit {
     this.matSnackBar.open(message)
   }
 
-  getChangedFields(): any {
+  getChangedFields(forceCreation: boolean = false): any {
     const currentValues = this.communityDetailsForm.value
     const changedFields: any = {}
     Object.keys(currentValues).forEach(key => {
@@ -469,6 +479,9 @@ export class CommunityCreationComponent implements AfterViewInit {
     // Always check if competencies have changed by comparing the arrays
     if (JSON.stringify(this.competencies) !== JSON.stringify(this.originalFormValues.competencies_v6 || [])) {
       changedFields['competencies_v6'] = this.competencies
+    }
+    if (forceCreation) {
+      changedFields['isCommunityCreationAllowed'] = true
     }
 
     return changedFields
@@ -601,6 +614,7 @@ export class CommunityCreationComponent implements AfterViewInit {
         }, 1000)
       },
       error: (error: HttpErrorResponse) => {
+
         this.loaderService.changeLoaderState(false)
         const errorMessage = _.get(error, 'error.message', 'Community created but failed to update with image URL')
         this.openSnackBar(errorMessage)
@@ -614,9 +628,9 @@ export class CommunityCreationComponent implements AfterViewInit {
 
 
 
-  updateCommunity(status = 'Draft') {
+  updateCommunity(status = 'Draft', forceCreation: boolean = false) {
     // Get only the changed fields
-    const changedFields = this.getChangedFields()
+    const changedFields = this.getChangedFields(forceCreation)
 
     // // Add status to the update
     // // changedFields.status = status
@@ -705,8 +719,13 @@ export class CommunityCreationComponent implements AfterViewInit {
         },
         error: (error: HttpErrorResponse) => {
           this.loaderService.changeLoaderState(false)
-          const errorMessage = _.get(error, 'error.message', 'Something went wrong while updating community, please try again')
-          this.openSnackBar(errorMessage)
+          if (error && error.status === 412) {
+            this.getConfirmationForCreation(error.error, status, 'updateCommunity')
+            return
+          } else {
+            const errorMessage = _.get(error, 'error.message', 'Something went wrong while updating community, please try again')
+            this.openSnackBar(errorMessage)
+          }
         }
       })
     }
@@ -757,8 +776,13 @@ export class CommunityCreationComponent implements AfterViewInit {
       },
       error: (error: HttpErrorResponse) => {
         this.loaderService.changeLoaderState(false)
-        const errorMessage = _.get(error, 'error.message', 'Something went wrong while updating community, please try again')
-        this.openSnackBar(errorMessage)
+        if (error && error.status === 412) {
+          this.getConfirmationForCreation(error.error, status, 'finalizeUpdate', updatedFields)
+          return
+        } else {
+          const errorMessage = _.get(error, 'error.message', 'Something went wrong while updating community, please try again')
+          this.openSnackBar(errorMessage)
+        }
       }
     })
   }
@@ -784,13 +808,15 @@ export class CommunityCreationComponent implements AfterViewInit {
     }
   }
 
-  publishCommunityMethod() {
+  publishCommunityMethod(status = 'Published', forceCreation: boolean = false) {
     // Show loader
     this.loaderService.changeLoaderState(true)
 
     // Get complete form data with Published status
-    const request = this.getFormBodyOfEvent('Published')
-
+    const request = this.getFormBodyOfEvent(status, forceCreation)
+    if (forceCreation || this.userConfirmCommunityCreation) {
+      request['isCommunityCreationAllowed'] = true
+    }
     this.communitySvc.publishCommunity(request).subscribe({
       next: (response: any) => {
         if (response && response.result) {
@@ -806,26 +832,36 @@ export class CommunityCreationComponent implements AfterViewInit {
       },
       error: (error: HttpErrorResponse) => {
         this.loaderService.changeLoaderState(false)
-        const errorMessage = _.get(error, 'error.message', 'Something went wrong while publishing community, please try again')
-        this.openSnackBar(errorMessage)
+        if (error && error.status === 412) {
+          this.getConfirmationForCreation(error.error, status, 'publishCommunityMethod')
+          return
+        } else {
+          const errorMessage = _.get(error, 'error.message', 'Something went wrong while publishing community, please try again')
+          this.openSnackBar(errorMessage)
+        }
       }
     })
   }
   getEnvironmentBaseUrl() {
-    if (environment.karmYogiPath && environment.dicussV2Bucket) {
-      return `${environment.karmYogiPath}/${environment.dicussV2Bucket}`
+    this.environmentData = environment
+    if (this.environmentData.karmYogiPath && this.environmentData.dicussV2Bucket) {
+      return `${this.environmentData.karmYogiPath}/${this.environmentData.dicussV2Bucket}`
+    } else if (this.environmentData.environment && this.environmentData.environment.karmYogiPath && this.environmentData.environment.dicussV2Bucket) {
+      return `${this.environmentData.environment.karmYogiPath}/${this.environmentData.environment.dicussV2Bucket}`
     }
     return ''
   }
 
-  createCommunityAndPublish() {
-    const formBody = this.getFormBodyOfEvent('Draft')
+  createCommunityAndPublish(forceCreation: boolean = false) {
+    const formBody = this.getFormBodyOfEvent('Draft', forceCreation)
     this.loaderService.changeLoaderState(true)
     this.communitySvc.createCommunity(formBody).subscribe({
       next: (res: any) => {
         if (res && res.result && res.result.communityId) {
           const communityId = res.result.communityId
           this.communityId = communityId
+          this.userConfirmCommunityCreation = forceCreation
+
           // Upload files first, then publish
           this.uploadCommunityImagesAndPublish(communityId)
         } else {
@@ -834,18 +870,27 @@ export class CommunityCreationComponent implements AfterViewInit {
         }
       },
       error: (error: HttpErrorResponse) => {
+
         this.loaderService.changeLoaderState(false)
-        let errorMessage = ''
-        if (error && error.error && error.error.responseCode === "CONFLICT") {
-          errorMessage = error.error.params && error.error.params.errMsg && error.error.params.errMsg || 'Community name already exists, please try with a different name'
+        if (error && error.status === 412) {
+          this.getConfirmationForCreation(error.error, status, 'createCommunityAndPublish')
+          return
         } else {
-          errorMessage = _.get(error, 'error.message', 'Something went wrong while creating community, please try again')
+          let errorMessage = ''
+          if (error && error.error && error.error.responseCode === "CONFLICT") {
+            errorMessage = error.error.params && error.error.params.errMsg && error.error.params.errMsg || 'Community name already exists, please try with a different name'
+          } else {
+            errorMessage = _.get(error, 'error.message', 'Something went wrong while creating community, please try again')
+          }
+          this.openSnackBar(errorMessage)
         }
-        this.openSnackBar(errorMessage)
       }
     })
   }
   updateAndPublish(updatedFields: any) {
+    if (this.userConfirmCommunityCreation) {
+      updatedFields['isCommunityCreationAllowed'] = true
+    }
     this.communitySvc.updateCommunity(updatedFields).subscribe({
       next: (res: any) => {
         if (res) {
@@ -933,6 +978,61 @@ export class CommunityCreationComponent implements AfterViewInit {
     const errorMessage = typeof error === 'string' ? error :
       _.get(error, 'error.message', 'Failed to upload image')
     this.openSnackBar(errorMessage)
+  }
+
+
+  getConfirmationForCreation(errData: any, status: any, callMethodType: string, request?: any) {
+    let msg = "Community with the given communityName already present in another organisation"
+    if (errData && errData.params && errData.params.errMsg) {
+      msg = errData.params.errMsg
+    }
+
+    const dialgData = {
+      dialogType: 'warning',
+      icon: {
+        iconName: 'error_outline',
+        iconClass: 'warning-icon'
+      },
+      message: msg,
+      buttonsList: [
+        {
+          btnAction: false,
+          displayText: 'No',
+          btnClass: 'btn-outline-primary'
+        },
+        {
+          btnAction: true,
+          displayText: 'Yes',
+          btnClass: 'successBtn'
+        },
+      ]
+    }
+
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      width: '500px',
+      height: '210px',
+      data: dialgData,
+      autoFocus: false
+    })
+
+    dialogRef.afterClosed().subscribe((btnAction: any) => {
+      if (btnAction) {
+        if (callMethodType === 'saveAndExit') {
+          this.saveAndExit(status, true)
+        } else if (callMethodType === 'updateCommunity') {
+          this.updateCommunity(status, true)
+        } else if (callMethodType === 'finalizeUpdate') {
+          request['isCommunityCreationAllowed'] = true
+          this.finalizeUpdate(request, status)
+        } else if (callMethodType === 'publishCommunityMethod') {
+          this.publishCommunityMethod(status, true)
+        } else if (callMethodType === 'createCommunity') {
+          this.createCommunityAndPublish()
+        } else if (callMethodType === 'createCommunityAndPublish') {
+          this.createCommunityAndPublish(true)
+        }
+      }
+    })
   }
 }
 

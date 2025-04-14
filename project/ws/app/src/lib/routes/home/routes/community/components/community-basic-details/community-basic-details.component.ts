@@ -67,6 +67,7 @@ export class CommunityBasicDetailsComponent implements OnInit {
 
   constructor(private sanitizer: DomSanitizer, private matSnackBar: MatLegacySnackBar) {
     const html = `
+    <p>Define the rules and expectations for engagement in your community. This ensures a respectful and meaningful discussion space. You can use the sample guidelines below:</p>
     <b>Sample Guidelines:</b>
     <ul>
       <li>Be respectful and professional in discussions.</li>
