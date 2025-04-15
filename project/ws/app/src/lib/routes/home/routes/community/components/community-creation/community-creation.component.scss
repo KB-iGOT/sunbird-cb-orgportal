@@ -2,6 +2,8 @@
   height: 65px;
   border-bottom: 1px solid #00000014;
 
+
+
   .back-arrow {
     color: #000000DE !important;
     font-size: 24px;
@@ -87,3 +89,9 @@
     background-color: #96ADD4!important;
   }
 }
+
+::ng-deep .mat-snack-bar-container.red-snackbar {
+  background: rgb(141, 16, 16)!important;
+  color: #000!important;
+}
+
