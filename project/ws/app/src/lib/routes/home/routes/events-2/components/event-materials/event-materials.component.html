@@ -4,7 +4,7 @@
   </div>
 
   <div class="add-file-card px-3 gap-4 flex items-center" onclick="document.getElementById('upload-file').click();"
-    [ngClass]="{'disableAddFile': !currentMaterialSaved || openMode === 'view'}">
+    [ngClass]="{'disableAddFile': !currentMaterialSaved || openMode === 'view' || openTab === 'past'}">
     <input #file type="file" name="upload-file" id="upload-file" class="hidden" accept=".pdf, .doc, .ppt, .pptx, .docx"
       (change)="onFileSelected(file.files);">
     <div class="upload-icon-card flex items-center justify-center">
@@ -19,7 +19,7 @@
 
   <ng-container *ngFor="let material of materialsList; let i = index ">
     <ws-app-material-details [materialDetails]="material" [openMaterial]="currentIndex === i" [openMode]="openMode"
-      [userProfile]="userProfile" (updatedMaterialDetails)="updateMaterial($event, i)"
+      [userProfile]="userProfile" [openTab]="openTab" (updatedMaterialDetails)="updateMaterial($event, i)"
       (canCloseOrOpenMaterial)="closeOrOpenMaterial($event, i)"
       (currentMaterialSaved)="currentMaterialSaveUpdate($event)"
       (deleteMaterial)="deleteMaterialFromList($event, i)"></ws-app-material-details>

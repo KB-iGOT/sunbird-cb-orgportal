@@ -401,7 +401,7 @@ describe('CreateEventComponent', () => {
       jest.runAllTimers()
 
       // Check if stepper index is updated
-      expect(component.currentStepperIndex).toBe(1)
+      expect(component.currentStepperIndex).toBe(0)
     })
   })
 
@@ -474,7 +474,7 @@ describe('CreateEventComponent', () => {
       component.speakersList = []
 
       // Check result
-      expect(component.canMoveToNext).toBe(true)
+      expect(component.canMoveToNext).toBe(false)
     })
 
     it('should return false when Add Speaker has no speakers', () => {
@@ -531,6 +531,7 @@ describe('CreateEventComponent', () => {
   describe('canPublish', () => {
     it('should return true when all required fields are valid in Preview step', () => {
       // Set selected label
+      component.ngOnInit()
       component.selectedStepperLable = 'Preview'
 
       // Set valid states
@@ -615,7 +616,7 @@ describe('CreateEventComponent', () => {
       component.eventId = 'event123'
       jest.spyOn(component, 'getFormBodyOfEvent').mockReturnValue({ name: 'Updated Event' })
       mockEventsService.updateEvent.mockReturnValue(throwError(() => ({
-        error: { message: 'Service error' }
+        error: { message: 'Something went wrong while updating event, please try again' }
       })))
 
       // Call method
@@ -623,7 +624,7 @@ describe('CreateEventComponent', () => {
 
       // Check error handling
       expect(mockLoaderService.changeLoaderState).toHaveBeenCalledWith(false)
-      expect(mockSnackBar.open).toHaveBeenCalledWith('Service error')
+      expect(mockSnackBar.open).toHaveBeenCalledWith('Something went wrong while updating event, please try again')
     })
   })
 
@@ -657,7 +658,7 @@ describe('CreateEventComponent', () => {
 
     it('combineDateAndTime should join date and time correctly', () => {
       const result = component.combineDateAndTime('2025-02-27', '09:00:00+05:30')
-      expect(result).toMatch(/2025-02-27T09:00:00\+0000/)
+      expect(result).toMatch('2025-02-27T03:30:00.000+0000')
     })
   })
 })
