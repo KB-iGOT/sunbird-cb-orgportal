@@ -8,11 +8,12 @@
     </div>
     <div class="flex gap-4">
       <ng-container *ngIf="openMode === 'edit' && pathUrl !== 'past'">
-        <button mat-raised-button class="flex justify-center items-center save-and-exit" (click)="saveAndPublish()">Save
+        <button mat-raised-button class="flex justify-center items-center save-and-exit" (click)="saveAndExit()">Save
           Draft & Exit</button>
       </ng-container>
       <ng-container *ngIf="openMode === 'edit' && pathUrl === 'past'">
-        <button mat-raised-button class="flex justify-center items-center save-and-exit" (click)="saveAndExit()">Save &
+        <button mat-raised-button class="flex justify-center items-center save-and-exit" (click)="saveAndPublish()">Save
+          &
           Exit</button>
       </ng-container>
       <ng-container *ngIf="selectedStepperLable !== 'Preview' && selectedStepperLable !== 'Add Competency'">

@@ -91,6 +91,9 @@ export class CreateEventComponent implements OnInit, AfterViewInit {
   patchEventDetails() {
     this.eventId = _.get(this.eventDetails, 'identifier')
     this.eventStatus = _.get(this.eventDetails, 'status', 'draft').toLowerCase()
+    if (this.eventStatus.toLocaleLowerCase() === 'senttopublish' && this.pathUrl === 'upcoming' && this.openMode === 'edit') {
+      this.openConforamtionPopup()
+    }
     const startDate = _.get(this.eventDetails, 'startDate', '')
     const registrationLink = _.get(this.eventDetails, 'registrationLink', '')
     const isYoutubeVideo = registrationLink.toLowerCase().includes('youtube')
@@ -139,7 +142,6 @@ export class CreateEventComponent implements OnInit, AfterViewInit {
     this.speakersList = _.get(this.eventDetails, 'speakers', [])
     this.materialsList = _.get(this.eventDetails, 'eventHandouts', [])
     this.competencies = _.get(this.eventDetails, 'competencies_v6', [])
-
   }
 
   ngAfterViewInit() {
@@ -165,32 +167,52 @@ export class CreateEventComponent implements OnInit, AfterViewInit {
 
   openConforamtionPopup() {
     if (this.openMode === 'edit') {
-      const dialgData = {
-        dialogType: 'warning',
-        icon: {
-          iconName: 'error_outline',
-          iconClass: 'warning-icon'
-        },
-        message: 'Are you sure you want to exit without saving?',
-        buttonsList: [
-          {
-            btnAction: false,
-            displayText: 'No',
-            btnClass: 'btn-outline-primary'
+      let dialgData = {}
+      if (this.eventStatus.toLocaleLowerCase() === 'senttopublish') {
+        dialgData = {
+          dialogType: 'warning',
+          icon: {
+            iconName: 'error_outline',
+            iconClass: 'warning-icon'
           },
-          {
-            btnAction: true,
-            displayText: 'Yes',
-            btnClass: 'successBtn'
+          message: 'This event has already been sent to publisher. You can edit it once the Publisher approves the request.',
+          buttonsList: [
+            {
+              btnAction: true,
+              displayText: 'Go back',
+              btnClass: 'successBtn'
+            },
+          ]
+        }
+      } else {
+        dialgData = {
+          dialogType: 'warning',
+          icon: {
+            iconName: 'error_outline',
+            iconClass: 'warning-icon'
           },
-        ]
+          message: 'Are you sure you want to exit without saving?',
+          buttonsList: [
+            {
+              btnAction: false,
+              displayText: 'No',
+              btnClass: 'btn-outline-primary'
+            },
+            {
+              btnAction: true,
+              displayText: 'Yes',
+              btnClass: 'successBtn'
+            },
+          ]
+        }
       }
 
       const dialogRef = this.dialog.open(ConfirmDialogComponent, {
         width: '500px',
         height: '210px',
         data: dialgData,
-        autoFocus: false
+        autoFocus: false,
+        disableClose: true
       })
 
       dialogRef.afterClosed().subscribe((btnAction: any) => {
