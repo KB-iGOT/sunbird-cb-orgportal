@@ -38,7 +38,6 @@ import { AddModeratorComponent } from './components/add-moderator/add-moderator.
 import { CommunityCompetencyComponent } from './components/community-competency/community-competency.component'
 import { CompetencyAddModule } from '../../../../common/competency-add/competency-add.module'
 import { EventsService } from '../events-2/services/events.service'
-import { MatLegacyTooltipModule as MatTooltipModule } from '@angular/material/legacy-tooltip'
 
 import { MatLegacyChipsModule as MatChipsModule } from '@angular/material/legacy-chips'
 import { TooltipDirective } from './directive/tooltip.directive'
@@ -76,7 +75,6 @@ import { CompTooltipDirective } from '../../../state-profile/directives/tooltip.
     MatSnackBarModule,
     MatTableModule,
     MatIconModule,
-    MatTooltipModule,
     MatLegacyPaginatorModule,
     MatStepperModule,
     MatFormFieldModule,
@@ -97,6 +95,7 @@ import { CompTooltipDirective } from '../../../state-profile/directives/tooltip.
     DatePipe,
     CommunityService,
     EventsService
-  ]
+  ],
+  // Removed entryComponents as it is no longer required in Angular 9+
 })
 export class CommunityModule { }

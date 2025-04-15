@@ -115,8 +115,7 @@
                 <mat-form-field appearance="outline" class="fixed-height-select">
                   <mat-select #designation formControlName="designation" placeholder="Select designation"
                     panelClass="search-panel" (openedChange)="setupScrollListener($event)"
-                    (closed)="onDesignationDropdownClosed()"
-                    (selectionChange)="otherDropDownChange(designation?.value, 'designation')">
+                    (closed)="onDesignationDropdownClosed()">
 
                     <!-- Sticky search input container -->
                     <div class="sticky-search-container" (click)="$event.stopPropagation()">

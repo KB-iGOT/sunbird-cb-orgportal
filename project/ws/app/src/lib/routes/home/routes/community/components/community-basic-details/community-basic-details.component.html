@@ -193,7 +193,7 @@
   <div class="flex flex-column gap-2">
     <div class="form-lable required flex relative">
       Community Guidelines
-      <!-- <mat-icon class="ml-1 mr-1 cursor-pointer" [appTooltip]="tooltipHtml">info_outline</mat-icon> -->
+      <mat-icon class="ml-1 mr-1 cursor-pointer" [appTooltip]="tooltipHtml">info_outline</mat-icon>
     </div>
     <ckeditor [editor]="Editor" formControlName="communityGuideLines" [config]="getCongif()" (ready)="onReady($event)"
       (change)="onEditorChange($event)" (keyup)="checkCharacterLimit($event)" (focus)="onFocus()">
