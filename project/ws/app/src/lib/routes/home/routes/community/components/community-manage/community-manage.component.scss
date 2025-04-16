@@ -1,0 +1,64 @@
+@use '@angular/material' as mat;
+.dashboard-container {
+  padding: 20px;
+
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+
+    h1 {
+      margin: 0;
+    }
+  }
+  .search-field {
+    width: 100%;
+    margin-bottom: 20px;
+  }
+}
+
+.rsearch {
+  display: flex;
+  position: relative;
+  flex: 1 1 auto;
+}
+
+.sinput {
+  width: 385px;
+  border-radius: 18px;
+  border: 1px solid #d5d0d0;
+  padding: 9px 9px 9px 45px;
+  margin-bottom: 0px;
+  margin-top: 0;
+  /* stylelint-disable */
+  font: normal 14px Lato;
+  /* stylelint-enable */
+  font-weight: 400;
+}
+
+.search-icon {
+  position: absolute;
+  top: 8px;
+  font-size: 22px;
+  left: 16px;
+}
+.apply-filter {
+  background-color: none;
+  border:none;
+}
+
+.mat-standard-chip {
+    transition: box-shadow 280ms cubic-bezier(0.4, 0, 0.2, 1);
+    display: inline-flex;
+    padding: 7px 12px;
+    border-radius: 16px;
+    align-items: center;
+    cursor: default;
+    min-height: 32px;
+    height: 1px;
+}
+
+::ng-deep .mat-tab-body-content {
+  overflow: hidden!important;
+}

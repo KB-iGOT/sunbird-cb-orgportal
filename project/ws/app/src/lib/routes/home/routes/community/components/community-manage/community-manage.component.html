@@ -1,0 +1,71 @@
+<div class="dashboard-container">
+  <div class="header">
+    <h1>Reports</h1>
+
+
+  </div>
+
+  <!-- <mat-form-field class="search-field">
+    <mat-label>Search</mat-label>
+    <input matInput (keyup)="applyFilter($event)" placeholder="Search communities..." #input>
+    <mat-icon matSuffix>search</mat-icon>
+  </mat-form-field> -->
+  <mat-tab-group (selectedTabChange)="onTabChange($event)">
+    <mat-tab *ngFor="let tab of tabs">
+      <ng-template mat-tab-label>
+        {{tab?.label}}
+      </ng-template>
+      <ng-container *ngTemplateOutlet="tabContent"></ng-container>
+    </mat-tab>
+  </mat-tab-group>
+</div>
+
+
+<ng-template #tabContent>
+  <div class="search mt-4 flex flex-row">
+    <div class=rsearch>
+      <mat-icon class="search-icon">search</mat-icon>
+      <input class="sinput" type="Standard" label="" [formControl]="searchControl" placeholder="Type here to search... "
+        maxlength="30">
+    </div>
+
+    <div class="filter-section flex ">
+      <button mat-button type="button" class="apply-filter margin-right-s" [matMenuTriggerFor]="cardMenu">
+        <mat-icon class="margin-right-xs">sort</mat-icon> Sort
+      </button>
+      <mat-menu #cardMenu="matMenu">
+        <ng-template matMenuContent>
+          <div mat-menu-item class="flex items-center">
+            <span>A-Z</span>
+          </div>
+          <div mat-menu-item class="flex items-center">
+            <span>Z-A</span>
+          </div>
+          <div mat-menu-item class="flex items-center">
+            <span>Latest</span>
+          </div>
+          <div mat-menu-item class="flex items-center">
+            <span>Oldest</span>
+          </div>
+        </ng-template>
+      </mat-menu>
+    </div>
+  </div>
+
+  <div class="flex mt-4">
+    <mat-chip-list>
+      <mat-chip>All(123)</mat-chip>
+      <mat-chip>Post(45)</mat-chip>
+      <mat-chip>Comments (30)</mat-chip>
+      <mat-chip>Reply (3)</mat-chip>
+    </mat-chip-list>
+  </div>
+
+  <div>
+    <div>
+
+    </div>
+  </div>
+
+
+</ng-template>

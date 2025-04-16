@@ -42,7 +42,8 @@ import { EventsService } from '../events-2/services/events.service'
 import { MatLegacyChipsModule as MatChipsModule } from '@angular/material/legacy-chips'
 import { TooltipDirective } from './directive/tooltip.directive'
 import { TooltipComponent } from './directive/tooltip/tooltip.component'
-import { CompTooltipDirective } from '../../../state-profile/directives/tooltip.directive'
+import { CompTooltipDirective } from '../../../state-profile/directives/tooltip.directive';
+import { CommunityManageComponent } from './components/community-manage/community-manage.component'
 
 
 @NgModule({
@@ -54,7 +55,8 @@ import { CompTooltipDirective } from '../../../state-profile/directives/tooltip.
     CommunityCompetencyComponent,
     TooltipComponent,
     TooltipDirective,
-    CompTooltipDirective
+    CompTooltipDirective,
+    CommunityManageComponent
   ],
   imports: [
     CommonModule,

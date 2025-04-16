@@ -115,6 +115,9 @@ export class CommunityDashboardComponent implements OnInit {
     if (action === 'edit') {
       this.router.navigate(['/app/home/community/edit', community.communityId])
     }
+    if (action === 'manage') {
+      this.router.navigate(['/app/home/community/manage', community.communityId])
+    }
   }
 
   canEdit(community: Community) {
