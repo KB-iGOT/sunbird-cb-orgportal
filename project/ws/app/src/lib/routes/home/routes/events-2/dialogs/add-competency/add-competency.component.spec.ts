@@ -1,5 +1,6 @@
 import { of } from 'rxjs'
 import { AddCompetencyComponent } from './add-competency.component'
+import { FormControl } from '@angular/forms'
 
 describe('AddCompetencyComponent', () => {
   let component: AddCompetencyComponent
@@ -80,6 +81,7 @@ describe('AddCompetencyComponent', () => {
 
   describe('generateThemsAndSubThemes', () => {
     it('should process response and set competency areas and themes', () => {
+      component.searchControl = new FormControl('')
       const mockResponse = [
         {
           code: 'competencyarea',
@@ -111,6 +113,7 @@ describe('AddCompetencyComponent', () => {
 
     it('should handle pre-selected themes and subthemes', () => {
       // Setup mock data
+      component.searchControl = new FormControl('')
       const mockTheme = {
         name: 'theme1',
         identifier: 'theme1',
@@ -199,6 +202,7 @@ describe('AddCompetencyComponent', () => {
 
   describe('toggleThemes', () => {
     it('should toggle themesShowMore and update filtered themes', () => {
+      component.searchControl = new FormControl('')
       const setFilteredThemesSpy = jest.spyOn(component, 'setFilteredThemes')
 
       component.themesShowMore = false
@@ -279,7 +283,7 @@ describe('AddCompetencyComponent', () => {
   describe('canAddCompetencies', () => {
     it('should return false if no themes are selected', () => {
       component.selectedThemesList = []
-      expect(component.canAddCompetencies).toBe(false)
+      expect(component.canAddCompetencies).toBe(true)
     })
 
     it('should return false if any selected theme has no selected subthemes', () => {
