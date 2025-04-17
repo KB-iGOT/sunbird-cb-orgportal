@@ -29,7 +29,8 @@ interface Community {
 
 
 export class CommunityDashboardComponent implements OnInit {
-  displayedColumns: string[] = ['name', 'startDate', 'createdBy', 'publishedOn', 'members', 'mods', 'actions'];
+  // displayedColumns: string[] = ['name', 'startDate', 'createdBy', 'publishedOn', 'members', 'mods', 'actions'];
+  displayedColumns: string[] = []
   dataSource: MatTableDataSource<Community>
   userProfile: any
   searchControl = new FormControl('');
@@ -86,6 +87,8 @@ export class CommunityDashboardComponent implements OnInit {
     ).subscribe(searchString => {
       this.fetchCommunityData(searchString || '')
     })
+
+    this.getDisplayColumns()
   }
 
   ngAfterViewInit() {
@@ -108,6 +111,16 @@ export class CommunityDashboardComponent implements OnInit {
     this.dataSource.filter = filterValue.trim().toLowerCase()
   }
 
+  getDisplayColumns() {
+    if (this.currentStatus === 'active') {
+      this.displayedColumns = ['name', 'startDate', 'createdBy', 'publishedOn', 'members', 'mods']
+      // this.showActionTab = false
+    }
+    if (this.currentStatus === 'draft') {
+      this.displayedColumns = ['name', 'startDate', 'createdBy', 'publishedOn', 'members', 'mods', 'actions']
+      // this.showActionTab = true
+    }
+  }
 
 
   onActionClick(action: string, community: Community) {
@@ -141,6 +154,8 @@ export class CommunityDashboardComponent implements OnInit {
       this.displayedColumns = ['name', 'startDate', 'createdBy', 'publishedOn', 'members', 'mods', 'actions']
 
     }
+
+    this.getDisplayColumns()
     this.fetchCommunityData(this.currentSearchString)
   }
 
