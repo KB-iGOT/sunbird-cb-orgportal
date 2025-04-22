@@ -22,6 +22,7 @@ export class EventBasicDetailsComponent implements OnInit, OnChanges {
   @Input() openMode = 'edit'
   @Input() eventStatus = 'draft'
   @Input() userProfile: any
+  @Input() openTab = 'draft'
 
   evntCategorysList = ['Webinar', 'Karmayogi Talks', 'Karmayogi Saptah']
   todayDate = new Date()
@@ -103,7 +104,7 @@ export class EventBasicDetailsComponent implements OnInit, OnChanges {
           this.generatMinTimeToEnd(time)
         })
       }
-      if (this.eventDetails.controls.registrationLink) {
+      if (this.eventDetails.controls.registrationLink && this.openTab !== 'past') {
         this.eventDetails.controls.registrationLink.valueChanges.subscribe((url) => {
           if (url && url !== '') {
             if (this.disableUpload === false) {
@@ -190,7 +191,7 @@ export class EventBasicDetailsComponent implements OnInit, OnChanges {
 
   get appIconName(): string {
     let name = ''
-    const appiconurl = _.get(this.eventDetails, 'value.appIcon', '')
+    const appiconurl = _.get(this.eventDetails, 'controls.appIcon.value', '')
     if (appiconurl) {
       const urlSplit = appiconurl.split('_')
       if (urlSplit.length > 0) {
@@ -218,7 +219,7 @@ export class EventBasicDetailsComponent implements OnInit, OnChanges {
       this.eventDetails.controls.appIcon.updateValueAndValidity()
     } else if (item === 'uploadedVideo' && this.eventDetails.controls.recoredEventUrl) {
       this.uploadedVideoDuration = 0
-      if (this.eventDetails.controls && this.eventDetails.controls.startTime && this.eventDetails.controls.endTime) {
+      if (this.eventDetails.controls && this.eventDetails.controls.startTime && this.eventDetails.controls.endTime && this.openTab !== 'past') {
         this.eventDetails.controls.startTime.patchValue('')
         this.eventDetails.controls.startTime.updateValueAndValidity()
         this.eventDetails.controls.endTime.patchValue('')
@@ -226,10 +227,12 @@ export class EventBasicDetailsComponent implements OnInit, OnChanges {
       }
       this.eventDetails.controls.recoredEventUrl.patchValue('')
       this.eventDetails.controls.recoredEventUrl.updateValueAndValidity()
-      this.eventDetails.controls.registrationLink.setValidators([Validators.required, Validators.pattern(URL_PATRON)])
-      this.eventDetails.controls.registrationLink.updateValueAndValidity()
-      this.eventDetails.controls.registrationLink.enable()
-      this.disableUrl = false
+      if (this.openTab !== 'past') {
+        this.eventDetails.controls.registrationLink.setValidators([Validators.required, Validators.pattern(URL_PATRON)])
+        this.eventDetails.controls.registrationLink.updateValueAndValidity()
+        this.eventDetails.controls.registrationLink.enable()
+        this.disableUrl = false
+      }
     }
   }
 
@@ -365,7 +368,9 @@ export class EventBasicDetailsComponent implements OnInit, OnChanges {
       videoPath = ''
       return
     }
-    this.getVideoDuration(videoPath)
+    if (this.openTab !== 'past') {
+      this.getVideoDuration(videoPath)
+    }
     const mediaType = 'video'
     this.saveImage(videoPath, mediaType)
   }
