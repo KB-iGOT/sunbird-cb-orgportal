@@ -95,8 +95,16 @@ export class CreateEventComponent implements OnInit, AfterViewInit {
       this.openConforamtionPopup()
     }
     const startDate = _.get(this.eventDetails, 'startDate', '')
-    const registrationLink = _.get(this.eventDetails, 'registrationLink', '')
-    const isYoutubeVideo = registrationLink.toLowerCase().includes('youtube')
+    let registrationLink: any
+    let isYoutubeVideo: any
+    const resourceType = _.get(this.eventDetails, 'resourceType', '')
+    if (resourceType === 'Webinar') {
+      registrationLink = _.get(this.eventDetails, 'recordedLinks', '')[0]
+      isYoutubeVideo = registrationLink.toLowerCase().includes('youtube')
+    } else {
+      registrationLink = _.get(this.eventDetails, 'registrationLink', '')
+      isYoutubeVideo = registrationLink.toLowerCase().includes('youtube')
+    }
     if (registrationLink && isYoutubeVideo === false) {
       this.eventDetailsForm.controls.registrationLink.clearValidators()
       this.eventDetailsForm.controls.recoredEventUrl.setValidators([Validators.required])
@@ -478,7 +486,13 @@ export class CreateEventComponent implements OnInit, AfterViewInit {
     eventDetails['endDate'] = startDate
     eventDetails['startTime'] = startTime
     eventDetails['endTime'] = endTime
-    eventDetails['registrationLink'] = eventBaseDetails.registrationLink ? eventBaseDetails.registrationLink : eventBaseDetails.recoredEventUrl
+    if (eventBaseDetails.eventCategory === 'Webinar') {
+      eventDetails['recordedLinks'] = [this.youTubeUrlChange(eventBaseDetails.registrationLink)]
+      eventDetails['registrationLink'] = ''
+    } else {
+      eventDetails['registrationLink'] = eventBaseDetails.registrationLink ?
+        this.youTubeUrlChange(eventBaseDetails.registrationLink) : eventBaseDetails.recoredEventUrl
+    }
     eventDetails['appIcon'] = eventBaseDetails.appIcon
     eventDetails['typeofEvent'] = eventBaseDetails.typeofEvent
 
@@ -511,6 +525,13 @@ export class CreateEventComponent implements OnInit, AfterViewInit {
     eventDetails['status'] = status
 
     return eventDetails
+  }
+
+  youTubeUrlChange(url: string): string {
+    const regExp = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\n?#]+)/
+    const match = url.match(regExp)
+    console.log(match && match[1] ? `https://www.youtube.com/embed/${match[1]}` : url)
+    return match && match[1] ? `https://www.youtube.com/embed/${match[1]}` : url
   }
 
   getFormatedTime(selectedTime: string): string {
