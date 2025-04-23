@@ -23,16 +23,12 @@ export class CommunityManageComponent {
       status: 'history',
       icon: ''
     }
-    // {
-    //   label: 'Archived',
-    //   status: 'inactive',
-    //   icon: 'archive'
-    // }
   ]
 
   onTabChange(event: any) {
     this.selectedTabIndex = event.index
     this.currentStatus = this.tabs[event.index].status
+    console.log(this.selectedTabIndex, "this.selectedTabIndex===")
     this.pageNumber = 0 // Reset to first page on tab change
 
 
