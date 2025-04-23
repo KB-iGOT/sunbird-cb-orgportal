@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core'
+import { Component, Input, OnInit } from '@angular/core'
 import { FormGroup } from '@angular/forms'
 import { MatLegacySnackBar } from '@angular/material/legacy-snack-bar'
 
@@ -38,16 +38,19 @@ import {
   Underline,
   WordCount
 } from 'ckeditor5'
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser'
+import { debounceTime, distinctUntilChanged, startWith } from 'rxjs/operators'
 
 @Component({
   selector: 'ws-app-community-basic-details',
   templateUrl: './community-basic-details.component.html',
   styleUrls: ['./community-basic-details.component.scss']
 })
-export class CommunityBasicDetailsComponent {
+export class CommunityBasicDetailsComponent implements OnInit {
   @Input() communityDetailsForm!: FormGroup
   @Input() openMode!: string
   @Input() topicDataList: any[] = []
+  @Input() filterTopicDetails: any = []
   fileSize: any = 10
   communityStatus = 'draft'
   previewUrl: string = ''
@@ -57,11 +60,24 @@ export class CommunityBasicDetailsComponent {
   previewImageUrl: string = ''
   minimumCharacters: any = {
     communityName: 10,
-    description: 100,
+    description: 50,
     communityGuideLines: 100
   }
+  tooltipHtml: SafeHtml
 
-  constructor(private matSnackBar: MatLegacySnackBar) {
+  constructor(private sanitizer: DomSanitizer, private matSnackBar: MatLegacySnackBar) {
+    const html = `
+    <p>Define the rules and expectations for engagement in your community. This ensures a respectful and meaningful discussion space. You can use the sample guidelines below:</p>
+    <b>Sample Guidelines:</b>
+    <ul>
+      <li>Be respectful and professional in discussions.</li>
+      <li>Stay on-topic and ensure contributions are relevant.</li>
+      <li>No spam, promotions, or irrelevant links.</li>
+      <li>Report inappropriate content or behavior.</li>
+      <li>Moderators have the right to remove posts that violate guidelines.</li>
+    </ul>
+    `
+    this.tooltipHtml = this.sanitizer.bypassSecurityTrustHtml(html)
     this.ckEditorConfig = {
       toolbar: {
         items: [
@@ -74,27 +90,27 @@ export class CommunityBasicDetailsComponent {
           'italic',
           'underline',
           '|',
-          'blockQuote',
+          // 'blockQuote',
           '|',
           'bulletedList',
           'numberedList',
-          '|',
-          'fontSize',
-          'fontFamily',
-          'fontColor',
-          'fontBackgroundColor',
-          '|',
-          'outdent',
-          'indent',
-          'strikethrough',
-          'subscript',
-          'superscript',
-          'code',
-          'removeFormat',
-          'highlight',
-          '|',
-          'specialCharacters',
-          'insertTable',
+          // '|',
+          // 'fontSize',
+          // 'fontFamily',
+          // 'fontColor',
+          // 'fontBackgroundColor',
+          // '|',
+          // 'outdent',
+          // 'indent',
+          // 'strikethrough',
+          // 'subscript',
+          // 'superscript',
+          // 'code',
+          // 'removeFormat',
+          // 'highlight',
+          // '|',
+          // 'specialCharacters',
+          // 'insertTable',
         ],
         shouldNotGroupWhenFull: false
       },
@@ -208,14 +224,58 @@ export class CommunityBasicDetailsComponent {
     }
   }
 
+  ngOnInit(): void {
+    this.communityDetailsForm.get('searchTopic')!.valueChanges
+      .pipe(
+        debounceTime(250),
+        distinctUntilChanged(),
+        startWith(''),
+      )
+      .subscribe(searchText => {
+        if (searchText) {
+          this.filterTopicDetails = this.topicDataList.filter((val: any) =>
+            val && val.categoryName.trim().toLowerCase().includes(searchText && searchText.toLowerCase())
+          )
+        } else {
+          this.filterTopicDetails = this.topicDataList
+        }
+      })
+  }
 
   showValidationMsg(controlName: string, validationType: string): Boolean {
     let showMsg = false
-    const control = _.get(this.communityDetailsForm, `controls.${controlName}`)
-    if (control && control.touched && control.invalid && control.hasError(validationType)) {
-      showMsg = true
+    if (controlName === 'communityGuideLines') {
+      if (validationType === 'maxlength') {
+        let count = this.getEditorTextLength(_.get(this.communityDetailsForm, `controls.${controlName}`).value)
+        if (count > 500) {
+          // Set the control as invalid
+          const control = this.communityDetailsForm.get(controlName)
+          if (control && control.touched) {
+            showMsg = true
+            control.setErrors({ 'maxlength': true })
+          }
+        }
+        return showMsg
+      }
+      if (validationType === 'minlength') {
+        let count = this.getEditorTextLength(_.get(this.communityDetailsForm, `controls.${controlName}`).value)
+        if (count < 100) {
+          const control = this.communityDetailsForm.get(controlName)
+          if (control && control.touched) {
+            showMsg = true
+            control.setErrors({ 'minlength': true })
+          }
+        }
+        return showMsg
+      }
+      return showMsg
+    } else {
+      const control = _.get(this.communityDetailsForm, `controls.${controlName}`)
+      if (control && control.touched && control.invalid && control.hasError(validationType)) {
+        showMsg = true
+      }
+      return showMsg
     }
-    return showMsg
   }
 
 
@@ -442,4 +502,6 @@ export class CommunityBasicDetailsComponent {
     })
     this.previewImageUrl = ''
   }
+
+
 }

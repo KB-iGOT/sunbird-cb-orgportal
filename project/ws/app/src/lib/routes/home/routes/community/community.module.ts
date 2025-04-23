@@ -40,6 +40,10 @@ import { CompetencyAddModule } from '../../../../common/competency-add/competenc
 import { EventsService } from '../events-2/services/events.service'
 
 import { MatLegacyChipsModule as MatChipsModule } from '@angular/material/legacy-chips'
+import { TooltipDirective } from './directive/tooltip.directive'
+import { TooltipComponent } from './directive/tooltip/tooltip.component'
+import { CompTooltipDirective } from '../../../state-profile/directives/tooltip.directive'
+
 
 @NgModule({
   declarations: [
@@ -47,7 +51,10 @@ import { MatLegacyChipsModule as MatChipsModule } from '@angular/material/legacy
     CommunityCreationComponent,
     CommunityBasicDetailsComponent,
     AddModeratorComponent,
-    CommunityCompetencyComponent
+    CommunityCompetencyComponent,
+    TooltipComponent,
+    TooltipDirective,
+    CompTooltipDirective
   ],
   imports: [
     CommonModule,
@@ -88,6 +95,7 @@ import { MatLegacyChipsModule as MatChipsModule } from '@angular/material/legacy
     DatePipe,
     CommunityService,
     EventsService
-  ]
+  ],
+  // Removed entryComponents as it is no longer required in Angular 9+
 })
 export class CommunityModule { }

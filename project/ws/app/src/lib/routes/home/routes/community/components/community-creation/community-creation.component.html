@@ -25,8 +25,8 @@
     (selectionChange)="onSelectionChange($event)" class="mx-10" #stepper>
     <mat-step label="Basic Details">
       <ng-template matStepLabel>Basic Details</ng-template>
-      <ws-app-community-basic-details [topicDataList]="topicDataList" [communityDetailsForm]="communityDetailsForm"
-        [openMode]="openMode"></ws-app-community-basic-details>
+      <ws-app-community-basic-details [topicDataList]="topicDataList" [filterTopicDetails]="topicDataList"
+        [communityDetailsForm]="communityDetailsForm" [openMode]="openMode"></ws-app-community-basic-details>
     </mat-step>
 
     <mat-step label="Add Moderator">

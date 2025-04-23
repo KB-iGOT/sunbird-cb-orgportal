@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, ViewChild } from '@angular/core'
+import { AfterViewInit, ChangeDetectorRef, Component, ViewChild } from '@angular/core'
 import { MatLegacyDialog } from '@angular/material/legacy-dialog'
 import { ActivatedRoute, Router } from '@angular/router'
 import { ConfirmDialogComponent } from '../../../../../workallocation-v2/components/confirm-dialog/confirm-dialog.component'
@@ -21,7 +21,7 @@ import { environment } from '../../../../../../../../../../../src/environments/e
 })
 
 
-export class CommunityCreationComponent {
+export class CommunityCreationComponent implements AfterViewInit {
   openMode = 'edit'
   pathUrl = ''
   userProfile: any
@@ -33,12 +33,16 @@ export class CommunityCreationComponent {
   currentStepperIndex = 0
   communityDetailsObject: any = {}
   routeSubscription: Subscription = new Subscription()
-
+  environmentData: any
   topicDataList: any[] = []
   competencies: any = []
   originalFormValues: any = {}; // Add this to store original values
   isEdit = false;
   communityId: any
+  posterImageUrl: string = ''
+  imageUrl: string = ''
+
+  userConfirmCommunityCreation: boolean = false
 
   constructor(
     private formBuilder: FormBuilder,
@@ -55,6 +59,9 @@ export class CommunityCreationComponent {
     this.getRouteSubscription()
   }
 
+  /**
+     * Opens confirmation dialog when user tries to exit without saving
+     */
   openConforamtionPopup() {
     if (this.openMode === 'edit') {
       const dialgData = {
@@ -165,19 +172,29 @@ export class CommunityCreationComponent {
       // this.updatedEventDetails = this.getFormBodyOfEvent(this.eventDetails['status'])
     }
   }
+  ngAfterViewInit() {
+    if (this.stepper) {
+      this.stepper._getIndicatorType = () => 'number'
+      this.cdr.detectChanges()
+    }
+  }
 
-
+  /**
+    * Initializes form group and parameters
+    * Sets up form controls with validators
+    */
   initializeFormAndParams() {
     this.communityDetailsForm = this.formBuilder.group({
       communityName: new FormControl('', [Validators.required, Validators.minLength(10),
       Validators.maxLength(70), Validators.pattern(noSpecialChar)]),
       topicName: new FormControl(null, [Validators.required]),
       posterImageUrl: new FormControl('', [Validators.required]),
-      description: new FormControl('', [Validators.required, Validators.minLength(100), Validators.maxLength(500)]),
-      communityGuideLines: new FormControl('', [Validators.required, Validators.minLength(100), Validators.maxLength(500)]),
+      description: new FormControl('', [Validators.required, Validators.minLength(50), Validators.maxLength(250)]),
+      communityGuideLines: new FormControl('', [Validators.required, Validators.minLength(100)]),
       moderators: new FormControl([], [Validators.required]),
       imageUrl: new FormControl('', [Validators.required]),
       competencies_v6: new FormControl([], [Validators.required]),
+      searchTopic: new FormControl('', [])
     })
     // Store initial values to compare against later
     this.originalFormValues = this.communityDetailsForm.value
@@ -212,7 +229,10 @@ export class CommunityCreationComponent {
   }
 
 
-
+  /**
+     * Validates if community can be published
+     * Checks if all required forms and fields are valid
+     */
   get canPublish(): boolean {
     if (this.communityDetailsForm.invalid) {
       this.openSnackBar('Please fill all mandatory fields')
@@ -230,9 +250,12 @@ export class CommunityCreationComponent {
         return true
       }
       return false
-
     }
   }
+
+  /**
+   * Validates if current step is complete and can move to next step
+   */
   get canMoveToNext() {
     let currentFormIsValid = false
     if (this.selectedStepperLable === 'Basic Details') {
@@ -241,7 +264,9 @@ export class CommunityCreationComponent {
 
       // Loop through all controls and check validity (except moderators)
       Object.keys(controls).forEach(controlName => {
-        if (controlName !== 'moderators') {
+        if (controlName === 'moderators' || controlName === 'competencies_v6') {
+          return
+        } else {
           const control = controls[controlName]
           if (control.invalid) {
             allRequiredControlsValid = false
@@ -255,11 +280,9 @@ export class CommunityCreationComponent {
         this.openSnackBar('Please fill mandatory fields')
       }
     } else if (this.selectedStepperLable === 'Add Competency') {
-
       if (!(this.competencies && this.competencies.length)) {
         this.openSnackBar('Please add atleast one competency in Add Competency')
         currentFormIsValid = false
-
       } else {
         currentFormIsValid = true
       }
@@ -278,14 +301,31 @@ export class CommunityCreationComponent {
 
   addCompetencies(competencies: any) {
     this.competencies = competencies
+    this.communityDetailsForm.controls['competencies_v6'].setValue(this.competencies)
   }
 
 
-  saveAndExit(status = 'Draft') {
+  saveAndExit(status = 'Draft', forceCreation: boolean = false) {
     if (this.openMode === 'edit') {
-      this.updateCommunity(status)
+      this.updateCommunity(status, forceCreation)
     } else {
-      const formBody = this.getFormBodyOfEvent(status)
+      if (
+        !this.communityDetailsForm.value.communityName ||
+        this.communityDetailsForm.controls['communityName'].invalid
+      ) {
+        this.openSnackBar('Please provide a valid community name')
+        return
+      }
+
+      if (
+        !this.communityDetailsForm.value.topicName ||
+        this.communityDetailsForm.controls['topicName'].invalid
+      ) {
+        this.openSnackBar('Please select a valid topic')
+        return
+      }
+
+      const formBody = this.getFormBodyOfEvent(status, forceCreation)
       this.loaderService.changeLoaderState(true)
       this.communitySvc.createCommunity(formBody).subscribe({
         next: (res: any) => {
@@ -299,8 +339,17 @@ export class CommunityCreationComponent {
         },
         error: (error: HttpErrorResponse) => {
           this.loaderService.changeLoaderState(false)
-          const errorMessage = _.get(error, 'error.message', 'Something went wrong while creating community, please try again')
-          this.openSnackBar(errorMessage)
+          if (error && error.status === 412) {
+            this.getConfirmationForCreation(error.error, status, 'saveAndExit')
+          } else {
+            let errorMessage = ''
+            if (error && error.error && error.error.responseCode === "CONFLICT") {
+              errorMessage = error.error.params && error.error.params.errMsg && error.error.params.errMsg || 'Community name already exists, please try with a different name'
+            } else {
+              errorMessage = _.get(error, 'error.message', 'Something went wrong while creating community, please try again')
+            }
+            this.openSnackBar(errorMessage, 'red-snackbar')
+          }
         }
       })
     }
@@ -308,7 +357,7 @@ export class CommunityCreationComponent {
 
 
 
-  getFormBodyOfEvent(status: string) {
+  getFormBodyOfEvent(status: string, forceCreation?: boolean) {
     let rootOrgName = this.userProfile.rootOrg.orgName
     let rootOrgId = this.userProfile.rootOrgId
     const communityDetails: any = JSON.parse(JSON.stringify(this.communityDetailsObject))
@@ -320,7 +369,6 @@ export class CommunityCreationComponent {
     communityDetails['communityName'] = communityFormDetails.communityName
     communityDetails['description'] = communityFormDetails.description
     communityDetails['topicName'] = topicDetails.categoryName || ''
-    communityDetails['topicId'] = topicDetails.categoryId || ''
     communityDetails['communityAccessLevel'] = 'public'
     communityDetails["countOfPeopleJoined"] = 0
     communityDetails["countOfPeopleLiked"] = 0
@@ -330,6 +378,15 @@ export class CommunityCreationComponent {
     communityDetails['tags'] = []
     communityDetails['orgName'] = rootOrgName
     communityDetails['createdUserId'] = this.userProfile.id
+    if (communityFormDetails
+      && communityFormDetails
+      && communityFormDetails.moderators
+      && communityFormDetails.moderators.length) {
+      communityDetails['moderators'] = communityFormDetails.moderators
+    }
+    if (topicDetails.categoryId) {
+      communityDetails['topicId'] = topicDetails.categoryId
+    }
     if (this.competencies && this.competencies.length) {
       communityDetails['competencyArea'] = []
       communityDetails['competencyTheme'] = []
@@ -346,37 +403,60 @@ export class CommunityCreationComponent {
         }
       })
     }
-
     if (status === 'Published') {
+      if (!communityDetails['communityId']) {
+        communityDetails['communityId'] = this.communityId
+      }
+      if (!communityDetails['createdBy']) {
+        communityDetails['createdBy'] = this.userProfile.id
+      }
+      if (!communityDetails['updatedBy']) {
+        communityDetails['updatedBy'] = this.userProfile.id
+      }
+      if (this.posterImageUrl) {
+        communityDetails['posterImageUrl'] = this.posterImageUrl
+      }
+      if (this.imageUrl) {
+        communityDetails['imageUrl'] = this.imageUrl
+      }
       const propertiesToDelete = [
         'createdOn',
         'createdByUserId',
         'createdUserId',
         'countOfModerators',
+        'searchTopic',
         'id',
         'searchTags',
         'updatedOn',
         'status',
         'publishedBy',
         'publishedOn',
+        'updatedByUserId',
         'communityGuidelines' // Note: check if this should be 'communityGuideLines' instead
       ]
-
       // Remove properties in a single loop
       propertiesToDelete.forEach(prop => {
-        if (communityDetails[prop]) {
+        if (communityDetails[prop] || communityDetails[prop] === 0 || communityDetails[prop] === '') {
           delete communityDetails[prop]
         }
       })
     }
 
+    if (forceCreation || this.userConfirmCommunityCreation) {
+      communityDetails['isCommunityCreationAllowed'] = true
+    }
+
     return communityDetails
   }
-  private openSnackBar(message: string) {
-    this.matSnackBar.open(message)
+  private openSnackBar(message: string, className: string = '') {
+    // this.matSnackBar.open(message, 'Close', className)
+    this.matSnackBar.open(message, '', {
+      duration: 3000,
+      panelClass: className ? [className] : []
+    })
   }
 
-  getChangedFields(): any {
+  getChangedFields(forceCreation: boolean = false): any {
     const currentValues = this.communityDetailsForm.value
     const changedFields: any = {}
     Object.keys(currentValues).forEach(key => {
@@ -404,6 +484,9 @@ export class CommunityCreationComponent {
     if (JSON.stringify(this.competencies) !== JSON.stringify(this.originalFormValues.competencies_v6 || [])) {
       changedFields['competencies_v6'] = this.competencies
     }
+    if (forceCreation) {
+      changedFields['isCommunityCreationAllowed'] = true
+    }
 
     return changedFields
   }
@@ -421,9 +504,9 @@ export class CommunityCreationComponent {
       this.communitySvc.fileUpload(formData, communityId).subscribe({
         next: (response: any) => {
           if (response && response.result && response.result.url) {
-            let url = response.result.url.split('igot/discussionhub')[1]
+            let url = this.splitUrl(response.result.url)
             let finalUrl = `${this.getEnvironmentBaseUrl()}${url}`
-
+            this.posterImageUrl = finalUrl
             // Check if imageUrl also needs to be uploaded
             if (this.communityDetailsForm.value.imageUrl instanceof File) {
               this.uploadImageUrl(communityId, finalUrl)
@@ -466,6 +549,21 @@ export class CommunityCreationComponent {
     }
   }
 
+  splitUrl(url: string) {
+    if (url.includes('igot/discussionhub')) {
+      return url.split('igot/discussionhub')[1]
+    } else if (url.includes('igotqa/discussionhub')) {
+      return url.split('igotqa/discussionhub')[1]
+    } else if (url.includes('igotprod/discussionhub')) {
+      return url.split('igotprod/discussionhub')[1]
+    } else if (url.includes('igotuat/discussionhub')) {
+      return url.split('igotuat/discussionhub')[1]
+    } else {
+      return url
+    }
+  }
+
+
   uploadImageUrl(communityId: string, posterImageUrl?: string) {
     const formData = new FormData()
     formData.append('file', this.communityDetailsForm.value.imageUrl)
@@ -474,8 +572,9 @@ export class CommunityCreationComponent {
       next: (response: any) => {
         if (response && response.result && response.result.url) {
 
-          let url = response.result.url.split('igot/discussionhub')[1]
+          let url = this.splitUrl(response.result.url)
           let finalUrl = `${this.getEnvironmentBaseUrl()}${url}`
+          this.imageUrl = finalUrl
 
           const updateData: any = {
             communityId: communityId,
@@ -519,6 +618,7 @@ export class CommunityCreationComponent {
         }, 1000)
       },
       error: (error: HttpErrorResponse) => {
+
         this.loaderService.changeLoaderState(false)
         const errorMessage = _.get(error, 'error.message', 'Community created but failed to update with image URL')
         this.openSnackBar(errorMessage)
@@ -532,9 +632,9 @@ export class CommunityCreationComponent {
 
 
 
-  updateCommunity(status = 'Draft') {
+  updateCommunity(status = 'Draft', forceCreation: boolean = false) {
     // Get only the changed fields
-    const changedFields = this.getChangedFields()
+    const changedFields = this.getChangedFields(forceCreation)
 
     // // Add status to the update
     // // changedFields.status = status
@@ -573,9 +673,10 @@ export class CommunityCreationComponent {
         this.communitySvc.fileUpload(formData, this.communityId).subscribe({
           next: (response: any) => {
             if (response && response.result && response.result.url) {
-              let url = response.result.url.split('igot/discussionhub')[1]
+              let url = this.splitUrl(response.result.url)
               let finalUrl = `${this.getEnvironmentBaseUrl()}${url}`
               updatedFields.posterImageUrl = finalUrl
+              this.posterImageUrl = finalUrl
 
               // Check if we also need to upload imageUrl
               if (changedFields.imageUrl instanceof File) {
@@ -622,8 +723,13 @@ export class CommunityCreationComponent {
         },
         error: (error: HttpErrorResponse) => {
           this.loaderService.changeLoaderState(false)
-          const errorMessage = _.get(error, 'error.message', 'Something went wrong while updating community, please try again')
-          this.openSnackBar(errorMessage)
+          if (error && error.status === 412) {
+            this.getConfirmationForCreation(error.error, status, 'updateCommunity')
+            return
+          } else {
+            const errorMessage = _.get(error, 'error.message', 'Something went wrong while updating community, please try again')
+            this.openSnackBar(errorMessage)
+          }
         }
       })
     }
@@ -637,8 +743,9 @@ export class CommunityCreationComponent {
       next: (response: any) => {
         if (response && response.result && response.result.url) {
 
-          let url = response.result.url.split('igot/discussionhub')[1]
+          let url = this.splitUrl(response.result.url)
           let finalUrl = `${this.getEnvironmentBaseUrl()}${url}`
+          this.imageUrl = finalUrl
           updatedFields.imageUrl = finalUrl
           this.finalizeUpdate(updatedFields, status)
         } else {
@@ -673,8 +780,13 @@ export class CommunityCreationComponent {
       },
       error: (error: HttpErrorResponse) => {
         this.loaderService.changeLoaderState(false)
-        const errorMessage = _.get(error, 'error.message', 'Something went wrong while updating community, please try again')
-        this.openSnackBar(errorMessage)
+        if (error && error.status === 412) {
+          this.getConfirmationForCreation(error.error, status, 'finalizeUpdate', updatedFields)
+          return
+        } else {
+          const errorMessage = _.get(error, 'error.message', 'Something went wrong while updating community, please try again')
+          this.openSnackBar(errorMessage)
+        }
       }
     })
   }
@@ -684,26 +796,31 @@ export class CommunityCreationComponent {
     if (!this.canPublish) {
       return
     }
-
-    // If on Add Competency step, call the direct publish method
-    if (this.selectedStepperLable === 'Add Competency') {
-      let changedFields = this.getChangedFields()
-      if (changedFields && Object.keys(changedFields).length > 2) {
-        this.updateCommunity('Published')
-      } else {
-        this.publishCommunityMethod()
-        return
+    if (!this.communityId) {
+      this.createCommunityAndPublish()
+    } else {
+      // If on Add Competency step, call the direct publish method
+      if (this.selectedStepperLable === 'Add Competency') {
+        let changedFields = this.getChangedFields()
+        if (changedFields && Object.keys(changedFields).length > 2) {
+          this.updateCommunity('Published')
+        } else {
+          this.publishCommunityMethod()
+          return
+        }
       }
     }
   }
 
-  publishCommunityMethod() {
+  publishCommunityMethod(status = 'Published', forceCreation: boolean = false) {
     // Show loader
     this.loaderService.changeLoaderState(true)
 
     // Get complete form data with Published status
-    const request = this.getFormBodyOfEvent('Published')
-
+    const request = this.getFormBodyOfEvent(status, forceCreation)
+    if (forceCreation || this.userConfirmCommunityCreation) {
+      request['isCommunityCreationAllowed'] = true
+    }
     this.communitySvc.publishCommunity(request).subscribe({
       next: (response: any) => {
         if (response && response.result) {
@@ -719,16 +836,207 @@ export class CommunityCreationComponent {
       },
       error: (error: HttpErrorResponse) => {
         this.loaderService.changeLoaderState(false)
-        const errorMessage = _.get(error, 'error.message', 'Something went wrong while publishing community, please try again')
-        this.openSnackBar(errorMessage)
+        if (error && error.status === 412) {
+          this.getConfirmationForCreation(error.error, status, 'publishCommunityMethod')
+          return
+        } else {
+          const errorMessage = _.get(error, 'error.message', 'Something went wrong while publishing community, please try again')
+          this.openSnackBar(errorMessage)
+        }
       }
     })
   }
   getEnvironmentBaseUrl() {
-    if (environment.karmYogiPath && environment.dicussV2Bucket) {
-      return `${environment.karmYogiPath}/${environment.dicussV2Bucket}`
+    this.environmentData = environment
+    if (this.environmentData.karmYogiPath && this.environmentData.dicussV2Bucket) {
+      return `${this.environmentData.karmYogiPath}/${this.environmentData.dicussV2Bucket}`
+    } else if (this.environmentData.environment && this.environmentData.environment.karmYogiPath && this.environmentData.environment.dicussV2Bucket) {
+      return `${this.environmentData.environment.karmYogiPath}/${this.environmentData.environment.dicussV2Bucket}`
     }
     return ''
+  }
+
+  createCommunityAndPublish(forceCreation: boolean = false) {
+    const formBody = this.getFormBodyOfEvent('Draft', forceCreation)
+    this.loaderService.changeLoaderState(true)
+    this.communitySvc.createCommunity(formBody).subscribe({
+      next: (res: any) => {
+        if (res && res.result && res.result.communityId) {
+          const communityId = res.result.communityId
+          this.communityId = communityId
+          this.userConfirmCommunityCreation = forceCreation
+
+          // Upload files first, then publish
+          this.uploadCommunityImagesAndPublish(communityId)
+        } else {
+          this.loaderService.changeLoaderState(false)
+          this.openSnackBar('Failed to create community')
+        }
+      },
+      error: (error: HttpErrorResponse) => {
+
+        this.loaderService.changeLoaderState(false)
+        if (error && error.status === 412) {
+          this.getConfirmationForCreation(error.error, status, 'createCommunityAndPublish')
+          return
+        } else {
+          let errorMessage = ''
+          if (error && error.error && error.error.responseCode === "CONFLICT") {
+            errorMessage = error.error.params && error.error.params.errMsg && error.error.params.errMsg || 'Community name already exists, please try with a different name'
+          } else {
+            errorMessage = _.get(error, 'error.message', 'Something went wrong while creating community, please try again')
+          }
+          this.openSnackBar(errorMessage, 'red-snackbar')
+        }
+      }
+    })
+  }
+  updateAndPublish(updatedFields: any) {
+    if (this.userConfirmCommunityCreation) {
+      updatedFields['isCommunityCreationAllowed'] = true
+    }
+    this.communitySvc.updateCommunity(updatedFields).subscribe({
+      next: (res: any) => {
+        if (res) {
+          // Now publish the community
+          this.publishCommunityMethod()
+        } else {
+          this.loaderService.changeLoaderState(false)
+          this.openSnackBar('Failed to update community with images')
+        }
+      },
+      error: (error: HttpErrorResponse) => {
+        this.loaderService.changeLoaderState(false)
+        const errorMessage = _.get(error, 'error.message', 'Failed to update community with images')
+        this.openSnackBar(errorMessage)
+      }
+    })
+  }
+
+  uploadCommunityImagesAndPublish(communityId: string) {
+    // Check if we need to upload images
+    if (this.communityDetailsForm.value.posterImageUrl instanceof File ||
+      this.communityDetailsForm.value.imageUrl instanceof File) {
+
+      let uploadCount = 0
+      let neededUploads = 0
+      let updatedFields: any = { communityId: communityId }
+
+      if (this.communityDetailsForm.value.posterImageUrl instanceof File) {
+        neededUploads++
+        const formData = new FormData()
+        formData.append('file', this.communityDetailsForm.value.posterImageUrl)
+
+        this.communitySvc.fileUpload(formData, communityId).subscribe({
+          next: (response: any) => {
+            if (response && response.result && response.result.url) {
+              let url = this.splitUrl(response.result.url)
+              let finalUrl = `${this.getEnvironmentBaseUrl()}${url}`
+              updatedFields.posterImageUrl = finalUrl
+              this.posterImageUrl = finalUrl
+
+              uploadCount++
+              if (uploadCount === neededUploads) {
+                this.updateAndPublish(updatedFields)
+              }
+            } else {
+              this.handleUploadError('Failed to upload poster image')
+            }
+          },
+          error: (error) => this.handleUploadError(error)
+        })
+      }
+
+      if (this.communityDetailsForm.value.imageUrl instanceof File) {
+        neededUploads++
+        const formData = new FormData()
+        formData.append('file', this.communityDetailsForm.value.imageUrl)
+
+        this.communitySvc.fileUpload(formData, communityId).subscribe({
+          next: (response: any) => {
+            if (response && response.result && response.result.url) {
+              let url = this.splitUrl(response.result.url)
+              let finalUrl = `${this.getEnvironmentBaseUrl()}${url}`
+              updatedFields.imageUrl = finalUrl
+              this.imageUrl = finalUrl
+
+              uploadCount++
+              if (uploadCount === neededUploads) {
+                this.updateAndPublish(updatedFields)
+              }
+            } else {
+              this.handleUploadError('Failed to upload image')
+            }
+          },
+          error: (error) => this.handleUploadError(error)
+        })
+      }
+    } else {
+      // No files to upload, proceed directly to publish
+      this.publishCommunityMethod()
+    }
+  }
+
+  handleUploadError(error: any) {
+    this.loaderService.changeLoaderState(false)
+    const errorMessage = typeof error === 'string' ? error :
+      _.get(error, 'error.message', 'Failed to upload image')
+    this.openSnackBar(errorMessage)
+  }
+
+
+  getConfirmationForCreation(errData: any, status: any, callMethodType: string, request?: any) {
+    let msg = "Community with the given communityName already present in another organisation"
+    if (errData && errData.params && errData.params.errMsg) {
+      msg = errData.params.errMsg
+    }
+
+    const dialgData = {
+      dialogType: 'warning',
+      icon: {
+        iconName: 'error_outline',
+        iconClass: 'warning-icon'
+      },
+      message: msg,
+      buttonsList: [
+        {
+          btnAction: false,
+          displayText: 'No',
+          btnClass: 'btn-outline-primary'
+        },
+        {
+          btnAction: true,
+          displayText: 'Yes',
+          btnClass: 'successBtn'
+        },
+      ]
+    }
+
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      width: '500px',
+      height: '210px',
+      data: dialgData,
+      autoFocus: false
+    })
+
+    dialogRef.afterClosed().subscribe((btnAction: any) => {
+      if (btnAction) {
+        if (callMethodType === 'saveAndExit') {
+          this.saveAndExit(status, true)
+        } else if (callMethodType === 'updateCommunity') {
+          this.updateCommunity(status, true)
+        } else if (callMethodType === 'finalizeUpdate') {
+          request['isCommunityCreationAllowed'] = true
+          this.finalizeUpdate(request, status)
+        } else if (callMethodType === 'publishCommunityMethod') {
+          this.publishCommunityMethod(status, true)
+        } else if (callMethodType === 'createCommunity') {
+          this.createCommunityAndPublish()
+        } else if (callMethodType === 'createCommunityAndPublish') {
+          this.createCommunityAndPublish(true)
+        }
+      }
+    })
   }
 }
 

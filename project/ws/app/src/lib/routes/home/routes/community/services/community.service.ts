@@ -2,7 +2,8 @@ import { HttpClient } from '@angular/common/http'
 import { Injectable } from '@angular/core'
 
 const API_END_POINTS = {
-  COMMUNITY_SEARCH: `/apis/proxies/v8/community/v1/search`,
+  // COMMUNITY_SEARCH: `/apis/proxies/v8/community/v1/search`,
+  COMMUNITY_SEARCH: `/apis/proxies/v8/community/v1/mdo/search`,
   TOPIC_DETAILS: `/apis/proxies/v8/community/v1/topic/search`,
   USER_SEARCH: `/apis/proxies/v8/user/v1/search`,
   COMMUNITY_CREATE: `/apis/proxies/v8/community/v1/create`,

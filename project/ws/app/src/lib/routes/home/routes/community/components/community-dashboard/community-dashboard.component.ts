@@ -29,12 +29,14 @@ interface Community {
 
 
 export class CommunityDashboardComponent implements OnInit {
-  displayedColumns: string[] = ['name', 'startDate', 'createdBy', 'publishedOn', 'members', 'mods', 'actions'];
+  // displayedColumns: string[] = ['name', 'startDate', 'createdBy', 'publishedOn', 'members', 'mods', 'actions'];
+  displayedColumns: string[] = []
   dataSource: MatTableDataSource<Community>
   userProfile: any
   searchControl = new FormControl('');
   pageNumber = 0;
   pageSize = 10;
+  additionalUserInfo: any = {}
   totalElements = 0  // Add this to store total count
   currentSearchString = ''  // Add this to store current search
   currentStatus = 'active'
@@ -63,20 +65,12 @@ export class CommunityDashboardComponent implements OnInit {
   constructor(private router: Router, private communitySvc: CommunityService, private activatedRoute: ActivatedRoute) {
     // Initialize with sample data
     const sampleData: Community[] = [
-      {
-        name: 'Community 1',
-        startDate: new Date(),
-        createdBy: 'John Doe',
-        publishedOn: new Date(),
-        members: 100,
-        mods: 5
-      }
 
     ]
 
     this.dataSource = new MatTableDataSource(sampleData)
-    this.fetchCommunityData('')
     this.getRouteSubscription()
+    this.fetchCommunityData('')
   }
 
   getRouteSubscription() {
@@ -93,11 +87,23 @@ export class CommunityDashboardComponent implements OnInit {
     ).subscribe(searchString => {
       this.fetchCommunityData(searchString || '')
     })
+
+    this.getDisplayColumns()
   }
 
   ngAfterViewInit() {
-    // this.dataSource.paginator = this.paginator
     this.dataSource.sort = this.sort
+    this.dataSource.sortingDataAccessor = (item: any, property: string) => {
+      switch (property) {
+        case 'name': return item.communityName?.toLowerCase() || ''
+        case 'startDate': return new Date(item.createdOn).getTime()
+        case 'createdBy': return this.additionalUserInfo[item.createdBy]?.first_name?.toLowerCase() || ''
+        case 'publishedOn': return new Date(item.updatedOn).getTime()
+        case 'members': return item.countOfPeopleJoined || 0
+        case 'mods': return item.countOfModerators || 0
+        default: return item[property]
+      }
+    }
   }
 
   applyFilter(event: Event) {
@@ -105,6 +111,16 @@ export class CommunityDashboardComponent implements OnInit {
     this.dataSource.filter = filterValue.trim().toLowerCase()
   }
 
+  getDisplayColumns() {
+    if (this.currentStatus === 'active') {
+      this.displayedColumns = ['name', 'startDate', 'createdBy', 'publishedOn', 'members', 'mods']
+      // this.showActionTab = false
+    }
+    if (this.currentStatus === 'draft') {
+      this.displayedColumns = ['name', 'startDate', 'createdBy', 'publishedOn', 'members', 'mods', 'actions']
+      // this.showActionTab = true
+    }
+  }
 
 
   onActionClick(action: string, community: Community) {
@@ -132,6 +148,14 @@ export class CommunityDashboardComponent implements OnInit {
     this.selectedTabIndex = event.index
     this.currentStatus = this.tabs[event.index].status
     this.pageNumber = 0 // Reset to first page on tab change
+    if (event.index === 1) {
+      this.displayedColumns = ['name', 'startDate', 'createdBy', 'members', 'mods', 'actions']
+    } else {
+      this.displayedColumns = ['name', 'startDate', 'createdBy', 'publishedOn', 'members', 'mods', 'actions']
+
+    }
+
+    this.getDisplayColumns()
     this.fetchCommunityData(this.currentSearchString)
   }
 
@@ -139,12 +163,15 @@ export class CommunityDashboardComponent implements OnInit {
     let req: any = {
       "filterCriteriaMap":
       {
-        "status": this.currentStatus
+        "status": this.currentStatus,
+        "orgId": this.userProfile.rootOrgId,
       },
       "requestedFields": [],
       "pageNumber": this.pageNumber,
       "pageSize": this.pageSize,
-      "facets": []
+      "facets": [],
+      "orderBy": "createdOn",
+      "orderDirection": "DESC"
     }
     if (searchString) {
       req["searchString"] = searchString
@@ -154,6 +181,10 @@ export class CommunityDashboardComponent implements OnInit {
         && res.result.search_results.data
         && res.result.search_results.data.length > 0
       ) {
+        this.additionalUserInfo = res.result.search_results.additionalInfo.reduce((acc: any, item: any) => {
+          acc[item.user_id] = item
+          return acc
+        }, {})
         this.dataSource.data = res.result.search_results.data || []
         this.totalElements = res.result.search_results.totalCount || 0  // Update total count
       } else {

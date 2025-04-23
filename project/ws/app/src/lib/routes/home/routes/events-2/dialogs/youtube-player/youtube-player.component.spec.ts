@@ -1,89 +1,207 @@
 import { YoutubePlayerComponent } from './youtube-player.component'
-import { DomSanitizer } from '@angular/platform-browser'
 import { MatLegacyDialogRef } from '@angular/material/legacy-dialog'
+import { DomSanitizer } from '@angular/platform-browser'
 
 describe('YoutubePlayerComponent', () => {
   let component: YoutubePlayerComponent
-  let mockDialogRef: MatLegacyDialogRef<YoutubePlayerComponent>
-  let mockDomSanitizer: DomSanitizer
+  let mockDialogRef: jest.Mocked<MatLegacyDialogRef<YoutubePlayerComponent>>
+  let mockDomSanitizer: jest.Mocked<DomSanitizer>
+  let mockData: any
 
   beforeEach(() => {
-    // Mocks for dependencies
     mockDialogRef = {
-      close: jest.fn(),
+      close: jest.fn()
     } as any
 
     mockDomSanitizer = {
-      bypassSecurityTrustResourceUrl: jest.fn(),
+      bypassSecurityTrustResourceUrl: jest.fn(url => `sanitized:${url}` as any)
     } as any
 
-    // Create the component instance
+    // Ensure all required properties exist in mock data
+    mockData = {
+      event: {
+        recordedLinks: ['https://www.youtube.com/watch?v=abc123'],
+        registrationLink: 'https://www.youtube.com/watch?v=def456'
+      }
+    }
+
     component = new YoutubePlayerComponent(
       mockDialogRef,
-      { event: { recordedLinks: ['https://www.youtube.com/watch?v=abcd1234'] } },
+      mockData,
       mockDomSanitizer
     )
   })
 
+  it('should create', () => {
+    expect(component).toBeTruthy()
+  })
+
   describe('ngOnInit', () => {
-    it('should initialize event data and call getLink', () => {
+    it('should set eventData and call getLink', () => {
+      // Spy on getLink method
       const getLinkSpy = jest.spyOn(component, 'getLink')
+
+      // Call ngOnInit
       component.ngOnInit()
-      expect(component.eventData).toEqual({ recordedLinks: ['https://www.youtube.com/watch?v=abcd1234'] })
+
+      // Assertions
+      expect(component.eventData).toBe(mockData.event)
       expect(getLinkSpy).toHaveBeenCalled()
     })
   })
 
+  describe('getYouTubeVideoId', () => {
+    it('should extract video ID from YouTube URL', () => {
+      const url = 'https://www.youtube.com/watch?v=abc123&t=10s'
+      const result = component.getYouTubeVideoId(url)
+      expect(result).toBe('abc123')
+    })
+
+    it('should return null for invalid URL', () => {
+      // Mock implementation for URL
+      global.URL = jest.fn(() => ({
+        searchParams: {
+          get: jest.fn(() => null)
+        }
+      })) as any
+
+      const url = 'invalid-url'
+      const result = component.getYouTubeVideoId(url)
+      expect(result).toBeNull()
+    })
+  })
+
   describe('getLink', () => {
-    it('should set videoId correctly from recordedLinks', () => {
+    it('should use recordedLinks if available', () => {
+      // Setup - ensure eventData is initialized before calling getLink
+      component.eventData = {
+        recordedLinks: ['https://www.youtube.com/watch?v=abc123'],
+        registrationLink: 'https://www.youtube.com/watch?v=def456'
+      }
+
+      const bypassSpy = jest.spyOn(mockDomSanitizer, 'bypassSecurityTrustResourceUrl')
+
+      // Mock getYouTubeVideoId to return a specific value
+      jest.spyOn(component, 'getYouTubeVideoId').mockReturnValue('abc123')
+
+      // Call the method
       component.getLink()
-      expect(component.videoId).toBe('https://www.youtube.com/watch?v=abcd1234')
+
+      // Check if videoId is set correctly
+      expect(component.videoId).toBe('abc123')
+      // Verify sanitizer was called
+      expect(bypassSpy).toHaveBeenCalledTimes(2)
     })
 
-    it('should handle videoId for YouTube watch URLs', () => {
-      const youtubeUrl = 'https://www.youtube.com/watch?v=abcd1234'
-      component.eventData = { recordedLinks: [], registrationLink: youtubeUrl }
+    it('should use registrationLink if recordedLinks is empty', () => {
+      // Setup - ensure eventData is initialized before calling getLink
+      component.eventData = {
+        recordedLinks: [],
+        registrationLink: 'https://www.youtube.com/watch?v=def456'
+      }
+
+      const bypassSpy = jest.spyOn(mockDomSanitizer, 'bypassSecurityTrustResourceUrl')
+
+      // Mock getYouTubeVideoId to return a specific value
+      jest.spyOn(component, 'getYouTubeVideoId').mockReturnValue('def456')
+
+      // Call the method
       component.getLink()
-      expect(component.videoId).toBe('abcd1234')
-      expect(mockDomSanitizer.bypassSecurityTrustResourceUrl).toHaveBeenCalled()
+
+      // Assertions
+      expect(component.videoId).toBe('def456')
+      expect(bypassSpy).toHaveBeenCalledTimes(2)
     })
 
-    it('should handle non-YouTube URL by setting youtubeURL to false', () => {
-      const nonYoutubeUrl = 'https://example.com/video.mp4'
-      component.eventData = { recordedLinks: [], registrationLink: nonYoutubeUrl }
+    it('should handle YouTube embed URLs', () => {
+      // Setup - ensure eventData is initialized before calling getLink
+      component.eventData = {
+        recordedLinks: ['https://www.youtube.com/embed/embed123'],
+        registrationLink: 'https://www.youtube.com/watch?v=def456'
+      }
+
+      const bypassSpy = jest.spyOn(mockDomSanitizer, 'bypassSecurityTrustResourceUrl')
+
+      // Call the method
       component.getLink()
+
+      // Assertions
+      expect(component.videoId).toBe('embed123')
+      expect(component.youtubeURL).toBe(true)
+      expect(bypassSpy).toHaveBeenCalledTimes(2)
+    })
+
+    it('should handle non-YouTube URLs', () => {
+      // Setup - ensure eventData is initialized before calling getLink
+      component.eventData = {
+        recordedLinks: ['https://example.com/video.mp4'],
+        registrationLink: 'https://www.youtube.com/watch?v=def456'
+      }
+
+      const bypassSpy = jest.spyOn(mockDomSanitizer, 'bypassSecurityTrustResourceUrl')
+
+      // Call the method
+      component.getLink()
+
+      // Assertions
+      expect(component.videoId).toBe('https://example.com/video.mp4')
       expect(component.youtubeURL).toBe(false)
-      expect(mockDomSanitizer.bypassSecurityTrustResourceUrl).toHaveBeenCalled()
+      expect(bypassSpy).toHaveBeenCalledTimes(1)
     })
+
+    // it('should handle case when eventData is null', () => {
+    //   // Setup - explicitly set eventData to null
+    //   component.eventData = null
+
+    //   const bypassSpy = jest.spyOn(mockDomSanitizer, 'bypassSecurityTrustResourceUrl')
+
+    //   // Call the method
+    //   component.getLink()
+
+    //   // Assertions - verify it doesn't crash
+    //   expect(component.videoId).toBeUndefined()
+    //   expect(bypassSpy).not.toHaveBeenCalled()
+    // })
   })
 
   describe('generateVideoLink', () => {
-    it('should generate a valid video link for YouTube URLs', () => {
-      component.videoId = 'abcd1234'
+    it('should generate video link for YouTube URLs', () => {
+      // Setup
+      component.videoId = 'abc123'
       component.youtubeURL = true
+      const bypassSpy = jest.spyOn(mockDomSanitizer, 'bypassSecurityTrustResourceUrl')
+
+      // Call the method
       component.generateVideoLink()
-      expect(mockDomSanitizer.bypassSecurityTrustResourceUrl).toHaveBeenCalledTimes(2) // Called twice for videoLink and iframeSrc
-      expect(component.iframeSrc).toBe('bypass-security-trust-resource-url-called') // this is the mock behavior
+
+      // Assertions
+      expect(bypassSpy).toHaveBeenCalledWith('abc123')
+      expect(bypassSpy).toHaveBeenCalledWith('https://www.youtube.com/embed/abc123')
+      expect(component.videoLink).toBe('sanitized:abc123')
+      expect(component.iframeSrc).toBe('sanitized:https://www.youtube.com/embed/abc123')
     })
 
-    it('should generate a valid video link for non-YouTube URLs', () => {
+    it('should generate video link for non-YouTube URLs', () => {
+      // Setup
       component.videoId = 'https://example.com/video.mp4'
       component.youtubeURL = false
-      component.generateVideoLink()
-      expect(mockDomSanitizer.bypassSecurityTrustResourceUrl).toHaveBeenCalledTimes(1) // Only called once for videoLink
-    })
-  })
+      const bypassSpy = jest.spyOn(mockDomSanitizer, 'bypassSecurityTrustResourceUrl')
 
-  describe('getYouTubeVideoId', () => {
-    it('should extract the video ID from a YouTube URL', () => {
-      const videoId = component.getYouTubeVideoId('https://www.youtube.com/watch?v=abcd1234')
-      expect(videoId).toBe('abcd1234')
+      // Call the method
+      component.generateVideoLink()
+
+      // Assertions
+      expect(bypassSpy).toHaveBeenCalledWith('https://example.com/video.mp4')
+      expect(component.videoLink).toBe('sanitized:https://example.com/video.mp4')
     })
   })
 
   describe('closeDialog', () => {
     it('should close the dialog', () => {
+      // Call the method
       component.closeDialog()
+
+      // Verify dialog was closed
       expect(mockDialogRef.close).toHaveBeenCalled()
     })
   })

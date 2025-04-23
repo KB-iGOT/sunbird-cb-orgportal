@@ -31,8 +31,9 @@
         <mat-nav-list class="nav-list-menu flex-1">
           <ng-container *ngFor="let tab of menu?.subMenu; let i = index">
             <ng-container>
-              <a mat-list-item disableRipple class="flex outline-1 menu-item-a" [attr.data-index]="i"
-                [routerLink]="[tab.routerLink]" [queryParamsHandling]="preserve" routerLinkActive="ws-active-route-men">
+              <a *ngIf="isAllowed(tab)" mat-list-item disableRipple class="flex outline-1 menu-item-a"
+                [attr.data-index]="i" [routerLink]="[tab.routerLink]" [queryParamsHandling]="preserve"
+                routerLinkActive="ws-active-route-men">
                 <span class="padding-left-xs">{{tab?.name}}</span>
               </a>
             </ng-container>
@@ -44,7 +45,7 @@
 
   <ng-container *ngIf="!menu.subMenu">
     <mat-nav-list class="nav-list-menu flex-1">
-      <a mat-list-item disableRipple class="flex outline-1 main-menuitem" [attr.data-index]="mi"
+      <a mat-list-item *ngIf="isAllowed(menu)" disableRipple class="flex outline-1 main-menuitem" [attr.data-index]="mi"
         [routerLink]="[menu.routerLink]" [queryParamsHandling]="preserve" routerLinkActive="ws-active-route-men">
         <span class="padding-left-xs sub-menu-text">{{menu?.menuCategory}}</span>
       </a>
