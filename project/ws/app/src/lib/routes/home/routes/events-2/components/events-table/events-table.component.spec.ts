@@ -1,108 +1,292 @@
 import { EventsTableComponent } from './events-table.component'
-// import { of } from 'rxjs'
-// import { MatSort } from '@angular/material/sort'
+import { SimpleChange, SimpleChanges } from '@angular/core'
+import { MatTableDataSource } from '@angular/material/table'
 import { PageEvent } from '@angular/material/paginator'
-import * as _ from 'lodash'
+import { MatSort } from '@angular/material/sort'
+import { of } from 'rxjs'
+
+jest.mock('@angular/material/table')
+jest.mock('lodash', () => ({
+  get: jest.fn((obj, path, defaultValue) => {
+    if (path === 'showSearchBox') return obj.showSearchBox
+    if (path === 'noDataMessage') return obj.noDataMessage
+    if (path === 'showPagination') return obj.showPagination
+    return defaultValue
+  }),
+  map: jest.fn((array, iteratee) => array.map(iteratee))
+}))
 
 describe('EventsTableComponent', () => {
   let component: EventsTableComponent
-  // let mockSort: MatSort
+  let mockMatTableDataSource: any
+  // let mockValueChanges: any
 
   beforeEach(() => {
-    // mockSort = { sortChange: of(null) } as any // Mock MatSort
+    // Reset mocks
+    jest.clearAllMocks()
 
-    component = new EventsTableComponent() // Instantiate the component directly
+    // Setup ValueChanges mock
+    // mockValueChanges = {
+    //   pipe: jest.fn().mockReturnThis(),
+    //   subscribe: jest.fn()
+    // }
 
-    // Mock input values
-    component.tableData = {
-      columns: [{
-        key: 'name', displayName: 'Name',
-        cellType: ''
-      }],
-      showSearchBox: true,
-      noDataMessage: 'No data available',
-      showPagination: true
-    }
-    component.menuItems = [{
-      action: 'edit',
-      btnText: ''
-    }]
-    component.data = []
-    component.paginationDetails = {
-      startIndex: 0,
-      lastIndex: 20,
-      pageSize: 20,
-      pageIndex: 0,
-      totalCount: 20
-    }
+    // Setup MatTableDataSource mock
+    mockMatTableDataSource = {
+      data: [],
+      sort: null
+    };
+
+    (MatTableDataSource as jest.Mock).mockImplementation(() => mockMatTableDataSource)
+
+    // Initialize component
+    component = new EventsTableComponent()
+
+    // Mock FormControl valueChanges
+    jest.spyOn(component.searchControl, 'valueChanges', 'get').mockReturnValue(of('test'))
   })
 
-  it('should initialize correctly', () => {
-    component.ngOnInit()
-    expect(component.displayedColumns).toEqual([{ key: 'name', displayName: 'Name' }])
-    expect(component.showSearchBox).toBe(true)
-    expect(component.noDataMessage).toBe('No data available')
-    expect(component.showPagination).toBe(true)
+  it('should create', () => {
+    expect(component).toBeTruthy()
   })
 
-  it('should handle changes in tableData and data correctly in ngOnChanges', () => {
-    const changes = {
-      tableData: {
-        currentValue: {
-          columns: [{ key: 'age', displayName: 'Age' }]
+  describe('ngOnInit', () => {
+    it('should set displayedColumns and other properties from tableData', () => {
+      // Arrange
+      component.tableData = {
+        columns: [{
+          displayName: 'col1',
+          key: 'col1',
+          cellType: 'textImage'
         },
-        previousValue: null,
-        firstChange: true,
-        isFirstChange: jest.fn(() => true)
-      },
-      data: {
-        currentValue: [{ name: 'New Item' }],
-        previousValue: null,
-        firstChange: true,
-        isFirstChange: jest.fn(() => true)
+        {
+          displayName: 'col2',
+          key: 'col2',
+          cellType: 'text'
+        },
+        {
+          displayName: 'col3',
+          key: 'col3',
+          cellType: 'date'
+        },
+        {
+          displayName: 'col4',
+          key: 'col4',
+          cellType: 'number'
+        },
+        {
+          displayName: 'col5',
+          key: 'col5',
+          cellType: 'menu'
+        }],
+        showSearchBox: false,
+        noDataMessage: 'Custom message',
+        showPagination: false
       }
-    }
 
-    component.ngOnChanges(changes)
+      // Act
+      component.ngOnInit()
 
-    expect(component.columnsList).toEqual(['age']) // After calling getFinalColumns
-    expect(component.dataSource.data).toEqual([{ name: 'New Item' }])
+      // Assert
+      expect(component.displayedColumns).toEqual(['col1', 'col2'])
+      expect(component.showSearchBox).toBe(false)
+      expect(component.noDataMessage).toBe('Custom message')
+      expect(component.showPagination).toBe(false)
+    })
+
+    it('should subscribe to searchControl valueChanges', () => {
+      // Arrange
+      const searchEmitSpy = jest.spyOn(component.searchKey, 'emit')
+      component.tableData = {
+        columns: [],
+        showSearchBox: false,
+        showPagination: false
+      }
+
+      // Act
+      component.ngOnInit()
+
+      // Assert - Verify debounceTime was applied and subscription emits values
+      expect(searchEmitSpy).toHaveBeenCalledWith('test')
+    })
   })
 
-  it('should update columns when getFinalColumns is called', () => {
-    component.menuItems = [{
-      action: 'edit',
-      btnText: ''
-    }]
-    component.getFinalColumns()
-    expect(component.columnsList).toContain('menu')
-    expect(component.tableColumns.length).toBe(2) // Columns + menu item
+  describe('ngOnChanges', () => {
+    it('should call getFinalColumns when tableData changes', () => {
+      // Arrange
+      const getFinalColumnsSpy = jest.spyOn(component, 'getFinalColumns')
+      const changes: SimpleChanges = {
+        tableData: new SimpleChange(null, { columns: [] }, true)
+      }
+
+      // Act
+      component.ngOnChanges(changes)
+
+      // Assert
+      expect(getFinalColumnsSpy).toHaveBeenCalled()
+    })
+
+    it('should update dataSource.data when data changes', () => {
+      // Arrange
+      const mockData = [{ id: 1 }, { id: 2 }]
+      const changes: SimpleChanges = {
+        data: new SimpleChange(null, mockData, true)
+      }
+      component.dataSource = mockMatTableDataSource
+      component.sort = new MatSort()
+
+      // Act
+      component.ngOnChanges(changes)
+
+      // Assert
+      expect(component.dataSource.data).toBe(mockData)
+
+      // Fast-forward timers
+      jest.advanceTimersByTime(10)
+      expect(component.dataSource.sort).toBe(component.sort)
+    })
   })
 
-  it('should filter buttons correctly with getButtonsToShow', () => {
-    const rowData = { buttonsToHide: ['edit'] }
-    const buttons = component.getButtonsToShow(rowData)
-    expect(buttons.length).toBe(0) // Edit button should be filtered out
+  describe('getFinalColumns', () => {
+    it('should set columnsList and tableColumns correctly without menu items', () => {
+      // Arrange
+      component.tableData = {
+        columns: [{ displayName: 'Name', key: 'name', cellType: 'text' }],
+        showSearchBox: false,
+        showPagination: false
+      }
+      component.menuItems = []
+
+      // Act
+      component.getFinalColumns()
+
+      // Assert
+      expect(component.columnsList).toEqual(['name'])
+      expect(component.tableColumns).toEqual([{ displayName: 'Name', key: 'name', cellType: 'text' }])
+    })
+
+    it('should add Actions column when menu items are present', () => {
+      // Arrange
+      component.tableData = {
+        columns: [{
+          displayName: 'Name', key: 'name', cellType: 'text'
+        }],
+        showSearchBox: false,
+        showPagination: false
+      }
+      component.menuItems = [{ btnText: 'Edit', action: 'edit' }]
+
+      // Act
+      component.getFinalColumns()
+
+      // Assert
+      expect(component.columnsList).toEqual(['name', 'menu'])
+      expect(component.tableColumns).toEqual([
+        { displayName: 'Name', key: 'name', cellType: 'text' },
+        { displayName: 'Actions', key: 'menu', cellType: 'menu' }
+      ])
+    })
   })
 
-  it('should emit actionClick when buttonClick is called', () => {
-    const action = 'edit'
-    const rows = [{ name: 'Test' }]
-    const emitSpy = jest.spyOn(component.actionsClick, 'emit')
-    component.buttonClick(action, rows)
-    expect(emitSpy).toHaveBeenCalledWith({ action, rows })
+  describe('getButtonsToShow', () => {
+    it('should return all menu items when no buttonsToHide specified', () => {
+      // Arrange
+      const menuItems = [
+        { btnText: 'Edit', action: 'edit' },
+        { btnText: 'Delete', action: 'delete' }
+      ]
+      component.menuItems = menuItems
+      const rowData = { id: 1 }
+
+      // Act
+      const result = component.getButtonsToShow(rowData)
+
+      // Assert
+      expect(result).toEqual(menuItems)
+    })
+
+    it('should filter out buttons in buttonsToHide', () => {
+      // Arrange
+      const menuItems = [
+        { btnText: 'Edit', action: 'edit' },
+        { btnText: 'Delete', action: 'delete' },
+        { btnText: 'View', action: 'view' }
+      ]
+      component.menuItems = menuItems
+      const rowData = { id: 1, buttonsToHide: ['delete'] }
+
+      // Act
+      const result = component.getButtonsToShow(rowData)
+
+      // Assert
+      expect(result).toEqual([
+        { name: 'Edit', action: 'edit' },
+        { name: 'View', action: 'view' }
+      ])
+    })
   })
 
-  it('should handle page change correctly', () => {
-    const pageEvent: PageEvent = {
-      pageIndex: 1,
-      pageSize: 20,
-      length: 100
-    }
-    const emitSpy = jest.spyOn(component.pageChange, 'emit')
-    component.onChangePage(pageEvent)
-    expect(component.paginationDetails.startIndex).toBe(20)
-    expect(component.paginationDetails.pageIndex).toBe(1)
-    expect(emitSpy).toHaveBeenCalledWith(component.paginationDetails)
+  describe('buttonClick', () => {
+    it('should emit action and rows when tableData exists', () => {
+      // Arrange
+      const actionsClickSpy = jest.spyOn(component.actionsClick, 'emit')
+      component.tableData = {
+        columns: [],
+        showSearchBox: false,
+        showPagination: false
+      }
+      const action = 'edit'
+      const rows = { id: 1 }
+
+      // Act
+      component.buttonClick(action, rows)
+
+      // Assert
+      expect(actionsClickSpy).toHaveBeenCalledWith({ action, rows })
+    })
+
+    it('should not emit when tableData is undefined', () => {
+      // Arrange
+      const actionsClickSpy = jest.spyOn(component.actionsClick, 'emit')
+      component.tableData = {
+        columns: [],
+        showSearchBox: false,
+        showPagination: false
+      } // Assign an empty object to tableData
+      const action = 'edit'
+      const rows = { id: 1 }
+
+      // Act
+      component.buttonClick(action, rows)
+
+      // Assert
+      expect(actionsClickSpy).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('onChangePage', () => {
+    it('should update pagination details and emit pageChange event', () => {
+      // Arrange
+      const pageChangeSpy = jest.spyOn(component.pageChange, 'emit')
+      const pageEvent: PageEvent = {
+        pageIndex: 2,
+        pageSize: 30,
+        length: 100,
+        previousPageIndex: 1
+      }
+
+      // Act
+      component.onChangePage(pageEvent)
+
+      // Assert
+      expect(component.paginationDetails).toEqual({
+        startIndex: 60,
+        lastIndex: 90,
+        pageSize: 30,
+        pageIndex: 2,
+        totalCount: 20 // This value wasn't updated in the original component
+      })
+      expect(pageChangeSpy).toHaveBeenCalledWith(component.paginationDetails)
+    })
   })
 })

@@ -6,11 +6,48 @@
   <div>
     <div class="flex flex-row gap-4">
       <div class="flex flex-column gap-2 community-form w-full" [ngClass]="{'disableForm': communityStatus === 'live'}">
-        <div class="form-lable required">
-          Topic name
+        <div class="form-lable required flex">
+          Choose a Topic
+          <mat-icon class="ml-1 mr-1 cursor-pointer"
+            [matTooltip]="'Select a relevant topic to associate your community with.'"
+            [matTooltipClass]="'tooltip-custom'" matTooltipPosition="above">info_outline</mat-icon>
         </div>
-        <mat-form-field appearance="outline" class="disable-round">
-          <mat-select placeholder="select Topic" formControlName="topicName">
+        <mat-form-field appearance="outline" class="fixed-height-select">
+          <mat-select #topicName formControlName="topicName" placeholder="Select designation" panelClass="search-panel">
+
+            <!-- Sticky search input container -->
+            <div class="sticky-search-container" (click)="$event.stopPropagation()">
+              <div class="search-input-wrapper">
+                <input type="text" placeholder="Search topic" formControlName="searchTopic" class="search-input"
+                  (keydown)="$event.stopPropagation()" autocomplete="off">
+                <button *ngIf="searchTopic?.value" type="button" class="clear-button"
+                  (click)="searchTopic?.setValue('')">
+                  ✕
+                </button>
+              </div>
+            </div>
+            <!-- Options list -->
+            <ng-container *ngFor="let topic of filterTopicDetails">
+              <mat-option [value]="topic">
+                {{topic?.categoryName}}
+              </mat-option>
+            </ng-container>
+            <!-- Loading indicator -->
+            <!-- <div *ngIf="isLoadingMoreDesignations" class="loading-indicator">
+                              Loading more...
+                            </div> -->
+            <!-- No results message -->
+            <mat-option *ngIf="(filterTopicDetails )?.length === 0" disabled>
+              No matches found
+            </mat-option>
+          </mat-select>
+          <!-- <mat-error [hidden]="false"
+                            *ngIf="updateUserDataForm?.controls['designation'].errors?.required">
+                            Designation is mandatory
+                          </mat-error> -->
+        </mat-form-field>
+        <!-- <mat-form-field appearance="outline" class="disable-round">
+          <mat-select placeholder="Select Topic" formControlName="topicName">
             <mat-option disabled [value]="null">Select a topic</mat-option>
             <ng-container *ngFor="let topic of topicDataList">
               <mat-option [value]="topic">
@@ -21,7 +58,7 @@
           <mat-error *ngIf="showValidationMsg('topicName','required')">
             Topic name is mandatory
           </mat-error>
-        </mat-form-field>
+        </mat-form-field> -->
       </div>
     </div>
   </div>
@@ -112,16 +149,20 @@
 
 
   <div class="flex flex-column gap-2 community-form disable-round">
-    <div class="form-lable required">
+    <div class="form-lable required flex">
       Community Name
+      <mat-icon class="ml-1 mr-1 cursor-pointer"
+        [matTooltip]="'Pick a clear and concise name for your community. Make sure the name has not been used within your MDO and try creating a unique name.'"
+        [matTooltipClass]="'tooltip-custom'" matTooltipPosition="above">info_outline</mat-icon>
+
     </div>
     <mat-form-field appearance="outline" class="">
-      <input matInput placeholder="Add your community name" formControlName="communityName" maxlength="70">
+      <input matInput placeholder="Add your community name" formControlName="communityName" maxlength="50">
       <mat-hint>Only ( a-z/A-Z , 0-9 . - _ $ / : [ ]' ' !) characters are supported</mat-hint>
       <mat-hint align="end"
-        class="text-sm">{{communityDetailsForm?.controls['communityName']?.value?.length}}/70</mat-hint>
+        class="text-sm">{{communityDetailsForm?.controls['communityName']?.value?.length}}/50</mat-hint>
       <mat-error *ngIf="showValidationMsg('communityName','required')">
-        Event name is mandatory
+        Community name is mandatory
       </mat-error>
       <mat-error *ngIf="showValidationMsg('communityName','pattern')">
         Only ( a-z/A-Z , 0-9 . _ - $ / : [ ]' ' !) characters are supported
@@ -138,7 +179,7 @@
       Description
     </div>
     <mat-form-field appearance="outline" class="">
-      <textarea matInput placeholder="Add your description" formControlName="description" maxlength="500"> </textarea>
+      <textarea matInput placeholder="Add your description" formControlName="description" maxlength="250"> </textarea>
       <mat-error *ngIf="showValidationMsg('description','required')">
         Description is mandatory
       </mat-error>
@@ -147,11 +188,12 @@
         communityDetailsForm?.controls['description']?.value?.length}}
       </mat-error>
     </mat-form-field>
-    <span class="description-count flex justify-end">{{communityDetailsForm?.value?.description?.length}}/500</span>
+    <span class="description-count flex justify-end">{{communityDetailsForm?.value?.description?.length}}/250</span>
   </div>
   <div class="flex flex-column gap-2">
-    <div class="form-lable required">
+    <div class="form-lable required flex relative">
       Community Guidelines
+      <mat-icon class="ml-1 mr-1 cursor-pointer" [appTooltip]="tooltipHtml">info_outline</mat-icon>
     </div>
     <ckeditor [editor]="Editor" formControlName="communityGuideLines" [config]="getCongif()" (ready)="onReady($event)"
       (change)="onEditorChange($event)" (keyup)="checkCharacterLimit($event)" (focus)="onFocus()">
@@ -161,9 +203,12 @@
     </mat-error>
     <mat-error class="mat-caption mat-error-text" *ngIf="showValidationMsg('communityGuideLines','minlength')">
       Minimum characters left to create {{ minimumCharacters?.communityGuideLines -
-      communityDetailsForm?.controls['communityGuideLines']?.value?.length}}
+      getEditorTextLength(communityDetailsForm.get('communityGuideLines')?.value)}}
     </mat-error>
-    <!-- <span
-      class="description-count flex justify-end">{{communityDetailsForm?.value?.communityGuideLines?.length}}/500</span> -->
+    <mat-error class="mat-caption mat-error-text" *ngIf="showValidationMsg('communityGuideLines','maxlength')">
+      Maximum characters allowed to create 500 characters
+    </mat-error>
+    <span
+      class="description-count flex justify-end">{{getEditorTextLength(communityDetailsForm.get('communityGuideLines')?.value)}}/500</span>
   </div>
 </form>
