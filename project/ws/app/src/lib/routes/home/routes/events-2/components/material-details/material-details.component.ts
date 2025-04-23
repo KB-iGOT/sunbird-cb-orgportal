@@ -64,6 +64,10 @@ export class MaterialDetailsComponent implements OnChanges {
           }
         })
 
+        if (this.openTab === 'past' && !this.materialDetails?.isNew) {
+          this.eventForm.disable()
+        }
+
         if (this.openMode === 'view') {
           this.eventForm.disable()
         }

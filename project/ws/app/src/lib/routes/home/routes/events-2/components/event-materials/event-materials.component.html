@@ -4,7 +4,7 @@
   </div>
 
   <div class="add-file-card px-3 gap-4 flex items-center" onclick="document.getElementById('upload-file').click();"
-    [ngClass]="{'disableAddFile': !currentMaterialSaved || openMode === 'view' || openTab === 'past'}">
+    [ngClass]="{'disableAddFile': !currentMaterialSaved || openMode === 'view'}">
     <input #file type="file" name="upload-file" id="upload-file" class="hidden" accept=".pdf, .doc, .ppt, .pptx, .docx"
       (change)="onFileSelected(file.files);">
     <div class="upload-icon-card flex items-center justify-center">
