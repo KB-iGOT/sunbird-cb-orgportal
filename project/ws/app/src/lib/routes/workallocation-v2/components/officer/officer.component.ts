@@ -5,8 +5,9 @@ import { debounceTime, map, switchMap, takeUntil } from 'rxjs/operators'
 import { AllocationService } from '../../services/allocation.service'
 import { WatStoreService } from '../../services/wat.store.service'
 // tslint:disable
-import _ from 'lodash'
+import * as _ from 'lodash'
 // tslint:enable
+
 
 @Component({
   selector: 'ws-app-officer',
