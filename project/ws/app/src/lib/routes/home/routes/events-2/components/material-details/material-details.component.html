@@ -18,12 +18,14 @@
 
 <div [ngClass]="{'hideElement': !openMaterial}" class="openCard flex flex-column gap-4 px-4 py-4">
   <form [formGroup]="eventForm" class="flex flex-column gap-2 w-full event-form"
-    [ngClass]="{'disableForm': openMode === 'view' || openTab === 'past'}">
+    [ngClass]="{'disableForm': openMode === 'view' || (openTab === 'past' && !this.materialDetails?.isNew)}">
     <div class="form-lable required">
       Full Name
     </div>
     <mat-form-field appearance="outline" class="">
-      <input matInput placeholder="Enter name" formControlName="title">
+      <input matInput placeholder="Enter name" formControlName="title"
+        [disabled]="openMode === 'edit' && openTab === 'past'"
+        (keyup)="eventForm?.controls?.title?.updateValueAndValidity()">
       <mat-error *ngIf="eventForm?.controls?.title.touched && eventForm?.controls?.title.hasError('required')">
         Name is mandatory
       </mat-error>
@@ -65,10 +67,9 @@
       </div>
     </ng-template>
   </div>
-
   <div class="flex justify-center gap-4 mb-2">
     <button mat-button class="cancel-btn" (click)="openStatus(false)">Cancel</button>
-    <ng-container *ngIf="openMode === 'edit' || openTab !== 'past'">
+    <ng-container *ngIf="openMode === 'edit' && this.materialDetails?.isNew">
       <button mat-button class="save-btn" (click)="saveDetails()" [ngClass]="{'disablebtn': eventForm?.invalid}"
         [disabled]="materialDetails?.invalid">{{materialDetails?.title
         ? 'Update' :
