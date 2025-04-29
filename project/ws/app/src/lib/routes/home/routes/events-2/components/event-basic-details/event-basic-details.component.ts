@@ -25,7 +25,7 @@ export class EventBasicDetailsComponent implements OnInit, OnChanges {
   @Input() openTab = 'draft'
 
   evntCategorysList = ['Webinar', 'Karmayogi Talks', 'Karmayogi Saptah']
-  todayDate = new Date()
+  minDate = new Date()
 
   maxTimeToStart = '11:44 pm'
   minTimeToStart: string | null = '12:00 am'
@@ -46,11 +46,14 @@ export class EventBasicDetailsComponent implements OnInit, OnChanges {
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes.eventDetails) {
-      const startTime = _.get(this.eventDetails, 'value.startTime')
+      if (this.openTab === 'past') {
+        this.minDate = new Date(_.get(this.eventDetails, 'value.startDate'))
+      }
+      const startTime = _.get(this.eventDetails, 'controls.startTime.value')
       if (startTime) {
         const convertedStartTime = this.convertTo12HourFormat(startTime)
         this.eventDetails.controls.startTime.patchValue(convertedStartTime)
-        if (this.openMode === 'edit') {
+        if (this.openMode === 'edit' && this.openTab !== 'past') {
           setTimeout(() => {
             const resetEndTime = false
             this.generatMinTimeToEnd(convertedStartTime, resetEndTime)
@@ -58,12 +61,12 @@ export class EventBasicDetailsComponent implements OnInit, OnChanges {
         }
       }
 
-      const endTime = _.get(this.eventDetails, 'value.endTime')
+      const endTime = _.get(this.eventDetails, 'controls.endTime.value')
       if (endTime) {
         this.eventDetails.controls.endTime.patchValue(this.convertTo12HourFormat(endTime))
       }
 
-      if (_.get(this.eventDetails, 'value.startDate') && this.openMode === 'edit') {
+      if (_.get(this.eventDetails, 'value.startDate') && this.openMode === 'edit' && this.openTab !== 'past') {
         this.checkMinTimeToStart(_.get(this.eventDetails, 'value.startDate'))
       }
 
@@ -93,7 +96,7 @@ export class EventBasicDetailsComponent implements OnInit, OnChanges {
   }
 
   ngOnInit(): void {
-    if (this.eventDetails && this.eventDetails.controls && this.openMode === 'edit') {
+    if (this.eventDetails && this.eventDetails.controls && this.openMode === 'edit' && this.openTab !== 'past') {
       if (this.eventDetails.controls.startDate) {
         this.eventDetails.controls.startDate.valueChanges.subscribe((date) => {
           this.checkMinTimeToStart(date)

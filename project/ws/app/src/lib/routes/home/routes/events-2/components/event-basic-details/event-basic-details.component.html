@@ -164,7 +164,7 @@
         Date
       </div>
       <mat-form-field appearance="outline" class="disable-round">
-        <input matInput [matDatepicker]="startDate" [min]="todayDate" placeholder="Enter Start Date"
+        <input matInput [matDatepicker]="startDate" [min]="minDate" placeholder="Enter Start Date"
           formControlName="startDate" readonly>
         <mat-datepicker-toggle matSuffix [for]="startDate"></mat-datepicker-toggle>
         <mat-datepicker #startDate></mat-datepicker>
