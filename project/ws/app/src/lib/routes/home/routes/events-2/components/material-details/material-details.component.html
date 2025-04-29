@@ -69,7 +69,7 @@
   </div>
   <div class="flex justify-center gap-4 mb-2">
     <button mat-button class="cancel-btn" (click)="openStatus(false)">Cancel</button>
-    <ng-container *ngIf="openMode === 'edit' && this.materialDetails?.isNew">
+    <ng-container *ngIf="openMode === 'edit' &&(openTab !== 'past' || this.materialDetails?.isNew)">
       <button mat-button class="save-btn" (click)="saveDetails()" [ngClass]="{'disablebtn': eventForm?.invalid}"
         [disabled]="materialDetails?.invalid">{{materialDetails?.title
         ? 'Update' :
