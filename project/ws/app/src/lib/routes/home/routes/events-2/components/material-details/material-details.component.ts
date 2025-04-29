@@ -120,7 +120,11 @@ export class MaterialDetailsComponent implements OnChanges {
 
   saveDetails() {
     if (this.eventForm.valid) {
-      this.updatedMaterialDetails.emit(this.eventForm.value)
+      const materialDetails: any = this.eventForm.value
+      if (this.materialDetails) {
+        materialDetails['isNew'] = this.materialDetails.isNew
+      }
+      this.updatedMaterialDetails.emit(materialDetails)
     }
     this.eventForm.markAllAsTouched()
   }

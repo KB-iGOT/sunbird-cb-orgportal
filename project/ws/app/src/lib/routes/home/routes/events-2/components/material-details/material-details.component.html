@@ -3,7 +3,7 @@
     <div class="pdfName flex items-center">{{materialDetails?.title}}</div>
     <div class="flex gap-1">
       <mat-icon class="edit-icon flex items-center" (click)="openStatus(true)">edit</mat-icon>
-      <ng-container *ngIf="openMode === 'edit' && openTab !== 'past'">
+      <ng-container *ngIf="openMode === 'edit' && (openTab !== 'past' || this.materialDetails?.isNew)">
         <mat-icon class="edit-icon flex items-center" (click)="deleteMaterialFromList()">delete</mat-icon>
       </ng-container>
     </div>
@@ -69,7 +69,7 @@
   </div>
   <div class="flex justify-center gap-4 mb-2">
     <button mat-button class="cancel-btn" (click)="openStatus(false)">Cancel</button>
-    <ng-container *ngIf="openMode === 'edit' &&(openTab !== 'past' || this.materialDetails?.isNew)">
+    <ng-container *ngIf="openMode === 'edit' && (openTab !== 'past' || this.materialDetails?.isNew)">
       <button mat-button class="save-btn" (click)="saveDetails()" [ngClass]="{'disablebtn': eventForm?.invalid}"
         [disabled]="materialDetails?.invalid">{{materialDetails?.title
         ? 'Update' :

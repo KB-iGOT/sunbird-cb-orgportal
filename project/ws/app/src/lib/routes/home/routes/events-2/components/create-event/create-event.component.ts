@@ -507,7 +507,7 @@ export class CreateEventComponent implements OnInit, AfterViewInit {
       eventDetails['speakers'] = this.speakersList
     }
     if (this.materialsList) {
-      eventDetails['eventHandouts'] = this.materialsList
+      eventDetails['eventHandouts'] = this.materialsList.map(({ isNew, ...rest }) => rest)
     }
     if (this.competencies) {
       eventDetails['competencies_v6'] = this.competencies
