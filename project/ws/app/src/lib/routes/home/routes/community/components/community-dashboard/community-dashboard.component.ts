@@ -29,8 +29,8 @@ interface Community {
 
 
 export class CommunityDashboardComponent implements OnInit {
-  // displayedColumns: string[] = ['name', 'startDate', 'createdBy', 'publishedOn', 'members', 'mods', 'actions'];
-  displayedColumns: string[] = []
+  displayedColumns: string[] = ['name', 'startDate', 'createdBy', 'publishedOn', 'members', 'mods', 'actions'];
+  // displayedColumns: string[] = []
   dataSource: MatTableDataSource<Community>
   userProfile: any
   searchControl = new FormControl('');
@@ -88,7 +88,7 @@ export class CommunityDashboardComponent implements OnInit {
       this.fetchCommunityData(searchString || '')
     })
 
-    this.getDisplayColumns()
+    // this.getDisplayColumns()
   }
 
   ngAfterViewInit() {
@@ -158,7 +158,7 @@ export class CommunityDashboardComponent implements OnInit {
 
     }
 
-    this.getDisplayColumns()
+    // this.getDisplayColumns()
     this.fetchCommunityData(this.currentSearchString)
   }
 
