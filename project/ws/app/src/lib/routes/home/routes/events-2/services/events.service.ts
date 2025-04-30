@@ -10,7 +10,7 @@ const API_END_POINTS = {
   CREATE_CONTENT: 'apis/proxies/v8/action/content/v3/create',
   UPLOAD_CONTENT: 'apis/proxies/v8/upload/action/content/v3/upload',
   CREATE_EVENT: '/apis/proxies/v8/event/v4/create',
-  // EVENT_READ: (eventId: string) => `apis/proxies/v8/event/v4/read/${eventId}`,
+  EVENT_READ: (eventId: string) => `apis/proxies/v8/event/v4/read/${eventId}`,
   EDIT_EVENT_READ: (eventId: string) => `apis/proxies/v8/event/v4/read/${eventId}?mode=edit`,
   UPDATE_EVENT: (eventId: string) => `apis/proxies/v8/event/v4/update/${eventId}`,
   PUBLISH_EVENT: (eventId: string) => `apis/proxies/v8/event/v4/publish/${eventId}`,
@@ -69,13 +69,9 @@ export class EventsService {
     return this.http.post<any>(API_END_POINTS.CREATE_EVENT, req)
   }
 
-  getEventDetailsByid(eventId: string) {
-    // if (tab === 'upcoming') {
-    //   return this.http.get<any>(API_END_POINTS.EVENT_READ(eventId)).pipe(map((res: any) => {
-
-    //   }))
-    // }
-    return this.http.get<any>(API_END_POINTS.EDIT_EVENT_READ(eventId))
+  getEventDetailsByid(eventId: string, getLiveData: boolean) {
+    const apiUrl = getLiveData ? API_END_POINTS.EVENT_READ(eventId) : API_END_POINTS.EDIT_EVENT_READ(eventId)
+    return this.http.get<any>(apiUrl)
   }
 
   updateEvent(formBody: any, eventId: string) {
