@@ -25,12 +25,9 @@ export class ReportIssueComponent {
     @Inject(MAT_DIALOG_DATA) public data: IDialogData[]) { }
 
   ngOnInit(): void {
-
-    console.log(this.data, 'data========')
   }
 
   onCancelDialog(): void {
-    console.log('btn clicked!')
     this.dialogRef.close()
   }
 

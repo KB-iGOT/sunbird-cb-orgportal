@@ -81,7 +81,7 @@ export class CommunityManageComponent {
   }
 
   openReportDialog(discussionId: any): void {
-    console.log(discussionId)
+    // console.log(discussionId)
     // const dialogRef = this.dialog.open(ReportIssueComponent, {
     //   width: '500px',
     //   panelClass: 'report-dialog-box',
@@ -89,7 +89,6 @@ export class CommunityManageComponent {
     // })
     this.getReportedIssueList(discussionId).subscribe((reportedIssues: any) => {
       if (reportedIssues) {
-        console.log(reportedIssues, 'reportedIssues')
         const dialogRef = this.dialog.open(ReportIssueComponent, {
           width: '500px',
           panelClass: 'report-dialog-box',
@@ -113,7 +112,6 @@ export class CommunityManageComponent {
   }
 
 
-
   openDialog(value: any, discussionId: any, itemType: any) {
     let discussId = discussionId
     let type = itemType
@@ -132,7 +130,7 @@ export class CommunityManageComponent {
       })
       confirmDialog.afterClosed().subscribe((response: any) => {
         if (response) {
-          console.log(response, "response--")
+          // console.log(response, "response--")
           this.showOnPlatform(discussId, type)
         }
       })
@@ -152,7 +150,7 @@ export class CommunityManageComponent {
       })
       confirmDialog.afterClosed().subscribe((response: any) => {
         if (response) {
-          console.log(response, "response--")
+          // console.log(response, "response--")
           this.hideContent(discussId, type)
         }
       })
@@ -172,7 +170,7 @@ export class CommunityManageComponent {
         "status": [
           "reported"
         ],
-        "communityId": '9e2148a6-bebf-48ef-8579-da8d7cae81cd',
+        "communityId": this.communityId,
         "type": ["question", "answerPost", "answerPostReply"]
       },
       "requestedFields": [],
@@ -186,8 +184,6 @@ export class CommunityManageComponent {
       if (res && res.result && res.result.search_results && res.result.search_results.data) {
         this.allDisussionObj = res.result.search_results.data
         this.allDisussionObjCount = res.result.search_results.totalCount
-
-        console.log(this.allDisussionObjCount, "this.allDisussionObjCount====")
       }
     })
   }
@@ -208,13 +204,11 @@ export class CommunityManageComponent {
 
 
   viewMoreOrLess(item: any) {
-    console.log(item, 'item===========')
     if (this.getEditorTextLength(item.description) > this.viewMoreLength) {
       item.expanded = !item.expanded
     }
   }
   getEditorTextLength(content: any) {
-    // console.log(content, "content=====")
     let test = content.replace(/<[^>]*>/g, '')
     test = test.replace(/&nbsp;/gi, ' ')
     test = test.trim()
@@ -234,7 +228,7 @@ export class CommunityManageComponent {
       "filterCriteriaMap": {
         "type": ["question", "answerPost", "answerPostReply"],
         "status": ["suspended"],
-        "communityId": '9e2148a6-bebf-48ef-8579-da8d7cae81cd',
+        "communityId": this.communityId,
       },
       "requestedFields": [],
       "pageNumber": 0,
@@ -247,46 +241,40 @@ export class CommunityManageComponent {
       if (res && res.result && res.result.search_results && res.result.search_results.data) {
         this.hiddenDisussionObj = res.result.search_results.data
         this.hiddenDisussionObjCount = res.result.search_results.totalCount
-        console.log(this.hiddenDisussionObj, 'this.hiddenDisussionObj========')
       }
     })
   }
 
   showOnPlatform(discussionId: any, type: any) {
-    // call showOnPlatform
-    console.log(discussionId, "discussionId====")
-    console.log(type, "type====")
-    // call hideContent
+
     const requestBody = {
       "discussionId": discussionId,
       "type": type
     }
     this.communitySvc.displayReportedPost(requestBody).subscribe((res: any) => {
       if (res) {
+        // tslint:disable-next-line
         console.log(res, 'response====')
       }
     })
   }
 
   hideContent(discussionId: any, type: any) {
-    console.log(discussionId, "discussionId====")
-    console.log(type, "type====")
-    // call hideContent
     const requestBody = {
       "discussionId": discussionId,
       "type": type
     }
     this.communitySvc.hideReportedPost(requestBody).subscribe((res: any) => {
       if (res) {
+        // tslint:disable-next-line
         console.log(res, 'response====')
       }
     })
   }
 
   getReportedIssueList(discussionId: any): Observable<any> {
-    console.log(discussionId, "discussionId----")
     const requestBody = {
-      "discussionId": "ab4abf80-0a41-11f0-a0ab-45901893576b",
+      "discussionId": discussionId,
       "type": "question"
     }
     // this.communitySvc.getReportedIssuesStats(requestBody).subscribe((res) => {
@@ -297,7 +285,6 @@ export class CommunityManageComponent {
     return this.communitySvc.getReportedIssuesStats(requestBody).pipe(
       map((res: any) => {
         if (res?.result?.reportReasons) {
-          console.log(res?.result?.reportReasons, "res?.result?.reportReasons=====")
           return res.result.reportReasons
         } else {
           return []
@@ -327,8 +314,6 @@ export class CommunityManageComponent {
       if (res && res.result && res.result.search_results && res.result.search_results.data) {
         this.getPostItems = res.result.search_results.data
         this.getPostItemsCount = res.result.search_results.totalCount
-
-        console.log(this.getPostItemsCount, "this.allDisussionObjCount====")
       }
     })
 
@@ -354,8 +339,6 @@ export class CommunityManageComponent {
       if (res && res.result && res.result.search_results && res.result.search_results.data) {
         this.getCommentItems = res.result.search_results.data
         this.getCommentItemsCount = res.result.search_results.totalCount
-
-        console.log(this.getCommentItemsCount, "this.allDisussionObjCount====")
       }
     })
 
@@ -381,21 +364,12 @@ export class CommunityManageComponent {
       if (res && res.result && res.result.search_results && res.result.search_results.data) {
         this.getReplyItems = res.result.search_results.data
         this.getReplyItemsCount = res.result.search_results.totalCount
-
-        console.log(this.getReplyItemsCount, "this.getReplyItemsCount====")
       }
     })
 
   }
   filterItems(keyVal: any) {
-    console.log(keyVal, "keyVal---")
     this.activeFilter = keyVal
-    this.actvRoute?.params?.subscribe(params => {
-      if (params) {
-        this.communityId = params['communityId']
-      }
-
-    })
     if (keyVal === 'all') {
       this.getReportedDiscussionItems()
     }
@@ -408,7 +382,6 @@ export class CommunityManageComponent {
     }
     if (keyVal === 'reply') {
       this.getReplyFilterItems()
-
 
     }
   }
