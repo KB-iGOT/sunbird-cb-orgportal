@@ -43,7 +43,7 @@
             <img [src]="uploadedDocTypeImg" alt="material type">
             <div class="pdfName flex items-center">{{materialName}}</div>
           </div>
-          <ng-container *ngIf="openMode === 'edit' && openTab !== 'past'">
+          <ng-container *ngIf="openMode === 'edit' && (openTab !== 'past' || this.materialDetails?.isNew)">
             <mat-icon class="clearMaterial" (click)="removeMaterial()">clear</mat-icon>
           </ng-container>
         </div>
