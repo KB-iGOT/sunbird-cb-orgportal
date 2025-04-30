@@ -42,8 +42,13 @@ import { EventsService } from '../events-2/services/events.service'
 import { MatLegacyChipsModule as MatChipsModule } from '@angular/material/legacy-chips'
 import { TooltipDirective } from './directive/tooltip.directive'
 import { TooltipComponent } from './directive/tooltip/tooltip.component'
-import { CompTooltipDirective } from '../../../state-profile/directives/tooltip.directive';
+import { CompTooltipDirective } from '../../../state-profile/directives/tooltip.directive'
 import { CommunityManageComponent } from './components/community-manage/community-manage.component'
+import { ReportIssueComponent } from './components/report-issue/report-issue.component'
+import { MatLegacyProgressBarModule as MatProgressBarModule } from '@angular/material/legacy-progress-bar';
+import { StripHtmlPipe } from './pipes/strip-html.pipe';
+import { ImageSlidersComponent } from './components/image-sliders/image-sliders.component';
+import { PipeRelativeTimePipe } from './pipes/pipe-relative-time/pipe-relative-time.pipe'
 
 
 @NgModule({
@@ -56,7 +61,11 @@ import { CommunityManageComponent } from './components/community-manage/communit
     TooltipComponent,
     TooltipDirective,
     CompTooltipDirective,
-    CommunityManageComponent
+    CommunityManageComponent,
+    ReportIssueComponent,
+    StripHtmlPipe,
+    ImageSlidersComponent,
+    PipeRelativeTimePipe
   ],
   imports: [
     CommonModule,
@@ -91,7 +100,8 @@ import { CommunityManageComponent } from './components/community-manage/communit
     ComponentSharedModule,
     CKEditorModule,
     CompetencyAddModule,
-    MatChipsModule
+    MatChipsModule,
+    MatProgressBarModule
   ],
   providers: [
     DatePipe,

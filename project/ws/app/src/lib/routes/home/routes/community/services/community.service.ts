@@ -11,6 +11,11 @@ const API_END_POINTS = {
   COMMUNITY_UPDATE: `/apis/proxies/v8/community/v1/update`,
   COMMUNITY_READ: (id: string) => `/apis/proxies/v8/community/v1/read/${id}`,
   COMMUNITY_PUBLISH: `/apis/proxies/v8/community/v1/publish`,
+  GET_ALL_REPORTED_DISCUSSION_ITEMS: `/apis/proxies/v8/feedDiscussion/search`,
+  GET_HIDDEN_DISCUSSION_ITEMS: `/apis/proxies/v8/feedDiscussion/search`,
+  GET_REPORTED_ISSUES_STATS: `/apis/proxies/v8/feedDiscussion/getReportStatistics`,
+  HIDE_REPORTED_DISCUSSION_POST: `/apis/proxies/v8/feedDiscussion/admin/removePost`,
+  ACTIVATE_REPORTED_DISCUSSION_POST: `apis/proxies/v8/feedDiscussion/admin/activatePost`
 }
 
 @Injectable({
@@ -51,4 +56,26 @@ export class CommunityService {
   publishCommunity(request: any) {
     return this.http.post<any>(`${API_END_POINTS.COMMUNITY_PUBLISH}`, request)
   }
+
+  getAllReportedDiscussion(request: any) {
+    return this.http.post<any>(`${API_END_POINTS.GET_ALL_REPORTED_DISCUSSION_ITEMS}`, request)
+  }
+
+  getHiddenDiscussions(request: any) {
+    return this.http.post<any>(`${API_END_POINTS.GET_HIDDEN_DISCUSSION_ITEMS}`, request)
+  }
+
+  getReportedIssuesStats(request: any) {
+    return this.http.post<any>(`${API_END_POINTS.GET_REPORTED_ISSUES_STATS}`, request)
+  }
+
+  hideReportedPost(request: any) {
+    return this.http.post<any>(`${API_END_POINTS.HIDE_REPORTED_DISCUSSION_POST}`, request)
+  }
+
+  displayReportedPost(request: any) {
+    return this.http.post<any>(`${API_END_POINTS.ACTIVATE_REPORTED_DISCUSSION_POST}`, request)
+  }
+
+
 }

@@ -1,8 +1,6 @@
 <div class="dashboard-container">
   <div class="header">
-    <h1>Reports</h1>
-
-
+    <p class="mat-subheading-1">Reports</p>
   </div>
 
   <!-- <mat-form-field class="search-field">
@@ -13,59 +11,384 @@
   <mat-tab-group (selectedTabChange)="onTabChange($event)">
     <mat-tab *ngFor="let tab of tabs">
       <ng-template mat-tab-label>
-        {{tab?.label}}
+        {{tab?.label}} <span *ngIf="tab?.label === 'Pending'" class="ml-2">({{allDisussionObjCount}})</span>
+        <span *ngIf="tab?.label === 'Hidden'" class="ml-2">({{hiddenDisussionObjCount}})</span>
       </ng-template>
-      <ng-container *ngTemplateOutlet="tabContent"></ng-container>
+
+      <ng-container *ngIf="tab?.label === 'Pending'">
+
+        <div>
+          <div class="flex mt-4">
+            <a class="active filter-link mr-4 flex items-center justify-center" [class.active]="activeFilter === 'all'"
+              (click)="filterItems('all')">All
+              ({{ allDisussionObjCount}})</a>
+            <a class="filter-link mr-4 flex items-center justify-center" [class.active]="activeFilter === 'posts'"
+              (click)="filterItems('posts')">Post
+              ({{getPostItemsCount}})</a>
+            <a class="filter-link mr-4 flex items-center justify-center" [class.active]="activeFilter === 'comments'"
+              (click)="filterItems('comments')">Comments
+              ({{getCommentItemsCount}})</a>
+            <a class="filter-link mr-4 flex items-center justify-center" [class.active]="activeFilter === 'reply'"
+              (click)="filterItems('reply')">Reply
+              ({{getReplyItemsCount}})</a>
+          </div>
+
+          <!-- get all discussions -->
+          <div *ngIf="activeFilter === 'all'">
+            <div *ngIf="allDisussionObj && allDisussionObj.length > 0">
+              <div class="community-card mt-4 flex flex-1 flex-col" *ngFor="let item of allDisussionObj">
+                <div class="card-header  flex flex-1 flex-col">
+                  <div class="user-info-box flex flex-1 flex-row justify-between">
+                    <div class="user-info-inner flex flex-1">
+                      <div class="user-image-box flex">
+                        <img [src]="item?.createdBy?.user_profile_img_url" class="user-image" />
+                      </div>
+                      <div class="user-info text-left margin-left-s">
+                        <p class="mat-body-1 bold mr-1 margin-remove-bottom text-name"
+                          *ngIf="item?.createdBy?.first_name">
+                          {{item?.createdBy?.first_name }}
+                          <span *ngIf="item?.createdBy?.userProfileStatus.toLowerCase()==='verified'">
+                            <img src="assets/icons/accept_icon.svg" class="verify_icon ml-1" />
+                          </span>
+                        </p>
+                        <p *ngIf="item?.createdBy?.designation"
+                          class="ws-mat-black60-text mat-body-2 small-text margin-bottom-none">
+                          {{item?.createdBy?.designation }}</p>
+                      </div>
+                    </div>
+                    <span class="flex mat-body-2">
+                      <span class="mat-body-2 nodtranslate ws-mat-black60-text">{{item?.updatedOn |
+                        pipeRelativeTime}}</span>
+                    </span>
+                  </div>
+                  <!-- <div class="community-descripton card-body mt-4">
+
+                  <p
+                    class="community-post-text comment-txt description mat-body-2 mb-1 ws-mat-black60-text margin-bottom-none">
+                    {{item?.description | stripHtml}}
+                  </p>
+                </div> -->
+                  <!-- <div
+                  class="comment-txt mb-1 mat-body-1 ws-mat-black60-text description {{getEditorTextLength(item?.description) > viewMoreLength && !item?.expanded ? 'expand' : 'un-expand'}}"
+                  [innerHTML]="item?.description">
+                </div>
+                <div class="more-or-less text-right" *ngIf="getEditorTextLength(item?.description) > viewMoreLength">
+                  <div class="cursor-pointer nodtranslate" (click)="viewMoreOrLess(item)" *ngIf="!item?.expanded">
+                    View
+                    more</div>
+                  <div class="cursor-pointer nodtranslate" (click)="viewMoreOrLess(item)" *ngIf="item?.expanded">
+                    View
+                    less
+                  </div>
+                </div> -->
+
+                  <div
+                    class="comment-txt mb-1 mat-body-1 mt-2 ws-mat-black60-text description {{getEditorTextLength(item?.description) > viewMoreLength && !item?.expanded ? 'expand' : 'un-expand'}}"
+                    [innerHTML]="item?.description">
+                  </div>
+                  <div class="more-or-less text-right" *ngIf="getEditorTextLength(item?.description) > viewMoreLength">
+                    <div class="cursor-pointer nodtranslate" (click)="viewMoreOrLess(item)" *ngIf="!item?.expanded">View
+                      more</div>
+                    <div class="cursor-pointer nodtranslate" (click)="viewMoreOrLess(item)" *ngIf="item?.expanded">View
+                      less
+                    </div>
+                  </div>
+
+                  <!-- <div *ngIf="item?.categoryType?.includes('image')">
+                  <div class="media media-full-width nodtranslate"
+                    *ngIf="item?.mediaCategory && item?.mediaCategory?.image">
+                    <d-v2-image-sliders [title]="'Images'" [imageUrls]="item?.mediaCategory?.image"
+                      [styleData]="cardConfig?.sliderData?.styleData"></d-v2-image-sliders>
+                  </div>
+                </ng-container> -->
+                  <!-- IF Doc  -->
+                  <!-- <ng-container *ngIf="item?.categoryType?.includes('document')">
+                  <div class="media nodtranslate" *ngIf="item?.mediaCategory && item?.mediaCategory?.document">
+                    <div *ngFor="let doc of item?.mediaCategory?.document"
+                      class="doc-item flex items-center gap-2 mb-2 nodtranslate">
+                      <mat-icon class="doc-icon" [ngClass]="{
+                                            'pdf-icon': getFileExtension(doc) === 'pdf',
+                                            'doc-icon': getFileExtension(doc) === 'doc',
+                                            'docx-icon': getFileExtension(doc) === 'docx'
+                                        }">
+                        {{getFileIcon(doc)}}
+                      </mat-icon>
+                      <a [href]="doc" target="_blank" rel="noopener noreferrer" class="doc-name doc-link nodtranslate"
+                        (click)="openDocument($event, doc)">
+                        {{getFileName(doc)}}
+                      </a>
+                    </div>
+                  </div>
+                </ng-container> -->
+                  <!-- <ng-container *ngIf="item?.categoryType?.includes('link')">
+                  <div class="media" *ngIf="item?.mediaCategory && item?.mediaCategory?.link">
+                    <div *ngFor="let linkUrl of item?.mediaCategory?.link"
+                      class="doc-item flex items-center gap-2 mb-2">
+                      <mat-icon class="doc-icon">link</mat-icon>
+                      <a [href]="linkUrl" target="_blank" rel="noopener noreferrer"
+                        class="doc-name doc-link nodtranslate">
+                        {{linkUrl}}
+                      </a>
+                    </div>
+                  </div>
+                </ng-container> -->
+
+                  <div class="community-button-box flex flex-1 flex-row justify-end">
+                    <!-- <a class="reported-issue-btn link-btn flex items-center" (click)="openReportDialog()">
+                    <mat-icon class="mr-2 color-white">info</mat-icon>Reported Issues</a>
+                  <a class="show-btn link-btn flex btn-blue items-center"
+                    (click)="showOnPlatform(item?.discussionId, item?.type)"><img src="assets/icons/accept_icon.svg"
+                      class="verify_icon1 mr-2" />Show on the platform </a>
+                  <a class="hide-issue-btn link-btn flex btn-blue items-center"
+                    (click)="hideContent(item?.discussionId, item?.type)"><mat-icon
+                      class="mr-2 color-orange">visibility_off</mat-icon>Keep it Hidden</a> -->
+                    <a class="reported-issue-btn link-btn flex items-center"
+                      (click)="openReportDialog(item?.discussionId)">
+                      <mat-icon class="mr-2 color-white">info</mat-icon>Reported Issues</a>
+                    <a class="show-btn link-btn flex btn-blue items-center"
+                      (click)="openDialog('showPlatform', item?.discussionId, item?.type)"><img
+                        src="assets/icons/accept_icon.svg" class="verify_icon1 mr-2" />Show on the platform </a>
+                    <a class="hide-issue-btn link-btn flex btn-blue items-center"
+                      (click)="openDialog('hideContent',item?.discussionId, item?.type)"><mat-icon
+                        class="mr-2 color-orange">visibility_off</mat-icon>Keep it Hidden</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- get post items -->
+          <div *ngIf="activeFilter === 'posts'">
+            <div *ngIf="getPostItems && getPostItems.length > 0">
+              <div class="community-card mt-4 flex flex-1 flex-col" *ngFor="let item of getPostItems">
+                <div class="card-header  flex flex-1 flex-col">
+                  <div class="user-info-box flex flex-1 flex-row justify-between">
+                    <div class="user-info-inner flex flex-1">
+                      <div class="user-image-box flex">
+                        <img [src]="item?.createdBy?.user_profile_img_url" class="user-image" />
+                      </div>
+                      <div class="user-info text-left margin-left-s">
+                        <p class="mat-body-1 bold mr-1 margin-remove-bottom text-name"
+                          *ngIf="item?.createdBy?.first_name">
+                          {{item?.createdBy?.first_name }}
+                          <span *ngIf="item?.createdBy?.userProfileStatus.toLowerCase()==='verified'">
+                            <img src="assets/icons/accept_icon.svg" class="verify_icon ml-1" />
+                          </span>
+                        </p>
+                        <p *ngIf="item?.createdBy?.designation"
+                          class="ws-mat-black60-text mat-body-2 small-text margin-bottom-none">
+                          {{item?.createdBy?.designation }}</p>
+                      </div>
+                    </div>
+                    <span class="flex mat-body-2">
+                      <span class="mat-body-2 nodtranslate ws-mat-black60-text">{{item?.updatedOn |
+                        pipeRelativeTime}}</span>
+                    </span>
+                  </div>
+
+
+                  <div
+                    class="comment-txt mb-1 mat-body-1 mt-2 ws-mat-black60-text description {{getEditorTextLength(item?.description) > viewMoreLength && !item?.expanded ? 'expand' : 'un-expand'}}"
+                    [innerHTML]="item?.description">
+                  </div>
+                  <div class="more-or-less text-right" *ngIf="getEditorTextLength(item?.description) > viewMoreLength">
+                    <div class="cursor-pointer nodtranslate" (click)="viewMoreOrLess(item)" *ngIf="!item?.expanded">View
+                      more</div>
+                    <div class="cursor-pointer nodtranslate" (click)="viewMoreOrLess(item)" *ngIf="item?.expanded">View
+                      less
+                    </div>
+                  </div>
+
+
+
+                  <div class="community-button-box flex flex-1 flex-row justify-end">
+                    <a class="reported-issue-btn link-btn flex items-center"
+                      (click)="openReportDialog(item?.discussionId)">
+                      <mat-icon class="mr-2 color-white">info</mat-icon>Reported Issues</a>
+                    <a class="show-btn link-btn flex btn-blue items-center"
+                      (click)="openDialog('showPlatform', item?.discussionId, item?.type)"><img
+                        src="assets/icons/accept_icon.svg" class="verify_icon1 mr-2" />Show on the platform </a>
+                    <a class="hide-issue-btn link-btn flex btn-blue items-center"
+                      (click)="openDialog('hideContent',item?.discussionId, item?.type)"><mat-icon
+                        class="mr-2 color-orange">visibility_off</mat-icon>Keep it Hidden</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- get comments -->
+          <div *ngIf="activeFilter === 'comments'">
+            <div *ngIf="getCommentItems && getCommentItems.length > 0">
+              <div class="community-card mt-4 flex flex-1 flex-col" *ngFor="let item of getCommentItems">
+                <div class="card-header  flex flex-1 flex-col">
+                  <div class="user-info-box flex flex-1 flex-row justify-between">
+                    <div class="user-info-inner flex flex-1">
+                      <div class="user-image-box flex">
+                        <img [src]="item?.createdBy?.user_profile_img_url" class="user-image" />
+                      </div>
+                      <div class="user-info text-left margin-left-s">
+                        <p class="mat-body-1 bold mr-1 margin-remove-bottom text-name"
+                          *ngIf="item?.createdBy?.first_name">
+                          {{item?.createdBy?.first_name }}
+                          <span *ngIf="item?.createdBy?.userProfileStatus.toLowerCase()==='verified'">
+                            <img src="assets/icons/accept_icon.svg" class="verify_icon ml-1" />
+                          </span>
+                        </p>
+                        <p *ngIf="item?.createdBy?.designation"
+                          class="ws-mat-black60-text mat-body-2 small-text margin-bottom-none">
+                          {{item?.createdBy?.designation }}</p>
+                      </div>
+                    </div>
+                    <span class="flex mat-body-2">
+                      <span class="mat-body-2 nodtranslate ws-mat-black60-text">{{item?.updatedOn |
+                        pipeRelativeTime}}</span>
+                    </span>
+                  </div>
+
+                  <div
+                    class="comment-txt mb-1 mat-body-1 mt-2 ws-mat-black60-text description {{getEditorTextLength(item?.description) > viewMoreLength && !item?.expanded ? 'expand' : 'un-expand'}}"
+                    [innerHTML]="item?.description">
+                  </div>
+                  <div class="more-or-less text-right" *ngIf="getEditorTextLength(item?.description) > viewMoreLength">
+                    <div class="cursor-pointer nodtranslate" (click)="viewMoreOrLess(item)" *ngIf="!item?.expanded">View
+                      more</div>
+                    <div class="cursor-pointer nodtranslate" (click)="viewMoreOrLess(item)" *ngIf="item?.expanded">View
+                      less
+                    </div>
+                  </div>
+
+
+                  <div class="community-button-box flex flex-1 flex-row justify-end">
+                    <a class="reported-issue-btn link-btn flex items-center"
+                      (click)="openReportDialog(item?.discussionId)">
+                      <mat-icon class="mr-2 color-white">info</mat-icon>Reported Issues</a>
+                    <a class="show-btn link-btn flex btn-blue items-center"
+                      (click)="openDialog('showPlatform', item?.discussionId, item?.type)"><img
+                        src="assets/icons/accept_icon.svg" class="verify_icon1 mr-2" />Show on the platform </a>
+                    <a class="hide-issue-btn link-btn flex btn-blue items-center"
+                      (click)="openDialog('hideContent',item?.discussionId, item?.type)"><mat-icon
+                        class="mr-2 color-orange">visibility_off</mat-icon>Keep it Hidden</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- get reply -->
+          <div *ngIf="activeFilter === 'reply'">
+            <div *ngIf="getReplyItems && getReplyItems.length > 0">
+              <div class="community-card mt-4 flex flex-1 flex-col" *ngFor="let item of getReplyItems">
+                <div class="card-header  flex flex-1 flex-col">
+                  <div class="user-info-box flex flex-1 flex-row justify-between">
+                    <div class="user-info-inner flex flex-1">
+                      <div class="user-image-box flex">
+                        <img [src]="item?.createdBy?.user_profile_img_url" class="user-image" />
+                      </div>
+                      <div class="user-info text-left margin-left-s">
+                        <p class="mat-body-1 bold mr-1 margin-remove-bottom text-name"
+                          *ngIf="item?.createdBy?.first_name">
+                          {{item?.createdBy?.first_name }}
+                          <span *ngIf="item?.createdBy?.userProfileStatus.toLowerCase()==='verified'">
+                            <img src="assets/icons/accept_icon.svg" class="verify_icon ml-1" />
+                          </span>
+                        </p>
+                        <p *ngIf="item?.createdBy?.designation"
+                          class="ws-mat-black60-text mat-body-2 small-text margin-bottom-none">
+                          {{item?.createdBy?.designation }}</p>
+                      </div>
+                    </div>
+                    <span class="flex mat-body-2">
+                      <span class="mat-body-2 nodtranslate ws-mat-black60-text">{{item?.updatedOn |
+                        pipeRelativeTime}}</span>
+                    </span>
+                  </div>
+
+                  <div
+                    class="comment-txt mb-1 mat-body-1 mt-2 ws-mat-black60-text description {{getEditorTextLength(item?.description) > viewMoreLength && !item?.expanded ? 'expand' : 'un-expand'}}"
+                    [innerHTML]="item?.description">
+                  </div>
+                  <div class="more-or-less text-right" *ngIf="getEditorTextLength(item?.description) > viewMoreLength">
+                    <div class="cursor-pointer nodtranslate" (click)="viewMoreOrLess(item)" *ngIf="!item?.expanded">View
+                      more</div>
+                    <div class="cursor-pointer nodtranslate" (click)="viewMoreOrLess(item)" *ngIf="item?.expanded">View
+                      less
+                    </div>
+                  </div>
+
+
+
+                  <div class="community-button-box flex flex-1 flex-row justify-end">
+                    <a class="reported-issue-btn link-btn flex items-center"
+                      (click)="openReportDialog(item?.discussionId)">
+                      <mat-icon class="mr-2 color-white">info</mat-icon>Reported Issues</a>
+                    <a class="show-btn link-btn flex btn-blue items-center"
+                      (click)="openDialog('showPlatform', item?.discussionId, item?.type)"><img
+                        src="assets/icons/accept_icon.svg" class="verify_icon1 mr-2" />Show on the platform </a>
+                    <a class="hide-issue-btn link-btn flex btn-blue items-center"
+                      (click)="openDialog('hideContent',item?.discussionId, item?.type)"><mat-icon
+                        class="mr-2 color-orange">visibility_off</mat-icon>Keep it Hidden</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </ng-container>
+
+      <ng-container *ngIf="tab.label === 'Hidden'">
+        <div *ngIf="hiddenDisussionObj && hiddenDisussionObj.length > 0">
+          <div class="community-card mt-4 flex flex-1 flex-col" *ngFor="let item of hiddenDisussionObj">
+            <div class="card-header  flex flex-1 flex-col">
+              <div class="user-info-box flex flex-1 flex-row justify-between">
+                <div class="user-info-inner flex flex-1">
+                  <div class="user-image-box flex">
+                    <img [src]="item?.createdBy?.user_profile_img_url" class="user-image" />
+                  </div>
+                  <div class="user-info text-left margin-left-s">
+                    <p class="mat-body-1 bold mr-1 margin-remove-bottom text-name" *ngIf="item?.createdBy?.first_name">
+                      {{item?.createdBy?.first_name }}
+                      <span *ngIf="item?.createdBy?.userProfileStatus.toLowerCase()==='verified'">
+                        <img src="assets/icons/accept_icon.svg" class="verify_icon ml-1" />
+                      </span>
+                    </p>
+                    <p *ngIf="item?.createdBy?.designation"
+                      class="ws-mat-black60-text mat-body-2 small-text margin-bottom-none">
+                      {{item?.createdBy?.designation }}</p>
+                  </div>
+                </div>
+                <span class="flex mat-body-2">
+                  <span class="mat-body-2 nodtranslate ws-mat-black60-text">{{item?.updatedOn |
+                    pipeRelativeTime}}</span>
+                </span>
+              </div>
+              <div
+                class="comment-txt mb-1 mat-body-1 mt-2 ws-mat-black60-text description {{getEditorTextLength(item?.description) > viewMoreLength && !item?.expanded ? 'expand' : 'un-expand'}}"
+                [innerHTML]="item?.description">
+              </div>
+              <div class="more-or-less text-right" *ngIf="getEditorTextLength(item?.description) > viewMoreLength">
+                <div class="cursor-pointer nodtranslate" (click)="viewMoreOrLess(item)" *ngIf="!item?.expanded">View
+                  more</div>
+                <div class="cursor-pointer nodtranslate" (click)="viewMoreOrLess(item)" *ngIf="item?.expanded">View less
+                </div>
+              </div>
+
+              <div class="community-button-box flex flex-1 flex-row justify-end">
+                <a class="reported-issue-btn link-btn flex items-center" (click)="openReportDialog(item?.discussionId)">
+                  <mat-icon class="mr-2 color-white">info</mat-icon>Reported Issues</a>
+                <a class="show-btn link-btn flex btn-blue items-center"
+                  (click)="openDialog('showPlatform', item?.discussionId, item?.type)"><img
+                    src="assets/icons/accept_icon.svg" class="verify_icon1 mr-2" />Show on the platform </a>
+
+              </div>
+            </div>
+          </div>
+        </div>
+      </ng-container>
+
     </mat-tab>
   </mat-tab-group>
 </div>
-
-
-<ng-template #tabContent>
-  <div class="search mt-4 flex flex-row">
-    <div class=rsearch>
-      <mat-icon class="search-icon">search</mat-icon>
-      <input class="sinput" type="Standard" label="" [formControl]="searchControl" placeholder="Type here to search... "
-        maxlength="30">
-    </div>
-
-    <div class="filter-section flex ">
-      <button mat-button type="button" class="apply-filter margin-right-s" [matMenuTriggerFor]="cardMenu">
-        <mat-icon class="margin-right-xs">sort</mat-icon> Sort
-      </button>
-      <mat-menu #cardMenu="matMenu">
-        <ng-template matMenuContent>
-          <div mat-menu-item class="flex items-center">
-            <span>A-Z</span>
-          </div>
-          <div mat-menu-item class="flex items-center">
-            <span>Z-A</span>
-          </div>
-          <div mat-menu-item class="flex items-center">
-            <span>Latest</span>
-          </div>
-          <div mat-menu-item class="flex items-center">
-            <span>Oldest</span>
-          </div>
-        </ng-template>
-      </mat-menu>
-    </div>
-  </div>
-
-  <div class="flex mt-4">
-    <mat-chip-list>
-      <mat-chip>All(123)</mat-chip>
-      <mat-chip>Post(45)</mat-chip>
-      <mat-chip>Comments (30)</mat-chip>
-      <mat-chip>Reply (3)</mat-chip>
-    </mat-chip-list>
-  </div>
-
-  <div>
-    <div>
-
-    </div>
-  </div>
-
-
-</ng-template>
