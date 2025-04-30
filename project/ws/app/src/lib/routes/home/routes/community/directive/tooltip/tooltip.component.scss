@@ -1,7 +1,8 @@
 
     :host {
       position: fixed;
-      background-color: rgba(0, 0, 0, 0.8);
+      // background-color: rgba(0, 0, 0, 0.8);
+      background: rgba(97, 97, 97, 0.9);
       color: white;
       padding: 8px;
       border-radius: 4px;
@@ -11,5 +12,7 @@
       pointer-events: none;
     }
     .tooltip-content {
-      font-size: 14px;
+      // font-size: 14px;
+      font-family: Lato;
+    font-size: 10px;
     }

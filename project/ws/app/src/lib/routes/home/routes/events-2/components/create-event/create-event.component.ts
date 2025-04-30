@@ -74,11 +74,6 @@ export class CreateEventComponent implements OnInit, AfterViewInit {
   }
 
   getEventDetailsFromResolver() {
-    this.userProfile = _.get(this.activatedRoute, 'snapshot.data.configService.userProfile')
-    if (_.get(this.activatedRoute, 'snapshot.data.eventDetails')) {
-      this.eventDetails = _.get(this.activatedRoute, 'snapshot.data.eventDetails.data')
-      this.patchEventDetails()
-    }
     this.activatedRoute.queryParams.subscribe((params: any) => {
       this.openMode = params['mode']
       this.pathUrl = params['pathUrl']
@@ -86,25 +81,43 @@ export class CreateEventComponent implements OnInit, AfterViewInit {
         this.eventDetailsForm.disable()
       }
     })
+    this.userProfile = _.get(this.activatedRoute, 'snapshot.data.configService.userProfile')
+    if (_.get(this.activatedRoute, 'snapshot.data.eventDetails')) {
+      this.eventDetails = _.get(this.activatedRoute, 'snapshot.data.eventDetails.data')
+      this.patchEventDetails()
+    }
   }
 
   patchEventDetails() {
     this.eventId = _.get(this.eventDetails, 'identifier')
     this.eventStatus = _.get(this.eventDetails, 'status', 'draft').toLowerCase()
+    if (this.eventStatus.toLocaleLowerCase() === 'senttopublish' && this.pathUrl === 'upcoming' && this.openMode === 'edit') {
+      this.openConforamtionPopup()
+    }
     const startDate = _.get(this.eventDetails, 'startDate', '')
-    const registrationLink = _.get(this.eventDetails, 'registrationLink', '')
-    const isYoutubeVideo = registrationLink.toLowerCase().includes('youtube')
+    let registrationLink: any
+    let isYoutubeVideo: any
+    const resourceType = _.get(this.eventDetails, 'resourceType', '')
+    if (resourceType === 'Webinar') {
+      registrationLink = _.get(this.eventDetails, 'recordedLinks', '')[0]
+      isYoutubeVideo = _.get(this.eventDetails, 'registrationLink', '').toLowerCase().includes('youtube')
+    } else {
+      registrationLink = _.get(this.eventDetails, 'registrationLink', '')
+      isYoutubeVideo = registrationLink.toLowerCase().includes('youtube')
+    }
+
     if (registrationLink && isYoutubeVideo === false) {
       this.eventDetailsForm.controls.registrationLink.clearValidators()
       this.eventDetailsForm.controls.recoredEventUrl.setValidators([Validators.required])
       this.eventDetailsForm.controls.recoredEventUrl.updateValueAndValidity()
       this.eventDetailsForm.controls.registrationLink.updateValueAndValidity()
     }
+
     const eventBaseDetails = {
       eventName: _.get(this.eventDetails, 'name', ''),
       description: _.get(this.eventDetails, 'description', ''),
       eventCategory: _.get(this.eventDetails, 'resourceType', ''),
-      streamType: _.get(this.eventDetails, 'streamType', ''),//new key to add
+      streamType: _.get(this.eventDetails, 'streamType', ''), // new key to add
       startDate: startDate ? new Date(startDate) : startDate,
       startTime: _.get(this.eventDetails, 'startTime', ''),
       endTime: _.get(this.eventDetails, 'endTime', ''),
@@ -113,6 +126,7 @@ export class CreateEventComponent implements OnInit, AfterViewInit {
       appIcon: _.get(this.eventDetails, 'appIcon', ''),
       typeofEvent: _.get(this.eventDetails, 'typeofEvent', '')
     }
+
     if (registrationLink) {
       if (isYoutubeVideo) {
         eventBaseDetails.registrationLink = registrationLink
@@ -120,22 +134,29 @@ export class CreateEventComponent implements OnInit, AfterViewInit {
         eventBaseDetails.recoredEventUrl = registrationLink
       }
     }
-    this.eventDetailsForm.setValue(eventBaseDetails)
-    if (this.eventStatus === 'live') {
+
+    this.eventDetailsForm.patchValue(eventBaseDetails)
+
+    if (this.pathUrl === 'past' && this.openMode === 'edit') {
+      this.eventDetailsForm.disable()
+      if (isYoutubeVideo) {
+        this.eventDetailsForm.controls.registrationLink.enable()
+      } else {
+        this.eventDetailsForm.controls.recoredEventUrl.enable()
+      }
+    } else if (this.eventStatus === 'live' || _.get(this.eventDetails, 'prevStatus', '') !== '') {
+      this.eventDetailsForm.controls.eventName.disable()
+      this.eventDetailsForm.controls.description.disable()
       this.eventDetailsForm.controls.typeofEvent.disable()
-      this.eventDetailsForm.controls.registrationLink.disable()
-      this.eventDetailsForm.controls.endTime.disable()
-      this.eventDetailsForm.controls.startTime.disable()
-      this.eventDetailsForm.controls.startDate.disable()
       this.eventDetailsForm.controls.streamType.disable()
-      this.eventDetailsForm.controls.eventCategory.disable()
+      this.eventStatus = 'live' // this is to handle the case when user is trying to edit duplicate record of the event which is already live
     }
+
     this.eventDetailsForm.updateValueAndValidity()
 
     this.speakersList = _.get(this.eventDetails, 'speakers', [])
     this.materialsList = _.get(this.eventDetails, 'eventHandouts', [])
     this.competencies = _.get(this.eventDetails, 'competencies_v6', [])
-
   }
 
   ngAfterViewInit() {
@@ -161,32 +182,52 @@ export class CreateEventComponent implements OnInit, AfterViewInit {
 
   openConforamtionPopup() {
     if (this.openMode === 'edit') {
-      const dialgData = {
-        dialogType: 'warning',
-        icon: {
-          iconName: 'error_outline',
-          iconClass: 'warning-icon'
-        },
-        message: 'Are you sure you want to exit without saving?',
-        buttonsList: [
-          {
-            btnAction: false,
-            displayText: 'No',
-            btnClass: 'btn-outline-primary'
+      let dialgData = {}
+      if (this.eventStatus.toLocaleLowerCase() === 'senttopublish') {
+        dialgData = {
+          dialogType: 'warning',
+          icon: {
+            iconName: 'error_outline',
+            iconClass: 'warning-icon'
           },
-          {
-            btnAction: true,
-            displayText: 'Yes',
-            btnClass: 'successBtn'
+          message: 'This event has already been sent to publisher. You can edit it once the Publisher approves the request.',
+          buttonsList: [
+            {
+              btnAction: true,
+              displayText: 'Go back',
+              btnClass: 'successBtn'
+            },
+          ]
+        }
+      } else {
+        dialgData = {
+          dialogType: 'warning',
+          icon: {
+            iconName: 'error_outline',
+            iconClass: 'warning-icon'
           },
-        ]
+          message: 'Are you sure you want to exit without saving?',
+          buttonsList: [
+            {
+              btnAction: false,
+              displayText: 'No',
+              btnClass: 'btn-outline-primary'
+            },
+            {
+              btnAction: true,
+              displayText: 'Yes',
+              btnClass: 'successBtn'
+            },
+          ]
+        }
       }
 
       const dialogRef = this.dialog.open(ConfirmDialogComponent, {
         width: '500px',
         height: '210px',
         data: dialgData,
-        autoFocus: false
+        autoFocus: false,
+        disableClose: true
       })
 
       dialogRef.afterClosed().subscribe((btnAction: any) => {
@@ -241,7 +282,7 @@ export class CreateEventComponent implements OnInit, AfterViewInit {
   get canMoveToNext() {
     let currentFormIsValid = false
     if (this.selectedStepperLable === 'Basic Details') {
-      if (this.eventDetailsForm.valid) {
+      if (!this.eventDetailsForm.invalid) {
         currentFormIsValid = true
       } else {
         this.openSnackBar('Please fill mandatory fields')
@@ -369,9 +410,62 @@ export class CreateEventComponent implements OnInit, AfterViewInit {
     })
   }
 
+  saveAndPublish() {
+    const formBody = {
+      request: {
+        event: this.getFormBodyOfEvent('Live')
+      }
+    }
+    this.loaderService.changeLoaderState(true)
+    this.eventSvc.updateEvent(formBody, this.eventId).subscribe({
+      next: res => {
+        if (res) {
+          const versionKey = _.get(res, 'result.versionKey')
+          const identifier = _.get(res, 'result.identifier')
+          const req: any = {
+            request: {
+              event: {
+                versionKey: versionKey,
+                status: 'Live',
+                identifier: identifier,
+                publishedOn: _.get(this.eventDetails, 'publishedOn'),
+              },
+            },
+          }
+          this.eventSvc.publishEvent(identifier, req).subscribe({
+            next: res => {
+              if (res) {
+                const successMessage = 'Event details saved successfully'
+                this.openSnackBar(successMessage)
+                setTimeout(() => {
+                  this.navigateBack()
+                  this.loaderService.changeLoaderState(false)
+                }, 1000)
+              } else {
+                this.loaderService.changeLoaderState(false)
+              }
+            },
+            error: (error: HttpErrorResponse) => {
+              this.loaderService.changeLoaderState(false)
+              const errorMessage = _.get(error, 'error.message', 'Something went wrong while updating event, please try again')
+              this.openSnackBar(errorMessage)
+            }
+          })
+        } else {
+          this.loaderService.changeLoaderState(false)
+        }
+      },
+      error: (error: HttpErrorResponse) => {
+        this.loaderService.changeLoaderState(false)
+        const errorMessage = _.get(error, 'error.message', 'Something went wrong while updating event, please try again')
+        this.openSnackBar(errorMessage)
+      }
+    })
+  }
+
   getFormBodyOfEvent(status: string) {
     const eventDetails: any = JSON.parse(JSON.stringify(this.eventDetails))
-    const eventBaseDetails = this.eventDetailsForm.value
+    const eventBaseDetails = this.eventDetailsForm.getRawValue()
     let startTime = ''
     let endTime = ''
     let startDateTime = ''
@@ -399,7 +493,13 @@ export class CreateEventComponent implements OnInit, AfterViewInit {
     eventDetails['endDate'] = startDate
     eventDetails['startTime'] = startTime
     eventDetails['endTime'] = endTime
-    eventDetails['registrationLink'] = eventBaseDetails.registrationLink ? eventBaseDetails.registrationLink : eventBaseDetails.recoredEventUrl
+    if (eventBaseDetails.eventCategory === 'Webinar') {
+      eventDetails['recordedLinks'] = [this.youTubeUrlChange(eventBaseDetails.registrationLink)]
+      eventDetails['registrationLink'] = ''
+    } else {
+      eventDetails['registrationLink'] = eventBaseDetails.registrationLink ?
+        this.youTubeUrlChange(eventBaseDetails.registrationLink) : eventBaseDetails.recoredEventUrl
+    }
     eventDetails['appIcon'] = eventBaseDetails.appIcon
     eventDetails['typeofEvent'] = eventBaseDetails.typeofEvent
 
@@ -414,7 +514,7 @@ export class CreateEventComponent implements OnInit, AfterViewInit {
       eventDetails['speakers'] = this.speakersList
     }
     if (this.materialsList) {
-      eventDetails['eventHandouts'] = this.materialsList
+      eventDetails['eventHandouts'] = this.materialsList.map(({ isNew, ...rest }) => rest)
     }
     if (this.competencies) {
       eventDetails['competencies_v6'] = this.competencies
@@ -432,6 +532,13 @@ export class CreateEventComponent implements OnInit, AfterViewInit {
     eventDetails['status'] = status
 
     return eventDetails
+  }
+
+  youTubeUrlChange(url: string): string {
+    const regExp = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\n?#]+)/
+    const match = url.match(regExp)
+    console.log(match && match[1] ? `https://www.youtube.com/embed/${match[1]}` : url)
+    return match && match[1] ? `https://www.youtube.com/embed/${match[1]}` : url
   }
 
   getFormatedTime(selectedTime: string): string {

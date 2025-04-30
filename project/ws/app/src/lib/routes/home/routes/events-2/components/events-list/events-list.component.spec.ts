@@ -101,7 +101,7 @@ describe('EventsListComponent', () => {
       component.ngOnInit()
 
       expect(component.tableData.columns).toHaveLength(4)
-      expect(component.menuItems).toHaveLength(2)
+      expect(component.menuItems).toHaveLength(3)
       expect(component.pathUrl).toBe('draft')
     })
   })
@@ -196,6 +196,9 @@ describe('EventsListComponent', () => {
         {
           request: {
             event: {
+              cancelledBy: "",
+              cancelledByName: "",
+              cancelledOn: "2025-04-17T06:37:17.006+0000",
               identifier: mockEvent.identifier,
               versionKey: mockEvent.versionKey,
               status: 'Cancelled'

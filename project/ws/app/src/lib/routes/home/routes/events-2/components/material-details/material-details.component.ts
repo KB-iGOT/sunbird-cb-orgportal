@@ -19,6 +19,7 @@ export class MaterialDetailsComponent implements OnChanges {
   @Input() openMaterial: boolean = false
   @Input() openMode = 'edit'
   @Input() userProfile: any
+  @Input() openTab = 'draft'
   @Output() updatedMaterialDetails = new EventEmitter<material>()
   @Output() canCloseOrOpenMaterial = new EventEmitter<boolean>()
   @Output() currentMaterialSaveUpdate = new EventEmitter<boolean>()
@@ -62,6 +63,10 @@ export class MaterialDetailsComponent implements OnChanges {
             this.currentMaterialSaveUpdate.emit(this.currentMaterialSaved)
           }
         })
+
+        if (this.openTab === 'past' && !this.materialDetails?.isNew) {
+          this.eventForm.disable()
+        }
 
         if (this.openMode === 'view') {
           this.eventForm.disable()
@@ -115,7 +120,11 @@ export class MaterialDetailsComponent implements OnChanges {
 
   saveDetails() {
     if (this.eventForm.valid) {
-      this.updatedMaterialDetails.emit(this.eventForm.value)
+      const materialDetails: any = this.eventForm.value
+      if (this.materialDetails) {
+        materialDetails['isNew'] = this.materialDetails.isNew
+      }
+      this.updatedMaterialDetails.emit(materialDetails)
     }
     this.eventForm.markAllAsTouched()
   }

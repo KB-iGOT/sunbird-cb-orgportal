@@ -348,7 +348,7 @@ export class CommunityCreationComponent implements AfterViewInit {
             } else {
               errorMessage = _.get(error, 'error.message', 'Something went wrong while creating community, please try again')
             }
-            this.openSnackBar(errorMessage)
+            this.openSnackBar(errorMessage, 'red-snackbar')
           }
         }
       })
@@ -448,8 +448,12 @@ export class CommunityCreationComponent implements AfterViewInit {
 
     return communityDetails
   }
-  private openSnackBar(message: string) {
-    this.matSnackBar.open(message)
+  private openSnackBar(message: string, className: string = '') {
+    // this.matSnackBar.open(message, 'Close', className)
+    this.matSnackBar.open(message, '', {
+      duration: 3000,
+      panelClass: className ? [className] : []
+    })
   }
 
   getChangedFields(forceCreation: boolean = false): any {
@@ -882,7 +886,7 @@ export class CommunityCreationComponent implements AfterViewInit {
           } else {
             errorMessage = _.get(error, 'error.message', 'Something went wrong while creating community, please try again')
           }
-          this.openSnackBar(errorMessage)
+          this.openSnackBar(errorMessage, 'red-snackbar')
         }
       }
     })
