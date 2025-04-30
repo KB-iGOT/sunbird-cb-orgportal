@@ -100,7 +100,7 @@ export class CreateEventComponent implements OnInit, AfterViewInit {
     const resourceType = _.get(this.eventDetails, 'resourceType', '')
     if (resourceType === 'Webinar') {
       registrationLink = _.get(this.eventDetails, 'recordedLinks', '')[0]
-      isYoutubeVideo = registrationLink.toLowerCase().includes('youtube')
+      isYoutubeVideo = _.get(this.eventDetails, 'registrationLink', '').toLowerCase().includes('youtube')
     } else {
       registrationLink = _.get(this.eventDetails, 'registrationLink', '')
       isYoutubeVideo = registrationLink.toLowerCase().includes('youtube')
@@ -275,7 +275,7 @@ export class CreateEventComponent implements OnInit, AfterViewInit {
   get canMoveToNext() {
     let currentFormIsValid = false
     if (this.selectedStepperLable === 'Basic Details') {
-      if (this.eventDetailsForm.valid) {
+      if (!this.eventDetailsForm.invalid) {
         currentFormIsValid = true
       } else {
         this.openSnackBar('Please fill mandatory fields')
@@ -507,7 +507,7 @@ export class CreateEventComponent implements OnInit, AfterViewInit {
       eventDetails['speakers'] = this.speakersList
     }
     if (this.materialsList) {
-      eventDetails['eventHandouts'] = this.materialsList
+      eventDetails['eventHandouts'] = this.materialsList.map(({ isNew, ...rest }) => rest)
     }
     if (this.competencies) {
       eventDetails['competencies_v6'] = this.competencies
