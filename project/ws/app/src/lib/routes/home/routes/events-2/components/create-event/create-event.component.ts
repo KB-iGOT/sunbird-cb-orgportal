@@ -105,17 +105,19 @@ export class CreateEventComponent implements OnInit, AfterViewInit {
       registrationLink = _.get(this.eventDetails, 'registrationLink', '')
       isYoutubeVideo = registrationLink.toLowerCase().includes('youtube')
     }
+
     if (registrationLink && isYoutubeVideo === false) {
       this.eventDetailsForm.controls.registrationLink.clearValidators()
       this.eventDetailsForm.controls.recoredEventUrl.setValidators([Validators.required])
       this.eventDetailsForm.controls.recoredEventUrl.updateValueAndValidity()
       this.eventDetailsForm.controls.registrationLink.updateValueAndValidity()
     }
+
     const eventBaseDetails = {
       eventName: _.get(this.eventDetails, 'name', ''),
       description: _.get(this.eventDetails, 'description', ''),
       eventCategory: _.get(this.eventDetails, 'resourceType', ''),
-      streamType: _.get(this.eventDetails, 'streamType', ''),//new key to add
+      streamType: _.get(this.eventDetails, 'streamType', ''), // new key to add
       startDate: startDate ? new Date(startDate) : startDate,
       startTime: _.get(this.eventDetails, 'startTime', ''),
       endTime: _.get(this.eventDetails, 'endTime', ''),
@@ -124,6 +126,7 @@ export class CreateEventComponent implements OnInit, AfterViewInit {
       appIcon: _.get(this.eventDetails, 'appIcon', ''),
       typeofEvent: _.get(this.eventDetails, 'typeofEvent', '')
     }
+
     if (registrationLink) {
       if (isYoutubeVideo) {
         eventBaseDetails.registrationLink = registrationLink
@@ -131,7 +134,9 @@ export class CreateEventComponent implements OnInit, AfterViewInit {
         eventBaseDetails.recoredEventUrl = registrationLink
       }
     }
-    this.eventDetailsForm.setValue(eventBaseDetails)
+
+    this.eventDetailsForm.patchValue(eventBaseDetails)
+
     if (this.pathUrl === 'past' && this.openMode === 'edit') {
       this.eventDetailsForm.disable()
       if (isYoutubeVideo) {
@@ -146,6 +151,7 @@ export class CreateEventComponent implements OnInit, AfterViewInit {
       this.eventDetailsForm.controls.streamType.disable()
       this.eventStatus = 'live' // this is to handle the case when user is trying to edit duplicate record of the event which is already live
     }
+
     this.eventDetailsForm.updateValueAndValidity()
 
     this.speakersList = _.get(this.eventDetails, 'speakers', [])
@@ -459,7 +465,7 @@ export class CreateEventComponent implements OnInit, AfterViewInit {
 
   getFormBodyOfEvent(status: string) {
     const eventDetails: any = JSON.parse(JSON.stringify(this.eventDetails))
-    const eventBaseDetails = this.eventDetailsForm.value
+    const eventBaseDetails = this.eventDetailsForm.getRawValue()
     let startTime = ''
     let endTime = ''
     let startDateTime = ''
