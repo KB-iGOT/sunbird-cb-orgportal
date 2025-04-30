@@ -139,11 +139,12 @@ export class CreateEventComponent implements OnInit, AfterViewInit {
       } else {
         this.eventDetailsForm.controls.recoredEventUrl.enable()
       }
-    } else if (this.eventStatus === 'live') {
+    } else if (this.eventStatus === 'live' || _.get(this.eventDetails, 'prevStatus', '') !== '') {
       this.eventDetailsForm.controls.eventName.disable()
       this.eventDetailsForm.controls.description.disable()
       this.eventDetailsForm.controls.typeofEvent.disable()
       this.eventDetailsForm.controls.streamType.disable()
+      this.eventStatus = 'live' // this is to handle the case when user is trying to edit duplicate record of the event which is already live
     }
     this.eventDetailsForm.updateValueAndValidity()
 
