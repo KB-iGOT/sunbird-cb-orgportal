@@ -63,7 +63,8 @@
         Minimum characters left to create {{ 250 - eventDetails?.controls['description']?.value?.length}}
       </mat-error>
     </mat-form-field>
-    <span class="description-count flex justify-end">{{eventDetails?.value?.description?.length}}/2000</span>
+    <span
+      class="description-count flex justify-end">{{eventDetails?.controls['description']?.value?.length}}/2000</span>
   </div>
 
   <div [ngClass]="{'disableForm': eventStatus === 'live'}">
