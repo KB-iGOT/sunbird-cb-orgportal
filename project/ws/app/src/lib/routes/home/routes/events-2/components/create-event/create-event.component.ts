@@ -493,12 +493,13 @@ export class CreateEventComponent implements OnInit, AfterViewInit {
     eventDetails['endDate'] = startDate
     eventDetails['startTime'] = startTime
     eventDetails['endTime'] = endTime
+    const sourceLink = eventBaseDetails.registrationLink ?
+      this.youTubeUrlChange(eventBaseDetails.registrationLink) : eventBaseDetails.recoredEventUrl
     if (eventBaseDetails.eventCategory === 'Webinar') {
-      eventDetails['recordedLinks'] = [this.youTubeUrlChange(eventBaseDetails.registrationLink)]
+      eventDetails['recordedLinks'] = [sourceLink]
       eventDetails['registrationLink'] = ''
     } else {
-      eventDetails['registrationLink'] = eventBaseDetails.registrationLink ?
-        this.youTubeUrlChange(eventBaseDetails.registrationLink) : eventBaseDetails.recoredEventUrl
+      eventDetails['registrationLink'] = sourceLink
     }
     eventDetails['appIcon'] = eventBaseDetails.appIcon
     eventDetails['typeofEvent'] = eventBaseDetails.typeofEvent
