@@ -47,7 +47,7 @@
                         <p class="mat-body-1 bold mr-1 margin-remove-bottom text-name"
                           *ngIf="item?.createdBy?.first_name">
                           {{item?.createdBy?.first_name }}
-                          <span *ngIf="item?.createdBy?.userProfileStatus.toLowerCase()==='verified'">
+                          <span *ngIf="item?.createdBy?.userProfileStatus?.toLowerCase()==='verified'">
                             <img src="assets/icons/accept_icon.svg" class="verify_icon ml-1" />
                           </span>
                         </p>
@@ -93,45 +93,46 @@
                       less
                     </div>
                   </div>
-
-                  <!-- <div *ngIf="item?.categoryType?.includes('image')">
-                  <div class="media media-full-width nodtranslate"
-                    *ngIf="item?.mediaCategory && item?.mediaCategory?.image">
-                    <d-v2-image-sliders [title]="'Images'" [imageUrls]="item?.mediaCategory?.image"
-                      [styleData]="cardConfig?.sliderData?.styleData"></d-v2-image-sliders>
+                  <div *ngIf="item?.categoryType?.includes('image')">
+                    <div class="media media-full-width nodtranslate"
+                      *ngIf="item?.mediaCategory && item?.mediaCategory?.image">
+                      <ws-app-image-sliders [title]="'Images'"
+                        [imageUrls]="item?.mediaCategory?.image"></ws-app-image-sliders>
+                    </div>
                   </div>
-                </ng-container> -->
+
+
                   <!-- IF Doc  -->
-                  <!-- <ng-container *ngIf="item?.categoryType?.includes('document')">
-                  <div class="media nodtranslate" *ngIf="item?.mediaCategory && item?.mediaCategory?.document">
-                    <div *ngFor="let doc of item?.mediaCategory?.document"
-                      class="doc-item flex items-center gap-2 mb-2 nodtranslate">
-                      <mat-icon class="doc-icon" [ngClass]="{
+                  <ng-container *ngIf="item?.categoryType?.includes('document')">
+                    <div class="media nodtranslate" *ngIf="item?.mediaCategory && item?.mediaCategory?.document">
+                      <div *ngFor="let doc of item?.mediaCategory?.document"
+                        class="doc-item flex items-center gap-2 mb-2 nodtranslate">
+                        <mat-icon class="doc-icon" [ngClass]="{
                                             'pdf-icon': getFileExtension(doc) === 'pdf',
                                             'doc-icon': getFileExtension(doc) === 'doc',
                                             'docx-icon': getFileExtension(doc) === 'docx'
                                         }">
-                        {{getFileIcon(doc)}}
-                      </mat-icon>
-                      <a [href]="doc" target="_blank" rel="noopener noreferrer" class="doc-name doc-link nodtranslate"
-                        (click)="openDocument($event, doc)">
-                        {{getFileName(doc)}}
-                      </a>
+                          {{getFileIcon(doc)}}
+                        </mat-icon>
+                        <a [href]="doc" target="_blank" rel="noopener noreferrer" class="doc-name doc-link nodtranslate"
+                          (click)="openDocument($event, doc)">
+                          {{getFileName(doc)}}
+                        </a>
+                      </div>
                     </div>
-                  </div>
-                </ng-container> -->
-                  <!-- <ng-container *ngIf="item?.categoryType?.includes('link')">
-                  <div class="media" *ngIf="item?.mediaCategory && item?.mediaCategory?.link">
-                    <div *ngFor="let linkUrl of item?.mediaCategory?.link"
-                      class="doc-item flex items-center gap-2 mb-2">
-                      <mat-icon class="doc-icon">link</mat-icon>
-                      <a [href]="linkUrl" target="_blank" rel="noopener noreferrer"
-                        class="doc-name doc-link nodtranslate">
-                        {{linkUrl}}
-                      </a>
+                  </ng-container>
+                  <ng-container *ngIf="item?.categoryType?.includes('link')">
+                    <div class="media" *ngIf="item?.mediaCategory && item?.mediaCategory?.link">
+                      <div *ngFor="let linkUrl of item?.mediaCategory?.link"
+                        class="doc-item flex items-center gap-2 mb-2">
+                        <mat-icon class="doc-icon">link</mat-icon>
+                        <a [href]="linkUrl" target="_blank" rel="noopener noreferrer"
+                          class="doc-name doc-link nodtranslate">
+                          {{linkUrl}}
+                        </a>
+                      </div>
                     </div>
-                  </div>
-                </ng-container> -->
+                  </ng-container>
 
                   <div class="community-button-box flex flex-1 flex-row justify-end">
                     <!-- <a class="reported-issue-btn link-btn flex items-center" (click)="openReportDialog()">
@@ -155,6 +156,13 @@
                 </div>
               </div>
             </div>
+
+            <div class="flex justify-center items-center h-full flex-wrap"
+              *ngIf="!allDisussionObj || allDisussionObj.length === 0">
+              <img alt="  " src="/assets/instances/eagle/app_logos/allocation_empty.svg"
+                class="block mx-auto margin-top-xl margin-bottom-l">
+              <div class="flex justify-center items-center w-full text-gray-900 font-bold"> No data found</div>
+            </div>
           </div>
 
           <!-- get post items -->
@@ -171,7 +179,7 @@
                         <p class="mat-body-1 bold mr-1 margin-remove-bottom text-name"
                           *ngIf="item?.createdBy?.first_name">
                           {{item?.createdBy?.first_name }}
-                          <span *ngIf="item?.createdBy?.userProfileStatus.toLowerCase()==='verified'">
+                          <span *ngIf="item?.createdBy?.userProfileStatus?.toLowerCase()==='verified'">
                             <img src="assets/icons/accept_icon.svg" class="verify_icon ml-1" />
                           </span>
                         </p>
@@ -198,6 +206,44 @@
                       less
                     </div>
                   </div>
+                  <div *ngIf="item?.categoryType?.includes('image')">
+                    <div class="media media-full-width nodtranslate"
+                      *ngIf="item?.mediaCategory && item?.mediaCategory?.image">
+                      <ws-app-image-sliders [title]="'Images'" [imageUrls]="item?.mediaCategory?.image"
+                        [styleData]="cardConfig?.sliderData?.styleData"></ws-app-image-sliders>
+                    </div>
+                  </div>
+                  <!-- IF Doc  -->
+                  <ng-container *ngIf="item?.categoryType?.includes('document')">
+                    <div class="media nodtranslate" *ngIf="item?.mediaCategory && item?.mediaCategory?.document">
+                      <div *ngFor="let doc of item?.mediaCategory?.document"
+                        class="doc-item flex items-center gap-2 mb-2 nodtranslate">
+                        <mat-icon class="doc-icon" [ngClass]="{
+                                                              'pdf-icon': getFileExtension(doc) === 'pdf',
+                                                              'doc-icon': getFileExtension(doc) === 'doc',
+                                                              'docx-icon': getFileExtension(doc) === 'docx'
+                                                          }">
+                          {{getFileIcon(doc)}}
+                        </mat-icon>
+                        <a [href]="doc" target="_blank" rel="noopener noreferrer" class="doc-name doc-link nodtranslate"
+                          (click)="openDocument($event, doc)">
+                          {{getFileName(doc)}}
+                        </a>
+                      </div>
+                    </div>
+                  </ng-container>
+                  <ng-container *ngIf="item?.categoryType?.includes('link')">
+                    <div class="media" *ngIf="item?.mediaCategory && item?.mediaCategory?.link">
+                      <div *ngFor="let linkUrl of item?.mediaCategory?.link"
+                        class="doc-item flex items-center gap-2 mb-2">
+                        <mat-icon class="doc-icon">link</mat-icon>
+                        <a [href]="linkUrl" target="_blank" rel="noopener noreferrer"
+                          class="doc-name doc-link nodtranslate">
+                          {{linkUrl}}
+                        </a>
+                      </div>
+                    </div>
+                  </ng-container>
 
 
 
@@ -214,6 +260,13 @@
                   </div>
                 </div>
               </div>
+            </div>
+
+            <div class="flex justify-center items-center h-full flex-wrap"
+              *ngIf="!getPostItems || getPostItems.length === 0">
+              <img alt="Feature comming soon" src="/assets/instances/eagle/app_logos/allocation_empty.svg"
+                class="block mx-auto margin-top-xl margin-bottom-l">
+              <div class="flex justify-center items-center w-full text-gray-900 font-bold"> No data found</div>
             </div>
 
           </div>
@@ -232,7 +285,7 @@
                         <p class="mat-body-1 bold mr-1 margin-remove-bottom text-name"
                           *ngIf="item?.createdBy?.first_name">
                           {{item?.createdBy?.first_name }}
-                          <span *ngIf="item?.createdBy?.userProfileStatus.toLowerCase()==='verified'">
+                          <span *ngIf="item?.createdBy?.userProfileStatus?.toLowerCase()==='verified'">
                             <img src="assets/icons/accept_icon.svg" class="verify_icon ml-1" />
                           </span>
                         </p>
@@ -258,6 +311,45 @@
                       less
                     </div>
                   </div>
+                  <div *ngIf="item?.categoryType?.includes('image')">
+                    <div class="media media-full-width nodtranslate"
+                      *ngIf="item?.mediaCategory && item?.mediaCategory?.image">
+                      <ws-app-image-sliders [title]="'Images'" [imageUrls]="item?.mediaCategory?.image"
+                        [styleData]="cardConfig?.sliderData?.styleData"></ws-app-image-sliders>
+                    </div>
+                  </div>
+                  <!-- IF Doc  -->
+                  <ng-container *ngIf="item?.categoryType?.includes('document')">
+                    <div class="media nodtranslate" *ngIf="item?.mediaCategory && item?.mediaCategory?.document">
+                      <div *ngFor="let doc of item?.mediaCategory?.document"
+                        class="doc-item flex items-center gap-2 mb-2 nodtranslate">
+                        <mat-icon class="doc-icon" [ngClass]="{
+                                                              'pdf-icon': getFileExtension(doc) === 'pdf',
+                                                              'doc-icon': getFileExtension(doc) === 'doc',
+                                                              'docx-icon': getFileExtension(doc) === 'docx'
+                                                          }">
+                          {{getFileIcon(doc)}}
+                        </mat-icon>
+                        <a [href]="doc" target="_blank" rel="noopener noreferrer" class="doc-name doc-link nodtranslate"
+                          (click)="openDocument($event, doc)">
+                          {{getFileName(doc)}}
+                        </a>
+                      </div>
+                    </div>
+                  </ng-container>
+                  <ng-container *ngIf="item?.categoryType?.includes('link')">
+                    <div class="media" *ngIf="item?.mediaCategory && item?.mediaCategory?.link">
+                      <div *ngFor="let linkUrl of item?.mediaCategory?.link"
+                        class="doc-item flex items-center gap-2 mb-2">
+                        <mat-icon class="doc-icon">link</mat-icon>
+                        <a [href]="linkUrl" target="_blank" rel="noopener noreferrer"
+                          class="doc-name doc-link nodtranslate">
+                          {{linkUrl}}
+                        </a>
+                      </div>
+                    </div>
+                  </ng-container>
+
 
 
                   <div class="community-button-box flex flex-1 flex-row justify-end">
@@ -273,6 +365,13 @@
                   </div>
                 </div>
               </div>
+            </div>
+
+            <div class="flex justify-center items-center h-full flex-wrap"
+              *ngIf="!getCommentItems || getCommentItems.length === 0">
+              <img alt="Feature comming soon" src="/assets/instances/eagle/app_logos/allocation_empty.svg"
+                class="block mx-auto margin-top-xl margin-bottom-l">
+              <div class="flex justify-center items-center w-full text-gray-900 font-bold"> No data found</div>
             </div>
 
           </div>
@@ -291,7 +390,7 @@
                         <p class="mat-body-1 bold mr-1 margin-remove-bottom text-name"
                           *ngIf="item?.createdBy?.first_name">
                           {{item?.createdBy?.first_name }}
-                          <span *ngIf="item?.createdBy?.userProfileStatus.toLowerCase()==='verified'">
+                          <span *ngIf="item?.createdBy?.userProfileStatus?.toLowerCase()==='verified'">
                             <img src="assets/icons/accept_icon.svg" class="verify_icon ml-1" />
                           </span>
                         </p>
@@ -317,6 +416,44 @@
                       less
                     </div>
                   </div>
+                  <div *ngIf="item?.categoryType?.includes('image')">
+                    <div class="media media-full-width nodtranslate"
+                      *ngIf="item?.mediaCategory && item?.mediaCategory?.image">
+                      <ws-app-image-sliders [title]="'Images'" [imageUrls]="item?.mediaCategory?.image"
+                        [styleData]="cardConfig?.sliderData?.styleData"></ws-app-image-sliders>
+                    </div>
+                  </div>
+                  <!-- IF Doc  -->
+                  <ng-container *ngIf="item?.categoryType?.includes('document')">
+                    <div class="media nodtranslate" *ngIf="item?.mediaCategory && item?.mediaCategory?.document">
+                      <div *ngFor="let doc of item?.mediaCategory?.document"
+                        class="doc-item flex items-center gap-2 mb-2 nodtranslate">
+                        <mat-icon class="doc-icon" [ngClass]="{
+                                                              'pdf-icon': getFileExtension(doc) === 'pdf',
+                                                              'doc-icon': getFileExtension(doc) === 'doc',
+                                                              'docx-icon': getFileExtension(doc) === 'docx'
+                                                          }">
+                          {{getFileIcon(doc)}}
+                        </mat-icon>
+                        <a [href]="doc" target="_blank" rel="noopener noreferrer" class="doc-name doc-link nodtranslate"
+                          (click)="openDocument($event, doc)">
+                          {{getFileName(doc)}}
+                        </a>
+                      </div>
+                    </div>
+                  </ng-container>
+                  <ng-container *ngIf="item?.categoryType?.includes('link')">
+                    <div class="media" *ngIf="item?.mediaCategory && item?.mediaCategory?.link">
+                      <div *ngFor="let linkUrl of item?.mediaCategory?.link"
+                        class="doc-item flex items-center gap-2 mb-2">
+                        <mat-icon class="doc-icon">link</mat-icon>
+                        <a [href]="linkUrl" target="_blank" rel="noopener noreferrer"
+                          class="doc-name doc-link nodtranslate">
+                          {{linkUrl}}
+                        </a>
+                      </div>
+                    </div>
+                  </ng-container>
 
 
 
@@ -333,6 +470,12 @@
                   </div>
                 </div>
               </div>
+            </div>
+            <div class="flex justify-center items-center h-full flex-wrap"
+              *ngIf="!getReplyItems || getReplyItems.length === 0">
+              <img alt="" src="/assets/instances/eagle/app_logos/allocation_empty.svg"
+                class="block mx-auto margin-top-xl margin-bottom-l">
+              <div class="flex justify-center items-center w-full text-gray-900 font-bold"> No data found</div>
             </div>
 
           </div>
@@ -351,7 +494,7 @@
                   <div class="user-info text-left margin-left-s">
                     <p class="mat-body-1 bold mr-1 margin-remove-bottom text-name" *ngIf="item?.createdBy?.first_name">
                       {{item?.createdBy?.first_name }}
-                      <span *ngIf="item?.createdBy?.userProfileStatus.toLowerCase()==='verified'">
+                      <span *ngIf="item?.createdBy?.userProfileStatus?.toLowerCase()==='verified'">
                         <img src="assets/icons/accept_icon.svg" class="verify_icon ml-1" />
                       </span>
                     </p>
@@ -375,6 +518,43 @@
                 <div class="cursor-pointer nodtranslate" (click)="viewMoreOrLess(item)" *ngIf="item?.expanded">View less
                 </div>
               </div>
+              <div *ngIf="item?.categoryType?.includes('image')">
+                <div class="media media-full-width nodtranslate"
+                  *ngIf="item?.mediaCategory && item?.mediaCategory?.image">
+                  <ws-app-image-sliders [title]="'Images'" [imageUrls]="item?.mediaCategory?.image"
+                    [styleData]="cardConfig?.sliderData?.styleData"></ws-app-image-sliders>
+                </div>
+              </div>
+              <!-- IF Doc  -->
+              <ng-container *ngIf="item?.categoryType?.includes('document')">
+                <div class="media nodtranslate" *ngIf="item?.mediaCategory && item?.mediaCategory?.document">
+                  <div *ngFor="let doc of item?.mediaCategory?.document"
+                    class="doc-item flex items-center gap-2 mb-2 nodtranslate">
+                    <mat-icon class="doc-icon" [ngClass]="{
+                                                          'pdf-icon': getFileExtension(doc) === 'pdf',
+                                                          'doc-icon': getFileExtension(doc) === 'doc',
+                                                          'docx-icon': getFileExtension(doc) === 'docx'
+                                                      }">
+                      {{getFileIcon(doc)}}
+                    </mat-icon>
+                    <a [href]="doc" target="_blank" rel="noopener noreferrer" class="doc-name doc-link nodtranslate"
+                      (click)="openDocument($event, doc)">
+                      {{getFileName(doc)}}
+                    </a>
+                  </div>
+                </div>
+              </ng-container>
+              <ng-container *ngIf="item?.categoryType?.includes('link')">
+                <div class="media" *ngIf="item?.mediaCategory && item?.mediaCategory?.link">
+                  <div *ngFor="let linkUrl of item?.mediaCategory?.link" class="doc-item flex items-center gap-2 mb-2">
+                    <mat-icon class="doc-icon">link</mat-icon>
+                    <a [href]="linkUrl" target="_blank" rel="noopener noreferrer"
+                      class="doc-name doc-link nodtranslate">
+                      {{linkUrl}}
+                    </a>
+                  </div>
+                </div>
+              </ng-container>
 
               <div class="community-button-box flex flex-1 flex-row justify-end">
                 <a class="reported-issue-btn link-btn flex items-center" (click)="openReportDialog(item?.discussionId)">
@@ -386,6 +566,12 @@
               </div>
             </div>
           </div>
+        </div>
+        <div class="flex justify-center items-center h-full flex-wrap"
+          *ngIf="!hiddenDisussionObj || hiddenDisussionObj.length === 0">
+          <img alt="" src="/assets/instances/eagle/app_logos/allocation_empty.svg"
+            class="block mx-auto margin-top-xl margin-bottom-l">
+          <div class="flex justify-center items-center w-full text-gray-900 font-bold"> No data found</div>
         </div>
       </ng-container>
 

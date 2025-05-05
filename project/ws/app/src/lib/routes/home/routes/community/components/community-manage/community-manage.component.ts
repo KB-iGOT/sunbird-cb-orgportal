@@ -7,6 +7,7 @@ import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack
 import { DialogConfirmComponent } from '../../../../../../../../../../../src/app/component/dialog-confirm/dialog-confirm.component'
 import { map } from 'rxjs/operators'
 import { Observable } from 'rxjs'
+// import { UsersService } from '../../../../../users/services/users.service'
 
 export interface IDialogData {
   title: {
@@ -39,15 +40,22 @@ export class CommunityManageComponent {
   getReplyItems: any
   getReplyItemsCount: number = 0
   activeFilter: string = 'all'
+  totalDiscussionsCount: number = 0
 
-  postText = `Farming is such a vital and fascinating part of our world! It not only provides us with food but also plays a crucial role in our economies and cultures.
-   Do you have a specific aspect of farming you're interested in or a particular question about it, share with us.Farming is such a vital and fascinating part of our world! It not only provides us with food but also plays a crucial role in our economies and cultures.
-   Do you have a specific aspect of farming you're interested in or a particular question about it, share with us`
+
 
   constructor(private dialog: MatLegacyDialog,
     private communitySvc: CommunityService,
-    private actvRoute: ActivatedRoute, private snackbar: MatSnackBar,) {
+    private actvRoute: ActivatedRoute,
+    private snackbar: MatSnackBar,
+  ) {
+    this.actvRoute?.params?.subscribe(params => {
+      if (params) {
+        this.communityId = params['communityId']
+        // this.communityId = '1d08a92b-07fa-41e4-8060-93a221d416e6'
+      }
 
+    })
   }
 
   currentStatus = 'active'
@@ -70,23 +78,16 @@ export class CommunityManageComponent {
     this.getPostFiletItems()
     this.getCommentFilterItems()
     this.getReplyFilterItems()
+
   }
 
   onTabChange(event: any) {
     this.selectedTabIndex = event.index
     this.currentStatus = this.tabs[event.index].status
     this.pageNumber = 0 // Reset to first page on tab change
-
-
   }
 
   openReportDialog(discussionId: any): void {
-    // console.log(discussionId)
-    // const dialogRef = this.dialog.open(ReportIssueComponent, {
-    //   width: '500px',
-    //   panelClass: 'report-dialog-box',
-    //   data: this.getReportedIssuesObj
-    // })
     this.getReportedIssueList(discussionId).subscribe((reportedIssues: any) => {
       if (reportedIssues) {
         const dialogRef = this.dialog.open(ReportIssueComponent, {
@@ -101,7 +102,7 @@ export class CommunityManageComponent {
             // this.snackbar.open('Reported issues updated successfully!', 'Close', { duration: 3000 })
           }
           (err: any) => {
-            this.snackbar.open('Unable to fetch rating summary, due to some error!', err)
+            this.snackbar.open('Unable to fetch Report, due to some error!', err)
             // tslint:disable-next-line
             console.log(err)
           }
@@ -130,8 +131,13 @@ export class CommunityManageComponent {
       })
       confirmDialog.afterClosed().subscribe((response: any) => {
         if (response) {
-          // console.log(response, "response--")
           this.showOnPlatform(discussId, type)
+          this.snackbar.open('Post has been published on platform successfully!', 'Close', { duration: 3000 })
+        }
+        (err: any) => {
+          this.snackbar.open('Something went wrong!', 'Close', { duration: 3000 })
+          // tslint:disable-next-line
+          console.log(err)
         }
       })
     }
@@ -150,8 +156,12 @@ export class CommunityManageComponent {
       })
       confirmDialog.afterClosed().subscribe((response: any) => {
         if (response) {
-          // console.log(response, "response--")
           this.hideContent(discussId, type)
+          this.snackbar.open('Post has been hidden from platform successfully!', 'Close', { duration: 3000 })
+        } (err: any) => {
+          this.snackbar.open('Something went wrong!', 'Close', { duration: 3000 })
+          // tslint:disable-next-line
+          console.log(err)
         }
       })
     }
@@ -159,12 +169,6 @@ export class CommunityManageComponent {
 
   //  GET ALL REPORTED ITEMS
   getReportedDiscussionItems() {
-    this.actvRoute?.params?.subscribe(params => {
-      if (params) {
-        this.communityId = params['communityId']
-      }
-
-    })
     const requestBody = {
       "filterCriteriaMap": {
         "status": [
@@ -181,27 +185,13 @@ export class CommunityManageComponent {
       "facets": ["type"]
     }
     this.communitySvc.getAllReportedDiscussion(requestBody).subscribe((res: any) => {
-      if (res && res.result && res.result.search_results && res.result.search_results.data) {
+      if (res && res.result && res.result.search_results && res.result.search_results.data && res.result.search_results.data.length &&
+        res.result.search_results.data.length > 0) {
         this.allDisussionObj = res.result.search_results.data
         this.allDisussionObjCount = res.result.search_results.totalCount
       }
     })
   }
-
-  // viewMoreOrLess(item: any) {
-  //   console.log(item, 'item===========')
-  //   if (this.getEditorTextLength(item.description) > this.viewMoreLength) {
-  //     item.expanded = !item.expanded
-  //   }
-  // }
-  // getEditorTextLength(content: any) {
-  //   console.log(content, "content=====")
-  //   let test = content.replace(/<[^>]*>/g, '')
-  //   test = test.replace(/&nbsp;/gi, ' ')
-  //   test = test.trim()
-  //   return test.length
-  // }
-
 
   viewMoreOrLess(item: any) {
     if (this.getEditorTextLength(item.description) > this.viewMoreLength) {
@@ -218,12 +208,6 @@ export class CommunityManageComponent {
 
   // GET ALL HIDDEN ITEMS
   getHiddenDiscussionItems() {
-    this.actvRoute?.params?.subscribe(params => {
-      if (params) {
-        this.communityId = params['communityId']
-      }
-
-    })
     const requestBody = {
       "filterCriteriaMap": {
         "type": ["question", "answerPost", "answerPostReply"],
@@ -238,7 +222,8 @@ export class CommunityManageComponent {
       "facets": ["type"]
     }
     this.communitySvc.getHiddenDiscussions(requestBody).subscribe((res: any) => {
-      if (res && res.result && res.result.search_results && res.result.search_results.data) {
+      if (res && res.result && res.result.search_results && res.result.search_results.data && res.result.search_results.data.length
+        && res.result.search_results.data.length > 0) {
         this.hiddenDisussionObj = res.result.search_results.data
         this.hiddenDisussionObjCount = res.result.search_results.totalCount
       }
@@ -246,7 +231,6 @@ export class CommunityManageComponent {
   }
 
   showOnPlatform(discussionId: any, type: any) {
-
     const requestBody = {
       "discussionId": discussionId,
       "type": type
@@ -256,6 +240,7 @@ export class CommunityManageComponent {
         // tslint:disable-next-line
         console.log(res, 'response====')
       }
+
     })
   }
 
@@ -277,11 +262,6 @@ export class CommunityManageComponent {
       "discussionId": discussionId,
       "type": "question"
     }
-    // this.communitySvc.getReportedIssuesStats(requestBody).subscribe((res) => {
-    //   if (res && res.result && res.result.reportReasons && res.result.reportReasons.length && res.result.reportReasons.length > 0) {
-    //     this.getReportedIssuesObj = res.result.reportReasons
-    //   }
-    // })
     return this.communitySvc.getReportedIssuesStats(requestBody).pipe(
       map((res: any) => {
         if (res?.result?.reportReasons) {
@@ -311,7 +291,8 @@ export class CommunityManageComponent {
       "facets": ["type"]
     }
     this.communitySvc.getAllReportedDiscussion(requestBody).subscribe((res: any) => {
-      if (res && res.result && res.result.search_results && res.result.search_results.data) {
+      if (res && res.result && res.result.search_results && res.result.search_results.data &&
+        res.result.search_results.data.length && res.result.search_results.data.length > 0) {
         this.getPostItems = res.result.search_results.data
         this.getPostItemsCount = res.result.search_results.totalCount
       }
@@ -336,7 +317,8 @@ export class CommunityManageComponent {
       "facets": ["type"]
     }
     this.communitySvc.getAllReportedDiscussion(requestBody).subscribe((res: any) => {
-      if (res && res.result && res.result.search_results && res.result.search_results.data) {
+      if (res && res.result && res.result.search_results && res.result.search_results.data &&
+        res.result.search_results.data.length && res.result.search_results.data.length > 0) {
         this.getCommentItems = res.result.search_results.data
         this.getCommentItemsCount = res.result.search_results.totalCount
       }
@@ -361,7 +343,8 @@ export class CommunityManageComponent {
       "facets": ["type"]
     }
     this.communitySvc.getAllReportedDiscussion(requestBody).subscribe((res: any) => {
-      if (res && res.result && res.result.search_results && res.result.search_results.data) {
+      if (res && res.result && res.result.search_results && res.result.search_results.data &&
+        res.result.search_results.data.length && res.result.search_results.data.length > 0) {
         this.getReplyItems = res.result.search_results.data
         this.getReplyItemsCount = res.result.search_results.totalCount
       }
@@ -384,6 +367,12 @@ export class CommunityManageComponent {
       this.getReplyFilterItems()
 
     }
+  }
+
+
+  openDocument(event: MouseEvent, url: string) {
+    event.preventDefault()
+    window.open(url, '_blank')
   }
 
 }

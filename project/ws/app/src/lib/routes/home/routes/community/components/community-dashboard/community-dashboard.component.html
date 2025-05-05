@@ -97,7 +97,7 @@
               <mat-icon>edit</mat-icon>
               <span>Edit</span>
             </button>
-            <button mat-menu-item (click)="onActionClick('manage', row)">
+            <button mat-menu-item (click)="onActionClick('manage', row)" *ngIf="isCommunityModeratorRole">
               <mat-icon>settings</mat-icon>
               <span>Manage</span>
             </button>
