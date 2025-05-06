@@ -40,9 +40,11 @@
                 <div class="card-header  flex flex-1 flex-col">
                   <div class="user-info-box flex flex-1 flex-row justify-between">
                     <div class="user-info-inner flex flex-1">
-                      <div class="user-image-box flex">
+                      <!-- <div class="user-image-box flex">
                         <img [src]="item?.createdBy?.user_profile_img_url" class="user-image" />
-                      </div>
+                      </div> -->
+                      <ws-app-profile-avatar [size]="'ml'" [name]="item?.createdBy?.first_name"
+                        [photoUrl]="item?.createdBy?.user_profile_img_url"></ws-app-profile-avatar>
                       <div class="user-info text-left margin-left-s">
                         <p class="mat-body-1 bold mr-1 margin-remove-bottom text-name"
                           *ngIf="item?.createdBy?.first_name">
@@ -173,7 +175,9 @@
                   <div class="user-info-box flex flex-1 flex-row justify-between">
                     <div class="user-info-inner flex flex-1">
                       <div class="user-image-box flex">
-                        <img [src]="item?.createdBy?.user_profile_img_url" class="user-image" />
+                        <!-- <img [src]="item?.createdBy?.user_profile_img_url" class="user-image" /> -->
+                        <ws-app-profile-avatar [size]="'ml'" [name]="item?.createdBy?.first_name"
+                          [photoUrl]="item?.createdBy?.user_profile_img_url"></ws-app-profile-avatar>
                       </div>
                       <div class="user-info text-left margin-left-s">
                         <p class="mat-body-1 bold mr-1 margin-remove-bottom text-name"
@@ -209,8 +213,8 @@
                   <div *ngIf="item?.categoryType?.includes('image')">
                     <div class="media media-full-width nodtranslate"
                       *ngIf="item?.mediaCategory && item?.mediaCategory?.image">
-                      <ws-app-image-sliders [title]="'Images'" [imageUrls]="item?.mediaCategory?.image"
-                        [styleData]="cardConfig?.sliderData?.styleData"></ws-app-image-sliders>
+                      <ws-app-image-sliders [title]="'Images'"
+                        [imageUrls]="item?.mediaCategory?.image"></ws-app-image-sliders>
                     </div>
                   </div>
                   <!-- IF Doc  -->
@@ -279,7 +283,9 @@
                   <div class="user-info-box flex flex-1 flex-row justify-between">
                     <div class="user-info-inner flex flex-1">
                       <div class="user-image-box flex">
-                        <img [src]="item?.createdBy?.user_profile_img_url" class="user-image" />
+                        <!-- <img [src]="item?.createdBy?.user_profile_img_url" class="user-image" /> -->
+                        <ws-app-profile-avatar [size]="'ml'" [name]="item?.createdBy?.first_name"
+                          [photoUrl]="item?.createdBy?.user_profile_img_url"></ws-app-profile-avatar>
                       </div>
                       <div class="user-info text-left margin-left-s">
                         <p class="mat-body-1 bold mr-1 margin-remove-bottom text-name"
@@ -314,8 +320,8 @@
                   <div *ngIf="item?.categoryType?.includes('image')">
                     <div class="media media-full-width nodtranslate"
                       *ngIf="item?.mediaCategory && item?.mediaCategory?.image">
-                      <ws-app-image-sliders [title]="'Images'" [imageUrls]="item?.mediaCategory?.image"
-                        [styleData]="cardConfig?.sliderData?.styleData"></ws-app-image-sliders>
+                      <ws-app-image-sliders [title]="'Images'"
+                        [imageUrls]="item?.mediaCategory?.image"></ws-app-image-sliders>
                     </div>
                   </div>
                   <!-- IF Doc  -->
@@ -384,7 +390,9 @@
                   <div class="user-info-box flex flex-1 flex-row justify-between">
                     <div class="user-info-inner flex flex-1">
                       <div class="user-image-box flex">
-                        <img [src]="item?.createdBy?.user_profile_img_url" class="user-image" />
+                        <!-- <img [src]="item?.createdBy?.user_profile_img_url" class="user-image" /> -->
+                        <ws-app-profile-avatar [size]="'ml'" [name]="item?.createdBy?.first_name"
+                          [photoUrl]="item?.createdBy?.user_profile_img_url"></ws-app-profile-avatar>
                       </div>
                       <div class="user-info text-left margin-left-s">
                         <p class="mat-body-1 bold mr-1 margin-remove-bottom text-name"
@@ -419,8 +427,8 @@
                   <div *ngIf="item?.categoryType?.includes('image')">
                     <div class="media media-full-width nodtranslate"
                       *ngIf="item?.mediaCategory && item?.mediaCategory?.image">
-                      <ws-app-image-sliders [title]="'Images'" [imageUrls]="item?.mediaCategory?.image"
-                        [styleData]="cardConfig?.sliderData?.styleData"></ws-app-image-sliders>
+                      <ws-app-image-sliders [title]="'Images'"
+                        [imageUrls]="item?.mediaCategory?.image"></ws-app-image-sliders>
                     </div>
                   </div>
                   <!-- IF Doc  -->
@@ -489,7 +497,9 @@
               <div class="user-info-box flex flex-1 flex-row justify-between">
                 <div class="user-info-inner flex flex-1">
                   <div class="user-image-box flex">
-                    <img [src]="item?.createdBy?.user_profile_img_url" class="user-image" />
+                    <!-- <img [src]="item?.createdBy?.user_profile_img_url" class="user-image" /> -->
+                    <ws-app-profile-avatar [size]="'ml'" [name]="item?.createdBy?.first_name"
+                      [photoUrl]="item?.createdBy?.user_profile_img_url"></ws-app-profile-avatar>
                   </div>
                   <div class="user-info text-left margin-left-s">
                     <p class="mat-body-1 bold mr-1 margin-remove-bottom text-name" *ngIf="item?.createdBy?.first_name">
@@ -521,8 +531,8 @@
               <div *ngIf="item?.categoryType?.includes('image')">
                 <div class="media media-full-width nodtranslate"
                   *ngIf="item?.mediaCategory && item?.mediaCategory?.image">
-                  <ws-app-image-sliders [title]="'Images'" [imageUrls]="item?.mediaCategory?.image"
-                    [styleData]="cardConfig?.sliderData?.styleData"></ws-app-image-sliders>
+                  <ws-app-image-sliders [title]="'Images'"
+                    [imageUrls]="item?.mediaCategory?.image"></ws-app-image-sliders>
                 </div>
               </div>
               <!-- IF Doc  -->

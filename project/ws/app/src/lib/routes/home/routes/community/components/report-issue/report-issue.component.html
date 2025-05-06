@@ -4,75 +4,75 @@
     <a (click)="onCancelDialog()" class="close-icon flex"><mat-icon>close</mat-icon></a>
   </div>
   <div class="flex flex-1 flex-col mt-4" *ngIf="data">
-    <div class=" flex flex-row mt-2" *ngFor="let item of data | keyvalue">
-      <ng-container *ngIf="item.key.toLowerCase() === 'sexual content'">
+    <div class=" flex flex-row mt-2" *ngFor="let item of data">
+      <ng-container *ngIf="item?.reason?.toLowerCase() === 'sexual content'">
         <div class="flex flex-1 items-center justify-center title-box text-left">
-          <p class=" ws-mat-black60-text mat-body-2">{{ item.key}}</p>
+          <p class=" ws-mat-black60-text mat-body-2">{{ item?.reason}}</p>
         </div>
         <div class="flex flex-1 items-center justify-center progress-bar-box">
           <mat-progress-bar class="custom-progress-bar mat-progress-bar-buffer bg-red1" mode="determinate"
-            [value]="item.value.percentage"></mat-progress-bar>
+            [value]="item?.percentage"></mat-progress-bar>
         </div>
         <div class="flex flex-1 items-center justify-center relative percenageVal-box"><span class="color-red1"> {{
-            item.value.count}} </span>
-          <span class="font-mini with-parentheses"> {{ item.value.percentage / 100 | percent }} </span>
+            item?.count}} </span>
+          <span class="font-mini with-parentheses"> {{ item?.percentage / 100 | percent }} </span>
         </div>
       </ng-container>
 
-      <ng-container *ngIf="item.key.toLowerCase() === 'spam'">
+      <ng-container *ngIf="item?.reason?.toLowerCase() === 'spam'">
         <div class="flex flex-1 items-center justify-center title-box text-left">
-          <p class="mat-body-2 ws-mat-black60-text">{{ item.key}}</p>
+          <p class="mat-body-2 ws-mat-black60-text">{{ item?.reason}}</p>
         </div>
         <div class="flex flex-1 items-center justify-center progress-bar-box">
           <mat-progress-bar class="custom-progress-bar mat-progress-bar-buffer bg-red2" mode="determinate"
-            [value]="item.value.percentage"></mat-progress-bar>
+            [value]="item?.percentage"></mat-progress-bar>
         </div>
         <div class="flex flex-1 items-center justify-center relative percenageVal-box"><span class="color-red2"> {{
-            item.value.count}} </span>
-          <span class="font-mini with-parentheses"> {{ item.value.percentage / 100 | percent }} </span>
+            item?.count}} </span>
+          <span class="font-mini with-parentheses"> {{ item?.percentage / 100 | percent }} </span>
         </div>
       </ng-container>
 
-      <ng-container *ngIf="item.key.toLowerCase() === 'abusive'">
+      <ng-container *ngIf="item?.reason.toLowerCase() === 'abusive'">
         <div class="flex flex-1 items-center justify-center title-box text-left">
-          <p class="mat-body-2 ws-mat-black60-text">{{ item.key}}</p>
+          <p class="mat-body-2 ws-mat-black60-text">{{ item?.reason}}</p>
         </div>
         <div class="flex flex-1 items-center justify-center progress-bar-box">
           <mat-progress-bar class="custom-progress-bar mat-progress-bar-buffer bg-red3" mode="determinate"
-            [value]="item.value.percentage"></mat-progress-bar>
+            [value]="item?.percentage"></mat-progress-bar>
         </div>
         <div class="flex flex-1 items-center justify-center relative percenageVal-box "><span class="color-red3"> {{
-            item.value.count}} </span>
-          <span class="font-mini with-parentheses"> {{ item.value.percentage / 100 | percent }} </span>
+            item?.count}} </span>
+          <span class="font-mini with-parentheses"> {{ item?.percentage / 100 | percent }} </span>
         </div>
       </ng-container>
 
-      <ng-container *ngIf="item.key.toLowerCase() === 'misinformation'">
+      <ng-container *ngIf="item?.reason.toLowerCase() === 'misinformation'">
         <div class="flex flex-1 items-center justify-center title-box text-left">
-          <p class="mat-body-2 ws-mat-black60-text">{{ item.key}}</p>
+          <p class="mat-body-2 ws-mat-black60-text">{{ item?.reason}}</p>
         </div>
         <div class="flex flex-1 items-center justify-center progress-bar-box">
           <mat-progress-bar class="custom-progress-bar mat-progress-bar-buffer bg-red4" mode="determinate"
-            [value]="item.value.percentage"></mat-progress-bar>
+            [value]="item?.percentage"></mat-progress-bar>
         </div>
         <div class="flex flex-1 items-center justify-center relative percenageVal-box"><span class="color-red4"> {{
-            item.value.count}} </span>
-          <span class="font-mini with-parentheses"> {{ item.value.percentage / 100 | percent }} </span>
+            item?.count}} </span>
+          <span class="font-mini with-parentheses"> {{ item?.percentage / 100 | percent }} </span>
         </div>
       </ng-container>
 
-      <ng-container *ngIf="item.key.toLowerCase() === 'others'">
+      <ng-container *ngIf="item?.reason.toLowerCase() === 'others'">
         <div class="flex flex-1 items-center justify-center title-box text-left">
-          <p class="mat-body-2 ws-mat-black60-text">{{ item.key}}</p>
+          <p class="mat-body-2 ws-mat-black60-text">{{ item?.reason}}</p>
 
         </div>
         <div class="flex flex-1 items-center justify-center progress-bar-box">
           <mat-progress-bar class="custom-progress-bar mat-progress-bar-buffer bg-red5" mode="determinate"
-            [value]="item.value.percentage"></mat-progress-bar>
+            [value]="item?.percentage"></mat-progress-bar>
         </div>
         <div class="flex flex-1 items-center justify-center relative percenageVal-box"><span class="color-red5"> {{
-            item.value.count}} </span>
-          <span class="font-mini with-parentheses"> {{ item.value.percentage / 100 | percent }} </span>
+            item?.count}} </span>
+          <span class="font-mini with-parentheses"> {{ item?.percentage / 100 | percent }} </span>
         </div>
       </ng-container>
     </div>

@@ -43,7 +43,6 @@ export class CommunityManageComponent {
   totalDiscussionsCount: number = 0
 
 
-
   constructor(private dialog: MatLegacyDialog,
     private communitySvc: CommunityService,
     private actvRoute: ActivatedRoute,
@@ -78,7 +77,6 @@ export class CommunityManageComponent {
     this.getPostFiletItems()
     this.getCommentFilterItems()
     this.getReplyFilterItems()
-
   }
 
   onTabChange(event: any) {
@@ -90,8 +88,9 @@ export class CommunityManageComponent {
   openReportDialog(discussionId: any): void {
     this.getReportedIssueList(discussionId).subscribe((reportedIssues: any) => {
       if (reportedIssues) {
+        console.log(reportedIssues, "reportedIssues")
         const dialogRef = this.dialog.open(ReportIssueComponent, {
-          width: '500px',
+          width: '550px',
           panelClass: 'report-dialog-box',
           data: reportedIssues  // Pass actual fetched data
         })
@@ -118,7 +117,7 @@ export class CommunityManageComponent {
     let type = itemType
     if (value && value === "showPlatform") {
       const confirmDialog = this.dialog.open(DialogConfirmComponent, {
-        width: '400px',
+        width: '500px',
         data: {
           title: '',
           // tslint:disable-next-line
@@ -132,7 +131,7 @@ export class CommunityManageComponent {
       confirmDialog.afterClosed().subscribe((response: any) => {
         if (response) {
           this.showOnPlatform(discussId, type)
-          this.snackbar.open('Post has been published on platform successfully!', 'Close', { duration: 3000 })
+
         }
         (err: any) => {
           this.snackbar.open('Something went wrong!', 'Close', { duration: 3000 })
@@ -144,7 +143,7 @@ export class CommunityManageComponent {
 
     if (value && value === "hideContent") {
       const confirmDialog = this.dialog.open(DialogConfirmComponent, {
-        width: '400px',
+        width: '500px',
         data: {
           title: '',
           body: `Are you sure you want to hide this post from the platform?`,
@@ -157,7 +156,6 @@ export class CommunityManageComponent {
       confirmDialog.afterClosed().subscribe((response: any) => {
         if (response) {
           this.hideContent(discussId, type)
-          this.snackbar.open('Post has been hidden from platform successfully!', 'Close', { duration: 3000 })
         } (err: any) => {
           this.snackbar.open('Something went wrong!', 'Close', { duration: 3000 })
           // tslint:disable-next-line
@@ -166,6 +164,19 @@ export class CommunityManageComponent {
       })
     }
   }
+
+  viewMoreOrLess(item: any) {
+    if (this.getEditorTextLength(item.description) > this.viewMoreLength) {
+      item.expanded = !item.expanded
+    }
+  }
+  getEditorTextLength(content: any) {
+    let test = content.replace(/<[^>]*>/g, '')
+    test = test.replace(/&nbsp;/gi, ' ')
+    test = test.trim()
+    return test.length
+  }
+
 
   //  GET ALL REPORTED ITEMS
   getReportedDiscussionItems() {
@@ -193,18 +204,6 @@ export class CommunityManageComponent {
     })
   }
 
-  viewMoreOrLess(item: any) {
-    if (this.getEditorTextLength(item.description) > this.viewMoreLength) {
-      item.expanded = !item.expanded
-    }
-  }
-  getEditorTextLength(content: any) {
-    let test = content.replace(/<[^>]*>/g, '')
-    test = test.replace(/&nbsp;/gi, ' ')
-    test = test.trim()
-    return test.length
-  }
-
 
   // GET ALL HIDDEN ITEMS
   getHiddenDiscussionItems() {
@@ -230,15 +229,19 @@ export class CommunityManageComponent {
     })
   }
 
-  showOnPlatform(discussionId: any, type: any) {
+  showOnPlatform(discussionId: any, type: any): void {
     const requestBody = {
       "discussionId": discussionId,
       "type": type
     }
     this.communitySvc.displayReportedPost(requestBody).subscribe((res: any) => {
       if (res) {
+        this.snackbar.open('Post has been published on platform successfully!', 'Close', { duration: 3000 })
         // tslint:disable-next-line
         console.log(res, 'response====')
+        // return res
+      } (err: any) => {
+        this.snackbar.open(err, 'Close', { duration: 3000 })
       }
 
     })
@@ -251,8 +254,12 @@ export class CommunityManageComponent {
     }
     this.communitySvc.hideReportedPost(requestBody).subscribe((res: any) => {
       if (res) {
+        this.snackbar.open('Post has been hidden from platform successfully!', 'Close', { duration: 3000 })
         // tslint:disable-next-line
         console.log(res, 'response====')
+      }
+      (err: any) => {
+        this.snackbar.open(err, 'Close', { duration: 3000 })
       }
     })
   }
@@ -264,8 +271,21 @@ export class CommunityManageComponent {
     }
     return this.communitySvc.getReportedIssuesStats(requestBody).pipe(
       map((res: any) => {
-        if (res?.result?.reportReasons) {
-          return res.result.reportReasons
+        const reasons = res?.result?.reportReasons
+        // if (res?.result?.reportReasons) {
+        //   return res.result.reportReasons
+        // } else {
+        //   return []
+        // }
+        if (reasons) {
+          // Convert object to array and sort by percentage in ascending order
+          return Object.entries(reasons)
+            .map(([key, value]: [string, any]) => ({
+              reason: key,
+              percentage: value.percentage,
+              count: value.count
+            }))
+            .sort((a, b) => b.percentage - a.percentage)
         } else {
           return []
         }
@@ -373,6 +393,30 @@ export class CommunityManageComponent {
   openDocument(event: MouseEvent, url: string) {
     event.preventDefault()
     window.open(url, '_blank')
+  }
+
+
+  getFileExtension(file: string): string {
+    return file.split('.').pop() || ''
+  }
+
+  getFileName(url: string): string {
+    const filename = url.split('/').pop() || ''
+    // Decode the URL-encoded filename
+    return decodeURIComponent(filename)
+  }
+
+  getFileIcon(url: string): string {
+    const extension = this.getFileExtension(url)
+    switch (extension) {
+      case 'pdf':
+        return 'picture_as_pdf'
+      case 'doc':
+      case 'docx':
+        return 'description'
+      default:
+        return 'insert_drive_file'
+    }
   }
 
 }

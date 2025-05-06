@@ -48,7 +48,8 @@ import { ReportIssueComponent } from './components/report-issue/report-issue.com
 import { MatLegacyProgressBarModule as MatProgressBarModule } from '@angular/material/legacy-progress-bar';
 import { StripHtmlPipe } from './pipes/strip-html.pipe';
 import { ImageSlidersComponent } from './components/image-sliders/image-sliders.component';
-import { PipeRelativeTimePipe } from './pipes/pipe-relative-time/pipe-relative-time.pipe'
+import { PipeRelativeTimePipe } from './pipes/pipe-relative-time/pipe-relative-time.pipe';
+import { ProfileAvatarComponent } from './components/profile-avatar/profile-avatar.component'
 
 
 @NgModule({
@@ -65,7 +66,8 @@ import { PipeRelativeTimePipe } from './pipes/pipe-relative-time/pipe-relative-t
     ReportIssueComponent,
     StripHtmlPipe,
     ImageSlidersComponent,
-    PipeRelativeTimePipe
+    PipeRelativeTimePipe,
+    ProfileAvatarComponent
   ],
   imports: [
     CommonModule,
