@@ -379,7 +379,6 @@ export class CommunityCreationComponent implements AfterViewInit {
     communityDetails['orgName'] = rootOrgName
     communityDetails['createdUserId'] = this.userProfile.id
     if (communityFormDetails
-      && communityFormDetails
       && communityFormDetails.moderators
       && communityFormDetails.moderators.length) {
       communityDetails['moderators'] = communityFormDetails.moderators
