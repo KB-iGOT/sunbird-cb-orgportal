@@ -12,6 +12,7 @@ import { MatLegacyDialog } from '@angular/material/legacy-dialog'
 export class EventCompetenciesComponent implements OnChanges {
   @Input() openMode = 'edit'
   @Input() competenciesList: any = []
+  @Input() openTab = 'draft'
   @Output() addCompetencies = new EventEmitter<any>()
   competencies: any
   searchText: string = ''

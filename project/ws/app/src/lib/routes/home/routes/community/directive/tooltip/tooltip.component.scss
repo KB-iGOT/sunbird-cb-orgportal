@@ -1,0 +1,20 @@
+
+    :host {
+      position: fixed;
+      // background-color: rgba(0, 0, 0, 0.8);
+      background: rgba(97, 97, 97, 0.9);
+      color: white;
+      padding: 8px;
+      border-radius: 4px;
+      z-index: 1000;
+      max-width: 500px;
+      transition: opacity 0.2s;
+      pointer-events: none;
+    }
+    .tooltip-content {
+      // font-size: 14px;
+      /*stylelint-disable*/
+      font-family: Lato;
+      /*stylelint-enable*/
+    font-size: 10px;
+    }

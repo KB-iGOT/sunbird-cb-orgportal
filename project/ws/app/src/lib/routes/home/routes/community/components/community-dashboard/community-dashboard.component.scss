@@ -35,7 +35,7 @@
     }
 
     .mat-cell {
-      padding: 8px 16px;
+      padding: 8px 8px;
     }
   }
 
@@ -58,7 +58,9 @@
     // Tab label styles
     .mat-tab-label {
         opacity: 1;
+        /*stylelint-disable*/
         font-family: Lato;
+        /*stylelint-enable*/
         font-weight: 400;
         font-size: 14px;
         line-height: 16.8px;
@@ -73,7 +75,9 @@
         }
 
       &.mat-tab-label-active {
+        /*stylelint-disable*/
         font-family: Lato;
+        /*stylelint-enable*/
         font-weight: 700 !important;
         font-size: 14px;
         line-height: 16.8px;
@@ -116,11 +120,13 @@
 
 .community-name-block {
   .community-name-block {
-    width: 76px;
+    width: 235px;
 
     .community-name {
       //styleName: Sub heading 2;
+      /*stylelint-disable*/
       font-family: Lato;
+      /*stylelint-enable*/
       font-size: 14px;
       font-weight: 700;
       line-height: 16.8px;
@@ -159,6 +165,7 @@
 
 .table-cell-spacing {
   padding: 0 8px;
+  vertical-align: top;
   /* Adjust the value as needed */
 }
 
@@ -222,7 +229,9 @@
 
   td.mat-cell {
     //styleName: Body 2;
+    /*stylelint-disable*/
     font-family: Lato;
+    /*stylelint-enable*/
     font-size: 14px;
     font-weight: 400;
     line-height: 16.8px;

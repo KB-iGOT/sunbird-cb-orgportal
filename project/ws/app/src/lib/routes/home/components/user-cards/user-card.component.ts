@@ -91,6 +91,11 @@ export class UserCardComponent implements OnInit, OnChanges, AfterViewChecked, A
   updateUserDataForm: UntypedFormGroup
   approveUserDataForm: UntypedFormGroup
   designationsMeta: any = []
+  filterDesignationsMeta: any = []
+  designationListLoadCount = 50
+  designationDefaultLoadCount = 50
+  isLoadingMoreDesignations = false;
+  desigantionFilterEnable = false
   groupsList: any = []
   selectedtags: any[] = []
   reqbody: any
@@ -159,6 +164,7 @@ export class UserCardComponent implements OnInit, OnChanges, AfterViewChecked, A
       gender: new UntypedFormControl('', []),
       category: new UntypedFormControl('', []),
       pincode: new UntypedFormControl('', []),
+      searchDesignation: new UntypedFormControl('', []),
     })
 
     this.approveUserDataForm = new UntypedFormGroup({
@@ -217,6 +223,27 @@ export class UserCardComponent implements OnInit, OnChanges, AfterViewChecked, A
       this.init()
     }
     this.userLimitSet = this.usersSvc.TOTAL_USERS_LIMIT
+
+
+    this.updateUserDataForm.get('searchDesignation')!.valueChanges
+      .pipe(
+        debounceTime(250),
+        distinctUntilChanged(),
+        startWith(''),
+      )
+      .subscribe(searchText => {
+        if (searchText) {
+          this.desigantionFilterEnable = true
+          this.filterDesignationsMeta = this.designationsMeta.filter((val: any) =>
+            val && val.name.trim().toLowerCase().includes(searchText && searchText.toLowerCase())
+          )
+        } else {
+          this.filterDesignationsMeta = this.designationsMeta.slice(0, this.designationDefaultLoadCount)
+          this.desigantionFilterEnable = false
+
+          this.checkCurrentDesignationPresent()
+        }
+      })
   }
 
   ngAfterViewInit() {
@@ -227,13 +254,15 @@ export class UserCardComponent implements OnInit, OnChanges, AfterViewChecked, A
         this.paginator.pageIndex = this.cacheTransferPageIndex
       }
       this.paginator.pageSize = this.pageSize
-      this.cdr.detectChanges()
+
+      // Use setTimeout to avoid ExpressionChangedAfterItHasBeenCheckedError
+      setTimeout(() => {
+        this.cdr.detectChanges() // Explicitly trigger change detection
+      }, 0)
     }
-    this.cdr.detectChanges()
   }
 
   ngOnChanges() {
-
     if (this.usersData) {
       this.usersData = _.orderBy(this.usersData, item => {
         if (item.profileDetails && item.profileDetails.personalDetails) {
@@ -241,6 +270,7 @@ export class UserCardComponent implements OnInit, OnChanges, AfterViewChecked, A
             item.profileDetails.personalDetails.firstname.toUpperCase() : item.firstName.toUpperCase()
         }
         // tslint:disable-next-line
+        return ''
       }, ['asc'])
 
       if (this.isApprovals) {
@@ -256,7 +286,12 @@ export class UserCardComponent implements OnInit, OnChanges, AfterViewChecked, A
   }
 
   ngAfterViewChecked() {
-    // this.cdr.detectChanges()
+    if (this.htmlDetected) {
+      // Use setTimeout to avoid ExpressionChangedAfterItHasBeenCheckedError
+      setTimeout(() => {
+        this.cdr.detectChanges()
+      }, 0)
+    }
   }
 
   getApprovalData() {
@@ -354,9 +389,40 @@ export class UserCardComponent implements OnInit, OnChanges, AfterViewChecked, A
   async loadDesignations() {
     await this.usersSvc.getDesignations({}).subscribe(
       (data: any) => {
-        this.designationsMeta = data.responseData
+        this.designationsMeta = data.responseData || []
+        // Add "Others" option if not already present
+        if (!this.designationsMeta.some((d: any) => d.name === 'Others')) {
+          this.designationsMeta.push({ name: 'Others', id: 0, description: 'Others' })
+        }
+        // Initialize the filtered list
+        this.filterDesignationsMeta = this.designationsMeta.slice(0, this.designationDefaultLoadCount)
+
+        // If we have a user with a designation that's not in the list, add it
+        if (this.usersData && this.usersData.length > 0) {
+          this.usersData.forEach((user: any) => {
+            if (user.profileDetails &&
+              user.profileDetails.professionalDetails &&
+              user.profileDetails.professionalDetails[0] &&
+              user.profileDetails.professionalDetails[0].designation) {
+
+              const userDesignation = user.profileDetails.professionalDetails[0].designation
+              const designationExists = this.designationsMeta.some(
+                (d: any) => d.name && d.name.toLowerCase() === userDesignation.toLowerCase()
+              )
+
+              if (!designationExists && userDesignation) {
+                this.designationsMeta.push({
+                  name: userDesignation,
+                  id: 'custom-' + Date.now(),
+                  description: userDesignation
+                })
+              }
+            }
+          })
+        }
       },
       (_err: any) => {
+        console.error('Error loading designations:', _err)
       })
   }
 
@@ -447,7 +513,6 @@ export class UserCardComponent implements OnInit, OnChanges, AfterViewChecked, A
     this.usersSvc.getUserById(user.userId).subscribe((res: any) => {
       if (res) {
         userval = res
-        // console.log('userval', userval)
         this.usersData.forEach((u: any) => {
           if (u.userId === user.userId) {
             if (this.isMdoLeader) {
@@ -461,14 +526,18 @@ export class UserCardComponent implements OnInit, OnChanges, AfterViewChecked, A
               u.enableEdit = true
               userval.enableEdit = true
             }
-
           } else {
             u.enableEdit = false
           }
         })
 
-        pnael.open()
+        // Wrap in setTimeout to avoid ExpressionChangedAfterItHasBeenCheckedError
+        setTimeout(() => {
+          pnael.open()
+        }, 200)
+
         this.setUserDetails(userval)
+        this.cdr.detectChanges()
       }
     })
   }
@@ -507,6 +576,12 @@ export class UserCardComponent implements OnInit, OnChanges, AfterViewChecked, A
 
   mapRoles(user: any) {
     if (this.orgTypeList && this.orgTypeList.length > 0) {
+      // Clear previous values to avoid detection issues
+      this.uniqueRoles = []
+      this.rolesList = []
+      this.userRoles.clear()
+      this.orguserRoles = []
+
       // New code for roles
       for (let i = 0; i < this.orgTypeList.length; i += 1) {
         if (this.orgTypeList[i].name === 'MDO') {
@@ -527,11 +602,15 @@ export class UserCardComponent implements OnInit, OnChanges, AfterViewChecked, A
       const usrRoles = user.organisations[0] && user.organisations[0].roles
         ? user.organisations[0].roles : []
       if (usrRoles.length > 0) {
-        this.updateUserDataForm.controls['roles'].setValue(usrRoles)
+        // Set form value inside setTimeout to avoid ExpressionChangedAfterItHasBeenCheckedError
+        setTimeout(() => {
+          this.updateUserDataForm.controls['roles'].setValue(usrRoles)
+          this.cdr.detectChanges()
+        }, 0)
+
         usrRoles.forEach((role: any) => {
           this.orguserRoles.push(role)
           this.userRoles.add(role)
-          // this.modifyUserRoles(role)
         })
       }
     } else {
@@ -1267,4 +1346,92 @@ export class UserCardComponent implements OnInit, OnChanges, AfterViewChecked, A
   //   }
 
   // }
+
+
+  setupScrollListener(opened: boolean): void {
+    if (opened) {
+      this.desigantionFilterEnable = false
+      this.designationListLoadCount = this.designationDefaultLoadCount // Reset the load count
+      this.filterDesignationsMeta = this.designationsMeta.slice(0, this.designationListLoadCount)
+      this.checkCurrentDesignationPresent()
+      if (this.updateUserDataForm.get('searchDesignation')) {
+        this.updateUserDataForm.get('searchDesignation')!.setValue('')
+      }
+      setTimeout(() => {
+        const searchInput = document.querySelector('.search-input') as HTMLInputElement
+        if (searchInput) {
+          searchInput.focus()
+        }
+      }, 100)
+      // Wait for the panel to be rendered in the DOM
+      setTimeout(() => {
+        // Find the panel element
+        const panel = document.querySelector('.mat-select-panel')
+        if (panel) {
+          // Add scroll event listener to the panel
+          panel.addEventListener('scroll', this.onDesignationSelectScroll.bind(this))
+        }
+      }, 100)
+    }
+  }
+
+  onDesignationSelectScroll(event: any): void {
+    const element = event.target
+    if (!this.desigantionFilterEnable) {
+      // Check if user has scrolled to the bottom (with a small threshold)
+      if (element.scrollTop + element.clientHeight >= element.scrollHeight - 5) {
+        // Only load more if not already loading and if there are potentially more items
+        if (!this.isLoadingMoreDesignations && this.designationsMeta.length > this.filterDesignationsMeta.length) {
+          this.isLoadingMoreDesignations = true
+
+          // Increase the load count by designationDefaultLoadCount
+          this.designationListLoadCount += this.designationDefaultLoadCount
+
+          // Update the filtered list with more items
+          setTimeout(() => {
+            this.filterDesignationsMeta = this.designationsMeta.slice(0, this.designationListLoadCount)
+            this.checkCurrentDesignationPresent()
+            this.isLoadingMoreDesignations = false
+          }, 500) // Small timeout to simulate loading and prevent multiple triggers
+        }
+      }
+    }
+  }
+
+
+  checkCurrentDesignationPresent() {
+    // Get the current designation value
+    const currentDesignation = this.updateUserDataForm.get('designation')!.value
+    // Check if current designation exists in the list
+    if (currentDesignation) {
+      const designationExists = this.filterDesignationsMeta.some(
+        (designation: any) => designation.name.toLowerCase() === currentDesignation.toLowerCase()
+      )
+
+      // If designation doesn't exist in the list, add it
+      if (!designationExists) {
+        // Create a new designation object to match the structure of other items
+        const newDesignation = {
+          name: currentDesignation,
+          // Add any other required properties matching your data structure
+          id: 'custom-' + Date.now(),
+          description: currentDesignation
+        }
+        // Make sure the custom designation appears in the filtered list
+        if (this.filterDesignationsMeta.length >= this.designationListLoadCount) {
+          // Replace the last item with the new one to maintain the same number of items
+          this.filterDesignationsMeta.pop()
+        }
+        this.filterDesignationsMeta.unshift(newDesignation)
+        this.isLoadingMoreDesignations = false
+      }
+    }
+  }
+  onDesignationDropdownClosed(): void {
+
+    this.desigantionFilterEnable = false
+    this.designationListLoadCount = this.designationDefaultLoadCount // Reset the load count
+    this.filterDesignationsMeta = this.designationsMeta.slice(0, this.designationListLoadCount)
+    this.checkCurrentDesignationPresent()
+  }
 }

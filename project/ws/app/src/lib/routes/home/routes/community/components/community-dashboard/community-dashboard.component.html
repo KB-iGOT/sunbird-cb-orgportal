@@ -25,22 +25,23 @@
   <div class="search mt-4">
     <div class=rsearch>
       <mat-icon class="search-icon">search</mat-icon>
-      <input class="sinput" type="Standard" label="" [formControl]="searchControl"
-        placeholder="Type here to search... ">
+      <input class="sinput" type="Standard" label="" [formControl]="searchControl" placeholder="Type here to search... "
+        maxlength="30">
     </div>
   </div>
   <div class="table-wrapper">
-    <table mat-table class="table-container w-full mt-4" [dataSource]="dataSource" matSort>
+    <table mat-table class="table-container w-full mt-4" [dataSource]="dataSource" matSort
+      aria-label="community dashboard table">
       <!-- Name Column -->
       <ng-container matColumnDef="name">
-        <th class="table-header-spacing" mat-header-cell *matHeaderCellDef [style.width.px]="300">
+        <th class="table-header-spacing" mat-header-cell *matHeaderCellDef mat-sort-header [style.width.px]="300">
           Community Name </th>
         <td class="table-cell-spacing" mat-cell *matCellDef="let row" [style.width.px]="300">
-          <div class="community-name-block flex gap-2 flex-1 flex-start cursor-pointer">
-            <div class="community-name-container pt-2 pb-2">
+          <div class="community-name-block flex gap-2 flex-1 flex-start">
+            <div class="community-name-container  pb-2">
               <img src="{{row?.imageUrl}}" alt="Parliament Building" (error)="changeToDefaultImg($event)">
             </div>
-            <div class="community-name-block pt-2">
+            <div class="community-name-block ">
               <span class="community-name line-clamp-2">{{row?.communityName || '-'}}</span>
             </div>
           </div>
@@ -49,24 +50,25 @@
 
       <!-- Start Date Column -->
       <ng-container matColumnDef="startDate">
-        <th class="table-header-spacing" mat-header-cell *matHeaderCellDef [style.width.px]="141"> Start
-          Date </th>
+        <th class="table-header-spacing" mat-header-cell *matHeaderCellDef mat-sort-header [style.width.px]="141">
+          Created On </th>
         <td class="table-cell-spacing" mat-cell *matCellDef="let row" [style.width.px]="141"> {{row.createdOn | date}}
         </td>
       </ng-container>
 
       <!-- Created By Column -->
       <ng-container matColumnDef="createdBy">
-        <th class="table-header-spacing" mat-header-cell *matHeaderCellDef [style.width.px]="200">
+        <th class="table-header-spacing" mat-header-cell *matHeaderCellDef mat-sort-header [style.width.px]="200">
           Created By </th>
-        <td class="table-cell-spacing" mat-cell *matCellDef="let row" [style.width.px]="200"> {{row?.createdByUserId ||
-          '-'}}
+        <td class="table-cell-spacing" mat-cell *matCellDef="let row" [style.width.px]="200">
+          <span *ngIf="row?.createdBy">{{additionalUserInfo[row?.createdBy]?.first_name ||
+            '-'}}</span>
         </td>
       </ng-container>
 
       <!-- Published On Column -->
       <ng-container matColumnDef="publishedOn">
-        <th class="table-header-spacing" mat-header-cell *matHeaderCellDef [style.width.px]="141">
+        <th class="table-header-spacing" mat-header-cell *matHeaderCellDef mat-sort-header [style.width.px]="141">
           Published On </th>
         <td class="table-cell-spacing" mat-cell *matCellDef="let row" [style.width.px]="141"> {{row?.updatedOn | date}}
         </td>
@@ -74,13 +76,13 @@
 
       <!-- Members Column -->
       <ng-container matColumnDef="members">
-        <th class="table-header-spacing" mat-header-cell *matHeaderCellDef> Members </th>
+        <th class="table-header-spacing" mat-header-cell *matHeaderCellDef mat-sort-header> Members </th>
         <td class="table-cell-spacing" mat-cell *matCellDef="let row"> {{row?.countOfPeopleJoined || 0}} </td>
       </ng-container>
 
       <!-- Mods Column -->
       <ng-container matColumnDef="mods">
-        <th class="table-header-spacing" mat-header-cell *matHeaderCellDef> Mods </th>
+        <th class="table-header-spacing" mat-header-cell *matHeaderCellDef mat-sort-header> Mods </th>
         <td class="table-cell-spacing" mat-cell *matCellDef="let row"> {{row?.countOfModerators || 0}} </td>
       </ng-container>
 
@@ -89,10 +91,10 @@
         <th class="table-header-spacing" mat-header-cell *matHeaderCellDef> Actions </th>
         <td class="table-cell-spacing" mat-cell *matCellDef="let row">
           <button mat-icon-button [matMenuTriggerFor]="menu">
-            <mat-icon>more_vert</mat-icon>
+            <mat-icon class="align-top-icon">more_vert</mat-icon>
           </button>
           <mat-menu #menu="matMenu">
-            <button mat-menu-item *ngIf="canEdit(row)" (click)="onActionClick('edit', row)">
+            <button mat-menu-item (click)="onActionClick('edit', row)" [disabled]="!canEdit(row)">
               <mat-icon>edit</mat-icon>
               <span>Edit</span>
             </button>

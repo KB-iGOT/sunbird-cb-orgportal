@@ -11,7 +11,7 @@
   <mat-sidenav [mode]="mode$ | async" [(opened)]="sideNavBarOpened" class="left-nav border-0">
     <div class="container2" *ngIf="widgetData">
       <!-- <ng-container [wsResolverWidget]="widgetData"></ng-container> -->
-      <ws-widget-left-menu [widgetData]="widgetData"></ws-widget-left-menu>
+      <ws-widget-left-menu [myRoles]="myRoles" [widgetData]="widgetData"></ws-widget-left-menu>
     </div>
   </mat-sidenav>
   <mat-sidenav-content>
