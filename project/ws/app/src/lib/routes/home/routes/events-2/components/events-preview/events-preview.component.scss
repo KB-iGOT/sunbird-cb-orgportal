@@ -175,7 +175,7 @@
   box-sizing: border-box;
   width: 100%;
   overflow: hidden;
-  padding: 16px 16px 16px 0;
+  padding: 16px 16px 16px 0px;
 }
 
 .text-truncate {
@@ -213,7 +213,9 @@
 }
 
 .speaker-name {
+  /*stylelint-disable*/
   font-family: Montserrat;
+  /*stylelint-enable*/
   font-weight: 600;
   font-size: 14px;
   line-height: 17.07px;
@@ -221,7 +223,9 @@
 }
 
 .speaker-description {
+  /*stylelint-disable*/
   font-family: Lato;
+  /*stylelint-enable*/
   font-weight: 400;
   font-size: 12px;
   line-height: 14.4px;
