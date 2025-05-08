@@ -175,7 +175,10 @@
   box-sizing: border-box;
   width: 100%;
   overflow: hidden;
-  padding: 16px 16px 16px 0px;
+  padding-left: 0px;
+  padding-top: 16px;
+  padding-right: 16px;
+  padding-bottom: 16px;
 }
 
 .text-truncate {
