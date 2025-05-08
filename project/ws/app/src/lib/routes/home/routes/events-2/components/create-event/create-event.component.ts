@@ -416,6 +416,7 @@ export class CreateEventComponent implements OnInit, AfterViewInit {
         event: this.getFormBodyOfEvent('Live')
       }
     }
+    formBody.request.event.status = 'SentToPublish'
     this.loaderService.changeLoaderState(true)
     this.eventSvc.updateEvent(formBody, this.eventId).subscribe({
       next: res => {
