@@ -74,7 +74,7 @@ export class CommunityManageComponent {
   ngOnInit(): void {
     this.getReportedDiscussionItems()
     this.getHiddenDiscussionItems()
-    this.getPostFiletItems()
+    this.getPostFilterItems()
     this.getCommentFilterItems()
     this.getReplyFilterItems()
   }
@@ -191,7 +191,7 @@ export class CommunityManageComponent {
       "requestedFields": [],
       "pageNumber": 0,
       "pageSize": 10,
-      "orderBy": "createdOn",
+      "orderBy": "recentReportedOn",
       "orderDirection": "DESC",
       "facets": ["type"]
     }
@@ -216,7 +216,7 @@ export class CommunityManageComponent {
       "requestedFields": [],
       "pageNumber": 0,
       "pageSize": 10,
-      "orderBy": "createdOn",
+      "orderBy": "recentReportedOn",
       "orderDirection": "DESC",
       "facets": ["type"]
     }
@@ -294,7 +294,8 @@ export class CommunityManageComponent {
 
   }
 
-  getPostFiletItems() {
+
+  getPostFilterItems() {
     const requestBody = {
       "filterCriteriaMap": {
         "status": [
@@ -306,7 +307,7 @@ export class CommunityManageComponent {
       "requestedFields": [],
       "pageNumber": 0,
       "pageSize": 10,
-      "orderBy": "createdOn",
+      "orderBy": "recentReportedOn",
       "orderDirection": "DESC",
       "facets": ["type"]
     }
@@ -320,6 +321,7 @@ export class CommunityManageComponent {
 
   }
 
+  //  get comment filter items
   getCommentFilterItems() {
     const requestBody = {
       "filterCriteriaMap": {
@@ -332,7 +334,7 @@ export class CommunityManageComponent {
       "requestedFields": [],
       "pageNumber": 0,
       "pageSize": 10,
-      "orderBy": "createdOn",
+      "orderBy": "recentReportedOn",
       "orderDirection": "DESC",
       "facets": ["type"]
     }
@@ -346,6 +348,7 @@ export class CommunityManageComponent {
 
   }
 
+  // get reply filter items
   getReplyFilterItems() {
     const requestBody = {
       "filterCriteriaMap": {
@@ -358,7 +361,7 @@ export class CommunityManageComponent {
       "requestedFields": [],
       "pageNumber": 0,
       "pageSize": 10,
-      "orderBy": "createdOn",
+      "orderBy": "recentReportedOn",
       "orderDirection": "DESC",
       "facets": ["type"]
     }
@@ -377,7 +380,7 @@ export class CommunityManageComponent {
       this.getReportedDiscussionItems()
     }
     if (keyVal === 'posts') {
-      this.getPostFiletItems()
+      this.getPostFilterItems()
     }
     if (keyVal === 'comments') {
       this.getCommentFilterItems()
