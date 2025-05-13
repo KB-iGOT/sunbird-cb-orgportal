@@ -7,7 +7,6 @@ import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack
 import { DialogConfirmComponent } from '../../../../../../../../../../../src/app/component/dialog-confirm/dialog-confirm.component'
 import { map } from 'rxjs/operators'
 import { Observable } from 'rxjs'
-// import { UsersService } from '../../../../../users/services/users.service'
 
 export interface IDialogData {
   title: {
@@ -48,7 +47,7 @@ export class CommunityManageComponent {
     private actvRoute: ActivatedRoute,
     private snackbar: MatSnackBar,
   ) {
-    this.actvRoute?.params?.subscribe(params => {
+    this.actvRoute?.params?.subscribe((params: any) => {
       if (params) {
         this.communityId = params['communityId']
         // this.communityId = '1d08a92b-07fa-41e4-8060-93a221d416e6'
@@ -88,7 +87,6 @@ export class CommunityManageComponent {
   openReportDialog(discussionId: any): void {
     this.getReportedIssueList(discussionId).subscribe((reportedIssues: any) => {
       if (reportedIssues) {
-        console.log(reportedIssues, "reportedIssues")
         const dialogRef = this.dialog.open(ReportIssueComponent, {
           width: '550px',
           panelClass: 'report-dialog-box',
@@ -105,7 +103,6 @@ export class CommunityManageComponent {
             // tslint:disable-next-line
             console.log(err)
           }
-
         })
       }
     })
@@ -170,9 +167,12 @@ export class CommunityManageComponent {
       item.expanded = !item.expanded
     }
   }
+
   getEditorTextLength(content: any) {
-    let test = content.replace(/<[^>]*>/g, '')
+    let test = content.trim()
+    test = test.replace(/<[^>]*>/g, '')
     test = test.replace(/&nbsp;/gi, ' ')
+    test = test.replace(/\s+/g, ' ')
     test = test.trim()
     return test.length
   }
@@ -200,6 +200,84 @@ export class CommunityManageComponent {
         res.result.search_results.data.length > 0) {
         this.allDisussionObj = res.result.search_results.data
         this.allDisussionObjCount = res.result.search_results.totalCount
+      }
+    })
+  }
+
+  getPostFilterItems() {
+    const requestBody = {
+      "filterCriteriaMap": {
+        "status": [
+          "reported"
+        ],
+        "communityId": this.communityId,
+        "type": ["question"]
+      },
+      "requestedFields": [],
+      "pageNumber": 0,
+      "pageSize": 10,
+      "orderBy": "recentReportedOn",
+      "orderDirection": "DESC",
+      "facets": ["type"]
+    }
+    this.communitySvc.getAllReportedDiscussion(requestBody).subscribe((res: any) => {
+      if (res && res.result && res.result.search_results && res.result.search_results.data &&
+        res.result.search_results.data.length && res.result.search_results.data.length > 0) {
+        this.getPostItems = res.result.search_results.data
+        this.getPostItemsCount = res.result.search_results.totalCount
+      }
+    })
+  }
+
+  //  get comment filter items
+  getCommentFilterItems() {
+    const requestBody = {
+      "filterCriteriaMap": {
+        "status": [
+          "reported"
+        ],
+        "communityId": this.communityId,
+        "type": ["answerPost"]
+      },
+      "requestedFields": [],
+      "pageNumber": 0,
+      "pageSize": 10,
+      "orderBy": "recentReportedOn",
+      "orderDirection": "DESC",
+      "facets": ["type"]
+    }
+    this.communitySvc.getAllReportedDiscussion(requestBody).subscribe((res: any) => {
+      if (res && res.result && res.result.search_results && res.result.search_results.data &&
+        res.result.search_results.data.length && res.result.search_results.data.length > 0) {
+        this.getCommentItems = res.result.search_results.data
+        this.getCommentItemsCount = res.result.search_results.totalCount
+      }
+    })
+
+  }
+
+  // get reply filter items
+  getReplyFilterItems() {
+    const requestBody = {
+      "filterCriteriaMap": {
+        "status": [
+          "reported"
+        ],
+        "communityId": this.communityId,
+        "type": ["answerPostReply"]
+      },
+      "requestedFields": [],
+      "pageNumber": 0,
+      "pageSize": 10,
+      "orderBy": "recentReportedOn",
+      "orderDirection": "DESC",
+      "facets": ["type"]
+    }
+    this.communitySvc.getAllReportedDiscussion(requestBody).subscribe((res: any) => {
+      if (res && res.result && res.result.search_results && res.result.search_results.data &&
+        res.result.search_results.data.length && res.result.search_results.data.length > 0) {
+        this.getReplyItems = res.result.search_results.data
+        this.getReplyItemsCount = res.result.search_results.totalCount
       }
     })
   }
@@ -272,11 +350,6 @@ export class CommunityManageComponent {
     return this.communitySvc.getReportedIssuesStats(requestBody).pipe(
       map((res: any) => {
         const reasons = res?.result?.reportReasons
-        // if (res?.result?.reportReasons) {
-        //   return res.result.reportReasons
-        // } else {
-        //   return []
-        // }
         if (reasons) {
           // Convert object to array and sort by percentage in ascending order
           return Object.entries(reasons)
@@ -291,89 +364,12 @@ export class CommunityManageComponent {
         }
       })
     )
-
   }
 
 
-  getPostFilterItems() {
-    const requestBody = {
-      "filterCriteriaMap": {
-        "status": [
-          "reported"
-        ],
-        "communityId": this.communityId,
-        "type": ["question"]
-      },
-      "requestedFields": [],
-      "pageNumber": 0,
-      "pageSize": 10,
-      "orderBy": "recentReportedOn",
-      "orderDirection": "DESC",
-      "facets": ["type"]
-    }
-    this.communitySvc.getAllReportedDiscussion(requestBody).subscribe((res: any) => {
-      if (res && res.result && res.result.search_results && res.result.search_results.data &&
-        res.result.search_results.data.length && res.result.search_results.data.length > 0) {
-        this.getPostItems = res.result.search_results.data
-        this.getPostItemsCount = res.result.search_results.totalCount
-      }
-    })
 
-  }
 
-  //  get comment filter items
-  getCommentFilterItems() {
-    const requestBody = {
-      "filterCriteriaMap": {
-        "status": [
-          "reported"
-        ],
-        "communityId": this.communityId,
-        "type": ["answerPost"]
-      },
-      "requestedFields": [],
-      "pageNumber": 0,
-      "pageSize": 10,
-      "orderBy": "recentReportedOn",
-      "orderDirection": "DESC",
-      "facets": ["type"]
-    }
-    this.communitySvc.getAllReportedDiscussion(requestBody).subscribe((res: any) => {
-      if (res && res.result && res.result.search_results && res.result.search_results.data &&
-        res.result.search_results.data.length && res.result.search_results.data.length > 0) {
-        this.getCommentItems = res.result.search_results.data
-        this.getCommentItemsCount = res.result.search_results.totalCount
-      }
-    })
 
-  }
-
-  // get reply filter items
-  getReplyFilterItems() {
-    const requestBody = {
-      "filterCriteriaMap": {
-        "status": [
-          "reported"
-        ],
-        "communityId": this.communityId,
-        "type": ["answerPostReply"]
-      },
-      "requestedFields": [],
-      "pageNumber": 0,
-      "pageSize": 10,
-      "orderBy": "recentReportedOn",
-      "orderDirection": "DESC",
-      "facets": ["type"]
-    }
-    this.communitySvc.getAllReportedDiscussion(requestBody).subscribe((res: any) => {
-      if (res && res.result && res.result.search_results && res.result.search_results.data &&
-        res.result.search_results.data.length && res.result.search_results.data.length > 0) {
-        this.getReplyItems = res.result.search_results.data
-        this.getReplyItemsCount = res.result.search_results.totalCount
-      }
-    })
-
-  }
   filterItems(keyVal: any) {
     this.activeFilter = keyVal
     if (keyVal === 'all') {
@@ -384,23 +380,22 @@ export class CommunityManageComponent {
     }
     if (keyVal === 'comments') {
       this.getCommentFilterItems()
-
     }
     if (keyVal === 'reply') {
       this.getReplyFilterItems()
-
     }
   }
-
 
   openDocument(event: MouseEvent, url: string) {
     event.preventDefault()
     window.open(url, '_blank')
   }
 
-
-  getFileExtension(file: string): string {
-    return file.split('.').pop() || ''
+  getFileExtension(filename: string): string {
+    if (filename && filename !== 'undefined' && filename.includes('.') && !filename.endsWith('.')) {
+      return filename.split('.').pop() || ''
+    }
+    return ''
   }
 
   getFileName(url: string): string {

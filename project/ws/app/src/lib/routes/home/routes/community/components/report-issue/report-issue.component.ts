@@ -35,6 +35,4 @@ export class ReportIssueComponent {
   //   this.dialog.closeAll()
   // }
 
-
-
 }

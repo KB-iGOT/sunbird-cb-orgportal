@@ -12,7 +12,7 @@ import { Subject } from 'rxjs'
 import { HttpErrorResponse } from '@angular/common/http'
 
 interface Community {
-  name: string
+  communityName: string
   startDate: Date
   createdBy: string
   publishedOn: Date
@@ -89,6 +89,7 @@ export class CommunityDashboardComponent implements OnInit {
 
   ngOnInit() {
     // Setup search subscription with debounce
+    'component called !!!!!!!!'
     this.searchControl.valueChanges.pipe(
       debounceTime(300), // Wait 300ms after last input
       distinctUntilChanged() // Only emit if value has changed
@@ -130,6 +131,7 @@ export class CommunityDashboardComponent implements OnInit {
     this.dataSource.sort = this.sort
     this.dataSource.sortingDataAccessor = (item: any, property: string) => {
       switch (property) {
+
         case 'name': return item.communityName?.toLowerCase() || ''
         case 'startDate': return new Date(item.createdOn).getTime()
         case 'createdBy': return this.additionalUserInfo[item.createdBy]?.first_name?.toLowerCase() || ''

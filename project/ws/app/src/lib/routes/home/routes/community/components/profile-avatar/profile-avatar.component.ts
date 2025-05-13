@@ -39,17 +39,18 @@ export class ProfileAvatarComponent {
   ]
 
   ngOnInit() {
-    console.log(this.name, 'name=')
     if (!this.photoUrl || !(this.photoUrl.startsWith('http://') || this.photoUrl.startsWith('https://'))) {
       this.showInitials = true
       if (!this.initials) {
         this.createInititals()
       }
-      if (this.datalen === 1) {
-        this.randomcolors = [
-          '#006400', // green
-        ]
-      }
+      // this.name = 'N '
+      // console.log((this.name).trim().length, "(this.name).trim().length====")
+      // if ((this.name).trim().length === 1) {
+      //   this.randomcolors = [
+      //     '#006400', // green
+      //   ]
+      // }
       const randomIndex = Math.floor(Math.random() * Math.floor(this.colors.length))
       this.circleColor = this.colors[randomIndex]
       if (this.randomColor) {
@@ -61,8 +62,43 @@ export class ProfileAvatarComponent {
 
   private createInititals(): void {
     let initials = ''
-    const array = `${this.name} `.toString().split(' ')
-    if (array[0] !== 'undefined' && typeof array[1] !== 'undefined') {
+    let userName = `${this.name} `.trim()
+    userName = userName.replace(/\s+/g, ' ')
+    // const array = `${this.name} `.trim().toString().split(' ')
+    const array = userName.trim().toString().split(' ')
+    // const array = userName.trim().toString().split(' ')
+    // if (array && array.length === 1 && typeof array[0] !== 'undefined') {
+    //   if (array[0].length === 1) {
+    //     initials += array[0].charAt(0)
+    //     this.randomcolors = [
+    //       '#006400', // green
+    //     ]
+    //   }
+    //   if (array[0].length > 1) {
+    //     initials += array[0].charAt(0)
+    //     initials += array[0].charAt(1)
+    //     this.randomcolors = [
+    //       '#006400', // green
+    //     ]
+    //   }
+
+    //   // console.log(initials, "initials==========")
+    //   // console.log(this.randomcolors, "randomcolors========")
+    // }
+    // if (array && array.length >= 2 && typeof array[0] !== 'undefined' && typeof array[1] !== 'undefined') {
+    //   initials += array[0].charAt(0)
+    //   initials += array[1].charAt(0)
+    // } else {
+    if (array && array.length === 1 && typeof array[0] !== 'undefined') {
+      if (array[0].length === 1) {
+        initials += array[0].charAt(0)
+        this.randomcolors = ['#006400'] // green
+      } else if (array[0].length > 1) {
+        initials += array[0].charAt(0)
+        initials += array[0].charAt(1)
+        this.randomcolors = ['#006400'] // green
+      }
+    } else if (array && array.length >= 2 && typeof array[0] !== 'undefined' && typeof array[1] !== 'undefined') {
       initials += array[0].charAt(0)
       initials += array[1].charAt(0)
     } else {
