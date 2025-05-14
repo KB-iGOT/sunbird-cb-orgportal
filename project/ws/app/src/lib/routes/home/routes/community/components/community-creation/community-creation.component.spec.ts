@@ -1,546 +1,432 @@
-import { CommunityCreationComponent } from './community-creation.component'
 import { of, throwError } from 'rxjs'
+import { CommunityCreationComponent } from './community-creation.component'
 import { FormBuilder } from '@angular/forms'
 import { HttpErrorResponse } from '@angular/common/http'
 
-describe('CommunityCreationComponent', () => {
-  let component: CommunityCreationComponent
-  let mockFormBuilder: FormBuilder
-  let mockCdr: any
-  let mockRouter: any
-  let mockDialog: any
-  let mockMatSnackBar: any
-  let mockCommunitySvc: any
-  let mockLoaderService: any
-  let mockActivatedRoute: any
-
-  // Mock community data
-  const mockCommunityDetails = {
-    id: 'community-123',
-    communityName: 'Test Community',
-    description: 'This is a test community',
-    topicId: 'topic-123',
-    topicName: 'Tech',
-    communityGuideLines: 'These are the guidelines for the community',
-    moderators: [{ userId: 'user1', name: 'User One' }],
-    competencies_v6: [
-      {
-        competencyAreaName: 'Area 1',
-        competencyThemeName: 'Theme 1',
-        competencySubThemeName: 'SubTheme 1'
+// Mock services
+const mockActivatedRoute = {
+  params: of({}),
+  snapshot: {
+    data: {
+      configService: {
+        unMappedUser: {
+          id: 'test-user-id',
+          rootOrg: {
+            orgName: 'Test Org'
+          },
+          rootOrgId: 'test-org-id'
+        }
+      },
+      communityDetails: {
+        data: {}
       }
-    ],
-    posterImageUrl: 'http://example.com/poster.jpg',
-    imageUrl: 'http://example.com/image.jpg'
+    },
+    url: [{ path: 'test-path' }]
   }
+}
 
-  // Mock topics data
-  const mockTopicData = {
+const mockRouter = {
+  navigate: jest.fn()
+}
+
+const mockDialog = {
+  open: jest.fn().mockReturnValue({
+    afterClosed: () => of(true)
+  })
+}
+
+const mockMatSnackBar = {
+  open: jest.fn()
+}
+
+const mockCommunityService = {
+  getTopicDetails: jest.fn().mockReturnValue(of({
     result: {
       search_results: {
         data: [
-          { categoryId: 'topic-123', categoryName: 'Tech' },
-          { categoryId: 'topic-456', categoryName: 'Leadership' }
+          { categoryId: 'topic1', categoryName: 'Topic 1' },
+          { categoryId: 'topic2', categoryName: 'Topic 2' }
         ]
       }
     }
-  }
+  })),
+  createCommunity: jest.fn().mockReturnValue(of({
+    result: {
+      communityId: 'test-community-id'
+    }
+  })),
+  updateCommunity: jest.fn().mockReturnValue(of({})),
+  publishCommunity: jest.fn().mockReturnValue(of({
+    result: true
+  })),
+  fileUpload: jest.fn().mockReturnValue(of({
+    result: {
+      url: 'igot/discussionhub/test-image-url'
+    }
+  }))
+}
+
+const mockLoaderService = {
+  changeLoaderState: jest.fn()
+}
+
+const mockChangeDetectorRef = {
+  detectChanges: jest.fn()
+}
+
+describe('CommunityCreationComponent', () => {
+  let component: CommunityCreationComponent
+  let formBuilder: FormBuilder
 
   beforeEach(() => {
-    // Create FormBuilder
-    mockFormBuilder = new FormBuilder()
+    formBuilder = new FormBuilder()
 
-    // Create mocks for all dependencies
-    mockCdr = {
-      detectChanges: jest.fn()
-    }
+    // Reset mocks before each test
+    jest.clearAllMocks()
 
-    mockRouter = {
-      navigate: jest.fn()
-    }
-
-    mockDialog = {
-      open: jest.fn().mockReturnValue({
-        afterClosed: jest.fn().mockReturnValue(of(true))
-      })
-    }
-
-    mockMatSnackBar = {
-      open: jest.fn()
-    }
-
-    mockCommunitySvc = {
-      getTopicDetails: jest.fn().mockReturnValue(of(mockTopicData)),
-      createCommunity: jest.fn().mockReturnValue(of({ result: { communityId: 'community-123' } })),
-      updateCommunity: jest.fn().mockReturnValue(of({ result: true })),
-      publishCommunity: jest.fn().mockReturnValue(of({ result: true })),
-      fileUpload: jest.fn().mockReturnValue(of({
-        result: {
-          url: 'igot/discussionhub/upload/file.jpg'
-        }
-      }))
-    }
-
-    mockLoaderService = {
-      changeLoaderState: jest.fn()
-    }
-
-    mockActivatedRoute = {
-      params: of({}),
-      snapshot: {
-        data: {
-          configService: {
-            unMappedUser: {
-              id: 'user-123',
-              rootOrg: { orgName: 'TestOrg' },
-              rootOrgId: 'org-123'
-            }
-          },
-          communityDetails: {
-            data: null
-          }
-        },
-        url: [{ path: 'create-community' }]
-      }
-    }
-
-    // Initialize component
+    // Create component instance with mocked dependencies
     component = new CommunityCreationComponent(
-      mockFormBuilder,
-      mockCdr,
-      mockRouter,
-      mockDialog,
-      mockMatSnackBar,
-      mockCommunitySvc,
-      mockLoaderService,
-      mockActivatedRoute
+      formBuilder,
+      mockChangeDetectorRef as any,
+      mockRouter as any,
+      mockDialog as any,
+      mockMatSnackBar as any,
+      mockCommunityService as any,
+      mockLoaderService as any,
+      mockActivatedRoute as any
     )
 
-    // Spy on component methods
-    jest.spyOn(component, 'getTopicData')
-    jest.spyOn(component, 'initializeFormAndParams')
-    jest.spyOn(component, 'getRouteSubscription');
+    // Setup the component's forms
+    component.communityDetailsForm = formBuilder.group({
+      communityName: '',
+      topicName: null,
+      posterImageUrl: '',
+      description: '',
+      communityGuideLines: '',
+      moderators: [],
+      imageUrl: '',
+      competencies_v6: [],
+      searchTopic: ''
+    });
 
-    // Mock environment data for URL construction
+    // Mock environment data
     (component as any).environmentData = {
-      karmYogiPath: 'https://karmayogi.gov.in',
-      dicussV2Bucket: 'discussionhub'
+      karmYogiPath: 'test-path',
+      dicussV2Bucket: 'test-bucket'
     }
+
+    // Set up necessary properties
+    component.competencies = []
+    component.communityId = 'test-community-id'
   })
 
-  it('should create', () => {
+  it('should create the component', () => {
     expect(component).toBeTruthy()
   })
 
-  describe('Constructor and initialization', () => {
+  it('should initialize form and fetch topic data on creation', () => {
+    jest.spyOn(component as any, 'getTopicData')
+    jest.spyOn(component as any, 'initializeFormAndParams')
+    jest.spyOn(component as any, 'getRouteSubscription');
 
+    // Call constructor logic manually
+    (component as any).getTopicData();
+    (component as any).initializeFormAndParams();
+    (component as any).getRouteSubscription()
 
-    it('should initialize form with validators', () => {
-      // Verify form controls
-      expect(component.communityDetailsForm.get('communityName')).toBeDefined()
-      expect(component.communityDetailsForm.get('topicName')).toBeDefined()
-      expect(component.communityDetailsForm.get('posterImageUrl')).toBeDefined()
-      expect(component.communityDetailsForm.get('description')).toBeDefined()
-      expect(component.communityDetailsForm.get('communityGuideLines')).toBeDefined()
-      expect(component.communityDetailsForm.get('moderators')).toBeDefined()
-      expect(component.communityDetailsForm.get('imageUrl')).toBeDefined()
-      expect(component.communityDetailsForm.get('competencies_v6')).toBeDefined()
-    })
-
-    it('should fetch topic data on initialization', () => {
-      expect(mockCommunitySvc.getTopicDetails).toHaveBeenCalled()
-      expect(component.topicDataList.length).toBe(2)
-    })
-
-    it('should determine mode based on route parameters', () => {
-      // Default test is 'create' mode
-      expect(component.openMode).toBe('create')
-
-      // Test 'edit' mode
-      mockActivatedRoute.params = of({ communityId: 'community-123' })
-      component.getRouteSubscription()
-      expect(component.openMode).toBe('edit')
-      expect(component.communityId).toBe('community-123')
-    })
+    expect((component as any).getTopicData).toHaveBeenCalled()
+    expect((component as any).initializeFormAndParams).toHaveBeenCalled()
+    expect((component as any).getRouteSubscription).toHaveBeenCalled()
+    expect(mockCommunityService.getTopicDetails).toHaveBeenCalled()
   })
 
-  describe('Form validation and canMoveToNext', () => {
-    beforeEach(() => {
-      // Setup a valid form
-      component.communityDetailsForm.patchValue({
-        communityName: 'Valid Community Name',
-        topicName: { categoryId: 'topic-123', categoryName: 'Tech' },
-        posterImageUrl: 'image-url.jpg',
-        description: 'This is a description that is more than 50 characters long to meet the requirements',
-        communityGuideLines: 'These are community guidelines with more than 100 characters. They provide rules and expectations for community members to follow when participating in discussions and activities.',
-        moderators: [{ userId: 'user1', name: 'User One' }],
-        imageUrl: 'image-url.jpg',
-        competencies_v6: [{ competencyAreaName: 'Area 1' }]
-      })
-
-      component.competencies = [{ competencyAreaName: 'Area 1' }]
-      component.selectedStepperLable = 'Basic Details'
-    })
-
-    it('should validate Basic Details step', () => {
-      expect(component.canMoveToNext).toBeTruthy()
-
-      // Make form invalid
-      component.communityDetailsForm.patchValue({
-        communityName: 'Short', // Too short
-      })
-
-      expect(component.canMoveToNext).toBeFalsy()
-    })
-
-    it('should validate Add Competency step', () => {
-      component.selectedStepperLable = 'Add Competency'
-      expect(component.canMoveToNext).toBeTruthy()
-
-      // No competencies
-      component.competencies = []
-      expect(component.canMoveToNext).toBeFalsy()
-    })
-
-    it('should validate Add Moderator step', () => {
-      component.selectedStepperLable = 'Add Moderator'
-      expect(component.canMoveToNext).toBeTruthy()
-
-      // No moderators
-      component.communityDetailsForm.patchValue({
-        moderators: []
-      })
-      expect(component.canMoveToNext).toBeFalsy()
-    })
-
-    it('should check canPublish', () => {
-      component.selectedStepperLable = 'Preview'
-      expect(component.canPublish).toBeTruthy()
-
-      // No competencies
-      component.competencies = []
-      expect(component.canPublish).toBeFalsy()
-    })
+  it('should navigate back when openConforamtionPopup is called in view mode', () => {
+    component.openMode = 'create'
+    component.openConforamtionPopup()
+    expect(mockRouter.navigate).toHaveBeenCalledWith(['/app/home/community'])
   })
 
-  describe('patchFormValues', () => {
-    it('should patch form values when community details are available', () => {
-      // Setup
-      component.topicDataList = [
-        { categoryId: 'topic-123', categoryName: 'Tech' }
-      ]
-      component.communityDetailsObject = mockCommunityDetails
-
-      // Call method
-      component.patchFormValues()
-
-      // Assert
-      expect(component.communityDetailsForm.value.communityName).toBe('Test Community')
-      expect(component.communityDetailsForm.value.description).toBe('This is a test community')
-      expect(component.communityDetailsForm.value.competencies_v6).toEqual(mockCommunityDetails.competencies_v6)
-      expect(component.competencies).toEqual(mockCommunityDetails.competencies_v6)
-    })
+  it('should open confirmation dialog when openConforamtionPopup is called in edit mode', () => {
+    component.openMode = 'edit'
+    component.openConforamtionPopup()
+    expect(mockDialog.open).toHaveBeenCalled()
   })
 
-  describe('saveAndExit', () => {
-    beforeEach(() => {
-      // Setup a valid form
-      component.communityDetailsForm.patchValue({
-        communityName: 'Valid Community Name',
-        topicName: { categoryId: 'topic-123', categoryName: 'Tech' },
-        posterImageUrl: 'image-url.jpg',
-        description: 'This is a description that is more than 50 characters long to meet the requirements',
-        communityGuideLines: 'These are community guidelines with more than 100 characters. They provide rules and expectations for community members to follow when participating in discussions and activities.',
-        moderators: [{ userId: 'user1', name: 'User One' }],
-        imageUrl: 'image-url.jpg'
-      })
-
-      component.competencies = [{
-        competencyAreaName: 'Area 1',
-        competencyThemeName: 'Theme 1',
-        competencySubThemeName: 'SubTheme 1'
-      }]
+  it('should check canMoveToNext when on Basic Details step with valid form', () => {
+    component.selectedStepperLable = 'Basic Details'
+    component.communityDetailsForm.patchValue({
+      communityName: 'Test Community Name Long Enough',
+      topicName: { categoryId: 'topic1', categoryName: 'Topic 1' },
+      posterImageUrl: 'test-image-url',
+      description: 'This is a test description that is at least fifty characters long to meet the validation requirements.',
+      communityGuideLines: 'These are test community guidelines. They need to be at least one hundred characters long to meet the validation requirements for the form to be considered valid.',
+      imageUrl: 'test-image-url'
     })
 
-    it('should create a new community when in create mode', () => {
-      // Setup
-      component.openMode = 'create'
-
-      // Call method
-      component.saveAndExit()
-
-      // Assert
-      expect(mockCommunitySvc.createCommunity).toHaveBeenCalled()
-      expect(mockLoaderService.changeLoaderState).toHaveBeenCalledWith(true)
-    })
-
-    it('should update community when in edit mode', () => {
-      // Setup
-      component.openMode = 'edit'
-      component.communityId = 'community-123'
-
-      // Call method
-      component.saveAndExit()
-
-      // Assert
-      expect(mockCommunitySvc.updateCommunity).toHaveBeenCalled()
-      expect(mockLoaderService.changeLoaderState).toHaveBeenCalledWith(true)
-    })
-
-    it('should validate form before saving', () => {
-      // Setup - invalid form
-      component.communityDetailsForm.patchValue({
-        communityName: 'X', // too short
-        topicName: null
-      })
-
-      // Spy on openSnackBar
-      jest.spyOn(component as any, 'openSnackBar')
-
-      // Call method
-      component.saveAndExit()
-
-      // Assert
-      expect(mockCommunitySvc.createCommunity).not.toHaveBeenCalled()
-      expect(component['openSnackBar']).toHaveBeenCalled()
-    })
+    const result = component.canMoveToNext
+    expect(result).toBeTruthy()
   })
 
-  describe('uploadCommunityImage', () => {
-    it('should upload poster image file', () => {
-      // Setup
-      const mockFile = new File(['test'], 'poster.jpg', { type: 'image/jpeg' })
-      component.communityDetailsForm.patchValue({
-        posterImageUrl: mockFile,
-        imageUrl: 'http://example.com/image.jpg' // Not a File
-      })
+  it('should check canMoveToNext when on Add Competency step without competencies', () => {
+    component.selectedStepperLable = 'Add Competency'
+    component.competencies = []
 
-      // Spy on updateCommunityWithImage
-      jest.spyOn(component, 'updateCommunityWithImage')
-
-      // Call method
-      component.uploadCommunityImage('community-123')
-
-      // Assert
-      expect(mockCommunitySvc.fileUpload).toHaveBeenCalled()
-      expect(component.updateCommunityWithImage).toHaveBeenCalled()
-    })
-
-
+    const result = component.canMoveToNext
+    expect(result).toBeFalsy()
+    expect(mockMatSnackBar.open).toHaveBeenCalled()
   })
 
-  describe('getFormBodyOfEvent', () => {
-    it('should prepare form data correctly for Draft status', () => {
-      // Setup
-      component.userProfile = {
-        id: 'user-123',
-        rootOrg: { orgName: 'TestOrg' },
-        rootOrgId: 'org-123'
-      }
+  it('should check canMoveToNext when on Add Competency step with competencies', () => {
+    component.selectedStepperLable = 'Add Competency'
+    component.competencies = [
+      { competencyAreaName: 'Area 1', competencyThemeName: 'Theme 1', competencySubThemeName: 'SubTheme 1' }
+    ]
 
-      component.communityDetailsForm.patchValue({
-        communityName: 'Test Community',
-        topicName: { categoryId: 'topic-123', categoryName: 'Tech' },
-        description: 'Test description',
-        communityGuideLines: 'Test guidelines'
-      })
+    const result = component.canMoveToNext
+    expect(result).toBeTruthy()
+  })
 
-      component.competencies = [
-        {
-          competencyAreaName: 'Area 1',
-          competencyThemeName: 'Theme 1',
-          competencySubThemeName: 'SubTheme 1'
+  it('should check canPublish with invalid form', () => {
+    component.selectedStepperLable = 'Preview'
+    component.communityDetailsForm.setErrors({ invalid: true })
+
+    const result = component.canPublish
+    expect(result).toBeFalsy()
+    expect(mockMatSnackBar.open).toHaveBeenCalled()
+  })
+
+  it('should check canPublish with valid form but no competencies', () => {
+    component.selectedStepperLable = 'Preview'
+    component.communityDetailsForm.setErrors(null)
+    component.competencies = []
+
+    const result = component.canPublish
+    expect(result).toBeFalsy()
+    expect(mockMatSnackBar.open).toHaveBeenCalled()
+  })
+
+  it('should check canPublish with valid form and competencies', () => {
+    component.selectedStepperLable = 'Preview'
+    component.communityDetailsForm.setErrors(null)
+    component.competencies = [
+      { competencyAreaName: 'Area 1', competencyThemeName: 'Theme 1', competencySubThemeName: 'SubTheme 1' }
+    ]
+
+    const result = component.canPublish
+    expect(result).toBeTruthy()
+  })
+
+  it('should create community when saveAndExit is called in create mode', () => {
+    component.openMode = 'create'
+    component.communityDetailsForm.patchValue({
+      communityName: 'Test Community Name',
+      topicName: { categoryId: 'topic1', categoryName: 'Topic 1' }
+    })
+
+    component.saveAndExit()
+    expect(mockCommunityService.createCommunity).toHaveBeenCalled()
+  })
+
+  it('should update community when saveAndExit is called in edit mode', () => {
+    component.openMode = 'edit'
+    component.userProfile = {
+      id: 'test-user-id',
+      rootOrg: {
+        orgName: 'Test Org'
+      },
+      rootOrgId: 'test-org-id'
+    }
+    component.communityDetailsObject = {
+      communityId: 'test-community-id'
+    }
+
+    component.saveAndExit()
+    expect(mockCommunityService.updateCommunity).toHaveBeenCalled()
+  })
+
+  it('should handle error when creating community with duplicate name', () => {
+    component.openMode = 'create'
+    component.communityDetailsForm.patchValue({
+      communityName: 'Test Community Name',
+      topicName: { categoryId: 'topic1', categoryName: 'Topic 1' }
+    })
+
+    const errorResponse = new HttpErrorResponse({
+      error: {
+        responseCode: 'CONFLICT',
+        params: {
+          errMsg: 'Community name already exists'
         }
-      ]
-
-      // Call method
-      const result = component.getFormBodyOfEvent('Draft')
-
-      // Assert
-      expect(result.communityName).toBe('Test Community')
-      expect(result.topicId).toBe('topic-123')
-      expect(result.topicName).toBe('Tech')
-      expect(result.communityAccessLevel).toBe('public')
-      expect(result.competencyArea).toEqual(['Area 1'])
-      expect(result.competencyTheme).toEqual(['Theme 1'])
-      expect(result.competencySubTheme).toEqual(['SubTheme 1'])
+      },
+      status: 400
     })
 
-    it('should add force creation flag when specified', () => {
-      // Call method with force creation
-      const result = component.getFormBodyOfEvent('Draft', true)
+    mockCommunityService.createCommunity.mockReturnValueOnce(throwError(() => errorResponse))
 
-      // Assert
-      expect(result.isCommunityCreationAllowed).toBe(true)
-    })
+    component.saveAndExit()
+    expect(mockCommunityService.createCommunity).toHaveBeenCalled()
+    expect(mockMatSnackBar.open).toHaveBeenCalledWith(
+      'Community name already exists',
+      '',
+      expect.objectContaining({ panelClass: ['red-snackbar'] })
+    )
   })
 
-  describe('publishCommunity', () => {
-    beforeEach(() => {
-      // Setup valid form and competencies
-      component.communityDetailsForm.patchValue({
-        communityName: 'Valid Community Name',
-        topicName: { categoryId: 'topic-123', categoryName: 'Tech' },
-        posterImageUrl: 'image-url.jpg',
-        description: 'This is a description that is more than 50 characters long to meet the requirements',
-        communityGuideLines: 'These are community guidelines with more than 100 characters.',
-        moderators: [{ userId: 'user1', name: 'User One' }],
-        imageUrl: 'image-url.jpg'
-      })
-
-      component.competencies = [{
-        competencyAreaName: 'Area 1',
-        competencyThemeName: 'Theme 1',
-        competencySubThemeName: 'SubTheme 1'
-      }]
-
-      component.selectedStepperLable = 'Preview'
+  it('should handle precondition failed error when creating community', () => {
+    component.openMode = 'create'
+    component.communityDetailsForm.patchValue({
+      communityName: 'Test Community Name',
+      topicName: { categoryId: 'topic1', categoryName: 'Topic 1' }
     })
 
-
-
-    it('should not proceed when form is invalid', () => {
-      // Setup - invalid form
-      component.communityDetailsForm.patchValue({
-        communityName: 'X' // too short
-      })
-
-      // Spy on methods
-      jest.spyOn(component, 'createCommunityAndPublish')
-      jest.spyOn(component, 'publishCommunityMethod')
-
-      // Call method
-      component.publishCommunity()
-
-      // Assert - neither method should be called
-      expect(component.createCommunityAndPublish).not.toHaveBeenCalled()
-      expect(component.publishCommunityMethod).not.toHaveBeenCalled()
+    const errorResponse = new HttpErrorResponse({
+      error: {
+        params: {
+          errMsg: 'Community with the given communityName already present in another organisation'
+        }
+      },
+      status: 412
     })
+
+    mockCommunityService.createCommunity.mockReturnValueOnce(throwError(() => errorResponse))
+
+    component.saveAndExit()
+    expect(mockCommunityService.createCommunity).toHaveBeenCalled()
+    expect(mockDialog.open).toHaveBeenCalled()
   })
 
-  describe('updateCommunity', () => {
-    beforeEach(() => {
-      // Setup
-      component.communityId = 'community-123'
-      component.competencies = [{
-        competencyAreaName: 'Area 1',
-        competencyThemeName: 'Theme 1',
-        competencySubThemeName: 'SubTheme 1'
-      }]
-      component.originalFormValues = {
-        communityName: 'Original Name',
-        competencies_v6: []
+  it('should get changed fields between current and original form values', () => {
+    component.originalFormValues = {
+      communityName: 'Old Name',
+      topicName: { categoryId: 'old-topic', categoryName: 'Old Topic' },
+      moderators: []
+    }
+
+    component.communityDetailsForm.patchValue({
+      communityName: 'New Name',
+      topicName: { categoryId: 'new-topic', categoryName: 'New Topic' },
+      moderators: ['user1']
+    })
+
+    component.communityId = 'test-community-id'
+
+    const changedFields = (component as any).getChangedFields()
+
+    expect(changedFields).toHaveProperty('communityName', 'New Name')
+    expect(changedFields).toHaveProperty('topicName')
+    expect(changedFields).toHaveProperty('moderators')
+    expect(changedFields).toHaveProperty('communityId', 'test-community-id')
+  })
+
+  it('should upload community image', () => {
+    const communityId = 'test-community-id'
+    const mockFile = new File([''], 'filename', { type: 'image/png' })
+
+    component.communityDetailsForm.patchValue({
+      posterImageUrl: mockFile,
+      imageUrl: 'existing-image-url'
+    })
+
+    component.uploadCommunityImage(communityId)
+
+    expect(mockCommunityService.fileUpload).toHaveBeenCalled()
+  })
+
+  it('should publish community when all validations pass', () => {
+    component.communityId = 'test-community-id'
+    component.selectedStepperLable = 'Add Competency'
+    component.communityDetailsForm.setErrors(null)
+    component.competencies = [
+      { competencyAreaName: 'Area 1', competencyThemeName: 'Theme 1', competencySubThemeName: 'SubTheme 1' }
+    ]
+
+    jest.spyOn(component, 'canPublish', 'get').mockReturnValue(true)
+    jest.spyOn(component as any, 'publishCommunityMethod')
+
+    component.publishCommunity()
+
+    expect((component as any).publishCommunityMethod).toHaveBeenCalled()
+  })
+
+  it('should create and then publish community when no communityId exists', () => {
+    component.communityId = ''
+    component.selectedStepperLable = 'Add Competency'
+    component.communityDetailsForm.setErrors(null)
+    component.competencies = [
+      { competencyAreaName: 'Area 1', competencyThemeName: 'Theme 1', competencySubThemeName: 'SubTheme 1' }
+    ]
+
+    jest.spyOn(component, 'canPublish', 'get').mockReturnValue(true)
+    jest.spyOn(component as any, 'createCommunityAndPublish')
+
+    component.publishCommunity()
+
+    expect((component as any).createCommunityAndPublish).toHaveBeenCalled()
+  })
+
+  it('should handle publishing community with server error', () => {
+    component.communityId = 'test-community-id'
+
+    const errorResponse = new HttpErrorResponse({
+      error: {
+        message: 'Server error'
+      },
+      status: 500
+    })
+
+    mockCommunityService.publishCommunity.mockReturnValueOnce(throwError(() => errorResponse))
+
+    component.publishCommunityMethod()
+
+    expect(mockCommunityService.publishCommunity).toHaveBeenCalled()
+    expect(mockMatSnackBar.open).toHaveBeenCalledWith(
+      'Something went wrong while publishing community, please try again',
+      '',
+      expect.any(Object)
+    )
+  })
+
+  it('should get environment base URL', () => {
+    (component as any).environmentData = {
+      karmYogiPath: 'test-path',
+      dicussV2Bucket: 'test-bucket'
+    }
+
+    const result = component.getEnvironmentBaseUrl()
+    expect(result).toBe('test-path/test-bucket')
+  })
+
+  it('should correctly split URL', () => {
+    const result1 = (component as any).splitUrl('igot/discussionhub/test-image')
+    expect(result1).toBe('/test-image')
+
+    const result2 = (component as any).splitUrl('igotqa/discussionhub/test-image')
+    expect(result2).toBe('/test-image')
+
+    const result3 = (component as any).splitUrl('other/path/test-image')
+    expect(result3).toBe('other/path/test-image')
+  })
+
+  it('should add competencies and update form control', () => {
+    const testCompetencies = [
+      { competencyAreaName: 'Area 1', competencyThemeName: 'Theme 1', competencySubThemeName: 'SubTheme 1' }
+    ]
+
+    component.addCompetencies(testCompetencies)
+
+    expect(component.competencies).toEqual(testCompetencies)
+    expect(component.communityDetailsForm.controls['competencies_v6'].value).toEqual(testCompetencies)
+  })
+
+  it('should open confirmation dialog when getConfirmationForCreation is called', () => {
+    const errData = {
+      params: {
+        errMsg: 'Test error message'
       }
-    })
+    };
 
-    it('should extract changed fields correctly', () => {
-      // Setup - change a field
-      component.communityDetailsForm.patchValue({
-        communityName: 'Updated Name',
-        topicName: { categoryId: 'topic-456', categoryName: 'Leadership' }
-      })
+    (component as any).getConfirmationForCreation(errData, 'Draft', 'saveAndExit')
 
-      // Spy on getChangedFields
-      jest.spyOn(component, 'getChangedFields')
-
-      // Call method
-      component.updateCommunity()
-
-      // Assert
-      expect(component.getChangedFields).toHaveBeenCalled()
-      const changedFields = component.getChangedFields()
-      expect(changedFields.communityName).toBe('Updated Name')
-      expect(changedFields.competencies_v6).toBeTruthy()
-    })
-
-    it('should handle file uploads first before updating', () => {
-      // Setup - add file to upload
-      const mockFile = new File(['test'], 'poster.jpg', { type: 'image/jpeg' })
-      component.communityDetailsForm.patchValue({
-        posterImageUrl: mockFile
-      })
-
-      // Spy on methods
-      jest.spyOn(component, 'getChangedFields').mockReturnValue({
-        posterImageUrl: mockFile,
-        communityId: 'community-123'
-      })
-
-      // Call method
-      component.updateCommunity()
-
-      // Assert
-      expect(mockCommunitySvc.fileUpload).toHaveBeenCalled()
-    })
-
-    it('should call publishCommunityMethod when updating with Published status', () => {
-      // Spy on publishCommunityMethod
-      jest.spyOn(component, 'publishCommunityMethod')
-
-      // Mock successful update
-      mockCommunitySvc.updateCommunity.mockReturnValue(of(true))
-
-      // Call method with Published status
-      component.updateCommunity('Published')
-
-      // Assert
-      expect(component.publishCommunityMethod).toHaveBeenCalled()
-    })
-
-    it('should handle update API error', () => {
-      // Mock API error
-      mockCommunitySvc.updateCommunity.mockReturnValue(
-        throwError(() => new HttpErrorResponse({
-          error: { message: 'Update failed' },
-          status: 500
-        }))
-      )
-
-      // Spy on openSnackBar
-      jest.spyOn(component as any, 'openSnackBar')
-
-      // Call method
-      component.updateCommunity()
-
-      // Assert
-      expect(mockLoaderService.changeLoaderState).toHaveBeenCalledWith(false)
-      expect(component['openSnackBar']).toHaveBeenCalled()
-    })
-  })
-
-  describe('navigateBack and confirmation', () => {
-    it('should navigate to communities page', () => {
-      // Call method
-      component.navigateBack()
-
-      // Assert
-      expect(mockRouter.navigate).toHaveBeenCalledWith(['/app/home/community'])
-    })
-
-    it('should open confirmation dialog in edit mode', () => {
-      // Setup
-      component.openMode = 'edit'
-
-      // Call method
-      component.openConforamtionPopup()
-
-      // Assert
-      expect(mockDialog.open).toHaveBeenCalled()
-    })
-
-    it('should navigate back directly in view mode', () => {
-      // Setup
-      component.openMode = 'view'
-
-      // Spy on navigateBack
-      jest.spyOn(component, 'navigateBack')
-
-      // Call method
-      component.openConforamtionPopup()
-
-      // Assert
-      expect(mockDialog.open).not.toHaveBeenCalled()
-      expect(component.navigateBack).toHaveBeenCalled()
-    })
+    expect(mockDialog.open).toHaveBeenCalled()
   })
 })

@@ -91,7 +91,9 @@ export class CommunityCompetencyComponent implements OnChanges {
   }
 
   showAddCompetencyDialog() {
-
+    if (!this.competencies) {
+      return
+    }
     const dialogRef = this.dialog.open(CompetencyAddComponent, {
       panelClass: 'dialog_sidenav',
       width: '800px',

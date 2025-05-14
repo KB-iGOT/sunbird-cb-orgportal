@@ -1,0 +1,86 @@
+<!--<ng-container *ngIf="objectArray?.length">
+  <div
+    class="banner-container cursor-pointer {{isMobile? styleData?.responsive?.bannerMetaClass : styleData?.bannerMetaClass}}"
+    (swipeleft)="slideToObject(currentIndex + 1)" (swiperight)="slideToObject(currentIndex - 1)"
+    *ngIf="objectArray?.length" [style.height]="isMobile? styleData?.responsive?.customHeight : styleData?.customHeight"
+    [style.minHeight]="isMobile? styleData?.responsive?.customMinHeight : styleData?.customMinHeight"
+    [ngStyle]="{'border-radius': styleData?.borderRadius || '12px'}">
+    <a class="banner-overlay {{objectArray[currentIndex] && objectArray[currentIndex].redirectUrl ? '' : ''}}"
+      [routerLink]=" !isOpenObjectInNewTab && objectArray[currentIndex].redirectUrl? objectArray[currentIndex].redirectUrl : null"
+      [ngClass]="{'cursor-pointer': !objectArray[currentIndex].redirectUrl}">
+      <div class="banner WidgetInstanceId " *ngFor="let slide of objectArray; let i = index"
+        [hidden]="i !== currentIndex" (click)="imageClick(slide)"
+        [style.minHeight]="isMobile? styleData?.responsive?.customMinHeight : styleData?.customMinHeight" [ngStyle]="{
+        'border-width': isMobile?  styleData?.responsive?.imageBorderWidth : styleData?.imageBorderWidth,
+        'border-color': isMobile? styleData?.responsive?.imageBorderColor : styleData?.imageBorderColor,
+        'border-style': isMobile? styleData?.responsive?.imageBorderStyle: styleData?.imageBorderStyle}">
+
+        <img i18n-alt alt="Image{{i}}"
+          [style.height]="isMobile? styleData?.responsive?.customImgHeight : styleData?.customImgHeight"
+          [style.minHeight]="isMobile? styleData?.responsive?.customMinHeight : styleData?.customMinHeight"
+          [src]="slide?.posterImageUrl" class=" banner-image object-cover" (error)="changeToDefaultImg($event)" />
+        <div class="image-info">
+          <p class="nodtranslate">{{slide?.name}}</p>
+        </div>
+      </div>
+    </a>
+    <ng-container
+      *ngIf="isMobile && styleData?.responsive?.dots !== 'hidden' || !isMobile && styleData?.dots !== 'hidden'">
+      <div class="banner-meta {{isMobile? styleData?.responsive?.bannerMetaAlign : styleData?.bannerMetaAlign}}">
+        <a [routerLink]=" !isOpenObjectInNewTab && objectArray[currentIndex].redirectUrl? objectArray[currentIndex].redirectUrl : null"
+          class="banner-title text-truncate nodtranslate" *ngIf="objectArray[currentIndex].title"
+          [title]="objectArray[currentIndex].title">
+          {{ objectArray[currentIndex].title }}
+        </a>
+        <div class="dots-container" *ngIf="objectArray?.length > 1">
+          <span class="dot" [ngClass]="{ active: j === currentIndex }" *ngFor="let slide of objectArray; let j = index"
+            (click)="slideToObject(j)"></span>
+        </div>
+      </div>
+    </ng-container>
+    <ng-container *ngIf="objectArray?.length > 1">
+      <div class="navigation {{isMobile? styleData?.responsive?.arrowsPlacement : styleData?.arrowsPlacement}}"
+        *ngIf="isMobile && styleData?.responsive?.navigationArrows !== 'hidden' || !isMobile && styleData?.navigationArrows !== 'hidden'">
+        <a *ngIf="objectArray?.length > 1" role="button" class="prev"
+          (click)="slideToObject(currentIndex - 1)">&#10094;</a>
+        <a *ngIf="objectArray?.length > 1" role="button" class="next"
+          (click)="slideToObject(currentIndex + 1)">&#10095;</a>
+      </div>
+    </ng-container>
+  </div>
+</ng-container> -->
+
+
+<ng-container *ngIf="imageUrls?.length">
+  <div class="banner-container" (swipeleft)="slideTo(currentIndex + 1)" (swiperight)="slideTo(currentIndex - 1)"
+    *ngIf="imageUrls?.length">
+    <a class="banner-overlay {{imageUrls[currentIndex] && imageUrls[currentIndex].redirectUrl ? '' : 'pointer-events-none'}}"
+      [routerLink]=" !isOpenInNewTab && imageUrls[currentIndex].redirectUrl? imageUrls[currentIndex].redirectUrl : null"
+      [ngClass]="{'cursor-auto': !imageUrls[currentIndex].redirectUrl}">
+      <div class="banner WidgetInstanceId" *ngFor="let slide of imageUrls; let i = index" [hidden]="i !== currentIndex">
+        <img i18n-alt alt="Image{{i}}" [src]="slide" class=" banner-image" />
+      </div>
+    </a>
+    <!-- <ng-container
+      *ngIf="isMobile && styleData?.responsive?.dots !== 'hidden' || !isMobile && styleData?.dots !== 'hidden'">
+      <div class="banner-meta {{isMobile? styleData?.responsive?.bannerMetaAlign : styleData?.bannerMetaAlign}}">
+        <a [routerLink]=" !isOpenInNewTab && imageUrls[currentIndex].redirectUrl? imageUrls[currentIndex].redirectUrl : null"
+          class="nodtranslate banner-title text-truncate {{imageUrls[currentIndex] && imageUrls[currentIndex].redirectUrl ? '' : 'pointer-events-none'}}"
+          *ngIf="imageUrls[currentIndex].title" [title]="imageUrls[currentIndex].title">
+          {{ imageUrls[currentIndex].title }}
+        </a>
+        <div class="dots-container" *ngIf="imageUrls?.length > 1">
+          <span class="dot" [ngClass]="{ active: j === currentIndex }" *ngFor="let slide of imageUrls; let j = index"
+            (click)="slideTo(j)"></span>
+        </div>
+      </div>
+    </ng-container> -->
+    <ng-container *ngIf="imageUrls?.length > 1">
+      <div>
+        <a *ngIf="imageUrls?.length > 1" role="button" class="prev" (click)="slideTo(currentIndex - 1)">&#10094;</a>
+        <a *ngIf="imageUrls?.length > 1" role="button" class="next" (click)="slideTo(currentIndex + 1)">&#10095;</a>
+      </div>
+    </ng-container>
+  </div>
+
+</ng-container>
