@@ -2,9 +2,9 @@
   margin: 0 0%;
 
   .title {
-    font-family: Montserrat;
-    font-size: 14px;
-    font-weight: 600;
+    /*stylelint-disable*/
+    font: 600 14px Montserrat;
+    /*stylelint-enable*/
     line-height: 17.07px;
     text-align: left;
     text-underline-position: from-font;
@@ -17,7 +17,9 @@
     ;
     border-radius: 50px;
     cursor: pointer;
+    /*stylelint-disable*/
     font-family: Lato;
+    /*stylelint-enable*/
     font-size: 14px;
     font-weight: 700;
     line-height: 16.8px;
@@ -46,7 +48,9 @@
 
   .theme {
     padding: 6px 12px;
+    /*stylelint-disable*/
     font-family: Montserrat;
+    /*stylelint-enable*/
     font-size: 16px;
     line-height: 19.5px;
     text-align: left;
@@ -55,7 +59,9 @@
   }
 
   .no-events {
+    /*stylelint-disable*/
     font-family: Lato;
+    /*stylelint-enable*/
     font-size: 14px;
     font-weight: 700;
     line-height: 16.8px;
@@ -64,11 +70,11 @@
     text-decoration-skip-ink: none;
   }
 
-
-
   .area {
     padding: 6px 10px;
+    /*stylelint-disable*/
     font-family: Montserrat;
+    /*stylelint-enable*/
     font-size: 16px;
     font-weight: 600;
     line-height: 19.5px;
@@ -94,7 +100,6 @@
     border-top: 4px solid #E24577;
     border-top-left-radius: 8px;
     border-top-right-radius: 8px;
-
   }
 
   .domain {
@@ -103,16 +108,15 @@
     border-top-right-radius: 8px;
   }
 
-
   .add-theme {
     padding: 5px 16px;
     border: 1px solid rgba(27, 76, 161, 1);
     border-radius: 50px;
     cursor: pointer;
     color: rgba(27, 76, 161, 1);
-    font-family: Lato;
-    font-size: 14px;
-    font-weight: 700;
+    /*stylelint-disable*/
+    font: 700 14px Lato;
+    /*stylelint-enable*/
     line-height: 16.8px;
     text-align: center;
     text-underline-position: from-font;
@@ -120,7 +124,9 @@
   }
 
   .theme-header {
+    /*stylelint-disable*/
     font-family: Helvetica Neue;
+    /*stylelint-enable*/
     font-size: 16px;
     font-weight: 700;
     line-height: 24px;
@@ -128,7 +134,6 @@
     text-underline-position: from-font;
     text-decoration-skip-ink: none;
   }
-
 }
 
 .filter-overlay-12 {

@@ -36,7 +36,7 @@ export class EventsComponent implements OnInit, OnDestroy {
   //#region (onint)
   ngOnInit(): void {
     this.initialization()
-    this.getRouteSubscription
+    this.getRouteSubscription()
   }
 
   initialization() {
