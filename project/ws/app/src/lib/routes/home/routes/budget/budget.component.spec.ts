@@ -38,8 +38,8 @@ describe('BudgetComponent', () => {
             getBudgetdetails: jest.fn().mockReturnValue(of({
                 result: {
                     response: [
-                        { schemeName: 'all', budgetYear: '2024-2025', salaryBudgetAllocated: 100, trainingBudgetAllocated: 200, trainingBudgetUtilization: 150, id: '1' },
-                        { schemeName: 'Scheme 1', budgetYear: '2024-2025', salaryBudgetAllocated: 50, trainingBudgetAllocated: 100, trainingBudgetUtilization: 75, id: '2' }
+                        { schemeName: 'all', budgetYear: '2025-2026', salaryBudgetAllocated: 100, trainingBudgetAllocated: 200, trainingBudgetUtilization: 150, id: '1' },
+                        { schemeName: 'Scheme 1', budgetYear: '2025-2026', salaryBudgetAllocated: 50, trainingBudgetAllocated: 100, trainingBudgetUtilization: 75, id: '2' }
                     ]
                 }
             })),
@@ -151,12 +151,12 @@ describe('BudgetComponent', () => {
 
     it('should successfully get budget details', () => {
         component.deptID = 'test-org-id'
-        component.getBudgetDetails('2024-2025')
+        component.getBudgetDetails('2025-2026')
 
-        expect(mockMdoInfoSrvc.getBudgetdetails).toHaveBeenCalledWith('test-org-id', '2024-2025')
+        expect(mockMdoInfoSrvc.getBudgetdetails).toHaveBeenCalledWith('test-org-id', '2025-2026')
         expect(component.overallbudget).toBeDefined()
         expect(component.dataSource.data.length).toBe(1) // One scheme after 'all' is removed
-        expect(component.budgetdata.get('budgetyear')?.value).toBe('2024-2025')
+        expect(component.budgetdata.get('budgetyear')?.value).toBe('2025-2026')
         expect(component.budgetdata.get('salarybudget')?.value).toBe(100)
         expect(component.budgetdata.get('trainingbudget')?.value).toBe(200)
         expect(component.budgetdata.get('budgetutilized')?.value).toBe(150)
@@ -168,9 +168,9 @@ describe('BudgetComponent', () => {
         )
 
         component.deptID = 'test-org-id'
-        component.getBudgetDetails('2024-2025')
+        component.getBudgetDetails('2025-2026')
 
-        expect(mockMdoInfoSrvc.getBudgetdetails).toHaveBeenCalledWith('test-org-id', '2024-2025')
+        expect(mockMdoInfoSrvc.getBudgetdetails).toHaveBeenCalledWith('test-org-id', '2025-2026')
         expect(component.budgetdata.get('salarybudget')?.value).toBe('')
         expect(component.budgetdata.get('trainingbudget')?.value).toBe('')
         expect(component.budgetdata.get('budgetutilized')?.value).toBe('')
@@ -184,7 +184,7 @@ describe('BudgetComponent', () => {
 
         const formValue = {
             value: {
-                budgetyear: '2024-2025',
+                budgetyear: '2025-2026',
                 salarybudget: '100',
                 trainingbudget: '200',
                 budgetutilized: '150'
@@ -195,14 +195,14 @@ describe('BudgetComponent', () => {
 
         expect(mockMdoInfoSrvc.addBudgetdetails).toHaveBeenCalledWith({
             orgId: 'test-org-id',
-            budgetYear: '2024-2025',
+            budgetYear: '2025-2026',
             schemeName: 'all',
             salaryBudgetAllocated: 100,
             trainingBudgetAllocated: 200,
             trainingBudgetUtilization: 150
         })
         expect(mockSnackBar.open).toHaveBeenCalledWith('Budget details added successfully')
-        expect(mockMdoInfoSrvc.getBudgetdetails).toHaveBeenCalledWith('test-org-id', '2024-2025')
+        expect(mockMdoInfoSrvc.getBudgetdetails).toHaveBeenCalledWith('test-org-id', '2025-2026')
     })
 
     it('should submit form and update budget details when overallbudget exists', () => {
@@ -211,7 +211,7 @@ describe('BudgetComponent', () => {
 
         const formValue = {
             value: {
-                budgetyear: '2024-2025',
+                budgetyear: '2025-2026',
                 salarybudget: '100',
                 trainingbudget: '200',
                 budgetutilized: '150'
@@ -223,18 +223,18 @@ describe('BudgetComponent', () => {
         expect(mockMdoInfoSrvc.updateBudgetdetails).toHaveBeenCalledWith({
             id: '1',
             orgId: 'test-org-id',
-            budgetYear: '2024-2025',
+            budgetYear: '2025-2026',
             schemeName: 'all',
             trainingBudgetUtilization: 150
         })
         expect(mockSnackBar.open).toHaveBeenCalledWith('Budget details updated successfully')
-        expect(mockMdoInfoSrvc.getBudgetdetails).toHaveBeenCalledWith('test-org-id', '2024-2025')
+        expect(mockMdoInfoSrvc.getBudgetdetails).toHaveBeenCalledWith('test-org-id', '2025-2026')
     })
 
     it('should update budget details', () => {
         const data = {
             id: '2',
-            budgetyear: '2024-2025',
+            budgetyear: '2025-2026',
             schemename: 'Scheme 1',
             trainingBudgetUtilization: 80
         }
@@ -245,12 +245,12 @@ describe('BudgetComponent', () => {
         expect(mockMdoInfoSrvc.updateBudgetdetails).toHaveBeenCalledWith({
             id: '2',
             orgId: 'test-org-id',
-            budgetYear: '2024-2025',
+            budgetYear: '2025-2026',
             schemeName: 'Scheme 1',
             trainingBudgetUtilization: 80
         })
         expect(mockSnackBar.open).toHaveBeenCalledWith('Scheme details updated successfully')
-        expect(mockMdoInfoSrvc.getBudgetdetails).toHaveBeenCalledWith('test-org-id', '2024-2025')
+        expect(mockMdoInfoSrvc.getBudgetdetails).toHaveBeenCalledWith('test-org-id', '2025-2026')
     })
 
     it('should apply filter', () => {
@@ -286,7 +286,7 @@ describe('BudgetComponent', () => {
         mockDialog.open = jest.fn().mockReturnValue({
             afterClosed: () => of({
                 data: {
-                    budgetyear: '2024-2025',
+                    budgetyear: '2025-2026',
                     schemename: 'New Scheme',
                     trainingBudgetUtilization: 50
                 }
@@ -303,7 +303,7 @@ describe('BudgetComponent', () => {
         // Check service called
         expect(mockMdoInfoSrvc.addBudgetdetails).toHaveBeenCalledWith({
             orgId: 'test-org-id',
-            budgetYear: '2024-2025',
+            budgetYear: '2025-2026',
             schemeName: 'New Scheme',
             salaryBudgetAllocated: 0,
             trainingBudgetAllocated: 200,
@@ -320,7 +320,7 @@ describe('BudgetComponent', () => {
             afterClosed: () => of({
                 data: {
                     id: '2',
-                    budgetyear: '2024-2025',
+                    budgetyear: '2025-2026',
                     schemename: 'Scheme 1',
                     trainingBudgetUtilization: 80
                 }
@@ -330,7 +330,7 @@ describe('BudgetComponent', () => {
         const rowData = {
             id: '2',
             schemeName: 'Scheme 1',
-            budgetYear: '2024-2025'
+            budgetYear: '2025-2026'
         }
 
         component.deptID = 'test-org-id'
@@ -343,7 +343,7 @@ describe('BudgetComponent', () => {
         expect(mockMdoInfoSrvc.updateBudgetdetails).toHaveBeenCalledWith({
             id: '2',
             orgId: 'test-org-id',
-            budgetYear: '2024-2025',
+            budgetYear: '2025-2026',
             schemeName: 'Scheme 1',
             trainingBudgetUtilization: 80
         })
