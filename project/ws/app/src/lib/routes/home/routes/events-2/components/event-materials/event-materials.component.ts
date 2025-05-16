@@ -19,6 +19,7 @@ export class EventMaterialsComponent implements OnInit {
 
   @Input() materialsList: material[] = []
   @Input() openMode = 'edit'
+  @Input() openTab = 'draft'
 
   userProfile: any
   filePath: any
@@ -118,7 +119,8 @@ export class EventMaterialsComponent implements OnInit {
   addNewFileToList(fileUrl: string) {
     const fileDetails: material = {
       title: '',
-      content: fileUrl
+      content: fileUrl,
+      isNew: true
     }
     this.materialsList.unshift(fileDetails)
     this.currentIndex = 0

@@ -30,7 +30,8 @@
     </div>
   </div>
   <div class="table-wrapper">
-    <table mat-table class="table-container w-full mt-4" [dataSource]="dataSource" matSort>
+    <table mat-table class="table-container w-full mt-4" [dataSource]="dataSource" matSort
+      aria-label="community dashboard table">
       <!-- Name Column -->
       <ng-container matColumnDef="name">
         <th class="table-header-spacing" mat-header-cell *matHeaderCellDef mat-sort-header [style.width.px]="300">

@@ -39,7 +39,8 @@ export interface speaker {
 
 export interface material {
   title: string,
-  content: string
+  content: string,
+  isNew?: boolean
 }
 
 export const URL_PATRON = /^(https?|http):\/\/[^\s/$.?#].[^\s]*$/
