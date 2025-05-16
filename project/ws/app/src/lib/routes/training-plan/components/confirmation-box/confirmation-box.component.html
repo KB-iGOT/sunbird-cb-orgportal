@@ -15,6 +15,9 @@
     <div class="flex flex-1 flex-row subtitle">
         {{data?.subTitle}}
     </div>
+    <div class="flex flex-1 flex-row subtitle" *ngIf="data?.subTitle2">
+        {{data?.subTitle2}}
+    </div>
     <div mat-dialog-actions class="flex flex-1 flex-row action">
         <button mat-button class="cancel" type="button"
             [mat-dialog-close]="data?.secondaryAction">{{data?.secondaryAction}}</button>
@@ -34,6 +37,9 @@
     </div>
     <div class="flex flex-1 flex-row progress-subtitle">
         {{data?.subTitle}}
+    </div>
+    <div class="flex flex-1 flex-row progress-subtitle" *ngIf="data?.subTitle2">
+        {{data?.subTitle2}}
     </div>
     <div class="flex flex-1 flex-row progress-icon">
         <ng-container *ngIf="data?.showLoader; else progressIcon">
@@ -56,6 +62,9 @@
     </div>
     <div class="flex flex-1 flex-row progress-subtitle-16">
         {{data?.subTitle}}
+    </div>
+    <div class="flex flex-1 flex-row progress-subtitle2" *ngIf="data?.subTitle2">
+        {{data?.subTitle2}}
     </div>
     <div class="flex flex-1 flex-row progress-icon">
         <img src="assets/icons/{{data?.icon}}.svg" alt="icon" />

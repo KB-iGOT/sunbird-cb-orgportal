@@ -302,14 +302,17 @@ export class ImportDesignationComponent implements OnInit, OnDestroy {
   publishFrameWork() {
     const frameworkName = _.get(this.frameworkInfo, 'code')
     this.progressDialogData['subTitle'] = _.get(this.designationConfig, 'publishingMsg')
+    this.progressDialogData['subTitle2'] = _.get(this.designationConfig, 'subTitle2')
     this.designationsService.publishFramework(frameworkName).subscribe({
       next: response => {
         if (response) {
           // setTimeout(() => {
           //   this.dialogRef.close(true)
           // },         _.get(this.designationConfig, 'refreshDelayTime', 10000))
-          const refreshTime = ((this.designationsImportSuccessResponses.length / 2) * 1000) >= 10000 ?
-            (this.designationsImportSuccessResponses.length / 2) * 1000 : 10000
+
+          // const refreshTime = ((this.designationsImportSuccessResponses.length / 2) * 1000) >= 10000 ?
+          //   (this.designationsImportSuccessResponses.length / 2) * 1000 : 10000
+          const refreshTime = 10000
           setTimeout(() => {
             this.dialogRef.close(true)
           }, refreshTime)
