@@ -29,14 +29,24 @@ export class UsersComponent implements OnInit, AfterViewInit, AfterContentChecke
   rootOrgId: any
 
   constructor(private usersSvc: UsersService, private router: Router, private activatedRoute: ActivatedRoute, private route: ActivatedRoute,
-              private profileUtilSvc: ProfileV2UtillService, private userS: UsersService2, private cdref: ChangeDetectorRef) { }
+    private profileUtilSvc: ProfileV2UtillService, private userS: UsersService2, private cdref: ChangeDetectorRef) { }
 
   ngOnInit() {
-    const url = this.router.url.split('/')
-    this.role = url[url.length - 2]
-    this.roleName = this.role.replace('%20', ' ')
-    this.configSvc = _.get(this.route, 'snapshot.parent.data.configService') || {}
-    this.rootOrgId = _.get(this.route.snapshot.parent, 'data.configService.unMappedUser.rootOrg.rootOrgId')
+    // const url = this.router.url.split('/')
+    // this.role = url && url.length && url[url.length - 2]
+
+    const segments = this.router.url?.split('/') || []
+    if (segments.length >= 2) {
+      this.role = segments[segments.length - 2]
+      this.roleName = this.role.replace('%20', ' ')
+    }
+
+
+    // this.configSvc = _.get(this.route, 'snapshot.parent.data.configService') || {}
+    // this.rootOrgId = _.get(this.route.snapshot.parent, 'data.configService.unMappedUser.rootOrg.rootOrgId')
+    this.configSvc = this.route?.snapshot?.parent?.data?.configService || {}
+    this.rootOrgId = this.route?.snapshot?.parent?.data?.configService?.unMappedUser?.rootOrg?.rootOrgId || ''
+
 
     // int left blank
     this.activatedRoute.params.subscribe(params => {
@@ -159,6 +169,9 @@ export class UsersComponent implements OnInit, AfterViewInit, AfterContentChecke
   menuActions($event: { action: string, row: any }) {
     const user = { userId: _.get($event.row, 'wid') }
     _.set(user, 'deptId', _.get(this.data2, 'id'))
+
+    // const user = { userId: $event.row?.wid }
+    // user.deptId = this.data2?.id
     switch ($event.action) {
       case 'showOnKarma':
         window.open(`${environment.karmYogiPath}/app/person-profile/${user.userId}`)
