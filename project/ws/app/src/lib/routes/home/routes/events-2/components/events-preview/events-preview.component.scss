@@ -171,13 +171,15 @@
 }
 
 .resource {
-  /*stylelint-disable*/
-  padding-left: 16px;
-  /*stylelint-enable*/
+
+  // padding-left: 16px;
+
   box-sizing: border-box;
   width: 100%;
   overflow: hidden;
+  /*stylelint-disable*/
   padding: 16px 16px 16px 0px;
+   /*stylelint-enable*/
 }
 
 .text-truncate {
