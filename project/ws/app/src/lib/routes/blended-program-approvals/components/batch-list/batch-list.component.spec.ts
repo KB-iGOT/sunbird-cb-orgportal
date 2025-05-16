@@ -225,19 +225,6 @@ describe('BatchListComponent', () => {
                     }
                 }
             }))
-
-            // Initialize component with mocked behaviors
-            // const tempComponent = new BatchListComponent(
-            //     mockRouter,
-            //     mockActivatedRoute as any,
-            //     mockBlendedApporvalService as any
-            // )
-
-            // Check classification - should be done in getBPDetails
-            // expect(tempComponent.batchesList.length).toBe(1)
-            // expect(tempComponent.arcBatchList.length).toBe(1)
-            // expect(tempComponent.batchesList[0].batchId).toBe('batch-1')
-            // expect(tempComponent.arcBatchList[0].batchId).toBe('batch-2')
         })
     })
 
