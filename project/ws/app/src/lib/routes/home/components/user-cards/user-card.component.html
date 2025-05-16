@@ -49,8 +49,14 @@
               user?.profileDetails?.professionalDetails[0]?.designation) ?
               user?.profileDetails?.professionalDetails[0]?.designation : '-'}}</div>
             <div class="mat-caption ws-mat-black40-text">
-              Marked on: {{user?.profileDetails?.profileStatusUpdatedOn || ' NA'}}</div>
-            <!-- <div class="mat-caption ws-mat-black40-text" *ngIf="!user?.profileDetails?.profileStatusUpdatedOn">-</div> -->
+              Marked on:
+              <span
+                *ngIf="user?.profileDetails?.profileStatus !== 'NOT-MY-USER'">{{user?.profileDetails?.profileStatusUpdatedOn
+                || ' NA'}}</span>
+              <span
+                *ngIf="user?.profileDetails?.profileStatus === 'NOT-MY-USER'">{{user?.profileDetails?.updatedAsNotMyUserOn
+                | date:'dd-MM-yyyy h.mm.ss' || ' NA'}}</span>
+            </div>
           </div>
         </div>
         <div class="float-right flex items-center" *ngIf="(isMdoAdmin || isMdoLeader) && !forMentor">

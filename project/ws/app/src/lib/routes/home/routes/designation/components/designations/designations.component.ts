@@ -261,8 +261,12 @@ export class DesignationsComponent implements OnInit {
           headerClass: 'flex items-center justify-center text-blue',
           messages: [
             {
-              msgClass: '',
+              msgClass: 'text-center',
               msg: `Please note that doing so will result in the loss of role mapping.`,
+            },
+            {
+              msgClass: 'text-center',
+              msg: `The changes will reflect in some time.`,
             },
           ],
         },
@@ -334,8 +338,11 @@ export class DesignationsComponent implements OnInit {
           //     this.openSnackbar(_.get(this.designationConfig, 'termRemoveMsg'))
           //   }
           // }, _.get(this.designationConfig, 'refreshDelayTime', 10000))
-          const refreshTime = ((this.designationsList.length / 2) * 1000) >= 10000 ?
-            (this.designationsList.length / 2) * 1000 : 10000
+
+          // const refreshTime = ((this.designationsList.length / 2) * 1000) >= 10000 ?
+          //   (this.designationsList.length / 2) * 1000 : 10000
+
+          const refreshTime = 10000
           setTimeout(() => {
             this.getFrameworkInfo(this.frameworkDetails.code)
             if (action && action === 'delete') {
