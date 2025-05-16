@@ -98,7 +98,7 @@ export class CreateEventComponent implements OnInit, AfterViewInit {
     let registrationLink: any
     let isYoutubeVideo: any
     const resourceType = _.get(this.eventDetails, 'resourceType', '')
-    if (resourceType === 'Webinar') {
+    if (resourceType === 'Webinar' && this.pathUrl === 'past' && _.get(this.eventDetails, 'recordedLinks', '')[0]) {
       registrationLink = _.get(this.eventDetails, 'recordedLinks', '')[0]
       isYoutubeVideo = _.get(this.eventDetails, 'registrationLink', '').toLowerCase().includes('youtube')
     } else {
@@ -416,6 +416,7 @@ export class CreateEventComponent implements OnInit, AfterViewInit {
         event: this.getFormBodyOfEvent('Live')
       }
     }
+    formBody.request.event.status = 'SentToPublish'
     this.loaderService.changeLoaderState(true)
     this.eventSvc.updateEvent(formBody, this.eventId).subscribe({
       next: res => {
@@ -495,11 +496,12 @@ export class CreateEventComponent implements OnInit, AfterViewInit {
     eventDetails['endTime'] = endTime
     const sourceLink = eventBaseDetails.registrationLink ?
       this.youTubeUrlChange(eventBaseDetails.registrationLink) : eventBaseDetails.recoredEventUrl
-    if (eventBaseDetails.eventCategory === 'Webinar') {
+    if (eventBaseDetails.eventCategory === 'Webinar' && this.pathUrl === 'past') {
       eventDetails['recordedLinks'] = [sourceLink]
       eventDetails['registrationLink'] = ''
     } else {
       eventDetails['registrationLink'] = sourceLink
+      delete eventDetails['recordedLinks']
     }
     eventDetails['appIcon'] = eventBaseDetails.appIcon
     eventDetails['typeofEvent'] = eventBaseDetails.typeofEvent

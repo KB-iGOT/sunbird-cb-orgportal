@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
 
 import moment from 'moment'
+// import * as moment from 'moment'
 import { BlendedApporvalService } from '../../services/blended-approval.service'
 
 @Component({
