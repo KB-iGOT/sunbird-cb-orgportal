@@ -49,7 +49,7 @@ describe('EventsService', () => {
       datePipeMock.transform.mockReturnValue('01 Sep, 2021') // Mocked date transformation
 
       // Act
-      service.getEvents(req).subscribe((data) => {
+      service.getEvents(req, '').subscribe((data) => {
         // Assert
         expect(data.Event.length).toBe(2)
         expect(data.Event[0].startDate).toBe('01 Sep, 2021')
