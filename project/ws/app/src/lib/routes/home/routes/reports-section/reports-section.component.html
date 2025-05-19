@@ -176,10 +176,11 @@
     </mat-card>
 
     <div class="mt-10 flex justify-center items-center h-full" *ngIf="!hassAccessToreports">
-      <p class="text-center">
+      <!-- <p class="text-center">
         Your access to reports expired on {{reportAccessExpireDate | date:'dd-MMM-yyyy'}}. Please
         contact your MDO Leader to renew access.
-      </p>
+      </p> -->
+      <div [innerHTML]="sanitizeHtml(reportsNoteList)"> </div>
     </div>
 
     <ng-container *ngIf="showAdminsTable">
