@@ -176,13 +176,19 @@
     </mat-card>
 
     <div class="mt-10 flex justify-center items-center h-full" *ngIf="!hassAccessToreports">
-      <!-- <p class="text-center">
-        Your access to reports expired on {{reportAccessExpireDate | date:'dd-MMM-yyyy'}}. Please
-        contact your MDO Leader to renew access.
-      </p> -->
-      <div [innerHTML]="sanitizeHtml(reportsNoteList)"> </div>
+      <div *ngIf="!isOrgHasLeaderRole; else notTrue">
+        <p class="text-center">
+          Your organization currently does not have a designated MDO Leader. For further assistance, please contact
+          support.
+        </p>
+      </div>
+      <ng-template #notTrue>
+        <p class="text-center">
+          Currently, your MDO Leader has not granted you access to these reports. Kindly contact your MDO Leader to
+          provide you access.
+        </p>
+      </ng-template>
     </div>
-
     <ng-container *ngIf="showAdminsTable">
       <div class="mt-8" *ngIf="!showLoaderOnTable">
         <mat-accordion>
