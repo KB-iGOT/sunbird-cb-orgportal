@@ -375,7 +375,8 @@ export class AllocationActionsComponent implements OnInit {
   }
 
   saveWorkOrder() {
-    delete this.selectedCompetency['childCount']
+    // delete this.selectedCompetency['childCount']
+    this.selectedCompetency.forEach((comp: any) => delete comp.childCount)
     const roleCompetencyArr = []
     const roleCompetencyObj = {
       roleDetails: this.selectedRole,
