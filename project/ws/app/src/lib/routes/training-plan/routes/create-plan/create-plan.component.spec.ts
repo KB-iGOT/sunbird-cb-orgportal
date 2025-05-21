@@ -1,8 +1,9 @@
-import { SearchInputHomeComponent } from './search-input-home.component'
+import { SearchInputHomeComponent } from '../../../search/components/search-input-home/search-input-home.component'
 import { ActivatedRoute, Router } from '@angular/router'
 import { ConfigurationsService } from '@sunbird-cb/utils'
-import { SearchServService } from '../../services/search-serv.service'
-import { of, BehaviorSubject } from 'rxjs'
+import { SearchServService } from '../../../search/services/search-serv.service'
+import { BehaviorSubject } from 'rxjs'
+import { convertToParamMap } from '@angular/router'
 
 describe('SearchInputHomeComponent', () => {
     let component: SearchInputHomeComponent
@@ -21,20 +22,26 @@ describe('SearchInputHomeComponent', () => {
     }
 
     // Create a proper ParamMap implementation
-    const createParamMap = () => ({
-        has: jest.fn().mockImplementation((key) => key === 'q'),
-        get: jest.fn().mockImplementation((key) => {
-            if (key === 'q') return 'test query'
-            if (key === 'lang') return 'en'
-            return null
-        }),
-        getAll: jest.fn().mockImplementation((key) => {
-            if (key === 'q') return ['test query']
-            if (key === 'lang') return ['en']
-            return []
-        }),
-        keys: jest.fn().mockReturnValue(['q', 'lang'])
-    })
+    // const createParamMap = () => ({
+    //     has: jest.fn().mockImplementation((key) => key === 'q'),
+    //     get: jest.fn().mockImplementation((key) => {
+    //         if (key === 'q') return 'test query'
+    //         if (key === 'lang') return 'en'
+    //         return null
+    //     }),
+    //     getAll: jest.fn().mockImplementation((key) => {
+    //         if (key === 'q') return ['test query']
+    //         if (key === 'lang') return ['en']
+    //         return []
+    //     }),
+    //     keys: jest.fn().mockReturnValue(['q', 'lang'])
+    // })
+
+    const createParamMap = () =>
+        convertToParamMap({
+            q: 'test query',
+            lang: 'en',
+        })
 
     const mockQueryParamMap = new BehaviorSubject(createParamMap())
 
@@ -49,7 +56,7 @@ describe('SearchInputHomeComponent', () => {
                     }
                 },
                 queryParamMap: createParamMap()
-            },
+            } as any,
             queryParamMap: mockQueryParamMap,
             parent: {} as any
         }
@@ -65,10 +72,10 @@ describe('SearchInputHomeComponent', () => {
         }
 
         configSvcMock = {
-            activeLocale: { locals: ['en'] },
+            activeLocale: { locals: ['en'] } as any,
             userPreference: {
                 selectedLangGroup: 'en,hi'
-            }
+            } as any
         }
 
         routeMock = {
@@ -78,7 +85,7 @@ describe('SearchInputHomeComponent', () => {
                         data: mockSearchConfig
                     }
                 }
-            }
+            } as any
         }
 
         // Create component with mocks
@@ -117,6 +124,21 @@ describe('SearchInputHomeComponent', () => {
     })
 
     describe('autoFilter', () => {
+        beforeEach(() => {
+            // Ensure routeMock is properly initialized for each test
+            routeMock.snapshot = {
+                data: {
+                    searchPageData: {
+                        data: {
+                            search: {
+                                isAutoCompleteAllowed: true, // default true
+                                languageSearch: ['All', 'En', 'Hi'],
+                            },
+                        },
+                    },
+                },
+            } as any
+        })
         it('should set up valueChanges subscription when autoComplete is allowed', () => {
             // Setup
             const spy = jest.spyOn(component.queryControl.valueChanges, 'pipe')
@@ -130,7 +152,8 @@ describe('SearchInputHomeComponent', () => {
 
         it('should not set up valueChanges subscription when autoComplete is not allowed', () => {
             // Setup
-            routeMock.snapshot.data.searchPageData.data.search.isAutoCompleteAllowed = false
+            // routeMock?.snapshot?.data?.searchPageData?.data?.search?.isAutoCompleteAllowed = false
+            routeMock.snapshot!.data.searchPageData.data.search.isAutoCompleteAllowed = false
             const spy = jest.spyOn(component.queryControl.valueChanges, 'pipe')
 
             // Execute
@@ -270,23 +293,30 @@ describe('SearchInputHomeComponent', () => {
             component.init()
 
             // Update the mock queryParamMap to simulate changes
-            mockQueryParamMap.next({
-                has: jest.fn().mockReturnValue(true),
-                get: jest.fn().mockImplementation((key) => {
-                    if (key === 'q') return 'new query'
-                    if (key === 'lang') return 'fr'
-                    return null
-                }),
-                getAll: jest.fn().mockImplementation((key) => {
-                    if (key === 'q') return ['new query']
-                    if (key === 'lang') return ['fr']
-                    return []
-                }),
-                keys: jest.fn().mockReturnValue(['q', 'lang'])
-            })
+            // mockQueryParamMap.next({
+            //     has: jest.fn().mockReturnValue(true),
+            //     get: jest.fn().mockImplementation((key) => {
+            //         if (key === 'q') return 'new query'
+            //         if (key === 'lang') return 'fr'
+            //         return null
+            //     }),
+            //     getAll: jest.fn().mockImplementation((key) => {
+            //         if (key === 'q') return ['new query']
+            //         if (key === 'lang') return ['fr']
+            //         return []
+            //     }),
+            //     keys: jest.fn().mockReturnValue(['q', 'lang'])
+            // })
+
+            mockQueryParamMap.next(
+                convertToParamMap({
+                    q: 'new query',
+                    lang: 'fr',
+                })
+            )
 
             // Verify queryControl was updated
-            expect(component.queryControl.value).toBe('test query')
+            expect(component.queryControl.value).toBe('new query')
         })
 
         it('should focus on search input element', () => {
