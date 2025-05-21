@@ -284,7 +284,7 @@ export class ReportsSectionComponent implements OnInit {
           Every organization must have a leader assigned to
           iGOT to access these reports.
           Please reach out to us at mission.karmayogi@gov.in or
-          connect with us via Video Conferencing by clicking the button below:
+          connect with us via Video Conferencing by clicking the link:
           [<a target='_blank' href='${this.teamUrl}'>Join Now</a>]`,
           `Once the MDO Leader is onboarded, they will grant you access to download the
           reports, and you are requested to connect with your MDO Leader for further process.`,
