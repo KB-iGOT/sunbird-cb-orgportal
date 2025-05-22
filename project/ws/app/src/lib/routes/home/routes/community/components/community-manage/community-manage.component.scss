@@ -1,0 +1,239 @@
+@use '@angular/material' as mat;
+
+.dashboard-container {
+  padding: 20px;
+
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+
+    h1 {
+      margin: 0;
+    }
+  }
+
+  .search-field {
+    width: 100%;
+    margin-bottom: 20px;
+  }
+}
+
+.rsearch {
+  display: flex;
+  position: relative;
+  flex: 1 1 auto;
+}
+
+.sinput {
+  width: 385px;
+  border-radius: 18px;
+  border: 1px solid #d5d0d0;
+  padding: 9px 9px 9px 45px;
+  margin-bottom: 0px;
+  margin-top: 0;
+  /* stylelint-disable */
+  font: normal 14px Lato;
+  /* stylelint-enable */
+  font-weight: 400;
+}
+
+.search-icon {
+  position: absolute;
+  top: 8px;
+  font-size: 22px;
+  left: 16px;
+}
+
+.apply-filter {
+  background-color: none;
+  border: none;
+}
+
+.mat-standard-chip {
+  transition: box-shadow 280ms cubic-bezier(0.4, 0, 0.2, 1);
+  display: inline-flex;
+  padding: 7px 12px;
+  border-radius: 16px;
+  align-items: center;
+  cursor: default;
+  min-height: 32px;
+  height: 1px;
+}
+
+::ng-deep .mat-tab-body-content {
+  overflow: hidden !important;
+}
+
+.community-card {
+  padding: 24px;
+  border: 1px solid rgba(0, 0, 0, 0.16);
+  border-radius: 12px;
+  width: 612px;
+}
+
+.user-image-box {
+  border-radius: 50%;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  .user-image {
+    border-radius: 50%;
+    width: 48px;
+    height: 48px;
+  }
+}
+
+.font-semibold {
+  font-weight: 600 !important;
+}
+
+.bold {
+  font-weight: 700;
+}
+
+.margin-remove-bottom {
+  margin-bottom: 0;
+}
+
+.community-post-text {
+  white-space: initial;
+  position: relative;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  word-break: break-word;
+}
+
+.community-button-box {
+  margin-top: 12px;
+}
+
+.link-btn {
+  padding: 8px 16px;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 21px;
+  font-family: Lato;
+  letter-spacing: normal;
+  box-sizing: border-box;
+  height: 32px;
+  max-width: 200px;
+  border-radius: 64px;
+  margin-left: 16px;
+  cursor: pointer;
+}
+
+.btn-blue {
+  border: 1px solid #1b4ca1;
+  color: #1b4ca1;
+}
+
+.reported-issue-btn {
+  background-color: #F3962F;
+  color: rgba(0, 0, 0, 0.87);
+}
+
+.text-description {
+  color: rgba(0, 0, 0, 0.6);
+  font: 400 14px Lato;
+}
+
+.verify_icon {
+  height: 16px;
+  vertical-align: text-top;
+}
+
+.verify_icon1 {
+  height: 24px;
+  vertical-align: text-top;
+}
+
+.expand {
+  -webkit-line-clamp: 5;
+}
+
+.un-expand {
+  -webkit-line-clamp: 0;
+}
+
+.more-or-less {
+  font-family: Lato;
+  color: #1b4ca1;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 20px;
+  font-weight: 600;
+  margin: 8px 0;
+}
+
+.mat-standard-chip {
+  background-color: #fff !important;
+  border: 1px solid rgba(0, 0, 0, 0.6) !important;
+  color: rgba(0, 0, 0, 0.6) !important;
+  transition: box-shadow 280ms cubic-bezier(0.4, 0, 0.2, 1);
+  display: inline-flex;
+  padding: 7px 12px;
+  border-radius: 16px;
+  align-items: center;
+  cursor: default;
+  min-height: 32px;
+  height: 1px;
+
+}
+
+.color-white {
+  color: #fff;
+}
+
+.color-orange {
+  color: #F3962F;
+}
+
+.report-dialog-box {
+  padding: 24px 24px !important;
+}
+
+.filter-link.active {
+  background: rgba(27, 76, 161, 0.16) !important;
+  color: #1B4CA1 !important;
+  border: 1px solid #1B4CA1 !important;
+}
+
+.filter-link {
+  border-radius: 20px;
+  padding: 4px 12px;
+  background-color: #fff;
+  border: 1px solid rgba(0, 0, 0, 0.4);
+  color: rgba(0, 0, 0, 0.4);
+  font: 14px/21px 'Lato';
+  font-weight: 700;
+  box-sizing: border-box;
+  cursor: pointer;
+  min-width: 100px;
+}
+
+.small-text {
+  font-size: 12px !important;
+  text-transform: capitalize!important;
+}
+
+.margin-bottom-none {
+  margin-bottom: 0;
+}
+
+.comment-txt {
+  white-space: initial;
+  position: relative;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  word-break: break-word;
+}

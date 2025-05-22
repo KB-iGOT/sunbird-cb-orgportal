@@ -3,6 +3,7 @@ import { RouterModule, Routes } from '@angular/router'
 import { CommunityDashboardComponent } from './components/community-dashboard/community-dashboard.component'
 import { CommunityCreationComponent } from './components/community-creation/community-creation.component'
 import { CommunityResolverService } from './services/community-resolver.service'
+import { CommunityManageComponent } from './components/community-manage/community-manage.component'
 
 const routes: Routes = [
   {
@@ -12,6 +13,10 @@ const routes: Routes = [
   {
     path: 'create',
     component: CommunityCreationComponent,
+  },
+  {
+    path: 'manage/:communityId',
+    component: CommunityManageComponent,
   },
   {
     path: 'edit/:communityId',

@@ -1,31 +1,35 @@
-import { CommunityCompetencyComponent } from './community-competency.component'
+import { SimpleChanges } from '@angular/core'
 import { MatLegacyDialog } from '@angular/material/legacy-dialog'
 import { MatLegacySnackBar } from '@angular/material/legacy-snack-bar'
 import { EventsService } from '../../../events-2/services/events.service'
 import { CompetencyAddComponent } from '../../../../../../common/competency-add/competency-add.component'
-import { SimpleChange } from '@angular/core'
-import { of } from 'rxjs'
+import { CommunityCompetencyComponent } from './community-competency.component'
+
+// Mocks
+jest.mock('@angular/material/legacy-dialog')
+jest.mock('@angular/material/legacy-snack-bar')
+jest.mock('../../../events-2/services/events.service')
 
 describe('CommunityCompetencyComponent', () => {
   let component: CommunityCompetencyComponent
   let mockMatSnackBar: jest.Mocked<MatLegacySnackBar>
-  let mockMatDialog: jest.Mocked<MatLegacyDialog>
+  let mockDialog: jest.Mocked<MatLegacyDialog>
   let mockEventsService: jest.Mocked<EventsService>
 
   // Sample test data
   const mockCompetenciesList = [
     {
-      competencyAreaId: 'area1',
-      competencyAreaName: 'Area 1',
-      themes: [
+      competencyAreaId: '1',
+      competencyAreaName: 'Programming',
+      competencyThemes: [
         {
-          competencyThemeId: 'theme1',
-          competencyThemeName: 'Theme 1',
-          subThems: [
+          competencyThemeId: '1-1',
+          competencyThemeName: 'Web Development',
+          competencySubThemes: [
             {
-              competencySubThemeId: 'subtheme1',
+              competencySubThemeId: '1-1-1',
               competencySubThemeAdditionalProperties: {
-                displayName: 'Sub Theme 1'
+                displayName: 'Frontend'
               }
             }
           ]
@@ -34,21 +38,21 @@ describe('CommunityCompetencyComponent', () => {
     }
   ]
 
-  const mockTreeView = [
+  const mockTreeViewData = [
     {
-      competencyAreaId: 'area1',
-      competencyAreaName: 'Area 1',
+      competencyAreaId: '1',
+      competencyAreaName: 'Programming',
       collapsed: true,
       themes: [
         {
-          competencyThemeId: 'theme1',
-          competencyThemeName: 'Theme 1',
+          competencyThemeId: '1-1',
+          competencyThemeName: 'Web Development',
           collapsed: true,
           subThems: [
             {
-              competencySubThemeId: 'subtheme1',
+              competencySubThemeId: '1-1-1',
               competencySubThemeAdditionalProperties: {
-                displayName: 'Sub Theme 1'
+                displayName: 'Frontend'
               }
             }
           ]
@@ -57,255 +61,384 @@ describe('CommunityCompetencyComponent', () => {
     }
   ]
 
-  beforeEach(() => {
-    // Create mocks for dependencies
-    mockMatSnackBar = {
-      open: jest.fn()
-    } as any
+  // Mock dialog reference
+  const mockDialogRef = {
+    afterClosed: jest.fn().mockReturnValue({
+      subscribe: jest.fn()
+    })
+  }
 
-    mockMatDialog = {
-      open: jest.fn()
-    } as any
+  beforeEach(() => {
+    // Create mocks
+    mockMatSnackBar = {
+      open: jest.fn(),
+    } as unknown as jest.Mocked<MatLegacySnackBar>
+
+    mockDialog = {
+      open: jest.fn().mockReturnValue(mockDialogRef)
+    } as unknown as jest.Mocked<MatLegacyDialog>
 
     mockEventsService = {
-      convertToTreeView: jest.fn(),
-      convertToTabularView: jest.fn()
-    } as any
+      convertToTreeView: jest.fn().mockReturnValue(mockTreeViewData),
+      convertToTabularView: jest.fn().mockReturnValue(mockCompetenciesList)
+    } as unknown as jest.Mocked<EventsService>
 
-    // Set up default mock behavior
-    mockEventsService.convertToTreeView.mockReturnValue(mockTreeView)
-    mockEventsService.convertToTabularView.mockReturnValue(mockCompetenciesList)
-
-    // Create component instance with mocked dependencies
+    // Create component instance
     component = new CommunityCompetencyComponent(
       mockMatSnackBar,
-      mockMatDialog,
+      mockDialog,
       mockEventsService
     )
-  })
 
-  test('should initialize with default values', () => {
-    expect(component.openMode).toBe('edit')
-    expect(component.competenciesList).toEqual([])
-    expect(component.searchText).toBe('')
-  })
-
-  test('ngOnChanges should convert competenciesList to tree view', () => {
-    // Set up component with initial data
+    // Set default property values
     component.competenciesList = mockCompetenciesList
+    component.competencies = mockTreeViewData
 
-    // Create a mock SimpleChanges object
-    const changes = {
-      competenciesList: new SimpleChange(null, mockCompetenciesList, true)
-    }
-
-    // Call ngOnChanges
-    component.ngOnChanges(changes)
-
-    // Verify that the service was called and the component's data was updated
-    expect(mockEventsService.convertToTreeView).toHaveBeenCalledWith(mockCompetenciesList)
-    expect(component.competencies).toEqual(mockTreeView)
+    // Reset the dialog afterClosed subscription function
+    mockDialogRef.afterClosed.mockReturnValue({
+      subscribe: jest.fn().mockImplementation(callback => callback(mockCompetenciesList))
+    })
   })
 
-  test('hideAndShow should toggle collapsed state of a row', () => {
-    // Setup
-    component.competencies = [...mockTreeView]
-    const testRow = { collapsed: true }
-
-    // Execute
-    component.hideAnfShow(testRow)
-
-    // Verify
-    expect(testRow.collapsed).toBe(false)
-
-    // Execute again
-    component.hideAnfShow(testRow)
-
-    // Verify toggle
-    expect(testRow.collapsed).toBe(true)
+  afterEach(() => {
+    jest.clearAllMocks()
   })
 
-  test('removeNode should remove competency area and update', () => {
-    // Setup
-    component.competencies = [...mockTreeView]
-    const competencyToRemove = mockTreeView[0]
-
-    // Spy on the updateCompetencies method
-    const updateSpy = jest.spyOn(component, 'updateCompetencies')
-
-    // Execute
-    component.removeNode(competencyToRemove)
-
-    // Verify
-    expect(component.competencies).toEqual([])
-    expect(mockMatSnackBar.open).toHaveBeenCalledWith('Competency area is removed successfully.')
-    expect(updateSpy).toHaveBeenCalled()
+  describe('constructor', () => {
+    it('should create the component with default values', () => {
+      expect(component).toBeTruthy()
+      expect(component.openMode).toBe('edit')
+      expect(component.competenciesList).toEqual(mockCompetenciesList)
+      expect(component.searchText).toBe('')
+      expect(component.event).toBeUndefined()
+      expect(component.eventId).toBeUndefined()
+    })
   })
 
-  test('removeTheme should remove theme from competency area and update', () => {
-    // Setup
-    component.competencies = [
-      {
-        ...mockTreeView[0],
-        themes: [...mockTreeView[0].themes]
+  describe('ngOnChanges', () => {
+    it('should convert competenciesList to tree view when changes occur', () => {
+      // Setup
+      const changes: SimpleChanges = {
+        competenciesList: {
+          currentValue: mockCompetenciesList,
+          previousValue: undefined,
+          firstChange: true,
+          isFirstChange: () => true
+        }
       }
-    ]
-    const competency = component.competencies[0]
-    const themeToRemove = competency.themes[0]
 
-    // Spy on the updateCompetencies method
-    const updateSpy = jest.spyOn(component, 'updateCompetencies')
+      // Act
+      component.ngOnChanges(changes)
 
-    // Execute
-    component.removeTheme(competency, themeToRemove)
+      // Assert
+      expect(mockEventsService.convertToTreeView).toHaveBeenCalledWith(mockCompetenciesList)
+      expect(component.competencies).toEqual(mockTreeViewData)
+    })
 
-    // Verify
-    expect(component.competencies[0].themes).toEqual([])
-    expect(mockMatSnackBar.open).toHaveBeenCalledWith('Competency theme is removed successfully.')
-    expect(updateSpy).toHaveBeenCalled()
-  })
-
-  test('removeSubTheme should remove subtheme from theme and update', () => {
-    // Setup
-    component.competencies = JSON.parse(JSON.stringify(mockTreeView)) // Deep clone
-    const competency = component.competencies[0]
-    const theme = competency.themes[0]
-    const subThemeToRemove = theme.subThems[0]
-
-    // Spy on the updateCompetencies method
-    const updateSpy = jest.spyOn(component, 'updateCompetencies')
-
-    // Execute
-    component.removeSubTheme(competency, theme, subThemeToRemove)
-
-    // Verify
-    expect(component.competencies[0].themes[0].subThems).toEqual([])
-    expect(mockMatSnackBar.open).toHaveBeenCalledWith('Competency sub theme is removed successfully.')
-    expect(updateSpy).toHaveBeenCalled()
-  })
-
-  test('updateCompetencies should emit converted competencies', () => {
-    // Setup
-    component.competencies = [...mockTreeView]
-    const emitSpy = jest.spyOn(component.addCompetencies, 'emit')
-
-    // Execute
-    component.updateCompetencies()
-
-    // Verify
-    expect(mockEventsService.convertToTabularView).toHaveBeenCalledWith(component.competencies)
-    expect(emitSpy).toHaveBeenCalledWith(mockCompetenciesList)
-  })
-
-  test('showAddCompetencyDialog should open dialog and handle result', () => {
-    // Setup
-    component.competencies = [...mockTreeView]
-    const mockDialogRef = {
-      afterClosed: jest.fn().mockReturnValue(of(mockCompetenciesList))
-    }
-    mockMatDialog.open.mockReturnValue(mockDialogRef as any)
-
-    const emitSpy = jest.spyOn(component.addCompetencies, 'emit')
-
-    // Execute
-    component.showAddCompetencyDialog()
-
-    // Verify dialog was opened with correct params
-    expect(mockMatDialog.open).toHaveBeenCalledWith(
-      CompetencyAddComponent,
-      {
-        panelClass: 'dialog_sidenav',
-        width: '800px',
-        disableClose: true,
-        data: component.competencies
+    it('should not convert to tree view when competenciesList is not changed', () => {
+      // Setup
+      const changes: SimpleChanges = {
+        otherProperty: {
+          currentValue: 'something',
+          previousValue: undefined,
+          firstChange: true,
+          isFirstChange: () => true
+        }
       }
-    )
 
-    // Verify result handling
-    expect(mockEventsService.convertToTreeView).toHaveBeenCalledWith(mockCompetenciesList)
-    expect(emitSpy).toHaveBeenCalledWith(mockCompetenciesList)
+      // Reset mock to track new calls
+      mockEventsService.convertToTreeView.mockClear()
+
+      // Act
+      component.ngOnChanges(changes)
+
+      // Assert
+      expect(mockEventsService.convertToTreeView).not.toHaveBeenCalled()
+    })
   })
 
-  test('showAddCompetencyDialog should not update if no result', () => {
-    // Setup
-    component.competencies = [...mockTreeView]
-    const mockDialogRef = {
-      afterClosed: jest.fn().mockReturnValue(of(null))
-    }
-    mockMatDialog.open.mockReturnValue(mockDialogRef as any)
+  describe('hideAnfShow', () => {
+    it('should toggle collapsed state from true to false', () => {
+      // Setup
+      const row = { collapsed: true }
 
-    const emitSpy = jest.spyOn(component.addCompetencies, 'emit')
+      // Act
+      component.hideAnfShow(row)
 
-    // Execute
-    component.showAddCompetencyDialog()
+      // Assert
+      expect(row.collapsed).toBe(false)
+    })
 
-    // Verify
-    expect(emitSpy).not.toHaveBeenCalled()
-    // The second call would have been for the dialog result, which doesn't happen
-    expect(mockEventsService.convertToTreeView).toHaveBeenCalledTimes(0)
+    it('should toggle collapsed state from false to true', () => {
+      // Setup
+      const row = { collapsed: false }
+
+      // Act
+      component.hideAnfShow(row)
+
+      // Assert
+      expect(row.collapsed).toBe(true)
+    })
   })
 
-  test('openSnackBar should call snackBar.open with message', () => {
-    // Setup
-    const testMessage = 'Test message';
+  describe('removeNode', () => {
+    it('should remove a competency area and update competencies', () => {
+      // Setup
+      const competencyToRemove = mockTreeViewData[0]
+      const emitSpy = jest.spyOn(component.addCompetencies, 'emit')
 
-    // Execute - Call the private method using type assertion
-    (component as any).openSnackBar(testMessage)
+      // Act
+      component.removeNode(competencyToRemove)
 
-    // Verify
-    expect(mockMatSnackBar.open).toHaveBeenCalledWith(testMessage)
+      // Assert
+      expect(component.competencies).toEqual([])
+      expect(mockMatSnackBar.open).toHaveBeenCalledWith('Competency area is removed successfully.')
+      expect(mockEventsService.convertToTabularView).toHaveBeenCalledWith([])
+      expect(emitSpy).toHaveBeenCalled()
+    })
   })
 
-  test('should handle ngOnChanges when competenciesList is not changed', () => {
-    // Setup - changes without competenciesList
-    const changes = {
-      otherProperty: new SimpleChange(null, 'something', true)
-    }
+  describe('removeTheme', () => {
+    it('should remove a theme from a competency area and update competencies', () => {
+      // Setup
+      const competency = mockTreeViewData[0]
+      const themeToRemove = competency.themes[0]
+      const emitSpy = jest.spyOn(component.addCompetencies, 'emit')
 
-    // Set initial state
-    component.competencies = 'initial value' as any
+      // Expected result: competency with empty themes array
+      const expectedCompetencies = [
+        {
+          ...competency,
+          themes: []
+        }
+      ]
 
-    // Execute
-    component.ngOnChanges(changes as any)
+      // Act
+      component.removeTheme(competency, themeToRemove)
 
-    // Verify that nothing changed
-    expect(component.competencies).toEqual('initial value')
-    expect(mockEventsService.convertToTreeView).not.toHaveBeenCalled()
+      // Assert
+      expect(component.competencies).toEqual(expectedCompetencies)
+      expect(mockMatSnackBar.open).toHaveBeenCalledWith('Competency theme is removed successfully.')
+      expect(mockEventsService.convertToTabularView).toHaveBeenCalledWith(expectedCompetencies)
+      expect(emitSpy).toHaveBeenCalled()
+    })
+
+    it('should not modify other competency areas when removing a theme', () => {
+      // Setup
+      // Add another competency area to test isolation
+      component.competencies = [
+        ...mockTreeViewData,
+        {
+          competencyAreaId: '2',
+          competencyAreaName: 'Design',
+          collapsed: true,
+          themes: [
+            {
+              competencyThemeId: '2-1',
+              competencyThemeName: 'UI Design',
+              collapsed: true,
+              subThems: []
+            }
+          ]
+        }
+      ]
+
+      const competency = component.competencies[0]
+      const themeToRemove = competency.themes[0]
+
+      // Act
+      component.removeTheme(competency, themeToRemove)
+
+      // Assert
+      expect(component.competencies[1]).toEqual({
+        competencyAreaId: '2',
+        competencyAreaName: 'Design',
+        collapsed: true,
+        themes: [
+          {
+            competencyThemeId: '2-1',
+            competencyThemeName: 'UI Design',
+            collapsed: true,
+            subThems: []
+          }
+        ]
+      })
+    })
   })
 
-  test('should handle empty competencies list properly', () => {
-    // Setup
-    mockEventsService.convertToTreeView.mockReturnValue([])
-    component.competenciesList = []
+  describe('removeSubTheme', () => {
+    it('should remove a subtheme from a theme and update competencies', () => {
+      // Setup
+      const competency = mockTreeViewData[0]
+      const theme = competency.themes[0]
+      const subThemeToRemove = theme.subThems[0]
+      const emitSpy = jest.spyOn(component.addCompetencies, 'emit')
 
-    // Create a mock SimpleChanges object
-    const changes = {
-      competenciesList: new SimpleChange(null, [], true)
-    }
+      // Expected result: theme with empty subThems array
+      const expectedCompetencies = [
+        {
+          ...competency,
+          themes: [
+            {
+              ...theme,
+              subThems: []
+            }
+          ]
+        }
+      ]
 
-    // Call ngOnChanges
-    component.ngOnChanges(changes)
+      // Act
+      component.removeSubTheme(competency, theme, subThemeToRemove)
 
-    // Verify
-    expect(component.competencies).toEqual([])
+      // Assert
+      expect(component.competencies).toEqual(expectedCompetencies)
+      expect(mockMatSnackBar.open).toHaveBeenCalledWith('Competency sub theme is removed successfully.')
+      expect(mockEventsService.convertToTabularView).toHaveBeenCalledWith(expectedCompetencies)
+      expect(emitSpy).toHaveBeenCalled()
+    })
+
+    it('should not modify other themes when removing a subtheme', () => {
+      // Setup
+      // Add another theme to test isolation
+      component.competencies = [
+        {
+          ...mockTreeViewData[0],
+          themes: [
+            mockTreeViewData[0].themes[0],
+            {
+              competencyThemeId: '1-2',
+              competencyThemeName: 'Mobile Development',
+              collapsed: true,
+              subThems: [
+                {
+                  competencySubThemeId: '1-2-1',
+                  competencySubThemeAdditionalProperties: {
+                    displayName: 'Android'
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+
+      const competency = component.competencies[0]
+      const theme = competency.themes[0]
+      const subThemeToRemove = theme.subThems[0]
+
+      // Act
+      component.removeSubTheme(competency, theme, subThemeToRemove)
+
+      // Assert
+      expect(component.competencies[0].themes[1].subThems).toEqual([
+        {
+          competencySubThemeId: '1-2-1',
+          competencySubThemeAdditionalProperties: {
+            displayName: 'Android'
+          }
+        }
+      ])
+    })
   })
 
-  test('removeNode should handle case when node is not found', () => {
-    // Setup
-    component.competencies = [...mockTreeView]
-    const nonExistentCompetency = {
-      competencyAreaName: 'Non-existent Area'
-    }
+  describe('updateCompetencies', () => {
+    it('should convert tree view back to tabular and emit the result', () => {
+      // Setup
+      const emitSpy = jest.spyOn(component.addCompetencies, 'emit')
 
-    // Spy on the updateCompetencies method
-    const updateSpy = jest.spyOn(component, 'updateCompetencies')
+      // Act
+      component.updateCompetencies()
 
-    // Execute
-    component.removeNode(nonExistentCompetency)
+      // Assert
+      expect(mockEventsService.convertToTabularView).toHaveBeenCalledWith(component.competencies)
+      expect(emitSpy).toHaveBeenCalledWith(mockCompetenciesList)
+    })
+  })
 
-    // Verify that original competencies are unchanged
-    expect(component.competencies).toEqual(mockTreeView)
-    expect(mockMatSnackBar.open).toHaveBeenCalledWith('Competency area is removed successfully.')
-    expect(updateSpy).toHaveBeenCalled()
+  describe('showAddCompetencyDialog', () => {
+    it('should open dialog and update competencies when dialog returns result', () => {
+      // Setup
+      const emitSpy = jest.spyOn(component.addCompetencies, 'emit')
+
+      // Act
+      component.showAddCompetencyDialog()
+
+      // Assert
+      expect(mockDialog.open).toHaveBeenCalledWith(
+        CompetencyAddComponent,
+        expect.objectContaining({
+          panelClass: 'dialog_sidenav',
+          width: '800px',
+          disableClose: true,
+          data: component.competencies
+        })
+      )
+
+      expect(mockEventsService.convertToTreeView).toHaveBeenCalledWith(mockCompetenciesList)
+      expect(emitSpy).toHaveBeenCalledWith(mockCompetenciesList)
+    })
+
+    it('should not update competencies when dialog returns no result', () => {
+      // Setup
+      mockDialogRef.afterClosed = jest.fn().mockReturnValue({
+        subscribe: jest.fn().mockImplementation(callback => callback(null))
+      })
+
+      const convertToTreeViewSpy = jest.spyOn(mockEventsService, 'convertToTreeView')
+      const emitSpy = jest.spyOn(component.addCompetencies, 'emit')
+
+      // Reset tracking of previous calls
+      convertToTreeViewSpy.mockClear()
+      emitSpy.mockClear()
+
+      // Act
+      component.showAddCompetencyDialog()
+
+      // Assert
+      expect(convertToTreeViewSpy).not.toHaveBeenCalled()
+      expect(emitSpy).not.toHaveBeenCalled()
+    })
+
+    it('should not open dialog when competencies is null', () => {
+      // Setup
+      component.competencies = null
+
+      // Act
+      component.showAddCompetencyDialog()
+
+      // Assert
+      expect(mockDialog.open).not.toHaveBeenCalled()
+    })
+
+    it('should not open dialog when competencies is undefined', () => {
+      // Setup
+      component.competencies = undefined
+
+      // Act
+      component.showAddCompetencyDialog()
+
+      // Assert
+      expect(mockDialog.open).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('openSnackBar', () => {
+    it('should open snackbar with provided message', () => {
+      // Setup
+      const message = 'Test message';
+
+      // Act
+      (component as any).openSnackBar(message)
+
+      // Assert
+      expect(mockMatSnackBar.open).toHaveBeenCalledWith(message)
+    })
+  })
+
+  describe('ngOnInit', () => {
+    it('should initialize without errors', () => {
+      // Just ensure it doesn't throw errors, as the method is empty in the component
+      expect(() => component.ngOnInit()).not.toThrow()
+    })
   })
 })
