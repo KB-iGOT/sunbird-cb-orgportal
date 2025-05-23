@@ -73,11 +73,12 @@ export class BatchDetailsComponent implements OnInit {
     if (currentState && currentState.extras.state) {
       this.batchData = currentState.extras.state
     }
-    if (this.activeRouter.parent && this.activeRouter.parent.snapshot.data.configService) {
+    if (this.activeRouter && (this.activeRouter.parent && this.activeRouter.parent.snapshot && this.activeRouter.parent.snapshot.data &&
+      this.activeRouter.parent.snapshot.data.configService)) {
       this.userProfile = this.activeRouter.parent.snapshot.data.configService.unMappedUser
     }
-    this.programID = this.activeRouter.snapshot.params.id
-    this.batchID = this.activeRouter.snapshot.params.batchid
+    this.programID = this.activeRouter?.snapshot?.params?.id
+    this.batchID = this.activeRouter?.snapshot?.params?.batchid
     if (this.programID) {
       this.getBPDetails(this.programID)
     }
@@ -167,12 +168,12 @@ export class BatchDetailsComponent implements OnInit {
 
   getBPDetails(programID: any) {
     this.bpService.getBlendedProgramsDetails(programID).subscribe((res: any) => {
-      this.programData = res.result.content
+      this.programData = res?.result?.content
       if (this.programData && this.programData.wfSurveyLink && this.programData.wfSurveyLink.length) {
         this.checkSurveyLink = true
       }
       if (!this.batchData) {
-        this.programData.batches.forEach((b: any) => {
+        this.programData?.batches.forEach((b: any) => {
           if (b.batchId === this.batchID) {
             this.batchData = b
           }
@@ -185,11 +186,11 @@ export class BatchDetailsComponent implements OnInit {
           { title: this.batchData.name, url: 'none' }],
         }
         this.linkData = {
-          programName: this.programData.name,
-          programID: this.programData.identifier,
-          batchName: this.batchData.name,
+          // programName: this.programData.name,
+          programID: this.programData?.identifier,
+          batchName: this.batchData?.name,
           batchID: this.batchID,
-          approvalType: this.programData.wfApprovalType,
+          approvalType: this.programData?.wfApprovalType,
         }
         this.getNewRequestsList()
       }
@@ -197,7 +198,7 @@ export class BatchDetailsComponent implements OnInit {
   }
 
   getLearnersList() {
-    this.bpService.getLearners(this.batchData.batchId, this.userProfile.channel).subscribe((res: any) => {
+    this.bpService.getLearners(this.batchData?.batchId, this.userProfile?.channel).subscribe((res: any) => {
       if (res && res.length > 0) {
         this.approvedUsers = res
         this.clonedApprovedUsers = res
@@ -211,7 +212,7 @@ export class BatchDetailsComponent implements OnInit {
     const request = {
       serviceName: 'blendedprogram',
       applicationStatus: 'SEND_FOR_MDO_APPROVAL',
-      applicationIds: [this.batchData.batchId],
+      applicationIds: [this.batchData?.batchId],
       limit: 100,
       offset: 0,
       deptName: this.userProfile.rootOrg.orgName,
@@ -220,16 +221,16 @@ export class BatchDetailsComponent implements OnInit {
       if (res) {
         this.newUsers = res.result.data
         this.newUsers.sort((a: any, b: any) => {
-          return <any>new Date(a.wfInfo[0].lastUpdatedOn) - <any>new Date(b.wfInfo[0].lastUpdatedOn)
+          return <any>new Date(a?.wfInfo[0]?.lastUpdatedOn) - <any>new Date(b?.wfInfo[0]?.lastUpdatedOn)
         })
-        this.clonedNewUsers = res.result.data
+        this.clonedNewUsers = res?.result?.data
       }
     })
     this.getAllLearner()
   }
 
   getAllLearner() {
-    this.bpService.getLearnersWithoutOrg(this.batchData.batchId).subscribe((res: any) => {
+    this.bpService.getLearnersWithoutOrg(this.batchData?.batchId).subscribe((res: any) => {
       if (res && res.length > 0) {
         this.learnerCount = res.length
       }
@@ -240,14 +241,14 @@ export class BatchDetailsComponent implements OnInit {
     const request = {
       serviceName: 'blendedprogram',
       applicationStatus: 'REJECTED',
-      applicationIds: [this.batchData.batchId],
+      applicationIds: [this.batchData?.batchId],
       limit: 100,
       offset: 0,
-      deptName: this.userProfile.rootOrg.orgName,
+      deptName: this.userProfile?.rootOrg?.orgName,
     }
     this.bpService.getRequests(request).subscribe((res: any) => {
       if (res) {
-        this.rejectedUsers = res.result.data
+        this.rejectedUsers = res?.result?.data
         this.clonedRejectedUsers = res.result.data
       }
     })
@@ -257,10 +258,10 @@ export class BatchDetailsComponent implements OnInit {
     const request = {
       serviceName: ['blendedprogram'],
       applicationStatus: ['SEND_FOR_PC_APPROVAL', 'SEND_FOR_MDO_APPROVAL', 'REJECTED', 'REMOVED'],
-      applicationIds: [this.batchData.batchId],
+      applicationIds: [this.batchData?.batchId],
       limit: 100,
       offset: 0,
-      deptName: [this.userProfile.rootOrg.orgName],
+      deptName: [this.userProfile?.rootOrg?.orgName],
     }
     this.bpService.getSerchRequests(request).subscribe((res: any) => {
       if (res) {
@@ -272,13 +273,13 @@ export class BatchDetailsComponent implements OnInit {
   }
 
   getSessionDetails() {
-    this.sessionDetails = this.batchData.batchAttributes.sessionDetails_v2
+    this.sessionDetails = this.batchData?.batchAttributes?.sessionDetails_v2
   }
 
   onSubmit(event: any) {
     const actionType = event.action.toUpperCase()
     // const reqData = event.userData.wfInfo[0]
-    const reqData = _.maxBy(event.userData.wfInfo, (el: any) => {
+    const reqData = _.maxBy(event?.userData?.wfInfo, (el: any) => {
       return new Date(el.lastUpdatedOn).getTime()
     })
     const request = {
@@ -316,40 +317,40 @@ export class BatchDetailsComponent implements OnInit {
         this.filter('rejected')
       }
       this.showUserDetails = false
-    },                                                      (error: any) => {
+    }, (error: any) => {
       this.openSnackbar(_.get(error, 'error.params.errmsg') ||
         _.get(error, 'error.result.errmsg') ||
         'Something went wrong, please try again later!')
     })
   }
 
-  requestMesages() {
-    if (this.programData.wfApprovalType === NsContent.WFBlendedProgramApprovalTypes.ONE_STEP_MDO ||
-      this.programData.wfApprovalType === NsContent.WFBlendedProgramApprovalTypes.TWO_STEP_PC_MDO
+  requestMesages(): string {
+    if (this.programData?.wfApprovalType === NsContent.WFBlendedProgramApprovalTypes.ONE_STEP_MDO ||
+      this.programData?.wfApprovalType === NsContent.WFBlendedProgramApprovalTypes.TWO_STEP_PC_MDO
     ) {
       return 'Request is approved successfully!'
     }
-    if (this.programData.wfApprovalType === NsContent.WFBlendedProgramApprovalTypes.TWO_STEP_MDO_PC) {
+    if (this.programData?.wfApprovalType === NsContent.WFBlendedProgramApprovalTypes.TWO_STEP_MDO_PC) {
       return 'Request is approved successfully! Further needs to be approved by program coordinator.'
     }
     return 'Request is approved successfully!'
   }
 
   removeUser(event: any) {
-    const actionType = event.action.toUpperCase()
+    const actionType = event?.action?.toUpperCase()
     const request = {
-      rootOrgId: this.userProfile.rootOrgId,
-      userId: event.userData.user_id,
-      actorUserId: this.userProfile.userId,
+      rootOrgId: this.userProfile?.rootOrgId,
+      userId: event?.userData?.user_id,
+      actorUserId: this.userProfile?.userId,
       state: 'APPROVED',
       action: actionType,
       applicationId: this.batchID,
       serviceName: 'blendedprogram',
       courseId: this.programID,
-      deptName: event.userData.department,
-      comment: event.comment,
+      deptName: event?.userData?.department,
+      comment: event?.comment,
       updateFieldValues: [{
-        toValue: { name: event.userData.first_name },
+        toValue: { name: event?.userData?.first_name },
       }],
     }
     this.bpService.removeLearner(request).subscribe((_res: any) => {
@@ -560,13 +561,13 @@ export class BatchDetailsComponent implements OnInit {
 
   async getBpReportStatus() {
     const batchDetails = this.batchData
-    const roleName = this.userDetails.roles.includes('MDO_LEADER') ? 'MDO_LEADER' :
-      this.userDetails.roles.includes('MDO_ADMIN') ? 'MDO_ADMIN' : ''
+    const roleName = this.userDetails?.roles.includes('MDO_LEADER') ? 'MDO_LEADER' :
+      this.userDetails?.roles.includes('MDO_ADMIN') ? 'MDO_ADMIN' : ''
     const req = {
       request: {
-        orgId: this.userDetails.rootOrgId || '',
-        courseId: this.programData.identifier || '',
-        batchId: batchDetails.batchId || '',
+        orgId: this.userDetails?.rootOrgId || '',
+        courseId: this.programData?.identifier || '',
+        batchId: batchDetails?.batchId || '',
         reportRequester: roleName,
       },
     }
@@ -615,11 +616,11 @@ export class BatchDetailsComponent implements OnInit {
 
   async downloadReport() {
     const batchDetails = this.batchData
-    const downloadUrl = this.reportStatusList[0].downloadLink.split('gcpbpreports/')
-    [this.reportStatusList[0].downloadLink.split('gcpbpreports/').length - 1]
-    const fileExtension = downloadUrl.split('.').pop()?.toLowerCase()
+    const downloadUrl = this.reportStatusList[0]?.downloadLink.split('gcpbpreports/')
+    [this.reportStatusList[0]?.downloadLink.split('gcpbpreports/').length - 1]
+    const fileExtension = downloadUrl?.split('.')?.pop()?.toLowerCase()
     // tslint:disable-next-line: max-line-length
-    const fileName = `MDO_${batchDetails.name.split(' ').join('')}_Enrollment_Requests_Report_${this.formatDate(this.reportStatusList[0].lastReportGeneratedOn)}.${fileExtension}`
+    const fileName = `MDO_${batchDetails?.name.split(' ').join('')}_Enrollment_Requests_Report_${this.formatDate(this.reportStatusList[0]?.lastReportGeneratedOn)}.${fileExtension}`
     await this.bpService.downloadReport(downloadUrl, fileName)
   }
 

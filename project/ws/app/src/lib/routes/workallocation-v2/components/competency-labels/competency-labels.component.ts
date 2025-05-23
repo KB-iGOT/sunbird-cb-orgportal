@@ -53,14 +53,14 @@ export class CompetencyLabelsComponent implements OnInit, OnDestroy, AfterViewIn
   }
 
   get labelsList(): UntypedFormArray {
-    return this.activityForm.get('labelsArray') as UntypedFormArray
+    return this.activityForm?.get('labelsArray') as UntypedFormArray
   }
 
   get groupList(): UntypedFormArray {
-    return this.activityForm.get('groupsArray') as UntypedFormArray
+    return this.activityForm?.get('groupsArray') as UntypedFormArray
   }
   groupListByIndex(index: number): UntypedFormArray {
-    return ((this.activityForm.get('groupsArray') as UntypedFormArray).at(index) as any).get('compDescription')
+    return ((this.activityForm?.get('groupsArray') as UntypedFormArray).at(index) as any).get('compDescription')
   }
 
   get groupcompetencyList(): UntypedFormArray {
