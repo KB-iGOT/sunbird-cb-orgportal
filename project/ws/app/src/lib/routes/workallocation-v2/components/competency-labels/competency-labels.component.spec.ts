@@ -1,6 +1,6 @@
 import { CompetencyLabelsComponent } from './competency-labels.component'
 import { BehaviorSubject, of } from 'rxjs'
-import { UntypedFormBuilder } from '@angular/forms'
+import { UntypedFormArray, UntypedFormBuilder, UntypedFormControl, UntypedFormGroup } from '@angular/forms'
 
 // Mock dependencies
 describe('CompetencyLabelsComponent', () => {
@@ -158,35 +158,49 @@ describe('CompetencyLabelsComponent', () => {
         })
 
         it('should add a new group with addNewGroup', () => {
-            // Spy on group list's push method
-            const pushSpy = jest.fn()
-            //  component.groupList = { push: pushSpy, value: [] } as any
+            // Create a fake form array and spy on its push method
+            const formArray = new UntypedFormArray([])
+            const pushSpy = jest.spyOn(formArray, 'push')
+
+            // Mock the activityForm to return this form array
+            component['activityForm'] = new UntypedFormGroup({
+                groupsArray: formArray
+            })
+
+            // Spy on internal method
             jest.spyOn(component, 'setGroupValues')
 
-            // Call addNewGroup
+            // Call the method under test
             component.addNewGroup()
 
-            // Verify group was added
+            // Assert expectations
             expect(pushSpy).toHaveBeenCalled()
             expect(component.setGroupValues).toHaveBeenCalled()
         })
 
+
         it('should add a new group activity with addNewGroupActivity', () => {
-            // Setup
+            // Mock FormArray
             const mockGroupCompetencyList = {
                 push: jest.fn(),
+                patchValue: jest.fn(), // ✅ this fixes the error
                 value: []
             }
+
+            // Spy on groupcompetencyList getter
             jest.spyOn(component, 'groupcompetencyList', 'get').mockReturnValue(mockGroupCompetencyList as any)
+
+            // Spy on setGroupActivityValues
             jest.spyOn(component, 'setGroupActivityValues')
 
-            // Call addNewGroupActivity
+            // Call the method
             component.addNewGroupActivity(0)
 
-            // Verify activity was added
+            // Assert push and setGroupActivityValues were called
             expect(mockGroupCompetencyList.push).toHaveBeenCalled()
             expect(component.setGroupActivityValues).toHaveBeenCalled()
         })
+
     })
 
     describe('Event Handlers', () => {
@@ -234,47 +248,118 @@ describe('CompetencyLabelsComponent', () => {
     })
 
     describe('Drag and Drop Functionality', () => {
+
+
         it('should handle dropping within the same container', () => {
-            // Setup mock event
+            const mockPatchValue = jest.fn()
+            const mockValue = { compName: 'Test', id: 1 }
+
+            // Mock for form control (FormGroup)
+            const mockFormGroup = {
+                value: mockValue,
+                patchValue: mockPatchValue
+            }
+
+            // Mock for competencies FormArray
+            const mockCompetenciesArray = {
+                at: jest.fn().mockReturnValue(mockFormGroup),
+                controls: [mockFormGroup, mockFormGroup, mockFormGroup],
+                value: [mockValue, mockValue, mockValue]
+            }
+
+            // Mock for FormArray inside groupsArray
+            const mockGroupsArray = {
+                at: jest.fn().mockReturnValue({
+                    get: jest.fn().mockImplementation((key: string) => {
+                        if (key === 'competincies') {
+                            return mockCompetenciesArray
+                        }
+                        return undefined
+                    })
+                })
+            }
+
+            // Mock activityForm.get
+            component['activityForm'] = {
+                get: jest.fn().mockReturnValue(mockGroupsArray)
+            } as any
+
             const mockEvent = {
                 previousContainer: {
                     id: 'compe_0',
-                    data: [{ id: 1 }, { id: 2 }, { id: 3 }]
+                    data: [mockValue, mockValue, mockValue]
                 },
                 container: {
                     id: 'compe_0',
-                    data: [{ id: 1 }, { id: 2 }, { id: 3 }]
+                    data: [mockValue, mockValue, mockValue]
                 },
                 previousIndex: 1,
                 currentIndex: 2,
-                item: { data: { compName: 'Test' } }
+                item: { data: mockValue }
             }
 
-            // Setup mock group competency list
-            const mockControls = [{ value: 1 }, { value: 2 }, { value: 3 }]
-            const mockGroupList = {
-                controls: mockControls,
-                value: [1, 2, 3]
-            }
-            jest.spyOn(component, 'groupcompetencyList', 'get').mockReturnValue(mockGroupList as any)
+            // Stub moveItemInArray directly if your method uses it
+            const moveItemInArray = jest.fn()
+            jest.mocked(moveItemInArray)
 
-            // Mock moveItemInArray function globally
-            //global.moveItemInArray = jest.fn()
+            mockWatStore.setgetcompetencyGroup = jest.fn()
 
-            // Call dropgroup
+            // Call the method
             component.dropgroup(mockEvent as any)
 
-            // Verify moveItemInArray was called twice (once for controls, once for values)
-            //expect(global.moveItemInArray).toHaveBeenCalledTimes(2)
-
-            // Verify watStore.setgetcompetencyGroup was called
+            // Assert correct behavior
+            expect(mockPatchValue).toHaveBeenCalled()
             expect(mockWatStore.setgetcompetencyGroup).toHaveBeenCalled()
         })
+
     })
 
+
+
     describe('Competency Selection and Updates', () => {
+
         it('should open dialog when competency is selected', () => {
-            // Setup
+            const mockPatchValue = jest.fn()
+
+            const mockFormControl = {
+                get: jest.fn().mockReturnValue({ value: 'mock-id' }),
+                patchValue: mockPatchValue
+            }
+
+            const mockFormArray = {
+                at: jest.fn().mockReturnValue(mockFormControl),
+                get: jest.fn().mockReturnValue(mockFormControl),
+                value: [{ localId: 'mock-id', compName: 'Test' }],
+                patchValue: mockPatchValue
+            }
+
+            const mockGroup = {
+                get: jest.fn().mockImplementation((key: string) => {
+                    if (key === 'competincies') {
+                        return mockFormArray
+                    }
+                    return undefined
+                }),
+            }
+
+            Object.defineProperty(component, 'groupList', {
+                get: jest.fn().mockReturnValue({
+                    at: jest.fn().mockReturnValue(mockGroup),
+                    value: [{}],
+                })
+            })
+
+            component.selectedCompIdx = 0
+
+            const mockDialogRef = {
+                componentInstance: {},
+                afterClosed: jest.fn().mockReturnValue({
+                    subscribe: jest.fn()
+                }),
+            }
+
+            mockDialog.open.mockReturnValue(mockDialogRef)
+
             const mockEvent = {
                 option: {
                     value: {
@@ -286,25 +371,8 @@ describe('CompetencyLabelsComponent', () => {
                 }
             }
 
-            // Setup groupList
-            // component.groupList = {
-            //     at: jest.fn().mockReturnValue({
-            //         get: jest.fn().mockReturnValue({
-            //             at: jest.fn().mockReturnValue({
-            //                 get: jest.fn().mockReturnValue({
-            //                     value: 'mock-id'
-            //                 }),
-            //                 patchValue: jest.fn()
-            //             }),
-            //             value: [{ localId: 'mock-id', compName: 'Test' }]
-            //         })
-            //     })
-            // } as any
-
-            // Call competencySelected
             component.competencySelected(mockEvent, 0)
 
-            // Verify dialog was opened
             expect(mockDialog.open).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({
                 restoreFocus: false,
                 disableClose: true,
@@ -312,8 +380,73 @@ describe('CompetencyLabelsComponent', () => {
             }))
         })
 
+
         it('should update form values when dialog is closed with OK', () => {
-            // Setup
+            // Setup mock form structure
+            const mockFormGroup = new UntypedFormGroup({
+                compId: new UntypedFormControl(''),
+                compDescription: new UntypedFormControl(''),
+                localId: new UntypedFormControl('mock-id'),
+                compName: new UntypedFormControl(''),
+                compSource: new UntypedFormControl(''),
+                compLevel: new UntypedFormControl(''),
+                compType: new UntypedFormControl(''),
+                compArea: new UntypedFormControl(''),
+                levelList: new UntypedFormArray([]),
+            })
+
+            const competenciesArray = new UntypedFormArray([mockFormGroup])
+
+            const group = new UntypedFormGroup({
+                competincies: competenciesArray
+            })
+
+            const groupsArray = new UntypedFormArray([group])
+
+            component['activityForm'] = new UntypedFormGroup({
+                groupsArray: groupsArray
+            })
+
+            // Ensure selectedCompIdx is valid
+            component.selectedCompIdx = 0
+
+            // Mock ActivatedRoute snapshot
+            component['activated'] = {
+                snapshot: {
+                    data: {
+                        pageData: {
+                            data: {
+                                levels: []
+                            }
+                        }
+                    }
+                }
+            } as any
+
+            // Mock dialog
+            const mockDialogRef = {
+                afterClosed: jest.fn().mockReturnValue(of({
+                    ok: true,
+                    data: {
+                        compId: 'new-id',
+                        compDescription: 'new-desc',
+                        localId: 'new-local-id',
+                        compName: 'new-name',
+                        compSource: 'new-source',
+                        compLevel: 'Level 1',
+                        compType: 'Type X',
+                        compArea: 'Area Y',
+                        levelList: ['L1', 'L2']
+                    }
+                })),
+                componentInstance: {}
+            }
+            jest.spyOn(component.dialog, 'open').mockReturnValue(mockDialogRef as any)
+
+            // Spy updateCompData
+            jest.spyOn(component, 'updateCompData')
+
+            // Mock event
             const mockEvent = {
                 option: {
                     value: {
@@ -325,38 +458,20 @@ describe('CompetencyLabelsComponent', () => {
                 }
             }
 
-            // Mock form controls
-            const mockPatchValue = jest.fn()
-            // const mockFormControls = {
-            //     compId: { patchValue: mockPatchValue },
-            //     compDescription: { patchValue: mockPatchValue },
-            //     localId: { patchValue: mockPatchValue },
-            //     compName: { patchValue: mockPatchValue },
-            //     compSource: { patchValue: mockPatchValue },
-            //     compLevel: { patchValue: mockPatchValue },
-            //     compType: { patchValue: mockPatchValue },
-            //     compArea: { patchValue: mockPatchValue },
-            //     levelList: { patchValue: mockPatchValue }
-            // }
-
-            // Setup groupList
-            // component.groupList = {
-            //     at: jest.fn().mockReturnValue({
-            //         get: jest.fn().mockReturnValue({
-            //             at: jest.fn().mockReturnValue({
-            //                 get: (key: string) => mockFormControls[key]
-            //             }),
-            //             value: [{ localId: 'mock-id', compName: 'Test' }]
-            //         })
-            //     })
-            // } as any
-
-            // Call competencySelected
+            // Call the method
             component.competencySelected(mockEvent, 0)
 
-            // Verify form values were updated
-            expect(mockPatchValue).toHaveBeenCalledTimes(9) // One for each form control
+            // Verify patchValue updates
+            const updatedGroup = (component.groupList.at(0).get('competincies') as UntypedFormArray).at(0)
+            expect(updatedGroup.get('compId')?.value).toBe('new-id')
+            expect(updatedGroup.get('compName')?.value).toBe('new-name')
+            expect(updatedGroup.get('compDescription')?.value).toBe('new-desc')
+
+            // Verify store and update call
+            expect(component['watStore'].setgetcompetencyGroup).toHaveBeenCalled()
+            expect(component.updateCompData).toHaveBeenCalled()
         })
+
     })
 
     describe('Delete Operations', () => {
@@ -392,27 +507,35 @@ describe('CompetencyLabelsComponent', () => {
             expect(mockSnackBar.open).not.toHaveBeenCalled()
         })
 
+
         it('should remove competency at specified index with deleteRowCompetency', () => {
-            // Setup mocks
+            // Create a mock form array for competencies
             const removeAtSpy = jest.fn()
-            // const mockCompetinciesArray = {
-            //     removeAt: removeAtSpy
-            // }
+            const mockCompetinciesArray = {
+                removeAt: removeAtSpy
+            } as unknown as UntypedFormArray
 
-            // const mockRoleGroup = {
-            //     get: jest.fn().mockReturnValue(mockCompetinciesArray)
-            // }
+            // Mock the role group that returns the competencies array
+            const mockRoleGroup = new UntypedFormGroup({
+                competincies: new UntypedFormArray([])
+            })
+            jest.spyOn(mockRoleGroup, 'get').mockReturnValue(mockCompetinciesArray)
 
-            // component.groupList = {
-            //     at: jest.fn().mockReturnValue(mockRoleGroup)
-            // } as any
+            // Create the mock groups array (i.e., groupList)
+            const groupsArray = new UntypedFormArray([mockRoleGroup])
 
-            // Call deleteRowCompetency
+            // Assign the mocked form to component.activityForm
+            component['activityForm'] = new UntypedFormGroup({
+                groupsArray: groupsArray
+            })
+
+            // Call the method
             component.deleteRowCompetency(0, 1)
 
-            // Verify competency was removed and store was updated
+            // Assert
             expect(removeAtSpy).toHaveBeenCalledWith(1)
             expect(mockWatStore.setgetcompetencyGroup).toHaveBeenCalled()
         })
+
     })
 })
