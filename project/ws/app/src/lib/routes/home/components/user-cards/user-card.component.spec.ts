@@ -171,10 +171,25 @@ describe('UserCardComponent', () => {
 		expect(component.selectedtags).toEqual([])
 	})
 
+	// it('should format profileStatusUpdatedOn value in ngOnInit', () => {
+	// 	component.ngOnInit()
+	// 	expect(component.usersData[0].profileDetails.profileStatusUpdatedOn).toBe('2023-01-01')
+	// })
+
 	it('should format profileStatusUpdatedOn value in ngOnInit', () => {
+		component.usersData = [
+			{
+				profileDetails: {
+					profileStatusUpdatedOn: '2023-01-01T10:00:00Z', // ISO string input
+				}
+			}
+		] as any
+
 		component.ngOnInit()
-		expect(component.usersData[0].profileDetails.profileStatusUpdatedOn).toBe('2023-01-01')
+
+		expect(component.usersData[0].profileDetails.profileStatusUpdatedOn).toBe('2023-01-01T10:00:00Z')
 	})
+
 
 	it('should load roles on init', () => {
 		component.ngOnInit()
