@@ -11,6 +11,7 @@ import { RolesService } from '../../../../../users/services/roles.service'
 import { Subject } from 'rxjs'
 import { HttpErrorResponse } from '@angular/common/http'
 
+
 interface Community {
   communityName: string
   startDate: Date
@@ -87,6 +88,35 @@ export class CommunityDashboardComponent implements OnInit {
     }
   }
 
+  getOrgRolesList(): void {
+    this.rolesService.getAllRoles()
+      .pipe(takeUntil(this.destroySubject$))
+      .subscribe((res: any) => {
+        if (res && res.result && res.result.response && res.result.response.value) {
+          this.masterData['rolesList'] = JSON.parse(res.result.response.value)
+          const orgTypeList = this.masterData.rolesList?.orgTypeList
+          if (Array.isArray(orgTypeList)) {
+            const mdoArray = orgTypeList.find((elem: any) => elem.name === 'MDO')
+            if (mdoArray.roles && Array.isArray(mdoArray.roles)) {
+              this.masterData['mdoRoles'] = mdoArray.roles
+              const targetRoles = ['COMMUNITY_MODERATOR', 'MDO_LEADER']
+              const itemPresent = targetRoles.some((role: any) => this.masterData['mdoRoles'].includes(role))
+              if (itemPresent) {
+                this.isCommunityModeratorRole = true
+              }
+            }
+          }
+        }
+        // tslint:disable-next-line
+      }, (_err: HttpErrorResponse) => {
+        if (!_err.ok) {
+          // this.matSnackBar.open('Unable to fetch roles list, please try again later!')
+          // tslint:disable-next-line
+          console.log('error ===')
+        }
+      })
+  }
+
   ngOnInit() {
     // Setup search subscription with debounce
     'component called !!!!!!!!'
@@ -103,29 +133,7 @@ export class CommunityDashboardComponent implements OnInit {
     // this.getDisplayColumns()
   }
 
-  getOrgRolesList(): void {
-    this.rolesService.getAllRoles()
-      .pipe(takeUntil(this.destroySubject$))
-      .subscribe((res: any) => {
-        if (res && res.result && res.result.response.value) {
-          this.masterData['rolesList'] = JSON.parse(res.result.response.value)
-          if (Array.isArray(this.masterData.rolesList.orgTypeList)) {
-            const mdoArray = this.masterData.rolesList.orgTypeList.find((elem: any) => elem.name === 'MDO')
-            this.masterData['mdoRoles'] = mdoArray.roles
-            this.isCommunityModeratorRole = this.masterData['mdoRoles'].some((val: any) => val === 'COMMUNITY_MODERATOR')
-          }
-        }
 
-
-        // tslint:disable-next-line
-      }, (_err: HttpErrorResponse) => {
-        if (!_err.ok) {
-          // this.matSnackBar.open('Unable to fetch roles list, please try again later!')
-          // tslint:disable-next-line
-          console.log('error ===')
-        }
-      })
-  }
 
   ngAfterViewInit() {
     this.dataSource.sort = this.sort
