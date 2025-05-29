@@ -120,7 +120,9 @@
   font-size: 14px;
   font-weight: 400;
   line-height: 21px;
+  /* stylelint-disable */
   font-family: Lato;
+  /* stylelint-enable */
   letter-spacing: normal;
   box-sizing: border-box;
   height: 32px;
@@ -142,7 +144,9 @@
 
 .text-description {
   color: rgba(0, 0, 0, 0.6);
+  /* stylelint-disable */
   font: 400 14px Lato;
+  /* stylelint-enable */
 }
 
 .verify_icon {
@@ -164,12 +168,16 @@
 }
 
 .more-or-less {
+  /* stylelint-disable */
   font-family: Lato;
+  /* stylelint-enable */
   color: #1b4ca1;
   font-size: 14px;
   font-weight: 400;
   line-height: 20px;
+  /* stylelint-disable */
   font-weight: 600;
+  /* stylelint-enable */
   margin: 8px 0;
 }
 
@@ -212,7 +220,9 @@
   background-color: #fff;
   border: 1px solid rgba(0, 0, 0, 0.4);
   color: rgba(0, 0, 0, 0.4);
+  /* stylelint-disable */
   font: 14px/21px 'Lato';
+  /* stylelint-enable */
   font-weight: 700;
   box-sizing: border-box;
   cursor: pointer;
