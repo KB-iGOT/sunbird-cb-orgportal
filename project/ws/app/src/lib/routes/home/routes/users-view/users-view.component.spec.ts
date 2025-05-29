@@ -251,7 +251,29 @@ describe('UsersViewComponent', () => {
   })
 
   describe('data fetching methods', () => {
+    // it('getAllUsers should call usersService.getAllKongUsers with correct params', async () => {
+    //   await component.getAllUsers('')
+
+    //   expect(mockUsersService.getAllKongUsers).toHaveBeenCalledWith(expect.objectContaining({
+    //     request: expect.objectContaining({
+    //       filters: expect.objectContaining({
+    //         rootOrgId: 'test-root-org-id',
+    //         'profileDetails.profileStatus': ['VERIFIED', 'NOT-VERIFIED'],
+    //         status: 1
+    //       }),
+    //       limit: 20,
+    //       offset: 0
+    //     })
+    //   }))
+
+    //   expect(component.activeUsersData).toBeDefined()
+    //   expect(component.activeUsersDataCount).toBeDefined()
+    // })
+
     it('getAllUsers should call usersService.getAllKongUsers with correct params', async () => {
+      // 👇 Set expected rootOrgId before calling the method
+      component.rootOrgId = 'test-root-org-id'
+
       await component.getAllUsers('')
 
       expect(mockUsersService.getAllKongUsers).toHaveBeenCalledWith(expect.objectContaining({
@@ -270,7 +292,30 @@ describe('UsersViewComponent', () => {
       expect(component.activeUsersDataCount).toBeDefined()
     })
 
+
+    // it('getVUsers should call usersService.getAllKongUsers with correct params', async () => {
+    //   await component.getVUsers('')
+
+    //   expect(mockUsersService.getAllKongUsers).toHaveBeenCalledWith(expect.objectContaining({
+    //     request: expect.objectContaining({
+    //       filters: expect.objectContaining({
+    //         rootOrgId: 'test-root-org-id',
+    //         'profileDetails.profileStatus': 'VERIFIED',
+    //         status: 1
+    //       }),
+    //       limit: 20,
+    //       offset: 0
+    //     })
+    //   }))
+
+    //   expect(component.verifiedUsersData).toBeDefined()
+    //   expect(component.verifiedUsersDataCount).toBeDefined()
+    // })
+
     it('getVUsers should call usersService.getAllKongUsers with correct params', async () => {
+      // Set rootOrgId before calling the method
+      component.rootOrgId = 'test-root-org-id'
+
       await component.getVUsers('')
 
       expect(mockUsersService.getAllKongUsers).toHaveBeenCalledWith(expect.objectContaining({
@@ -288,6 +333,7 @@ describe('UsersViewComponent', () => {
       expect(component.verifiedUsersData).toBeDefined()
       expect(component.verifiedUsersDataCount).toBeDefined()
     })
+
   })
 
   describe('filter helper methods', () => {
