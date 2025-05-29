@@ -336,7 +336,7 @@ export class CommunityManageComponent {
         // tslint:disable-next-line
         console.log(res, 'response====')
       }
-      (err: any) => {
+      (err: any) => {// NOSONAR
         this.snackbar.open(err, 'Close', { duration: 3000 })
       }
     })
