@@ -991,11 +991,11 @@ export class UserCardComponent implements OnInit, OnChanges, AfterViewChecked, A
   onTransferSubmit(panel: any, appData: any) {
 
     let orgReq = {}
-    appData.userWorkflow.wfInfo.forEach((wf: any) => {
-      const fields = JSON.parse(wf.updateFieldValues)
+    appData?.userWorkflow?.wfInfo.forEach((wf: any) => {
+      const fields = JSON.parse(wf?.updateFieldValues)
       if (fields.length > 0) {
         fields.forEach((field: any) => {
-          const labelKey = Object.keys(field.toValue)[0]
+          const labelKey = Object.keys(field?.toValue)[0]
           if (labelKey === 'name') {
             orgReq = {
               action: 'APPROVE',
@@ -1016,7 +1016,7 @@ export class UserCardComponent implements OnInit, OnChanges, AfterViewChecked, A
     this.actionList.push(orgReq)
     const datalength = this.actionList.length
     this.actionList.forEach((req: any, index: any) => {
-      if (req.action === 'APPROVE') {
+      if (req?.action === 'APPROVE') {
         req.comment = ''
       }
       let request: any = {
@@ -1032,7 +1032,7 @@ export class UserCardComponent implements OnInit, OnChanges, AfterViewChecked, A
           // tslint:disable-next-line
         }, 100)
       }
-      if (this.approvalData.length === 0) {
+      if (this.approvalData?.length === 0) {
         this.disableButton.emit()
       }
     })
