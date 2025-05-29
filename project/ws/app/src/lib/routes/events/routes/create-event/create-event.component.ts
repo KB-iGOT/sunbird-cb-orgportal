@@ -514,12 +514,15 @@ export class CreateEventComponent implements OnInit {
     } else {
       this.eventsSvc.createEvent(form).subscribe(
         res => {
-          this.displayLoader = false
-          this.disableCreateButton = false
-          const identifier = res.result.identifier
-          const versionKey = res.result.versionKey
-          // this.fileSubmit(identifier)
-          this.publishEvent(identifier, versionKey)
+          if (res && res.result) {
+            this.displayLoader = false
+            this.disableCreateButton = false
+            const identifier = res.result.identifier
+            const versionKey = res.result.versionKey
+            // this.fileSubmit(identifier)
+            this.publishEvent(identifier, versionKey)
+          }
+
         },
         (err: any) => {
           this.displayLoader = false

@@ -52,8 +52,8 @@ export class FilterComponent implements OnInit, AfterContentChecked {
     this.compentencyKey = this.initService?.configSvc?.competency[environment.compentencyVersionKey]
     this.filterObj = {
       [this.compentencyKey?.vCompetencyArea]: [],
-      [this.compentencyKey.vCompetencyTheme]: [],
-      [this.compentencyKey.vCompetencySubTheme]: [],
+      [this.compentencyKey?.vCompetencyTheme]: [],
+      [this.compentencyKey?.vCompetencySubTheme]: [],
       providers: [],
 
     }
