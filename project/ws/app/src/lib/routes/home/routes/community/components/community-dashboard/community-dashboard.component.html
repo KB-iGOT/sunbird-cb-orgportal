@@ -94,10 +94,12 @@
             <mat-icon class="align-top-icon">more_vert</mat-icon>
           </button>
           <mat-menu #menu="matMenu">
-            <button mat-menu-item (click)="onActionClick('edit', row)" [disabled]="!canEdit(row)">
+            <!-- <button mat-menu-item (click)="onActionClick('edit', row)"
+              [disabled]="!canEdit(row) || isCommunityModeratorRole">
               <mat-icon>edit</mat-icon>
               <span>Edit</span>
-            </button>
+            </button> -->
+
             <button mat-menu-item (click)="onActionClick('manage', row)" *ngIf="isCommunityModeratorRole">
               <mat-icon>settings</mat-icon>
               <span>Manage</span>
