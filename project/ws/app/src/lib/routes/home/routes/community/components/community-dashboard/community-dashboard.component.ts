@@ -48,6 +48,7 @@ export class CommunityDashboardComponent implements OnInit {
   private destroySubject$ = new Subject()
   masterData: any = {}
   isCommunityModeratorRole = false
+  isCommunityCreateRole = false
 
   tabs = [
     {
@@ -100,9 +101,14 @@ export class CommunityDashboardComponent implements OnInit {
             if (mdoArray.roles && Array.isArray(mdoArray.roles)) {
               this.masterData['mdoRoles'] = mdoArray.roles
               const targetRoles = ['COMMUNITY_MODERATOR', 'MDO_LEADER']
+
               const itemPresent = targetRoles.some((role: any) => this.masterData['mdoRoles'].includes(role))
               if (itemPresent) {
                 this.isCommunityModeratorRole = true
+              }
+              const mdoLeaderPresent = this.masterData['mdoRoles'].some((role: any) => role.includes('MDO_LEADER'))
+              if (mdoLeaderPresent) {
+                this.isCommunityCreateRole = true
               }
             }
           }
