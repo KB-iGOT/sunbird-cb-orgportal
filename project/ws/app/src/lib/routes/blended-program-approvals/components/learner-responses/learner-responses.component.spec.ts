@@ -4,7 +4,7 @@ import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog'
 import { RejectReasonDialogComponent } from '../reject-reason-dialog/reject-reason-dialog.component'
 import { DialogConfirmComponent } from '../../../../../../../../../src/app/component/dialog-confirm/dialog-confirm.component'
 import { of } from 'rxjs'
-import _ from 'lodash'
+import * as _ from 'lodash'
 
 jest.mock('../../services/blended-approval.service')
 jest.mock('@angular/material/legacy-dialog')

@@ -3,7 +3,7 @@ import { Router, ActivatedRoute } from '@angular/router'
 import { ITableData } from '@sunbird-cb/collection/lib/ui-org-table/interface/interfaces'
 import { EventService } from '@sunbird-cb/utils'
 // tslint:disable-next-line
-import _ from 'lodash'
+import * as _ from 'lodash'
 import { TelemetryEvents } from '../../../../head/_services/telemetry.event.model'
 import { RolesService } from '../../../users/services/roles.service'
 import { UsersService } from '../../../users/services/users.service'
@@ -21,11 +21,11 @@ export class RolesAccessComponent implements OnInit, AfterViewInit, OnDestroy {
   uniqueRoles: any = []
 
   constructor(private router: Router,
-              private activeRouter: ActivatedRoute,
-              private usersService: UsersService,
+    private activeRouter: ActivatedRoute,
+    private usersService: UsersService,
     // private telemetrySvc: TelemetryService,
-              private events: EventService,
-              private roleservice: RolesService) { }
+    private events: EventService,
+    private roleservice: RolesService) { }
 
   ngOnInit() {
     this.tabledata = {

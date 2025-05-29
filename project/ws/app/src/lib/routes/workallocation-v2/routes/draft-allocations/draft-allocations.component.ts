@@ -4,7 +4,7 @@ import { MatLegacyPaginator as MatPaginator } from '@angular/material/legacy-pag
 import { Router, ActivatedRoute } from '@angular/router'
 import { EventService } from '@sunbird-cb/utils'
 /* tslint:disable */
-import _ from 'lodash'
+import * as _ from 'lodash'
 import { PublishPopupComponent } from '../../components/publish-popup/publish-popup.component'
 import { AllocationService } from '../../services/allocation.service'
 // import FileSaver from 'file-saver'

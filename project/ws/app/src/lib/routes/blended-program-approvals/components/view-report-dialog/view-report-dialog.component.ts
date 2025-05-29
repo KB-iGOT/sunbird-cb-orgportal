@@ -2,7 +2,7 @@ import { Component, Inject, OnInit } from '@angular/core'
 import { UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms'
 import { MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA, MatLegacyDialogRef as MatDialogRef } from '@angular/material/legacy-dialog'
 /* tslint:disable */
-import _ from 'lodash'
+import * as _ from 'lodash'
 import { BlendedApporvalService } from '../../services/blended-approval.service'
 /* tslint:enable */
 
@@ -51,7 +51,7 @@ export class ViewReportDialogComponent implements OnInit {
       this.latestData = tempData[tempData.length - 1]
       setTimeout(() => {
         this.showSpinner = false
-      },         1000)
+      }, 1000)
     }
     this.apiData = {
       getAPI: `/apis/proxies/v8/forms/getFormById?id=${this.latestData.formId}`,

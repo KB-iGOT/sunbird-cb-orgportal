@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core'
 // tslint:disable
-import _ from 'lodash'
+import * as _ from 'lodash'
 // tslint:enable
 import { BehaviorSubject, Observable } from 'rxjs'
 import { NSWatActivity } from '../models/activity-wot.model'

@@ -6,7 +6,7 @@ import { UsersService } from '../../services/users.service'
 import { MatLegacyChipInputEvent as MatChipInputEvent } from '@angular/material/legacy-chips'
 import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar'
 // tslint:disable-next-line
-import _ from 'lodash'
+import * as _ from 'lodash'
 import { EventService } from '@sunbird-cb/utils'
 import { Subscription } from 'rxjs'
 import { TelemetryEvents } from '../../../../head/_services/telemetry.event.model'

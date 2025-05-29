@@ -1,6 +1,6 @@
 import { BlendedApporvalService } from './blended-approval.service'
 import { of } from 'rxjs'
-import _ from 'lodash'
+import * as _ from 'lodash'
 
 describe('BlendedApporvalService', () => {
     let service: BlendedApporvalService

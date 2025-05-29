@@ -4,7 +4,7 @@ import { MatLegacyCheckboxChange as MatCheckboxChange } from '@angular/material/
 import { MatLegacyRadioChange as MatRadioChange } from '@angular/material/legacy-radio'
 import { MatLegacyDialogRef as MatDialogRef, MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA } from '@angular/material/legacy-dialog'
 /* tslint:disable */
-import _ from 'lodash'
+import * as _ from 'lodash'
 /* tslint:enable */
 
 export interface IWatCompPopupData {

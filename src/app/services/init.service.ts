@@ -24,7 +24,7 @@ import {
 import { map } from 'rxjs/operators'
 import { environment } from '../../environments/environment'
 /* tslint:disable*/
-import _ from 'lodash'
+import * as _ from 'lodash'
 import { v4 as uuid } from 'uuid'
 import { Subscription } from 'rxjs'
 /* tslint:enable*/

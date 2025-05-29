@@ -4,7 +4,7 @@ import moment from 'moment'
 // import { ConfigurationsService } from '@sunbird-cb/utils'
 // import { NeedApprovalsService } from '../../services/need-approvals.service'
 // tslint:disable
-import _ from 'lodash'
+import * as _ from 'lodash'
 import { EventService } from '@sunbird-cb/utils'
 import { TelemetryEvents } from '../../../../head/_services/telemetry.event.model'
 // tslint:enable

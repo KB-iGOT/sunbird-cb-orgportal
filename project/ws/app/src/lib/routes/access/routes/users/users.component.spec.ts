@@ -1,6 +1,6 @@
 // users.component.spec.ts
 import { UsersComponent } from './users.component'
-import _ from 'lodash'
+import * as _ from 'lodash'
 
 describe('UsersComponent', () => {
     let component: UsersComponent

@@ -2,7 +2,7 @@ import { TrainingPlanDashboardComponent } from './training-plan-dashboard.compon
 import { of, throwError } from 'rxjs'
 import * as moment from 'moment'
 import { fakeAsync } from '@angular/core/testing'
-import _ from 'lodash'
+import * as _ from 'lodash'
 
 describe('TrainingPlanDashboardComponent', () => {
     let component: TrainingPlanDashboardComponent

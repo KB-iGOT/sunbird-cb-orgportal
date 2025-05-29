@@ -5,7 +5,7 @@ import { UsersService } from '../../services/users.service'
 import { UsersService as UsersService2 } from '../../../users/services/users.service'
 
 /* tslint:disable */
-import _ from 'lodash'
+import * as _ from 'lodash'
 import { ITableData } from '@sunbird-cb/collection/lib/ui-org-table/interface/interfaces'
 import { ProfileV2UtillService } from '../../../home/services/home-utill.service'
 

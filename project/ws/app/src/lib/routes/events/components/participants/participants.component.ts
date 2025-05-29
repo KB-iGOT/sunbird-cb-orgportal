@@ -7,7 +7,7 @@ import { debounceTime, distinctUntilChanged } from 'rxjs/operators'
 import { EventsService } from '../../services/events.service'
 import { HttpClient } from '@angular/common/http'
 // tslint:disable-next-line
-import _ from 'lodash'
+import * as _ from 'lodash'
 import { ProfileV2UtillService } from '../../../home/services/home-utill.service'
 
 export interface IParticipantElement {

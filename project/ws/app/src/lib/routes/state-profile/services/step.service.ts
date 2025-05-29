@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core'
 // tslint:disable-next-line
-import _ from 'lodash'
+import * as _ from 'lodash'
 import { BehaviorSubject } from 'rxjs'
 
 @Injectable({

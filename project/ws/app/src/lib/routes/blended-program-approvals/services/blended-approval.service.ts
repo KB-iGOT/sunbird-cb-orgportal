@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http'
 import { Observable } from 'rxjs'
 import { map } from 'rxjs/operators'
 // tslint:disable-next-line:import-name
-import _ from 'lodash'
+import * as _ from 'lodash'
 
 const API_END_POINTS = {
   UPDATE_REQUEST: '/apis/proxies/v8/workflow/blendedprogram/update/mdo',

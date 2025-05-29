@@ -2,7 +2,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core'
 import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog'
 import { ActivatedRoute, Router } from '@angular/router'
 /* tslint:disable */
-import _ from 'lodash'
+import * as _ from 'lodash'
 /* tslint:enable */
 // import { environment } from 'src/environments/environment'
 import { LegacyPageEvent as PageEvent } from '@angular/material/legacy-paginator'
@@ -106,7 +106,7 @@ export class MentorManageComponent implements OnInit, OnDestroy {
       setTimeout(() => {
         this.getAllVerifiedUsers('')
         this.getMentorUsers('')
-      },         1000)
+      }, 1000)
 
     })
     this.getAllVerifiedUsers('')

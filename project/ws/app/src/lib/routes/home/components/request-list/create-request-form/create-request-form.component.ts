@@ -7,7 +7,7 @@ import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack
 import { CompetencyViewComponent } from '../competency-view/competency-view.component'
 import { ConfirmationBoxComponent } from '../../../../training-plan/components/confirmation-box/confirmation.box.component'
 /* tslint:disable */
-import _ from 'lodash'
+import * as _ from 'lodash'
 import { debounceTime, distinctUntilChanged, startWith } from 'rxjs/operators'
 import { preventHtmlAndJs } from '../../../../validators/prevent-html-and-js.validator'
 import { ICompentencyKeys } from '../../../interface/interfaces'

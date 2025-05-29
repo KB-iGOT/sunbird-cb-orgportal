@@ -5,7 +5,7 @@ import { OrgProfileService } from '../../services/org-profile.service'
 import { Subject } from 'rxjs'
 import { ConfigurationsService } from '@sunbird-cb/utils'
 /* tslint:disable*/
-import _ from 'lodash'
+import * as _ from 'lodash'
 
 
 
