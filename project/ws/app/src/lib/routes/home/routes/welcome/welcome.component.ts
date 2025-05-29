@@ -2,7 +2,7 @@
 import { DOCUMENT } from '@angular/common'
 import { AfterViewInit, Component, Inject, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core'
 /* tslint:disable */
-import _ from 'lodash'
+import * as _ from 'lodash'
 import { environment } from '../../../../../../../../../src/environments/environment'
 import { ProfileV2Service } from '../../services/home.servive'
 import { dashboardEmptyData } from '../../../../../../../../../src/mdo-assets/data/data'

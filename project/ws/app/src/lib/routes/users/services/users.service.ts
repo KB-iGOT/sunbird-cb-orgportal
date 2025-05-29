@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http'
 import { Observable, Subject } from 'rxjs'
 import { map, retry } from 'rxjs/operators'
 // tslint:disable
-import _ from 'lodash'
+import * as _ from 'lodash'
 
 // tslint:enable
 

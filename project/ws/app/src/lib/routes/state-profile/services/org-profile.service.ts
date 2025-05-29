@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core'
 import { HttpClient } from '@angular/common/http'
 // tslint:disable
-import _ from 'lodash'
+import * as _ from 'lodash'
 // tslint:enable
 
 const API_END_POINTS = {

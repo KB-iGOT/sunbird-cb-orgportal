@@ -6,7 +6,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core'
 // import { ITableData } from '@sunbird-cb/collection/lib/ui-org-table/interface/interfaces'
 // import { MatDialog, MatSnackBar, PageEvent } from '@angular/material'
 // /* tslint:disable */
-// import _ from 'lodash'
+// import * as _ from 'lodash'
 // import { EventService } from '@sunbird-cb/utils'
 // import { TelemetryEvents } from '../../../../head/_services/telemetry.event.model'
 // import { DomSanitizer, SafeHtml } from '@angular/platform-browser'

@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core'
 import { ActivatedRoute, Router, NavigationEnd, Event } from '@angular/router'
 /* tslint:disable */
-import _ from 'lodash'
+import * as _ from 'lodash'
 /* tslint:enable */
 // import { ConfigurationsService } from '@sunbird-cb/utils'
 

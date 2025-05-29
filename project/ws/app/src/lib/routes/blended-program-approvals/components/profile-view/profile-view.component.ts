@@ -4,7 +4,7 @@ import { NSProfileDataV2 } from '../../../../routes/approvals/models/profile-v2.
 import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog'
 import { ActivatedRoute, Router } from '@angular/router'
 /* tslint:disable */
-import _ from 'lodash'
+import * as _ from 'lodash'
 import { BlendedApporvalService } from '../../services/blended-approval.service'
 import { WidgetUserService } from '@sunbird-cb/collection'
 import moment from 'moment'

@@ -8,7 +8,7 @@ import { Clipboard } from '@angular/cdk/clipboard'
 import { LoadingPopupComponent } from '../loading-popup/loading-popup.component'
 import { OnboardingService } from '../../../services/onboarding.service'
 import { DesignationsService } from '../../designation/services/designations.service'
-import _ from 'lodash'
+import * as _ from 'lodash'
 import { EventService } from '@sunbird-cb/utils'
 
 @Component({
