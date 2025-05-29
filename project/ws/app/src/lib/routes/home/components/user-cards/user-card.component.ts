@@ -143,7 +143,7 @@ export class UserCardComponent implements OnInit, OnChanges, AfterViewChecked, A
   checked = false
   currentUserStatus = ''
   userLimitSet: any
-  constructor(private usersSvc: UsersService, private roleservice: RolesService,
+  constructor(public usersSvc: UsersService, private roleservice: RolesService,
     private dialog: MatDialog, private approvalSvc: ApprovalsService,
     private route: ActivatedRoute, private snackBar: MatSnackBar,
     private events: EventService,
@@ -222,7 +222,7 @@ export class UserCardComponent implements OnInit, OnChanges, AfterViewChecked, A
     } else {
       this.init()
     }
-    this.userLimitSet = this.usersSvc.TOTAL_USERS_LIMIT
+    this.userLimitSet = this.usersSvc?.TOTAL_USERS_LIMIT
 
 
     this.updateUserDataForm.get('searchDesignation')!.valueChanges
@@ -348,7 +348,7 @@ export class UserCardComponent implements OnInit, OnChanges, AfterViewChecked, A
 
   async getFieldsMappedData(approvalData: any) {
     approvalData.forEach((appdata: any) => {
-      if (appdata.userWorkflow.wfInfo && appdata.userWorkflow.wfInfo.length > 0) {
+      if (appdata.userWorkflow && appdata.userWorkflow.wfInfo && appdata.userWorkflow.wfInfo.length > 0) {
         appdata.needApprovalList = []
         appdata.userWorkflow.wfInfo.forEach((wf: any) => {
           if (typeof wf.updateFieldValues === 'string') {
@@ -599,20 +599,23 @@ export class UserCardComponent implements OnInit, OnChanges, AfterViewChecked, A
           this.rolesList.push(role)
         }
       })
-      const usrRoles = user.organisations[0] && user.organisations[0].roles
-        ? user.organisations[0].roles : []
-      if (usrRoles.length > 0) {
-        // Set form value inside setTimeout to avoid ExpressionChangedAfterItHasBeenCheckedError
-        setTimeout(() => {
-          this.updateUserDataForm.controls['roles'].setValue(usrRoles)
-          this.cdr.detectChanges()
-        }, 0)
+      if (user && user.organisations && user.organisations.length) {
+        const usrRoles = user.organisations[0] && user.organisations[0].roles
+          ? user.organisations[0].roles : []
+        if (usrRoles.length > 0) {
+          // Set form value inside setTimeout to avoid ExpressionChangedAfterItHasBeenCheckedError
+          setTimeout(() => {
+            this.updateUserDataForm.controls['roles'].setValue(usrRoles)
+            this.cdr.detectChanges()
+          }, 0)
 
-        usrRoles.forEach((role: any) => {
-          this.orguserRoles.push(role)
-          this.userRoles.add(role)
-        })
+          usrRoles.forEach((role: any) => {
+            this.orguserRoles.push(role)
+            this.userRoles.add(role)
+          })
+        }
       }
+
     } else {
       this.loadRoles()
       this.mapRoles(user)
@@ -705,7 +708,9 @@ export class UserCardComponent implements OnInit, OnChanges, AfterViewChecked, A
         name = `${user.profileDetails.personalDetails.firstName}`
       }
     } else {
-      name = `${user.firstName}`
+      if (user && user.firstName) {
+        name = `${user.firstName}`
+      }
     }
     return name
   }

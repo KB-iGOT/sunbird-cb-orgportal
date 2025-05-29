@@ -571,10 +571,10 @@ export class InitService {
   private updateNavConfig() {
     if (this.configSvc.instanceConfig) {
       const background = this.configSvc.instanceConfig.backgrounds
-      if (background.primaryNavBar) {
+      if (background && background.primaryNavBar) {
         this.configSvc.primaryNavBar = background.primaryNavBar
       }
-      if (background.pageNavBar) {
+      if (background && background.pageNavBar) {
         this.configSvc.pageNavBar = background.pageNavBar
       }
       if (this.configSvc.instanceConfig.primaryNavBarConfig) {
@@ -585,7 +585,9 @@ export class InitService {
 
   private updateAppIndexMeta() {
     if (this.configSvc.instanceConfig) {
-      document.title = this.configSvc.instanceConfig.details.appName
+      if (this.configSvc.instanceConfig.details) {
+        document.title = this.configSvc.instanceConfig.details.appName
+      }
       try {
         if (this.configSvc.instanceConfig.indexHtmlMeta.description) {
           const manifestElem = document.getElementById('id-app-description')
@@ -630,7 +632,7 @@ export class InitService {
     let returnValue = false
     const rolesForCBP = environment.portalRoles
     role.forEach(v => {
-      if ((rolesForCBP).includes(v)) {
+      if (rolesForCBP && (rolesForCBP).includes(v)) {
         returnValue = true
       }
     })

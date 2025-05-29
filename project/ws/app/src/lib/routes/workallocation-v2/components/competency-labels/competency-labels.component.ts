@@ -160,7 +160,7 @@ export class CompetencyLabelsComponent implements OnInit, OnDestroy, AfterViewIn
       moveItemInArray(this.groupcompetencyList.controls, event.previousIndex, event.currentIndex)
       moveItemInArray(this.groupcompetencyList.value, event.previousIndex, event.currentIndex)
     } else {
-      if (!event.item.data.compName) {
+      if (event.item && !event.item.data.compName) {
         this.snackBar.open('Competency Name is required to drag', undefined, { duration: 2000 })
         return
       }
