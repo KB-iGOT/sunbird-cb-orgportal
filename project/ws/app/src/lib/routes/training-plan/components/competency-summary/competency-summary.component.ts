@@ -75,11 +75,11 @@ export class CompetencySummaryComponent implements OnInit, OnChanges {
     if (this.selectedCardData && this.compentencyKey && this.compentencyKey.vKey) {
       let fObj = { competencyTheme: '', count: 0 }
       this.selectedCardData.forEach((sitem: any) => {
-        if (sitem && sitem[this.compentencyKey.vKey]) {
-          sitem[this.compentencyKey.vKey].map((fitem: any) => {
-            if (fitem[this.compentencyKey.vCompetencyArea].toLowerCase() === 'behavioural') {
+        if (sitem && sitem[this.compentencyKey?.vKey]) {
+          sitem[this.compentencyKey?.vKey].map((fitem: any) => {
+            if (fitem[this.compentencyKey?.vCompetencyArea]?.toLowerCase() === 'behavioural') {
               const result = this.checkIfThemeNameExists(this.competencySummaryObj[0]['behavioural']['listData'], fitem)
-              fObj = { competencyTheme: fitem[this.compentencyKey.vCompetencyTheme], count: 1 }
+              fObj = { competencyTheme: fitem[this.compentencyKey?.vCompetencyTheme], count: 1 }
               if (result) {
                 this.competencySummaryObj[0]['behavioural']['count'] = this.competencySummaryObj[0]['behavioural']['count'] + 1
                 this.competencySummaryObj[0]['behavioural']['listData'].push(fObj)
@@ -88,7 +88,7 @@ export class CompetencySummaryComponent implements OnInit, OnChanges {
             }
             if (fitem[this.compentencyKey.vCompetencyArea].toLowerCase() === 'functional') {
               const result = this.checkIfThemeNameExists(this.competencySummaryObj[1]['functional']['listData'], fitem)
-              fObj = { competencyTheme: fitem[this.compentencyKey.vCompetencyTheme], count: 1 }
+              fObj = { competencyTheme: fitem[this.compentencyKey?.vCompetencyTheme], count: 1 }
               if (result) {
                 this.competencySummaryObj[1]['functional']['count'] = this.competencySummaryObj[1]['functional']['count'] + 1
                 this.competencySummaryObj[1]['functional']['listData'].push(fObj)
@@ -97,7 +97,7 @@ export class CompetencySummaryComponent implements OnInit, OnChanges {
             }
             if (fitem[this.compentencyKey.vCompetencyArea].toLowerCase() === 'domain') {
               const result = this.checkIfThemeNameExists(this.competencySummaryObj[2]['domain']['listData'], fitem)
-              fObj = { competencyTheme: fitem[this.compentencyKey.vCompetencyTheme], count: 1 }
+              fObj = { competencyTheme: fitem[this.compentencyKey?.vCompetencyTheme], count: 1 }
               if (result) {
                 this.competencySummaryObj[2]['domain']['count'] = this.competencySummaryObj[2]['domain']['count'] + 1
                 this.competencySummaryObj[2]['domain']['listData'].push(fObj)
@@ -114,7 +114,7 @@ export class CompetencySummaryComponent implements OnInit, OnChanges {
   checkIfThemeNameExists(arr: any, fitem: any): boolean {
     let flag = true
     arr.map((sitem: any) => {
-      if (sitem.competencyTheme === fitem[this.compentencyKey.vCompetencyTheme]) {
+      if (sitem?.competencyTheme === fitem[this.compentencyKey?.vCompetencyTheme]) {
         sitem['count'] = sitem['count'] + 1
         flag = false
       }
