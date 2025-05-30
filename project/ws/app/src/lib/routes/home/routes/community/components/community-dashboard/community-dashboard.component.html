@@ -2,7 +2,8 @@
   <div class="header">
     <h1>Communities</h1>
 
-    <button mat-button class="createBtn" (click)="onCreateCommunity()">Create New Community</button>
+    <button mat-button class="createBtn" (click)="onCreateCommunity()" *ngIf="isCommunityCreateRole">Create New
+      Community</button>
   </div>
 
   <!-- <mat-form-field class="search-field">
