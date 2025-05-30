@@ -44,10 +44,10 @@ export class CustomSelfRegistrationComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.configSvc = this.activatedRoute.parent && this.activatedRoute.parent.snapshot.data.configService
-    this.onboardingConfig = this.activatedRoute.parent && this.activatedRoute.parent.snapshot.data.pageData.data
-    this.rootOrdId = this.configSvc.userProfile.rootOrgId
-    this.framewordId = this.configSvc.orgReadData.frameworkid
+    this.configSvc = this.activatedRoute?.parent && this.activatedRoute?.parent?.snapshot?.data?.configService
+    this.onboardingConfig = this.activatedRoute?.parent && this.activatedRoute?.parent?.snapshot?.data?.pageData?.data
+    this.rootOrdId = this.configSvc?.userProfile?.rootOrgId
+    this.framewordId = this.configSvc?.orgReadData?.frameworkid
     this.initializeForm()
 
     if (this.framewordId && this.configSvc.orgReadData) {
@@ -61,15 +61,15 @@ export class CustomSelfRegistrationComponent implements OnInit {
         if (response.result && Array.isArray(response.result?.qrCodeDataForOrg) && response.result?.qrCodeDataForOrg.length > 0) {
           this.registeredLinksList = response.result.qrCodeDataForOrg
           this.latestRegisteredData = this.registeredLinksList[this.registeredLinksList.length - 1]
-          this.selfRegistrationForm.get('startDate')?.setValue(new Date(this.latestRegisteredData.startDate))
-          this.selfRegistrationForm.get('endDate')?.setValue(new Date(this.latestRegisteredData.endDate))
+          this.selfRegistrationForm.get('startDate')?.setValue(new Date(this.latestRegisteredData?.startDate))
+          this.selfRegistrationForm.get('endDate')?.setValue(new Date(this.latestRegisteredData?.endDate))
           this.customRegistrationLinks = {
-            registrationLink: this.latestRegisteredData.url,
-            qrRegistrationLink: this.latestRegisteredData.qrCodeImagePath?.replace('portal', 'mdo'),
+            registrationLink: this.latestRegisteredData?.url,
+            qrRegistrationLink: this.latestRegisteredData?.qrCodeImagePath?.replace('portal', 'mdo'),
             qrRegistrationLogoPath: this.getQRCodePath(this.latestRegisteredData),
           }
-          this.numberOfUsersOnboarded = this.latestRegisteredData.numberOfUsersOnboarded
-        } else {
+          this.numberOfUsersOnboarded = this.latestRegisteredData?.numberOfUsersOnboarded
+        } else {  
           this.customRegistrationLinks = undefined
         }
         this.isLoading = false
@@ -149,20 +149,20 @@ export class CustomSelfRegistrationComponent implements OnInit {
     })
 
     const payload = {
-      registrationStartDate: (Math.floor(this.selfRegistrationForm.controls['startDate'].value.getTime())),
-      registrationEndDate: (Math.floor(this.selfRegistrationForm.controls['endDate'].value.getTime())),
+      registrationStartDate: (Math.floor(this.selfRegistrationForm?.controls['startDate']?.value?.getTime())),
+      registrationEndDate: (Math.floor(this.selfRegistrationForm?.controls['endDate']?.value?.getTime())),
       orgId: this.rootOrdId,
     }
     this.onboardingService.generateSelfRegistrationQRCode(payload).subscribe({
       next: (response: any) => {
         if (response.result && Object.keys(response.result).length > 0 && response.responseCode === 'OK') {
           this.customRegistrationLinks = {
-            registrationLink: response.result.registrationLink,
-            qrRegistrationLink: response.result?.qrRegistrationLink.replace('portal', 'mdo'),
-            qrRegistrationLogoPath: response.result?.qrCodeLogoPath.replace('portal', 'mdo'),
+            registrationLink: response.result?.registrationLink,
+            qrRegistrationLink: response.result?.qrRegistrationLink?.replace('portal', 'mdo'),
+            qrRegistrationLogoPath: response.result?.qrCodeLogoPath?.replace('portal', 'mdo'),
           }
-          this.latestRegisteredData.endDate = new Date(this.selfRegistrationForm.controls['endDate'].value)
-          this.latestRegisteredData.startDate = new Date(this.selfRegistrationForm.controls['startDate'].value)
+          this.latestRegisteredData.endDate = new Date(this.selfRegistrationForm?.controls['endDate']?.value)
+          this.latestRegisteredData.startDate = new Date(this.selfRegistrationForm?.controls['startDate']?.value)
           this.latestRegisteredData.status = 'active'
           dialogRef.close()
 
@@ -206,7 +206,7 @@ export class CustomSelfRegistrationComponent implements OnInit {
 
   getFrameworkInfo(frameworkid: string) {
     this.isLoading = true
-    this.designationsService.getFrameworkInfo(frameworkid)
+    this.designationsService?.getFrameworkInfo(frameworkid)
       .subscribe({
         next: (frameworkResponse) => {
           const frameworkDetails = _.get(frameworkResponse, 'result.framework')
