@@ -102,6 +102,8 @@ import { CapitalizePipe } from './pipe/capitalize.pipe'
 import { BulkUploadOdcsComponent } from './routes/odcs-mapping/bulk-upload-odcs/bulk-upload-odcs.component'
 import { GroupsGradeComponent } from './components/groups-grade/groups-grade.component'
 import { MAT_DATE_LOCALE } from '@angular/material/core'
+import { MyNotificationsComponent } from './routes/my-notifications/my-notifications.component'
+import { AllNotificationsModule } from '@sunbird-cb/notification'
 
 @NgModule({
   declarations: [
@@ -152,7 +154,8 @@ import { MAT_DATE_LOCALE } from '@angular/material/core'
     SurveyFormComponent,
     CapitalizePipe,
     BulkUploadOdcsComponent,
-    GroupsGradeComponent
+    GroupsGradeComponent,
+    MyNotificationsComponent
   ],
   imports: [
     CommonModule,
@@ -212,6 +215,7 @@ import { MAT_DATE_LOCALE } from '@angular/material/core'
     DesignationModule,
     TaxonomyEditorModule,
     ImageResponsiveModule,
+    AllNotificationsModule
   ],
   providers: [
     { provide: 'environment', useValue: environment },
