@@ -89,7 +89,7 @@ export class CreateRequestFormComponent implements OnInit {
     this.initFromGroup()
     this.getRequestTypeList()
     this.fullProfile = _.get(this.activatedRouter.snapshot, 'data.configService')
-    this.userId = this.fullProfile.userProfile.userId
+    this.userId = this.fullProfile?.userProfile?.userId
     this.competencyArea = new UntypedFormControl('')
     this.competencyTheme = new UntypedFormControl('')
     this.competencySubtheme = new UntypedFormControl('')
@@ -145,12 +145,13 @@ export class CreateRequestFormComponent implements OnInit {
   }
 
   setRequestData() {
+
     this.requestForm.setValue({
       TitleName: this.requestObjData.title,
       Objective: this.requestObjData.objective,
       userType: this.requestObjData.typeOfUser ? this.requestObjData.typeOfUser : '',
       learningMode: this.requestObjData.learningMode ? this.requestObjData.learningMode : '',
-      [this.compentencyKey.vKey]: [],
+      [this.compentencyKey?.vKey]: [],
       referenceLink: this.requestObjData.referenceLink ? this.requestObjData.referenceLink : '',
       providers: [],
       assignee: {},
@@ -161,7 +162,7 @@ export class CreateRequestFormComponent implements OnInit {
       querySubThemeControl: '',
       assigneeText: '',
     })
-    const value = this.requestForm.controls[this.compentencyKey.vKey].value || []
+    const value = this.requestForm.controls[this.compentencyKey?.vKey]?.value || []
     this.requestObjData.competencies.map((comp: any) => {
       const obj = {
         competencyArea: comp.area || comp.select_area,
@@ -171,7 +172,7 @@ export class CreateRequestFormComponent implements OnInit {
       value.push(obj)
     })
 
-    this.requestForm.controls[this.compentencyKey.vKey].setValue(value)
+    this.requestForm.controls[this.compentencyKey?.vKey]?.setValue(value)
 
     this.selectRequestType(this.requestObjData.requestType)
     if (this.filteredRequestType) {
@@ -356,7 +357,7 @@ export class CreateRequestFormComponent implements OnInit {
 
   openedChange(e: any, searchControl: any) {
     // Set search textbox value as empty while opening selectbox
-    this.requestForm.controls[searchControl].patchValue('')
+    this.requestForm.controls[searchControl]?.patchValue('')
     // Focus to search textbox while clicking on selectbox
     if (e === true) {
       // this.contentForm.value.provider.focus()
@@ -367,7 +368,7 @@ export class CreateRequestFormComponent implements OnInit {
   clearSearch(event: any, searchControl: any) {
     event.stopPropagation()
     if (this.requestForm) {
-      this.requestForm.controls[searchControl].patchValue('')
+      this.requestForm.controls[searchControl]?.patchValue('')
     }
 
   }
@@ -517,16 +518,19 @@ export class CreateRequestFormComponent implements OnInit {
         }
       }
       if (this.requestForm) {
-        const value = this.requestForm.controls[this.compentencyKey.vKey].value || []
-        if (this.canPush(value, obj)) {
-          value.push(obj)
-          this.requestForm.controls[this.compentencyKey.vKey].setValue(value)
-          this.resetCompfields()
-          this.refreshData()
-        } else {
-          this.snackBar.open('This competency is already added')
-          this.resetCompfields()
+        if (this.requestForm.controls[this.compentencyKey && this.compentencyKey.vKey]) {
+          const value = this.requestForm.controls[this.compentencyKey && this.compentencyKey.vKey].value || []
+          if (this.canPush(value, obj)) {
+            value.push(obj)
+            this.requestForm.controls[this.compentencyKey.vKey].setValue(value)
+            this.resetCompfields()
+            this.refreshData()
+          } else {
+            this.snackBar.open('This competency is already added')
+            this.resetCompfields()
+          }
         }
+
       }
 
     }
@@ -535,7 +539,7 @@ export class CreateRequestFormComponent implements OnInit {
 
   removeCompetency(id: any): void {
     if (id && !id.competencyArea) {
-      if (this.requestForm) {
+      if (this.requestForm && this.compentencyKey) {
         const index = _.findIndex(this.requestForm.controls[this.compentencyKey.vKey].value, { id })
         this.requestForm.controls[this.compentencyKey.vKey].value.splice(index, 1)
         this.requestForm.controls[this.compentencyKey.vKey].setValue(this.requestForm.controls[this.compentencyKey.vKey].value)
@@ -595,7 +599,7 @@ export class CreateRequestFormComponent implements OnInit {
     const control = this.requestForm.get('providers')
     if (control) {
       const selectedProviders = control.value
-      return selectedProviders.length >= 5 && !selectedProviders.includes(option)
+      return selectedProviders?.length >= 5 && !selectedProviders.includes(option)
     }
     return false
   }
@@ -631,8 +635,8 @@ export class CreateRequestFormComponent implements OnInit {
     }
 
     let competencyDataList: any[] = []
-    if (this.requestForm && this.requestForm.value[this.compentencyKey.vKey]) {
-      competencyDataList = this.requestForm.value[this.compentencyKey.vKey].map((item: any) => ({
+    if (this.requestForm && this.requestForm.value[this.compentencyKey?.vKey]) {
+      competencyDataList = this.requestForm.value[this.compentencyKey?.vKey].map((item: any) => ({
         area: item.competencyArea,
         theme: item.competencyTheme,
         sub_theme: item.competencySubTheme,

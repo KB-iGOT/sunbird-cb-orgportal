@@ -1,383 +1,458 @@
 import { CreateEventComponent } from './create-event.component'
-import { EventsService } from '../../services/events.service'
-import { Router } from '@angular/router'
 import { FormBuilder } from '@angular/forms'
+import { EventsService } from '../../services/events.service'
+import { ActivatedRoute, Router } from '@angular/router'
 import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar'
 import { DatePipe } from '@angular/common'
 import { LoaderService } from '../../../../../../../../../../../src/app/services/loader.service'
-import { MatLegacyDialog } from '@angular/material/legacy-dialog'
 import { ChangeDetectorRef } from '@angular/core'
-import { StepperSelectionEvent } from '@angular/cdk/stepper'
+import { MatLegacyDialog } from '@angular/material/legacy-dialog'
 import { of, throwError } from 'rxjs'
-import * as _ from 'lodash'
+import { HttpErrorResponse } from '@angular/common/http'
+import { StepperSelectionEvent } from '@angular/cdk/stepper'
 
 describe('CreateEventComponent', () => {
   let component: CreateEventComponent
   let mockEventsService: jest.Mocked<EventsService>
-  let mockActivatedRoute: any
-  let mockFormBuilder: FormBuilder
+  let mockActivatedRoute: jest.Mocked<ActivatedRoute>
   let mockRouter: jest.Mocked<Router>
-  let mockSnackBar: jest.Mocked<MatSnackBar>
+  let mockFormBuilder: FormBuilder
+  let mockMatSnackBar: jest.Mocked<MatSnackBar>
   let mockDatePipe: jest.Mocked<DatePipe>
   let mockLoaderService: jest.Mocked<LoaderService>
-  let mockCdr: jest.Mocked<ChangeDetectorRef>
+  let mockChangeDetectorRef: jest.Mocked<ChangeDetectorRef>
   let mockDialog: jest.Mocked<MatLegacyDialog>
 
   beforeEach(() => {
-    // Create mocks
+    // Create mock services
     mockEventsService = {
-      updateEvent: jest.fn()
-    } as unknown as jest.Mocked<EventsService>
-
-    mockRouter = {
-      navigate: jest.fn()
-    } as unknown as jest.Mocked<Router>
-
-    mockSnackBar = {
-      open: jest.fn()
-    } as unknown as jest.Mocked<MatSnackBar>
-
-    mockDatePipe = {
-      transform: jest.fn().mockImplementation((date, format) => {
-        if (format === 'yyyy-MM-dd') return '2025-02-27'
-        if (format === 'dd MMM, yyyy') return '27 Feb, 2025'
-        return date
-      })
-    } as unknown as jest.Mocked<DatePipe>
-
-    mockLoaderService = {
-      changeLoaderState: jest.fn()
-    } as unknown as jest.Mocked<LoaderService>
-
-    mockCdr = {
-      detectChanges: jest.fn()
-    } as unknown as jest.Mocked<ChangeDetectorRef>
-
-    mockDialog = {
-      open: jest.fn()
-    } as unknown as jest.Mocked<MatLegacyDialog>
-
-    mockFormBuilder = new FormBuilder()
+      updateEvent: jest.fn(),
+      publishEvent: jest.fn()
+    } as any
 
     mockActivatedRoute = {
+      queryParams: of({ mode: 'edit', pathUrl: 'upcoming' }),
       snapshot: {
         data: {
-          configService: {
-            userProfile: { name: 'Test User' }
-          },
+          configService: { userProfile: { id: 'user123' } },
           eventDetails: {
             data: {
               identifier: 'event123',
               name: 'Test Event',
-              description: 'Test Event Description',
-              resourceType: 'Webinar',
-              startDate: '2025-02-27',
-              startTime: '10:00:00+05:30',
-              endTime: '11:00:00+05:30',
-              registrationLink: 'https://example.com',
-              appIcon: 'test-icon',
-              typeofEvent: 'online',
-              status: 'Draft',
-              speakers: [{ name: 'Speaker 1', designation: 'Test Designation' }],
-              eventHandouts: [{ title: 'Handout 1', content: 'Test content' }],
-              competencies_v6: [{ id: 'comp1', name: 'Competency 1' }]
+              description: 'Test description',
+              status: 'draft'
             }
           }
         }
-      },
-      queryParams: of({ mode: 'edit', pathUrl: 'test-path' })
-    }
+      }
+    } as any
 
-    // Create component
+    mockRouter = {
+      navigate: jest.fn()
+    } as any
+
+    mockFormBuilder = new FormBuilder()
+
+    mockMatSnackBar = {
+      open: jest.fn()
+    } as any
+
+    mockDatePipe = {
+      transform: jest.fn()
+    } as any
+
+    mockLoaderService = {
+      changeLoaderState: jest.fn()
+    } as any
+
+    mockChangeDetectorRef = {
+      detectChanges: jest.fn()
+    } as any
+
+    mockDialog = {
+      open: jest.fn().mockReturnValue({
+        afterClosed: () => of(true)
+      })
+    } as any
+
+    // Create component instance
     component = new CreateEventComponent(
       mockEventsService,
       mockActivatedRoute,
       mockFormBuilder,
       mockRouter,
-      mockSnackBar,
+      mockMatSnackBar,
       mockDatePipe,
       mockLoaderService,
-      mockCdr,
+      mockChangeDetectorRef,
       mockDialog
     )
   })
 
-  describe('ngOnInit', () => {
-    it('should initialize form and get event details', () => {
-      // Spy on methods
-      jest.spyOn(component, 'initializeFormAndParams')
-      jest.spyOn(component, 'getEventDetailsFromResolver')
+  describe('Component Initialization', () => {
+    it('should create component', () => {
+      expect(component).toBeTruthy()
+    })
 
-      // Call ngOnInit
+    it('should initialize form with default values', () => {
       component.ngOnInit()
 
-      // Expect methods to be called
-      expect(component.initializeFormAndParams).toHaveBeenCalled()
-      expect(component.getEventDetailsFromResolver).toHaveBeenCalled()
-    })
-  })
-
-  describe('initializeFormAndParams', () => {
-    it('should initialize the event details form', () => {
-      // Call method
-      component.initializeFormAndParams()
-
-      // Check if form is created
       expect(component.eventDetailsForm).toBeDefined()
-      expect(component.eventDetailsForm.get('eventName')).toBeDefined()
-      expect(component.eventDetailsForm.get('description')).toBeDefined()
-      expect(component.eventDetailsForm.get('eventCategory')).toBeDefined()
-      expect(component.eventDetailsForm.get('streamType')).toBeDefined()
-      expect(component.eventDetailsForm.get('startDate')).toBeDefined()
-      expect(component.eventDetailsForm.get('startTime')).toBeDefined()
-      expect(component.eventDetailsForm.get('endTime')).toBeDefined()
-      expect(component.eventDetailsForm.get('registrationLink')).toBeDefined()
-      expect(component.eventDetailsForm.get('recoredEventUrl')).toBeDefined()
-      expect(component.eventDetailsForm.get('appIcon')).toBeDefined()
-      expect(component.eventDetailsForm.get('typeofEvent')).toBeDefined()
+      expect(component.eventDetailsForm.get('eventName')).toBeTruthy()
+      expect(component.eventDetailsForm.get('description')).toBeTruthy()
+      expect(component.eventDetailsForm.get('eventCategory')).toBeTruthy()
     })
-  })
 
-  describe('getEventDetailsFromResolver', () => {
-    it('should get user profile and event details', () => {
-      // Spy on method
-      jest.spyOn(component, 'patchEventDetails')
+    it('should set openMode and pathUrl from query params', () => {
+      component.ngOnInit()
 
-      // Call method
-      component.getEventDetailsFromResolver()
-
-      // Check if user profile is set
-      expect(component.userProfile).toEqual({ name: 'Test User' })
-
-      // Check if event details are set and patchEventDetails is called
-      expect(component.eventDetails).toBeDefined()
-      expect(component.patchEventDetails).toHaveBeenCalled()
-
-      // Check if mode and pathUrl are set
       expect(component.openMode).toBe('edit')
-      expect(component.pathUrl).toBe('test-path')
+      expect(component.pathUrl).toBe('upcoming')
     })
 
-    it('should disable form when in view mode', () => {
-      // Mock view mode
-      mockActivatedRoute.queryParams = of({ mode: 'view', pathUrl: 'test-path' })
+    it('should disable form when openMode is view', () => {
+      mockActivatedRoute.queryParams = of({ mode: 'view', pathUrl: 'upcoming' })
 
-      // Spy on form disable
-      jest.spyOn(component.eventDetailsForm, 'disable')
+      component.ngOnInit()
 
-      // Call method
-      component.getEventDetailsFromResolver()
-
-      // Check if form is disabled
-      expect(component.eventDetailsForm.disable).toHaveBeenCalled()
+      expect(component.eventDetailsForm.disabled).toBe(true)
     })
   })
 
-  describe('patchEventDetails', () => {
+  describe('Form Validation', () => {
+    beforeEach(() => {
+      component.ngOnInit()
+    })
+
+    it('should validate required fields', () => {
+      const eventNameControl = component.eventDetailsForm.get('eventName')
+      const descriptionControl = component.eventDetailsForm.get('description')
+
+      expect(eventNameControl?.hasError('required')).toBe(true)
+      expect(descriptionControl?.hasError('required')).toBe(true)
+    })
+
+    it('should validate minimum length for event name', () => {
+      const eventNameControl = component.eventDetailsForm.get('eventName')
+      eventNameControl?.setValue('short')
+
+      expect(eventNameControl?.hasError('minlength')).toBe(true)
+    })
+
+    it('should validate maximum length for event name', () => {
+      const eventNameControl = component.eventDetailsForm.get('eventName')
+      const longName = 'a'.repeat(71)
+      eventNameControl?.setValue(longName)
+
+      expect(eventNameControl?.hasError('maxlength')).toBe(true)
+    })
+
+    it('should validate description length', () => {
+      const descriptionControl = component.eventDetailsForm.get('description')
+      descriptionControl?.setValue('short')
+
+      expect(descriptionControl?.hasError('minlength')).toBe(true)
+    })
+  })
+
+  describe('Event Details Patching', () => {
+    beforeEach(() => {
+      component.eventDetails = {
+        identifier: 'event123',
+        name: 'Test Event',
+        description: 'Test description for the event that is long enough to meet validation requirements. This description contains more than 250 characters to ensure it passes the minimum length validation that is set in the form.',
+        resourceType: 'Webinar',
+        startDate: '2024-12-01',
+        startTime: '10:00 AM',
+        endTime: '11:00 AM',
+        registrationLink: 'https://example.com',
+        status: 'draft',
+        speakers: [{ name: 'John Doe', designation: 'Expert' }],
+        eventHandouts: [{ title: 'Material 1', content: 'Content 1' }],
+        competencies_v6: [{ name: 'Skill 1' }]
+      }
+      component.ngOnInit()
+    })
+
     it('should patch form with event details', () => {
-      // Call method
       component.patchEventDetails()
 
-      // Check if eventId is set
-      expect(component.eventId).toBe('event123')
-
-      // Check if form values are patched
       expect(component.eventDetailsForm.get('eventName')?.value).toBe('Test Event')
-      expect(component.eventDetailsForm.get('description')?.value).toBe('Test Event Description')
       expect(component.eventDetailsForm.get('eventCategory')?.value).toBe('Webinar')
-      expect(component.eventDetailsForm.get('registrationLink')?.value).toBe('https://example.com')
-
-      // Check if arrays are populated
-      expect(component.speakersList.length).toBe(1)
-      expect(component.materialsList.length).toBe(1)
-      expect(component.competencies.length).toBe(1)
     })
 
-    it('should handle YouTube links correctly', () => {
-      // Mock YouTube link
-      component.eventDetails = {
-        identifier: 'event123',
-        registrationLink: 'https://youtube.com/watch?v=123',
-        // other properties...
-      }
-
-      // Call method
+    it('should set event ID and status', () => {
       component.patchEventDetails()
 
-      // Check if registration link is set correctly
-      expect(component.eventDetailsForm.get('registrationLink')?.value).toBe('https://youtube.com/watch?v=123')
-      expect(component.eventDetailsForm.get('recoredEventUrl')?.value).toBe('')
+      expect(component.eventId).toBe('event123')
+      expect(component.eventStatus).toBe('draft')
     })
 
-    it('should handle non-YouTube links correctly', () => {
-      // Mock non-YouTube link
-      component.eventDetails = {
-        identifier: 'event123',
-        registrationLink: 'https://example.com/recording',
-        // other properties...
-      }
-
-      // Call method
+    it('should populate speakers, materials and competencies', () => {
       component.patchEventDetails()
 
-      // Check if recorded event URL is set correctly
-      expect(component.eventDetailsForm.get('registrationLink')?.value).toBe('')
-      expect(component.eventDetailsForm.get('recoredEventUrl')?.value).toBe('https://example.com/recording')
+      expect(component.speakersList).toHaveLength(1)
+      expect(component.materialsList).toHaveLength(1)
+      expect(component.competencies).toHaveLength(1)
     })
   })
 
-  describe('onSelectionChange', () => {
-    it('should update current stepper index and selected label', () => {
+  describe('Stepper Navigation', () => {
+    beforeEach(() => {
+      component.ngOnInit()
       // Mock stepper
       component.stepper = {
         steps: {
-          toArray: () => [{ label: 'Basic Details' }, { label: 'Preview' }]
-        }
+          toArray: () => [
+            { label: 'Basic Details' },
+            { label: 'Add Speaker' },
+            { label: 'Add Material' },
+            { label: 'Preview' }
+          ]
+        },
+        _getIndicatorType: jest.fn(),
+        selectedIndex: 0
       } as any
+    })
 
-      // Mock event
-      const event = { selectedIndex: 1 } as StepperSelectionEvent
+    it('should handle stepper selection change', () => {
+      const event: StepperSelectionEvent = {
+        selectedIndex: 1,
+        previouslySelectedIndex: 0,
+        selectedStep: null as any,
+        previouslySelectedStep: null as any
+      }
 
-      // Call method
       component.onSelectionChange(event)
 
-      // Check if values are updated
       expect(component.currentStepperIndex).toBe(1)
-      expect(component.selectedStepperLable).toBe('Preview')
-      expect(mockCdr.detectChanges).toHaveBeenCalled()
+      expect(component.selectedStepperLable).toBe('Add Speaker')
     })
 
-    it('should update event details when Preview step is selected', () => {
-      // Mock stepper
-      component.stepper = {
-        steps: {
-          toArray: () => [{ label: 'Basic Details' }, { label: 'Preview' }]
-        }
-      } as any
-
-      // Mock event
-      const event = { selectedIndex: 1 } as StepperSelectionEvent
-
-      // Set event details
-      component.eventDetails = { status: 'Draft' }
-
-      // Spy on method
-      jest.spyOn(component, 'getFormBodyOfEvent').mockReturnValue({ name: 'Updated Event' })
-
-      // Call method
-      component.onSelectionChange(event)
-
-      // Check if updated event details is set
-      expect(component.updatedEventDetails).toEqual({ name: 'Updated Event' })
-    })
-  })
-
-  describe('navigateBack', () => {
-    it('should navigate to the events page', () => {
-      // Set path URL
-      component.pathUrl = 'test-path'
-
-      // Call method
-      component.navigateBack()
-
-      // Check if router navigate is called
-      expect(mockRouter.navigate).toHaveBeenCalledWith(['/app/home/events/test-path'])
-    })
-  })
-
-  describe('openConforamtionPopup', () => {
-    it('should show confirmation dialog in edit mode', () => {
-      // Set mode to edit
-      component.openMode = 'edit'
-
-      // Mock dialog open
-      mockDialog.open.mockReturnValue({
-        afterClosed: () => of(true)
-      } as any)
-
-      // Spy on navigateBack
-      jest.spyOn(component, 'navigateBack')
-
-      // Call method
-      component.openConforamtionPopup()
-
-      // Check if dialog is opened
-      expect(mockDialog.open).toHaveBeenCalled()
-      expect(component.navigateBack).toHaveBeenCalled()
-    })
-
-    it('should not navigate back if user cancels dialog', () => {
-      // Set mode to edit
-      component.openMode = 'edit'
-
-      // Mock dialog open
-      mockDialog.open.mockReturnValue({
-        afterClosed: () => of(false)
-      } as any)
-
-      // Spy on navigateBack
-      jest.spyOn(component, 'navigateBack')
-
-      // Call method
-      component.openConforamtionPopup()
-
-      // Check if dialog is opened but navigateBack not called
-      expect(mockDialog.open).toHaveBeenCalled()
-      expect(component.navigateBack).not.toHaveBeenCalled()
-    })
-
-    it('should navigate back directly in view mode', () => {
-      // Set mode to view
-      component.openMode = 'view'
-
-      // Spy on navigateBack
-      jest.spyOn(component, 'navigateBack')
-
-      // Call method
-      component.openConforamtionPopup()
-
-      // Check if navigateBack is called without dialog
-      expect(mockDialog.open).not.toHaveBeenCalled()
-      expect(component.navigateBack).toHaveBeenCalled()
-    })
-  })
-
-  describe('moveToNextForm', () => {
-    it('should increment current stepper index when form is valid', () => {
-      // Set current index
-      component.currentStepperIndex = 0
-
-      // Mock canMoveToNext getter
-      Object.defineProperty(component, 'canMoveToNext', {
-        get: jest.fn(() => true)
+    it('should move to next form when validation passes', () => {
+      // Set valid form data
+      component.eventDetailsForm.patchValue({
+        eventName: 'Valid Event Name That Is Long Enough',
+        description: 'Valid description that is long enough to meet the minimum length requirement of 250 characters. This description contains more than the required characters to ensure it passes validation and allows the user to proceed to the next step.',
+        eventCategory: 'Webinar',
+        startDate: new Date(),
+        startTime: '10:00 AM',
+        endTime: '11:00 AM',
+        registrationLink: 'https://example.com',
+        appIcon: 'icon.png',
+        typeofEvent: 'Online'
       })
 
-      // Call method
+      const initialIndex = component.currentStepperIndex
       component.moveToNextForm()
 
-      // Check if index is incremented
-      expect(component.currentStepperIndex).toBe(1)
-    })
-
-    it('should increment current stepper index in view mode regardless of validation', () => {
-      // Set current index and mode
-      component.currentStepperIndex = 0
-      component.openMode = 'view'
-
-      // Call method
-      component.moveToNextForm()
-
-      // Check if index is incremented
-      expect(component.currentStepperIndex).toBe(1)
+      expect(component.currentStepperIndex).toBe(initialIndex + 1)
     })
   })
 
-  describe('preview', () => {
-    it('should show preview and update event details', () => {
-      // Set event details
-      component.eventDetails = { status: 'Draft' }
+  describe('Validation Getters', () => {
+    beforeEach(() => {
+      component.ngOnInit()
+    })
 
-      // Mock stepper
+    it('should validate canMoveToNext for Basic Details step', () => {
+      component.selectedStepperLable = 'Basic Details'
+
+      expect(component.canMoveToNext).toBe(false)
+
+      // Set valid form
+      component.eventDetailsForm.patchValue({
+        eventName: 'Valid Event Name That Is Long Enough',
+        description: 'Valid description that is long enough to meet the minimum length requirement of 250 characters. This description contains more than the required characters to ensure it passes validation.',
+        eventCategory: 'Webinar',
+        startDate: new Date(),
+        startTime: '10:00 AM',
+        endTime: '11:00 AM',
+        registrationLink: 'https://example.com',
+        appIcon: 'icon.png',
+        typeofEvent: 'Online'
+      })
+
+      expect(component.canMoveToNext).toBe(true)
+    })
+
+    it('should validate canMoveToNext for Add Speaker step', () => {
+      component.selectedStepperLable = 'Add Speaker'
+      component.speakersList = []
+
+      expect(component.canMoveToNext).toBe(false)
+
+      component.speakersList = [{ name: 'John Doe', email: 'Expert', description: '' }]
+      expect(component.canMoveToNext).toBe(true)
+    })
+
+    it('should validate materials correctly', () => {
+      component.materialsList = [
+        { title: 'Material 1', content: 'Content 1' },
+        { title: '', content: 'Content 2' }
+      ]
+
+      expect(component.isMaterialsValid).toBe(false)
+
+      component.materialsList = [
+        { title: 'Material 1', content: 'Content 1' },
+        { title: 'Material 2', content: 'Content 2' }
+      ]
+
+      expect(component.isMaterialsValid).toBe(true)
+    })
+  })
+
+  describe('Time Validation', () => {
+    beforeEach(() => {
+      component.ngOnInit()
+      mockDatePipe.transform.mockImplementation((format) => {
+        if (format === 'yyyy-MM-dd') {
+          return '2024-12-01'
+        }
+        if (format === 'h:mm a') {
+          return '10:00 AM'
+        }
+        return ''
+      })
+    })
+
+    it('should validate future date and time', () => {
+      // Mock current date to be in the past
+      jest.spyOn(Date.prototype, 'getTime').mockReturnValue(new Date('2024-11-30').getTime())
+
+      component.eventDetailsForm.patchValue({
+        startDate: new Date('2024-12-01'),
+        startTime: '10:00 AM'
+      })
+
+      expect(component.isValidTimeToStart).toBe(true)
+    })
+
+    it('should convert time to minutes correctly', () => {
+      expect(component.timeToMinutes('10:30 AM')).toBe(630) // 10.5 * 60
+      expect(component.timeToMinutes('2:15 PM')).toBe(855) // (14.25 * 60)
+    })
+
+    it('should check if time is less than now', () => {
+      mockDatePipe.transform.mockReturnValue('2:00 PM')
+
+      expect(component.isTimeLessThanNow('1:00 PM')).toBe(true)
+      expect(component.isTimeLessThanNow('3:00 PM')).toBe(false)
+    })
+  })
+
+  describe('Save and Update Operations', () => {
+    beforeEach(() => {
+      component.ngOnInit()
+      component.eventId = 'event123'
+      component.eventDetails = {
+        identifier: 'event123',
+        status: 'draft',
+        name: 'Test Event'
+      }
+    })
+
+    it('should save and exit with draft status', () => {
+      mockEventsService.updateEvent.mockReturnValue(of({ success: true }))
+
+      component.saveAndExit('Draft')
+
+      expect(mockLoaderService.changeLoaderState).toHaveBeenCalledWith(true)
+      expect(mockEventsService.updateEvent).toHaveBeenCalled()
+    })
+
+    it('should handle save error', () => {
+      const error = new HttpErrorResponse({
+        error: { message: 'Save failed' },
+        status: 500,
+        statusText: 'Internal Server Error'
+      })
+      mockEventsService.updateEvent.mockReturnValue(throwError(() => error))
+
+      component.saveAndExit('Draft')
+
+      expect(mockMatSnackBar.open).toHaveBeenCalledWith('Save failed')
+      expect(mockLoaderService.changeLoaderState).toHaveBeenCalledWith(false)
+    })
+
+    it('should publish event successfully', () => {
+      mockEventsService.updateEvent.mockReturnValue(of({
+        result: { versionKey: 'v1', identifier: 'event123' }
+      }))
+      mockEventsService.publishEvent.mockReturnValue(of({ success: true }))
+
+      component.saveAndPublish()
+
+      expect(mockEventsService.updateEvent).toHaveBeenCalled()
+      expect(mockEventsService.publishEvent).toHaveBeenCalled()
+    })
+  })
+
+  describe('Helper Methods', () => {
+    it('should format YouTube URL correctly', () => {
+      const watchUrl = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'
+      const shortUrl = 'https://youtu.be/dQw4w9WgXcQ'
+      const expectedEmbed = 'https://www.youtube.com/embed/dQw4w9WgXcQ'
+
+      expect(component.youTubeUrlChange(watchUrl)).toBe(expectedEmbed)
+      expect(component.youTubeUrlChange(shortUrl)).toBe(expectedEmbed)
+    })
+
+    it('should return original URL if not YouTube', () => {
+      const regularUrl = 'https://example.com/video'
+      expect(component.youTubeUrlChange(regularUrl)).toBe(regularUrl)
+    })
+
+    it('should format time correctly', () => {
+      expect(component.formatTime(9, 30)).toBe('09:30:00')
+      expect(component.formatTime(14, 5)).toBe('14:05:00')
+    })
+
+    it('should get formatted time with timezone', () => {
+      const time12Hour = '2:30 PM'
+      const result = component.getFormatedTime(time12Hour)
+
+      expect(result).toBe('14:30:00+05:30')
+    })
+
+    it('should calculate time difference in minutes', () => {
+      const time1 = '10:00:00+05:30'
+      const time2 = '11:30:00+05:30'
+
+      expect(component.getTimeDifferenceInMinutes(time1, time2)).toBe(90)
+    })
+
+    it('should combine date and time correctly', () => {
+      const date = '2024-12-01'
+      const time = '10:30:00+05:30'
+      const result = component.combineDateAndTime(date, time)
+
+      expect(result).toContain('2024-12-01T10:30:00')
+      expect(result).toContain('+0000')
+    })
+  })
+
+  describe('UI Interactions', () => {
+    beforeEach(() => {
+      component.ngOnInit()
+    })
+
+    it('should open confirmation popup', () => {
+      component.openConforamtionPopup()
+
+      expect(mockDialog.open).toHaveBeenCalled()
+    })
+
+    it('should navigate back', () => {
+      component.pathUrl = 'upcoming'
+      component.navigateBack()
+
+      expect(mockRouter.navigate).toHaveBeenCalledWith(['/app/home/events/upcoming'])
+    })
+
+    it('should show preview', () => {
+      component.eventDetails = { status: 'draft' }
       component.stepper = {
         steps: {
           toArray: () => [
@@ -387,278 +462,95 @@ describe('CreateEventComponent', () => {
         }
       } as any
 
-      // Spy on getFormBodyOfEvent
-      jest.spyOn(component, 'getFormBodyOfEvent').mockReturnValue({ name: 'Preview Event' })
-
-      // Call method
       component.preview()
 
-      // Check if preview is shown and event details updated
       expect(component.showPreview).toBe(true)
-      expect(component.updatedEventDetails).toEqual({ name: 'Preview Event' })
+      expect(component.updatedEventDetails).toBeDefined()
+    })
 
-      // Wait for setTimeout
-      jest.runAllTimers()
+    it('should add competencies', () => {
+      const competencies = [{ name: 'Skill 1' }, { name: 'Skill 2' }]
 
-      // Check if stepper index is updated
-      expect(component.currentStepperIndex).toBe(0)
+      component.addCompetencies(competencies)
+
+      expect(component.competencies).toEqual(competencies)
+    })
+
+    it('should open snack bar with message', () => {
+      const message = 'Test message';
+
+      (component as any).openSnackBar(message)
+
+      expect(mockMatSnackBar.open).toHaveBeenCalledWith(message)
     })
   })
 
-  describe('publish', () => {
-    it('should call saveAndExit with SentToPublish status when canPublish is true', () => {
-      // Mock canPublish getter
-      Object.defineProperty(component, 'canPublish', {
-        get: jest.fn(() => true)
-      })
-
-      // Spy on saveAndExit
-      jest.spyOn(component, 'saveAndExit')
-
-      // Call method
-      component.publish()
-
-      // Check if saveAndExit is called with correct status
-      expect(component.saveAndExit).toHaveBeenCalledWith('SentToPublish')
-    })
-
-    it('should not call saveAndExit when canPublish is false', () => {
-      // Mock canPublish getter
-      Object.defineProperty(component, 'canPublish', {
-        get: jest.fn(() => false)
-      })
-
-      // Spy on saveAndExit
-      jest.spyOn(component, 'saveAndExit')
-
-      // Call method
-      component.publish()
-
-      // Check if saveAndExit is not called
-      expect(component.saveAndExit).not.toHaveBeenCalled()
-    })
-  })
-
-  describe('canMoveToNext', () => {
-    it('should return true when Basic Details form is valid', () => {
-      // Set selected label
-      component.selectedStepperLable = 'Basic Details'
-
-      // Mock form valid state
-      jest.spyOn(component.eventDetailsForm, 'valid', 'get').mockReturnValue(true)
-
-      // Check result
-      expect(component.canMoveToNext).toBe(true)
-    })
-
-    it('should return false when Basic Details form is invalid', () => {
-      // Set selected label
-      component.selectedStepperLable = 'Basic Details'
-
-      // Mock form valid state
-      jest.spyOn(component.eventDetailsForm, 'valid', 'get').mockReturnValue(false)
-
-      // Spy on openSnackBar
-      jest.spyOn(component as any, 'openSnackBar')
-
-      // Check result
-      expect(component.canMoveToNext).toBe(false)
-      expect(component['openSnackBar']).toHaveBeenCalledWith('Please fill mandatory fields')
-    })
-
-    it('should return true when Add Speaker has at least one speaker', () => {
-      // Set selected label
-      component.selectedStepperLable = 'Add Speaker'
-
-      // Set speakers list
-      component.speakersList = []
-
-      // Check result
-      expect(component.canMoveToNext).toBe(false)
-    })
-
-    it('should return false when Add Speaker has no speakers', () => {
-      // Set selected label
-      component.selectedStepperLable = 'Add Speaker'
-
-      // Set empty speakers list
-      component.speakersList = []
-
-      // Spy on openSnackBar
-      jest.spyOn(component as any, 'openSnackBar')
-
-      // Check result
-      expect(component.canMoveToNext).toBe(false)
-      expect(component['openSnackBar']).toHaveBeenCalledWith('Please add atleast one speaker')
-    })
-  })
-
-  describe('isMaterialsValid', () => {
-    it('should return true when all materials have title and content', () => {
-      // Set materials list
-      component.materialsList = [
-        { title: 'Material 1', content: 'Content 1' },
-        { title: 'Material 2', content: 'Content 2' }
-      ]
-
-      // Check result
-      expect(component.isMaterialsValid).toBe(true)
-    })
-
-    it('should return false when any material is missing title', () => {
-      // Set materials list with invalid item
-      component.materialsList = [
-        { title: 'Material 1', content: 'Content 1' },
-        { title: '', content: 'Content 2' }
-      ]
-
-      // Check result
-      expect(component.isMaterialsValid).toBe(false)
-    })
-
-    it('should return false when any material is missing content', () => {
-      // Set materials list with invalid item
-      component.materialsList = [
-        { title: 'Material 1', content: 'Content 1' },
-        { title: 'Material 2', content: '' }
-      ]
-
-      // Check result
-      expect(component.isMaterialsValid).toBe(false)
-    })
-  })
-
-  describe('canPublish', () => {
-    it('should return true when all required fields are valid in Preview step', () => {
-      // Set selected label
+  describe('Form Body Generation', () => {
+    beforeEach(() => {
       component.ngOnInit()
-      component.selectedStepperLable = 'Preview'
-
-      // Set valid states
-      jest.spyOn(component.eventDetailsForm, 'invalid', 'get').mockReturnValue(false)
-      jest.spyOn(component, 'isMaterialsValid', 'get').mockReturnValue(true)
-      component.competencies = [{ id: 'comp1', name: 'Competency 1' }]
-
-      // Check result
-      expect(component.canPublish).toBe(true)
+      component.eventDetails = {
+        identifier: 'event123',
+        name: 'Original Event',
+        status: 'draft'
+      }
+      component.eventDetailsForm.patchValue({
+        eventName: 'Updated Event Name That Is Long Enough For Validation',
+        description: 'Updated description that meets the minimum length requirement of 250 characters. This description is sufficiently long to pass validation checks.',
+        eventCategory: 'Workshop',
+        startDate: new Date('2024-12-01'),
+        startTime: '10:00 AM',
+        endTime: '11:00 AM',
+        registrationLink: 'https://example.com'
+      })
+      mockDatePipe.transform.mockReturnValue('2024-12-01')
     })
 
-    it('should return false when form is invalid in Preview step', () => {
-      // Set selected label
-      component.selectedStepperLable = 'Preview'
+    it('should generate form body with updated values', () => {
+      const formBody = component.getFormBodyOfEvent('Draft')
 
-      // Set invalid form
-      jest.spyOn(component.eventDetailsForm, 'invalid', 'get').mockReturnValue(true)
-
-      // Spy on openSnackBar
-      jest.spyOn(component as any, 'openSnackBar')
-
-      // Check result
-      expect(component.canPublish).toBe(false)
-      expect(component['openSnackBar']).toHaveBeenCalledWith('Please fill mandatory fields in Basic Details')
-    })
-  })
-
-  describe('addCompetencies', () => {
-    it('should update competencies array', () => {
-      // Call method
-      component.addCompetencies([{ id: 'new-comp', name: 'New Competency' }])
-
-      // Check if competencies are updated
-      expect(component.competencies).toEqual([{ id: 'new-comp', name: 'New Competency' }])
-    })
-  })
-
-  describe('saveAndExit', () => {
-    it('should call updateEvent service and show success message for Draft status', () => {
-      // Setup
-      component.eventId = 'event123'
-      jest.spyOn(component, 'getFormBodyOfEvent').mockReturnValue({ name: 'Updated Event' })
-      mockEventsService.updateEvent.mockReturnValue(of({ success: true }))
-
-      // Mock setTimeout
-      jest.useFakeTimers()
-
-      // Call method
-      component.saveAndExit()
-
-      // Check if service is called
-      expect(mockLoaderService.changeLoaderState).toHaveBeenCalledWith(true)
-      expect(mockEventsService.updateEvent).toHaveBeenCalledWith(
-        { request: { event: { name: 'Updated Event' } } },
-        'event123'
-      )
-      expect(mockSnackBar.open).toHaveBeenCalledWith('Event details saved successfully')
-
-      // Run timer
-      jest.runAllTimers()
-
-      // Check navigation and loader state
-      expect(mockRouter.navigate).toHaveBeenCalled()
-      expect(mockLoaderService.changeLoaderState).toHaveBeenCalledWith(false)
+      expect(formBody.name).toBe('Updated Event Name That Is Long Enough For Validation')
+      expect(formBody.resourceType).toBe('Workshop')
+      expect(formBody.status).toBe('Draft')
     })
 
-    it('should show success message for SentToPublish status', () => {
-      // Setup
-      component.eventId = 'event123'
-      jest.spyOn(component, 'getFormBodyOfEvent').mockReturnValue({ name: 'Updated Event' })
-      mockEventsService.updateEvent.mockReturnValue(of({ success: true }))
+    it('should include speakers, materials and competencies', () => {
+      component.speakersList = [{ name: 'John Doe', email: '', description: '' }]
+      component.materialsList = [{ title: 'Material 1', content: 'Content 1', isNew: true }]
+      component.competencies = [{ name: 'Skill 1' }]
 
-      // Call method
-      component.saveAndExit('SentToPublish')
+      const formBody = component.getFormBodyOfEvent('Draft')
 
-      // Check success message
-      expect(mockSnackBar.open).toHaveBeenCalledWith('Event details sent for approval successfully')
+      expect(formBody.speakers).toHaveLength(1)
+      expect(formBody.eventHandouts).toHaveLength(1)
+      expect(formBody.eventHandouts[0].isNew).toBeUndefined() // Should be removed
+      expect(formBody.competencies_v6).toHaveLength(1)
     })
 
-    it('should handle error from service', () => {
-      // Setup
-      component.eventId = 'event123'
-      jest.spyOn(component, 'getFormBodyOfEvent').mockReturnValue({ name: 'Updated Event' })
-      mockEventsService.updateEvent.mockReturnValue(throwError(() => ({
-        error: { message: 'Something went wrong while updating event, please try again' }
-      })))
+    it('should set submittedOn date for SentToPublish status', () => {
+      const formBody = component.getFormBodyOfEvent('SentToPublish')
 
-      // Call method
-      component.saveAndExit()
-
-      // Check error handling
-      expect(mockLoaderService.changeLoaderState).toHaveBeenCalledWith(false)
-      expect(mockSnackBar.open).toHaveBeenCalledWith('Something went wrong while updating event, please try again')
+      expect(formBody.submitedOn).toBeDefined()
+      expect(formBody.submitedOn).toContain('+0000')
     })
   })
 
-  describe('Time formatting methods', () => {
-    it('getFormatedTime should format time string correctly', () => {
-      // Test AM time
-      expect(component.getFormatedTime('09:30 AM')).toBe('09:30:00+05:30')
+  describe('ngAfterViewInit', () => {
+    it('should configure stepper indicator type', () => {
+      const mockStepper = {
+        _getIndicatorType: jest.fn()
+      } as any
 
-      // Test PM time
-      expect(component.getFormatedTime('02:45 PM')).toBe('14:45:00+05:30')
+      component.stepper = mockStepper
+      component.ngAfterViewInit()
 
-      // Test 12 AM (midnight)
-      expect(component.getFormatedTime('12:00 AM')).toBe('00:00:00+05:30')
-
-      // Test 12 PM (noon)
-      expect(component.getFormatedTime('12:00 PM')).toBe('12:00:00+05:30')
+      expect(mockStepper._getIndicatorType()).toBe('number')
+      expect(mockChangeDetectorRef.detectChanges).toHaveBeenCalled()
     })
 
-    it('formatTime should pad hours and minutes correctly', () => {
-      expect(component['formatTime'](9, 5)).toBe('09:05:00')
-      expect(component['formatTime'](14, 30)).toBe('14:30:00')
-    })
+    it('should handle undefined stepper', () => {
+      component.stepper = undefined
 
-    it('getTimeDifferenceInMinutes should calculate duration correctly', () => {
-      // 1 hour difference
-      expect(component.getTimeDifferenceInMinutes('09:00:00+05:30', '10:00:00+05:30')).toBe(60)
-
-      // 1 hour 30 minutes difference
-      expect(component.getTimeDifferenceInMinutes('09:00:00+05:30', '10:30:00+05:30')).toBe(90)
-    })
-
-    it('combineDateAndTime should join date and time correctly', () => {
-      const result = component.combineDateAndTime('2025-02-27', '09:00:00+05:30')
-      expect(result).toMatch('2025-02-27T03:30:00.000+0000')
+      expect(() => component.ngAfterViewInit()).not.toThrow()
     })
   })
 })

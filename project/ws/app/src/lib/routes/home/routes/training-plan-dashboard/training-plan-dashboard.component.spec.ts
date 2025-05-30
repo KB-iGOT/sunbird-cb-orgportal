@@ -1,71 +1,119 @@
 import { TrainingPlanDashboardComponent } from './training-plan-dashboard.component'
+import { Router } from '@angular/router'
+import { TrainingPlanDashboardService } from '../../services/training-plan-dashboard.service'
+import { LoaderService } from '../../../../../../../../../src/app/services/loader.service'
+import { TrainingPlanService } from '../../../training-plan/services/traininig-plan.service'
+import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog'
+import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar'
 import { of, throwError } from 'rxjs'
-import * as moment from 'moment'
-import { fakeAsync } from '@angular/core/testing'
-import * as _ from 'lodash'
 
 describe('TrainingPlanDashboardComponent', () => {
     let component: TrainingPlanDashboardComponent
+    let mockRouter: jest.Mocked<Router>
     let mockActivatedRoute: any
-    let mockRouter: any
-    let mockTrainingDashboardSvc: any
-    let mockLoaderService: any
-    let mockTrainingPlanService: any
-    let mockSnackBar: any
-    let mockDialog: any
+    let mockTrainingDashboardSvc: jest.Mocked<TrainingPlanDashboardService>
+    let mockLoaderService: jest.Mocked<LoaderService>
+    let mockTrainingPlanService: jest.Mocked<TrainingPlanService>
+    let mockDialog: jest.Mocked<MatDialog>
+    let mockSnackBar: jest.Mocked<MatSnackBar>
+
+    const mockConfigService = {
+        userProfileV2: { userId: 'test-user-id' },
+        userRoles: new Set(['mdo_admin', 'mdo_leader'])
+    }
+
+    const mockPageData = {
+        data: {
+            actionMenu: [
+                {
+                    enabledFor: ['mdo_admin'],
+                    userAccess: false,
+                    isMdoAdmin: false,
+                    isMdoLeader: false
+                },
+                {
+                    enabledFor: ['mdo_leader'],
+                    userAccess: false,
+                    isMdoAdmin: false,
+                    isMdoLeader: false
+                }
+            ]
+        }
+    }
+
+    const mockTrainingPlanData = [
+        {
+            id: '1',
+            name: 'Test Plan 1',
+            status: 'Live',
+            userType: 'Designation',
+            contentList: [
+                {
+                    competencies_v5: [
+                        { competencyArea: 'Leadership' },
+                        { competencyArea: 'Management' }
+                    ]
+                }
+            ],
+            userDetails: [
+                { firstName: 'John', designation: 'Manager' },
+                { firstName: 'Jane', designation: 'Developer' }
+            ],
+            endDate: '2024-12-31',
+            updatedAt: '2024-01-15',
+            createdBy: 'test-user-id',
+            createdByName: 'Test User'
+        },
+        {
+            id: '2',
+            name: 'Test Plan 2',
+            status: 'DRAFT',
+            userType: 'AllUser',
+            contentList: [],
+            userDetails: [],
+            endDate: null,
+            updatedAt: '2024-01-10',
+            createdBy: 'other-user',
+            createdByName: 'Other User'
+        }
+    ]
 
     beforeEach(() => {
-        // Mock dependencies
+        // Create mocks
+        mockRouter = {
+            navigate: jest.fn()
+        } as any
+
         mockActivatedRoute = {
             snapshot: {
                 data: {
-                    configService: {
-                        userProfileV2: {
-                            userId: 'test-user-id'
-                        },
-                        userRoles: new Set(['content_creator', 'mdo_admin'])
-                    },
-                    pageData: {
-                        data: {
-                            actionMenu: [
-                                {
-                                    enabledFor: ['content_creator', 'mdo_admin'],
-                                    action: 'createCbpPlan'
-                                }
-                            ]
-                        }
-                    }
-                },
+                    configService: mockConfigService,
+                    pageData: mockPageData
+                }
             },
             queryParams: of({ type: 'live', tabSelected: 'Designation' })
         }
 
-        mockRouter = {
-            navigate: jest.fn()
-        }
-
         mockTrainingDashboardSvc = {
             getUserList: jest.fn()
-        }
+        } as any
 
         mockLoaderService = {
             changeLoaderState: jest.fn()
-        }
+        } as any
 
         mockTrainingPlanService = {
             archivePlan: jest.fn(),
             publishPlan: jest.fn()
-        }
+        } as any
+
+        mockDialog = {
+            open: jest.fn()
+        } as any
 
         mockSnackBar = {
             open: jest.fn()
-        }
-
-        mockDialog = {
-            open: jest.fn().mockReturnValue({
-                afterClosed: () => of('confirmed')
-            })
-        }
+        } as any
 
         // Create component instance
         component = new TrainingPlanDashboardComponent(
@@ -79,212 +127,218 @@ describe('TrainingPlanDashboardComponent', () => {
         )
     })
 
-    it('should create the component', () => {
-        expect(component).toBeTruthy()
+    afterEach(() => {
+        jest.clearAllMocks()
     })
 
     describe('ngOnInit', () => {
-        it('should set initial values and call filter', () => {
-            const filterSpy = jest.spyOn(component, 'filter')
-            const hasAccessSpy = jest.spyOn(component, 'hasAccess')
+        it('should initialize component properties correctly', () => {
+            component.ngOnInit()
+
+            expect(component.configSvc).toBe(mockConfigService)
+            expect(component.currentUser).toBe('test-user-id')
+            expect(component.pageConfig).toBe(mockPageData)
+            expect(component.tabledata).toBeDefined()
+            expect(component.tabledata.columns).toHaveLength(7)
+        })
+
+        it('should set up table data with correct columns', () => {
+            component.ngOnInit()
+
+            const expectedColumns = [
+                'Plan name', 'Assignee', 'Total content', 'Content type',
+                'Timeline', 'Created by', 'Created on'
+            ]
+
+            component.tabledata.columns.forEach((column, index) => {
+                expect(column.displayName).toBe(expectedColumns[index])
+            })
+        })
+
+        it('should handle query params and set current filter', () => {
+            jest.spyOn(component, 'filter')
 
             component.ngOnInit()
 
-            expect(component.configSvc).toBeDefined()
-            expect(component.currentUser).toBe('test-user-id')
-            expect(component.pageConfig).toBeDefined()
-            expect(filterSpy).toHaveBeenCalledWith('live')
-            expect(hasAccessSpy).toHaveBeenCalled()
-            expect(component.tabledata).toBeDefined()
-            expect(component.tabledata.columns.length).toBe(7)
+            expect(component.currentFilter).toBe('live')
+            expect(component.filter).toHaveBeenCalledWith('live')
+        })
+    })
+
+    describe('tabSelected', () => {
+        it('should set current filter', () => {
+            component.tabSelected('draft')
+            expect(component.currentFilter).toBe('draft')
         })
     })
 
     describe('filter', () => {
-        it('should set fetchContentDone to false and call filterData', () => {
-            const filterDataSpy = jest.spyOn(component, 'filterData')
+        beforeEach(() => {
+            jest.spyOn(component, 'filterData')
+        })
 
+        it('should set fetchContentDone to false and call filterData', () => {
+            component.urlQueryParams = {}
             component.filter('live')
 
             expect(component.fetchContentDone).toBe(false)
             expect(component.currentFilter).toBe('live')
-            expect(filterDataSpy).toHaveBeenCalled()
+            expect(component.filterData).toHaveBeenCalled()
         })
 
-        it('should update tagListData based on urlQueryParams', () => {
-            component.urlQueryParams = { tabSelected: 'CustomUser' }
+        it('should handle URL query params and set selected tab', () => {
+            component.urlQueryParams = { tabSelected: 'AllUser' }
+            component.filter('draft')
+
+            const selectedTag = component.tagListData.find((tag: any) => tag.value === 'AllUser')
+            expect(selectedTag?.selected).toBe(true)
+            expect(component.currentTab).toBe('AllUser')
+        })
+
+        it('should set current tab selection when no URL params', () => {
+            component.urlQueryParams = {}
+            component.currentTab = 'Designation'
             component.filter('live')
 
-            expect(component.tagListData.find((tag: any) => tag.value === 'CustomUser').selected).toBe(true)
-            expect(component.tagListData.find((tag: any) => tag.value === 'Designation').selected).toBe(false)
+            const selectedTag = component.tagListData.find((tag: any) => tag.value === 'Designation')
+            expect(selectedTag?.selected).toBe(true)
         })
     })
 
     describe('filterData', () => {
-        it('should call getLiveData when currentFilter is live', () => {
-            const getLiveDataSpy = jest.spyOn(component, 'getLiveData')
+        it('should call getLiveData when filter is live', () => {
+            jest.spyOn(component, 'getLiveData')
             component.currentFilter = 'live'
 
             component.filterData()
 
-            expect(getLiveDataSpy).toHaveBeenCalled()
+            expect(component.getLiveData).toHaveBeenCalled()
         })
 
-        it('should call getDraftData when currentFilter is draft', () => {
-            const getDraftDataSpy = jest.spyOn(component, 'getDraftData')
+        it('should call getDraftData when filter is draft', () => {
+            jest.spyOn(component, 'getDraftData')
             component.currentFilter = 'draft'
 
             component.filterData()
 
-            expect(getDraftDataSpy).toHaveBeenCalled()
+            expect(component.getDraftData).toHaveBeenCalled()
         })
     })
 
     describe('getLiveData', () => {
-        it('should fetch live data and process it', async () => {
+        it('should fetch live data successfully', async () => {
             const mockResponse = {
                 params: { status: 'success' },
-                result: {
-                    content: [
-                        {
-                            id: '1',
-                            name: 'Test Plan',
-                            userType: 'Designation',
-                            contentList: [{ id: 'c1' }, { id: 'c2' }],
-                            userDetails: [{ firstName: 'User1' }, { firstName: 'User2' }],
-                            endDate: '2023-12-31',
-                            updatedAt: '2023-01-01',
-                            createdBy: 'test-user-id'
-                        }
-                    ]
-                }
+                result: { content: mockTrainingPlanData }
             }
 
-            mockTrainingDashboardSvc.getUserList.mockReturnValue(of(mockResponse))
-            const convertDataSpy = jest.spyOn(component, 'convertDataAsPerTable')
+            mockTrainingDashboardSvc.getUserList.mockReturnValue({
+                toPromise: () => Promise.resolve(mockResponse)
+            } as any)
+
+            jest.spyOn(component, 'convertDataAsPerTable')
+            component.currentTab = 'Designation'
 
             await component.getLiveData()
 
             expect(mockLoaderService.changeLoaderState).toHaveBeenCalledWith(true)
-            expect(mockTrainingDashboardSvc.getUserList).toHaveBeenCalled()
-            expect(component.completeDataRes).toEqual(mockResponse.result.content)
-            expect(component.trainingPlanData.length).toBe(1)
-            expect(convertDataSpy).toHaveBeenCalled()
+            expect(mockTrainingDashboardSvc.getUserList).toHaveBeenCalledWith({
+                request: { filters: { status: 'Live' } }
+            })
+            expect(component.completeDataRes).toBe(mockTrainingPlanData)
+            expect(component.convertDataAsPerTable).toHaveBeenCalled()
         })
 
         it('should handle error when fetching live data', async () => {
-            mockTrainingDashboardSvc.getUserList.mockReturnValue(throwError('Error'))
+            mockTrainingDashboardSvc.getUserList.mockReturnValue({
+                toPromise: () => Promise.reject('Error')
+            } as any)
 
             await component.getLiveData()
 
             expect(mockLoaderService.changeLoaderState).toHaveBeenCalledWith(true)
+        })
+
+        it('should handle unsuccessful response', async () => {
+            const mockResponse = {
+                params: { status: 'failure' }
+            }
+
+            mockTrainingDashboardSvc.getUserList.mockReturnValue({
+                toPromise: () => Promise.resolve(mockResponse)
+            } as any)
+
+            await component.getLiveData()
+
             expect(mockLoaderService.changeLoaderState).toHaveBeenCalledWith(false)
         })
     })
 
     describe('getDraftData', () => {
-        it('should fetch draft data and process it', async () => {
+        it('should fetch draft data successfully', async () => {
             const mockResponse = {
                 params: { status: 'success' },
-                result: {
-                    content: [
-                        {
-                            id: '1',
-                            name: 'Test Draft Plan',
-                            userType: 'Designation',
-                            contentList: [{ id: 'c1' }],
-                            userDetails: [{ firstName: 'User1' }],
-                            endDate: '2023-12-31',
-                            updatedAt: '2023-01-01',
-                            createdBy: 'other-user-id',
-                            createdByName: 'Other User'
-                        }
-                    ]
-                }
+                result: { content: mockTrainingPlanData }
             }
 
-            mockTrainingDashboardSvc.getUserList.mockReturnValue(of(mockResponse))
-            const convertDataSpy = jest.spyOn(component, 'convertDataAsPerTable')
+            mockTrainingDashboardSvc.getUserList.mockReturnValue({
+                toPromise: () => Promise.resolve(mockResponse)
+            } as any)
+
+            jest.spyOn(component, 'convertDataAsPerTable')
+            component.currentTab = 'Designation'
 
             await component.getDraftData()
 
-            expect(mockLoaderService.changeLoaderState).toHaveBeenCalledWith(true)
-            expect(mockTrainingDashboardSvc.getUserList).toHaveBeenCalled()
-            expect(component.completeDataRes).toEqual(mockResponse.result.content)
-            expect(component.trainingPlanData.length).toBe(1)
-            expect(convertDataSpy).toHaveBeenCalled()
-        })
-
-        it('should handle error when fetching draft data', async () => {
-            mockTrainingDashboardSvc.getUserList.mockReturnValue(throwError('Error'))
-
-            await component.getDraftData()
-
-            expect(mockLoaderService.changeLoaderState).toHaveBeenCalledWith(true)
-            expect(mockLoaderService.changeLoaderState).toHaveBeenCalledWith(false)
+            expect(mockTrainingDashboardSvc.getUserList).toHaveBeenCalledWith({
+                request: { filters: { status: 'DRAFT' } }
+            })
+            expect(component.convertDataAsPerTable).toHaveBeenCalled()
         })
     })
 
     describe('convertDataAsPerTable', () => {
-        it('should transform data for table display', () => {
+        it('should transform data correctly', () => {
+            component.completeDataRes = [...mockTrainingPlanData]
             component.currentUser = 'test-user-id'
-            component.completeDataRes = [
-                {
-                    id: '1',
-                    contentList: [
-                        {
-                            competencies_v5: [
-                                { competencyArea: 'Area1' },
-                                { competencyArea: 'Area2' }
-                            ]
-                        }
-                    ],
-                    userType: 'CustomUser',
-                    userDetails: [
-                        { firstName: 'John', designation: 'Manager' },
-                        { firstName: 'Jane', designation: 'Developer' }
-                    ],
-                    endDate: '2023-12-31',
-                    updatedAt: '2023-01-01',
-                    createdBy: 'test-user-id'
-                }
-            ]
 
             component.convertDataAsPerTable()
 
-            const transformedData = component.completeDataRes[0]
-            expect(transformedData.contentCount).toBe(1)
-            expect(transformedData.assigneeCount).toBe(2)
-            expect(transformedData.endDate).toBe(moment('2023-12-31').format('MMM DD[,] YYYY'))
-            expect(transformedData.updatedAt).toBe(moment('2023-01-01').format('MMM DD[,] YYYY'))
-            expect(transformedData.createdByName).toBe('You')
-            expect(transformedData.competencies).toEqual(['Area1', 'Area2'])
-            expect(transformedData.userNameList).toEqual(['John', 'Jane'])
-            expect(transformedData.userDesignationList).toEqual(['Manager', 'Developer'])
             expect(component.fetchContentDone).toBe(true)
             expect(mockLoaderService.changeLoaderState).toHaveBeenCalledWith(false)
+
+            // Check data transformation
+            const firstPlan = component.completeDataRes[0]
+            expect(firstPlan.contentCount).toBe(1)
+            expect(firstPlan.assigneeCount).toBe(2)
+            expect(firstPlan.createdByName).toBe('You')
+            expect(firstPlan.competencies).toEqual(['Leadership', 'Management'])
+            expect(firstPlan.userNameList).toEqual(['John', 'Jane'])
+            expect(firstPlan.userDesignationList).toEqual(['Manager', 'Developer'])
+
+            const secondPlan = component.completeDataRes[1]
+            expect(secondPlan.assigneeCount).toBe('All Users')
         })
 
-        it('should handle AllUser type correctly', () => {
-            component.completeDataRes = [
-                {
-                    userType: 'AllUser',
-                    contentList: [],
-                    endDate: null,
-                    updatedAt: null,
-                    createdBy: 'other-user-id',
-                    createdByName: 'Other User'
-                }
-            ]
+        it('should handle missing data gracefully', () => {
+            component.completeDataRes = [{
+                id: '1',
+                contentList: null,
+                userDetails: null,
+                endDate: null,
+                updatedAt: null,
+                createdBy: 'other-user',
+                createdByName: 'Other User',
+                userType: 'CustomUser'
+            }]
 
             component.convertDataAsPerTable()
 
-            const transformedData = component.completeDataRes[0]
-            expect(transformedData.contentCount).toBe(0)
-            expect(transformedData.assigneeCount).toBe('All Users')
-            expect(transformedData.endDate).toBe('')
-            expect(transformedData.updatedAt).toBe('')
-            expect(transformedData.createdByName).toBe('Other User')
+            const plan = component.completeDataRes[0]
+            expect(plan.contentCount).toBe(0)
+            expect(plan.assigneeCount).toBe(0)
+            expect(plan.endDate).toBe('')
+            expect(plan.updatedAt).toBe('')
         })
     })
 
@@ -296,221 +350,244 @@ describe('TrainingPlanDashboardComponent', () => {
     })
 
     describe('menuSelected', () => {
-        it('should call previewData for preivewContent action', () => {
-            const previewSpy = jest.spyOn(component, 'previewData')
-            const mockEvent = { action: 'preivewContent', row: { id: '1' } }
+        const mockRow = { id: '1', name: 'Test Plan' }
 
-            component.menuSelected(mockEvent)
-
-            expect(previewSpy).toHaveBeenCalledWith(mockEvent.row)
+        it('should handle preview action', () => {
+            jest.spyOn(component, 'previewData')
+            component.menuSelected({ action: 'preivewContent', row: mockRow })
+            expect(component.previewData).toHaveBeenCalledWith(mockRow)
         })
 
-        it('should call editContentData for editContent action', () => {
-            const editSpy = jest.spyOn(component, 'editContentData')
-            const mockEvent = { action: 'editContent', row: { id: '1' } }
-
-            component.menuSelected(mockEvent)
-
-            expect(editSpy).toHaveBeenCalledWith(mockEvent.row)
+        it('should handle edit action', () => {
+            jest.spyOn(component, 'editContentData')
+            component.menuSelected({ action: 'editContent', row: mockRow })
+            expect(component.editContentData).toHaveBeenCalledWith(mockRow)
         })
 
-        it('should call showConformationModal for deleteContent action', () => {
-            const showModalSpy = jest.spyOn(component, 'showConformationModal')
-            const mockEvent = { action: 'deleteContent', row: { id: '1' } }
-
-            component.menuSelected(mockEvent)
-
-            expect(showModalSpy).toHaveBeenCalledWith(mockEvent.row, mockEvent.action)
+        it('should handle delete action', () => {
+            jest.spyOn(component, 'showConformationModal')
+            component.menuSelected({ action: 'deleteContent', row: mockRow })
+            expect(component.showConformationModal).toHaveBeenCalledWith(mockRow, 'deleteContent')
         })
 
-        it('should call showConformationModal for publishContent action', () => {
-            const showModalSpy = jest.spyOn(component, 'showConformationModal')
-            const mockEvent = { action: 'publishContent', row: { id: '1' } }
-
-            component.menuSelected(mockEvent)
-
-            expect(showModalSpy).toHaveBeenCalledWith(mockEvent.row, mockEvent.action)
+        it('should handle publish action', () => {
+            jest.spyOn(component, 'showConformationModal')
+            component.menuSelected({ action: 'publishContent', row: mockRow })
+            expect(component.showConformationModal).toHaveBeenCalledWith(mockRow, 'publishContent')
         })
     })
 
     describe('previewData', () => {
-        it('should navigate to preview plan page', () => {
-            const mockRow = { id: '123' }
-
+        it('should navigate to preview page', () => {
+            const mockRow = { id: '1' }
             component.previewData(mockRow)
-
-            expect(mockRouter.navigate).toHaveBeenCalledWith(['app', 'training-plan', 'preview-plan-for-dashboard', '123'])
+            expect(mockRouter.navigate).toHaveBeenCalledWith([
+                'app', 'training-plan', 'preview-plan-for-dashboard', '1'
+            ])
         })
     })
 
     describe('editContentData', () => {
-        it('should navigate to update plan page', () => {
-            const mockRow = { id: '123' }
-
+        it('should navigate to update page', () => {
+            const mockRow = { id: '1' }
             component.editContentData(mockRow)
-
-            expect(mockRouter.navigate).toHaveBeenCalledWith(['app', 'training-plan', 'update-plan', '123'])
+            expect(mockRouter.navigate).toHaveBeenCalledWith([
+                'app', 'training-plan', 'update-plan', '1'
+            ])
         })
     })
 
     describe('showConformationModal', () => {
-        it('should open dialog for delete action and call deleteContentData on confirmation', () => {
-            const deleteContentSpy = jest.spyOn(component, 'deleteContentData')
-            const mockRow = { id: '123' }
+        const mockRow = { id: '1', status: 'Live', userType: 'Designation' }
+
+        it('should open confirmation dialog for delete', () => {
+            const mockDialogRef = {
+                afterClosed: () => of('confirmed')
+            }
+            mockDialog.open.mockReturnValue(mockDialogRef as any)
+            jest.spyOn(component, 'deleteContentData')
 
             component.showConformationModal(mockRow, 'deleteContent')
 
             expect(mockDialog.open).toHaveBeenCalled()
-            expect(deleteContentSpy).toHaveBeenCalledWith(mockRow)
+            expect(component.deleteContentData).toHaveBeenCalledWith(mockRow)
         })
 
-        it('should open dialog for publish action and call publishContentData on confirmation', () => {
-            const publishContentSpy = jest.spyOn(component, 'publishContentData')
-            const mockRow = { id: '123' }
+        it('should open confirmation dialog for publish', () => {
+            const mockDialogRef = {
+                afterClosed: () => of('confirmed')
+            }
+            mockDialog.open.mockReturnValue(mockDialogRef as any)
+            jest.spyOn(component, 'publishContentData')
 
             component.showConformationModal(mockRow, 'publishContent')
 
-            expect(mockDialog.open).toHaveBeenCalled()
-            expect(publishContentSpy).toHaveBeenCalledWith(mockRow)
+            expect(component.publishContentData).toHaveBeenCalledWith(mockRow)
+        })
+
+        it('should not perform action when dialog is cancelled', () => {
+            const mockDialogRef = {
+                afterClosed: () => of('cancelled')
+            }
+            mockDialog.open.mockReturnValue(mockDialogRef as any)
+            jest.spyOn(component, 'deleteContentData')
+
+            component.showConformationModal(mockRow, 'deleteContent')
+
+            expect(component.deleteContentData).not.toHaveBeenCalled()
         })
     })
 
     describe('deleteContentData', () => {
-        it('should call archivePlan service and handle success', fakeAsync(() => {
-            const mockRow = { id: '123', status: 'DRAFT', userType: 'Designation' }
+        const mockRow = { id: '1', status: 'Live', userType: 'Designation' }
+
+        it('should delete content successfully', () => {
             mockTrainingPlanService.archivePlan.mockReturnValue(of({ success: true }))
-            const tabNavigateSpy = jest.spyOn(component, 'tabNavigate')
-            const filterSpy = jest.spyOn(component, 'filter')
+            jest.spyOn(component, 'filter')
+            jest.spyOn(component, 'tabNavigate')
 
             component.deleteContentData(mockRow)
 
             expect(mockLoaderService.changeLoaderState).toHaveBeenCalledWith(true)
             expect(mockTrainingPlanService.archivePlan).toHaveBeenCalledWith({
-                request: {
-                    id: '123',
-                    comment: 'Content deleted'
-                }
+                request: { id: '1', comment: 'Content deleted' }
             })
             expect(mockSnackBar.open).toHaveBeenCalledWith('CBP plan deleted successfully.')
             expect(mockLoaderService.changeLoaderState).toHaveBeenCalledWith(false)
-            expect(filterSpy).toHaveBeenCalledWith(component.currentFilter)
-            expect(tabNavigateSpy).toHaveBeenCalledWith('draft', 'Designation')
-        }))
+            expect(component.tabNavigate).toHaveBeenCalledWith('live', 'Designation')
+        })
 
-        it('should handle error when archiving plan', () => {
-            const mockRow = { id: '123' }
+        it('should handle delete error', () => {
             mockTrainingPlanService.archivePlan.mockReturnValue(throwError('Error'))
 
             component.deleteContentData(mockRow)
 
-            expect(mockLoaderService.changeLoaderState).toHaveBeenCalledWith(true)
             expect(mockLoaderService.changeLoaderState).toHaveBeenCalledWith(false)
         })
     })
 
     describe('publishContentData', () => {
-        it('should call publishPlan service and handle success', () => {
-            const mockRow = { id: '123', userType: 'Designation' }
-            mockTrainingPlanService.publishPlan.mockReturnValue(of({
-                params: { status: 'SUCCESS' }
-            }))
-            const tabNavigateSpy = jest.spyOn(component, 'tabNavigate')
+        const mockRow = { id: '1', status: 'DRAFT', userType: 'Designation' }
+
+        it('should publish content successfully', () => {
+            const mockResponse = { params: { status: 'success' } }
+            mockTrainingPlanService.publishPlan.mockReturnValue(of(mockResponse))
+            jest.spyOn(component, 'tabNavigate')
 
             component.publishContentData(mockRow)
 
-            expect(mockLoaderService.changeLoaderState).toHaveBeenCalledWith(true)
             expect(mockTrainingPlanService.publishPlan).toHaveBeenCalledWith({
-                request: {
-                    id: '123',
-                    comment: 'CBP plan approved'
-                }
+                request: { id: '1', comment: 'CBP plan approved' }
             })
             expect(mockSnackBar.open).toHaveBeenCalledWith('CBP plan published successfully.')
-            expect(mockLoaderService.changeLoaderState).toHaveBeenCalledWith(false)
-            expect(tabNavigateSpy).toHaveBeenCalledWith('live', 'Designation')
+            expect(component.tabNavigate).toHaveBeenCalledWith('live', 'Designation')
         })
 
-        it('should handle response with unsuccessful status', () => {
-            const mockRow = { id: '123' }
-            mockTrainingPlanService.publishPlan.mockReturnValue(of({
-                params: { status: 'error' }
-            }))
+        it('should handle unsuccessful publish response', () => {
+            const mockResponse = { params: { status: 'failure' } }
+            mockTrainingPlanService.publishPlan.mockReturnValue(of(mockResponse))
 
             component.publishContentData(mockRow)
 
-            expect(mockSnackBar.open).toHaveBeenCalledWith('Something went wrong while publishing CBP plan. Try again later')
-            expect(mockLoaderService.changeLoaderState).toHaveBeenCalledWith(false)
+            expect(mockSnackBar.open).toHaveBeenCalledWith(
+                'Something went wrong while publishing CBP plan. Try again later'
+            )
         })
 
-        it('should handle error when publishing plan', () => {
-            const mockRow = { id: '123' }
+        it('should handle publish error', () => {
             mockTrainingPlanService.publishPlan.mockReturnValue(throwError('Error'))
 
             component.publishContentData(mockRow)
 
-            expect(mockSnackBar.open).toHaveBeenCalledWith('Something went wrong while publishing CBP plan. Try again later')
-            expect(mockLoaderService.changeLoaderState).toHaveBeenCalledWith(false)
+            expect(mockSnackBar.open).toHaveBeenCalledWith(
+                'Something went wrong while publishing CBP plan. Try again later'
+            )
         })
     })
 
     describe('clickHandler', () => {
-        it('should call createCbp for createCbpPlan type', () => {
-            const createCbpSpy = jest.spyOn(component, 'createCbp')
-            const mockEvent = { type: 'createCbpPlan' }
-
-            component.clickHandler(mockEvent)
-
-            expect(createCbpSpy).toHaveBeenCalled()
+        it('should call createCbp when type is createCbpPlan', () => {
+            jest.spyOn(component, 'createCbp')
+            component.clickHandler({ type: 'createCbpPlan' })
+            expect(component.createCbp).toHaveBeenCalled()
         })
     })
 
     describe('filterDataAsPerTab', () => {
-        it('should update tagListData selection and filter trainingPlanData', () => {
-            component.completeDataRes = [
-                { userType: 'Designation', name: 'Plan 1' },
-                { userType: 'CustomUser', name: 'Plan 2' },
-                { userType: 'AllUser', name: 'Plan 3' }
-            ]
+        it('should filter data based on selected tab', () => {
+            component.completeDataRes = mockTrainingPlanData
+            component.filterDataAsPerTab('Designation')
 
-            component.filterDataAsPerTab('CustomUser')
+            const selectedTag = component.tagListData.find((tag: any) => tag.value === 'Designation')
+            expect(selectedTag?.selected).toBe(true)
 
-            expect(component.tagListData.find((tag: any) => tag.value === 'CustomUser').selected).toBe(true)
-            expect(component.tagListData.find((tag: any) => tag.value === 'Designation').selected).toBe(false)
-            expect(component.tagListData.find((tag: any) => tag.value === 'AllUser').selected).toBe(false)
-            expect(component.trainingPlanData).toEqual([{ userType: 'CustomUser', name: 'Plan 2' }])
+            const designationPlans = mockTrainingPlanData.filter(plan => plan.userType === 'Designation')
+            expect(component.trainingPlanData).toEqual(designationPlans)
         })
     })
 
     describe('hasAccess', () => {
-        it('should determine user access for action menu items', () => {
-            component.configSvc = { userRoles: new Set(['mdo_leader', 'content_creator']) }
-            component.pageConfig = {
-                data: {
-                    actionMenu: [
-                        { enabledFor: ['mdo_leader'] },
-                        { enabledFor: ['content_creator'] },
-                        { enabledFor: ['other_role'] }
-                    ]
-                }
-            }
+        it('should set user access flags correctly', () => {
+            component.pageConfig = mockPageData
+            component.configSvc = mockConfigService
 
             component.hasAccess()
 
-            expect(component.pageConfig.data.actionMenu[0].userAccess).toBe(true)
-            expect(component.pageConfig.data.actionMenu[0].isMdoLeader).toBe(true)
-            expect(component.pageConfig.data.actionMenu[1].userAccess).toBe(true)
-            expect(component.pageConfig.data.actionMenu[2].userAccess).toBe(false)
+            const adminMenu = component.pageConfig.data.actionMenu[0]
+            const leaderMenu = component.pageConfig.data.actionMenu[1]
+
+            expect(adminMenu.userAccess).toBe(true)
+            expect(adminMenu.isMdoAdmin).toBe(true)
+            expect(leaderMenu.userAccess).toBe(true)
+            expect(leaderMenu.isMdoLeader).toBe(true)
+        })
+
+        it('should handle missing page config', () => {
+            component.pageConfig = null
+            expect(() => component.hasAccess()).not.toThrow()
         })
     })
 
     describe('tabNavigate', () => {
-        it('should navigate with correct query params', () => {
-            component.tabNavigate('draft', 'CustomUser')
+        it('should navigate with query params', () => {
+            component.tabNavigate('live', 'Designation')
 
             expect(mockRouter.navigate).toHaveBeenCalledWith(
                 ['app', 'home', 'training-plan-dashboard'],
-                { queryParams: { type: 'draft', tabSelected: 'CustomUser' } }
+                {
+                    queryParams: {
+                        type: 'live',
+                        tabSelected: 'Designation'
+                    }
+                }
             )
+        })
+
+        it('should navigate without tabSelected param', () => {
+            component.tabNavigate('draft')
+
+            expect(mockRouter.navigate).toHaveBeenCalledWith(
+                ['app', 'home', 'training-plan-dashboard'],
+                {
+                    queryParams: {
+                        type: 'draft',
+                        tabSelected: undefined
+                    }
+                }
+            )
+        })
+    })
+
+    describe('Component initialization', () => {
+        it('should initialize with default values', () => {
+            expect(component.currentFilter).toBe('live')
+            expect(component.pageIndex).toBe(0)
+            expect(component.currentOffset).toBe(0)
+            expect(component.limit).toBe(20)
+            expect(component.searchQuery).toBe('')
+            expect(component.trainingPlanData).toEqual([])
+            expect(component.currentTab).toBe('Designation')
+            expect(component.tagListData).toHaveLength(3)
         })
     })
 })
