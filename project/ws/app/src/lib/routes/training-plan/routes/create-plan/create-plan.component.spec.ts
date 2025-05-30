@@ -1,356 +1,505 @@
-import { SearchInputHomeComponent } from '../../../search/components/search-input-home/search-input-home.component'
-import { ActivatedRoute, Router } from '@angular/router'
-import { ConfigurationsService } from '@sunbird-cb/utils'
-import { SearchServService } from '../../../search/services/search-serv.service'
-import { BehaviorSubject } from 'rxjs'
-import { convertToParamMap } from '@angular/router'
+import { CreatePlanComponent } from './create-plan.component'
+import { ActivatedRoute } from '@angular/router'
+import { TrainingPlanDataSharingService } from '../../services/training-plan-data-share.service'
+import { Subject } from 'rxjs'
 
-describe('SearchInputHomeComponent', () => {
-    let component: SearchInputHomeComponent
-    let activatedRouteMock: Partial<ActivatedRoute>
-    let routerMock: Partial<Router>
-    let searchServSvcMock: Partial<SearchServService>
-    let configSvcMock: Partial<ConfigurationsService>
-    let routeMock: Partial<ActivatedRoute>
-
-    // Mock data
-    const mockSearchConfig = {
-        search: {
-            isAutoCompleteAllowed: true,
-            languageSearch: ['All', 'En', 'Hi']
-        }
-    }
-
-    // Create a proper ParamMap implementation
-    // const createParamMap = () => ({
-    //     has: jest.fn().mockImplementation((key) => key === 'q'),
-    //     get: jest.fn().mockImplementation((key) => {
-    //         if (key === 'q') return 'test query'
-    //         if (key === 'lang') return 'en'
-    //         return null
-    //     }),
-    //     getAll: jest.fn().mockImplementation((key) => {
-    //         if (key === 'q') return ['test query']
-    //         if (key === 'lang') return ['en']
-    //         return []
-    //     }),
-    //     keys: jest.fn().mockReturnValue(['q', 'lang'])
-    // })
-
-    const createParamMap = () =>
-        convertToParamMap({
-            q: 'test query',
-            lang: 'en',
-        })
-
-    const mockQueryParamMap = new BehaviorSubject(createParamMap())
+describe('CreatePlanComponent', () => {
+    let component: CreatePlanComponent
+    let mockActivatedRoute: jest.Mocked<ActivatedRoute>
+    let mockTpdsSvc: jest.Mocked<TrainingPlanDataSharingService>
+    let filterToggleSubject: Subject<any>
 
     beforeEach(() => {
-        // Create mocks
-        activatedRouteMock = {
+        // Create filter toggle subject
+        filterToggleSubject = new Subject<any>()
+
+        // Create mock objects for dependencies
+        mockActivatedRoute = {
             snapshot: {
-                queryParams: { q: 'initial query' },
-                data: {
-                    searchPageData: {
-                        data: mockSearchConfig
-                    }
-                },
-                queryParamMap: createParamMap()
-            } as any,
-            queryParamMap: mockQueryParamMap,
-            parent: {} as any
-        }
-
-        routerMock = {
-            navigate: jest.fn()
-        }
-
-        searchServSvcMock = {
-            getSearchConfig: jest.fn().mockResolvedValue(mockSearchConfig),
-            getLanguageSearchIndex: jest.fn().mockImplementation(locale => locale),
-            searchAutoComplete: jest.fn().mockResolvedValue([{ displayText: 'test result', type: 'search' }])
-        }
-
-        configSvcMock = {
-            activeLocale: { locals: ['en'] } as any,
-            userPreference: {
-                selectedLangGroup: 'en,hi'
-            } as any
-        }
-
-        routeMock = {
-            snapshot: {
-                data: {
-                    searchPageData: {
-                        data: mockSearchConfig
-                    }
-                }
-            } as any
-        }
-
-        // Create component with mocks
-        component = new SearchInputHomeComponent(
-            activatedRouteMock as ActivatedRoute,
-            routerMock as Router,
-            searchServSvcMock as SearchServService,
-            configSvcMock as ConfigurationsService,
-            routeMock as ActivatedRoute
-        )
-
-        // Mock ViewChild
-        component.searchInputElem = {
-            nativeElement: {
-                focus: jest.fn(),
-                blur: jest.fn()
+                data: {}
             }
         } as any
+
+        mockTpdsSvc = {
+            trainingPlanTitle: '',
+            trainingPlanAssigneeData: {},
+            trainingPlanContentData: {},
+            trainingPlanStepperData: {
+                contentList: [],
+                contentType: '',
+                assignmentType: '',
+                assignmentTypeInfo: '',
+                endDate: '',
+                status: ''
+            },
+            filterToggle: filterToggleSubject
+        } as any
+
+        // Create component instance with mocked dependencies
+        component = new CreatePlanComponent(mockActivatedRoute, mockTpdsSvc)
     })
 
-    it('should create', () => {
-        expect(component).toBeTruthy()
+    describe('Component Initialization', () => {
+        it('should create component with default values', () => {
+            expect(component).toBeDefined()
+            expect(component.selectedTabData).toBe('createPlan')
+            expect(component.nextTab).toBe('')
+            expect(component.planId).toBe('')
+            expect(component.filterVisibilityFlag).toBe(false)
+            expect(component.from).toBe('')
+        })
     })
 
     describe('ngOnInit', () => {
-        it('should fetch search config and initialize', async () => {
-            jest.spyOn(component, 'autoFilter')
-            jest.spyOn(component, 'init')
+        it('should handle empty contentData', () => {
+            mockActivatedRoute.snapshot.data = {}
 
-            await component.ngOnInit()
+            component.ngOnInit()
 
-            expect(searchServSvcMock.getSearchConfig).toHaveBeenCalled()
-            expect(component.autoFilter).toHaveBeenCalled()
-            expect(component.init).toHaveBeenCalled()
-        })
-    })
-
-    describe('autoFilter', () => {
-        beforeEach(() => {
-            // Ensure routeMock is properly initialized for each test
-            routeMock.snapshot = {
-                data: {
-                    searchPageData: {
-                        data: {
-                            search: {
-                                isAutoCompleteAllowed: true, // default true
-                                languageSearch: ['All', 'En', 'Hi'],
-                            },
-                        },
-                    },
-                },
-            } as any
-        })
-        it('should set up valueChanges subscription when autoComplete is allowed', () => {
-            // Setup
-            const spy = jest.spyOn(component.queryControl.valueChanges, 'pipe')
-
-            // Execute
-            component.autoFilter()
-
-            // Verify
-            expect(spy).toHaveBeenCalled()
+            expect(component).toBeDefined()
         })
 
-        it('should not set up valueChanges subscription when autoComplete is not allowed', () => {
-            // Setup
-            // routeMock?.snapshot?.data?.searchPageData?.data?.search?.isAutoCompleteAllowed = false
-            routeMock.snapshot!.data.searchPageData.data.search.isAutoCompleteAllowed = false
-            const spy = jest.spyOn(component.queryControl.valueChanges, 'pipe')
+        it('should process contentData with CustomUser assignment type', () => {
+            const mockContentData = {
+                name: 'Test Plan',
+                assignmentType: 'CustomUser',
+                userDetails: [
+                    { userId: 'user1' },
+                    { userId: 'user2' },
+                    { userId: null } // should be filtered out
+                ],
+                contentList: [
+                    { identifier: 'content1' },
+                    { identifier: 'content2' }
+                ],
+                contentType: 'video',
+                assignmentTypeInfo: 'info',
+                endDate: '2024-12-31',
+                status: 'active'
+            }
 
-            // Execute
-            component.autoFilter()
+            mockActivatedRoute.snapshot.data = { contentData: mockContentData }
+            mockTpdsSvc.trainingPlanStepperData = {
+                contentList: [],
+                contentType: '',
+                assignmentType: '',
+                assignmentTypeInfo: '',
+                endDate: '',
+                status: ''
+            }
 
-            // Verify
-            expect(spy).not.toHaveBeenCalled()
-        })
-    })
+            component.ngOnInit()
 
-    describe('getActiveLocale', () => {
-        it('should return locale from config service', () => {
-            const result = component.getActiveLocale()
-            expect(result).toBe('en')
-            expect(searchServSvcMock.getLanguageSearchIndex).toHaveBeenCalledWith('en')
-        })
-
-        it('should return default locale if active locale not available', () => {
-            configSvcMock.activeLocale = undefined
-            const result = component.getActiveLocale()
-            expect(searchServSvcMock.getLanguageSearchIndex).toHaveBeenCalledWith('en')
-            expect(result).toBe('en')
-        })
-    })
-
-    describe('preferredLanguages', () => {
-        it('should return preferred languages from config', () => {
-            const result = component.preferredLanguages
-            expect(result).toBe('en,hi')
-        })
-
-        it('should return null if no user preference', () => {
-            configSvcMock.userPreference = undefined
-            const result = component.preferredLanguages
-            expect(result).toBeNull()
-        })
-    })
-
-    describe('updateQuery', () => {
-        it('should navigate to search page with query params from home ref', () => {
-            // Setup
-            component.ref = 'home'
-            const query = 'search term'
-            const emitSpy = jest.spyOn(component.closed, 'emit')
-
-            // Execute
-            component.updateQuery(query)
-
-            // Verify
-            expect(component.searchInputElem.nativeElement.blur).toHaveBeenCalled()
-            expect(emitSpy).toHaveBeenCalledWith(false)
-            expect(routerMock.navigate).toHaveBeenCalledWith(
-                ['/app/search'],
-                {
-                    queryParams: { q: 'search term' },
-                    queryParamsHandling: 'merge'
-                }
-            )
-        })
-
-        it('should navigate relative to parent when not from home ref', () => {
-            // Setup
-            component.ref = 'other'
-            const query = 'search term'
-
-            // Execute
-            component.updateQuery(query)
-
-            // Verify
-            expect(routerMock.navigate).toHaveBeenCalledWith(
-                [],
-                {
-                    relativeTo: activatedRouteMock.parent,
-                    queryParams: { q: 'search term' },
-                    queryParamsHandling: 'merge'
-                }
-            )
-        })
-    })
-
-    describe('getSearchAutoCompleteResults', () => {
-        it('should call searchAutoComplete when searchLocale is a single language', async () => {
-            // Setup
-            component.searchLocale = 'en'
-            const query = 'test'
-
-            // Execute
-            await component.getSearchAutoCompleteResults(query)
-
-            // Verify
-            expect(searchServSvcMock.searchAutoComplete).toHaveBeenCalledWith({
-                q: query,
-                l: 'en'
+            expect(mockTpdsSvc.trainingPlanTitle).toBe('Test Plan')
+            expect(mockTpdsSvc.trainingPlanAssigneeData).toEqual({
+                data: mockContentData.userDetails
             })
-            expect(component.autoCompleteResults).toEqual([{ displayText: 'test result', type: 'search' }])
+            expect(mockTpdsSvc.trainingPlanContentData).toEqual({
+                data: { content: mockContentData.contentList }
+            })
+            expect(mockTpdsSvc.trainingPlanStepperData.contentList).toEqual(['content1', 'content2'])
+            expect(mockTpdsSvc.trainingPlanStepperData.contentType).toBe('video')
+            expect(mockTpdsSvc.trainingPlanStepperData.assignmentType).toBe('CustomUser')
+            expect(mockTpdsSvc.trainingPlanStepperData.endDate).toBe('2024-12-31')
+            expect(mockTpdsSvc.trainingPlanStepperData.status).toBe('active')
         })
 
-        it('should not call searchAutoComplete when searchLocale has multiple languages', async () => {
-            // Setup
-            component.searchLocale = 'en,hi'
-            const query = 'test'
+        it('should process contentData with non-CustomUser assignment type', () => {
+            const mockContentData = {
+                name: 'Test Plan',
+                assignmentType: 'Department',
+                assignmentTypeInfo: 'IT Department',
+                contentList: [],
+                contentType: 'document',
+                endDate: '2024-12-31',
+                status: 'draft'
+            }
 
-            // Execute
-            await component.getSearchAutoCompleteResults(query)
+            mockActivatedRoute.snapshot.data = { contentData: mockContentData }
+            mockTpdsSvc.trainingPlanStepperData = {
+                contentList: [],
+                contentType: '',
+                assignmentType: '',
+                assignmentTypeInfo: '',
+                endDate: '',
+                status: ''
+            }
 
-            // Verify
-            expect(searchServSvcMock.searchAutoComplete).not.toHaveBeenCalled()
+            component.ngOnInit()
+
+            expect(mockTpdsSvc.trainingPlanAssigneeData).toEqual({
+                category: 'Department',
+                data: ['IT Department']
+            })
+        })
+
+        it('should handle contentData without contentList', () => {
+            const mockContentData = {
+                name: 'Test Plan',
+                assignmentType: 'Department',
+                assignmentTypeInfo: 'IT Department',
+                contentType: 'document',
+                endDate: '2024-12-31',
+                status: 'draft'
+            }
+
+            mockActivatedRoute.snapshot.data = { contentData: mockContentData }
+            mockTpdsSvc.trainingPlanStepperData = {
+                contentList: [],
+                contentType: '',
+                assignmentType: '',
+                assignmentTypeInfo: '',
+                endDate: '',
+                status: ''
+            }
+
+            component.ngOnInit()
+
+            expect(mockTpdsSvc.trainingPlanStepperData.contentList).toEqual([])
+        })
+
+        it('should subscribe to filterToggle observable', () => {
+            const mockFilterData = { status: true, from: 'testSource' }
+
+            component.ngOnInit()
+
+            // Emit data after subscription
+            filterToggleSubject.next(mockFilterData)
+
+            expect(component.filterVisibilityFlag).toBe(true)
+            expect(component.from).toBe('testSource')
+        })
+
+        it('should handle falsy data in filterToggle subscription', () => {
+            component.ngOnInit()
+
+            // Emit falsy data
+            filterToggleSubject.next(null)
+
+            // Should not update properties if data is falsy
+            expect(component.filterVisibilityFlag).toBe(false)
+            expect(component.from).toBe('')
+        })
+
+        it('should set selected property to true for each content item', () => {
+            const mockContentData = {
+                name: 'Test Plan',
+                assignmentType: 'Department',
+                assignmentTypeInfo: 'IT Department',
+                contentList: [
+                    { identifier: 'content1', selected: '1' },
+                    { identifier: 'content2', selected: '2' }
+                ],
+                contentType: 'video',
+                endDate: '2024-12-31',
+                status: 'active'
+            }
+
+            mockActivatedRoute.snapshot.data = { contentData: mockContentData }
+            mockTpdsSvc.trainingPlanStepperData = {
+                contentList: [],
+                contentType: '',
+                assignmentType: '',
+                assignmentTypeInfo: '',
+                endDate: '',
+                status: ''
+            }
+
+            component.ngOnInit()
+            expect(mockContentData.contentList[0].selected).toBe(true)
+            expect(mockContentData.contentList[1].selected).toBe(true)
         })
     })
 
-    describe('searchLanguage', () => {
-        it('should navigate with language and current query', () => {
-            // Setup
-            component.queryControl.setValue('test query')
+    describe('selectedTabAction', () => {
+        it('should update selectedTabData and nextTab', () => {
+            const testEvent = 'assignees'
 
-            // Execute
-            component.searchLanguage('fr')
+            component.selectedTabAction(testEvent)
 
-            // Verify
-            expect(routerMock.navigate).toHaveBeenCalledWith(
-                [],
-                {
-                    relativeTo: activatedRouteMock.parent,
-                    queryParams: {
-                        lang: 'fr',
-                        q: 'test query'
-                    },
-                    queryParamsHandling: 'merge'
-                }
-            )
+            expect(component.selectedTabData).toBe('assignees')
+            expect(component.nextTab).toBe('assignees')
+        })
+
+        it('should handle null event', () => {
+            component.selectedTabAction(null)
+
+            expect(component.selectedTabData).toBe(null)
+            expect(component.nextTab).toBe(null)
         })
     })
 
-    describe('init', () => {
-        it('should set up queryParamMap subscription', () => {
-            // Execute
-            component.init()
+    describe('changeTab', () => {
+        it('should update nextTab', () => {
+            const testEvent = 'content'
 
-            // Update the mock queryParamMap to simulate changes
-            // mockQueryParamMap.next({
-            //     has: jest.fn().mockReturnValue(true),
-            //     get: jest.fn().mockImplementation((key) => {
-            //         if (key === 'q') return 'new query'
-            //         if (key === 'lang') return 'fr'
-            //         return null
-            //     }),
-            //     getAll: jest.fn().mockImplementation((key) => {
-            //         if (key === 'q') return ['new query']
-            //         if (key === 'lang') return ['fr']
-            //         return []
-            //     }),
-            //     keys: jest.fn().mockReturnValue(['q', 'lang'])
-            // })
+            component.changeTab(testEvent)
 
-            mockQueryParamMap.next(
-                convertToParamMap({
-                    q: 'new query',
-                    lang: 'fr',
-                })
-            )
-
-            // Verify queryControl was updated
-            expect(component.queryControl.value).toBe('new query')
+            expect(component.nextTab).toBe('content')
         })
 
-        it('should focus on search input element', () => {
-            // Execute
-            component.init()
+        it('should handle empty string event', () => {
+            component.changeTab('')
 
-            // Verify
-            expect(component.searchInputElem.nativeElement.focus).toHaveBeenCalled()
+            expect(component.nextTab).toBe('')
         })
     })
 
-    describe('swapRemove', () => {
-        it('should swap and remove element at specified indices', () => {
-            // Setup
-            const array = ['a', 'b', 'c', 'd']
+    describe('isPlanTitleInvalid', () => {
+        it('should update createCheck with titleIsInvalid', () => {
+            component.createCheck = { someExistingProp: 'value' }
 
-            // Execute
-            component.swapRemove(array, 2, 0)
+            component.isPlanTitleInvalid(true)
 
-            // Verify
-            expect(array).toEqual(['c', 'a', 'b', 'd'])
+            expect(component.createCheck).toEqual({
+                someExistingProp: 'value',
+                titleIsInvalid: true
+            })
+        })
+
+        it('should handle undefined createCheck', () => {
+            component.createCheck = undefined
+
+            component.isPlanTitleInvalid(false)
+
+            expect(component.createCheck).toEqual({
+                titleIsInvalid: false
+            })
+        })
+
+        it('should handle boolean false event', () => {
+            component.createCheck = { titleIsInvalid: true }
+
+            component.isPlanTitleInvalid(false)
+
+            expect(component.createCheck.titleIsInvalid).toBe(false)
         })
     })
 
-    describe('ngOnChanges', () => {
-        it('should handle placeHolder change', () => {
-            // Setup
-            component.placeHolder = 'New Placeholder'
+    describe('isAddContentInvalid', () => {
+        it('should update createCheck with addContentIsInvalid', () => {
+            component.createCheck = { titleIsInvalid: false }
 
-            // Execute
-            component.ngOnChanges()
+            component.isAddContentInvalid(true)
 
-            // Verify
-            expect(component.placeHolder).toBe('New Placeholder')
+            expect(component.createCheck).toEqual({
+                titleIsInvalid: false,
+                addContentIsInvalid: true
+            })
+        })
+
+        it('should handle null createCheck', () => {
+            component.createCheck = null
+
+            component.isAddContentInvalid(true)
+
+            expect(component.createCheck).toEqual({
+                addContentIsInvalid: true
+            })
+        })
+    })
+
+    describe('isAddAssigneeInvalid', () => {
+        it('should update createCheck with addAssigneeInvalid', () => {
+            component.createCheck = { titleIsInvalid: false }
+
+            component.isAddAssigneeInvalid(true)
+
+            expect(component.createCheck).toEqual({
+                titleIsInvalid: false,
+                addAssigneeIsInvalid: true
+            })
+        })
+
+        it('should preserve existing properties', () => {
+            component.createCheck = {
+                titleIsInvalid: false,
+                addContentIsInvalid: true
+            }
+
+            component.isAddAssigneeInvalid(false)
+
+            expect(component.createCheck).toEqual({
+                titleIsInvalid: false,
+                addContentIsInvalid: true,
+                addAssigneeIsInvalid: false
+            })
+        })
+    })
+
+    describe('ngOnDestroy', () => {
+        it('should exist and be callable', () => {
+            expect(() => component.ngOnDestroy()).not.toThrow()
+        })
+
+        it('should not throw when called multiple times', () => {
+            expect(() => {
+                component.ngOnDestroy()
+                component.ngOnDestroy()
+            }).not.toThrow()
+        })
+    })
+
+    describe('Edge Cases', () => {
+        it('should handle CustomUser assignment type with empty userDetails', () => {
+            const mockContentData = {
+                name: 'Test Plan',
+                assignmentType: 'CustomUser',
+                userDetails: [],
+                contentList: [],
+                contentType: 'video',
+                assignmentTypeInfo: 'info',
+                endDate: '2024-12-31',
+                status: 'active'
+            }
+
+            mockActivatedRoute.snapshot.data = { contentData: mockContentData }
+            mockTpdsSvc.trainingPlanStepperData = {
+                contentList: [],
+                contentType: '',
+                assignmentType: '',
+                assignmentTypeInfo: '',
+                endDate: '',
+                status: ''
+            }
+
+            component.ngOnInit()
+
+            expect(mockContentData.assignmentTypeInfo).toEqual([])
+        })
+
+        it('should handle CustomUser assignment type with userDetails containing objects without userId', () => {
+            const mockContentData = {
+                name: 'Test Plan',
+                assignmentType: 'CustomUser',
+                userDetails: [
+                    { name: 'User 1' }, // no userId
+                    { userId: 'user2' },
+                    null,
+                    undefined
+                ],
+                contentList: [],
+                contentType: 'video',
+                assignmentTypeInfo: 'info',
+                endDate: '2024-12-31',
+                status: 'active'
+            }
+
+            mockActivatedRoute.snapshot.data = { contentData: mockContentData }
+            mockTpdsSvc.trainingPlanStepperData = {
+                contentList: [],
+                contentType: '',
+                assignmentType: '',
+                assignmentTypeInfo: '',
+                endDate: '',
+                status: ''
+            }
+
+            component.ngOnInit()
+
+            expect(mockContentData.assignmentTypeInfo).toEqual(['user2'])
+        })
+
+        it('should handle empty contentList array', () => {
+            const mockContentData = {
+                name: 'Test Plan',
+                assignmentType: 'Department',
+                assignmentTypeInfo: 'IT Department',
+                contentList: [],
+                contentType: 'document',
+                endDate: '2024-12-31',
+                status: 'draft'
+            }
+
+            mockActivatedRoute.snapshot.data = { contentData: mockContentData }
+            mockTpdsSvc.trainingPlanStepperData = {
+                contentList: [],
+                contentType: '',
+                assignmentType: '',
+                assignmentTypeInfo: '',
+                endDate: '',
+                status: ''
+            }
+
+            component.ngOnInit()
+
+            expect(mockTpdsSvc.trainingPlanStepperData.contentList).toEqual([])
+            expect(mockTpdsSvc.trainingPlanContentData).toEqual({
+                data: { content: [] }
+            })
+        })
+
+        it('should handle missing properties in contentData', () => {
+            const mockContentData = {
+                name: 'Test Plan'
+                // Missing other properties
+            }
+
+            mockActivatedRoute.snapshot.data = { contentData: mockContentData }
+            mockTpdsSvc.trainingPlanStepperData = {
+                contentList: [],
+                contentType: '',
+                assignmentType: '',
+                assignmentTypeInfo: '',
+                endDate: '',
+                status: ''
+            }
+
+            expect(() => component.ngOnInit()).not.toThrow()
+        })
+    })
+
+    describe('Observable Subscriptions', () => {
+        it('should handle observable emission after component initialization', () => {
+            const mockFilterData = { status: false, from: 'newSource' }
+
+            component.ngOnInit()
+
+            // Emit data after subscription
+            filterToggleSubject.next(mockFilterData)
+
+            expect(component.filterVisibilityFlag).toBe(false)
+            expect(component.from).toBe('newSource')
+        })
+
+        it('should handle multiple observable emissions', () => {
+            component.ngOnInit()
+
+            // First emission
+            const mockFilterData1 = { status: true, from: 'source1' }
+            filterToggleSubject.next(mockFilterData1)
+
+            expect(component.filterVisibilityFlag).toBe(true)
+            expect(component.from).toBe('source1')
+
+            // Second emission
+            const mockFilterData2 = { status: false, from: 'source2' }
+            filterToggleSubject.next(mockFilterData2)
+
+            expect(component.filterVisibilityFlag).toBe(false)
+            expect(component.from).toBe('source2')
+        })
+
+        it('should handle undefined data in filterToggle subscription', () => {
+            component.ngOnInit()
+
+            // Emit undefined data
+            filterToggleSubject.next(undefined)
+
+            // Should not update properties if data is undefined
+            expect(component.filterVisibilityFlag).toBe(false)
+            expect(component.from).toBe('')
+        })
+
+        it('should handle object without expected properties', () => {
+            component.ngOnInit()
+
+            // Emit object without status and from properties
+            filterToggleSubject.next({ someOtherProp: 'value' })
+
+            // Should not update properties if expected properties are missing
+            expect(component.filterVisibilityFlag).toBe(false)
+            expect(component.from).toBe('')
         })
     })
 })

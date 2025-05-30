@@ -13,10 +13,10 @@ import { WatStoreService } from '../../services/wat.store.service'
 
 export class AssistantMessageCardComponent implements OnInit, OnDestroy {
   dataStructure: any = {}
-  private activitySubscription: any
-  private groupSubscription: any
-  private compDetailsSubscription: any
-  private officerFormSubscription: any
+  public activitySubscription: any
+  public groupSubscription: any
+  public compDetailsSubscription: any
+  public officerFormSubscription: any
   validations!: any
 
   defaultProgressValues = {
@@ -60,7 +60,7 @@ export class AssistantMessageCardComponent implements OnInit, OnDestroy {
     },
   }
 
-  constructor(private watStore: WatStoreService) {
+  constructor(public watStore: WatStoreService) {
   }
 
   ngOnInit() {

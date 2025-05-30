@@ -162,7 +162,7 @@ export class TrainingPlanDashboardComponent implements OnInit {
     }
     if (this.trainingDashboardSvc.getUserList(req)) {
       const liveRes = await this.trainingDashboardSvc.getUserList(req).toPromise().catch(_error => { })
-      if (liveRes.params && liveRes.params.status && liveRes.params.status === 'success') {
+      if (liveRes && liveRes.params && liveRes.params.status && liveRes.params.status === 'success') {
         this.completeDataRes = liveRes.result.content
         this.trainingPlanData = this.completeDataRes.filter((v: any) => v.userType === this.currentTab)
         this.convertDataAsPerTable()
@@ -274,7 +274,7 @@ export class TrainingPlanDashboardComponent implements OnInit {
       autoFocus: false,
     })
 
-    this.dialogRef.afterClosed().subscribe((_res: any) => {
+    this.dialogRef && this.dialogRef.afterClosed().subscribe((_res: any) => {
       if (_res === 'confirmed') {
         if (_type === 'deleteContent') {
           this.deleteContentData(_selectedRow)

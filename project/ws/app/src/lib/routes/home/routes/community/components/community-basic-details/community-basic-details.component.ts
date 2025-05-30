@@ -504,4 +504,6 @@ export class CommunityBasicDetailsComponent implements OnInit {
   }
 
 
+
+
 }
