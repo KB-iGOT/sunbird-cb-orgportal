@@ -4,7 +4,9 @@ import { IBtnAppsConfig, CustomTourService } from '@sunbird-cb/collection'
 import { NsWidgetResolver } from '@sunbird-cb/resolver'
 import { ConfigurationsService, NsInstanceConfig, NsPage } from '@sunbird-cb/utils'
 import { Router, NavigationStart, NavigationEnd, Event } from '@angular/router'
-
+import { LibNotificationsService } from '@sunbird-cb/notification'
+import { NotificationsService } from '../../services/notifications.service'
+import * as _ from 'lodash'
 @Component({
   selector: 'ws-app-nav-bar',
   templateUrl: './app-nav-bar.component.html',
@@ -12,6 +14,7 @@ import { Router, NavigationStart, NavigationEnd, Event } from '@angular/router'
 })
 export class AppNavBarComponent implements OnInit, OnChanges {
   @Input() mode: 'top' | 'bottom' = 'top'
+  @Input() notificationsCount: any = 0
   // @Input()
   // @HostBinding('id')
   // public id!: string
@@ -34,11 +37,14 @@ export class AppNavBarComponent implements OnInit, OnChanges {
   showAppNavBar = false
   isSetUpPage = false
   popupTour: any
+  showDropdown: boolean = false
   constructor(
     private domSanitizer: DomSanitizer,
     private configSvc: ConfigurationsService,
     private tourService: CustomTourService,
     private router: Router,
+    private libNotificationsService: LibNotificationsService,
+    private notificationsService: NotificationsService,
   ) {
     this.btnAppsConfig = { ...this.basicBtnAppsConfig }
     if (this.configSvc.restrictedFeatures) {
@@ -92,6 +98,10 @@ export class AppNavBarComponent implements OnInit, OnChanges {
         this.isTourGuideAvailable = canShow
         this.popupTour = this.tourService.createPopupTour()
       }
+    })
+    this.getMyCount()
+    this.libNotificationsService._unreadCount.subscribe(() => {
+      this.getMyCount()
     })
   }
 
@@ -152,5 +162,36 @@ export class AppNavBarComponent implements OnInit, OnChanges {
 
   showDashboard() {
     this.router.navigateByUrl('app/my-dashboard-temp/temp')
+  }
+
+  onBellClick() {
+    this.showDropdown = false
+    setTimeout(() => {
+      this.showDropdown = true
+    })
+  }
+  onMenuClosed() {
+    this.showDropdown = false
+  }
+
+  viewAllClick(event: any) {
+    if (event.category) {
+      if (event.category === 'PROFILE') {
+        this.router.navigate([`app/home/approvals/approval`])
+      } else {
+        this.router.navigate(['/app/home/notifications'])
+      }
+    } else {
+      this.router.navigate(['/app/home/notifications'], { queryParams: { tab: event } })
+    }
+  }
+
+  getMyCount() {
+    this.notificationsService.getNotificationsData().subscribe((res: any) => {
+      this.notificationsCount = _.get(res, 'result.unread', 0)
+    }, error => {
+      console.error('Error while fetching notifications count', error)
+      this.notificationsCount = 0
+    })
   }
 }

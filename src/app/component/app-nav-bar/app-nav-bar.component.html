@@ -96,6 +96,19 @@
   <ng-container *ngIf="item.type === 'widgetButton'" [wsResolverWidget]="item.config"></ng-container>
   <ws-widget-btn-feature *ngIf="item.type === 'featureButton' && item.config.actionBtnId !== 'feature_notification'"
     [id]="item.config.actionBtnId" [widgetData]="item.config" [showFixedLength]="true"></ws-widget-btn-feature>
+  <div class="p-4" *ngIf="item.type === 'notificationButton'">
+    <div [matMenuTriggerFor]="menu" class="relative cursor-pointer" (click)="onBellClick()">
+      <mat-icon class="bell-icon">notifications</mat-icon>
+      <span class="counter" *ngIf="notificationsCount > 0">{{notificationsCount}}</span>
+    </div>
+    <mat-menu #menu="matMenu" xPosition="before" class="my-notifications" (closed)="onMenuClosed()">
+      <div class="notification-container">
+        <sb-uin-notification-dropdown (viewAllClick)="viewAllClick($event)" [unRead]="notificationsCount"
+          *ngIf="showDropdown">
+        </sb-uin-notification-dropdown>
+      </div>
+    </mat-menu>
+  </div>
 </ng-template>
 
 <mat-menu #helpMenu="matMenu">
