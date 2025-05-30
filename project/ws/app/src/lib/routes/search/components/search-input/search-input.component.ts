@@ -40,7 +40,7 @@ export class SearchInputComponent implements OnInit, OnChanges {
     private configSvc: ConfigurationsService,
     private route: ActivatedRoute,
   ) {
-    const isAutoCompleteAllowed = this.route.snapshot.data.searchPageData.data.search.isAutoCompleteAllowed
+    const isAutoCompleteAllowed = this.route?.snapshot?.data?.searchPageData?.data?.search?.isAutoCompleteAllowed
     if (typeof isAutoCompleteAllowed === 'undefined' ||
       (typeof isAutoCompleteAllowed === 'boolean' && isAutoCompleteAllowed)) {
       this.queryControl.valueChanges.pipe(
@@ -118,13 +118,13 @@ export class SearchInputComponent implements OnInit, OnChanges {
     if (this.ref === 'home') {
       this.closed.emit(false)
       this.router.navigate(['/app/search'], {
-        queryParams: { q: query.trim() },
+        queryParams: { q: query?.trim() },
         queryParamsHandling: 'merge',
       })
     } else {
       this.router.navigate([], {
         relativeTo: this.activated.parent,
-        queryParams: { q: query.trim() },
+        queryParams: { q: query?.trim() },
         queryParamsHandling: 'merge',
       })
     }
