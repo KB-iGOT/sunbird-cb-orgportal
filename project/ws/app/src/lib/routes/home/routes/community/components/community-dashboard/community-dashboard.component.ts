@@ -4,12 +4,12 @@ import { MatPaginator, PageEvent } from '@angular/material/paginator'
 import { MatSort } from '@angular/material/sort'
 import { CommunityService } from '../../services/community.service'
 import { FormControl } from '@angular/forms'
-import { debounceTime, distinctUntilChanged, takeUntil } from 'rxjs/operators'
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators'
 import { ActivatedRoute, Router } from '@angular/router'
 import * as _ from 'lodash'
-import { RolesService } from '../../../../../users/services/roles.service'
-import { Subject } from 'rxjs'
-import { HttpErrorResponse } from '@angular/common/http'
+// import { RolesService } from '../../../../../users/services/roles.service'
+// import { Subject } from 'rxjs'
+// import { HttpErrorResponse } from '@angular/common/http'
 
 
 interface Community {
@@ -45,7 +45,7 @@ export class CommunityDashboardComponent implements OnInit {
   totalElements = 0  // Add this to store total count
   currentSearchString = ''  // Add this to store current search
   currentStatus = 'active'
-  private destroySubject$ = new Subject()
+  // private destroySubject$ = new Subject()
   masterData: any = {}
   isCommunityModeratorRole = false
   isCommunityCreateRole = false
@@ -72,7 +72,9 @@ export class CommunityDashboardComponent implements OnInit {
   @ViewChild(MatPaginator) paginator!: MatPaginator
   @ViewChild(MatSort) sort!: MatSort
 
-  constructor(private router: Router, private communitySvc: CommunityService, private activatedRoute: ActivatedRoute, private rolesService: RolesService,) {
+  constructor(private router: Router, private communitySvc: CommunityService, private activatedRoute: ActivatedRoute,
+    // private rolesService: RolesService,
+  ) {
     // Initialize with sample data
     const sampleData: Community[] = [
 
@@ -90,37 +92,20 @@ export class CommunityDashboardComponent implements OnInit {
   }
 
   getOrgRolesList(): void {
-    this.rolesService.getAllRoles()
-      .pipe(takeUntil(this.destroySubject$))
-      .subscribe((res: any) => {
-        if (res && res.result && res.result.response && res.result.response.value) {
-          this.masterData['rolesList'] = JSON.parse(res.result.response.value)
-          const orgTypeList = this.masterData.rolesList?.orgTypeList
-          if (Array.isArray(orgTypeList)) {
-            const mdoArray = orgTypeList.find((elem: any) => elem.name === 'MDO')
-            if (mdoArray.roles && Array.isArray(mdoArray.roles)) {
-              this.masterData['mdoRoles'] = mdoArray.roles
-              const targetRoles = ['COMMUNITY_MODERATOR', 'MDO_LEADER']
+    if (_.get(this.activatedRoute, 'snapshot.data.configService.unMappedUser')) {
+      this.userProfile = _.get(this.activatedRoute, 'snapshot.data.configService.unMappedUser')
+      const userRole = this.userProfile.roles
+      const targetRoles = ['COMMUNITY_MODERATOR', 'MDO_LEADER']
+      const itemPresent = targetRoles.some((role: any) => userRole.includes(role))
+      if (itemPresent) {
+        this.isCommunityModeratorRole = true
+      }
+      const mdoLeaderPresent = userRole.some((role: any) => role.includes('MDO_LEADER'))
+      if (mdoLeaderPresent) {
+        this.isCommunityCreateRole = true
+      }
+    }
 
-              const itemPresent = targetRoles.some((role: any) => this.masterData['mdoRoles'].includes(role))
-              if (itemPresent) {
-                this.isCommunityModeratorRole = true
-              }
-              const mdoLeaderPresent = this.masterData['mdoRoles'].some((role: any) => role.includes('MDO_LEADER'))
-              if (mdoLeaderPresent) {
-                this.isCommunityCreateRole = true
-              }
-            }
-          }
-        }
-        // tslint:disable-next-line
-      }, (_err: HttpErrorResponse) => {
-        if (!_err.ok) {
-          // this.matSnackBar.open('Unable to fetch roles list, please try again later!')
-          // tslint:disable-next-line
-          console.log('error ===')
-        }
-      })
   }
 
   ngOnInit() {
