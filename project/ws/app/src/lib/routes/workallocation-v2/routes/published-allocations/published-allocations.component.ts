@@ -63,7 +63,7 @@ export class PublishedAllocationsComponent implements OnInit {
   // tslint:disable-next-line:use-lifecycle-interface
   ngOnChanges(data: SimpleChanges) {
     this.data = _.get(data, 'data.currentValue')
-    this.length = this.data.length
+    this.length = this.data?.length
     this.paginator.firstPage()
   }
 

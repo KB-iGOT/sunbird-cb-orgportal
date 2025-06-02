@@ -81,7 +81,7 @@ describe('CommunityDashboardComponent', () => {
       mockRouter,
       mockCommunitySvc,
       mockActivatedRoute,
-      mockRolesService
+      // mockRolesService
     )
 
     // Spy on component methods

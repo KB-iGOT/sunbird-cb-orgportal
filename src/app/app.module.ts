@@ -132,7 +132,8 @@ import { environment } from '../environments/environment'
 import { PublicLogoutModule } from './routes/public/public-logout/public-logout.module'
 import { LoaderService } from './services/loader.service'
 import { ConfirmationBoxComponent } from '../../project/ws/app/src/lib/routes/training-plan/components/confirmation-box/confirmation.box.component'
-
+import { LibNotificationsService, NotificationDropdownModule } from '@sunbird-cb/notification'
+import { NotificationsService } from './services/notifications.service'
 /** Collection Library Modules */
 
 // @Injectable()
@@ -278,6 +279,7 @@ const getBaseHref = (platformLocation: PlatformLocation): string => {
     BreadcrumbsOrgModule,
     AuthorCardModule,
     ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production }),
+    NotificationDropdownModule,
   ],
   exports: [
     TncComponent,
@@ -319,6 +321,8 @@ const getBaseHref = (platformLocation: PlatformLocation): string => {
     MatDatepickerModule, MatNativeDateModule,
     { provide: 'environment', useValue: environment },
     LoaderService,
+    LibNotificationsService,
+    NotificationsService
   ]
 })
 

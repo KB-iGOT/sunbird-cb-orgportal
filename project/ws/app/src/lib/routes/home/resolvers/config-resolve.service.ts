@@ -5,7 +5,7 @@ import { ConfigurationsService } from '@sunbird-cb/utils'
 @Injectable()
 export class ConfigResolveService {
   constructor(
-    @SkipSelf() private confService: ConfigurationsService,
+    @SkipSelf() public confService: ConfigurationsService,
   ) { }
   resolve(
   ): Observable<any> {

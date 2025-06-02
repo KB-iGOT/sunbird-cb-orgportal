@@ -26,7 +26,7 @@ export class MdoinfoComponent implements OnInit, OnDestroy {
   mode$ = this.isLtMedium$.pipe(map(isMedium => (isMedium ? 'over' : 'side')))
   tabs: any
   tabsData: MDOinfo.IProfileTab[] | undefined
-  private defaultSideNavBarOpenedSubscription: any
+  public defaultSideNavBarOpenedSubscription: any
   @HostListener('window:scroll', ['$event'])
   handleScroll() {
     const windowScroll = window.pageYOffset
