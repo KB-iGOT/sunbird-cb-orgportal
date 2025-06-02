@@ -43,7 +43,13 @@ describe('TncRendererComponent', () => {
 
     const mockTncData: NsTnc.ITnc = {
         isAccepted: false,
-        termsAndConditions: [mockTncUnit, mockDpTncUnit]
+        termsAndConditions: [mockTncUnit, mockDpTncUnit],
+        id: function (): unknown {
+            throw new Error('Function not implemented.')
+        },
+        content: function (): unknown {
+            throw new Error('Function not implemented.')
+        }
     }
 
     beforeEach(async () => {

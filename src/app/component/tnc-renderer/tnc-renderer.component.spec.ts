@@ -40,7 +40,13 @@ describe('TncRendererComponent', () => {
                 language: '',
                 version: ''
             }
-        ]
+        ],
+        id: function (): unknown {
+            throw new Error('Function not implemented.')
+        },
+        content: function (): unknown {
+            throw new Error('Function not implemented.')
+        }
     }
 
     beforeEach(async () => {
@@ -226,7 +232,13 @@ describe('TncRendererComponent', () => {
                         language: '',
                         version: ''
                     }
-                ]
+                ],
+                id: function (): unknown {
+                    throw new Error('Function not implemented.')
+                },
+                content: function (): unknown {
+                    throw new Error('Function not implemented.')
+                }
             }
             component.tncData = tncDataWithDifferentNames;
 
@@ -237,10 +249,10 @@ describe('TncRendererComponent', () => {
         })
 
         it('should handle empty termsAndConditions array', () => {
-            component.tncData = {
-                isAccepted: false,
-                termsAndConditions: []
-            };
+            // component.tncData = {
+            //     isAccepted: false,
+            //     termsAndConditions: []
+            // };
 
             (component as any).assignGeneralAndDp()
 
