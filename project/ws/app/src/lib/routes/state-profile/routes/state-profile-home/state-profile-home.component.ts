@@ -18,14 +18,14 @@ import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack
 export class StateProfileHomeComponent implements OnInit, OnDestroy {
   @ViewChild('stickyMenu', { static: true }) menuElement!: ElementRef
   isLtMedium$ = this.valueSvc.isLtMedium$
-  private defaultSideNavBarOpenedSubscription: any
+  public defaultSideNavBarOpenedSubscription: any
   sideNavBarOpened = true
   public screenSizeIsLtMedium = false
   sticky = false
   currentRoute = 'all'
   banner!: NsWidgetResolver.IWidgetData<any>
   userRouteName = ''
-  private routerSubscription: Subscription | null = null
+  public routerSubscription: Subscription | null = null
 
   tabs!: NSProfileDataV3.IProfileTab[]
   tabsData = this.route.parent && this.route.parent.snapshot.data.pageData.data.tabs || []
@@ -38,7 +38,7 @@ export class StateProfileHomeComponent implements OnInit, OnDestroy {
     public router: Router,
     private stepService: StepService,
     private configSvc: ConfigurationsService,
-    private snackBar: MatSnackBar,
+    public snackBar: MatSnackBar,
     private orgSvc: OrgProfileService,
   ) {
     this.tabs = _.orderBy(this.tabsData, 'step')
