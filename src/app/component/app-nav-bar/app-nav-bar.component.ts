@@ -99,7 +99,10 @@ export class AppNavBarComponent implements OnInit, OnChanges {
         this.popupTour = this.tourService.createPopupTour()
       }
     })
-    this.getMyCount()
+    if (this.configSvc.unMappedUser && this.configSvc.unMappedUser.identifier) {
+      this.getMyCount()
+    }
+
     this.libNotificationsService._unreadCount.subscribe(() => {
       this.getMyCount()
     })
