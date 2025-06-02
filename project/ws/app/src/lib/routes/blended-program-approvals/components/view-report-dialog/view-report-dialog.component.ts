@@ -37,7 +37,7 @@ export class ViewReportDialogComponent implements OnInit {
       searchObjects: [
         {
           key: 'formId',
-          values: this.data.formId,
+          values: this.data?.formId,
         },
         {
           key: 'updatedBy',
@@ -54,7 +54,7 @@ export class ViewReportDialogComponent implements OnInit {
       }, 1000)
     }
     this.apiData = {
-      getAPI: `/apis/proxies/v8/forms/getFormById?id=${this.latestData.formId}`,
+      getAPI: `/apis/proxies/v8/forms/getFormById?id=${this.latestData?.formId}`,
       postAPI: `/apis/proxies/v8/forms/v1/saveFormSubmit`,
       getAllApplications: `/apis/proxies/v8/forms/getAllApplications`,
       customizedHeader: {},
