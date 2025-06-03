@@ -49,6 +49,7 @@ export class CommunityDashboardComponent implements OnInit {
   masterData: any = {}
   isCommunityModeratorRole = false
   isCommunityCreateRole = false
+  isCommunityModeratorOnly = false
 
   tabs = [
     {
@@ -104,6 +105,11 @@ export class CommunityDashboardComponent implements OnInit {
       if (mdoLeaderPresent) {
         this.isCommunityCreateRole = true
       }
+      const isCommunityModeratorOnlyPresent = userRole?.some((role: any) => role?.includes('COMMUNITY_MODERATOR'))
+      if (isCommunityModeratorOnlyPresent) {
+        this.isCommunityModeratorOnly = true
+      }
+
     }
 
   }

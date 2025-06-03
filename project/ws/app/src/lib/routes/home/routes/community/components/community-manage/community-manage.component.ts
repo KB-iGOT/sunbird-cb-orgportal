@@ -120,7 +120,7 @@ export class CommunityManageComponent {
           // tslint:disable-next-line
           body: `Are you sure you want to show this post on the platform?`,
           ok: 'OK',
-          cancel: 'Cancle',
+          cancel: 'Cancel',
         },
         disableClose: true,
         autoFocus: false,
@@ -145,7 +145,7 @@ export class CommunityManageComponent {
           title: '',
           body: `Are you sure you want to hide this post from the platform?`,
           ok: 'OK',
-          cancel: 'Cancle',
+          cancel: 'Cancel',
         },
         disableClose: true,
         autoFocus: false,
