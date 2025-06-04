@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core'
+import { Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges } from '@angular/core'
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser'
 import { IBtnAppsConfig, CustomTourService } from '@sunbird-cb/collection'
 import { NsWidgetResolver } from '@sunbird-cb/resolver'
@@ -7,12 +7,13 @@ import { Router, NavigationStart, NavigationEnd, Event } from '@angular/router'
 import { LibNotificationsService } from '@sunbird-cb/notification'
 import { NotificationsService } from '../../services/notifications.service'
 import * as _ from 'lodash'
+import { Subscription } from 'rxjs'
 @Component({
   selector: 'ws-app-nav-bar',
   templateUrl: './app-nav-bar.component.html',
   styleUrls: ['./app-nav-bar.component.scss'],
 })
-export class AppNavBarComponent implements OnInit, OnChanges {
+export class AppNavBarComponent implements OnInit, OnChanges, OnDestroy {
   @Input() mode: 'top' | 'bottom' = 'top'
   @Input() notificationsCount: any = 0
   // @Input()
@@ -38,6 +39,7 @@ export class AppNavBarComponent implements OnInit, OnChanges {
   isSetUpPage = false
   popupTour: any
   showDropdown: boolean = false
+  private myNotificationsSubscription!: Subscription
   constructor(
     private domSanitizer: DomSanitizer,
     private configSvc: ConfigurationsService,
@@ -103,7 +105,7 @@ export class AppNavBarComponent implements OnInit, OnChanges {
       this.getMyCount()
     }
 
-    this.libNotificationsService._unreadCount.subscribe((res: boolean) => {
+    this.myNotificationsSubscription = this.libNotificationsService._unreadCount.subscribe((res: boolean) => {
       if (res === true) {
         this.getMyCount()
       }
@@ -198,5 +200,11 @@ export class AppNavBarComponent implements OnInit, OnChanges {
       console.error('Error while fetching notifications count', error)
       this.notificationsCount = 0
     })
+  }
+
+  ngOnDestroy() {
+    if (this.myNotificationsSubscription) {
+      this.myNotificationsSubscription.unsubscribe()
+    }
   }
 }
