@@ -118,12 +118,13 @@ export class CommunityManageComponent {
         data: {
           title: '',
           // tslint:disable-next-line
-          body: `Are you sure you want to show this post on the platform?`,
+          body: `Are you sure you want to show this on the platform?`,
           ok: 'OK',
           cancel: 'Cancel',
+          componentType: 'manageCommunity'
         },
         disableClose: true,
-        autoFocus: false,
+        autoFocus: false
       })
       confirmDialog.afterClosed().subscribe((response: any) => {
         if (response) {
@@ -143,9 +144,10 @@ export class CommunityManageComponent {
         width: '500px',
         data: {
           title: '',
-          body: `Are you sure you want to hide this post from the platform?`,
+          body: `Are you sure you want to keep this hidden from the platform?`,
           ok: 'OK',
           cancel: 'Cancel',
+          componentType: 'manageCommunity'
         },
         disableClose: true,
         autoFocus: false,
