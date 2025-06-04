@@ -10,3 +10,15 @@
   box-sizing: border-box;
   min-height: 185px;
 }
+.primary-button {
+    background: #1a4ca1 !important;
+    color: #fff !important;
+    height: 40px;
+}
+
+.secondary-button {
+    background: #fff !important;
+    color: #1a4ca1 !important;
+    border: 1px solid #1a4ca1;
+    height: 40px;
+}

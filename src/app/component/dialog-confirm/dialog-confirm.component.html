@@ -3,12 +3,22 @@
   <div mat-dialog-content class="mat-body-1" [innerHtml]="data.body">
   </div>
   <mat-divider class="margin-top-m margin-bottom-s"></mat-divider>
-  <div mat-dialog-actions class="flex-row-reverse">
-    <button *ngIf="data.cancel !== 'hide'" mat-button [mat-dialog-close]> {{data.cancel}}</button>
-    <button *ngIf="data.ok !== 'hide'"
+  <div mat-dialog-actions class="flex-row-reverse"
+    *ngIf="data?.componentType && data?.componentType === 'manageCommunity'">
+    <button *ngIf="data?.cancel !== 'hide'" mat-button [mat-dialog-close]
+      class='secondary-button ws-mat-accent-border-active"'> {{data?.cancel}}</button>
+    <button *ngIf=" data?.ok !=='hide'" [ngClass]=" {'primary-button margin-right-xs': true}" mat-flat-button
+      class="primary-button" cdkFocusInitial [color]="(data.ok === 'delete' || data.ok === 'Delete'  ) ? 'warn': 'blue'"
+      (click)="confirmed()">
+      {{data.ok}}
+    </button>
+  </div>
+  <div mat-dialog-actions class="flex-row-reverse" *ngIf="!data?.componentType">
+    <button *ngIf="data?.cancel !== 'hide'" mat-button [mat-dialog-close]> {{data?.cancel}}</button>
+    <button *ngIf="data?.ok !== 'hide'"
       [ngClass]="{'ws-mat-accent-text ws-mat-accent-border-active margin-right-xs': true}" mat-flat-button
       class="ws-mat-accent-border-active" cdkFocusInitial
-      [color]="(data.ok === 'delete' || data.ok === 'Delete'  ) ? 'warn': 'blue'" (click)="confirmed()"> {{data.ok}}
+      [color]="(data.ok === 'delete' || data.ok === 'Delete'  ) ? 'warn': 'blue'" (click)="confirmed()"> {{data?.ok}}
     </button>
   </div>
 </div>
