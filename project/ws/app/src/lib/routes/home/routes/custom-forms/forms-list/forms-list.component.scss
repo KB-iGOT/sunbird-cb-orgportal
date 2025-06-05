@@ -1,0 +1,33 @@
+.createFormBtn {
+  background-color: #1B4CA1 !important;
+  height: 32px;
+  border-radius: 17px;
+  color: #FFFFFF !important;
+  /* stylelint-disable */
+  font: 700 14px Lato;
+  /* stylelint-enable */
+}
+.rsearch {
+  display: flex;
+  position: relative;
+  flex: 1 1 auto;
+}
+.search-icon {
+  position: absolute;
+  top: 8px;
+  font-size: 22px;
+  left: 16px;
+}
+
+.sinput {
+  width: 385px;
+  border-radius: 18px;
+  border: 1px solid #d5d0d0;
+  padding: 9px 9px 9px 45px;
+  margin-bottom: 0px;
+  margin-top: 0;
+  /* stylelint-disable */
+  font: normal 14px Lato;
+  /* stylelint-enable */
+  font-weight: 400;
+}

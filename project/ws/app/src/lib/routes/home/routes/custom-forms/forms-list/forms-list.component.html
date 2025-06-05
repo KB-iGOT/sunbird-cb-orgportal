@@ -1,0 +1,24 @@
+<div class="flex flex-4 flex-column">
+  <mat-card>
+    <div class="flex justify-between">
+      <span class="mobile-margin mat-h2">Custom Profile</span>
+      <button mat-button class="createFormBtn" (click)="redirectToNewForm()">Create Custom Profile Form</button>
+    </div>
+    <mat-card-content>
+      <div class="events-table flex flex-column gap-4">
+        <div class="flex justify-between">
+          <ng-container>
+            <div class="search">
+              <div class=rsearch>
+                <mat-icon class="search-icon">search</mat-icon>
+                <input class="sinput" type="Standard" label="" [formControl]="searchControl"
+                  placeholder="Type here to search... ">
+              </div>
+            </div>
+          </ng-container>
+        </div>
+
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

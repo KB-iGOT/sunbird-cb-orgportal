@@ -1,0 +1,57 @@
+<form [formGroup]="question">
+
+  <div class="question-div">
+    <div class="flex gap-2 items-center justify-between">
+      <div class="filedTextbox">
+        <label>
+          <div class="flex flex-middle" [ngClass]="{ required: true }">
+            <span i18n class="mat-subheading-2 margin-remove flex">Field Name</span>
+          </div>
+        </label>
+        <mat-form-field appearance="outline" class="w-full">
+          <input type="text" class="input-text" formControlName="fieldName" matInput placeholder="Type here" />
+          <mat-error [hidden]="false"
+            *ngIf="question.get('fieldName')?.touched && !question.get('fieldName')?.hasError('required') && question.get('fieldName')?.hasError('invalidCharacter')">
+            HTML, JS code, combination of dots and slashes are not allowed.
+          </mat-error>
+          <mat-error [hidden]="false" *ngIf="question.get('fieldName')?.touched && !question.get('fieldName')?.hasError('required') && !question.get('fieldName')?.hasError('invalidCharacter') &&
+            question.get('fieldName')?.hasError('hasHtml')" i18n-aria-label
+            aria-label="Title Error | Explains title must be alphanumeric value">
+            HTML or Js is not allowed
+          </mat-error>
+        </mat-form-field>
+      </div>
+      <div class="filedTextbox">
+        <div class="flex gap-2 items-center justify-between">
+          <div class="filedTextbox">
+            <label>
+              <div class="flex flex-middle" [ngClass]="{ required: true }">
+                <span i18n class="mat-subheading-2 margin-remove flex">Field Attribute</span>
+              </div>
+            </label>
+            <mat-form-field appearance="outline" class="w-full">
+              <input type="text" class="input-text" formControlName="fieldAttribute" matInput placeholder="Type here" />
+            </mat-form-field>
+          </div>
+        </div>
+      </div>
+      <div class="filedTextbox">
+        <label>
+          <div class="flex flex-middle" [ngClass]="{ required: true }">
+            <span i18n class="mat-subheading-2 margin-remove flex">Field Validation</span>
+          </div>
+        </label>
+        <mat-form-field appearance="outline" class="w-full">
+          <input type="text" class="input-text" formControlName="fieldValidation" matInput placeholder="Type here" />
+        </mat-form-field>
+      </div>
+    </div>
+
+    <div class="flex gap-2 items-center justify-between">
+      <div class="fieldOptions flex items-center gap-4 pr-2">
+        <mat-slide-toggle class="example-margin" formControlName="isRequired">Required</mat-slide-toggle>
+      </div>
+    </div>
+
+  </div>
+</form>

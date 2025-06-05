@@ -1,0 +1,82 @@
+<div class="flex flex-4 flex-column background-color mt-4">
+  <div class="flex justify-between">
+    <span class="mobile-margin mat-h2">Create Custom Profile Form</span>
+  </div>
+</div>
+<div class="form-content form-padding mt-4">
+  <form [formGroup]="customForm">
+    <!-- <div class="flex flex-wrapped">
+      <div class="flex-1 items-center ">
+        <span class="mat-subheading-2 margin-remove flex required"
+          i18n="Title label|Label which explains the user to enter title">
+          Form title
+        </span>
+        <mat-form-field appearance="outline" class="surveytitle w-full">
+          <input matInput #title formControlName="title" i18n-placeholder placeholder="Enter form title" tabindex="1"
+            autocomplete="off" maxlength="100" />
+          <mat-error [hidden]="false" *ngIf="customForm?.controls['title'].errors?.required"
+            i18n="Title Error | Explains title is required">
+            Title is mandatory
+          </mat-error>
+          <mat-error [hidden]="false"
+            *ngIf="!customForm?.controls['title'].errors?.required && customForm?.controls['title'].errors?.whitespace"
+            i18n-aria-label aria-label="Title Error | Explains title must be alphanumeric value">
+            Please enter alphanumeric value
+          </mat-error>
+          <mat-error [hidden]="false" *ngIf="!customForm?.controls['title'].errors?.required && !customForm?.controls['title'].errors?.whitespace &&
+                              customForm?.controls['title'].errors?.hasHtml" i18n-aria-label
+            aria-label="Title Error | Explains title must be alphanumeric value">
+            HTML or Js is not allowed
+          </mat-error>
+          <mat-hint align="end">{{title.value.length}} of 100</mat-hint>
+        </mat-form-field>
+      </div>
+    </div> -->
+  </form>
+
+  <div class="w-full flex">
+    <div class="form-options">
+      <ng-container *ngFor="let section of sections">
+        <div
+          class="form-option mb-5 flex items-center p-4 gap-3 cursor-pointer {{selectedTab === section.type ? 'active' : ''}}"
+          (click)="addContent(section.type)">
+          <div class="icons"><mat-icon class="">{{section.icon}}</mat-icon></div>
+          <div class="{{selectedTab === section.type ? 'text-white' : ''}}">
+            <div class="icon-title">{{section.title}}</div>
+            <div class="icon-sub-title pt-1">{{section.subTitle}}</div>
+          </div>
+        </div>
+      </ng-container>
+    </div>
+    <div class="form-questions" *ngIf="getQuestions?.controls?.length">
+      <div *ngFor="let row of getQuestions?.controls; let i = index">
+        <ng-container>
+          <ws-app-custom-input-text [question]="row" [customForm]="customForm" [index]="i"></ws-app-custom-input-text>
+        </ng-container>
+      </div>
+      <div class="flex justify-between mt-5 gap-4"
+        *ngIf="selectedTab === 'masterList' || selectedTab === 'multiMasterList'">
+        <div class="flex flex-col items-center">
+          <div class="text-primary cursor-pointer ws-mat-white-background round mat-raised-button mat-button-base"
+            (click)="fileInput.click()" (dblclick)="$event.preventDefault()">
+            Upload file</div>
+          <input hidden type="file" #fileInput (click)="handleFileClick($event)" (change)="handleOnFileChange($event)"
+            name="file" placeholder="Choose file" (dblclick)="$event.preventDefault();"
+            accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" />
+        </div>
+        <button mat-button class="ws-mat-white-background round mat-raised-button mat-button-base"
+          (click)="addQuestion('inputText')" *ngIf="selectedTab === 'multiMasterList'">Add new question</button>
+
+      </div>
+      <div class="flex justify-end mt-5 gap-4">
+        <ng-container>
+          <button mat-button class="text-white ws-mat-primary-background round mat-raised-button mat-button-base"
+            [disabled]="customForm.invalid" (click)="onSave()">
+            Save
+          </button>
+        </ng-container>
+        <button mat-button class="ws-mat-white-background round mat-raised-button mat-button-base"
+          (click)="onCancel()">Cancel</button>
+      </div>
+    </div>
+  </div>
