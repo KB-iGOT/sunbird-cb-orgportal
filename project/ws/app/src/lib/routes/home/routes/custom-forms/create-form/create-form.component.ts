@@ -1,7 +1,6 @@
-import { Component, OnInit } from '@angular/core'
+import { Component, EventEmitter, OnInit, Output } from '@angular/core'
 import { FormArray, UntypedFormArray, UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms'
 import { preventHtmlAndJs } from '../../../../validators/prevent-html-and-js.validator'
-import { Router } from '@angular/router'
 
 @Component({
   selector: 'ws-app-create-form',
@@ -20,16 +19,16 @@ export class CreateFormComponent implements OnInit {
     },
     {
       icon: 'dashboard',
-      title: 'Master List',
+      title: 'List',
       subTitle: 'Add fields in profile',
-      type: 'masterList',
+      type: 'list',
     },
-    {
-      icon: 'dashboard',
-      title: 'Multi Master List',
-      subTitle: 'Add fields in profile',
-      type: 'multiMasterList',
-    },
+    // {
+    //   icon: 'dashboard',
+    //   title: 'Multi Master List',
+    //   subTitle: 'Add fields in profile',
+    //   type: 'multiMasterList',
+    // },
     // {
     //   icon: 'dashboard',
     //   title: 'Triplet List',
@@ -45,8 +44,8 @@ export class CreateFormComponent implements OnInit {
   ]
   customForm!: UntypedFormGroup
   selectedTab: string = ''
-
-  constructor(private formBuilder: UntypedFormBuilder, private router: Router) {
+  @Output() closeForm: EventEmitter<any> = new EventEmitter()
+  constructor(private formBuilder: UntypedFormBuilder) {
 
   }
 
@@ -56,7 +55,7 @@ export class CreateFormComponent implements OnInit {
 
   createForm() {
     this.customForm = this.formBuilder.group({
-      //title: ['', [Validators.required, this.noWhitespaceValidator, preventHtmlAndJs()]],
+      description: ['', [Validators.required, this.noWhitespaceValidator, preventHtmlAndJs()]],
       questions: this.formBuilder.array([]),
     })
   }
@@ -73,12 +72,7 @@ export class CreateFormComponent implements OnInit {
     if (questionsArray && questionsArray instanceof FormArray) {
       questionsArray.clear()
     }
-    if (type === 'inputText') {
-      this.addQuestion(type)
-    } else if (type === 'masterList' || type === 'multiMasterList') {
-      this.addQuestion(type)
-      this.addQuestion(type)
-    }
+    this.addQuestion(type)
   }
 
   forbiddenCharacterValidator(control: any) {
@@ -101,6 +95,7 @@ export class CreateFormComponent implements OnInit {
       fieldName: ['', [Validators.required, this.forbiddenCharacterValidator, preventHtmlAndJs()]],
       fieldAttribute: ['', [Validators.required]],
       fieldValidation: ['', [Validators.required]],
+      customValidation: [''],
       isRequired: [false],
     })
     this.getQuestions.push(questionGroup)
@@ -109,11 +104,32 @@ export class CreateFormComponent implements OnInit {
 
   onSave() {
     console.log(this.customForm.value)
-    this.router.navigate(['/app/home/custom-forms'])
+    this.closeForm.emit(true)
   }
 
-  onCancel() {
-    this.router.navigate(['/app/home/custom-forms'])
+  removeItem(index: number) {
+    this.getQuestions.removeAt(index)
   }
+
+  close() {
+    this.closeForm.emit(true)
+  }
+  customRegex(event: any) {
+    console.log(event)
+    const question = this.getQuestions.at(event) as UntypedFormGroup
+    const customValidation = question?.controls['customValidation']
+    if (event.selected === 'regex') {
+      if (customValidation) {
+        customValidation.setValidators([Validators.required])
+        customValidation.updateValueAndValidity()
+      }
+    } else {
+      if (customValidation) {
+        customValidation.clearValidators()
+        customValidation.updateValueAndValidity()
+      }
+    }
+  }
+
 
 }

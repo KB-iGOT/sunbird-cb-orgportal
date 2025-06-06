@@ -2,7 +2,7 @@ import { NgModule } from '@angular/core'
 import { CommonModule } from '@angular/common'
 import { FormsRoutingModule } from './custom-forms-routing.module'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
-import { MatTableModule } from '@angular/material/table'
+import { MatLegacyTableModule as MatTableModule } from '@angular/material/legacy-table'
 import { MatIconModule } from '@angular/material/icon'
 import { MatLegacyFormFieldModule as MatFormFieldModule, MatLegacyFormFieldModule } from '@angular/material/legacy-form-field'
 import { MatLegacyButtonModule } from '@angular/material/legacy-button'
@@ -17,12 +17,13 @@ import { MatLegacyTabsModule } from '@angular/material/legacy-tabs'
 import { MatDialogModule } from '@angular/material/dialog'
 import { MatLegacyTooltipModule } from '@angular/material/legacy-tooltip'
 import { MatSnackBarModule } from '@angular/material/snack-bar'
-import { MatLegacyPaginatorModule } from '@angular/material/legacy-paginator'
+import { MatLegacyPaginatorModule as MatPaginatorModule } from '@angular/material/legacy-paginator'
 import { MatSortModule } from '@angular/material/sort'
 import { CreateFormComponent } from './create-form/create-form.component'
 import { BaseComponent } from './base/base.component'
 import { CustomInputTextComponent } from './custom-input-text/custom-input-text.component'
 import { MatLegacySlideToggleModule as MatSlideToggleModule } from '@angular/material/legacy-slide-toggle'
+import { UIORGTableModule } from '@sunbird-cb/collection'
 @NgModule({
   declarations: [
     FormsListComponent,
@@ -58,11 +59,12 @@ import { MatLegacySlideToggleModule as MatSlideToggleModule } from '@angular/mat
     MatSnackBarModule,
     MatTableModule,
     MatIconModule,
-    MatLegacyPaginatorModule,
+    MatPaginatorModule,
     MatFormFieldModule,
     MatLegacyTabsModule,
     MatSortModule,
-    MatSlideToggleModule
+    MatSlideToggleModule,
+    UIORGTableModule
   ]
 })
 export class CustomFormsModule { }

@@ -41,17 +41,37 @@
             <span i18n class="mat-subheading-2 margin-remove flex">Field Validation</span>
           </div>
         </label>
-        <mat-form-field appearance="outline" class="w-full">
-          <input type="text" class="input-text" formControlName="fieldValidation" matInput placeholder="Type here" />
+        <mat-form-field appearance="none" class="w-full profile-form-field">
+          <mat-select placeholder="Select type" formControlName="fieldValidation"
+            (selectionChange)="onFieldValidationChange($event)">
+            <mat-option *ngFor="let fType of fieldValidationTypes" [value]="fType.value">
+              {{ fType.key }}</mat-option>
+          </mat-select>
         </mat-form-field>
       </div>
     </div>
-
+    <div class="flex gap-2 items-center justify-between">
+      <div class="filedTextbox" *ngIf="question.controls['fieldValidation'].value === 'regex'">
+        <div class="flex gap-2 items-center justify-between">
+          <div class="filedTextbox">
+            <label>
+              <div class="flex flex-middle" [ngClass]="{ required: true }">
+                <span i18n class="mat-subheading-2 margin-remove flex">Field Attribute</span>
+              </div>
+            </label>
+            <mat-form-field appearance="outline" class="w-full">
+              <input type="text" class="input-text" formControlName="customValidation" matInput
+                placeholder="Type here" />
+            </mat-form-field>
+          </div>
+        </div>
+      </div>
+    </div>
     <div class="flex gap-2 items-center justify-between">
       <div class="fieldOptions flex items-center gap-4 pr-2">
         <mat-slide-toggle class="example-margin" formControlName="isRequired">Required</mat-slide-toggle>
       </div>
+      <div class="cursor-pointer" (click)="removeItem(index)" *ngIf="index >= 1"><mat-icon>close</mat-icon></div>
     </div>
-
   </div>
 </form>
