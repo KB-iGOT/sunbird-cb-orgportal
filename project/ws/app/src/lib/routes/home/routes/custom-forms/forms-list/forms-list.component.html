@@ -33,7 +33,8 @@
                   {{element[col.key]}}
                 </span>
                 <span class="h-400-r-14-l color-87 textclass" *ngIf="col.key === 'status'">
-                  <mat-slide-toggle class="example-margin"></mat-slide-toggle>
+                  <mat-slide-toggle class="example-margin"
+                    (change)="onToggleChange($event, element)"></mat-slide-toggle>
                 </span>
               </mat-cell>
             </ng-container>
@@ -48,7 +49,7 @@
               </mat-cell>
             </ng-container>
             <mat-header-row *matHeaderRowDef="getFinalColumns()"></mat-header-row>
-            <mat-row *matRowDef="let row; columns: getFinalColumns();" (click)="selection.toggle(row);">
+            <mat-row *matRowDef="let row; columns: getFinalColumns();">
             </mat-row>
           </mat-table>
         </div>
@@ -59,3 +60,14 @@
     </mat-card-content>
   </mat-card>
 </div>
+
+<mat-menu #cardMenu="matMenu">
+  <ng-template matMenuContent let-rowData="data">
+    <button mat-menu-item name="channel-analytics-button" class="ws-mat-primary-text" aria-label="Analytics">
+      <mat-icon class="margin-right-xs">create</mat-icon><span>Edit</span>
+    </button>
+    <!-- <button mat-menu-item name="channel-analytics-button" class="ws-mat-primary-text" aria-label="Analytics">
+      <mat-icon class="margin-right-xs">archive</mat-icon><span>Archive event</span>
+    </button> -->
+  </ng-template>
+</mat-menu>

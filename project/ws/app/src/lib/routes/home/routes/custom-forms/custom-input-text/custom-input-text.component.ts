@@ -29,8 +29,6 @@ export class CustomInputTextComponent {
   }
 
   onFieldValidationChange(event: any) {
-    console.log(event.value)
     this.customRegex.emit({ selected: event.value, index: this.index })
-
   }
 }

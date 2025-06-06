@@ -160,7 +160,13 @@ export class FormsListComponent implements OnInit, AfterViewInit {
     }
   }
 
-
+  onToggleChange(event: any, col: any) {
+    if (event.checked) {
+      console.log('checked', event, col)
+    } else {
+      console.log('unchecked')
+    }
+  }
 
 
   getFinalColumns() {

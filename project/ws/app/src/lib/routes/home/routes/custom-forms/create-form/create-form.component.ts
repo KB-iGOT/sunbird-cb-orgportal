@@ -1,6 +1,11 @@
 import { Component, EventEmitter, OnInit, Output } from '@angular/core'
 import { FormArray, UntypedFormArray, UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms'
 import { preventHtmlAndJs } from '../../../../validators/prevent-html-and-js.validator'
+import { FileService } from '../../../../users/services/upload.service'
+import { HttpErrorResponse } from '@angular/common/http'
+import { takeUntil } from 'rxjs/operators'
+import { Subject } from 'rxjs'
+import { MatSnackBar } from '@angular/material/snack-bar'
 
 @Component({
   selector: 'ws-app-create-form',
@@ -45,7 +50,12 @@ export class CreateFormComponent implements OnInit {
   customForm!: UntypedFormGroup
   selectedTab: string = ''
   @Output() closeForm: EventEmitter<any> = new EventEmitter()
-  constructor(private formBuilder: UntypedFormBuilder) {
+  public fileName: any
+  fileSelected!: any
+  private destroySubject$ = new Subject()
+  constructor(private formBuilder: UntypedFormBuilder, private fileService: FileService,
+    private matSnackBar: MatSnackBar,
+  ) {
 
   }
 
@@ -115,8 +125,7 @@ export class CreateFormComponent implements OnInit {
     this.closeForm.emit(true)
   }
   customRegex(event: any) {
-    console.log(event)
-    const question = this.getQuestions.at(event) as UntypedFormGroup
+    const question = this.getQuestions.at(event.index) as UntypedFormGroup
     const customValidation = question?.controls['customValidation']
     if (event.selected === 'regex') {
       if (customValidation) {
@@ -126,9 +135,46 @@ export class CreateFormComponent implements OnInit {
     } else {
       if (customValidation) {
         customValidation.clearValidators()
+        customValidation.setValue('')
         customValidation.updateValueAndValidity()
       }
     }
+  }
+
+  handleFileClick(event: any): void {
+    event.target.value = ''
+  }
+
+  handleOnFileChange(event: any): void {
+    const fileList = (<HTMLInputElement>event.target).files
+    if (fileList && fileList.length > 0) {
+      const file: File = fileList[0]
+      this.fileName = file.name
+      this.fileSelected = file
+      if (this.fileService.validateXlFile(this.fileName)) {
+        if (this.fileSelected) {
+          const formData: FormData = new FormData()
+          formData.append('data', this.fileSelected, this.fileName)
+          this.fileService.upload(this.fileName, formData)
+            .pipe(takeUntil(this.destroySubject$))
+            .subscribe((_res: any) => {
+              this.matSnackBar.open('File uploaded successfully!')
+              this.fileName = ''
+              this.fileSelected = ''
+            }, (_err: HttpErrorResponse) => {
+              if (!_err.ok) {
+                this.matSnackBar.open('Uploading CSV file failed due to some error, please try again later!')
+              }
+            })
+        }
+      } else {
+        console.log('invalid file')
+      }
+    }
+  }
+
+  ngOnDestroy(): void {
+    this.destroySubject$.unsubscribe()
   }
 
 
