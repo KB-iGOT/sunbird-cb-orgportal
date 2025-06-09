@@ -9,13 +9,13 @@
           </div>
         </label>
         <mat-form-field appearance="outline" class="w-full">
-          <input type="text" class="input-text" formControlName="fieldName" matInput placeholder="Type here" />
+          <input type="text" class="input-text" formControlName="name" matInput placeholder="Type here" />
           <mat-error [hidden]="false"
-            *ngIf="question.get('fieldName')?.touched && !question.get('fieldName')?.hasError('required') && question.get('fieldName')?.hasError('invalidCharacter')">
+            *ngIf="question.get('name')?.touched && !question.get('name')?.hasError('required') && question.get('name')?.hasError('invalidCharacter')">
             HTML, JS code, combination of dots and slashes are not allowed.
           </mat-error>
-          <mat-error [hidden]="false" *ngIf="question.get('fieldName')?.touched && !question.get('fieldName')?.hasError('required') && !question.get('fieldName')?.hasError('invalidCharacter') &&
-            question.get('fieldName')?.hasError('hasHtml')" i18n-aria-label
+          <mat-error [hidden]="false" *ngIf="question.get('name')?.touched && !question.get('name')?.hasError('required') && !question.get('name')?.hasError('invalidCharacter') &&
+            question.get('name')?.hasError('hasHtml')" i18n-aria-label
             aria-label="Title Error | Explains title must be alphanumeric value">
             HTML or Js is not allowed
           </mat-error>
@@ -30,7 +30,7 @@
               </div>
             </label>
             <mat-form-field appearance="outline" class="w-full">
-              <input type="text" class="input-text" formControlName="fieldAttribute" matInput placeholder="Type here" />
+              <input type="text" class="input-text" formControlName="attributeName" matInput placeholder="Type here" />
             </mat-form-field>
           </div>
         </div>
@@ -42,7 +42,7 @@
           </div>
         </label>
         <mat-form-field appearance="none" class="w-full profile-form-field">
-          <mat-select placeholder="Select type" formControlName="fieldValidation"
+          <mat-select placeholder="Select type" formControlName="validation"
             (selectionChange)="onFieldValidationChange($event)">
             <mat-option *ngFor="let fType of fieldValidationTypes" [value]="fType.value">
               {{ fType.key }}</mat-option>
@@ -51,7 +51,7 @@
       </div>
     </div>
     <div class="flex gap-2 items-center justify-between">
-      <div class="filedTextbox" *ngIf="question.controls['fieldValidation'].value === 'regex'">
+      <div class="filedTextbox" *ngIf="question.controls['validation'].value === 'regex'">
         <div class="flex gap-2 items-center justify-between">
           <div class="filedTextbox">
             <label>
@@ -69,7 +69,7 @@
     </div>
     <div class="flex gap-2 items-center justify-between">
       <div class="fieldOptions flex items-center gap-4 pr-2">
-        <mat-slide-toggle class="example-margin" formControlName="isRequired">Required</mat-slide-toggle>
+        <mat-slide-toggle class="example-margin" formControlName="isMandatory">Required</mat-slide-toggle>
       </div>
       <div class="cursor-pointer" (click)="removeItem(index)" *ngIf="index >= 1"><mat-icon>close</mat-icon></div>
     </div>

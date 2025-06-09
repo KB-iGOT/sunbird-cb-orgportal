@@ -4,6 +4,8 @@ import { MatPaginator } from '@angular/material/paginator'
 import { MatSort } from '@angular/material/sort'
 import { MatTableDataSource } from '@angular/material/table'
 import * as _ from 'lodash'
+import { CustomFieldsService } from '../../../../users/services/custom-fields.service'
+import { ActivatedRoute } from '@angular/router'
 @Component({
   selector: 'ws-app-forms-list',
   templateUrl: './forms-list.component.html',
@@ -22,10 +24,15 @@ export class FormsListComponent implements OnInit, AfterViewInit {
   showCreateForm: boolean = false
   length!: number
   pageSize = 5
+  rootOrgId: any
+  searchResults: any[] = []
   @ViewChild(MatPaginator) paginator!: MatPaginator
   @ViewChild(MatSort) sort!: MatSort
 
-  constructor() {
+  constructor(private customFieldsService: CustomFieldsService,
+    private activeRoute: ActivatedRoute,
+  ) {
+    this.rootOrgId = _.get(this.activeRoute, 'snapshot.data.configService.userProfile.rootOrgId')
     this.dataSource = new MatTableDataSource<any>()
     this.dataSource.paginator = this.paginator
   }
@@ -47,96 +54,34 @@ export class FormsListComponent implements OnInit, AfterViewInit {
       sortState: 'asc',
       actionColumnName: 'Actions',
     }
-    this.data = [{
-      fieldName: 'Gender',
-      fieldAttribute: 'Checkbox',
-      createdOn: "2020-01-31T09:30:00.000Z",
-      status: false,
-    },
-    {
-      fieldName: 'Age',
-      fieldAttribute: 'Radio',
-      createdOn: "2021-04-01T09:30:00.000Z",
-      status: false,
-    },
-    {
-      fieldName: 'Cader',
-      fieldAttribute: 'CheckBox',
-      createdOn: "2021-08-08T09:30:00.000Z",
-      status: true,
-    },
-    {
-      fieldName: 'Address',
-      fieldAttribute: 'Checkbox',
-      createdOn: "2021-12-10T09:30:00.000Z",
-      status: false,
-    },
-    {
-      fieldName: 'Street',
-      fieldAttribute: 'Radio',
-      createdOn: "2022-12-31T09:30:00.000Z",
-      status: false,
-    },
-    {
-      fieldName: 'Pincode',
-      fieldAttribute: 'CheckBox',
-      createdOn: "2023-02-27T09:30:00.000Z",
-      status: true,
-    },
-    {
-      fieldName: 'Mother Tongue',
-      fieldAttribute: 'Checkbox',
-      createdOn: "2023-12-31T09:30:00.000Z",
-      status: false,
-    },
-    {
-      fieldName: 'DOB',
-      fieldAttribute: 'Radio',
-      createdOn: "2024-01-01T09:30:00.000Z",
-      status: false,
-    },
-    {
-      fieldName: 'Nationality',
-      fieldAttribute: 'CheckBox',
-      createdOn: "2024-01-31T09:30:00.000Z",
-      status: true,
-    },
-    {
-      fieldName: 'Other details',
-      fieldAttribute: 'Checkbox',
-      createdOn: "2024-02-12T09:30:00.000Z",
-      status: false,
-    },
-    {
-      fieldName: 'Age',
-      fieldAttribute: 'Radio',
-      createdOn: "2024-03-28T09:30:00.000Z",
-      status: false,
-    },
-    {
-      fieldName: 'Cader',
-      fieldAttribute: 'CheckBox',
-      createdOn: "2025-04-24T09:30:00.000Z",
-      status: true,
-    },
-    {
-      fieldName: 'Gender',
-      fieldAttribute: 'Checkbox',
-      createdOn: "2025-05-13T09:30:00.000Z",
-      status: false,
-    },
-    {
-      fieldName: 'Age',
-      fieldAttribute: 'Radio',
-      createdOn: "2025-05-30T09:30:00.000Z",
-      status: false,
-    },
-    {
-      fieldName: 'Cader',
-      fieldAttribute: 'CheckBox',
-      createdOn: "2025-06-01T09:30:00.000Z",
-      status: true,
-    }]
+
+    let payload = {
+      filterCriteriaMap: {
+        organisationId: this.rootOrgId,
+      },
+      requestedFields: [],
+      pageNumber: 0,
+      pageSize: 10,
+      facets: []
+    }
+    this.customFieldsService.getCustomFields(payload).subscribe((res: any) => {
+      console.log("res  ---------- ", res)
+      this.searchResults = _.get(res, 'result.searchResults.data')
+      this.length = _.get(res, 'result.searchResults.totalCount')
+      if (this.searchResults.length) {
+        this.searchResults.forEach((element: any) => {
+          this.data.push({
+            fieldName: element.name,
+            fieldAttribute: element.attributeName,
+            createdOn: element.createdOn,
+            status: element.isMandatory,
+            row: element,
+          })
+        })
+      }
+      this.dataSource.data = this.data
+    })
+
     if (this.tableData) {
       this.displayedColumns = this.tableData.columns
     }

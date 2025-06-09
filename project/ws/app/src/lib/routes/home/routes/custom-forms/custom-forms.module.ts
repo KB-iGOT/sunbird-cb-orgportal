@@ -24,6 +24,7 @@ import { BaseComponent } from './base/base.component'
 import { CustomInputTextComponent } from './custom-input-text/custom-input-text.component'
 import { MatLegacySlideToggleModule as MatSlideToggleModule } from '@angular/material/legacy-slide-toggle'
 import { UIORGTableModule } from '@sunbird-cb/collection'
+import { CustomFieldsService } from '../../../users/services/custom-fields.service'
 @NgModule({
   declarations: [
     FormsListComponent,
@@ -65,6 +66,7 @@ import { UIORGTableModule } from '@sunbird-cb/collection'
     MatSortModule,
     MatSlideToggleModule,
     UIORGTableModule
-  ]
+  ],
+  providers: [CustomFieldsService]
 })
 export class CustomFormsModule { }

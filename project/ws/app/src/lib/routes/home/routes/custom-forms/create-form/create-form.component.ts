@@ -6,6 +6,9 @@ import { HttpErrorResponse } from '@angular/common/http'
 import { takeUntil } from 'rxjs/operators'
 import { Subject } from 'rxjs'
 import { MatSnackBar } from '@angular/material/snack-bar'
+import { ActivatedRoute } from '@angular/router'
+import * as _ from 'lodash'
+import { CustomFieldsService } from '../../../../users/services/custom-fields.service'
 
 @Component({
   selector: 'ws-app-create-form',
@@ -20,7 +23,7 @@ export class CreateFormComponent implements OnInit {
       icon: 'add',
       title: 'Input Text',
       subTitle: 'Add fields in profile',
-      type: 'inputText',
+      type: 'text',
     },
     {
       icon: 'dashboard',
@@ -53,10 +56,11 @@ export class CreateFormComponent implements OnInit {
   public fileName: any
   fileSelected!: any
   private destroySubject$ = new Subject()
+  rootOrgId: any
   constructor(private formBuilder: UntypedFormBuilder, private fileService: FileService,
-    private matSnackBar: MatSnackBar,
+    private matSnackBar: MatSnackBar, private activeRoute: ActivatedRoute, private customFieldsService: CustomFieldsService
   ) {
-
+    this.rootOrgId = _.get(this.activeRoute, 'snapshot.data.configService.userProfile.rootOrgId')
   }
 
   ngOnInit() {
@@ -67,6 +71,7 @@ export class CreateFormComponent implements OnInit {
     this.customForm = this.formBuilder.group({
       description: ['', [Validators.required, this.noWhitespaceValidator, preventHtmlAndJs()]],
       questions: this.formBuilder.array([]),
+      type: [''],
     })
   }
 
@@ -100,21 +105,46 @@ export class CreateFormComponent implements OnInit {
   }
 
   addQuestion(type: string) {
+    this.customForm.controls['type'].setValue(type)
     const questionGroup = this.formBuilder.group({
-      type: [type],
-      fieldName: ['', [Validators.required, this.forbiddenCharacterValidator, preventHtmlAndJs()]],
-      fieldAttribute: ['', [Validators.required]],
-      fieldValidation: ['', [Validators.required]],
+      name: ['', [Validators.required, this.forbiddenCharacterValidator, preventHtmlAndJs()]],
+      attributeName: ['', [Validators.required]],
+      validation: ['', [Validators.required]],
       customValidation: [''],
-      isRequired: [false],
+      isMandatory: [false],
     })
     this.getQuestions.push(questionGroup)
-    console.log(this.customForm.value)
   }
 
   onSave() {
     console.log(this.customForm.value)
-    this.closeForm.emit(true)
+    let payload: any
+    if (this.customForm.value.type === 'text') {
+      payload = this.constructPayload()
+    }
+    console.log(payload)
+    this.customFieldsService.createField(payload).subscribe((res: any) => {
+      console.log(res)
+      if (res.result) {
+        this.matSnackBar.open('Field is created successfully!')
+        this.closeForm.emit(true)
+      }
+    }, error => {
+      console.log(error)
+    })
+  }
+
+  constructPayload() {
+    return {
+      name: this.customForm.value.questions[0].name,
+      description: this.customForm.value.description,
+      type: this.customForm.value.type,
+      organisationId: this.rootOrgId,
+      customFieldData: this.customForm.value.questions[0].name,
+      attributeName: this.customForm.value.questions[0].attributeName,
+      validation: 'alphaNumeric',
+      isMandatory: this.customForm.value.questions[0].isMandatory,
+    }
   }
 
   removeItem(index: number) {

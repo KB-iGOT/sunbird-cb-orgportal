@@ -2,7 +2,6 @@ import { NgModule } from "@angular/core"
 import { RouterModule, Routes } from "@angular/router"
 import { ConfigResolveService } from "../../resolvers/config-resolve.service"
 import { FormsListComponent } from "./forms-list/forms-list.component"
-import { CreateFormComponent } from "./create-form/create-form.component"
 import { BaseComponent } from "./base/base.component"
 
 const routes: Routes = [
@@ -39,20 +38,7 @@ const routes: Routes = [
           configService: ConfigResolveService,
         },
       },
-      {
-        path: 'new',
-        component: CreateFormComponent,
-        data: {
-          pageId: 'home/forms/new',
-          module: 'forms',
-          pageType: 'feature',
-          pageKey: 'Forms',
-          path: '',
-        },
-        resolve: {
-          configService: ConfigResolveService,
-        },
-      }
+
     ]
   },
 
