@@ -23,11 +23,8 @@ export class FormsListComponent implements OnInit, AfterViewInit {
   length!: number
   pageSize = 5
   @ViewChild(MatPaginator) paginator!: MatPaginator
-  @ViewChild(MatSort) set matSort(sort: MatSort) {
-    if (!this.dataSource.sort) {
-      this.dataSource.sort = sort
-    }
-  }
+  @ViewChild(MatSort) sort!: MatSort
+
   constructor() {
     this.dataSource = new MatTableDataSource<any>()
     this.dataSource.paginator = this.paginator
@@ -36,10 +33,10 @@ export class FormsListComponent implements OnInit, AfterViewInit {
   ngOnInit() {
     this.tableData = {
       columns: [
-        { displayName: 'Form Name', key: 'formName' },
-        { displayName: 'Form Attribute', key: 'formAttribute' },
+        { displayName: 'Field Name', key: 'fieldName' },
+        { displayName: 'Field Attribute', key: 'fieldAttribute' },
         //{ displayName: 'Form Validation', key: 'formValidation' },
-        { displayName: 'created on', key: 'createdOn' },
+        { displayName: 'Created on', key: 'createdOn' },
         { displayName: 'Status', key: 'status' },
       ],
       actions: [],
@@ -51,92 +48,92 @@ export class FormsListComponent implements OnInit, AfterViewInit {
       actionColumnName: 'Actions',
     }
     this.data = [{
-      formName: 'Gender',
-      formAttribute: 'Checkbox',
+      fieldName: 'Gender',
+      fieldAttribute: 'Checkbox',
       createdOn: "2020-01-31T09:30:00.000Z",
       status: false,
     },
     {
-      formName: 'Age',
-      formAttribute: 'Radio',
+      fieldName: 'Age',
+      fieldAttribute: 'Radio',
       createdOn: "2021-04-01T09:30:00.000Z",
       status: false,
     },
     {
-      formName: 'Cader',
-      formAttribute: 'CheckBox',
+      fieldName: 'Cader',
+      fieldAttribute: 'CheckBox',
       createdOn: "2021-08-08T09:30:00.000Z",
       status: true,
     },
     {
-      formName: 'Address',
-      formAttribute: 'Checkbox',
+      fieldName: 'Address',
+      fieldAttribute: 'Checkbox',
       createdOn: "2021-12-10T09:30:00.000Z",
       status: false,
     },
     {
-      formName: 'Street',
-      formAttribute: 'Radio',
+      fieldName: 'Street',
+      fieldAttribute: 'Radio',
       createdOn: "2022-12-31T09:30:00.000Z",
       status: false,
     },
     {
-      formName: 'Pincode',
-      formAttribute: 'CheckBox',
+      fieldName: 'Pincode',
+      fieldAttribute: 'CheckBox',
       createdOn: "2023-02-27T09:30:00.000Z",
       status: true,
     },
     {
-      formName: 'Mother Tongue',
-      formAttribute: 'Checkbox',
+      fieldName: 'Mother Tongue',
+      fieldAttribute: 'Checkbox',
       createdOn: "2023-12-31T09:30:00.000Z",
       status: false,
     },
     {
-      formName: 'DOB',
-      formAttribute: 'Radio',
+      fieldName: 'DOB',
+      fieldAttribute: 'Radio',
       createdOn: "2024-01-01T09:30:00.000Z",
       status: false,
     },
     {
-      formName: 'Nationality',
-      formAttribute: 'CheckBox',
+      fieldName: 'Nationality',
+      fieldAttribute: 'CheckBox',
       createdOn: "2024-01-31T09:30:00.000Z",
       status: true,
     },
     {
-      formName: 'Other details',
-      formAttribute: 'Checkbox',
+      fieldName: 'Other details',
+      fieldAttribute: 'Checkbox',
       createdOn: "2024-02-12T09:30:00.000Z",
       status: false,
     },
     {
-      formName: 'Age',
-      formAttribute: 'Radio',
+      fieldName: 'Age',
+      fieldAttribute: 'Radio',
       createdOn: "2024-03-28T09:30:00.000Z",
       status: false,
     },
     {
-      formName: 'Cader',
-      formAttribute: 'CheckBox',
+      fieldName: 'Cader',
+      fieldAttribute: 'CheckBox',
       createdOn: "2025-04-24T09:30:00.000Z",
       status: true,
     },
     {
-      formName: 'Gender',
-      formAttribute: 'Checkbox',
+      fieldName: 'Gender',
+      fieldAttribute: 'Checkbox',
       createdOn: "2025-05-13T09:30:00.000Z",
       status: false,
     },
     {
-      formName: 'Age',
-      formAttribute: 'Radio',
+      fieldName: 'Age',
+      fieldAttribute: 'Radio',
       createdOn: "2025-05-30T09:30:00.000Z",
       status: false,
     },
     {
-      formName: 'Cader',
-      formAttribute: 'CheckBox',
+      fieldName: 'Cader',
+      fieldAttribute: 'CheckBox',
       createdOn: "2025-06-01T09:30:00.000Z",
       status: true,
     }]
@@ -145,6 +142,7 @@ export class FormsListComponent implements OnInit, AfterViewInit {
     }
   }
   ngOnChanges(data: SimpleChanges) {
+    console.log('data', data)
     this.dataSource.data = _.get(data, 'data.currentValue')
     this.length = this.dataSource.data.length
     if (this.paginator) {
@@ -155,8 +153,9 @@ export class FormsListComponent implements OnInit, AfterViewInit {
   ngAfterViewInit() {
     if (this.data) {
       this.dataSource.data = this.data
-      this.length = this.data.length
-      this.dataSource.sort = this.matSort
+      this.length = this.dataSource.data.length
+      this.dataSource.paginator = this.paginator
+      this.dataSource.sort = this.sort
     }
   }
 
@@ -197,5 +196,9 @@ export class FormsListComponent implements OnInit, AfterViewInit {
     if (event) {
       this.showCreateForm = false
     }
+  }
+
+  onPageChange(event: any) {
+    console.log("event", event)
   }
 }
