@@ -152,7 +152,7 @@ export class CreateFormComponent implements OnInit {
   }
 
   close() {
-    this.closeForm.emit(true)
+    this.closeForm.emit(false)
   }
   customRegex(event: any) {
     const question = this.getQuestions.at(event.index) as UntypedFormGroup

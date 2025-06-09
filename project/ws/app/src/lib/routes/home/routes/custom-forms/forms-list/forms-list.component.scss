@@ -43,3 +43,10 @@
 .mat-header-row {
     min-height: 40px;
 }
+
+.fixed-spinner {
+  position: absolute;
+  top: 45%;
+  left: 45%;
+  z-index: 1000;
+}

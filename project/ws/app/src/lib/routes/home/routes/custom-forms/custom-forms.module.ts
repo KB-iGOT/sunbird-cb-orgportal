@@ -25,6 +25,7 @@ import { CustomInputTextComponent } from './custom-input-text/custom-input-text.
 import { MatLegacySlideToggleModule as MatSlideToggleModule } from '@angular/material/legacy-slide-toggle'
 import { UIORGTableModule } from '@sunbird-cb/collection'
 import { CustomFieldsService } from '../../../users/services/custom-fields.service'
+import { MatLegacyProgressSpinnerModule as MatProgressSpinnerModule } from '@angular/material/legacy-progress-spinner'
 @NgModule({
   declarations: [
     FormsListComponent,
@@ -65,7 +66,8 @@ import { CustomFieldsService } from '../../../users/services/custom-fields.servi
     MatLegacyTabsModule,
     MatSortModule,
     MatSlideToggleModule,
-    UIORGTableModule
+    UIORGTableModule,
+    MatProgressSpinnerModule,
   ],
   providers: [CustomFieldsService]
 })

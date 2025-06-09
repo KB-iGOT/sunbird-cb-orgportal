@@ -24,8 +24,10 @@ export class FormsListComponent implements OnInit, AfterViewInit {
   showCreateForm: boolean = false
   length!: number
   pageSize = 5
+  pageNumber = 0
   rootOrgId: any
   searchResults: any[] = []
+  isLoading = false
   @ViewChild(MatPaginator) paginator!: MatPaginator
   @ViewChild(MatSort) sort!: MatSort
 
@@ -54,18 +56,22 @@ export class FormsListComponent implements OnInit, AfterViewInit {
       sortState: 'asc',
       actionColumnName: 'Actions',
     }
+    this.loadData()
+  }
 
+  loadData() {
+    this.isLoading = true
     let payload = {
       filterCriteriaMap: {
         organisationId: this.rootOrgId,
       },
       requestedFields: [],
-      pageNumber: 0,
-      pageSize: 10,
+      pageNumber: this.pageNumber,
+      pageSize: this.pageSize,
       facets: []
     }
+    this.data = []
     this.customFieldsService.getCustomFields(payload).subscribe((res: any) => {
-      console.log("res  ---------- ", res)
       this.searchResults = _.get(res, 'result.searchResults.data')
       this.length = _.get(res, 'result.searchResults.totalCount')
       if (this.searchResults.length) {
@@ -80,8 +86,11 @@ export class FormsListComponent implements OnInit, AfterViewInit {
         })
       }
       this.dataSource.data = this.data
+      this.isLoading = false
+    }, (err: any) => {
+      console.error(err)
+      this.isLoading = false
     })
-
     if (this.tableData) {
       this.displayedColumns = this.tableData.columns
     }
@@ -112,7 +121,6 @@ export class FormsListComponent implements OnInit, AfterViewInit {
     }
   }
 
-
   getFinalColumns() {
     if (this.tableData !== undefined) {
       const columns = _.map(this.tableData.columns, c => c.key)
@@ -139,8 +147,12 @@ export class FormsListComponent implements OnInit, AfterViewInit {
   closeForm(event: any) {
     console.log(event)
     if (event) {
+      this.loadData()
+      this.showCreateForm = false
+    } else {
       this.showCreateForm = false
     }
+
   }
 
   onPageChange(event: any) {
