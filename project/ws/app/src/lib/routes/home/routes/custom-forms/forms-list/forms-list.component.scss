@@ -7,30 +7,6 @@
   font: 700 14px Lato;
   /* stylelint-enable */
 }
-.rsearch {
-  display: flex;
-  position: relative;
-  flex: 1 1 auto;
-}
-.search-icon {
-  position: absolute;
-  top: 8px;
-  font-size: 22px;
-  left: 16px;
-}
-
-.sinput {
-  width: 385px;
-  border-radius: 18px;
-  border: 1px solid #d5d0d0;
-  padding: 9px 9px 9px 45px;
-  margin-bottom: 0px;
-  margin-top: 0;
-  /* stylelint-disable */
-  font: normal 14px Lato;
-  /* stylelint-enable */
-  font-weight: 400;
-}
 
 .create-new {
   background-color: rgb(152 182 235 / 16%);
@@ -49,4 +25,40 @@
   top: 45%;
   left: 45%;
   z-index: 1000;
+}
+
+::ng-deep .cdk-column-fieldName {
+  flex: 0 0 11% !important;
+  width: 11% !important;
+}
+::ng-deep .cdk-column-fieldAttribute {
+  flex: 0 0 11% !important;
+  width: 11% !important;
+}
+
+::ng-deep .cdk-column-createdOn {
+  flex: 0 0 11% !important;
+  width: 11% !important;
+}
+
+::ng-deep .cdk-column-isMandatory {
+  flex: 0 0 9% !important;
+  width: 9% !important;
+}
+
+::ng-deep .cdk-column-status {
+ flex: 0 0 9% !important;
+  width: 9% !important;
+}
+
+::ng-deep .mat-column-actions {
+  flex: 0 0 8% !important;
+  width: 8% !important;
+}
+
+::ng-deep .filedTextbox .mat-form-field-wrapper {
+  padding-bottom: 0.5rem!important;
+}
+::ng-deep .filedTextbox .mat-form-field-appearance-outline .mat-form-field-infix {
+  padding: 0rem!important;
 }

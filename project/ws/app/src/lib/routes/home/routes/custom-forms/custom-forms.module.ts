@@ -26,12 +26,14 @@ import { MatLegacySlideToggleModule as MatSlideToggleModule } from '@angular/mat
 import { UIORGTableModule } from '@sunbird-cb/collection'
 import { CustomFieldsService } from '../../../users/services/custom-fields.service'
 import { MatLegacyProgressSpinnerModule as MatProgressSpinnerModule } from '@angular/material/legacy-progress-spinner'
+import { ConfirmDeleteComponent } from './confirm-delete/confirm-delete.component'
 @NgModule({
   declarations: [
     FormsListComponent,
     CreateFormComponent,
     BaseComponent,
     CustomInputTextComponent,
+    ConfirmDeleteComponent,
   ],
   imports: [
     CommonModule,
@@ -69,6 +71,6 @@ import { MatLegacyProgressSpinnerModule as MatProgressSpinnerModule } from '@ang
     UIORGTableModule,
     MatProgressSpinnerModule,
   ],
-  providers: [CustomFieldsService]
+  providers: [CustomFieldsService, MatDialogModule]
 })
 export class CustomFormsModule { }

@@ -22,11 +22,34 @@ export class CustomInputTextComponent {
     { key: 'Regex', value: "regex" }
   ]
 
-  constructor() { }
+  constructor() {
+  }
+
+  ngOnInit(): void {
+    if (this.question) {
+      this.question.get('name')?.valueChanges.subscribe(value => {
+        const parameterized = this.createParameterName(value || '')
+        const attributeNameControl = this.question?.get('attributeName')
+        if (attributeNameControl) {
+          attributeNameControl.setValue(parameterized)
+        }
+      })
+    }
+  }
 
   removeItem() {
     this.removeRow.emit(this.index)
   }
+
+  createParameterName(input: string): string {
+    return input
+      .toLowerCase() //Convert to lowercase
+      .replace(/[^a-z0-9\s]/g, '') //Remove special characters
+      .replace(/\s+/g, '_') //Replace spaces with underscores
+      .replace(/^_+|_+$/g, '') //Remove leading/trailing underscores
+  }
+
+
 
   onFieldValidationChange(event: any) {
     this.customRegex.emit({ selected: event.value, index: this.index })

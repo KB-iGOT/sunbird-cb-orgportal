@@ -3,28 +3,17 @@
     <mat-spinner [diameter]="30" [strokeWidth]="3"></mat-spinner>
   </div>
 </ng-container>
-<div class="flex flex-4 flex-column">
+<div class="flex flex-4 flex-column mt-5">
   <mat-card>
     <div class="flex justify-between">
       <span class="mobile-margin mat-h2">Custom Profile</span>
       <button mat-button class="createFormBtn" (click)="redirectToNewForm()">Create Custom Profile Form</button>
     </div>
     <div class="create-new p-5 mb-5" *ngIf="showCreateForm">
-      <ws-app-create-form (closeForm)="closeForm($event)"></ws-app-create-form>
+      <ws-app-create-form [customFieldId]="customFieldId" (closeForm)="closeForm($event)"></ws-app-create-form>
     </div>
     <mat-card-content>
-      <div class="events-table flex flex-column gap-4">
-        <!-- <div class="flex justify-between">
-          <ng-container>
-            <div class="search">
-              <div class=rsearch>
-                <mat-icon class="search-icon">search</mat-icon>
-                <input class="sinput" type="Standard" label="" [formControl]="searchControl"
-                  placeholder="Type here to search... ">
-              </div>
-            </div>
-          </ng-container>
-        </div> -->
+      <div class="custom-fields-table flex flex-column gap-4">
         <div class="table-container">
           <mat-table #table mat-table matSort class="mt-2" [dataSource]=" dataSource">
             <ng-container matColumnDef="{{col.key}}" *ngFor="let col of tableData!.columns">
@@ -41,26 +30,30 @@
                   <mat-slide-toggle class="example-margin" [checked]="element[col.key]"
                     (change)="onToggleChange($event, element)"></mat-slide-toggle>
                 </span>
+                <span class="h-400-r-14-l color-87 textclass" *ngIf="col.key === 'preview'">
+                  <div class="" *ngIf="element.status">
+                    <div class="filedTextbox py-2">
+                      <label>
+                        <div class="flex flex-middle pb-1">
+                          <span i18n class="margin-remove flex">{{element?.fieldName}}</span>
+                        </div>
+                      </label>
+                      <mat-form-field appearance="outline" class="w-full">
+                        <input type="text" class="input-text" matInput [placeholder]="element.fieldName" />
+                      </mat-form-field>
+                    </div>
+                  </div>
+                </span>
                 <span class="h-400-r-14-l color-87 textclass" *ngIf="col.key === 'actions'">
                   <button type="button" mat-icon-button="" aria-label="action items" [matMenuTriggerFor]="cardMenu"
                     class="mat-focus-indicator mat-menu-trigger action-btn mat-icon-button mat-button-base"
-                    aria-haspopup="menu" aria-expanded="false"><span class="mat-button-wrapper"><mat-icon
-                        _ngcontent-ng-c279954062="" role="img"
+                    [matMenuTriggerData]="{'data':element}" aria-haspopup="menu" aria-expanded="false"><span
+                      class="mat-button-wrapper"><mat-icon _ngcontent-ng-c279954062="" role="img"
                         class="mat-icon notranslate material-icons mat-ligature-font mat-icon-no-color"
                         aria-hidden="true" data-mat-icon-type="font">more_horiz</mat-icon></span><span matripple=""
                       class="mat-ripple mat-button-ripple mat-button-ripple-round" ng-reflect-disabled="false"
                       ng-reflect-centered="true"></span><span class="mat-button-focus-overlay"></span></button>
                 </span>
-              </mat-cell>
-            </ng-container>
-            <ng-container matColumnDef="Menu">
-              <mat-header-cell *matHeaderCellDef class="clr-darkish-blue action-header">Actions
-              </mat-header-cell>
-              <mat-cell *matCellDef="let row" class="action-cell">
-                <button type="button" mat-icon-button aria-label="action items" [matMenuTriggerFor]="cardMenu"
-                  [matMenuTriggerData]="{'data':row}" class="action-btn">
-                  <mat-icon>more_horiz</mat-icon>
-                </button>
               </mat-cell>
             </ng-container>
             <mat-header-row *matHeaderRowDef="getFinalColumns()"></mat-header-row>

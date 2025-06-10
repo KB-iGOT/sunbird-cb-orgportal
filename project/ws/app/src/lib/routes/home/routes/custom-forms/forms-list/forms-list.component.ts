@@ -7,6 +7,8 @@ import * as _ from 'lodash'
 import { CustomFieldsService } from '../../../../users/services/custom-fields.service'
 import { ActivatedRoute } from '@angular/router'
 import { MatSnackBar } from '@angular/material/snack-bar'
+import { MatDialog } from '@angular/material/dialog'
+import { ConfirmDeleteComponent } from '../confirm-delete/confirm-delete.component'
 @Component({
   selector: 'ws-app-forms-list',
   templateUrl: './forms-list.component.html',
@@ -31,9 +33,10 @@ export class FormsListComponent implements OnInit, AfterViewInit {
   isLoading = false
   @ViewChild(MatPaginator) paginator!: MatPaginator
   @ViewChild(MatSort) sort!: MatSort
+  customFieldId: any = ''
 
   constructor(private customFieldsService: CustomFieldsService,
-    private activeRoute: ActivatedRoute, private matSnackBar: MatSnackBar,
+    private activeRoute: ActivatedRoute, private matSnackBar: MatSnackBar, private matDialog: MatDialog
   ) {
     this.rootOrgId = _.get(this.activeRoute, 'snapshot.data.configService.userProfile.rootOrgId')
     this.dataSource = new MatTableDataSource<any>()
@@ -71,6 +74,8 @@ export class FormsListComponent implements OnInit, AfterViewInit {
       requestedFields: [],
       pageNumber: this.pageNumber,
       pageSize: this.pageSize,
+      orderDirection: "DESC",
+      orderBy: 'updatedOn',
       facets: []
     }
     this.data = []
@@ -166,17 +171,35 @@ export class FormsListComponent implements OnInit, AfterViewInit {
 
   deleteHandler(rowData: any) {
     console.log(rowData)
-    this.customFieldsService.deleteCustomField(rowData.customFieldId).subscribe((res: any) => {
-      if (res.result && res.result.status === 'deleted') {
-        this.matSnackBar.open('Field is deleted successfully!')
-        setTimeout(() => {
-          this.loadData()
-        }, 1000)
-      } else {
-        console.log('Error while deleting custom field')
-      }
-    }, error => {
-      console.log(error)
+    const dialog = this.matDialog.open(ConfirmDeleteComponent, {
+      width: '400px',
+      backdropClass: 'backdropBackground',
     })
+    dialog.afterClosed().subscribe(res => {
+      if (res === true)
+        this.customFieldsService.deleteCustomField(rowData.customFieldId).subscribe((res: any) => {
+          if (res.result && res.result.status === 'deleted') {
+            this.matSnackBar.open('Field is deleted successfully!')
+            setTimeout(() => {
+              this.loadData()
+            }, 500)
+          } else {
+            console.log('Error while deleting custom field')
+          }
+        }, error => {
+          this.matSnackBar.open(error)
+          console.log(error)
+        })
+    })
+  }
+
+  editHandler(rowData: any) {
+    console.log(rowData)
+    this.showCreateForm = false
+    setTimeout(() => {
+      this.showCreateForm = true
+      this.customFieldId = ''
+      this.customFieldId = rowData.customFieldId
+    }, 500)
   }
 }

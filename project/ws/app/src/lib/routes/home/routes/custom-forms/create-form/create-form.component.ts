@@ -1,4 +1,4 @@
-import { Component, EventEmitter, OnInit, Output } from '@angular/core'
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core'
 import { FormArray, UntypedFormArray, UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms'
 import { preventHtmlAndJs } from '../../../../validators/prevent-html-and-js.validator'
 import { FileService } from '../../../../users/services/upload.service'
@@ -31,25 +31,9 @@ export class CreateFormComponent implements OnInit {
       subTitle: 'Add fields in profile',
       type: 'list',
     },
-    // {
-    //   icon: 'dashboard',
-    //   title: 'Multi Master List',
-    //   subTitle: 'Add fields in profile',
-    //   type: 'multiMasterList',
-    // },
-    // {
-    //   icon: 'dashboard',
-    //   title: 'Triplet List',
-    //   subTitle: 'Add fields in profile',
-    //   type: 'tripletList',
-    // },
-    // {
-    //   icon: 'visibility',
-    //   title: 'Preview Form',
-    //   subTitle: 'Preview this form',
-    //   type: 'preview',
-    // },
   ]
+  @Input() customFieldId: any
+  @Input() customFieldObject: any
   customForm!: UntypedFormGroup
   selectedTab: string = ''
   @Output() closeForm: EventEmitter<any> = new EventEmitter()
@@ -73,6 +57,9 @@ export class CreateFormComponent implements OnInit {
       questions: this.formBuilder.array([]),
       type: [''],
     })
+    if (this.customFieldId) {
+      this.addContent('text')
+    }
   }
 
   noWhitespaceValidator(control: any) {
@@ -106,6 +93,33 @@ export class CreateFormComponent implements OnInit {
 
   addQuestion(type: string) {
     this.customForm.controls['type'].setValue(type)
+    if (this.customFieldId) {
+      this.customFieldsService.readCustomField(this.customFieldId).subscribe((res: any) => {
+        if (res.result) {
+          this.customForm.controls['description'].setValue(res.result.name)
+          this.customForm.controls['type'].setValue(res.result.type)
+          this.appendQuestionWithData(res)
+        } else {
+          this.appendQuestion()
+        }
+      })
+    } else {
+      this.appendQuestion()
+    }
+  }
+
+  appendQuestionWithData(res: any) {
+    const questionGroup = this.formBuilder.group({
+      name: [res.result.name, [Validators.required, this.forbiddenCharacterValidator, preventHtmlAndJs()]],
+      attributeName: [res.result.attributeName, [Validators.required]],
+      validation: [res.result.validation, [Validators.required]],
+      customValidation: [res.result.validation],
+      isMandatory: [res.result.isMandatory],
+    })
+    this.getQuestions.push(questionGroup)
+  }
+
+  appendQuestion() {
     const questionGroup = this.formBuilder.group({
       name: ['', [Validators.required, this.forbiddenCharacterValidator, preventHtmlAndJs()]],
       attributeName: ['', [Validators.required]],
@@ -117,12 +131,10 @@ export class CreateFormComponent implements OnInit {
   }
 
   onSave() {
-    console.log(this.customForm.value)
     let payload: any
     if (this.customForm.value.type === 'text') {
       payload = this.constructPayload()
     }
-    console.log(payload)
     this.customFieldsService.createField(payload).subscribe((res: any) => {
       console.log(res)
       if (res.result) {
@@ -130,8 +142,26 @@ export class CreateFormComponent implements OnInit {
         this.closeForm.emit(true)
       }
     }, error => {
+      this.matSnackBar.open(error)
       console.log(error)
     })
+  }
+
+  onUpdate() {
+    let payload: any
+    if (this.customForm.value.type === 'text') {
+      payload = this.constructPayload()
+      this.customFieldsService.updateCustomField(this.customFieldId, payload).subscribe((res: any) => {
+        console.log(res)
+        if (res.result) {
+          this.matSnackBar.open('Field is updated successfully!')
+          this.closeForm.emit(true)
+        }
+      }, error => {
+        this.matSnackBar.open(error)
+        console.log(error)
+      })
+    }
   }
 
   constructPayload() {
@@ -206,6 +236,4 @@ export class CreateFormComponent implements OnInit {
   ngOnDestroy(): void {
     this.destroySubject$.unsubscribe()
   }
-
-
 }
