@@ -6,6 +6,7 @@ import { MatTableDataSource } from '@angular/material/table'
 import * as _ from 'lodash'
 import { CustomFieldsService } from '../../../../users/services/custom-fields.service'
 import { ActivatedRoute } from '@angular/router'
+import { MatSnackBar } from '@angular/material/snack-bar'
 @Component({
   selector: 'ws-app-forms-list',
   templateUrl: './forms-list.component.html',
@@ -32,7 +33,7 @@ export class FormsListComponent implements OnInit, AfterViewInit {
   @ViewChild(MatSort) sort!: MatSort
 
   constructor(private customFieldsService: CustomFieldsService,
-    private activeRoute: ActivatedRoute,
+    private activeRoute: ActivatedRoute, private matSnackBar: MatSnackBar,
   ) {
     this.rootOrgId = _.get(this.activeRoute, 'snapshot.data.configService.userProfile.rootOrgId')
     this.dataSource = new MatTableDataSource<any>()
@@ -44,17 +45,19 @@ export class FormsListComponent implements OnInit, AfterViewInit {
       columns: [
         { displayName: 'Field Name', key: 'fieldName' },
         { displayName: 'Field Attribute', key: 'fieldAttribute' },
-        //{ displayName: 'Form Validation', key: 'formValidation' },
         { displayName: 'Created on', key: 'createdOn' },
+        { displayName: 'Mandatory', key: 'isMandatory' },
         { displayName: 'Status', key: 'status' },
+        { displayName: 'Actions', key: 'actions' },
+        { displayName: 'Preview', key: 'preview' },
+
       ],
-      actions: [],
+      // actions: [],
       needCheckBox: false,
       needHash: false,
-      needUserMenus: true,
+      needUserMenus: false,
       sortColumn: '',
       sortState: 'asc',
-      actionColumnName: 'Actions',
     }
     this.loadData()
   }
@@ -80,8 +83,10 @@ export class FormsListComponent implements OnInit, AfterViewInit {
             fieldName: element.name,
             fieldAttribute: element.attributeName,
             createdOn: element.createdOn,
-            status: element.isMandatory,
-            row: element,
+            isMandatory: element.isMandatory,
+            object: element,
+            customFieldId: element.customFieldId,
+            status: element.isActive
           })
         })
       }
@@ -157,5 +162,21 @@ export class FormsListComponent implements OnInit, AfterViewInit {
 
   onPageChange(event: any) {
     console.log("event", event)
+  }
+
+  deleteHandler(rowData: any) {
+    console.log(rowData)
+    this.customFieldsService.deleteCustomField(rowData.customFieldId).subscribe((res: any) => {
+      if (res.result && res.result.status === 'deleted') {
+        this.matSnackBar.open('Field is deleted successfully!')
+        setTimeout(() => {
+          this.loadData()
+        }, 1000)
+      } else {
+        console.log('Error while deleting custom field')
+      }
+    }, error => {
+      console.log(error)
+    })
   }
 }

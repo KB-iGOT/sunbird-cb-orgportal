@@ -14,7 +14,7 @@
     </div>
     <mat-card-content>
       <div class="events-table flex flex-column gap-4">
-        <div class="flex justify-between">
+        <!-- <div class="flex justify-between">
           <ng-container>
             <div class="search">
               <div class=rsearch>
@@ -24,7 +24,7 @@
               </div>
             </div>
           </ng-container>
-        </div>
+        </div> -->
         <div class="table-container">
           <mat-table #table mat-table matSort class="mt-2" [dataSource]=" dataSource">
             <ng-container matColumnDef="{{col.key}}" *ngFor="let col of tableData!.columns">
@@ -40,6 +40,16 @@
                 <span class="h-400-r-14-l color-87 textclass" *ngIf="col.key === 'status'">
                   <mat-slide-toggle class="example-margin" [checked]="element[col.key]"
                     (change)="onToggleChange($event, element)"></mat-slide-toggle>
+                </span>
+                <span class="h-400-r-14-l color-87 textclass" *ngIf="col.key === 'actions'">
+                  <button type="button" mat-icon-button="" aria-label="action items" [matMenuTriggerFor]="cardMenu"
+                    class="mat-focus-indicator mat-menu-trigger action-btn mat-icon-button mat-button-base"
+                    aria-haspopup="menu" aria-expanded="false"><span class="mat-button-wrapper"><mat-icon
+                        _ngcontent-ng-c279954062="" role="img"
+                        class="mat-icon notranslate material-icons mat-ligature-font mat-icon-no-color"
+                        aria-hidden="true" data-mat-icon-type="font">more_horiz</mat-icon></span><span matripple=""
+                      class="mat-ripple mat-button-ripple mat-button-ripple-round" ng-reflect-disabled="false"
+                      ng-reflect-centered="true"></span><span class="mat-button-focus-overlay"></span></button>
                 </span>
               </mat-cell>
             </ng-container>
@@ -68,11 +78,13 @@
 
 <mat-menu #cardMenu="matMenu">
   <ng-template matMenuContent let-rowData="data">
-    <button mat-menu-item name="channel-analytics-button" class="ws-mat-primary-text" aria-label="Analytics">
+    <button (click)="editHandler(rowData)" mat-menu-item name="channel-analytics-button" class="ws-mat-primary-text"
+      aria-label="Analytics">
       <mat-icon class="margin-right-xs">create</mat-icon><span>Edit</span>
     </button>
-    <!-- <button mat-menu-item name="channel-analytics-button" class="ws-mat-primary-text" aria-label="Analytics">
-      <mat-icon class="margin-right-xs">archive</mat-icon><span>Archive event</span>
-    </button> -->
+    <button (click)="deleteHandler(rowData)" mat-menu-item name="channel-analytics-button" class="ws-mat-primary-text"
+      aria-label="Analytics">
+      <mat-icon class="margin-right-xs">delete</mat-icon><span>Delete</span>
+    </button>
   </ng-template>
 </mat-menu>
