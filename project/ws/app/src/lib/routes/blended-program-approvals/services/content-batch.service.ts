@@ -218,7 +218,10 @@ export class ContentBatchService {
   }
 
   downloadPendingRequestCSV(request: any): Observable<any> {
-    return this.http.post(`${API_END_POINTS.DOWNLOAD_PENDING_USERS_REQUEST_CSV}`, request)
+    return this.http.post(`${API_END_POINTS.DOWNLOAD_PENDING_USERS_REQUEST_CSV}`, request, {
+      responseType: 'text' as 'json',
+      withCredentials: true // If you need to include cookies like connect.sid
+    })
   }
 
   approveRejectUser(request: any): any {
