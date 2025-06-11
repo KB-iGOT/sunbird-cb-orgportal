@@ -1,0 +1,50 @@
+<p>Selected learners</p>
+<div class="table-data-block margin-top-l">
+  <div class="flex flex-between flex-middle title-search mat-full-radius-select">
+    <h4>All Learners</h4>
+    <mat-form-field appearance="outline" class="search-input-block">
+      <input matInput (keyup)="applyTableFilter($event)" class="search-input" placeholder="Search" #input>
+      <mat-icon class="search-icon">search</mat-icon>
+    </mat-form-field>
+  </div>
+  <div>
+
+    <table aria-describedby="selected-learners" mat-table [dataSource]="dataSource"
+      class="responsiveTable mat-table width-1-1">
+
+      <!--- Note that these columns can be defined in any order.
+        The actual rendered columns are set as a property on the row definition" -->
+
+      <!-- Position Column -->
+      <ng-container matColumnDef="fullName">
+        <th mat-header-cell *matHeaderCellDef class="mat-custom-headder"> Full Name </th>
+        <td mat-cell *matCellDef="let element" class="mat-custom-body"> {{element.fullName}} </td>
+      </ng-container>
+
+      <!-- Name Column -->
+      <ng-container matColumnDef="email">
+        <th mat-header-cell *matHeaderCellDef class="mat-custom-headder"> Email </th>
+        <td mat-cell *matCellDef="let element" class="mat-custom-body"> {{element.email}} </td>
+      </ng-container>
+
+      <!-- Weight Column -->
+      <ng-container matColumnDef="ministry">
+        <th mat-header-cell *matHeaderCellDef class="mat-custom-headder"> Ministry </th>
+        <td mat-cell *matCellDef="let element" class="mat-custom-body"> {{element.ministry}} </td>
+      </ng-container>
+
+      <!-- Symbol Column -->
+      <ng-container matColumnDef="status">
+        <th mat-header-cell *matHeaderCellDef class="mat-custom-headder"> Status </th>
+        <td mat-cell *matCellDef="let element" class="mat-custom-body"> {{element.status}} </td>
+      </ng-container>
+      <ng-container matColumnDef="mobile">
+        <th mat-header-cell *matHeaderCellDef class="mat-custom-headder"> Mobile </th>
+        <td mat-cell *matCellDef="let element" class="mat-custom-body"> {{element.mobile}} </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
+  </div>
+</div>

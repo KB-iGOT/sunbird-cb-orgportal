@@ -1,0 +1,12 @@
+<div class="snackbar-wrapper">
+  <div class="flex items-center justify-between">
+    <div class="message flex items-center gap-4">
+      <mat-icon *ngIf="data?.type === 'success'" class="text-white">check</mat-icon>
+      <!-- <mat-icon *ngIf="data?.type === 'error'" class="text-white">close</mat-icon> -->
+      <span *ngIf="data?.message" class="text-white">{{data?.message}}</span>
+    </div>
+    <div class="close">
+      <mat-icon class="cursor-pointer" (click)="snackBarRef.dismiss()" class="text-white">close</mat-icon>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,27 @@
+<div> <ng-container [formGroup]="contentForm">
+    <div class="card-contan">
+      <div class="mobile-break flex-1 margin-top-l">
+        <!-- <div [ngClass]="{ 'mat-form-field-invalid': showError('enroleType') }"> <mat-radio-group name="enroleType"
+            class="flex tgl-group margin-top-s" aria-label="Select an option" formControlName="enroleType">
+            <mat-radio-button [name]="'radio-' + _enroleType" class="flex flex-row itm-center margin-right-s"
+              *ngFor="let _enroleType of enroleTypeList" [value]="_enroleType"> <span
+                class="mat-body-2">{{_enroleType}}</span> </mat-radio-button> </mat-radio-group> <mat-error
+            *ngIf="showError('enroleType')" i18n>Enrollment type is mandatory </mat-error> </div> -->
+      </div>
+    </div>
+    <!-- *ngIf="contentForm?.value.enroleType === enroleTypeList[0]" -->
+    <div> <ng-container> <ws-app-user-bulk-upload
+          (successUserData)="selectedUsersData($event)"></ws-app-user-bulk-upload> </ng-container>
+      <!-- <ng-container
+        *ngIf="contentForm?.value.enroleType === enroleTypeList[0]">
+        <ws-app-select-learners-to-batch
+          (successUserData)="selectedUsersData($event)" [contentMeta]="content"></ws-app-select-learners-to-batch>
+      </ng-container>  -->
+    </div>
+    <div class="my-5 submit-btn"> <button
+        *ngIf="contentForm?.value.enroleType === enroleTypeList[1] || contentForm?.value.enroleType === enroleTypeList[0]"
+        type="submit" [disabled]="!contentForm?.controls?.selectedUsers?.value?.length" mat-flat-button
+        (click)="onSubmit()"
+        class="flex items-center rounded-full px-4 py-2 new-bg-color font-bold text-sm text-white add-batch-btn"> Submit
+      </button> </div>
+  </ng-container></div>
