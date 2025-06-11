@@ -6,6 +6,7 @@ import { ContentBatchService } from '../../services/content-batch.service'
 import { NSContent } from '../../interface/content'
 import { LocalDataService } from '../../services/local-data.service'
 import * as _ from 'lodash'
+import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar'
 
 @Component({
   selector: 'ws-app-content-nominate-learner',
@@ -21,6 +22,7 @@ export class ContentNominateLearnerComponent implements OnInit {
   constructor(public activatedRoute: ActivatedRoute, public router: Router,
     public batchService: ContentBatchService,
     private dataService: LocalDataService,
+    private snackBar: MatSnackBar,
   ) {
 
     this.contentForm = new FormGroup({
@@ -84,11 +86,17 @@ export class ContentNominateLearnerComponent implements OnInit {
         userIdList: userId,
       },
     }
-    console.log('request', request)
-    // this.batchService.inviteUserToBatch(request).subscribe((_res: any) => {
+    // console.log('request', request)
+    this.batchService.inviteUserToBatch(request).subscribe((_res: any) => {
+      this.openSnackbar('Users Inited to Batch Successfully.')
 
-    //   this.router.navigate(['/author', 'content-detail', this.contentId, 'batches'])
-    // })
+    })
+  }
+
+  private openSnackbar(primaryMsg: string, duration: number = 5000) {
+    this.snackBar.open(primaryMsg, 'X', {
+      duration,
+    })
   }
 
   showError(meta: string) {
