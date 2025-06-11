@@ -50488,12 +50488,12 @@ video {
   }
 
   .sm\:decoration-slice {
-     -webkit-box-decoration-break: slice;
+    -webkit-box-decoration-break: slice;
             box-decoration-break: slice;
   }
 
   .sm\:decoration-clone {
-     -webkit-box-decoration-break: clone;
+    -webkit-box-decoration-break: clone;
             box-decoration-break: clone;
   }
 
@@ -108936,7 +108936,7 @@ video {
   }
 
   .lg\:decoration-slice {
-    box-decoration-break: slice;-webkit-box-decoration-break: slice;
+    -webkit-box-decoration-break: slice;
             box-decoration-break: slice;
   }
 
