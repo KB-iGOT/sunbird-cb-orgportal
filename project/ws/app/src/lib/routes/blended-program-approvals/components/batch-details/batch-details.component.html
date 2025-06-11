@@ -34,6 +34,12 @@
               <!-- <span *ngIf="approvedUsers" class="ws-mat-black60-text">({{approvedUsers.length}})</span> -->
             </a>
             <a class="filter-option cursor-pointer"
+              [ngClass]="{'ws-mat-accent-border-active font-bold' : currentFilter === 'nominate-learner',
+                                                                          'ws-mat-accent-border font-medium':currentFilter !== 'nominate-learner'}"
+              mat-button (click)="filter('nominate-learner')" role="button">Nominate Learner
+              <!-- <span *ngIf="approvedUsers" class="ws-mat-black60-text">({{approvedUsers.length}})</span> -->
+            </a>
+            <a class="filter-option cursor-pointer"
               [ngClass]="{'ws-mat-accent-border-active font-bold' : currentFilter === 'approvalStatus',
                                                                                     'ws-mat-accent-border font-medium':currentFilter !== 'approvalStatus'}"
               mat-button (click)="filter('approvalStatus')" role="button">Enroll status
@@ -58,28 +64,44 @@
           </div>
         </div>
         <ng-container *ngIf="currentFilter === 'pending' && !showUserDetails">
-          <div class="flex flex-1 flex-row margin-top-l" *ngIf="clonedNewUsers && clonedNewUsers.length > 0">
-            <div class="flex-1">
-              <div class="search">
-                <div class="rsearch">
-                  <mat-icon class="color-60 search-icon">search</mat-icon>
-                  <input class="search-input color-60" type="Standard" #searchText placeholder="Search for a learner"
-                    (input)="onSearchLearners(searchText.value)">
+          <ng-container [formGroup]="contentForm">
+            <div [ngClass]="{ 'mat-form-field-invalid': showError('enroleType') }"> <mat-radio-group name="enroleType"
+                class="flex tgl-group margin-top-s" aria-label="Select an option" formControlName="enroleType">
+                <mat-radio-button [name]="'radio-' + _enroleType" class="flex flex-row itm-center margin-right-s"
+                  *ngFor="let _enroleType of enroleTypeList" [value]="_enroleType"> <span
+                    class="mat-body-2">{{_enroleType}}</span> </mat-radio-button> </mat-radio-group> <mat-error
+                *ngIf="showError('enroleType')" i18n>Enrollment type is mandatory </mat-error>
+            </div>
+          </ng-container>
+          <ng-container *ngIf="contentForm?.value.enroleType === enroleTypeList[0]">
+            <div class="flex flex-1 flex-row margin-top-l" *ngIf="clonedNewUsers && clonedNewUsers.length > 0">
+              <div class="flex-1">
+                <div class="search">
+                  <div class="rsearch">
+                    <mat-icon class="color-60 search-icon">search</mat-icon>
+                    <input class="search-input color-60" type="Standard" #searchText placeholder="Search for a learner"
+                      (input)="onSearchLearners(searchText.value)">
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-          <p class="new-request-count" *ngIf="newUsers.length > 0"> {{newUsers.length}} New
-            request(s)</p>
-          <div class="b-c box" *ngIf="newUsers && newUsers.length > 0">
-            <div *ngFor="let user of newUsers">
-              <ws-app-users-card [user]="user" [actions]="true" [programData]="linkData" (userClick)="onSubmit($event)"
-                [contentData]="programData" [type]="'newRequest'" (showUser)="onShowUser($event)"></ws-app-users-card>
+            <p class="new-request-count" *ngIf="newUsers.length > 0"> {{newUsers.length}} New
+              request(s)</p>
+            <div class="b-c box" *ngIf="newUsers && newUsers.length > 0">
+              <div *ngFor="let user of newUsers">
+                <ws-app-users-card [user]="user" [actions]="true" [programData]="linkData"
+                  (userClick)="onSubmit($event)" [contentData]="programData" [type]="'newRequest'"
+                  (showUser)="onShowUser($event)"></ws-app-users-card>
+              </div>
             </div>
-          </div>
-          <div class="b-c box" *ngIf="newUsers && newUsers.length == 0">
-            <p class="padding-m">No new requests yet</p>
-          </div>
+            <div class="b-c box" *ngIf="newUsers && newUsers.length == 0">
+              <p class="padding-m">No new requests yet</p>
+            </div>
+          </ng-container>
+          <ng-container *ngIf="contentForm?.value.enroleType === enroleTypeList[1]">
+            <ws-app-user-request-bulk-upload [batchData]="batchData"
+              (successUserData)="selectedUsersData($event)"></ws-app-user-request-bulk-upload>
+          </ng-container>
         </ng-container>
         <ng-container *ngIf="currentFilter === 'pending' && showUserDetails">
           <ws-app-learner-responses [selectedUser]="selectedUser" [contentData]="programData" [batchData]="batchData"
@@ -214,6 +236,14 @@
               </div>
             </ng-container>
           </ng-container>
+        </ng-container>
+        <ng-container *ngIf="currentFilter === 'nominate-learner'">
+          <!-- <div class="text-center margin-m">
+            <img class="block mx-auto mb-3" src="/assets/instances/eagle/app_logos/allocation_empty.svg"
+              alt="No Report Generated">
+            <span class="block mat-subheading-2 mt-3">No Nominate Learner</span>
+          </div> -->
+          <ws-app-content-nominate-learner></ws-app-content-nominate-learner>
         </ng-container>
       </ng-container>
     </mat-card-content>

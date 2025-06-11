@@ -1,0 +1,160 @@
+<div class="bulk-upload margin-top-xl">
+  <p class="heading"><b>Bulk upload learners</b></p>
+  <div class="flex upload-wrapper margin-top-l">
+    <div class="info-block">
+      <p class="headder margin-remove-bottom">Open & follow these instruction</p>
+      <ol>
+        <li>Keep the row of the items you wish to process</li>
+        <li>Delete the entire row you donot intend to process</li>
+      </ol>
+      <a mat-stroked-button class="rounded-full px-4 py-2 font-bold text-sm mat-btn-outline font-bold text-sm"
+        href="/assets/instances/inviteUsers.csv" target="_self">Download</a>
+
+    </div>
+    <div class="upload-block">
+      <div class="right_upload_inner flex flex-col items-center justify-center" wsAuthDragDrop
+        (fileDropped)="onDrop($event)">
+        <div class="margin-bottom-l">
+          <img src="assets/icons/csv.svg" alt="">
+        </div>
+        <div class="items-center justify-center flex flex-col">
+          <a class="browse_link cursor-pointer" (click)="fileInput.click()">Browse files</a>
+          <p class="or-txt margin-bottom-xs margin-top-xs"> or</p>
+          <p class="drag-drop-txt margin-bottom-l">Drag file to upload</p>
+          <p class=" max-size margin-remove">Max file size: 400 MB</p>
+          <p class="support-type margin-remove">Supported file types: CSV</p>
+        </div>
+        <input type="file" #fileInput class="inputfile" accept=".csv"
+          (change)="onDrop($event.target.files[0]); fileInput.value = null" />
+        <!-- <div *ngIf="file" class="flex flex-middle justify-center flex-column position-relative pt-5 px-5">
+                <mat-icon class="ws-mat-primary-text" svgIcon="excel-sheet">
+                </mat-icon>
+                <p class="margin-left-xs mat-h3 font-weight-500 margin-remove-bottom break">
+                  <ng-container *ngIf="file; else elseBlock">
+                    <span class="flex-wrap"> {{ file?.name }}</span>
+                  </ng-container>
+                  <ng-template #elseBlock>
+                    <span i18n>No file uploaded</span>
+                  </ng-template>
+                </p>
+              </div> -->
+      </div>
+    </div>
+  </div>
+</div>
+<!-- <div *ngIf="contacts.length">
+  {{contacts|json}} {{contacts.length}}
+</div> -->
+
+<div class="users-block margin-top-xl" *ngIf="isSuccessUserlist.length || isErrorUserlist.length">
+  <p><b>Bulk upload learners & invite</b></p>
+  <div class="flex filter-block flex-middle flex-center">
+    <p class="margin-remove"><b>Filter By:</b></p>
+    <div class="tab-btn" (click)="changeFilterType('success')" [ngClass]="{'active-tab':isSeletedTab === 'success'}">
+      Success
+    </div>
+    <div class="tab-btn" (click)="changeFilterType('error')" [ngClass]="{'active-tab':isSeletedTab === 'error'}">Error
+    </div>
+  </div>
+  <div class="margin-top-xl" *ngIf="isSuccessUserlist.length || isErrorUserlist.length">
+
+    <p>Select the user who should be able to view the program.</p>
+
+    <div class="mat-full-radius-select">
+      <mat-form-field appearance="outline" class="search-input-block">
+        <input matInput (keyup)="applyFilter($event)" class="search-input" placeholder="Search" #input>
+        <mat-icon class="search-icon">search</mat-icon>
+      </mat-form-field>
+    </div>
+    <div class="flex flex-between">
+      <p><span *ngIf="isSeletedTab === 'success' ">
+          {{isSeletedTab === 'success' ? isSuccessUserlist.length :
+          isErrorUserlist.length}}/{{contacts.length}} entries uploaded succesfully
+        </span></p>
+      <button *ngIf="isSeletedTab === 'error' " type="button" (click)="downloadErrorFile()" mat-stroked-button
+        class="rounded-full px-4 py-2 font-bold text-sm mat-btn-outline font-bold text-sm">
+        Download error log file
+      </button>
+    </div>
+
+
+    <h4 class="margin-top-l">All learners</h4>
+    <table aria-describedby="all-learners" mat-table [dataSource]="dataSource"
+      class=" responsiveTable mat-table width-1-1">
+
+      <!-- Checkbox Column -->
+      <ng-container matColumnDef="select">
+        <th mat-header-cell *matHeaderCellDef class="mat-custom-headder">
+          <mat-checkbox (change)="$event ? toggleAllRows() : null" [checked]="selection.hasValue() && isAllSelected()"
+            [indeterminate]="selection.hasValue() && !isAllSelected()" [aria-label]="checkboxLabel()">
+          </mat-checkbox>
+        </th>
+        <td mat-cell *matCellDef="let row" class="mat-custom-body">
+          <mat-checkbox (click)="$event.stopPropagation()" (change)="$event ? selection.toggle(row) : null"
+            [checked]="selection.isSelected(row)" [aria-label]="checkboxLabel(row)">
+          </mat-checkbox>
+        </td>
+      </ng-container>
+
+      <!-- Full Name Column -->
+      <ng-container matColumnDef="fullName">
+        <th mat-header-cell *matHeaderCellDef class="mat-custom-headder"> Full Name </th>
+        <td mat-cell *matCellDef="let element" class="mat-custom-body"> {{element.fullName}} </td>
+      </ng-container>
+
+      <!-- Email Column -->
+      <ng-container matColumnDef="email">
+        <th mat-header-cell *matHeaderCellDef class="mat-custom-headder"> Email </th>
+        <td mat-cell *matCellDef="let element" class="mat-custom-body"> {{element.email}} </td>
+      </ng-container>
+
+      <!-- Ministry Column -->
+      <ng-container matColumnDef="ministry">
+        <th mat-header-cell *matHeaderCellDef class="mat-custom-headder"> Ministry </th>
+        <td mat-cell *matCellDef="let element" class="mat-custom-body"> {{element.ministry}} </td>
+      </ng-container>
+
+      <!-- Status Column -->
+      <ng-container matColumnDef="status">
+        <th mat-header-cell *matHeaderCellDef class="mat-custom-headder"> Status </th>
+        <td mat-cell *matCellDef="let element" class="mat-custom-body">
+          <span class="user-success" [ngClass]="{'user-error':isSeletedTab === 'error'}">
+            {{element.status}}
+          </span>
+        </td>
+      </ng-container>
+      <!-- mobile Column -->
+      <ng-container matColumnDef="mobile">
+        <th mat-header-cell *matHeaderCellDef class="mat-custom-headder"> Mobile No </th>
+        <td mat-cell *matCellDef="let element" class="mat-custom-body"> {{element.mobile? element.mobile: '-'}} </td>
+      </ng-container>
+      <ng-container matColumnDef="message">
+        <th mat-header-cell *matHeaderCellDef class="mat-custom-headder"> Message </th>
+        <td mat-cell *matCellDef="let element" class="mat-custom-body"> {{element.message}} </td>
+      </ng-container>
+      <!-- <ng-container matColumnDef="symbol">
+        <th mat-header-cell *matHeaderCellDef> Mobile No </th>
+        <td mat-cell *matCellDef="let element"> {{element.symbol}} </td>
+      </ng-container> -->
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;" (click)="selection.toggle(row)">
+      </tr>
+    </table>
+    <ng-container *ngIf="dataSource.data.length === 0 || dataSource.filteredData.length === 0 ">
+      <div class="flex flex-middle flex-center margin-top-xl">
+        <p>No Record Found</p>
+      </div>
+    </ng-container>
+  </div>
+</div>
+<!-- <ws-widget-search-input (searchRequest)="searchRequest($event)"></ws-widget-search-input> -->
+
+
+<div class="flex flex-middle  flex-center file-upload-loader" *ngIf="fileUploading">
+  <div class="loader-box">
+    <img src="assets/icons/csv.svg" width="80" height="80" alt="">
+    <div class="loader"></div>
+    <p>File uploading…..</p>
+  </div>
+</div>

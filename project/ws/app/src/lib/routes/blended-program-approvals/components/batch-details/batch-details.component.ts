@@ -12,6 +12,8 @@ import moment from 'moment'
 import { NsContent } from '../../../../head/_services/widget-content.model'
 import { DialogConfirmComponent } from '../../../../../../../../../src/app/component/dialog-confirm/dialog-confirm.component'
 import { ITableData } from '@sunbird-cb/collection/lib/ui-org-table/interface/interfaces'
+import { IRequestLearnerType } from '../../enums/enrolment-type'
+import { FormControl, FormGroup, Validators } from '@angular/forms'
 @Component({
   selector: 'ws-app-batch-details',
   templateUrl: './batch-details.component.html',
@@ -42,7 +44,7 @@ export class BatchDetailsComponent implements OnInit {
   fetchStatus = true
   checkSurveyLink = false
   reportStatusList: any[] = []
-
+  enroleTypeList = Object.values(IRequestLearnerType)
   tabledata: ITableData = {
     actions: [],
     columns: [
@@ -59,7 +61,7 @@ export class BatchDetailsComponent implements OnInit {
     needUserMenus: false,
   }
   userDetails: any
-
+  contentForm!: FormGroup
   constructor(
     private router: Router,
     private activeRouter: ActivatedRoute,
@@ -81,13 +83,17 @@ export class BatchDetailsComponent implements OnInit {
     if (this.programID) {
       this.getBPDetails(this.programID)
     }
+    this.contentForm = new FormGroup({
+      enroleType: new FormControl('Select learner Requests', Validators.required)
+      // userProfileFileds: new FormControl(IUserProfileFields.existing),
+    })
   }
 
   async ngOnInit() {
     this.userDetails = await this.bpService.getUserById('').toPromise().catch(_error => { })
   }
 
-  filter(key: 'pending' | 'approved' | 'rejected' | 'sessions' | 'approvalStatus' | 'reportStatus') {
+  filter(key: 'pending' | 'approved' | 'rejected' | 'sessions' | 'approvalStatus' | 'reportStatus' | 'nominate-learner') {
     this.approvedUsers = []
     this.rejectedUsers = []
     this.newUsers = []
@@ -115,6 +121,10 @@ export class BatchDetailsComponent implements OnInit {
       case 'reportStatus':
         this.currentFilter = 'reportStatus'
         this.getBpReportStatus()
+        break
+      case 'nominate-learner':
+        this.currentFilter = 'nominate-learner'
+        //this.getLearnersList()
         break
       default:
         break
@@ -316,7 +326,7 @@ export class BatchDetailsComponent implements OnInit {
         this.filter('rejected')
       }
       this.showUserDetails = false
-    },                                                      (error: any) => {
+    }, (error: any) => {
       this.openSnackbar(_.get(error, 'error.params.errmsg') ||
         _.get(error, 'error.result.errmsg') ||
         'Something went wrong, please try again later!')
@@ -631,5 +641,18 @@ export class BatchDetailsComponent implements OnInit {
     // const hour = date.getHours()
     // const minutes = date.getMinutes()
     return `${day}-${month}-${year}`
+  }
+
+  showError(meta: string) {
+    if (this.contentForm.controls[meta] && this.contentForm.controls[meta].touched) {
+      if (!this.contentForm.controls[meta].valid) {
+        return true
+      }
+    }
+    return false
+  }
+
+  selectedUsersData(event: any) {
+    console.log('event', event)
   }
 }
