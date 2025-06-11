@@ -2,7 +2,7 @@ import { Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges } from '@
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser'
 import { IBtnAppsConfig, CustomTourService } from '@sunbird-cb/collection'
 import { NsWidgetResolver } from '@sunbird-cb/resolver'
-import { ConfigurationsService, NsInstanceConfig, NsPage } from '@sunbird-cb/utils'
+import { ConfigurationsService, EventService, NsInstanceConfig, NsPage } from '@sunbird-cb/utils'
 import { Router, NavigationStart, NavigationEnd, Event } from '@angular/router'
 import { LibNotificationsService } from '@sunbird-cb/notification'
 import { NotificationsService } from '../../services/notifications.service'
@@ -47,6 +47,7 @@ export class AppNavBarComponent implements OnInit, OnChanges, OnDestroy {
     private router: Router,
     private libNotificationsService: LibNotificationsService,
     private notificationsService: NotificationsService,
+    private events: EventService
   ) {
     this.btnAppsConfig = { ...this.basicBtnAppsConfig }
     if (this.configSvc.restrictedFeatures) {
@@ -183,6 +184,7 @@ export class AppNavBarComponent implements OnInit, OnChanges, OnDestroy {
 
   viewAllClick(event: any) {
     if (event.category) {
+      this.raiseTelemetryEventForNotification(event)
       if (event.category === 'PROFILE') {
         this.router.navigate([`app/home/approvals/approval`])
       } else {
@@ -200,6 +202,20 @@ export class AppNavBarComponent implements OnInit, OnChanges, OnDestroy {
       console.error('Error while fetching notifications count', error)
       this.notificationsCount = 0
     })
+  }
+
+  raiseTelemetryEventForNotification(notification: any) {
+    this.events.raiseInteractTelemetry(
+      {
+        type: 'click',
+        subType: 'notification-engine',
+        id: notification.notification_id,
+      },
+      {},
+      {
+        module: 'Home',
+      }
+    )
   }
 
   ngOnDestroy() {
