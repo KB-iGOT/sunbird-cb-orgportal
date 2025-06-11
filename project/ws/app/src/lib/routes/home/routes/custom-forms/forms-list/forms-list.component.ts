@@ -91,7 +91,8 @@ export class FormsListComponent implements OnInit, AfterViewInit {
             isMandatory: element.isMandatory,
             object: element,
             customFieldId: element.customFieldId,
-            status: element.isActive
+            status: element.isActive,
+            validation: element.validation
           })
         })
       }

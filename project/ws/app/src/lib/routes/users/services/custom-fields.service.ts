@@ -3,11 +3,11 @@ import { Observable } from 'rxjs'
 import { HttpClient } from '@angular/common/http'
 
 const API_ENDPOINTS = {
-  CREATE: `/apis/proxies/v8/customFields/create`,
-  LIST_CUSTOM_FIELDS: `/apis/proxies/v8/customFields/search`,
-  DELETE: `/apis/proxies/v8/customFields/delete`,
-  READ: `/apis/proxies/v8/customFields/read`,
-  UPDATE: `/apis/proxies/v8/customFields/update`
+  CREATE: `/apis/proxies/v8/customFields/v1/create`,
+  LIST_CUSTOM_FIELDS: `/apis/proxies/v8/customFields/v1/search`,
+  DELETE: `/apis/proxies/v8/customFields/v1/delete`,
+  READ: `/apis/proxies/v8/customFields/v1/read`,
+  UPDATE: `/apis/proxies/v8/customFields/v1/update`
 
 }
 

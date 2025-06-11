@@ -32,6 +32,16 @@ export class CreateFormComponent implements OnInit {
       type: 'list',
     },
   ]
+
+  fieldValidationTypes = [
+    { key: 'Numbers only', value: "^[0-9]+$" },
+    { key: 'Text only', value: "^[A-Za-z]+$" },
+    { key: 'Alphanumeric', value: "^[A-Za-z0-9]+$" },
+    { key: 'Email', value: "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$" },
+    { key: 'Phone number', value: "^[6-9]\d{9}$" },
+    { key: 'Regex', value: "regex" }
+  ]
+
   @Input() customFieldId: any
   @Input() customFieldObject: any
   customForm!: UntypedFormGroup
@@ -109,12 +119,18 @@ export class CreateFormComponent implements OnInit {
   }
 
   appendQuestionWithData(res: any) {
+    let validationType = 'regex'
+    if (this.fieldValidationTypes.find((item: any) => item.value === res.result.validation)) {
+      validationType = res.result.validation
+    }
+    res.result.validation
     const questionGroup = this.formBuilder.group({
       name: [res.result.name, [Validators.required, this.forbiddenCharacterValidator, preventHtmlAndJs()]],
       attributeName: [res.result.attributeName, [Validators.required]],
-      validation: [res.result.validation, [Validators.required]],
-      customValidation: [res.result.validation],
+      validation: [validationType, [Validators.required]],
+      customValidation: [validationType === 'regex' ? res.result.validation : ''],
       isMandatory: [res.result.isMandatory],
+      isEnabled: [res.result.isEnabled]
     })
     this.getQuestions.push(questionGroup)
   }
@@ -126,6 +142,7 @@ export class CreateFormComponent implements OnInit {
       validation: ['', [Validators.required]],
       customValidation: [''],
       isMandatory: [false],
+      isEnabled: [false]
     })
     this.getQuestions.push(questionGroup)
   }
@@ -170,10 +187,10 @@ export class CreateFormComponent implements OnInit {
       description: this.customForm.value.description,
       type: this.customForm.value.type,
       organisationId: this.rootOrgId,
-      customFieldData: this.customForm.value.questions[0].name,
       attributeName: this.customForm.value.questions[0].attributeName,
-      validation: 'alphaNumeric',
+      validation: this.customForm.value.questions[0].validation === 'regex' ? this.customForm.value.questions[0].customValidation : this.customForm.value.questions[0].validation,
       isMandatory: this.customForm.value.questions[0].isMandatory,
+      isEnabled: this.customForm.value.questions[0].isEnabled
     }
   }
 

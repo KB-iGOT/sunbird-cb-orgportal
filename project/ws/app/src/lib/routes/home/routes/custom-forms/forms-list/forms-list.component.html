@@ -39,7 +39,12 @@
                         </div>
                       </label>
                       <mat-form-field appearance="outline" class="w-full">
-                        <input type="text" class="input-text" matInput [placeholder]="element.fieldName" />
+                        <input type="text" class="input-text" matInput [placeholder]="element.fieldName"
+                          [name]="element.attributeName" [pattern]="element.validation"
+                          [required]="element.isMandatory" />
+                        <mat-error *ngIf="element.validation.invalid && element.validation.touched">
+                          Only numbers are allowed
+                        </mat-error>
                       </mat-form-field>
                     </div>
                   </div>
