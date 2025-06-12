@@ -20,17 +20,19 @@ export class FormsListComponent implements OnInit, AfterViewInit {
   searchControl = new FormControl()
   tableData: any = []
   data: any = []
-  pageSizeOptions = [5, 10, 20]
+  pageSizeOptions = [10, 30, 40]
   columnsList: any = []
   dataSource!: any
   displayedColumns: any = []
   showCreateForm: boolean = false
   length!: number
-  pageSize = 5
+  pageSize = 10
   pageNumber = 0
   rootOrgId: any
   searchResults: any[] = []
   isLoading = false
+  selectedOptions: any[] = []
+  selectedOptionsMap: { [key: string]: any[] } = {}
   @ViewChild(MatPaginator) paginator!: MatPaginator
   @ViewChild(MatSort) sort!: MatSort
   customFieldId: any = ''
@@ -91,12 +93,17 @@ export class FormsListComponent implements OnInit, AfterViewInit {
             isMandatory: element.isMandatory,
             object: element,
             customFieldId: element.customFieldId,
+            customFieldData: element.customFieldData,
             status: element.isActive,
-            validation: element.validation
+            validation: element.validation,
+            type: element.type,
+            // hiracchy: element.type === 'master' ? this.discoverLevels(element.customFieldData, 0, levelMap) : '',
           })
         })
       }
       this.dataSource.data = this.data
+      this.dataSource.data = this.data.map((item: any, idx: any) => ({ ...item, rowIndex: idx }))
+      this.initializeDropdowns()
       this.isLoading = false
     }, (err: any) => {
       console.error(err)
@@ -154,20 +161,17 @@ export class FormsListComponent implements OnInit, AfterViewInit {
 
   redirectToNewForm() {
     this.showCreateForm = true
+    this.customFieldId = ''
   }
   closeForm(event: any) {
-    console.log(event)
     if (event) {
+      this.customFieldId = ''
       this.loadData()
       this.showCreateForm = false
     } else {
       this.showCreateForm = false
     }
 
-  }
-
-  onPageChange(event: any) {
-    console.log("event", event)
   }
 
   deleteHandler(rowData: any) {
@@ -202,5 +206,72 @@ export class FormsListComponent implements OnInit, AfterViewInit {
       this.customFieldId = ''
       this.customFieldId = rowData.customFieldId
     }, 500)
+  }
+
+  onPageChange(event: any) {
+    this.pageNumber = event.pageIndex
+    this.pageSize = event.pageSize
+    this.pageNumber = event.pageIndex
+    this.loadData()
+  }
+
+  getSelectedOptions(rowKey: string): any[] {
+    if (!this.selectedOptionsMap[rowKey]) {
+      this.selectedOptionsMap[rowKey] = []
+    }
+    return this.selectedOptionsMap[rowKey]
+  }
+
+  getSelectedOptionsRef(rowKey: string): any[] {
+    if (!this.selectedOptionsMap[rowKey]) {
+      this.selectedOptionsMap[rowKey] = []
+    }
+    return this.selectedOptionsMap[rowKey]
+  }
+
+  onDropdownChange(level: number, rowKey: string) {
+    debugger
+    const arr = this.getSelectedOptions(rowKey)
+    this.selectedOptionsMap[rowKey] = arr.slice(0, level + 1)
+  }
+
+  // Pre-select values for a specific row
+  preSelectDropdownValues(rowKey: string, selections: any[]) {
+    // Create the row's options array if it doesn't exist
+    if (!this.selectedOptionsMap[rowKey]) {
+      this.selectedOptionsMap[rowKey] = []
+    }
+
+    // Set initial selections
+    selections.forEach((selection, index) => {
+      this.selectedOptionsMap[rowKey][index] = selection
+    })
+  }
+
+  // Call this when loading data
+  initializeDropdowns() {
+    // Clear any existing selections
+    this.selectedOptionsMap = {}
+
+    // Check if dataSource and its data exist
+    if (!this.dataSource || !this.dataSource.data || this.dataSource.data.length === 0) {
+      return
+    }
+
+    // Loop through each row in the data source
+    this.dataSource.data.forEach((row: any, index: number) => {
+      const rowKey = index.toString()
+
+      // Skip rows that don't have customFieldData or aren't masterList type
+      if (!row.customFieldData || !Array.isArray(row.customFieldData) || row.customFieldData.length === 0 || row.type !== 'masterList') {
+        return
+      }
+
+      // Initialize an empty array for this row
+      this.selectedOptionsMap[rowKey] = []
+
+      // Add first-level options to make dropdowns visible but without selection
+      this.selectedOptionsMap[rowKey][0] = null
+    })
   }
 }

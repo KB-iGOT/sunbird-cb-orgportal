@@ -4,6 +4,8 @@ import { HttpClient } from '@angular/common/http'
 
 const API_ENDPOINTS = {
   CREATE: `/apis/proxies/v8/customFields/v1/create`,
+  CREATE_LIST: `/apis/proxies/v8/customFields/v1/masterList/create`,
+
   LIST_CUSTOM_FIELDS: `/apis/proxies/v8/customFields/v1/search`,
   DELETE: `/apis/proxies/v8/customFields/v1/delete`,
   READ: `/apis/proxies/v8/customFields/v1/read`,
@@ -17,6 +19,10 @@ export class CustomFieldsService {
 
   createField(filter: object): Observable<any> {
     return this.http.post<any>(`${API_ENDPOINTS.CREATE}`, filter)
+  }
+
+  createList(filter: object): Observable<any> {
+    return this.http.post<any>(`${API_ENDPOINTS.CREATE_LIST}`, filter)
   }
 
   getCustomFields(payload: object): Observable<any> {

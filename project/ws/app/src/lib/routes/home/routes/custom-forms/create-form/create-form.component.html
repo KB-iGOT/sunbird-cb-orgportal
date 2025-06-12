@@ -56,8 +56,8 @@
             (customRegex)="customRegex($event)"></ws-app-custom-input-text>
         </ng-container>
       </div>
-      <div class="flex justify-between mt-5 gap-4" *ngIf="selectedTab === 'list'">
-        <div class="flex flex-col items-center">
+      <div class="flex justify-end mt-5 gap-4" *ngIf="selectedTab === 'masterList'">
+        <div class="flex flex-col items-center" *ngIf="getQuestions?.length > 1">
           <div class="text-primary cursor-pointer ws-mat-white-background round mat-raised-button mat-button-base"
             (click)="fileInput.click()" (dblclick)="$event.preventDefault()">
             Upload file</div>
@@ -66,13 +66,13 @@
             accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" />
         </div>
         <button mat-button class="ws-mat-white-background round mat-raised-button mat-button-base"
-          (click)="addQuestion('inputText')" *ngIf="selectedTab === 'list'">Add new list</button>
+          (click)="addQuestion('masterList')" *ngIf="selectedTab === 'masterList'">Add new list</button>
 
       </div>
       <div class="flex justify-end mt-5 gap-4">
         <ng-container>
           <button mat-button class="text-white ws-mat-primary-background round mat-raised-button mat-button-base"
-            [disabled]="customForm.invalid" (click)="customFieldId ? onUpdate() : onSave()">
+            [disabled]="customForm.invalid || validateForm()" (click)="customFieldId ? onUpdate() : onSave()">
             {{customFieldId ? 'Update' : 'Save'}}
           </button>
         </ng-container>

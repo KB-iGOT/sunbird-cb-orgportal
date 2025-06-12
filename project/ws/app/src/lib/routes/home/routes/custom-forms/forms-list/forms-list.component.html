@@ -30,15 +30,11 @@
                   <mat-slide-toggle class="example-margin" [checked]="element[col.key]"
                     (change)="onToggleChange($event, element)"></mat-slide-toggle>
                 </span>
-                <span class="h-400-r-14-l color-87 textclass" *ngIf="col.key === 'preview'">
-                  <div class="" *ngIf="element.status">
-                    <div class="filedTextbox py-2">
-                      <label>
-                        <div class="flex flex-middle pb-1">
-                          <span i18n class="margin-remove flex">{{element?.fieldName}}</span>
-                        </div>
-                      </label>
+                <span class="h-400-r-14-l color-87 textclass w-full" *ngIf="col.key === 'preview'">
+                  <div *ngIf="element.status">
+                    <div class="filedTextbox py-2 w-full" *ngIf="element?.type === 'text'">
                       <mat-form-field appearance="outline" class="w-full">
+                        <mat-label>{{ element?.fieldName}}</mat-label>
                         <input type="text" class="input-text" matInput [placeholder]="element.fieldName"
                           [name]="element.attributeName" [pattern]="element.validation"
                           [required]="element.isMandatory" />
@@ -46,6 +42,12 @@
                           Only numbers are allowed
                         </mat-error>
                       </mat-form-field>
+                    </div>
+                    <div class="filedSelect py-2" *ngIf="element?.type === 'masterList'">
+                      <ng-container *ngIf="element?.customFieldData">
+                        <ng-container
+                          *ngTemplateOutlet="dropdownRecursive; context: { $implicit: element.customFieldData, level: 0, rowKey: element.rowIndex }"></ng-container>
+                      </ng-container>
                     </div>
                   </div>
                 </span>
@@ -62,12 +64,13 @@
               </mat-cell>
             </ng-container>
             <mat-header-row *matHeaderRowDef="getFinalColumns()"></mat-header-row>
-            <mat-row *matRowDef="let row; columns: getFinalColumns();">
+            <mat-row *matRowDef="let row; let rowIndex = index; columns: getFinalColumns();"
+              [attr.data-row-index]="rowIndex" [attr.data-row-index]="rowIndex">
             </mat-row>
           </mat-table>
         </div>
         <mat-paginator [length]="length" #paginator [pageSize]="pageSize" [pageSizeOptions]="pageSizeOptions"
-          [pageIndex]="pageIndex">
+          [pageIndex]="pageNumber" (page)="onPageChange($event)">
         </mat-paginator>
       </div>
     </mat-card-content>
@@ -86,3 +89,51 @@
     </button>
   </ng-template>
 </mat-menu>
+
+<ng-template #dropdownRecursive let-options let-level="level" let-rowKey="rowKey">
+  <ng-container *ngIf="getSelectedOptionsRef(rowKey) as selectedOptions">
+    <mat-form-field appearance="outline" class="w-full" *ngIf="options?.length">
+      <mat-label>{{ options[0]?.fieldName || 'Select' }}</mat-label>
+      <mat-select [(ngModel)]="selectedOptions[level]" (selectionChange)="onDropdownChange(level, rowKey)">
+        <mat-option [value]="null">Select</mat-option>
+        <mat-option *ngFor="let opt of options" [value]="opt">{{ opt.fieldValue }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <!-- Show next level if current level is selected and has children -->
+    <ng-container *ngIf="selectedOptions[level]?.fieldValues?.length">
+      <ng-container
+        *ngTemplateOutlet="dropdownRecursive; context: { $implicit: selectedOptions[level].fieldValues, level: level + 1, rowKey: rowKey }"></ng-container>
+    </ng-container>
+
+    <!-- Show second level dropdown when first is not selected -->
+    <ng-container *ngIf="level === 0 && !selectedOptions[0] && options[0]?.fieldValues?.length">
+      <mat-form-field appearance="outline" class="w-full">
+        <mat-label>{{ options[0]?.fieldValues[0]?.fieldName || 'Select' }}</mat-label>
+        <mat-select [disabled]="!selectedOptions[0]">
+          <mat-option [value]="null">Please select {{ options[0]?.fieldName }} first</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <!-- Show third level dropdown when second is not selected -->
+      <ng-container *ngIf="options[0]?.fieldValues[0]?.fieldValues?.length">
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>{{ options[0]?.fieldValues[0]?.fieldValues[0]?.fieldName || 'Select' }}</mat-label>
+          <mat-select [disabled]="!selectedOptions[0]">
+            <mat-option [value]="null">Please select parent options first</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </ng-container>
+    </ng-container>
+
+    <!-- Show third level when second is selected but third is not -->
+    <ng-container *ngIf="level === 1 && !selectedOptions[1] && options[0]?.fieldValues?.length">
+      <mat-form-field appearance="outline" class="w-full">
+        <mat-label>{{ options[0]?.fieldValues[0]?.fieldName || 'Select' }}</mat-label>
+        <mat-select [disabled]="!selectedOptions[1]">
+          <mat-option [value]="null">Please select parent option first</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </ng-container>
+  </ng-container>
+</ng-template>

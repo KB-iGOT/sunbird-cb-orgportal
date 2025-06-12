@@ -56,6 +56,15 @@
   width: 8% !important;
 }
 
+
+
+::ng-deep .filedSelect .mat-form-field-wrapper {
+  padding-bottom: 0.5rem!important;
+}
+::ng-deep .filedSelect .mat-form-field-appearance-outline .mat-form-field-infix {
+  padding: 0.5rem!important;
+}
+
 ::ng-deep .filedTextbox .mat-form-field-wrapper {
   padding-bottom: 0.5rem!important;
 }

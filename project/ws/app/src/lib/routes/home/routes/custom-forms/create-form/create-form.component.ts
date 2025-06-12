@@ -2,8 +2,6 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core'
 import { FormArray, UntypedFormArray, UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms'
 import { preventHtmlAndJs } from '../../../../validators/prevent-html-and-js.validator'
 import { FileService } from '../../../../users/services/upload.service'
-import { HttpErrorResponse } from '@angular/common/http'
-import { takeUntil } from 'rxjs/operators'
 import { Subject } from 'rxjs'
 import { MatSnackBar } from '@angular/material/snack-bar'
 import { ActivatedRoute } from '@angular/router'
@@ -29,7 +27,7 @@ export class CreateFormComponent implements OnInit {
       icon: 'dashboard',
       title: 'List',
       subTitle: 'Add fields in profile',
-      type: 'list',
+      type: 'masterList',
     },
   ]
 
@@ -48,7 +46,7 @@ export class CreateFormComponent implements OnInit {
   selectedTab: string = ''
   @Output() closeForm: EventEmitter<any> = new EventEmitter()
   public fileName: any
-  fileSelected!: any
+  fileSelected!: File
   private destroySubject$ = new Subject()
   rootOrgId: any
   constructor(private formBuilder: UntypedFormBuilder, private fileService: FileService,
@@ -84,7 +82,26 @@ export class CreateFormComponent implements OnInit {
     if (questionsArray && questionsArray instanceof FormArray) {
       questionsArray.clear()
     }
-    this.addQuestion(type)
+    if (type === 'text') {
+      this.addQuestion(type)
+    } else if (type === 'masterList') {
+      this.addMasterListQuestion(type)
+    }
+  }
+
+  addMasterListQuestion(type: string) {
+    this.customForm.controls['type'].setValue(type)
+    this.appendListQuestion()
+  }
+
+  appendListQuestion() {
+    const questionGroup = this.formBuilder.group({
+      name: ['', [Validators.required, this.forbiddenCharacterValidator, preventHtmlAndJs()]],
+      attributeName: ['', [Validators.required]],
+      isMandatory: [false],
+      isEnabled: [false]
+    })
+    this.getQuestions.push(questionGroup)
   }
 
   forbiddenCharacterValidator(control: any) {
@@ -114,7 +131,11 @@ export class CreateFormComponent implements OnInit {
         }
       })
     } else {
-      this.appendQuestion()
+      if (type === 'text') {
+        this.appendQuestion()
+      } else if (type === 'masterList') {
+        this.addMasterListQuestion(type)
+      }
     }
   }
 
@@ -135,6 +156,13 @@ export class CreateFormComponent implements OnInit {
     this.getQuestions.push(questionGroup)
   }
 
+  validateForm() {
+    if (this.customForm.controls['type'].value === 'masterList') {
+      return this.customForm.invalid || this.getQuestions.length < 2 || this.fileSelected === undefined
+    }
+    return false
+  }
+
   appendQuestion() {
     const questionGroup = this.formBuilder.group({
       name: ['', [Validators.required, this.forbiddenCharacterValidator, preventHtmlAndJs()]],
@@ -151,17 +179,59 @@ export class CreateFormComponent implements OnInit {
     let payload: any
     if (this.customForm.value.type === 'text') {
       payload = this.constructPayload()
+      this.customFieldsService.createField(payload).subscribe((res: any) => {
+        console.log(res)
+        if (res.result) {
+          this.matSnackBar.open('Field is created successfully!')
+          this.closeForm.emit(true)
+        }
+      }, error => {
+        this.matSnackBar.open(error)
+        console.log(error)
+      })
+    } else if (this.customForm.value.type === 'masterList') {
+      payload = this.constructPayloadForList()
+      this.customFieldsService.createList(payload).subscribe((res: any) => {
+        console.log(res)
+        if (res.result) {
+          this.matSnackBar.open('List is created successfully!')
+          this.closeForm.emit(true)
+        }
+      }, error => {
+        this.matSnackBar.open(error.error.params.err)
+        console.log(error.error.params.err)
+      })
     }
-    this.customFieldsService.createField(payload).subscribe((res: any) => {
-      console.log(res)
-      if (res.result) {
-        this.matSnackBar.open('Field is created successfully!')
-        this.closeForm.emit(true)
+
+  }
+
+  constructPayloadForList() {
+    let customFieldData: any = []
+    this.customForm.value.questions.map((question: any, index: number) => {
+      if (index !== 0) {
+        customFieldData.push({
+          name: question.name,
+          attributeName: question.attributeName,
+          level: index
+        })
       }
-    }, error => {
-      this.matSnackBar.open(error)
-      console.log(error)
     })
+    const formData: FormData = new FormData()
+    const metaTag: any = {
+      name: this.customForm.value.questions[0].name,
+      description: this.customForm.value.description,
+      type: this.customForm.value.type,
+      organisationId: this.rootOrgId,
+      attributeName: this.customForm.value.questions[0].attributeName,
+      isMandatory: this.customForm.value.questions[0].isMandatory,
+      isEnabled: this.customForm.value.questions[0].isEnabled,
+      customFieldData: customFieldData // This is already an array/object, no need to stringify
+    }
+    formData.append('metadata', JSON.stringify(metaTag))
+    if (this.fileSelected) {
+      formData.append('file', this.fileSelected)
+    }
+    return formData
   }
 
   onUpdate() {
@@ -230,19 +300,23 @@ export class CreateFormComponent implements OnInit {
       this.fileSelected = file
       if (this.fileService.validateXlFile(this.fileName)) {
         if (this.fileSelected) {
-          const formData: FormData = new FormData()
-          formData.append('data', this.fileSelected, this.fileName)
-          this.fileService.upload(this.fileName, formData)
-            .pipe(takeUntil(this.destroySubject$))
-            .subscribe((_res: any) => {
-              this.matSnackBar.open('File uploaded successfully!')
-              this.fileName = ''
-              this.fileSelected = ''
-            }, (_err: HttpErrorResponse) => {
-              if (!_err.ok) {
-                this.matSnackBar.open('Uploading CSV file failed due to some error, please try again later!')
-              }
-            })
+          const input = event.target as HTMLInputElement
+          if (input.files?.length) {
+            this.fileSelected = input.files[0]
+          }
+          this.matSnackBar.open('File uploaded successfully!')
+          console.log('File selected:', this.fileSelected)
+          // this.fileService.upload(this.fileName, formData)
+          //   .pipe(takeUntil(this.destroySubject$))
+          //   .subscribe((_res: any) => {
+          //     this.matSnackBar.open('File uploaded successfully!')
+          //     this.fileName = ''
+          //     this.fileSelected = ''
+          //   }, (_err: HttpErrorResponse) => {
+          //     if (!_err.ok) {
+          //       this.matSnackBar.open('Uploading CSV file failed due to some error, please try again later!')
+          //     }
+          //   })
         }
       } else {
         console.log('invalid file')
