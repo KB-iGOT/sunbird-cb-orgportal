@@ -6,7 +6,7 @@ import { DialogConfirmComponent } from './../dialog-confirm/dialog-confirm.compo
 import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog'
 import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar'
 import { SnackbarComponent } from '../snackbar/snackbar.component'
-import { ActivatedRoute, Router } from '@angular/router'
+import { ActivatedRoute } from '@angular/router'
 // import { LocalDataService } from '../../services/local-data.service'
 // import * as fileSaver from 'file-saver'
 export interface IUserElement {
@@ -17,7 +17,9 @@ export interface IUserElement {
   ministry: string
   mobile: any
 }
-
+export interface WorkflowEntry {
+  [key: string]: string
+}
 @Component({
   selector: 'ws-app-user-request-bulk-upload',
   templateUrl: './user-request-bulk-upload.component.html',
@@ -39,8 +41,12 @@ export class UserRequestBulkUploadComponent implements OnInit {
   selectedFile: any
   @Output() successUserData = new EventEmitter<any>()
   @Input() batchData: any
+  @Input() programData: any
   collectionId: any
   userProfile: any
+  bulkRequestResponseDataSource: any[] = []
+  displayedColumnsForBulkRequestResponse: any[] = []
+
   constructor(
     private activeRouter: ActivatedRoute,
     private contentSvc: ContentBatchService,
@@ -52,9 +58,10 @@ export class UserRequestBulkUploadComponent implements OnInit {
     if (this.activeRouter.parent && this.activeRouter.parent.snapshot.data.configService) {
       this.userProfile = this.activeRouter.parent.snapshot.data.configService.unMappedUser
     }
+    console.log('programData', this.programData)
     this.successUserData.emit([])
-    if (this.batchData && this.batchData.collectionId) {
-      this.collectionId = this.batchData.collectionId
+    if (this.programData && this.programData.identifier) {
+      this.collectionId = this.programData.identifier
     }
     // this.getPendingRequests()
   }
@@ -281,7 +288,31 @@ export class UserRequestBulkUploadComponent implements OnInit {
       //   error: (err) => (this.uploadResponse = 'Upload failed'),
       // });
       this.contentSvc.approveRejectUser(formData, this.collectionId).toPromise().then(async (res: any) => {
-        if (res.result.response) {
+        if (res) {
+          console.log('res', res)
+          this.fileUploading = false
+          const lines = res.trim().split('\n')
+          const headerLine = lines[0]
+          const headers = headerLine.split(',')
+
+          this.displayedColumnsForBulkRequestResponse = headers.map((header: any) => this.cleanHeader(header))
+
+          const rows = lines.slice(1)
+
+          this.bulkRequestResponseDataSource = rows.map((row: any) => {
+            const values = this.parseCSVRow(row, headers.length)
+            const entry: WorkflowEntry = {}
+
+            headers.forEach((header: any, index: any) => {
+              entry[this.cleanHeader(header)] = values[index] || ''
+            })
+
+            return entry
+          })
+          // console.log('this.displayedColumnsForBulkRequestResponse', this.displayedColumnsForBulkRequestResponse)
+          // console.log('res', this.bulkRequestResponseDataSource)
+
+          this.successUserData.emit({ columns: this.displayedColumnsForBulkRequestResponse, dataSource: this.bulkRequestResponseDataSource })
           this.snackBar.openFromComponent(SnackbarComponent, {
             data: {
               message: 'Data Uploaded Successfully', type: 'success',
@@ -445,5 +476,43 @@ export class UserRequestBulkUploadComponent implements OnInit {
   }
   public downloadFile(): void {
     // this.fileService.download(this.downloadSampleFilePath, this.downloadAsFileName)
+  }
+
+  cleanHeader(header: string): string {
+    // Optionally remove characters like parentheses
+    return header.trim().replace(/[\(\)]/g, '')
+  }
+
+  parseCSVRow(row: string, expectedLength: number): string[] {
+    const result = []
+    let current = ''
+    let insideQuotes = false
+    // let valueCount = 0
+
+    for (let i = 0; i < row.length; i++) {
+      const char = row[i]
+
+      if (char === '"' && row[i + 1] === '"') {
+        current += '"'
+        i++ // skip next quote
+      } else if (char === '"') {
+        insideQuotes = !insideQuotes
+      } else if (char === ',' && !insideQuotes) {
+        result.push(current.trim())
+        current = ''
+        //valueCount++
+      } else {
+        current += char
+      }
+    }
+
+    result.push(current.trim())
+
+    // If row has more columns than expected (e.g., due to commas in error), merge the extras into the last column
+    while (result.length > expectedLength) {
+      result[expectedLength - 1] += ',' + result.pop()
+    }
+
+    return result
   }
 }

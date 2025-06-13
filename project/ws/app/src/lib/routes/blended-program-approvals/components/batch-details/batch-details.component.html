@@ -99,8 +99,37 @@
             </div>
           </ng-container>
           <ng-container *ngIf="contentForm?.value.enroleType === enroleTypeList[1]">
-            <ws-app-user-request-bulk-upload [batchData]="batchData"
+            <ws-app-user-request-bulk-upload [batchData]="batchData" [programData]="programData"
               (successUserData)="selectedUsersData($event)"></ws-app-user-request-bulk-upload>
+
+            <div class="my-5" *ngIf="bulkRequestResponseDataSource?.length">
+              <!-- <mat-card> -->
+              <div class="heading flex flex-row"><b>Bulk Upload Request Status</b></div>
+              <div class="flex flex-row my-5">
+                <mat-table [dataSource]="bulkRequestResponseDataSource">
+
+                  <ng-container *ngFor="let column of displayedColumnsForBulkRequestResponse" [matColumnDef]="column">
+                    <mat-header-cell class="header-font" *matHeaderCellDef>{{ column | titlecase
+                      }}</mat-header-cell>
+                    <mat-cell *matCellDef="let row" class="break-word">
+                      <span *ngIf="row[column] === 'Not updated'"
+                        [ngClass]="column === 'statusupdated/Not updated' ? 'not-updated-error': ''">{{ row[column]
+                        }}</span>
+                      <span *ngIf="!(row[column] === 'Not updated')"
+                        [ngClass]="column === 'statusupdated/Not updated' ? 'success-status': ''">{{ row[column]
+                        }}</span>
+                    </mat-cell>
+                  </ng-container>
+
+                  <mat-header-row class="header-details"
+                    *matHeaderRowDef="displayedColumnsForBulkRequestResponse"></mat-header-row>
+                  <mat-row class="row-details"
+                    *matRowDef="let row; columns: displayedColumnsForBulkRequestResponse;"></mat-row>
+
+                </mat-table>
+              </div>
+              <!-- </mat-card> -->
+            </div>
           </ng-container>
         </ng-container>
         <ng-container *ngIf="currentFilter === 'pending' && showUserDetails">
