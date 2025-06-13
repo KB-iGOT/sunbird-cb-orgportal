@@ -72,8 +72,9 @@
       <div class="flex justify-end mt-5 gap-4">
         <ng-container>
           <button mat-button class="text-white ws-mat-primary-background round mat-raised-button mat-button-base"
-            [disabled]="customForm.invalid || validateForm()" (click)="customFieldId ? onUpdate() : onSave()">
-            {{customFieldId ? 'Update' : 'Save'}}
+            [disabled]="customForm.invalid || validateForm()"
+            (click)="customFieldObject?.customFieldId ? onUpdate() : onSave()">
+            {{customFieldObject?.customFieldId ? 'Update' : 'Save'}}
           </button>
         </ng-container>
       </div>

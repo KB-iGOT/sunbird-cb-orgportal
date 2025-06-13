@@ -112,6 +112,10 @@
   border: 1px solid #1b4ca1;
 }
 
+.w-min {
+  min-width: 100px;
+}
+
 ::ng-deep .filedTextbox .mat-form-field-wrapper {
   padding-bottom: 0.5rem!important;
 }

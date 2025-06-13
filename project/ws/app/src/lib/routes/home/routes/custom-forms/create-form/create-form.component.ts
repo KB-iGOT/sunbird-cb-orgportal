@@ -65,8 +65,8 @@ export class CreateFormComponent implements OnInit {
       questions: this.formBuilder.array([]),
       type: [''],
     })
-    if (this.customFieldId) {
-      this.addContent('text')
+    if (this.customFieldObject) {
+      this.addContent(this.customFieldObject.type)
     }
   }
 
@@ -91,7 +91,31 @@ export class CreateFormComponent implements OnInit {
 
   addMasterListQuestion(type: string) {
     this.customForm.controls['type'].setValue(type)
-    this.appendListQuestion()
+    if (this.customFieldObject) {
+      this.customFieldsService.readCustomField(this.customFieldObject.customFieldId).subscribe((res: any) => {
+        if (res.result) {
+          this.customForm.controls['description'].setValue(res.result.description)
+          this.customForm.controls['type'].setValue(res.result.type)
+          this.appendListWithData(res)
+        } else {
+          this.appendListQuestion()
+        }
+      })
+    } else {
+      this.appendListQuestion()
+    }
+
+  }
+
+  appendListWithData(res: any) {
+    const questionGroup = this.formBuilder.group({
+      name: [res.result.name, [Validators.required, this.forbiddenCharacterValidator, preventHtmlAndJs()]],
+      attributeName: [res.result.attributeName, [Validators.required]],
+      isMandatory: [res.result.isMandatory],
+      isEnabled: [res.result.isEnabled]
+    })
+    this.getQuestions.push(questionGroup)
+    this.constructNestedQuestions(res.result.customFieldData)
   }
 
   appendListQuestion() {
@@ -120,10 +144,10 @@ export class CreateFormComponent implements OnInit {
 
   addQuestion(type: string) {
     this.customForm.controls['type'].setValue(type)
-    if (this.customFieldId) {
-      this.customFieldsService.readCustomField(this.customFieldId).subscribe((res: any) => {
+    if (this.customFieldObject) {
+      this.customFieldsService.readCustomField(this.customFieldObject.customFieldId).subscribe((res: any) => {
         if (res.result) {
-          this.customForm.controls['description'].setValue(res.result.name)
+          this.customForm.controls['description'].setValue(res.result.description)
           this.customForm.controls['type'].setValue(res.result.type)
           this.appendQuestionWithData(res)
         } else {
@@ -217,7 +241,7 @@ export class CreateFormComponent implements OnInit {
       }
     })
     const formData: FormData = new FormData()
-    const metaTag: any = {
+    let metaTag: any = {
       name: this.customForm.value.questions[0].name,
       description: this.customForm.value.description,
       type: this.customForm.value.type,
@@ -226,6 +250,9 @@ export class CreateFormComponent implements OnInit {
       isMandatory: this.customForm.value.questions[0].isMandatory,
       isEnabled: this.customForm.value.questions[0].isEnabled,
       customFieldData: customFieldData // This is already an array/object, no need to stringify
+    }
+    if (this.customFieldObject && this.customFieldObject.customFieldId) {
+      metaTag['customFieldId'] = this.customFieldObject.customFieldId
     }
     formData.append('metadata', JSON.stringify(metaTag))
     if (this.fileSelected) {
@@ -238,7 +265,7 @@ export class CreateFormComponent implements OnInit {
     let payload: any
     if (this.customForm.value.type === 'text') {
       payload = this.constructPayload()
-      this.customFieldsService.updateCustomField(this.customFieldId, payload).subscribe((res: any) => {
+      this.customFieldsService.updateCustomField(this.customFieldObject.customFieldId, payload).subscribe((res: any) => {
         console.log(res)
         if (res.result) {
           this.matSnackBar.open('Field is updated successfully!')
@@ -247,6 +274,18 @@ export class CreateFormComponent implements OnInit {
       }, error => {
         this.matSnackBar.open(error)
         console.log(error)
+      })
+    } else if (this.customForm.value.type === 'masterList') {
+      payload = this.constructPayloadForList()
+      this.customFieldsService.updateList(payload).subscribe((res: any) => {
+        console.log(res)
+        if (res.result) {
+          this.matSnackBar.open('List is updated successfully!')
+          this.closeForm.emit(true)
+        }
+      }, error => {
+        this.matSnackBar.open(error.error.params.err)
+        console.log(error.error.params.err)
       })
     }
   }
@@ -306,22 +345,66 @@ export class CreateFormComponent implements OnInit {
           }
           this.matSnackBar.open('File uploaded successfully!')
           console.log('File selected:', this.fileSelected)
-          // this.fileService.upload(this.fileName, formData)
-          //   .pipe(takeUntil(this.destroySubject$))
-          //   .subscribe((_res: any) => {
-          //     this.matSnackBar.open('File uploaded successfully!')
-          //     this.fileName = ''
-          //     this.fileSelected = ''
-          //   }, (_err: HttpErrorResponse) => {
-          //     if (!_err.ok) {
-          //       this.matSnackBar.open('Uploading CSV file failed due to some error, please try again later!')
-          //     }
-          //   })
         }
       } else {
         console.log('invalid file')
       }
     }
+  }
+
+  /**
+   * Constructs unique question groups from hierarchical field data with dynamic levels
+   * @param fieldData Hierarchical field data containing states, zones, universities, etc.
+   */
+  constructNestedQuestions(fieldData: any[]): void {
+    // Don't clear existing questions - we'll add the first question in appendListWithData
+    // Extract the first question which should already be added
+    const firstQuestion = this.getQuestions.at(0)?.value
+
+    if (!fieldData || !Array.isArray(fieldData) || fieldData.length === 0) {
+      return
+    }
+
+    // Use a Map to store unique field definitions by attributeName
+    const uniqueFields = new Map<string, { name: string, attributeName: string }>()
+
+    // Recursive function to extract unique fields from the hierarchy
+    const processFields = (items: any[]): void => {
+      if (!items || !Array.isArray(items)) return
+
+      items.forEach(item => {
+        // Skip processing the root level field that's already added
+        if (firstQuestion && item.fieldAttribute === firstQuestion.attributeName) {
+          // Skip this field as it's already added
+        }
+        // Process this field if it's unique by attributeName
+        else if (item.fieldName && item.fieldAttribute && !uniqueFields.has(item.fieldAttribute)) {
+          uniqueFields.set(item.fieldAttribute, {
+            name: item.fieldName,
+            attributeName: item.fieldAttribute
+          })
+        }
+
+        // Recursively process child fields if any
+        if (item.fieldValues && Array.isArray(item.fieldValues) && item.fieldValues.length > 0) {
+          processFields(item.fieldValues)
+        }
+      })
+    }
+
+    // Start processing from the top level
+    processFields(fieldData)
+
+    // Add form groups for each unique field (excluding the first one already added)
+    uniqueFields.forEach((field) => {
+      const questionGroup = this.formBuilder.group({
+        name: [field.name, [Validators.required, this.forbiddenCharacterValidator, preventHtmlAndJs()]],
+        attributeName: [field.attributeName, [Validators.required]],
+        isMandatory: [false],
+        isEnabled: [false]
+      })
+      this.getQuestions.push(questionGroup)
+    })
   }
 
   ngOnDestroy(): void {

@@ -10,7 +10,7 @@
       <button mat-button class="createFormBtn" (click)="redirectToNewForm()">Create new custom field</button>
     </div>
     <div class="create-new p-5 mb-5" *ngIf="showCreateForm">
-      <ws-app-create-form [customFieldId]="customFieldId" (closeForm)="closeForm($event)"></ws-app-create-form>
+      <ws-app-create-form [customFieldObject]="customFieldObject" (closeForm)="closeForm($event)"></ws-app-create-form>
     </div>
     <mat-card-content>
       <div class="custom-fields-table flex flex-column gap-4">

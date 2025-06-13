@@ -35,7 +35,7 @@ export class FormsListComponent implements OnInit, AfterViewInit {
   selectedOptionsMap: { [key: string]: any[] } = {}
   @ViewChild(MatPaginator) paginator!: MatPaginator
   @ViewChild(MatSort) sort!: MatSort
-  customFieldId: any = ''
+  customFieldObject: any = ''
 
   constructor(private customFieldsService: CustomFieldsService,
     private activeRoute: ActivatedRoute, private matSnackBar: MatSnackBar, private matDialog: MatDialog
@@ -168,11 +168,11 @@ export class FormsListComponent implements OnInit, AfterViewInit {
 
   redirectToNewForm() {
     this.showCreateForm = true
-    this.customFieldId = ''
+    this.customFieldObject = ''
   }
   closeForm(event: any) {
     if (event) {
-      this.customFieldId = ''
+      this.customFieldObject = ''
       this.loadData()
       this.showCreateForm = false
     } else {
@@ -210,8 +210,8 @@ export class FormsListComponent implements OnInit, AfterViewInit {
     this.showCreateForm = false
     setTimeout(() => {
       this.showCreateForm = true
-      this.customFieldId = ''
-      this.customFieldId = rowData.customFieldId
+      this.customFieldObject = ''
+      this.customFieldObject = rowData
     }, 500)
   }
 
