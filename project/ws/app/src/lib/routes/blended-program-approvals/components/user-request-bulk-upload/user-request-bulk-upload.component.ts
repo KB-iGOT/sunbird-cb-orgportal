@@ -6,6 +6,7 @@ import { DialogConfirmComponent } from './../dialog-confirm/dialog-confirm.compo
 import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog'
 import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar'
 import { SnackbarComponent } from '../snackbar/snackbar.component'
+import { ActivatedRoute, Router } from '@angular/router'
 // import { LocalDataService } from '../../services/local-data.service'
 // import * as fileSaver from 'file-saver'
 export interface IUserElement {
@@ -38,27 +39,36 @@ export class UserRequestBulkUploadComponent implements OnInit {
   selectedFile: any
   @Output() successUserData = new EventEmitter<any>()
   @Input() batchData: any
+  collectionId: any
+  userProfile: any
   constructor(
+    private activeRouter: ActivatedRoute,
     private contentSvc: ContentBatchService,
     private dialog: MatDialog,
     private snackBar: MatSnackBar,
   ) { }
 
   ngOnInit() {
+    if (this.activeRouter.parent && this.activeRouter.parent.snapshot.data.configService) {
+      this.userProfile = this.activeRouter.parent.snapshot.data.configService.unMappedUser
+    }
     this.successUserData.emit([])
-
+    if (this.batchData && this.batchData.collectionId) {
+      this.collectionId = this.batchData.collectionId
+    }
     // this.getPendingRequests()
   }
 
   getPendingRequests() {
-    console.log('this.dataService', this.batchData)
+    // console.log('this.dataService', this.batchData)
     // if (this.dataService.currentBatch.value && this.dataService.currentBatch.value.batchId) {
     //   this.batchData = this.dataService.currentBatch.value
 
     const request = {
       serviceName: 'blendedprogram',
-      applicationStatus: 'SEND_FOR_PC_APPROVAL',
-      applicationIds: [this.batchData.batchId]
+      applicationStatus: 'SEND_FOR_MDO_APPROVAL',
+      applicationIds: [this.batchData.batchId],
+      deptName: this.userProfile?.channel
     }
 
     //       const csvContent = `
@@ -270,7 +280,7 @@ export class UserRequestBulkUploadComponent implements OnInit {
       //   next: (res) => (this.uploadResponse = 'Upload successful'),
       //   error: (err) => (this.uploadResponse = 'Upload failed'),
       // });
-      this.contentSvc.approveRejectUser(formData).toPromise().then(async (res: any) => {
+      this.contentSvc.approveRejectUser(formData, this.collectionId).toPromise().then(async (res: any) => {
         if (res.result.response) {
           this.snackBar.openFromComponent(SnackbarComponent, {
             data: {
@@ -313,7 +323,7 @@ export class UserRequestBulkUploadComponent implements OnInit {
         ...request.request.filters, phone: userData,
       }
     }
-    return this.contentSvc.approveRejectUser(request).toPromise().then(async (res: any) => {
+    return this.contentSvc.approveRejectUser(request, this.collectionId).toPromise().then(async (res: any) => {
       if (res.result.response) {
         return await res.result.response
       }
