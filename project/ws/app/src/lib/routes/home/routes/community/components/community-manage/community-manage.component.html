@@ -1,5 +1,19 @@
 <div class="dashboard-container">
-  <div class="header">
+  <div class="flex gap-2 items-center">
+    <mat-icon class="back-arrow cursor-pointer" (click)="navigateBack()">arrow_back</mat-icon>
+    <span class="event-text mat-body-2">MDO Portal</span>
+    <mat-icon class="chevron-arrow">chevron_right</mat-icon>
+    <span class="event-builder-text mat-body-2">Community Manage</span>
+
+  </div>
+  <mat-divider class="margin-top-m margin-bottom-s"></mat-divider>
+  <div class="header mt-4">
+    <!-- <div class="flex margin-left-xl">
+      <ws-widget-breadcrumbs-org
+        [widgetData]="{titles:[{title:'Communities', url:'app/home/community'},{title:'Manage Community',url:'none'}] }">
+      </ws-widget-breadcrumbs-org>
+    </div> -->
+
     <p class="mat-subheading-1">Reports</p>
   </div>
 
@@ -9,8 +23,8 @@
     <mat-icon matSuffix>search</mat-icon>
   </mat-form-field> -->
   <mat-tab-group (selectedTabChange)="onTabChange($event)">
-    <mat-tab *ngFor="let tab of tabs">
-      <ng-template mat-tab-label>
+    <mat-tab *ngFor="let tab of tabs" class="filter-tab">
+      <ng-template mat-tab-label class="filter-tab-label">
         {{tab?.label}} <span *ngIf="tab?.label === 'Pending'" class="ml-2">({{allDisussionObjCount}})</span>
         <span *ngIf="tab?.label === 'Hidden'" class="ml-2">({{hiddenDisussionObjCount}})</span>
       </ng-template>
@@ -36,7 +50,7 @@
           <!-- get all discussions -->
           <div *ngIf="activeFilter === 'all'">
             <div *ngIf="allDisussionObj && allDisussionObj.length > 0">
-              <div class="community-card mt-4 flex flex-1 flex-col" *ngFor="let item of allDisussionObj">
+              <div class="community-card mt-4 flex flex-1 flex-col" *ngFor="let item of allDisussionObj | slice:0:visibleCardCount">
                 <div class="card-header  flex flex-1 flex-col">
                   <div class="user-info-box flex flex-1 flex-row justify-between">
                     <div class="user-info-inner flex flex-1">
@@ -263,6 +277,10 @@
                         class="mr-2 color-orange">visibility_off</mat-icon>Keep it Hidden</a>
                   </div>
                 </div>
+              </div>
+
+              <div class="text-center mt-4" *ngIf="allDisussionObj.length > visibleCardCount">
+                <button class="btn btn-outline-primary" (click)="showMoreCards()">View More</button>
               </div>
             </div>
 

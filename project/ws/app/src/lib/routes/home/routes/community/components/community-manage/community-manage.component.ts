@@ -1,6 +1,6 @@
 import { Component } from '@angular/core'
 import { MatLegacyDialog } from '@angular/material/legacy-dialog'
-import { ActivatedRoute } from '@angular/router'
+import { ActivatedRoute, Router } from '@angular/router'
 import { CommunityService } from '../../services/community.service'
 import { ReportIssueComponent } from '../report-issue/report-issue.component'
 import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar'
@@ -40,12 +40,15 @@ export class CommunityManageComponent {
   getReplyItemsCount: number = 0
   activeFilter: string = 'all'
   totalDiscussionsCount: number = 0
+  widgetData: any
+  visibleCardCount = 5
 
 
   constructor(private dialog: MatLegacyDialog,
     private communitySvc: CommunityService,
     private actvRoute: ActivatedRoute,
     private snackbar: MatSnackBar,
+    private router: Router,
   ) {
     this.actvRoute?.params?.subscribe((params: any) => {
       if (params) {
@@ -82,6 +85,10 @@ export class CommunityManageComponent {
     this.selectedTabIndex = event.index
     this.currentStatus = this.tabs[event.index].status
     this.pageNumber = 0 // Reset to first page on tab change
+  }
+
+  showMoreCards() {
+    this.visibleCardCount += 5
   }
 
   openReportDialog(discussionId: any): void {
@@ -177,6 +184,10 @@ export class CommunityManageComponent {
     test = test.replace(/\s+/g, ' ')
     test = test.trim()
     return test.length
+  }
+
+  navigateBack() {
+    this.router.navigate([`/app/home/community`])
   }
 
 
