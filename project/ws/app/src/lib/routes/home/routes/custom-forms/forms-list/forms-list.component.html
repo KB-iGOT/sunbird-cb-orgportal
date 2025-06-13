@@ -6,8 +6,8 @@
 <div class="flex flex-4 flex-column mt-5">
   <mat-card>
     <div class="flex justify-between">
-      <span class="mobile-margin mat-h2">Custom Profile</span>
-      <button mat-button class="createFormBtn" (click)="redirectToNewForm()">Create Custom Profile Form</button>
+      <span class="mobile-margin mat-h2">Custom Fields</span>
+      <button mat-button class="createFormBtn" (click)="redirectToNewForm()">Create new custom field</button>
     </div>
     <div class="create-new p-5 mb-5" *ngIf="showCreateForm">
       <ws-app-create-form [customFieldId]="customFieldId" (closeForm)="closeForm($event)"></ws-app-create-form>
@@ -23,18 +23,23 @@
                 <span class="h-400-r-14-l color-87 textclass" *ngIf="col.key === 'createdOn'">
                   {{element[col.key] | date: 'dd/MM/yyyy, hh:mm a'}}
                 </span>
-                <span class="h-400-r-14-l color-87 textclass" *ngIf="col.key !== 'status' && col.key !== 'createdOn'">
+                <span class="h-400-r-14-l color-87 textclass"
+                  *ngIf="col.key !== 'isEnabled' && col.key !== 'createdOn'">
                   {{element[col.key]}}
                 </span>
-                <span class="h-400-r-14-l color-87 textclass" *ngIf="col.key === 'status'">
+                <span class="h-400-r-14-l color-87 textclass" *ngIf="col.key === 'isEnabled'">
                   <mat-slide-toggle class="example-margin" [checked]="element[col.key]"
                     (change)="onToggleChange($event, element)"></mat-slide-toggle>
                 </span>
                 <span class="h-400-r-14-l color-87 textclass w-full" *ngIf="col.key === 'preview'">
-                  <div *ngIf="element.status">
+                  <div *ngIf="element.isEnabled">
                     <div class="filedTextbox py-2 w-full" *ngIf="element?.type === 'text'">
+                      <label>
+                        <div class="flex flex-middle pb-1">
+                          <span i18n class="margin-remove flex">{{element?.fieldName}}</span>
+                        </div>
+                      </label>
                       <mat-form-field appearance="outline" class="w-full">
-                        <mat-label>{{ element?.fieldName}}</mat-label>
                         <input type="text" class="input-text" matInput [placeholder]="element.fieldName"
                           [name]="element.attributeName" [pattern]="element.validation"
                           [required]="element.isMandatory" />
@@ -92,8 +97,12 @@
 
 <ng-template #dropdownRecursive let-options let-level="level" let-rowKey="rowKey">
   <ng-container *ngIf="getSelectedOptionsRef(rowKey) as selectedOptions">
+    <label>
+      <div class="flex flex-middle pb-1">
+        <span i18n class="margin-remove flex">{{ options[0]?.fieldName || 'Select' }}</span>
+      </div>
+    </label>
     <mat-form-field appearance="outline" class="w-full" *ngIf="options?.length">
-      <mat-label>{{ options[0]?.fieldName || 'Select' }}</mat-label>
       <mat-select [(ngModel)]="selectedOptions[level]" (selectionChange)="onDropdownChange(level, rowKey)">
         <mat-option [value]="null">Select</mat-option>
         <mat-option *ngFor="let opt of options" [value]="opt">{{ opt.fieldValue }}</mat-option>
@@ -108,8 +117,12 @@
 
     <!-- Show second level dropdown when first is not selected -->
     <ng-container *ngIf="level === 0 && !selectedOptions[0] && options[0]?.fieldValues?.length">
+      <label>
+        <div class="flex flex-middle pb-1">
+          <span i18n class="margin-remove flex">{{ options[0]?.fieldValues[0]?.fieldName || 'Select' }}</span>
+        </div>
+      </label>
       <mat-form-field appearance="outline" class="w-full">
-        <mat-label>{{ options[0]?.fieldValues[0]?.fieldName || 'Select' }}</mat-label>
         <mat-select [disabled]="!selectedOptions[0]">
           <mat-option [value]="null">Please select {{ options[0]?.fieldName }} first</mat-option>
         </mat-select>
@@ -117,8 +130,13 @@
 
       <!-- Show third level dropdown when second is not selected -->
       <ng-container *ngIf="options[0]?.fieldValues[0]?.fieldValues?.length">
+        <label>
+          <div class="flex flex-middle pb-1">
+            <span i18n class="margin-remove flex">{{ options[0]?.fieldValues[0]?.fieldValues[0]?.fieldName || 'Select'
+              }}</span>
+          </div>
+        </label>
         <mat-form-field appearance="outline" class="w-full">
-          <mat-label>{{ options[0]?.fieldValues[0]?.fieldValues[0]?.fieldName || 'Select' }}</mat-label>
           <mat-select [disabled]="!selectedOptions[0]">
             <mat-option [value]="null">Please select parent options first</mat-option>
           </mat-select>
@@ -128,8 +146,12 @@
 
     <!-- Show third level when second is selected but third is not -->
     <ng-container *ngIf="level === 1 && !selectedOptions[1] && options[0]?.fieldValues?.length">
+      <label>
+        <div class="flex flex-middle pb-1">
+          <span i18n class="margin-remove flex">{{ options[0]?.fieldValues[0]?.fieldName || 'Select' }}</span>
+        </div>
+      </label>
       <mat-form-field appearance="outline" class="w-full">
-        <mat-label>{{ options[0]?.fieldValues[0]?.fieldName || 'Select' }}</mat-label>
         <mat-select [disabled]="!selectedOptions[1]">
           <mat-option [value]="null">Please select parent option first</mat-option>
         </mat-select>

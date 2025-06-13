@@ -9,7 +9,8 @@ const API_ENDPOINTS = {
   LIST_CUSTOM_FIELDS: `/apis/proxies/v8/customFields/v1/search`,
   DELETE: `/apis/proxies/v8/customFields/v1/delete`,
   READ: `/apis/proxies/v8/customFields/v1/read`,
-  UPDATE: `/apis/proxies/v8/customFields/v1/update`
+  UPDATE: `/apis/proxies/v8/customFields/v1/update`,
+  UPDATE_STATUS: `/apis/proxies/v8/customFields/v1/status/update`
 
 }
 
@@ -39,5 +40,10 @@ export class CustomFieldsService {
 
   updateCustomField(id: string, payload: object): Observable<any> {
     return this.http.put<any>(`${API_ENDPOINTS.UPDATE}/${id}`, payload)
+  }
+
+  updateCustomFieldStatus(payload: any): Observable<any> {
+    return this.http.post<any>(`${API_ENDPOINTS.UPDATE_STATUS}`, payload)
+
   }
 }

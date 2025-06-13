@@ -52,7 +52,7 @@ export class FormsListComponent implements OnInit, AfterViewInit {
         { displayName: 'Field Attribute', key: 'fieldAttribute' },
         { displayName: 'Created on', key: 'createdOn' },
         { displayName: 'Mandatory', key: 'isMandatory' },
-        { displayName: 'Status', key: 'status' },
+        { displayName: 'Enabled', key: 'isEnabled' },
         { displayName: 'Actions', key: 'actions' },
         { displayName: 'Preview', key: 'preview' },
 
@@ -77,7 +77,7 @@ export class FormsListComponent implements OnInit, AfterViewInit {
       pageNumber: this.pageNumber,
       pageSize: this.pageSize,
       orderDirection: "DESC",
-      orderBy: 'updatedOn',
+      orderBy: 'createdOn',
       facets: []
     }
     this.data = []
@@ -94,7 +94,7 @@ export class FormsListComponent implements OnInit, AfterViewInit {
             object: element,
             customFieldId: element.customFieldId,
             customFieldData: element.customFieldData,
-            status: element.isActive,
+            isEnabled: element.isEnabled,
             validation: element.validation,
             type: element.type,
             // hiracchy: element.type === 'master' ? this.discoverLevels(element.customFieldData, 0, levelMap) : '',
@@ -131,12 +131,19 @@ export class FormsListComponent implements OnInit, AfterViewInit {
     }
   }
 
-  onToggleChange(event: any, col: any) {
-    if (event.checked) {
-      console.log('checked', event, col)
-    } else {
-      console.log('unchecked')
+  onToggleChange(event: any, element: any) {
+    let payload = {
+      customFieldId: element.customFieldId,
+      isEnabled: event.checked,
     }
+    this.customFieldsService.updateCustomFieldStatus(payload).subscribe((res: any) => {
+      if (res.result && res.result.customFieldId === element.customFieldId) {
+        this.loadData()
+        this.matSnackBar.open(`Field status ${event.checked ? 'activated' : 'deactivated'} successfully!`)
+      } else {
+        console.log('Error while updating custom field status')
+      }
+    })
   }
 
   getFinalColumns() {
