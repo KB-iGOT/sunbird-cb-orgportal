@@ -58,7 +58,6 @@ export class UserRequestBulkUploadComponent implements OnInit {
     if (this.activeRouter.parent && this.activeRouter.parent.snapshot.data.configService) {
       this.userProfile = this.activeRouter.parent.snapshot.data.configService.unMappedUser
     }
-    console.log('programData', this.programData)
     this.successUserData.emit([])
     if (this.programData && this.programData.identifier) {
       this.collectionId = this.programData.identifier
@@ -289,7 +288,6 @@ export class UserRequestBulkUploadComponent implements OnInit {
       // });
       this.contentSvc.approveRejectUser(formData, this.collectionId).toPromise().then(async (res: any) => {
         if (res) {
-          console.log('res', res)
           this.fileUploading = false
           const lines = res.trim().split('\n')
           const headerLine = lines[0]
