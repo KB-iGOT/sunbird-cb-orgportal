@@ -95,65 +95,16 @@
   </ng-template>
 </mat-menu>
 
+<!-- Template for displaying dynamic dropdowns with filtering -->
 <ng-template #dropdownRecursive let-options let-level="level" let-rowKey="rowKey">
   <ng-container *ngIf="getSelectedOptionsRef(rowKey) as selectedOptions">
-    <label>
-      <div class="flex flex-middle pb-1">
-        <span i18n class="margin-remove flex">{{ options[0]?.fieldName || 'Select' }}</span>
-      </div>
-    </label>
-    <mat-form-field appearance="outline" class="w-full" *ngIf="options?.length">
-      <mat-select [(ngModel)]="selectedOptions[level]" (selectionChange)="onDropdownChange(level, rowKey)">
-        <mat-option [value]="null">Select</mat-option>
-        <mat-option *ngFor="let opt of options" [value]="opt">{{ opt.fieldValue }}</mat-option>
-      </mat-select>
-    </mat-form-field>
-
-    <!-- Show next level if current level is selected and has children -->
-    <ng-container *ngIf="selectedOptions[level]?.fieldValues?.length">
-      <ng-container
-        *ngTemplateOutlet="dropdownRecursive; context: { $implicit: selectedOptions[level].fieldValues, level: level + 1, rowKey: rowKey }"></ng-container>
-    </ng-container>
-
-    <!-- Show second level dropdown when first is not selected -->
-    <ng-container *ngIf="level === 0 && !selectedOptions[0] && options[0]?.fieldValues?.length">
-      <label>
-        <div class="flex flex-middle pb-1">
-          <span i18n class="margin-remove flex">{{ options[0]?.fieldValues[0]?.fieldName || 'Select' }}</span>
-        </div>
-      </label>
+    <!-- Render a dropdown for each level in the hierarchy -->
+    <ng-container *ngFor="let fieldType of dropdownLevels[rowKey] || []; let i = index">
       <mat-form-field appearance="outline" class="w-full">
-        <mat-select [disabled]="!selectedOptions[0]">
-          <mat-option [value]="null">Please select {{ options[0]?.fieldName }} first</mat-option>
-        </mat-select>
-      </mat-form-field>
-
-      <!-- Show third level dropdown when second is not selected -->
-      <ng-container *ngIf="options[0]?.fieldValues[0]?.fieldValues?.length">
-        <label>
-          <div class="flex flex-middle pb-1">
-            <span i18n class="margin-remove flex">{{ options[0]?.fieldValues[0]?.fieldValues[0]?.fieldName || 'Select'
-              }}</span>
-          </div>
-        </label>
-        <mat-form-field appearance="outline" class="w-full">
-          <mat-select [disabled]="!selectedOptions[0]">
-            <mat-option [value]="null">Please select parent options first</mat-option>
-          </mat-select>
-        </mat-form-field>
-      </ng-container>
-    </ng-container>
-
-    <!-- Show third level when second is selected but third is not -->
-    <ng-container *ngIf="level === 1 && !selectedOptions[1] && options[0]?.fieldValues?.length">
-      <label>
-        <div class="flex flex-middle pb-1">
-          <span i18n class="margin-remove flex">{{ options[0]?.fieldValues[0]?.fieldName || 'Select' }}</span>
-        </div>
-      </label>
-      <mat-form-field appearance="outline" class="w-full">
-        <mat-select [disabled]="!selectedOptions[1]">
-          <mat-option [value]="null">Please select parent option first</mat-option>
+        <mat-label>{{ fieldType | titlecase }}</mat-label>
+        <mat-select [(ngModel)]="selectedOptions[i]" (selectionChange)="onDropdownChange(i, rowKey, $event.value)">
+          <mat-option [value]="null">Select {{ fieldType | titlecase }}</mat-option>
+          <mat-option *ngFor="let opt of getFilteredOptions(rowKey, i)" [value]="opt">{{ opt }}</mat-option>
         </mat-select>
       </mat-form-field>
     </ng-container>

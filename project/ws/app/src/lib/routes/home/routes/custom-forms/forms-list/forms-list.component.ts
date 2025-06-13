@@ -33,6 +33,9 @@ export class FormsListComponent implements OnInit, AfterViewInit {
   isLoading = false
   selectedOptions: any[] = []
   selectedOptionsMap: { [key: string]: any[] } = {}
+  dynamicDropdownMap: { [rowKey: string]: any } = {}
+  dropdownRelations: { [rowKey: string]: any } = {}
+  dropdownLevels: { [rowKey: string]: string[] } = {}
   @ViewChild(MatPaginator) paginator!: MatPaginator
   @ViewChild(MatSort) sort!: MatSort
   customFieldObject: any = ''
@@ -236,10 +239,151 @@ export class FormsListComponent implements OnInit, AfterViewInit {
     return this.selectedOptionsMap[rowKey]
   }
 
-  onDropdownChange(level: number, rowKey: string) {
-    debugger
-    const arr = this.getSelectedOptions(rowKey)
-    this.selectedOptionsMap[rowKey] = arr.slice(0, level + 1)
+  /**
+   * Handle dropdown selection changes with both bottom-up and top-down cascade
+   * @param level Level of dropdown that changed
+   * @param rowKey Row identifier
+   * @param value Selected value
+   */
+  onDropdownChange(level: number, rowKey: string, value: any = null) {
+    const selections = this.getSelectedOptions(rowKey)
+    const fieldTypes = this.dropdownLevels[rowKey] || []
+
+    // Update the current selection
+    selections[level] = value
+
+    if (value === null) {
+      // If clearing a selection, clear child selections to avoid invalid state
+      for (let i = level + 1; i < fieldTypes.length; i++) {
+        selections[i] = null
+      }
+    } else {
+      // When a value is selected, populate parent dropdowns (bottom-up)
+      this.populateParentFields(rowKey, level, value, selections)
+
+      // Also populate child dropdowns (top-down)
+      this.populateChildFields(rowKey, level, value, selections)
+    }
+
+    // Update the selections
+    this.selectedOptionsMap[rowKey] = selections
+  }
+
+  /**
+   * Enhanced method to populate parent fields based on a selected child value (bottom-up)
+   * @param rowKey Row identifier
+   * @param level Current level
+   * @param value Selected value
+   * @param selections Current selections array
+   */
+  populateParentFields(rowKey: string, level: number, value: any, selections: any[]) {
+    const fieldTypes = this.dropdownLevels[rowKey] || []
+    const currentFieldType = fieldTypes[level]
+
+    if (!currentFieldType || !this.dropdownRelations[rowKey]?.childToParent[currentFieldType]) {
+      return
+    }
+
+    // Get parent relationships for this value
+    const parentRelations = this.dropdownRelations[rowKey].childToParent[currentFieldType][value] || {}
+
+    // Update parent selections
+    Object.keys(parentRelations).forEach(parentType => {
+      const parentValue = parentRelations[parentType]
+      const parentIndex = fieldTypes.findIndex(type => type === parentType)
+
+      if (parentIndex !== -1) {
+        // Set the parent value regardless of level order
+        // This ensures bottom-up works correctly
+        selections[parentIndex] = parentValue
+
+        // Recursively populate grandparents
+        this.populateParentFields(rowKey, parentIndex, parentValue, selections)
+      }
+    })
+  }
+
+  /**
+   * New method to populate child fields based on a selected parent value (top-down)
+   * @param rowKey Row identifier
+   * @param level Current level
+   * @param value Selected value
+   * @param selections Current selections array
+   */
+  populateChildFields(rowKey: string, level: number, value: any, selections: any[]) {
+    const fieldTypes = this.dropdownLevels[rowKey] || []
+    const currentFieldType = fieldTypes[level]
+
+    if (!currentFieldType ||
+      !this.dropdownRelations[rowKey]?.parentToChildren[currentFieldType] ||
+      !this.dropdownRelations[rowKey]?.parentToChildren[currentFieldType][value]) {
+      return
+    }
+
+    // Get child relationships for this value
+    const childRelations = this.dropdownRelations[rowKey].parentToChildren[currentFieldType][value]
+
+    // For each child field type that could be populated
+    Object.keys(childRelations).forEach(childType => {
+      const childIndex = fieldTypes.findIndex(type => type === childType)
+
+      // Skip if we can't find this child type in our levels array
+      if (childIndex === -1) return
+
+      // If this child level already has a valid selection that's consistent with the parent,
+      // then we don't need to change it - this preserves user selections where possible
+      const currentChildValue = selections[childIndex]
+      if (currentChildValue &&
+        childRelations[childType].includes(currentChildValue)) {
+        return
+      }
+
+      // Otherwise, select the first available child option
+      const childOptions = childRelations[childType]
+      if (childOptions && childOptions.length > 0) {
+        selections[childIndex] = childOptions[0]
+
+        // Recursively populate grandchildren
+        this.populateChildFields(rowKey, childIndex, childOptions[0], selections)
+      }
+    })
+  }
+
+  /**
+   * Gets filtered options for a dropdown based on parent selections
+   * @param rowKey Row identifier
+   * @param level Dropdown level
+   */
+  getFilteredOptions(rowKey: string, level: number): string[] {
+    const fieldTypes = this.dropdownLevels[rowKey] || []
+    if (level < 0 || level >= fieldTypes.length) {
+      return []
+    }
+
+    const fieldType = fieldTypes[level]
+    const selections = this.getSelectedOptions(rowKey)
+
+    if (!fieldType || !this.dynamicDropdownMap[rowKey]?.[fieldType]) {
+      return []
+    }
+
+    // By default, return all options
+    let options = this.dynamicDropdownMap[rowKey][fieldType]
+
+    // Check if there are parent selections that should filter these options
+    for (let i = 0; i < level; i++) {
+      const parentType = fieldTypes[i]
+      const parentValue = selections[i]
+
+      if (parentValue &&
+        this.dropdownRelations[rowKey]?.parentToChildren[parentType]?.[parentValue]?.[fieldType]) {
+        // Filter to only children of the selected parent
+        options = this.dropdownRelations[rowKey].parentToChildren[parentType][parentValue][fieldType]
+        break // Most immediate parent takes precedence
+      }
+    }
+
+    return options
   }
 
   // Pre-select values for a specific row
@@ -259,6 +403,9 @@ export class FormsListComponent implements OnInit, AfterViewInit {
   initializeDropdowns() {
     // Clear any existing selections
     this.selectedOptionsMap = {}
+    this.dynamicDropdownMap = {}
+    this.dropdownRelations = {}
+    this.dropdownLevels = {}
 
     // Check if dataSource and its data exist
     if (!this.dataSource || !this.dataSource.data || this.dataSource.data.length === 0) {
@@ -277,8 +424,138 @@ export class FormsListComponent implements OnInit, AfterViewInit {
       // Initialize an empty array for this row
       this.selectedOptionsMap[rowKey] = []
 
-      // Add first-level options to make dropdowns visible but without selection
-      this.selectedOptionsMap[rowKey][0] = null
+      // Process the data for this row
+      this.processHierarchicalData(row.customFieldData, rowKey)
+
+      // Initialize selections for all levels with null
+      const levels = this.dropdownLevels[rowKey] || []
+      levels.forEach((_, index) => {
+        this.selectedOptionsMap[rowKey][index] = null
+      })
     })
+  }
+
+  /**
+   * Process hierarchical data to build dropdown structures
+   * @param data Hierarchical data to process
+   * @param rowKey Row identifier
+   */
+  processHierarchicalData(data: any[], rowKey: string) {
+    if (!data || !Array.isArray(data) || data.length === 0) return
+
+    // Map to store field types and their options
+    this.dynamicDropdownMap[rowKey] = {}
+
+    // Map to store relationships between fields
+    this.dropdownRelations[rowKey] = {
+      childToParent: {}, // Maps a child value to its parent value
+      parentToChildren: {} // Maps a parent value to its children values
+    }
+
+    // Set to track field types in order of hierarchy
+    const fieldTypes: Set<string> = new Set()
+
+    // Function to traverse the hierarchy
+    const traverseHierarchy = (
+      items: any[],
+      parentType: string | null = null,
+      parentValue: string | null = null,
+      path: string[] = []
+    ) => {
+      if (!items || items.length === 0) return
+
+      items.forEach(item => {
+        const fieldType = item.fieldAttribute
+        const fieldValue = item.fieldValue
+
+        // Add to field types if new
+        if (!fieldType) return
+        fieldTypes.add(fieldType)
+
+        // Initialize collection for this field type if needed
+        if (!this.dynamicDropdownMap[rowKey][fieldType]) {
+          this.dynamicDropdownMap[rowKey][fieldType] = new Set()
+        }
+
+        // Add value to the collection
+        this.dynamicDropdownMap[rowKey][fieldType].add(fieldValue)
+
+        // Store parent-child relationship if applicable
+        if (parentType && parentValue) {
+          // Child to parent mapping
+          if (!this.dropdownRelations[rowKey].childToParent[fieldType]) {
+            this.dropdownRelations[rowKey].childToParent[fieldType] = {}
+          }
+          if (!this.dropdownRelations[rowKey].childToParent[fieldType][fieldValue]) {
+            this.dropdownRelations[rowKey].childToParent[fieldType][fieldValue] = {}
+          }
+          this.dropdownRelations[rowKey].childToParent[fieldType][fieldValue][parentType] = parentValue
+
+          // Parent to children mapping
+          if (!this.dropdownRelations[rowKey].parentToChildren[parentType]) {
+            this.dropdownRelations[rowKey].parentToChildren[parentType] = {}
+          }
+          if (!this.dropdownRelations[rowKey].parentToChildren[parentType][parentValue]) {
+            this.dropdownRelations[rowKey].parentToChildren[parentType][parentValue] = {}
+          }
+          if (!this.dropdownRelations[rowKey].parentToChildren[parentType][parentValue][fieldType]) {
+            this.dropdownRelations[rowKey].parentToChildren[parentType][parentValue][fieldType] = new Set()
+          }
+          this.dropdownRelations[rowKey].parentToChildren[parentType][parentValue][fieldType].add(fieldValue)
+        }
+
+        // Continue traversing if there are child values
+        if (item.fieldValues && Array.isArray(item.fieldValues) && item.fieldValues.length > 0) {
+          traverseHierarchy(
+            item.fieldValues,
+            fieldType,
+            fieldValue,
+            [...path, fieldType]
+          )
+        }
+      })
+    }
+
+    // Start traversal
+    traverseHierarchy(data)
+
+    // Store field types in order
+    this.dropdownLevels[rowKey] = Array.from(fieldTypes)
+
+    // Convert Sets to Arrays
+    Object.keys(this.dynamicDropdownMap[rowKey]).forEach(fieldType => {
+      this.dynamicDropdownMap[rowKey][fieldType] =
+        Array.from(this.dynamicDropdownMap[rowKey][fieldType])
+    })
+
+    Object.keys(this.dropdownRelations[rowKey].parentToChildren).forEach(parentType => {
+      Object.keys(this.dropdownRelations[rowKey].parentToChildren[parentType]).forEach(parentValue => {
+        Object.keys(this.dropdownRelations[rowKey].parentToChildren[parentType][parentValue]).forEach(childType => {
+          this.dropdownRelations[rowKey].parentToChildren[parentType][parentValue][childType] =
+            Array.from(this.dropdownRelations[rowKey].parentToChildren[parentType][parentValue][childType])
+        })
+      })
+    })
+  }
+
+  /**
+   * Gets all available options for a dropdown (no filtering)
+   * @param rowKey Row identifier
+   * @param level Dropdown level
+   * @returns Array of all available options for the dropdown
+   */
+  getAllOptions(rowKey: string, level: number): string[] {
+    const fieldTypes = this.dropdownLevels[rowKey] || []
+    if (level < 0 || level >= fieldTypes.length) {
+      return []
+    }
+
+    const fieldType = fieldTypes[level]
+    if (!fieldType || !this.dynamicDropdownMap[rowKey]?.[fieldType]) {
+      return []
+    }
+
+    // Return all options for this field type without filtering
+    return this.dynamicDropdownMap[rowKey][fieldType]
   }
 }
