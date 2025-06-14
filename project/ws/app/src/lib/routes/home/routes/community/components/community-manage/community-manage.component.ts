@@ -19,6 +19,7 @@ export interface IDialogData {
   selector: 'ws-app-community-manage',
   templateUrl: './community-manage.component.html',
   styleUrls: ['./community-manage.component.scss'],
+  // changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CommunityManageComponent {
   selectedTabIndex = 0
@@ -27,6 +28,9 @@ export class CommunityManageComponent {
   allDisussionObj: any
   allDisussionObjCount: number = 0
   hiddenDisussionObj: any
+  // allDisussionObjCount: Observable<number>
+  // hiddenDisussionObj: any
+
   hiddenDisussionObjCount: number = 0
   getReportedIssuesObj: IDialogData[] = []
   viewMoreLength = 410
@@ -43,12 +47,16 @@ export class CommunityManageComponent {
   widgetData: any
   visibleCardCount = 5
 
+  // private reportedDiscussionSubject = new BehaviorSubject<any[]>([]);
+  // reportedDiscussion$ = this.reportedDiscussionSubject.asObservable();
+
 
   constructor(private dialog: MatLegacyDialog,
     private communitySvc: CommunityService,
     private actvRoute: ActivatedRoute,
     private snackbar: MatSnackBar,
     private router: Router,
+    // private cdRef: ChangeDetectorRef,
   ) {
     this.actvRoute?.params?.subscribe((params: any) => {
       if (params) {
@@ -212,7 +220,10 @@ export class CommunityManageComponent {
       if (res && res.result && res.result.search_results && res.result.search_results.data && res.result.search_results.data.length &&
         res.result.search_results.data.length > 0) {
         this.allDisussionObj = res.result.search_results.data
+        // this.allDisussionObj = [...res.result.search_results.data];
         this.allDisussionObjCount = res.result.search_results.totalCount
+        // this.reportedDiscussionSubject.next(res.result.search_results.data)
+        // this.cdRef.markForCheck();
       }
     })
   }
