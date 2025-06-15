@@ -1,9 +1,10 @@
-<div class="confirm-box">
-  <h1 mat-dialog-title class="mat-title">{{ data.title }}</h1>
-  <div mat-dialog-content class="mat-body-1" [innerHtml]="data.body">
+<div class="confirm-box text-center">
+  <mat-icon class="infoIcon orangeicon-dialog">error_outline</mat-icon>
+  <h1 mat-dialog-title class="mat-title" *ngIf="data.title">{{ data.title }}</h1>
+  <div mat-dialog-content class="mat-body-1 primary-text" [innerHtml]="data.body">
   </div>
-  <mat-divider class="margin-top-m margin-bottom-s"></mat-divider>
-  <div mat-dialog-actions class="flex-row-reverse"
+  <!-- <mat-divider class="margin-top-m margin-bottom-s"></mat-divider> -->
+  <div mat-dialog-actions class="flex items-center justify-center margin-top-s"
     *ngIf="data?.componentType && data?.componentType === 'manageCommunity'">
     <button *ngIf="data?.cancel !== 'hide'" mat-button [mat-dialog-close]
       class='secondary-button ws-mat-accent-border-active"'> {{data?.cancel}}</button>
@@ -13,7 +14,7 @@
       {{data.ok}}
     </button>
   </div>
-  <div mat-dialog-actions class="flex-row-reverse" *ngIf="!data?.componentType">
+  <div mat-dialog-actions class="flex items-center justify-center margin-top-s" *ngIf="!data?.componentType">
     <button *ngIf="data?.cancel !== 'hide'" mat-button [mat-dialog-close]> {{data?.cancel}}</button>
     <button *ngIf="data?.ok !== 'hide'"
       [ngClass]="{'ws-mat-accent-text ws-mat-accent-border-active margin-right-xs': true}" mat-flat-button

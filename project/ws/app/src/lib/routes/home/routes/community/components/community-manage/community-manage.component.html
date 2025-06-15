@@ -1,5 +1,19 @@
 <div class="dashboard-container">
-  <div class="header">
+  <div class="flex gap-2 items-center">
+    <mat-icon class="back-arrow cursor-pointer" (click)="navigateBack()">arrow_back</mat-icon>
+    <span class="event-text mat-body-2">MDO Portal</span>
+    <mat-icon class="chevron-arrow">chevron_right</mat-icon>
+    <span class="event-builder-text mat-body-2">Community Manage</span>
+
+  </div>
+  <!-- <mat-divider class="margin-top-m margin-bottom-s"></mat-divider> -->
+  <div class="header mt-4">
+    <!-- <div class="flex margin-left-xl">
+      <ws-widget-breadcrumbs-org
+        [widgetData]="{titles:[{title:'Communities', url:'app/home/community'},{title:'Manage Community',url:'none'}] }">
+      </ws-widget-breadcrumbs-org>
+    </div> -->
+
     <p class="mat-subheading-1">Reports</p>
   </div>
 
@@ -9,9 +23,9 @@
     <mat-icon matSuffix>search</mat-icon>
   </mat-form-field> -->
   <mat-tab-group (selectedTabChange)="onTabChange($event)">
-    <mat-tab *ngFor="let tab of tabs">
-      <ng-template mat-tab-label>
-        {{tab?.label}} <span *ngIf="tab?.label === 'Pending'" class="ml-2">({{allDisussionObjCount}})</span>
+    <mat-tab *ngFor="let tab of tabs" class="filter-tab">
+      <ng-template mat-tab-label class="filter-tab-label">
+        {{tab?.label}} <span *ngIf="tab?.label === 'Pending'" class="ml-2">({{allDisussionObjCount }})</span>
         <span *ngIf="tab?.label === 'Hidden'" class="ml-2">({{hiddenDisussionObjCount}})</span>
       </ng-template>
 
@@ -35,8 +49,9 @@
 
           <!-- get all discussions -->
           <div *ngIf="activeFilter === 'all'">
-            <div *ngIf="allDisussionObj && allDisussionObj.length > 0">
-              <div class="community-card mt-4 flex flex-1 flex-col" *ngFor="let item of allDisussionObj">
+            <div *ngIf="allDisussionObj && allDisussionObj.length > 0" class="community-card-main">
+              <div class="community-card mt-4 flex flex-1 flex-col"
+                *ngFor="let item of allDisussionObj | slice:0:visibleCardCount">
                 <div class="card-header  flex flex-1 flex-col">
                   <div class="user-info-box flex flex-1 flex-row justify-between">
                     <div class="user-info-inner flex flex-1">
@@ -157,6 +172,9 @@
                   </div>
                 </div>
               </div>
+              <div class="text-center mt-4" *ngIf="allDisussionObj.length > visibleCardCount">
+                <button class="btn btn-outline-primary view-more-btn" (click)="showMoreCards()">Load More</button>
+              </div>
             </div>
 
             <div class="flex justify-center items-center h-full flex-wrap"
@@ -169,8 +187,9 @@
 
           <!-- get post items -->
           <div *ngIf="activeFilter === 'posts'">
-            <div *ngIf="getPostItems && getPostItems.length > 0">
-              <div class="community-card mt-4 flex flex-1 flex-col" *ngFor="let item of getPostItems">
+            <div *ngIf="getPostItems && getPostItems.length > 0" class="community-card-main">
+              <div class="community-card mt-4 flex flex-1 flex-col"
+                *ngFor="let item of getPostItems | slice:0:visibleCardCount">
                 <div class="card-header  flex flex-1 flex-col">
                   <div class="user-info-box flex flex-1 flex-row justify-between">
                     <div class="user-info-inner flex flex-1">
@@ -264,6 +283,10 @@
                   </div>
                 </div>
               </div>
+              <div class="text-center mt-4" *ngIf="getPostItems.length > visibleCardCount">
+                <button class="btn btn-outline-primary view-more-btn" (click)="showMoreCards()">Load More</button>
+              </div>
+
             </div>
 
             <div class="flex justify-center items-center h-full flex-wrap"
@@ -277,8 +300,9 @@
 
           <!-- get comments -->
           <div *ngIf="activeFilter === 'comments'">
-            <div *ngIf="getCommentItems && getCommentItems.length > 0">
-              <div class="community-card mt-4 flex flex-1 flex-col" *ngFor="let item of getCommentItems">
+            <div *ngIf="getCommentItems && getCommentItems.length > 0" class="community-card-main">
+              <div class="community-card mt-4 flex flex-1 flex-col"
+                *ngFor="let item of getCommentItems | slice:0:visibleCardCount">
                 <div class="card-header  flex flex-1 flex-col">
                   <div class="user-info-box flex flex-1 flex-row justify-between">
                     <div class="user-info-inner flex flex-1">
@@ -370,6 +394,9 @@
                         class="mr-2 color-orange">visibility_off</mat-icon>Keep it Hidden</a>
                   </div>
                 </div>
+              </div>
+              <div class="text-center mt-4" *ngIf="getCommentItems.length > visibleCardCount">
+                <button class="btn btn-outline-primary view-more-btn" (click)="showMoreCards()">Load More</button>
               </div>
             </div>
 
@@ -384,8 +411,9 @@
 
           <!-- get reply -->
           <div *ngIf="activeFilter === 'reply'">
-            <div *ngIf="getReplyItems && getReplyItems.length > 0">
-              <div class="community-card mt-4 flex flex-1 flex-col" *ngFor="let item of getReplyItems">
+            <div *ngIf="getReplyItems && getReplyItems.length > 0" class="community-card-main">
+              <div class="community-card mt-4 flex flex-1 flex-col"
+                *ngFor="let item of getReplyItems | slice:0:visibleCardCount">
                 <div class="card-header  flex flex-1 flex-col">
                   <div class="user-info-box flex flex-1 flex-row justify-between">
                     <div class="user-info-inner flex flex-1">
@@ -478,6 +506,9 @@
                   </div>
                 </div>
               </div>
+              <div class="text-center mt-4" *ngIf="getReplyItems.length > visibleCardCount">
+                <button class="btn btn-outline-primary view-more-btn" (click)="showMoreCards()">Load More</button>
+              </div>
             </div>
             <div class="flex justify-center items-center h-full flex-wrap"
               *ngIf="!getReplyItems || getReplyItems.length === 0">
@@ -491,8 +522,9 @@
       </ng-container>
 
       <ng-container *ngIf="tab.label === 'Hidden'">
-        <div *ngIf="hiddenDisussionObj && hiddenDisussionObj.length > 0">
-          <div class="community-card mt-4 flex flex-1 flex-col" *ngFor="let item of hiddenDisussionObj">
+        <div *ngIf="hiddenDisussionObj && hiddenDisussionObj.length > 0" class="community-card-main">
+          <div class="community-card mt-4 flex flex-1 flex-col"
+            *ngFor="let item of hiddenDisussionObj | slice:0:visibleCardCount">
             <div class="card-header  flex flex-1 flex-col">
               <div class="user-info-box flex flex-1 flex-row justify-between">
                 <div class="user-info-inner flex flex-1">
@@ -575,6 +607,9 @@
 
               </div>
             </div>
+          </div>
+          <div class="text-center mt-4" *ngIf="allDisussionObj.length > visibleCardCount">
+            <button class="btn btn-outline-primary view-more-btn" (click)="showMoreCards()">Load More</button>
           </div>
         </div>
         <div class="flex justify-center items-center h-full flex-wrap"

@@ -1,6 +1,6 @@
 import { Component } from '@angular/core'
 import { MatLegacyDialog } from '@angular/material/legacy-dialog'
-import { ActivatedRoute } from '@angular/router'
+import { ActivatedRoute, Router } from '@angular/router'
 import { CommunityService } from '../../services/community.service'
 import { ReportIssueComponent } from '../report-issue/report-issue.component'
 import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar'
@@ -19,6 +19,7 @@ export interface IDialogData {
   selector: 'ws-app-community-manage',
   templateUrl: './community-manage.component.html',
   styleUrls: ['./community-manage.component.scss'],
+  // changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CommunityManageComponent {
   selectedTabIndex = 0
@@ -27,6 +28,9 @@ export class CommunityManageComponent {
   allDisussionObj: any
   allDisussionObjCount: number = 0
   hiddenDisussionObj: any
+  // allDisussionObjCount: Observable<number>
+  // hiddenDisussionObj: any
+
   hiddenDisussionObjCount: number = 0
   getReportedIssuesObj: IDialogData[] = []
   viewMoreLength = 410
@@ -40,12 +44,19 @@ export class CommunityManageComponent {
   getReplyItemsCount: number = 0
   activeFilter: string = 'all'
   totalDiscussionsCount: number = 0
+  widgetData: any
+  visibleCardCount = 5
+
+  // private reportedDiscussionSubject = new BehaviorSubject<any[]>([]);
+  // reportedDiscussion$ = this.reportedDiscussionSubject.asObservable();
 
 
   constructor(private dialog: MatLegacyDialog,
     private communitySvc: CommunityService,
     private actvRoute: ActivatedRoute,
     private snackbar: MatSnackBar,
+    private router: Router,
+    // private cdRef: ChangeDetectorRef,
   ) {
     this.actvRoute?.params?.subscribe((params: any) => {
       if (params) {
@@ -82,6 +93,10 @@ export class CommunityManageComponent {
     this.selectedTabIndex = event.index
     this.currentStatus = this.tabs[event.index].status
     this.pageNumber = 0 // Reset to first page on tab change
+  }
+
+  showMoreCards() {
+    this.visibleCardCount += 5
   }
 
   openReportDialog(discussionId: any): void {
@@ -179,6 +194,10 @@ export class CommunityManageComponent {
     return test.length
   }
 
+  navigateBack() {
+    this.router.navigate([`/app/home/community`])
+  }
+
 
   //  GET ALL REPORTED ITEMS
   getReportedDiscussionItems() {
@@ -201,7 +220,10 @@ export class CommunityManageComponent {
       if (res && res.result && res.result.search_results && res.result.search_results.data && res.result.search_results.data.length &&
         res.result.search_results.data.length > 0) {
         this.allDisussionObj = res.result.search_results.data
+        // this.allDisussionObj = [...res.result.search_results.data];
         this.allDisussionObjCount = res.result.search_results.totalCount
+        // this.reportedDiscussionSubject.next(res.result.search_results.data)
+        // this.cdRef.markForCheck();
       }
     })
   }

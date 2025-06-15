@@ -65,12 +65,16 @@
 ::ng-deep .mat-tab-body-content {
   overflow: hidden !important;
 }
+.community-card-main {
+  width: 630px;
+}
 
 .community-card {
   padding: 24px;
   border: 1px solid rgba(0, 0, 0, 0.16);
   border-radius: 12px;
-  width: 612px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .user-image-box {
@@ -118,7 +122,7 @@
   padding: 8px 16px;
   text-align: center;
   font-size: 14px;
-  font-weight: 400;
+  font-weight: 600;
   line-height: 21px;
   font-family: Lato;
   letter-spacing: normal;
@@ -220,7 +224,7 @@
 }
 
 .small-text {
-  font-size: 12px !important;
+  // font-size: 12px !important;
   text-transform: capitalize!important;
 }
 
@@ -237,3 +241,42 @@
   -webkit-box-orient: vertical;
   word-break: break-word;
 }
+.filter-tab .filter-tab-label {
+  color: #1b4ca1!important;
+}
+
+.breadcrum .event-builder-text {
+    font: 700 14px Lato;
+    color: #1B4CA1;
+}
+.event-builder-text {
+   color: #1b4ca1!important;
+}
+.event-text {
+  color: #000;
+}
+.view-more-btn {
+    color: #1b4ca1 !important;
+    font-family: Lato;
+    font-size: 14px;
+    font-weight: 700;
+    text-align: center;
+    text-underline-position: from-font;
+    text-decoration-skip-ink: none;
+    border: 1px solid #1B4CA1;
+    border-radius: 24px;
+        width: 100%;
+            position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    min-width: 64px;
+    overflow: visible;
+    vertical-align: middle;
+    background: rgba(0, 0, 0, 0);
+    width: 100%;
+    padding: 8px 0;
+    cursor: pointer;
+}
+
