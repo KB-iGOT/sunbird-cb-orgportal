@@ -608,7 +608,7 @@
               </div>
             </div>
           </div>
-          <div class="text-center mt-4" *ngIf="allDisussionObj.length > visibleCardCount">
+          <div class="text-center mt-4" *ngIf="hiddenDisussionObj?.length > visibleCardCount">
             <button class="btn btn-outline-primary view-more-btn" (click)="showMoreCards()">Load More</button>
           </div>
         </div>

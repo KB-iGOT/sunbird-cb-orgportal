@@ -293,7 +293,7 @@ export class CommunityCreationComponent implements AfterViewInit {
         && this.communityDetailsForm.value.moderators.length) {
         currentFormIsValid = true
       } else {
-        this.openSnackBar('Please add atleast one speaker')
+        this.openSnackBar('Please add atleast one Moderator')
       }
     }
     return currentFormIsValid

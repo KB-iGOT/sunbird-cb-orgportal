@@ -62,6 +62,8 @@ export class BatchDetailsComponent implements OnInit {
   }
   userDetails: any
   contentForm!: FormGroup
+  bulkRequestResponseDataSource: any[] = []
+  displayedColumnsForBulkRequestResponse: any[] = []
   constructor(
     private router: Router,
     private activeRouter: ActivatedRoute,
@@ -653,6 +655,10 @@ export class BatchDetailsComponent implements OnInit {
   }
 
   selectedUsersData(event: any) {
-    console.log('event', event)
+    // console.log('event', event)
+    if (event && event.columns && event.columns.length && event.dataSource && event.dataSource.length) {
+      this.displayedColumnsForBulkRequestResponse = event.columns
+      this.bulkRequestResponseDataSource = event.dataSource
+    }
   }
 }

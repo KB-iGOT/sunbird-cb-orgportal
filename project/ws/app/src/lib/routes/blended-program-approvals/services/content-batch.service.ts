@@ -24,7 +24,7 @@ const API_END_POINTS = {
   DOWNLOAD_REPORT: `apis/proxies/v8/bp/v1/bpreport/download/`,
   CADRE_DETAILS: `apis/proxies/v8/data/v2/system/settings/get/cadreConfig`,
   CONTENT_READ: `${AUTH_API_SLUG}action/content/v3/hierarchy/`,
-  DOWNLOAD_PENDING_USERS_REQUEST_CSV: `${AUTH_API_SLUG}workflow/blendedprogram/getUserApprovalDataInCsv`,
+  DOWNLOAD_PENDING_USERS_REQUEST_CSV: `apis/proxies/v8/workflow/blendedprogram/getUserApprovalDataInCsv`,
 
   FETCH_USER_ENROLLMENT_LIST: (userId: string | undefined) =>
     // tslint:disable-next-line: max-line-length
@@ -224,8 +224,11 @@ export class ContentBatchService {
     })
   }
 
-  approveRejectUser(request: any): any {
+  approveRejectUser(request: any, collectionId: any): any {
     // return this.apiService.post<any>(`apis/proxies/v8/user/v1/search`, request).subscribe()
-    return this.http.post(`apis/proxies/v8/workflow/blendedprogram/bulkApprovalDataFromCsv/do_1142770124022251521212`, request)
+    return this.http.post(`apis/proxies/v8/workflow/blendedprogram/bulkApprovalDataFromCsv/${collectionId}`, request, {
+      responseType: 'text' as 'json',
+      withCredentials: true // If you need to include cookies like connect.sid
+    })
   }
 }

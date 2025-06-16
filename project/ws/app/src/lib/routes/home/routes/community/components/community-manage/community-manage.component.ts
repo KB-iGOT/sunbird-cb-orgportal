@@ -339,6 +339,11 @@ export class CommunityManageComponent {
     this.communitySvc.displayReportedPost(requestBody).subscribe((res: any) => {
       if (res) {
         this.snackbar.open('Post has been published on platform successfully!', 'Close', { duration: 3000 })
+        this.getReportedDiscussionItems()
+        this.getHiddenDiscussionItems()
+        this.getPostFilterItems()
+        this.getCommentFilterItems()
+        this.getReplyFilterItems()
         // tslint:disable-next-line
         console.log(res, 'response====')
         // return res
@@ -357,6 +362,11 @@ export class CommunityManageComponent {
     this.communitySvc.hideReportedPost(requestBody).subscribe((res: any) => {
       if (res) {
         this.snackbar.open('Post has been hidden from platform successfully!', 'Close', { duration: 3000 })
+        this.getReportedDiscussionItems()
+        this.getHiddenDiscussionItems()
+        this.getPostFilterItems()
+        this.getCommentFilterItems()
+        this.getReplyFilterItems()
         // tslint:disable-next-line
         console.log(res, 'response====')
       }
