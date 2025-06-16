@@ -3,7 +3,7 @@
     <mat-card-title class="flex-4 mobile-margin text-capitalize">
       <span class="mat-subheading-1">{{this.onBoardingConfig?.featureInformation?.title}}</span>
     </mat-card-title>
-    <div class="my-4">
+    <!-- <div class="my-4">
       <mat-accordion>
         <mat-expansion-panel (opened)="panelOpenState = true" (closed)="panelOpenState = false" hideToggle>
           <mat-expansion-panel-header>
@@ -17,7 +17,7 @@
           </mat-expansion-panel-header>
           <div class="flex gap-10 justify-between">
             <div class="section-1 mt-1">
-              <!-- <div class="flex-4 mobile-margin text-capitalize mat-h2">Note:</div> -->
+
               <ng-container *ngFor="let note of onboardingNoteList">
                 <div class="flex gap-4 mb-4">
                   <div>
@@ -38,7 +38,7 @@
           </div>
         </mat-expansion-panel>
       </mat-accordion>
-    </div>
+    </div> -->
     <mat-card-content>
       <div class="flex flex-1 flex-row margin-fix">
         <div class="flex flex-3 filter max-height-60 gap-3">

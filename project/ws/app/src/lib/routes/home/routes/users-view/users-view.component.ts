@@ -4,7 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router'
 /* tslint:disable */
 import * as _ from 'lodash'
 /* tslint:enable */
-// import { environment } from 'src/environments/environment'
+import { environment } from 'src/environments/environment'
 import { LegacyPageEvent as PageEvent } from '@angular/material/legacy-paginator'
 import { EventService } from '@sunbird-cb/utils'
 import { NsContent } from '@sunbird-cb/collection'
@@ -134,7 +134,7 @@ export class UsersViewComponent implements OnInit, OnDestroy {
   openVideoPopup() {
     this.dialog.open(ReportsVideoComponent, {
       data: {
-        videoLink: 'https://www.youtube.com/embed/tgbNymZ7vqY?autoplay=1&mute=1',
+        videoLink: `${environment?.karmYogiPath}/assets/public/content/guide-videos/MDO-User.mp4`,
       },
       disableClose: true,
       width: '50%',
