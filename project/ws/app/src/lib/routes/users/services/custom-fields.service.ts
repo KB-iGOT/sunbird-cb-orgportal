@@ -47,7 +47,7 @@ export class CustomFieldsService {
   }
 
   updateList(filter: object): Observable<any> {
-    return this.http.put<any>(`${API_ENDPOINTS.UPDATE_LIST}`, filter)
+    return this.http.post<any>(`${API_ENDPOINTS.UPDATE_LIST}`, filter)
   }
 
 }
