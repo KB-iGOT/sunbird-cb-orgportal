@@ -1,0 +1,138 @@
+@import 'ws-mixins';
+
+.create-form-overlay {
+  background-color: white;
+
+  .form-padding {
+    padding: 24px 0;
+  }
+
+  .mat-form-field-outline {
+    border-radius: 30px;
+  }
+
+  .form-title {
+    /* stylelint-disable */
+    font-family: Montserrat;
+    /* stylelint-enable */
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 19.5px;
+    text-align: left;
+    text-underline-position: from-font;
+    text-decoration-skip-ink: none;
+  }
+
+  .form-option {
+    border: 1px solid #d5d3d3;
+    border-radius: 8px;
+    width: 33%;
+  }
+
+  .form-option:hover {
+    background-color: #1b4ca1;
+    color: white;
+  }
+
+  .icons {
+    height: 48px;
+    width: 48px;
+    background-color: #EDF1F7;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+  }
+
+  .icon-title {
+    /* stylelint-disable */
+    font-family: Lato;
+    /* stylelint-enable */
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 16.8px;
+    text-align: left;
+    text-underline-position: from-font;
+    text-decoration-skip-ink: none;
+  }
+
+  .icon-sub-title {
+    /* stylelint-disable */
+    font-family: Lato;
+    /* stylelint-enable */
+    font-size: 10px;
+    font-weight: 400;
+    line-height: 12px;
+    text-align: left;
+    text-underline-position: from-font;
+    text-decoration-skip-ink: none;
+  }
+
+  .round-with-white-bg {
+    border-radius: 30px;
+    background-color: white;
+    border: 1px solid #1b4ca1;
+  }
+
+}
+
+.round {
+  border-radius: 30px;
+  color: white !important;
+}
+
+.round[disabled] {
+  opacity: 0.6;
+}
+
+.question-div {
+  padding: 16px;
+  border: 1px solid #d5d3d3;
+  border-radius: 8px;
+  background-color: #F6F8FB;
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+.round[disabled] {
+  opacity: 0.6;
+}
+
+.filedTextbox {
+  width: 100%;
+}
+
+.option-field {
+  width: 100%;
+}
+
+.ws-mat-white-background {
+  background-color: #FFF;
+  color: #1b4ca1!important;
+  border: 1px solid #1b4ca1;
+}
+
+.w-min {
+  min-width: 100px;
+}
+
+::ng-deep .filedTextbox .mat-form-field-wrapper {
+  padding-bottom: 0.5rem!important;
+}
+::ng-deep .filedTextbox .mat-form-field-appearance-outline .mat-form-field-infix {
+  padding: 0rem!important;
+}
+
+::ng-deep .profile-form-field {
+  .mat-form-field-suffix {
+    position: relative;
+    left: -16px;
+  }
+}
+
+::ng-deep .required-select .mat-form-field-subscript-wrapper {
+  margin-top: 20px;
+}
+.profile-form-field .mat-select {
+  background: #fff;
+}
