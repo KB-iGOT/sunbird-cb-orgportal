@@ -222,8 +222,9 @@ export class CommunityManageComponent {
         this.allDisussionObj = res.result.search_results.data
         // this.allDisussionObj = [...res.result.search_results.data];
         this.allDisussionObjCount = res.result.search_results.totalCount
-        // this.reportedDiscussionSubject.next(res.result.search_results.data)
-        // this.cdRef.markForCheck();
+      } else {
+        this.allDisussionObj = []
+        this.allDisussionObjCount = 0
       }
     })
   }
@@ -249,6 +250,9 @@ export class CommunityManageComponent {
         res.result.search_results.data.length && res.result.search_results.data.length > 0) {
         this.getPostItems = res.result.search_results.data
         this.getPostItemsCount = res.result.search_results.totalCount
+      } else {
+        this.getPostItems = []
+        this.getPostItemsCount = 0
       }
     })
   }
@@ -275,6 +279,9 @@ export class CommunityManageComponent {
         res.result.search_results.data.length && res.result.search_results.data.length > 0) {
         this.getCommentItems = res.result.search_results.data
         this.getCommentItemsCount = res.result.search_results.totalCount
+      } else {
+        this.getCommentItems = []
+        this.getCommentItemsCount = 0
       }
     })
 
@@ -302,6 +309,9 @@ export class CommunityManageComponent {
         res.result.search_results.data.length && res.result.search_results.data.length > 0) {
         this.getReplyItems = res.result.search_results.data
         this.getReplyItemsCount = res.result.search_results.totalCount
+      } else {
+        this.getReplyItems = []
+        this.getReplyItemsCount = 0
       }
     })
   }
@@ -327,6 +337,9 @@ export class CommunityManageComponent {
         && res.result.search_results.data.length > 0) {
         this.hiddenDisussionObj = res.result.search_results.data
         this.hiddenDisussionObjCount = res.result.search_results.totalCount
+      } else {
+        this.hiddenDisussionObj = []
+        this.hiddenDisussionObjCount = 0
       }
     })
   }
