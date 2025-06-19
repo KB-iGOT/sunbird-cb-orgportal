@@ -55,6 +55,21 @@
             </mat-select>
           </mat-form-field>
         </div>
+        <div class="filedTextbox" *ngIf="question?.controls['validation']">
+          <div class="flex gap-2 items-center justify-between">
+            <div class="filedTextbox">
+              <label>
+                <div class="flex flex-middle">
+                  <span i18n class="mat-subheading-2 margin-remove flex">Field Max Length</span>
+                </div>
+              </label>
+              <mat-form-field appearance="outline" class="w-full">
+                <input type="number" class="input-text" formControlName="attributeMaxLength" matInput
+                  placeholder="Type here" />
+              </mat-form-field>
+            </div>
+          </div>
+        </div>
       </div>
       <div class="flex gap-2 items-center justify-between" *ngIf="question.controls['validation']">
         <div class="filedTextbox" *ngIf="question.controls['validation'].value === 'regex'">

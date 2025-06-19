@@ -175,7 +175,8 @@ export class CreateFormComponent implements OnInit {
       validation: [validationType, [Validators.required]],
       customValidation: [validationType === 'regex' ? res.result.validation : ''],
       isMandatory: [res.result.isMandatory],
-      isEnabled: [res.result.isEnabled]
+      isEnabled: [res.result.isEnabled],
+      attributeMaxLength: [res.result.attributeMaxLength ? res.result.attributeMaxLength : '']
     })
     this.getQuestions.push(questionGroup)
   }
@@ -194,7 +195,8 @@ export class CreateFormComponent implements OnInit {
       validation: ['', [Validators.required]],
       customValidation: [''],
       isMandatory: [false],
-      isEnabled: [false]
+      isEnabled: [false],
+      attributeMaxLength: ['']
     })
     this.getQuestions.push(questionGroup)
   }
@@ -291,7 +293,7 @@ export class CreateFormComponent implements OnInit {
   }
 
   constructPayload() {
-    return {
+    let obj: any = {
       name: this.customForm.value.questions[0].name,
       description: this.customForm.value.description,
       type: this.customForm.value.type,
@@ -299,8 +301,12 @@ export class CreateFormComponent implements OnInit {
       attributeName: this.customForm.value.questions[0].attributeName,
       validation: this.customForm.value.questions[0].validation === 'regex' ? this.customForm.value.questions[0].customValidation : this.customForm.value.questions[0].validation,
       isMandatory: this.customForm.value.questions[0].isMandatory,
-      isEnabled: this.customForm.value.questions[0].isEnabled
+      isEnabled: this.customForm.value.questions[0].isEnabled,
     }
+    if (this.customForm.value.questions[0].attributeMaxLength && this.customForm.value.questions[0].attributeMaxLength > 0) {
+      obj['attributeMaxLength'] = this.customForm.value.questions[0].attributeMaxLength
+    }
+    return obj
   }
 
   removeItem(index: number) {

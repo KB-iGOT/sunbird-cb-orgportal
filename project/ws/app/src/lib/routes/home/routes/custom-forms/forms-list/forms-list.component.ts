@@ -39,6 +39,7 @@ export class FormsListComponent implements OnInit, AfterViewInit {
   @ViewChild(MatPaginator) paginator!: MatPaginator
   @ViewChild(MatSort) sort!: MatSort
   customFieldObject: any = ''
+  enabled: boolean = false
 
   constructor(private customFieldsService: CustomFieldsService,
     private activeRoute: ActivatedRoute, private matSnackBar: MatSnackBar, private matDialog: MatDialog
@@ -557,5 +558,10 @@ export class FormsListComponent implements OnInit, AfterViewInit {
 
     // Return all options for this field type without filtering
     return this.dynamicDropdownMap[rowKey][fieldType]
+  }
+
+  onToggle(event: any) {
+    this.enabled = event.checked
+    console.log('Toggle event:', this.enabled)
   }
 }
