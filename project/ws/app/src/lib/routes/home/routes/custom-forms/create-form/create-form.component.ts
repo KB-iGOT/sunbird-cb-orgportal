@@ -33,8 +33,8 @@ export class CreateFormComponent implements OnInit {
 
   fieldValidationTypes = [
     { key: 'Numbers only', value: "^[0-9]+$" },
-    { key: 'Text only', value: "^[A-Za-z]+$" },
-    { key: 'Alphanumeric', value: "^[A-Za-z0-9]+$" },
+    { key: 'Text only', value: "^[A-Za-z\s]+$" },
+    { key: 'Alphanumeric', value: "^[A-Za-z0-9\s]+$" },
     { key: 'Email', value: "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$" },
     { key: 'Phone number', value: "^[6-9]\d{9}$" },
     { key: 'Regex', value: "regex" }
@@ -158,7 +158,11 @@ export class CreateFormComponent implements OnInit {
       if (type === 'text') {
         this.appendQuestion()
       } else if (type === 'masterList') {
-        this.addMasterListQuestion(type)
+        if (this.getQuestions.length > 5) {
+          this.matSnackBar.open('Maximum 5 questions can be added')
+        } else {
+          this.addMasterListQuestion(type)
+        }
       }
     }
   }
