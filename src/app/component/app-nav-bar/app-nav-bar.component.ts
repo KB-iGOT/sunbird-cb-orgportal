@@ -103,12 +103,12 @@ export class AppNavBarComponent implements OnInit, OnChanges, OnDestroy {
       }
     })
     if (this.configSvc.unMappedUser && this.configSvc.unMappedUser.identifier) {
-      this.getMyCount()
+      //this.getMyCount()
     }
 
     this.myNotificationsSubscription = this.libNotificationsService._unreadCount.subscribe((res: boolean) => {
       if (res === true) {
-        this.getMyCount()
+        //this.getMyCount()
       }
     })
   }

@@ -1,6 +1,6 @@
 import { Component } from '@angular/core'
 import { MatLegacyDialog } from '@angular/material/legacy-dialog'
-import { ActivatedRoute } from '@angular/router'
+import { ActivatedRoute, Router } from '@angular/router'
 import { CommunityService } from '../../services/community.service'
 import { ReportIssueComponent } from '../report-issue/report-issue.component'
 import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar'
@@ -19,6 +19,7 @@ export interface IDialogData {
   selector: 'ws-app-community-manage',
   templateUrl: './community-manage.component.html',
   styleUrls: ['./community-manage.component.scss'],
+  // changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CommunityManageComponent {
   selectedTabIndex = 0
@@ -27,6 +28,9 @@ export class CommunityManageComponent {
   allDisussionObj: any
   allDisussionObjCount: number = 0
   hiddenDisussionObj: any
+  // allDisussionObjCount: Observable<number>
+  // hiddenDisussionObj: any
+
   hiddenDisussionObjCount: number = 0
   getReportedIssuesObj: IDialogData[] = []
   viewMoreLength = 410
@@ -40,12 +44,19 @@ export class CommunityManageComponent {
   getReplyItemsCount: number = 0
   activeFilter: string = 'all'
   totalDiscussionsCount: number = 0
+  widgetData: any
+  visibleCardCount = 5
+
+  // private reportedDiscussionSubject = new BehaviorSubject<any[]>([]);
+  // reportedDiscussion$ = this.reportedDiscussionSubject.asObservable();
 
 
   constructor(private dialog: MatLegacyDialog,
     private communitySvc: CommunityService,
     private actvRoute: ActivatedRoute,
     private snackbar: MatSnackBar,
+    private router: Router,
+    // private cdRef: ChangeDetectorRef,
   ) {
     this.actvRoute?.params?.subscribe((params: any) => {
       if (params) {
@@ -82,6 +93,10 @@ export class CommunityManageComponent {
     this.selectedTabIndex = event.index
     this.currentStatus = this.tabs[event.index].status
     this.pageNumber = 0 // Reset to first page on tab change
+  }
+
+  showMoreCards() {
+    this.visibleCardCount += 5
   }
 
   openReportDialog(discussionId: any): void {
@@ -179,6 +194,10 @@ export class CommunityManageComponent {
     return test.length
   }
 
+  navigateBack() {
+    this.router.navigate([`/app/home/community`])
+  }
+
 
   //  GET ALL REPORTED ITEMS
   getReportedDiscussionItems() {
@@ -201,7 +220,11 @@ export class CommunityManageComponent {
       if (res && res.result && res.result.search_results && res.result.search_results.data && res.result.search_results.data.length &&
         res.result.search_results.data.length > 0) {
         this.allDisussionObj = res.result.search_results.data
+        // this.allDisussionObj = [...res.result.search_results.data];
         this.allDisussionObjCount = res.result.search_results.totalCount
+      } else {
+        this.allDisussionObj = []
+        this.allDisussionObjCount = 0
       }
     })
   }
@@ -227,6 +250,9 @@ export class CommunityManageComponent {
         res.result.search_results.data.length && res.result.search_results.data.length > 0) {
         this.getPostItems = res.result.search_results.data
         this.getPostItemsCount = res.result.search_results.totalCount
+      } else {
+        this.getPostItems = []
+        this.getPostItemsCount = 0
       }
     })
   }
@@ -253,6 +279,9 @@ export class CommunityManageComponent {
         res.result.search_results.data.length && res.result.search_results.data.length > 0) {
         this.getCommentItems = res.result.search_results.data
         this.getCommentItemsCount = res.result.search_results.totalCount
+      } else {
+        this.getCommentItems = []
+        this.getCommentItemsCount = 0
       }
     })
 
@@ -280,6 +309,9 @@ export class CommunityManageComponent {
         res.result.search_results.data.length && res.result.search_results.data.length > 0) {
         this.getReplyItems = res.result.search_results.data
         this.getReplyItemsCount = res.result.search_results.totalCount
+      } else {
+        this.getReplyItems = []
+        this.getReplyItemsCount = 0
       }
     })
   }
@@ -305,6 +337,9 @@ export class CommunityManageComponent {
         && res.result.search_results.data.length > 0) {
         this.hiddenDisussionObj = res.result.search_results.data
         this.hiddenDisussionObjCount = res.result.search_results.totalCount
+      } else {
+        this.hiddenDisussionObj = []
+        this.hiddenDisussionObjCount = 0
       }
     })
   }
@@ -317,6 +352,11 @@ export class CommunityManageComponent {
     this.communitySvc.displayReportedPost(requestBody).subscribe((res: any) => {
       if (res) {
         this.snackbar.open('Post has been published on platform successfully!', 'Close', { duration: 3000 })
+        this.getReportedDiscussionItems()
+        this.getHiddenDiscussionItems()
+        this.getPostFilterItems()
+        this.getCommentFilterItems()
+        this.getReplyFilterItems()
         // tslint:disable-next-line
         console.log(res, 'response====')
         // return res
@@ -335,6 +375,11 @@ export class CommunityManageComponent {
     this.communitySvc.hideReportedPost(requestBody).subscribe((res: any) => {
       if (res) {
         this.snackbar.open('Post has been hidden from platform successfully!', 'Close', { duration: 3000 })
+        this.getReportedDiscussionItems()
+        this.getHiddenDiscussionItems()
+        this.getPostFilterItems()
+        this.getCommentFilterItems()
+        this.getReplyFilterItems()
         // tslint:disable-next-line
         console.log(res, 'response====')
       }
