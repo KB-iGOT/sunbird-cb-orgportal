@@ -272,7 +272,8 @@
               alt="No Report Generated">
             <span class="block mat-subheading-2 mt-3">No Nominate Learner</span>
           </div> -->
-          <ws-app-content-nominate-learner></ws-app-content-nominate-learner>
+          <ws-app-content-nominate-learner [batchData]="batchData"
+            [programID]="programID"></ws-app-content-nominate-learner>
         </ng-container>
       </ng-container>
     </mat-card-content>

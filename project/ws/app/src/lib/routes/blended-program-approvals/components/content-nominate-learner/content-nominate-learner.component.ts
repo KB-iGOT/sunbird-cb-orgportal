@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core'
+import { Component, Input, OnInit } from '@angular/core'
 import { FormGroup, FormControl, Validators } from '@angular/forms'
 import { IEnroleType2 } from '../../enums/enrolment-type'
 import { ActivatedRoute, Router } from '@angular/router'
@@ -16,6 +16,8 @@ import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack
 export class ContentNominateLearnerComponent implements OnInit {
   contentForm!: FormGroup
   batchId: any
+  @Input() batchData: any
+  @Input() programID: any
   enroleTypeList = Object.values(IEnroleType2)
   public contentId: string | null = null
   public content!: NSContent.IContentMeta
@@ -81,8 +83,8 @@ export class ContentNominateLearnerComponent implements OnInit {
     })
     const request = {
       request: {
-        batchId: this.batchId,
-        programId: this.contentId,
+        batchId: this.batchData?.batchId,
+        programId: this.programID,
         userIdList: userId,
       },
     }

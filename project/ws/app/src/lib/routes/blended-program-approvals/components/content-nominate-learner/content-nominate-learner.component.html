@@ -18,10 +18,8 @@
           (successUserData)="selectedUsersData($event)" [contentMeta]="content"></ws-app-select-learners-to-batch>
       </ng-container>  -->
     </div>
-    <div class="my-5 submit-btn"> <button
-        *ngIf="contentForm?.value.enroleType === enroleTypeList[1] || contentForm?.value.enroleType === enroleTypeList[0]"
-        type="submit" [disabled]="!contentForm?.controls?.selectedUsers?.value?.length" mat-flat-button
-        (click)="onSubmit()"
+    <div class="my-5 submit-btn"> <button type="submit"
+        [disabled]="!contentForm?.controls?.selectedUsers?.value?.length" mat-flat-button (click)="onSubmit()"
         class="flex items-center rounded-full px-4 py-2 new-bg-color font-bold text-sm text-white add-batch-btn"> Submit
       </button> </div>
   </ng-container></div>
