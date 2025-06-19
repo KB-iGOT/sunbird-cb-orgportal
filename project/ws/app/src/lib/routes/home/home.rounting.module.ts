@@ -335,6 +335,10 @@ const routes: Routes = [
         },
       },
       {
+        path: 'custom-fields',
+        loadChildren: () => import('./routes/custom-forms/custom-forms.module').then(m => m.CustomFormsModule),
+      },
+      {
         path: 'events',
         loadChildren: () => import('./routes/events-2/events-2.module').then(m => m.Events2Module),
       },

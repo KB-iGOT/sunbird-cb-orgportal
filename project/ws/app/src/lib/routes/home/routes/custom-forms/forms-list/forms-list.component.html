@@ -1,0 +1,118 @@
+<ng-container>
+  <div class="flex items-center mx-auto fixed-spinner" *ngIf="isLoading">
+    <mat-spinner [diameter]="30" [strokeWidth]="3"></mat-spinner>
+  </div>
+</ng-container>
+<div class="flex flex-4 flex-column mt-5">
+  <mat-card>
+    <div class="flex justify-between">
+      <span class="mobile-margin mat-h2">Custom Fields</span>
+      <button mat-button class="createFormBtn" (click)="redirectToNewForm()">Create new custom field</button>
+    </div>
+    <div class="flex flex justify-end my-5">
+      <div class="fieldOptions flex items-center gap-4 pr-2 font-bold toggle-background">
+        <mat-slide-toggle class="example-margin" [checked]="enabled" (change)="onToggle($event)">
+          Show popup in the learner portal</mat-slide-toggle>
+      </div>
+    </div>
+    <div class="create-new p-5 mb-5" *ngIf="showCreateForm">
+      <ws-app-create-form [customFieldObject]="customFieldObject" (closeForm)="closeForm($event)"></ws-app-create-form>
+    </div>
+    <mat-card-content>
+      <div class="custom-fields-table flex flex-column gap-4">
+        <div class="table-container">
+          <mat-table #table mat-table matSort class="mt-2" [dataSource]=" dataSource">
+            <ng-container matColumnDef="{{col.key}}" *ngFor="let col of tableData!.columns">
+              <mat-header-cell *matHeaderCellDef mat-sort-header class=".h-400-r-14-l color-60"> {{col.displayName}}
+              </mat-header-cell>
+              <mat-cell *matCellDef="let element">
+                <span class="h-400-r-14-l color-87 textclass" *ngIf="col.key === 'createdOn'">
+                  {{element[col.key] | date: 'dd/MM/yyyy, hh:mm a'}}
+                </span>
+                <span class="h-400-r-14-l color-87 textclass"
+                  *ngIf="col.key !== 'isEnabled' && col.key !== 'createdOn'">
+                  {{element[col.key]}}
+                </span>
+                <span class="h-400-r-14-l color-87 textclass" *ngIf="col.key === 'isEnabled'">
+                  <mat-slide-toggle class="example-margin" [checked]="element[col.key]"
+                    (change)="onToggleChange($event, element)"></mat-slide-toggle>
+                </span>
+                <span class="h-400-r-14-l color-87 textclass w-full" *ngIf="col.key === 'preview'">
+                  <div *ngIf="element.isEnabled">
+                    <div class="filedTextbox py-2 w-full" *ngIf="element?.type === 'text'">
+                      <label>
+                        <div class="flex flex-middle pb-1">
+                          <span i18n class="margin-remove flex">{{element?.fieldName}}</span>
+                        </div>
+                      </label>
+                      <mat-form-field appearance="outline" class="w-full">
+                        <input type="text" class="input-text" matInput [placeholder]="element.fieldName"
+                          [name]="element.attributeName" [pattern]="element.validation"
+                          [required]="element.isMandatory" />
+                        <mat-error *ngIf="element.validation.invalid && element.validation.touched">
+                          Only numbers are allowed
+                        </mat-error>
+                      </mat-form-field>
+                    </div>
+                    <div class="filedSelect py-2" *ngIf="element?.type === 'masterList'">
+                      <ng-container *ngIf="element?.customFieldData">
+                        <ng-container
+                          *ngTemplateOutlet="dropdownRecursive; context: { $implicit: element.customFieldData, level: 0, rowKey: element.rowIndex }"></ng-container>
+                      </ng-container>
+                    </div>
+                  </div>
+                </span>
+                <span class="h-400-r-14-l color-87 textclass" *ngIf="col.key === 'actions'">
+                  <button type="button" mat-icon-button="" aria-label="action items" [matMenuTriggerFor]="cardMenu"
+                    class="mat-focus-indicator mat-menu-trigger action-btn mat-icon-button mat-button-base"
+                    [matMenuTriggerData]="{'data':element}" aria-haspopup="menu" aria-expanded="false"><span
+                      class="mat-button-wrapper"><mat-icon _ngcontent-ng-c279954062="" role="img"
+                        class="mat-icon notranslate material-icons mat-ligature-font mat-icon-no-color"
+                        aria-hidden="true" data-mat-icon-type="font">more_horiz</mat-icon></span><span matripple=""
+                      class="mat-ripple mat-button-ripple mat-button-ripple-round" ng-reflect-disabled="false"
+                      ng-reflect-centered="true"></span><span class="mat-button-focus-overlay"></span></button>
+                </span>
+              </mat-cell>
+            </ng-container>
+            <mat-header-row *matHeaderRowDef="getFinalColumns()"></mat-header-row>
+            <mat-row *matRowDef="let row; let rowIndex = index; columns: getFinalColumns();"
+              [attr.data-row-index]="rowIndex" [attr.data-row-index]="rowIndex">
+            </mat-row>
+          </mat-table>
+        </div>
+        <mat-paginator [length]="length" #paginator [pageSize]="pageSize" [pageSizeOptions]="pageSizeOptions"
+          [pageIndex]="pageNumber" (page)="onPageChange($event)">
+        </mat-paginator>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>
+
+<mat-menu #cardMenu="matMenu">
+  <ng-template matMenuContent let-rowData="data">
+    <button (click)="editHandler(rowData)" mat-menu-item name="channel-analytics-button" class="ws-mat-primary-text"
+      aria-label="Analytics">
+      <mat-icon class="margin-right-xs">create</mat-icon><span>Edit</span>
+    </button>
+    <button (click)="deleteHandler(rowData)" mat-menu-item name="channel-analytics-button" class="ws-mat-primary-text"
+      aria-label="Analytics">
+      <mat-icon class="margin-right-xs">delete</mat-icon><span>Delete</span>
+    </button>
+  </ng-template>
+</mat-menu>
+
+<!-- Template for displaying dynamic dropdowns with filtering -->
+<ng-template #dropdownRecursive let-options let-level="level" let-rowKey="rowKey">
+  <ng-container *ngIf="getSelectedOptionsRef(rowKey) as selectedOptions">
+    <!-- Render a dropdown for each level in the hierarchy -->
+    <ng-container *ngFor="let fieldType of dropdownLevels[rowKey] || []; let i = index">
+      <mat-form-field appearance="outline" class="w-full">
+        <mat-label>{{ fieldType | titlecase }}</mat-label>
+        <mat-select [(ngModel)]="selectedOptions[i]" (selectionChange)="onDropdownChange(i, rowKey, $event.value)">
+          <mat-option [value]="null">Select {{ fieldType | titlecase }}</mat-option>
+          <mat-option *ngFor="let opt of getFilteredOptions(rowKey, i)" [value]="opt">{{ opt }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </ng-container>
+  </ng-container>
+</ng-template>
