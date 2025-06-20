@@ -126,6 +126,16 @@ export class FileService {
     return allowedTypes.includes(type)
   }
 
+  validateXlFile(name: string) {
+    const allowedFormats = ['xlsx', 'xls']
+    const ext = name.substring(name.lastIndexOf('.') + 1).toLowerCase()
+    if (allowedFormats.indexOf(ext) > -1) {
+      return true
+    } else {
+      return false
+    }
+  }
+
   async getBulkUploadData() {
     return await this.http.get(`${API_ENDPOINTS.getBulkUploadData}`).toPromise()
   }
