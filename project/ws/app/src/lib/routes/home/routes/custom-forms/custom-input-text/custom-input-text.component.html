@@ -1,0 +1,107 @@
+<form [formGroup]="question">
+  <div class="flex items-center">
+    <div class="question-div">
+      <div class="flex gap-2 items-center justify-between">
+        <div class="w-min flex" *ngIf="index > 0">
+          <span class="margin-remove text-2xl">
+            List {{ index }}
+          </span>
+        </div>
+        <div class="filedTextbox">
+          <label>
+            <div class="flex flex-middle" [ngClass]="{ required: true }">
+              <span i18n class="mat-subheading-2 margin-remove flex">Field Name</span>
+            </div>
+          </label>
+          <mat-form-field appearance="outline" class="w-full">
+            <input type="text" class="input-text" formControlName="name" matInput placeholder="Type here" />
+            <mat-error [hidden]="false"
+              *ngIf="question.get('name')?.touched && !question.get('name')?.hasError('required') && question.get('name')?.hasError('invalidCharacter')">
+              HTML, JS code, combination of dots and slashes are not allowed.
+            </mat-error>
+            <mat-error [hidden]="false" *ngIf="question.get('name')?.touched && !question.get('name')?.hasError('required') && !question.get('name')?.hasError('invalidCharacter') &&
+                question.get('name')?.hasError('hasHtml')" i18n-aria-label
+              aria-label="Title Error | Explains title must be alphanumeric value">
+              HTML or Js is not allowed
+            </mat-error>
+          </mat-form-field>
+        </div>
+        <div class="filedTextbox">
+          <div class="flex gap-2 items-center justify-between">
+            <div class="filedTextbox">
+              <label>
+                <div class="flex flex-middle" [ngClass]="{ required: true }">
+                  <span i18n class="mat-subheading-2 margin-remove flex">Field Attribute</span>
+                </div>
+              </label>
+              <mat-form-field appearance="outline" class="w-full">
+                <input type="text" class="input-text" formControlName="attributeName" matInput
+                  placeholder="Type here" />
+              </mat-form-field>
+            </div>
+          </div>
+        </div>
+        <div class="filedTextbox" *ngIf="question?.controls['validation']">
+          <label>
+            <div class="flex flex-middle" [ngClass]="{ required: true }">
+              <span i18n class="mat-subheading-2 margin-remove flex">Field Type</span>
+            </div>
+          </label>
+          <mat-form-field appearance="none" class="w-full profile-form-field">
+            <mat-select placeholder="Select type" formControlName="validation"
+              (selectionChange)="onFieldValidationChange($event)">
+              <mat-option *ngFor="let fType of fieldValidationTypes" [value]="fType.value">
+                {{ fType.key }}</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+        <div class="filedTextbox" *ngIf="question?.controls['validation']">
+          <div class="flex gap-2 items-center justify-between">
+            <div class="filedTextbox">
+              <label>
+                <div class="flex flex-middle">
+                  <span i18n class="mat-subheading-2 margin-remove flex">Field Max Length</span>
+                </div>
+              </label>
+              <mat-form-field appearance="outline" class="w-full">
+                <input type="number" class="input-text" formControlName="attributeMaxLength" matInput
+                  placeholder="Type here" />
+              </mat-form-field>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="flex gap-2 items-center justify-between" *ngIf="question.controls['validation']">
+        <div class="filedTextbox" *ngIf="question.controls['validation'].value === 'regex'">
+          <div class="flex gap-2 items-center justify-between">
+            <div class="filedTextbox">
+              <label>
+                <div class="flex flex-middle" [ngClass]="{ required: true }">
+                  <span i18n class="mat-subheading-2 margin-remove flex">Field Attribute</span>
+                </div>
+              </label>
+              <mat-form-field appearance="outline" class="w-full">
+                <input type="text" class="input-text" formControlName="customValidation" matInput
+                  placeholder="Type here" />
+              </mat-form-field>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="flex gap-2 items-center justify-end">
+        <ng-container *ngIf="customForm?.controls['type']?.value === 'text'">
+          <div class="fieldOptions flex items-center gap-4 pr-2">
+            <mat-slide-toggle class="example-margin" formControlName="isMandatory">Required</mat-slide-toggle>
+          </div>
+        </ng-container>
+        <ng-container *ngIf="customForm?.controls['type']?.value === 'masterList'">
+          <div class="fieldOptions flex items-center gap-4 pr-2" *ngIf="index === 0">
+            <mat-slide-toggle class="example-margin" formControlName="isMandatory">Required</mat-slide-toggle>
+          </div>
+        </ng-container>
+        <div class="cursor-pointer" (click)="removeItem(index)" *ngIf="index >= 1"><mat-icon>close</mat-icon></div>
+      </div>
+    </div>
+  </div>
+
+</form>
