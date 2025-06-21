@@ -1,5 +1,5 @@
 import { AfterViewInit, Component, OnInit, SimpleChanges, ViewChild } from '@angular/core'
-import { FormControl } from '@angular/forms'
+import { FormControl, ValidatorFn, Validators } from '@angular/forms'
 import { MatPaginator } from '@angular/material/paginator'
 import { MatSort } from '@angular/material/sort'
 import { MatTableDataSource } from '@angular/material/table'
@@ -40,6 +40,7 @@ export class FormsListComponent implements OnInit, AfterViewInit {
   @ViewChild(MatSort) sort!: MatSort
   customFieldObject: any = ''
   enabled: boolean = false
+  inputFormControls: { [key: string]: FormControl } = {};
 
   constructor(private customFieldsService: CustomFieldsService,
     private activeRoute: ActivatedRoute, private matSnackBar: MatSnackBar, private matDialog: MatDialog
@@ -325,7 +326,8 @@ export class FormsListComponent implements OnInit, AfterViewInit {
   }
 
   /**
-   * New method to populate child fields based on a selected parent value (top-down)
+   * Modified method to populate child fields based on a selected parent value (top-down)
+   * WITHOUT auto-selecting default values
    * @param rowKey Row identifier
    * @param level Current level
    * @param value Selected value
@@ -351,21 +353,20 @@ export class FormsListComponent implements OnInit, AfterViewInit {
       // Skip if we can't find this child type in our levels array
       if (childIndex === -1) return
 
-      // If this child level already has a valid selection that's consistent with the parent,
-      // then we don't need to change it - this preserves user selections where possible
+      // Check if current child selection is valid for the new parent
       const currentChildValue = selections[childIndex]
       if (currentChildValue &&
         childRelations[childType].includes(currentChildValue)) {
+        // Keep valid selection
         return
       }
 
-      // Otherwise, select the first available child option
-      const childOptions = childRelations[childType]
-      if (childOptions && childOptions.length > 0) {
-        selections[childIndex] = childOptions[0]
+      // Clear child selection instead of setting a default
+      selections[childIndex] = null
 
-        // Recursively populate grandchildren
-        this.populateChildFields(rowKey, childIndex, childOptions[0], selections)
+      // Clear all grandchildren as well
+      for (let i = childIndex + 1; i < fieldTypes.length; i++) {
+        selections[i] = null
       }
     })
   }
@@ -580,6 +581,30 @@ export class FormsListComponent implements OnInit, AfterViewInit {
     return this.dynamicDropdownMap[rowKey][fieldType]
   }
 
+
+  getFormControl(element: any): FormControl {
+    // Create a unique key for this element
+    const key = element.customFieldId || element.attributeName
+
+    // If we don't have a control for this element yet, create one
+    if (!this.inputFormControls[key]) {
+      // Build validators array first, filtering out nulls
+      const validators: ValidatorFn[] = []
+
+      if (element.isMandatory) {
+        validators.push(Validators.required)
+      }
+
+      if (element.validation) {
+        validators.push(Validators.pattern(element.validation))
+      }
+
+      // Create form control with the validators array
+      this.inputFormControls[key] = new FormControl('', validators)
+    }
+
+    return this.inputFormControls[key]
+  }
   onToggle(event: any) {
     const payoad: any = {
       isPopupEnabled: event.checked,
