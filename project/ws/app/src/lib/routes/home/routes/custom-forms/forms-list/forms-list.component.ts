@@ -326,7 +326,8 @@ export class FormsListComponent implements OnInit, AfterViewInit {
   }
 
   /**
-   * New method to populate child fields based on a selected parent value (top-down)
+   * Modified method to populate child fields based on a selected parent value (top-down)
+   * WITHOUT auto-selecting default values
    * @param rowKey Row identifier
    * @param level Current level
    * @param value Selected value
@@ -352,21 +353,20 @@ export class FormsListComponent implements OnInit, AfterViewInit {
       // Skip if we can't find this child type in our levels array
       if (childIndex === -1) return
 
-      // If this child level already has a valid selection that's consistent with the parent,
-      // then we don't need to change it - this preserves user selections where possible
+      // Check if current child selection is valid for the new parent
       const currentChildValue = selections[childIndex]
       if (currentChildValue &&
         childRelations[childType].includes(currentChildValue)) {
+        // Keep valid selection
         return
       }
 
-      // Otherwise, select the first available child option
-      const childOptions = childRelations[childType]
-      if (childOptions && childOptions.length > 0) {
-        selections[childIndex] = childOptions[0]
+      // Clear child selection instead of setting a default
+      selections[childIndex] = null
 
-        // Recursively populate grandchildren
-        this.populateChildFields(rowKey, childIndex, childOptions[0], selections)
+      // Clear all grandchildren as well
+      for (let i = childIndex + 1; i < fieldTypes.length; i++) {
+        selections[i] = null
       }
     })
   }
