@@ -1,5 +1,5 @@
 import { AfterViewInit, Component, OnInit, SimpleChanges, ViewChild } from '@angular/core'
-import { FormControl } from '@angular/forms'
+import { FormControl, ValidatorFn, Validators } from '@angular/forms'
 import { MatPaginator } from '@angular/material/paginator'
 import { MatSort } from '@angular/material/sort'
 import { MatTableDataSource } from '@angular/material/table'
@@ -40,6 +40,7 @@ export class FormsListComponent implements OnInit, AfterViewInit {
   @ViewChild(MatSort) sort!: MatSort
   customFieldObject: any = ''
   enabled: boolean = false
+  inputFormControls: { [key: string]: FormControl } = {};
 
   constructor(private customFieldsService: CustomFieldsService,
     private activeRoute: ActivatedRoute, private matSnackBar: MatSnackBar, private matDialog: MatDialog
@@ -580,6 +581,30 @@ export class FormsListComponent implements OnInit, AfterViewInit {
     return this.dynamicDropdownMap[rowKey][fieldType]
   }
 
+
+  getFormControl(element: any): FormControl {
+    // Create a unique key for this element
+    const key = element.customFieldId || element.attributeName
+
+    // If we don't have a control for this element yet, create one
+    if (!this.inputFormControls[key]) {
+      // Build validators array first, filtering out nulls
+      const validators: ValidatorFn[] = []
+
+      if (element.isMandatory) {
+        validators.push(Validators.required)
+      }
+
+      if (element.validation) {
+        validators.push(Validators.pattern(element.validation))
+      }
+
+      // Create form control with the validators array
+      this.inputFormControls[key] = new FormControl('', validators)
+    }
+
+    return this.inputFormControls[key]
+  }
   onToggle(event: any) {
     const payoad: any = {
       isPopupEnabled: event.checked,

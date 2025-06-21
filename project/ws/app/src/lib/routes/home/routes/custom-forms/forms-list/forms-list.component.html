@@ -7,9 +7,10 @@
   <mat-card>
     <div class="flex justify-between">
       <span class="mobile-margin mat-h2">Custom Fields</span>
-      <button mat-button class="createFormBtn" (click)="redirectToNewForm()">Create new custom field</button>
+      <button mat-button class="createFormBtn" (click)="redirectToNewForm()" *ngIf="!showCreateForm">Create new custom
+        field</button>
     </div>
-    <div class="flex flex justify-end my-5">
+    <div class="flex flex justify-end my-5" *ngIf="!showCreateForm">
       <div class="fieldOptions flex items-center gap-4 pr-2 font-bold toggle-background">
         <mat-slide-toggle class="example-margin" [checked]="enabled" (change)="onToggle($event)">
           Show popup in the learner portal</mat-slide-toggle>
@@ -47,10 +48,17 @@
                       </label>
                       <mat-form-field appearance="outline" class="w-full">
                         <input type="text" class="input-text" matInput [placeholder]="element.fieldName"
-                          [name]="element.attributeName" [pattern]="element.validation"
-                          [required]="element.isMandatory" />
-                        <mat-error *ngIf="element.validation.invalid && element.validation.touched">
-                          Only numbers are allowed
+                          [name]="element.attributeName" [pattern]="element.validation" [required]="element.isMandatory"
+                          [formControl]="getFormControl(element)" />
+                        <mat-error class="mt-2"
+                          *ngIf="getFormControl(element).invalid && (getFormControl(element).touched || getFormControl(element).dirty)">
+                          <ng-container *ngIf="getFormControl(element).errors?.required">
+                            This field is required
+                          </ng-container>
+                          <ng-container *ngIf="getFormControl(element).errors?.pattern">
+                            <!-- Show different messages based on validation pattern -->
+                            Invalid input
+                          </ng-container>
                         </mat-error>
                       </mat-form-field>
                     </div>
