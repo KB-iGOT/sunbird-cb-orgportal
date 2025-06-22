@@ -153,20 +153,25 @@ export class FormsListComponent implements OnInit, AfterViewInit {
   }
 
   onToggleChange(event: any, element: any) {
+    const originalState = !event.checked
+    this.enabled = event.checked
     let payload = {
       customFieldId: element.customFieldId,
-      isEnabled: event.checked,
+      isEnabled: this.enabled,
     }
     this.customFieldsService.updateCustomFieldStatus(payload).subscribe((res: any) => {
       if (res.result && res.responseCode === 'OK') {
         this.loadData()
+        this.enabled = true
         this.matSnackBar.open(`Field is ${event.checked ? 'enabled' : 'disabled'} successfully!`)
       } else {
         this.loadData()
+        this.enabled = originalState
         console.log('Error while updating custom field status')
       }
     }, error => {
       this.loadData()
+      this.enabled = originalState
       this.matSnackBar.open(_.get(error, 'error.params.err', 'Error while updating the filed status'))
     })
   }

@@ -39,8 +39,8 @@ export class CustomFieldsService {
     return this.http.get<any>(`${API_ENDPOINTS.READ}/${id}`)
   }
 
-  updateCustomField(id: string, payload: object): Observable<any> {
-    return this.http.put<any>(`${API_ENDPOINTS.UPDATE}/${id}`, payload)
+  updateCustomField(payload: object): Observable<any> {
+    return this.http.put<any>(`${API_ENDPOINTS.UPDATE}`, payload)
   }
 
   updateCustomFieldStatus(payload: any): Observable<any> {
