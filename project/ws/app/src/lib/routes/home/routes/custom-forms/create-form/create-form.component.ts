@@ -89,6 +89,7 @@ export class CreateFormComponent implements OnInit {
     }
   }
 
+
   addMasterListQuestion(type: string) {
     this.customForm.controls['type'].setValue(type)
     if (this.customFieldObject) {
@@ -128,6 +129,22 @@ export class CreateFormComponent implements OnInit {
     this.getQuestions.push(questionGroup)
   }
 
+  addNewListQuestion() {
+    if (this.getQuestions.length > 5) {
+      this.matSnackBar.open('Maximum 5 questions can be added')
+    } else {
+      const questionGroup = this.formBuilder.group({
+        name: ['', [Validators.required, this.forbiddenCharacterValidator, preventHtmlAndJs()]],
+        attributeName: ['', [Validators.required]],
+        isMandatory: [false],
+        isEnabled: [false]
+      })
+      this.getQuestions.push(questionGroup)
+    }
+  }
+
+
+
   forbiddenCharacterValidator(control: any) {
     const forbiddenPattern = /<[^>]*>|(function[^\s]+)|(javascript:[^\s]+)|([/.]{2,})|(\\+)/i
     const forbidden = forbiddenPattern.test(control.value)
@@ -166,6 +183,8 @@ export class CreateFormComponent implements OnInit {
       }
     }
   }
+
+
 
   appendQuestionWithData(res: any) {
     let validationType = 'regex'
@@ -271,7 +290,8 @@ export class CreateFormComponent implements OnInit {
     let payload: any
     if (this.customForm.value.type === 'text') {
       payload = this.constructPayload()
-      this.customFieldsService.updateCustomField(this.customFieldObject.customFieldId, payload).subscribe((res: any) => {
+      payload['customFieldId'] = this.customFieldObject.customFieldId
+      this.customFieldsService.updateCustomField(payload).subscribe((res: any) => {
         console.log(res)
         if (res.result) {
           this.matSnackBar.open('Field is updated successfully!')

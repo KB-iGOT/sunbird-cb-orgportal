@@ -66,8 +66,7 @@
             accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" />
         </div>
         <button mat-button class="ws-mat-white-background round mat-raised-button mat-button-base"
-          (click)="addQuestion('masterList')" *ngIf="selectedTab === 'masterList'">Add new list</button>
-
+          (click)="addNewListQuestion()" *ngIf="selectedTab === 'masterList'">Add new list</button>
       </div>
       <div class="flex justify-end mt-5 gap-4">
         <ng-container>
