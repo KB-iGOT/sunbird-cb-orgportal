@@ -41,6 +41,7 @@ export class FormsListComponent implements OnInit, AfterViewInit {
   customFieldObject: any = ''
   canEnable: boolean = false
   inputFormControls: { [key: string]: FormControl } = {};
+  enabledFileds: any[] = []
 
   constructor(private customFieldsService: CustomFieldsService,
     private activeRoute: ActivatedRoute, private matSnackBar: MatSnackBar, private matDialog: MatDialog
@@ -102,6 +103,7 @@ export class FormsListComponent implements OnInit, AfterViewInit {
       facets: []
     }
     this.data = []
+    this.enabledFileds = []
     this.customFieldsService.getCustomFields(payload).subscribe((res: any) => {
       this.searchResults = _.get(res, 'result.searchResults.data')
       this.length = _.get(res, 'result.searchResults.totalCount')
@@ -120,6 +122,9 @@ export class FormsListComponent implements OnInit, AfterViewInit {
             type: element.type,
             // hiracchy: element.type === 'master' ? this.discoverLevels(element.customFieldData, 0, levelMap) : '',
           })
+          if (element.isEnabled) {
+            this.enabledFileds.push(element.customFieldId)
+          }
         })
       }
       this.dataSource.data = this.data
@@ -157,6 +162,7 @@ export class FormsListComponent implements OnInit, AfterViewInit {
       customFieldId: element.customFieldId,
       isEnabled: event.checked
     }
+    this.isLoading = true
     this.customFieldsService.updateCustomFieldStatus(payload).subscribe((res: any) => {
       if (res.result && res.responseCode === 'OK') {
         this.loadData()
@@ -627,6 +633,7 @@ export class FormsListComponent implements OnInit, AfterViewInit {
       isPopupEnabled: event.checked,
       organisationId: this.rootOrgId
     }
+    this.isLoading = true
     this.customFieldsService.updatePopup(payoad).subscribe((res: any) => {
       if (res.result && res.responseCode === 'OK') {
         this.canEnable = event.checked
@@ -635,9 +642,11 @@ export class FormsListComponent implements OnInit, AfterViewInit {
         this.canEnable = !event.checked
         this.matSnackBar.open('Error while updating popup status')
       }
+      this.isLoading = false
     }, (error: any) => {
       console.log('error', error)
       this.canEnable = !event.checked
+      this.isLoading = false
       this.matSnackBar.open(_.get(error, 'error.params.err', 'Error while updating popup status'))
     })
   }
