@@ -39,7 +39,7 @@ export class FormsListComponent implements OnInit, AfterViewInit {
   @ViewChild(MatPaginator) paginator!: MatPaginator
   @ViewChild(MatSort) sort!: MatSort
   customFieldObject: any = ''
-  enabled: boolean = false
+  isEnabled: boolean = false
   inputFormControls: { [key: string]: FormControl } = {};
 
   constructor(private customFieldsService: CustomFieldsService,
@@ -79,9 +79,9 @@ export class FormsListComponent implements OnInit, AfterViewInit {
     }
     this.customFieldsService.readOrgData(request).subscribe((res: any) => {
       if (_.get(res, 'result.response.customfieldsdata.isPopupEnabled', false)) {
-        this.enabled = true
+        this.isEnabled = true
       } else {
-        this.enabled = false
+        this.isEnabled = false
       }
     }, error => {
       console.error('Error fetching organization details', error)
@@ -154,24 +154,24 @@ export class FormsListComponent implements OnInit, AfterViewInit {
 
   onToggleChange(event: any, element: any) {
     const originalState = !event.checked
-    this.enabled = event.checked
+    this.isEnabled = event.checked
     let payload = {
       customFieldId: element.customFieldId,
-      isEnabled: this.enabled,
+      isEnabled: this.isEnabled,
     }
     this.customFieldsService.updateCustomFieldStatus(payload).subscribe((res: any) => {
       if (res.result && res.responseCode === 'OK') {
         this.loadData()
-        this.enabled = true
+        this.isEnabled = true
         this.matSnackBar.open(`Field is ${event.checked ? 'enabled' : 'disabled'} successfully!`)
       } else {
         this.loadData()
-        this.enabled = originalState
+        this.isEnabled = originalState
         console.log('Error while updating custom field status')
       }
     }, error => {
       this.loadData()
-      this.enabled = originalState
+      this.isEnabled = originalState
       this.matSnackBar.open(_.get(error, 'error.params.err', 'Error while updating the filed status'))
     })
   }
@@ -617,15 +617,15 @@ export class FormsListComponent implements OnInit, AfterViewInit {
     }
     this.customFieldsService.updatePopup(payoad).subscribe((res: any) => {
       if (res.result && res.responseCode === 'OK') {
-        this.enabled = event.checked
+        this.isEnabled = event.checked
         this.matSnackBar.open(`Popup is ${event.checked ? 'enabled' : 'disabled'} successfully!`)
       } else {
-        this.enabled = !event.checked
+        this.isEnabled = !event.checked
         this.matSnackBar.open('Error while updating popup status')
       }
     }, (error: any) => {
       console.log('error', error)
-      this.enabled = !event.checked
+      this.isEnabled = !event.checked
       this.matSnackBar.open(_.get(error, 'error.params.err', 'Error while updating popup status'))
     })
 
