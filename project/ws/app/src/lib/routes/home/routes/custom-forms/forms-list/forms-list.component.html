@@ -12,7 +12,8 @@
     </div>
     <div class="flex flex justify-end my-5" *ngIf="!showCreateForm">
       <div class="fieldOptions flex items-center gap-4 pr-2 font-bold toggle-background">
-        <mat-slide-toggle class="example-margin" [checked]="canEnable" (change)="onToggle($event)">
+        <mat-slide-toggle class="example-margin" [checked]="canEnable" [disabled]="!enabledFileds?.length > 0"
+          (change)="onToggle($event)">
           Show popup in the learner portal</mat-slide-toggle>
       </div>
     </div>
