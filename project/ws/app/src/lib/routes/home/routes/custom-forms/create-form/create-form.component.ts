@@ -49,6 +49,7 @@ export class CreateFormComponent implements OnInit {
   fileSelected!: File
   private destroySubject$ = new Subject()
   rootOrgId: any
+  isLoading: boolean = false
   constructor(private formBuilder: UntypedFormBuilder, private fileService: FileService,
     private matSnackBar: MatSnackBar, private activeRoute: ActivatedRoute, private customFieldsService: CustomFieldsService
   ) {
@@ -228,25 +229,31 @@ export class CreateFormComponent implements OnInit {
     let payload: any
     if (this.customForm.value.type === 'text') {
       payload = this.constructPayload()
+      this.isLoading = true
       this.customFieldsService.createField(payload).subscribe((res: any) => {
         console.log(res)
         if (res.result) {
           this.matSnackBar.open('Field is created successfully!')
           this.closeForm.emit(true)
         }
+        this.isLoading = false
       }, error => {
+        this.isLoading = false
         this.matSnackBar.open(error)
         console.log(error)
       })
     } else if (this.customForm.value.type === 'masterList') {
       payload = this.constructPayloadForList()
+      this.isLoading = true
       this.customFieldsService.createList(payload).subscribe((res: any) => {
         console.log(res)
         if (res.result) {
           this.matSnackBar.open('List is created successfully!')
           this.closeForm.emit(true)
         }
+        this.isLoading = false
       }, error => {
+        this.isLoading = false
         this.matSnackBar.open(error.error.params.err)
         console.log(error.error.params.err)
       })
@@ -291,25 +298,31 @@ export class CreateFormComponent implements OnInit {
     if (this.customForm.value.type === 'text') {
       payload = this.constructPayload()
       payload['customFieldId'] = this.customFieldObject.customFieldId
+      this.isLoading = true
       this.customFieldsService.updateCustomField(payload).subscribe((res: any) => {
         console.log(res)
         if (res.result) {
           this.matSnackBar.open('Field is updated successfully!')
           this.closeForm.emit(true)
         }
+        this.isLoading = false
       }, error => {
+        this.isLoading = false
         this.matSnackBar.open(error)
         console.log(error)
       })
     } else if (this.customForm.value.type === 'masterList') {
       payload = this.constructPayloadForList()
+      this.isLoading = false
       this.customFieldsService.updateList(payload).subscribe((res: any) => {
         console.log(res)
         if (res.result) {
           this.matSnackBar.open('List is updated successfully!')
           this.closeForm.emit(true)
         }
+        this.isLoading = false
       }, error => {
+        this.isLoading = false
         this.matSnackBar.open(error.error.params.err)
         console.log(error.error.params.err)
       })
