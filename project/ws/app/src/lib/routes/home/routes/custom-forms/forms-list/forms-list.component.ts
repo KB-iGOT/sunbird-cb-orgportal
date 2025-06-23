@@ -113,7 +113,7 @@ export class FormsListComponent implements OnInit, AfterViewInit {
             fieldName: element.name,
             fieldAttribute: element.attributeName,
             createdOn: element.createdOn,
-            isMandatory: element.isMandatory,
+            isMandatory: element.isMandatory ? 'True' : 'False',
             object: element,
             customFieldId: element.customFieldId,
             customFieldData: element.customFieldData,
