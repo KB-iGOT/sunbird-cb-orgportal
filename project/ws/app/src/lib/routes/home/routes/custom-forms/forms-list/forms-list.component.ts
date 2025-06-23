@@ -39,7 +39,7 @@ export class FormsListComponent implements OnInit, AfterViewInit {
   @ViewChild(MatPaginator) paginator!: MatPaginator
   @ViewChild(MatSort) sort!: MatSort
   customFieldObject: any = ''
-  isEnabled: boolean = false
+  canEnable: boolean = false
   inputFormControls: { [key: string]: FormControl } = {};
 
   constructor(private customFieldsService: CustomFieldsService,
@@ -79,9 +79,9 @@ export class FormsListComponent implements OnInit, AfterViewInit {
     }
     this.customFieldsService.readOrgData(request).subscribe((res: any) => {
       if (_.get(res, 'result.response.customfieldsdata.isPopupEnabled', false)) {
-        this.isEnabled = true
+        this.canEnable = true
       } else {
-        this.isEnabled = false
+        this.canEnable = false
       }
     }, error => {
       console.error('Error fetching organization details', error)
@@ -153,25 +153,20 @@ export class FormsListComponent implements OnInit, AfterViewInit {
   }
 
   onToggleChange(event: any, element: any) {
-    const originalState = !event.checked
-    this.isEnabled = event.checked
     let payload = {
       customFieldId: element.customFieldId,
-      isEnabled: this.isEnabled,
+      isEnabled: event.checked
     }
     this.customFieldsService.updateCustomFieldStatus(payload).subscribe((res: any) => {
       if (res.result && res.responseCode === 'OK') {
         this.loadData()
-        this.isEnabled = true
         this.matSnackBar.open(`Field is ${event.checked ? 'enabled' : 'disabled'} successfully!`)
       } else {
         this.loadData()
-        this.isEnabled = originalState
         console.log('Error while updating custom field status')
       }
     }, error => {
       this.loadData()
-      this.isEnabled = originalState
       this.matSnackBar.open(_.get(error, 'error.params.err', 'Error while updating the filed status'))
     })
   }
@@ -611,23 +606,39 @@ export class FormsListComponent implements OnInit, AfterViewInit {
     return this.inputFormControls[key]
   }
   onToggle(event: any) {
+    if (event.checked) {
+      let enabledfiledIds = this.data.filter((item: any) => item.isEnabled)
+      if (enabledfiledIds.length === 0) {
+        this.matSnackBar.open('Please enable at least one field to enable popup')
+        event.source.checked = false
+        this.canEnable = false
+        return
+      } else {
+        this.sendCall(event)
+      }
+    } else {
+      this.sendCall(event)
+    }
+  }
+
+
+  sendCall(event: any) {
     const payoad: any = {
       isPopupEnabled: event.checked,
       organisationId: this.rootOrgId
     }
     this.customFieldsService.updatePopup(payoad).subscribe((res: any) => {
       if (res.result && res.responseCode === 'OK') {
-        this.isEnabled = event.checked
+        this.canEnable = event.checked
         this.matSnackBar.open(`Popup is ${event.checked ? 'enabled' : 'disabled'} successfully!`)
       } else {
-        this.isEnabled = !event.checked
+        this.canEnable = !event.checked
         this.matSnackBar.open('Error while updating popup status')
       }
     }, (error: any) => {
       console.log('error', error)
-      this.isEnabled = !event.checked
+      this.canEnable = !event.checked
       this.matSnackBar.open(_.get(error, 'error.params.err', 'Error while updating popup status'))
     })
-
   }
 }
