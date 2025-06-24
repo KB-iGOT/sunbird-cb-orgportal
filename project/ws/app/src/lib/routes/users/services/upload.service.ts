@@ -118,18 +118,6 @@ export class FileService {
     }
   }
 
-  validateXlFile(name: String) {
-    const allowedFormats = ['xlsx', 'xls']
-    const ext = name.substring(name.lastIndexOf('.') + 1).toLowerCase()
-    if (allowedFormats.indexOf(ext) > -1) {
-      return true
-      // tslint:disable-next-line: no-else-after-return
-    } else {
-      return false
-    }
-  }
-
-
 
   validateExcelFile(type: string): boolean {
     const allowedTypes = [
@@ -137,6 +125,16 @@ export class FileService {
       'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
     ]
     return allowedTypes.includes(type)
+  }
+
+  validateXlFile(name: string) {
+    const allowedFormats = ['xlsx', 'xls']
+    const ext = name.substring(name.lastIndexOf('.') + 1).toLowerCase()
+    if (allowedFormats.indexOf(ext) > -1) {
+      return true
+    } else {
+      return false
+    }
   }
 
   async getBulkUploadData() {

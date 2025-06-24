@@ -6,7 +6,7 @@ import { Subject } from 'rxjs'
 import { MatSnackBar } from '@angular/material/snack-bar'
 import { ActivatedRoute } from '@angular/router'
 import * as _ from 'lodash'
-import { CustomFieldsService } from '../../../../users/services/custom-fields.service'
+import { CustomFieldsService } from '../../../../users/custom-fields.service'
 
 @Component({
   selector: 'ws-app-create-form',
@@ -36,7 +36,7 @@ export class CreateFormComponent implements OnInit {
     { key: 'Text only', value: "^[A-Za-z\s]+$" },
     { key: 'Alphanumeric', value: "^[A-Za-z0-9\s]+$" },
     { key: 'Email', value: "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$" },
-    { key: 'Phone number', value: "^[6-9]\d{9}$" },
+    { key: 'Phone number', value: "^[6-9]\\d{9}$" },
     { key: 'Regex', value: "regex" }
   ]
 
@@ -49,6 +49,7 @@ export class CreateFormComponent implements OnInit {
   fileSelected!: File
   private destroySubject$ = new Subject()
   rootOrgId: any
+  isLoading: boolean = false
   constructor(private formBuilder: UntypedFormBuilder, private fileService: FileService,
     private matSnackBar: MatSnackBar, private activeRoute: ActivatedRoute, private customFieldsService: CustomFieldsService
   ) {
@@ -128,6 +129,22 @@ export class CreateFormComponent implements OnInit {
     this.getQuestions.push(questionGroup)
   }
 
+  addNewListQuestion() {
+    if (this.getQuestions.length > 5) {
+      this.matSnackBar.open('Maximum 5 questions can be added')
+    } else {
+      const questionGroup = this.formBuilder.group({
+        name: ['', [Validators.required, this.forbiddenCharacterValidator, preventHtmlAndJs()]],
+        attributeName: ['', [Validators.required]],
+        isMandatory: [false],
+        isEnabled: [false]
+      })
+      this.getQuestions.push(questionGroup)
+    }
+  }
+
+
+
   forbiddenCharacterValidator(control: any) {
     const forbiddenPattern = /<[^>]*>|(function[^\s]+)|(javascript:[^\s]+)|([/.]{2,})|(\\+)/i
     const forbidden = forbiddenPattern.test(control.value)
@@ -166,6 +183,8 @@ export class CreateFormComponent implements OnInit {
       }
     }
   }
+
+
 
   appendQuestionWithData(res: any) {
     let validationType = 'regex'
@@ -209,25 +228,31 @@ export class CreateFormComponent implements OnInit {
     let payload: any
     if (this.customForm.value.type === 'text') {
       payload = this.constructPayload()
+      this.isLoading = true
       this.customFieldsService.createField(payload).subscribe((res: any) => {
         console.log(res)
         if (res.result) {
           this.matSnackBar.open('Field is created successfully!')
           this.closeForm.emit(true)
         }
+        this.isLoading = false
       }, error => {
+        this.isLoading = false
         this.matSnackBar.open(error)
         console.log(error)
       })
     } else if (this.customForm.value.type === 'masterList') {
       payload = this.constructPayloadForList()
+      this.isLoading = true
       this.customFieldsService.createList(payload).subscribe((res: any) => {
         console.log(res)
         if (res.result) {
           this.matSnackBar.open('List is created successfully!')
           this.closeForm.emit(true)
         }
+        this.isLoading = false
       }, error => {
+        this.isLoading = false
         this.matSnackBar.open(error.error.params.err)
         console.log(error.error.params.err)
       })
@@ -271,25 +296,32 @@ export class CreateFormComponent implements OnInit {
     let payload: any
     if (this.customForm.value.type === 'text') {
       payload = this.constructPayload()
-      this.customFieldsService.updateCustomField(this.customFieldObject.customFieldId, payload).subscribe((res: any) => {
+      payload['customFieldId'] = this.customFieldObject.customFieldId
+      this.isLoading = true
+      this.customFieldsService.updateCustomField(payload).subscribe((res: any) => {
         console.log(res)
         if (res.result) {
           this.matSnackBar.open('Field is updated successfully!')
           this.closeForm.emit(true)
         }
+        this.isLoading = false
       }, error => {
+        this.isLoading = false
         this.matSnackBar.open(error)
         console.log(error)
       })
     } else if (this.customForm.value.type === 'masterList') {
       payload = this.constructPayloadForList()
+      this.isLoading = false
       this.customFieldsService.updateList(payload).subscribe((res: any) => {
         console.log(res)
         if (res.result) {
           this.matSnackBar.open('List is updated successfully!')
           this.closeForm.emit(true)
         }
+        this.isLoading = false
       }, error => {
+        this.isLoading = false
         this.matSnackBar.open(error.error.params.err)
         console.log(error.error.params.err)
       })

@@ -24,9 +24,9 @@ import { BaseComponent } from './base/base.component'
 import { CustomInputTextComponent } from './custom-input-text/custom-input-text.component'
 import { MatLegacySlideToggleModule as MatSlideToggleModule } from '@angular/material/legacy-slide-toggle'
 import { UIORGTableModule } from '@sunbird-cb/collection'
-import { CustomFieldsService } from '../../../users/services/custom-fields.service'
 import { MatLegacyProgressSpinnerModule as MatProgressSpinnerModule } from '@angular/material/legacy-progress-spinner'
 import { ConfirmDeleteComponent } from './confirm-delete/confirm-delete.component'
+import { CustomFieldsService } from '../../../users/custom-fields.service'
 @NgModule({
   declarations: [
     FormsListComponent,

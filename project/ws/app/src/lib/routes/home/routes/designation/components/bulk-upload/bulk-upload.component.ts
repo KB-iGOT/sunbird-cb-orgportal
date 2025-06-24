@@ -193,7 +193,7 @@ export class BulkUploadComponent implements OnInit, OnDestroy, AfterViewInit {
           }, (_err: HttpErrorResponse) => {
             if (!_err.ok) {
               this.fileUploadDialogInstance.close()
-              this.matSnackBar.open('Uploading CSV file failed due to some error, please try again later!')
+              this.matSnackBar.open(_.get(_err, 'error.params.errmsg') || `Uploading CSV file failed due to some error, please try again later!`)
             }
           })
       }

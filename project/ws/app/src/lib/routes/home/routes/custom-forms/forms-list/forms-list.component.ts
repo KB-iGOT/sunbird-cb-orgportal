@@ -1,14 +1,14 @@
 import { AfterViewInit, Component, OnInit, SimpleChanges, ViewChild } from '@angular/core'
-import { FormControl } from '@angular/forms'
+import { FormControl, ValidatorFn, Validators } from '@angular/forms'
 import { MatPaginator } from '@angular/material/paginator'
 import { MatSort } from '@angular/material/sort'
 import { MatTableDataSource } from '@angular/material/table'
 import * as _ from 'lodash'
-import { CustomFieldsService } from '../../../../users/services/custom-fields.service'
 import { ActivatedRoute } from '@angular/router'
 import { MatSnackBar } from '@angular/material/snack-bar'
 import { MatDialog } from '@angular/material/dialog'
 import { ConfirmDeleteComponent } from '../confirm-delete/confirm-delete.component'
+import { CustomFieldsService } from '../../../../users/custom-fields.service'
 @Component({
   selector: 'ws-app-forms-list',
   templateUrl: './forms-list.component.html',
@@ -39,7 +39,9 @@ export class FormsListComponent implements OnInit, AfterViewInit {
   @ViewChild(MatPaginator) paginator!: MatPaginator
   @ViewChild(MatSort) sort!: MatSort
   customFieldObject: any = ''
-  enabled: boolean = false
+  canEnable: boolean = false
+  inputFormControls: { [key: string]: FormControl } = {};
+  enabledFileds: any[] = []
 
   constructor(private customFieldsService: CustomFieldsService,
     private activeRoute: ActivatedRoute, private matSnackBar: MatSnackBar, private matDialog: MatDialog
@@ -69,6 +71,22 @@ export class FormsListComponent implements OnInit, AfterViewInit {
       sortState: 'asc',
     }
     this.loadData()
+    this.getOrgDetails()
+  }
+
+  getOrgDetails() {
+    const request = {
+      request: { organisationId: this.rootOrgId },
+    }
+    this.customFieldsService.readOrgData(request).subscribe((res: any) => {
+      if (_.get(res, 'result.response.customfieldsdata.isPopupEnabled', false)) {
+        this.canEnable = true
+      } else {
+        this.canEnable = false
+      }
+    }, error => {
+      console.error('Error fetching organization details', error)
+    })
   }
 
   loadData() {
@@ -85,6 +103,7 @@ export class FormsListComponent implements OnInit, AfterViewInit {
       facets: []
     }
     this.data = []
+    this.enabledFileds = []
     this.customFieldsService.getCustomFields(payload).subscribe((res: any) => {
       this.searchResults = _.get(res, 'result.searchResults.data')
       this.length = _.get(res, 'result.searchResults.totalCount')
@@ -94,7 +113,7 @@ export class FormsListComponent implements OnInit, AfterViewInit {
             fieldName: element.name,
             fieldAttribute: element.attributeName,
             createdOn: element.createdOn,
-            isMandatory: element.isMandatory,
+            isMandatory: element.isMandatory ? 'True' : 'False',
             object: element,
             customFieldId: element.customFieldId,
             customFieldData: element.customFieldData,
@@ -103,6 +122,9 @@ export class FormsListComponent implements OnInit, AfterViewInit {
             type: element.type,
             // hiracchy: element.type === 'master' ? this.discoverLevels(element.customFieldData, 0, levelMap) : '',
           })
+          if (element.isEnabled) {
+            this.enabledFileds.push(element.customFieldId)
+          }
         })
       }
       this.dataSource.data = this.data
@@ -138,15 +160,20 @@ export class FormsListComponent implements OnInit, AfterViewInit {
   onToggleChange(event: any, element: any) {
     let payload = {
       customFieldId: element.customFieldId,
-      isEnabled: event.checked,
+      isEnabled: event.checked
     }
+    this.isLoading = true
     this.customFieldsService.updateCustomFieldStatus(payload).subscribe((res: any) => {
-      if (res.result && res.result.customFieldId === element.customFieldId) {
+      if (res.result && res.responseCode === 'OK') {
         this.loadData()
-        this.matSnackBar.open(`Field status ${event.checked ? 'activated' : 'deactivated'} successfully!`)
+        this.matSnackBar.open(`Field is ${event.checked ? 'enabled' : 'disabled'} successfully!`)
       } else {
+        this.loadData()
         console.log('Error while updating custom field status')
       }
+    }, error => {
+      this.loadData()
+      this.matSnackBar.open(_.get(error, 'error.params.err', 'Error while updating the filed status'))
     })
   }
 
@@ -305,7 +332,8 @@ export class FormsListComponent implements OnInit, AfterViewInit {
   }
 
   /**
-   * New method to populate child fields based on a selected parent value (top-down)
+   * Modified method to populate child fields based on a selected parent value (top-down)
+   * WITHOUT auto-selecting default values
    * @param rowKey Row identifier
    * @param level Current level
    * @param value Selected value
@@ -331,21 +359,20 @@ export class FormsListComponent implements OnInit, AfterViewInit {
       // Skip if we can't find this child type in our levels array
       if (childIndex === -1) return
 
-      // If this child level already has a valid selection that's consistent with the parent,
-      // then we don't need to change it - this preserves user selections where possible
+      // Check if current child selection is valid for the new parent
       const currentChildValue = selections[childIndex]
       if (currentChildValue &&
         childRelations[childType].includes(currentChildValue)) {
+        // Keep valid selection
         return
       }
 
-      // Otherwise, select the first available child option
-      const childOptions = childRelations[childType]
-      if (childOptions && childOptions.length > 0) {
-        selections[childIndex] = childOptions[0]
+      // Clear child selection instead of setting a default
+      selections[childIndex] = null
 
-        // Recursively populate grandchildren
-        this.populateChildFields(rowKey, childIndex, childOptions[0], selections)
+      // Clear all grandchildren as well
+      for (let i = childIndex + 1; i < fieldTypes.length; i++) {
+        selections[i] = null
       }
     })
   }
@@ -560,8 +587,67 @@ export class FormsListComponent implements OnInit, AfterViewInit {
     return this.dynamicDropdownMap[rowKey][fieldType]
   }
 
+
+  getFormControl(element: any): FormControl {
+    // Create a unique key for this element
+    const key = element.customFieldId || element.attributeName
+
+    // If we don't have a control for this element yet, create one
+    if (!this.inputFormControls[key]) {
+      // Build validators array first, filtering out nulls
+      const validators: ValidatorFn[] = []
+
+      if (element.isMandatory) {
+        validators.push(Validators.required)
+      }
+
+      if (element.validation) {
+        validators.push(Validators.pattern(element.validation))
+      }
+
+      // Create form control with the validators array
+      this.inputFormControls[key] = new FormControl('', validators)
+    }
+
+    return this.inputFormControls[key]
+  }
   onToggle(event: any) {
-    this.enabled = event.checked
-    console.log('Toggle event:', this.enabled)
+    if (event.checked) {
+      let enabledfiledIds = this.data.filter((item: any) => item.isEnabled)
+      if (enabledfiledIds.length === 0) {
+        this.matSnackBar.open('Please enable at least one field to enable popup')
+        event.source.checked = false
+        this.canEnable = false
+        return
+      } else {
+        this.sendCall(event)
+      }
+    } else {
+      this.sendCall(event)
+    }
+  }
+
+
+  sendCall(event: any) {
+    const payoad: any = {
+      isPopupEnabled: event.checked,
+      organisationId: this.rootOrgId
+    }
+    this.isLoading = true
+    this.customFieldsService.updatePopup(payoad).subscribe((res: any) => {
+      if (res.result && res.responseCode === 'OK') {
+        this.canEnable = event.checked
+        this.matSnackBar.open(`Popup is ${event.checked ? 'enabled' : 'disabled'} successfully!`)
+      } else {
+        this.canEnable = !event.checked
+        this.matSnackBar.open('Error while updating popup status')
+      }
+      this.isLoading = false
+    }, (error: any) => {
+      console.log('error', error)
+      this.canEnable = !event.checked
+      this.isLoading = false
+      this.matSnackBar.open(_.get(error, 'error.params.err', 'Error while updating popup status'))
+    })
   }
 }
