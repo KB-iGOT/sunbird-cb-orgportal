@@ -18,7 +18,7 @@ export class CustomInputTextComponent {
     { key: 'Text only', value: "^[A-Za-z\s]+$" },
     { key: 'Alphanumeric', value: "^[A-Za-z0-9\s]+$" },
     { key: 'Email', value: "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$" },
-    { key: 'Phone number', value: "^[6-9]\d{9}$" },
+    { key: 'Phone number', value: "^[6-9]\\d{9}$" },
     { key: 'Regex', value: "regex" }
   ]
 

@@ -50,6 +50,7 @@ export class ReportsSectionComponent implements OnInit {
   customReportPwd = ''
   showCustomReportPwd = false
   departmentType: any
+  isOrgHasLeaderRole = true
 
   displayedColumns: string[] = ['select', 'orgName', 'status', 'action']
   dataSource = new MatTableDataSource<any>()
@@ -269,14 +270,21 @@ export class ReportsSectionComponent implements OnInit {
           `Please grant or renew access to these reports to the MDO Admin very
           carefully due to Personally Identifiable Information (PII) data security.`,
         ]
+      } else if (userAccessExpireDate === '') {
+        this.hassAccessToreports = false
+        this.reportsNoteList = [
+          `Currently, your MDO Leader has not granted you access to these
+            reports. Kindly contact your MDO Leader to provide you access.`,
+        ]
       } else {
         this.hassAccessToreports = false
+        this.isOrgHasLeaderRole = false
         this.reportsNoteList = [
           `Your organization does not have an MDO Leader onboarded.
           Every organization must have a leader assigned to
           iGOT to access these reports.
           Please reach out to us at mission.karmayogi@gov.in or
-          connect with us via Video Conferencing by clicking the button below:
+          connect with us via Video Conferencing by clicking the link:
           [<a target='_blank' href='${this.teamUrl}'>Join Now</a>]`,
           `Once the MDO Leader is onboarded, they will grant you access to download the
           reports, and you are requested to connect with your MDO Leader for further process.`,
@@ -433,7 +441,7 @@ export class ReportsSectionComponent implements OnInit {
         this.updateDataSource()
         this.changeDetector.detectChanges()
       }
-    },                                                    (err: any) => {
+    }, (err: any) => {
       if (err.error && err.error.params && err.error.params.errmsg) {
         this.openSnackbar(err.error.params.errmsg)
       } else {
