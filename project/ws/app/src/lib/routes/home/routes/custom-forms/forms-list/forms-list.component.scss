@@ -1,0 +1,78 @@
+.createFormBtn {
+  background-color: #1B4CA1 !important;
+  height: 32px;
+  border-radius: 17px;
+  color: #FFFFFF !important;
+  /* stylelint-disable */
+  font: 700 14px Lato;
+  /* stylelint-enable */
+}
+
+.create-new {
+  background-color: rgb(152 182 235 / 16%);
+}
+
+.mat-header-cell {
+  background-color: #f5f5f5;
+}
+
+.mat-header-row {
+    min-height: 40px;
+}
+
+.fixed-spinner {
+  position: absolute;
+  top: 45%;
+  left: 45%;
+  z-index: 1000;
+}
+
+::ng-deep .cdk-column-fieldName {
+  flex: 0 0 15% !important;
+  width: 15% !important;
+}
+::ng-deep .cdk-column-fieldAttribute {
+  flex: 0 0 18% !important;
+  width: 18% !important;
+}
+
+::ng-deep .cdk-column-createdOn {
+  flex: 0 0 11% !important;
+  width: 11% !important;
+}
+
+::ng-deep .cdk-column-isMandatory {
+  flex: 0 0 9% !important;
+  width: 9% !important;
+}
+
+::ng-deep .cdk-column-isEnabled {
+ flex: 0 0 9% !important;
+  width: 9% !important;
+}
+
+::ng-deep .mat-column-actions {
+  flex: 0 0 8% !important;
+  width: 8% !important;
+}
+
+.toggle-background {
+  color: #1B4CA1 !important
+}
+
+
+
+
+::ng-deep .filedSelect .mat-form-field-wrapper {
+  padding-bottom: 0.5rem!important;
+}
+::ng-deep .filedSelect .mat-form-field-appearance-outline .mat-form-field-infix {
+  padding: 0.5rem!important;
+}
+
+::ng-deep .filedTextbox .mat-form-field-wrapper {
+  padding-bottom: 0.5rem!important;
+}
+::ng-deep .filedTextbox .mat-form-field-appearance-outline .mat-form-field-infix {
+  padding: 0rem!important;
+}
