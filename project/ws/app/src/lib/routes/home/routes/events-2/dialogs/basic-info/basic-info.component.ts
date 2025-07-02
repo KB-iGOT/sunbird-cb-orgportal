@@ -2,7 +2,7 @@ import { Component, Inject, OnInit } from '@angular/core'
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms'
 import { MatLegacyDialogRef as MatDialogRef, MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA, } from '@angular/material/legacy-dialog'
 import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar'
-import { events, noSpecialChar } from '../../models/events.model'
+import { events, noSpecialCharEvent } from '../../models/events.model'
 import * as _ from 'lodash'
 import { EventsService } from '../../services/events.service'
 import { map, mergeMap } from 'rxjs/operators'
@@ -42,7 +42,7 @@ export class BasicInfoComponent implements OnInit {
   createForm() {
     this.eventForm = this.formBuilder.group({
       eventName: new FormControl('', [Validators.required, Validators.minLength(10),
-      Validators.maxLength(70), Validators.pattern(noSpecialChar)]),
+      Validators.maxLength(70), Validators.pattern(noSpecialCharEvent)]),
       eventType: new FormControl('record', [Validators.required]),
     })
   }
