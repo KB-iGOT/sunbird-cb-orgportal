@@ -119,8 +119,15 @@ export class CreateFormComponent implements OnInit {
       isEnabled: [res.result.isEnabled]
     })
     this.getQuestions.push(questionGroup)
-    debugger
-    this.constructNestedQuestions(res.result.customFieldData)
+    res.result.originalCustomFieldData.forEach((element: any) => {
+      const questionGroup = this.formBuilder.group({
+        name: [element.name, [Validators.required, this.forbiddenCharacterValidator, preventHtmlAndJs()]],
+        attributeName: [element.attributeName, [Validators.required]],
+        isMandatory: [false],
+        isEnabled: [false]
+      })
+      this.getQuestions.push(questionGroup)
+    })
   }
 
   appendListQuestion() {
