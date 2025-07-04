@@ -44,8 +44,8 @@
     <div class="form-options">
       <ng-container *ngFor="let section of sections">
         <div
-          class="form-option mb-5 flex items-center p-4 gap-3 cursor-pointer {{selectedTab === section.type ? 'active' : ''}}"
-          (click)="addContent(section.type)">
+          class="form-option mb-5 flex items-center p-4 gap-3 {{isEditMode ? '' : 'cursor-pointer'}} {{selectedTab === section.type ? 'active' : ''}}"
+          (click)="isEditMode ? '' : addContent(section.type)">
           <div class="icons"><mat-icon class="">{{section.icon}}</mat-icon></div>
           <div class="{{selectedTab === section.type ? 'text-white' : ''}}">
             <div class="icon-title">{{section.title}}</div>

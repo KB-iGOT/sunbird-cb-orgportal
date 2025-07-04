@@ -50,6 +50,7 @@ export class CreateFormComponent implements OnInit {
   private destroySubject$ = new Subject()
   rootOrgId: any
   isLoading: boolean = false
+  isEditMode: boolean = false
   constructor(private formBuilder: UntypedFormBuilder, private fileService: FileService,
     private matSnackBar: MatSnackBar, private activeRoute: ActivatedRoute, private customFieldsService: CustomFieldsService
   ) {
@@ -58,6 +59,8 @@ export class CreateFormComponent implements OnInit {
 
   ngOnInit() {
     this.createForm()
+    this.isEditMode = this.customFieldObject ? true : false
+    console.log('isEditMode', this.isEditMode)
   }
 
   createForm() {
@@ -116,6 +119,7 @@ export class CreateFormComponent implements OnInit {
       isEnabled: [res.result.isEnabled]
     })
     this.getQuestions.push(questionGroup)
+    debugger
     this.constructNestedQuestions(res.result.customFieldData)
   }
 
