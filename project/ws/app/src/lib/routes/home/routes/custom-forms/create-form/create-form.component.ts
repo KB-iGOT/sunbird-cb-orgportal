@@ -60,7 +60,6 @@ export class CreateFormComponent implements OnInit {
   ngOnInit() {
     this.createForm()
     this.isEditMode = this.customFieldObject ? true : false
-    console.log('isEditMode', this.isEditMode)
   }
 
   createForm() {
