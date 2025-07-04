@@ -50,6 +50,7 @@ export class CreateFormComponent implements OnInit {
   private destroySubject$ = new Subject()
   rootOrgId: any
   isLoading: boolean = false
+  isEditMode: boolean = false
   constructor(private formBuilder: UntypedFormBuilder, private fileService: FileService,
     private matSnackBar: MatSnackBar, private activeRoute: ActivatedRoute, private customFieldsService: CustomFieldsService
   ) {
@@ -58,6 +59,7 @@ export class CreateFormComponent implements OnInit {
 
   ngOnInit() {
     this.createForm()
+    this.isEditMode = this.customFieldObject ? true : false
   }
 
   createForm() {
@@ -116,7 +118,15 @@ export class CreateFormComponent implements OnInit {
       isEnabled: [res.result.isEnabled]
     })
     this.getQuestions.push(questionGroup)
-    this.constructNestedQuestions(res.result.customFieldData)
+    res.result.originalCustomFieldData.forEach((element: any) => {
+      const questionGroup = this.formBuilder.group({
+        name: [element.name, [Validators.required, this.forbiddenCharacterValidator, preventHtmlAndJs()]],
+        attributeName: [element.attributeName, [Validators.required]],
+        isMandatory: [false],
+        isEnabled: [false]
+      })
+      this.getQuestions.push(questionGroup)
+    })
   }
 
   appendListQuestion() {

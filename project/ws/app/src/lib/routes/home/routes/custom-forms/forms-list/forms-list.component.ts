@@ -119,6 +119,7 @@ export class FormsListComponent implements OnInit, AfterViewInit {
             customFieldData: element.customFieldData,
             isEnabled: element.isEnabled,
             validation: element.validation,
+            attributeMaxLength: element.attributeMaxLength,
             type: element.type,
             // hiracchy: element.type === 'master' ? this.discoverLevels(element.customFieldData, 0, levelMap) : '',
           })
@@ -603,6 +604,12 @@ export class FormsListComponent implements OnInit, AfterViewInit {
 
       if (element.validation) {
         validators.push(Validators.pattern(element.validation))
+      }
+      if (element.attributeMaxLength && !isNaN(Number(element.attributeMaxLength))) {
+        const maxLength = parseInt(element.attributeMaxLength, 10)
+        if (maxLength > 0) {
+          validators.push(Validators.maxLength(maxLength))
+        }
       }
 
       // Create form control with the validators array
