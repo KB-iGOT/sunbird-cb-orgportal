@@ -194,60 +194,7 @@ export class AppNavBarComponent implements OnInit, OnChanges, OnDestroy {
   viewAllClick(event: any) {
     if (event.category) {
       this.raiseTelemetryEventForNotification(event)
-      if (event.category === 'PROFILE') {
-        this.router.navigate([`app/home/approvals/approval`])
-      } else if (event.category === 'LEARN') {
-        let url = `${this.environment.portalsForNotifications.portal}/app/toc/${event.message.data.id}`
-        window.open(url, '_blank')
-      } else if (event.category === 'EVENT') {
-        let url = `${this.environment.portalsForNotifications.portal}/app/event-hub/home/${event.message.data.id}`
-        window.open(url, '_blank')
-      } else if (event.category === 'DISCUSSION') {
-        let url = `${this.environment.portalsForNotifications.portal}/app/discussion-forum-v2/community/${event.message.data.communityId}/${event.message.data.discussionId}`
-        window.open(url, '_blank')
-      } else if (event?.category?.includes('CONTENT')) {
-        this.notificationsService.getContentData(event.message.data.id).subscribe((res: any) => {
-          let isStandaloneResource = false
-          if (res.primaryCategory === 'Learning Resource' &&
-            res.resourceCategory !== 'Learning Resource') {
-            localStorage.setItem('isStandaloneResource', 'true')
-            isStandaloneResource = true
-          } else {
-            localStorage.setItem('isStandaloneResource', 'false')
-          }
-          if (res.status === 'Live') {
-            window.open(`${environment.portalsForNotifications.cbp}/author/content-detail/${event.message.data.id}/overview-v2?isStandaloneResource=${isStandaloneResource}`, '_blank')
-          } else if (res.status === 'Draft') {
-            if (this.roles.includes('CONTENT_CREATOR')) {
-              window.open(`${environment.portalsForNotifications.cbp}/author/editor/${event.message.data.id}/collectionV2?isStandaloneResource=${isStandaloneResource}`, '_blank')
-            } else {
-              this.snackBar.open('You are not authorized to view this content.')
-            }
-          } else if (res.status === 'Review') {
-            switch (res.reviewStatus) {
-              case 'InReview': {
-                if (this.roles.includes('CONTENT_REVIEWER')) {
-                  window.open(`${environment.portalsForNotifications.cbp}/author/editor/${event.message.data.id}/collectionV2?isStandaloneResource=${isStandaloneResource}&preview=true&editMode=true&status=Review&reviewStatus=${res.reviewStatus}`, '_blank')
-                } else {
-                  this.snackBar.open("You are not authorized to view this content.")
-                }
-                break
-              } case 'Reviewed': {
-                if (this.roles.includes('CONTENT_PUBLISHER')) {
-                  window.open(`${environment.portalsForNotifications.cbp}/author/editor/${event.message.data.id}/collectionV2?isStandaloneResource=${isStandaloneResource}`, '_blank')
-                } else {
-                  this.snackBar.open("You are not authorized to view this content.")
-                }
-                break
-              }
-            }
-          } else if (res.status === 'Retired') {
-            this.snackBar.open('This content is retired.')
-          }
-        })
-      } else {
-        this.router.navigate(['/app/home/notifications'])
-      }
+      this.notificationsService.handleRedirection(event, this.environment, this.roles, this.snackBar)
     } else {
       this.router.navigate(['/app/home/notifications'], { queryParams: { tab: event } })
     }
