@@ -8,6 +8,8 @@ import { LibNotificationsService } from '@sunbird-cb/notification'
 import { NotificationsService } from '../../services/notifications.service'
 import * as _ from 'lodash'
 import { Subscription } from 'rxjs'
+import { environment } from '../../../environments/environment'
+import { MatSnackBar } from '@angular/material/snack-bar'
 @Component({
   selector: 'ws-app-nav-bar',
   templateUrl: './app-nav-bar.component.html',
@@ -40,6 +42,8 @@ export class AppNavBarComponent implements OnInit, OnChanges, OnDestroy {
   popupTour: any
   showDropdown: boolean = false
   private myNotificationsSubscription!: Subscription
+  environment: any
+  roles: string[] = []
   constructor(
     private domSanitizer: DomSanitizer,
     private configSvc: ConfigurationsService,
@@ -47,8 +51,10 @@ export class AppNavBarComponent implements OnInit, OnChanges, OnDestroy {
     private router: Router,
     private libNotificationsService: LibNotificationsService,
     private notificationsService: NotificationsService,
-    private events: EventService
+    private events: EventService,
+    private snackBar: MatSnackBar,
   ) {
+    this.environment = environment
     this.btnAppsConfig = { ...this.basicBtnAppsConfig }
     if (this.configSvc.restrictedFeatures) {
       this.isHelpMenuRestricted = this.configSvc.restrictedFeatures.has('helpNavBarMenu')
@@ -61,6 +67,9 @@ export class AppNavBarComponent implements OnInit, OnChanges, OnDestroy {
         this.cancelTour()
       }
     })
+    if (this.configSvc && this.configSvc.unMappedUser && this.configSvc.unMappedUser.roles) {
+      this.roles = this.configSvc.unMappedUser.roles
+    }
   }
 
   ngOnInit() {
@@ -187,6 +196,55 @@ export class AppNavBarComponent implements OnInit, OnChanges, OnDestroy {
       this.raiseTelemetryEventForNotification(event)
       if (event.category === 'PROFILE') {
         this.router.navigate([`app/home/approvals/approval`])
+      } else if (event.category === 'LEARN') {
+        let url = `${this.environment.portalsForNotifications.portal}/app/toc/${event.message.data.id}`
+        window.open(url, '_blank')
+      } else if (event.category === 'EVENT') {
+        let url = `${this.environment.portalsForNotifications.portal}/app/event-hub/home/${event.message.data.id}`
+        window.open(url, '_blank')
+      } else if (event.category === 'DISCUSSION') {
+        let url = `${this.environment.portalsForNotifications.portal}/app/discussion-forum-v2/community/${event.message.data.communityId}/${event.message.data.discussionId}`
+        window.open(url, '_blank')
+      } else if (event?.category?.includes('CONTENT')) {
+        this.notificationsService.getContentData(event.message.data.id).subscribe((res: any) => {
+          let isStandaloneResource = false
+          if (res.primaryCategory === 'Learning Resource' &&
+            res.resourceCategory !== 'Learning Resource') {
+            localStorage.setItem('isStandaloneResource', 'true')
+            isStandaloneResource = true
+          } else {
+            localStorage.setItem('isStandaloneResource', 'false')
+          }
+          if (res.status === 'Live') {
+            window.open(`${environment.portalsForNotifications.cbp}/author/content-detail/${event.message.data.id}/overview-v2?isStandaloneResource=${isStandaloneResource}`, '_blank')
+          } else if (res.status === 'Draft') {
+            if (this.roles.includes('CONTENT_CREATOR')) {
+              window.open(`${environment.portalsForNotifications.cbp}/author/editor/${event.message.data.id}/collectionV2?isStandaloneResource=${isStandaloneResource}`, '_blank')
+            } else {
+              this.snackBar.open('You are not authorized to view this content.')
+            }
+          } else if (res.status === 'Review') {
+            switch (res.reviewStatus) {
+              case 'InReview': {
+                if (this.roles.includes('CONTENT_REVIEWER')) {
+                  window.open(`${environment.portalsForNotifications.cbp}/author/editor/${event.message.data.id}/collectionV2?isStandaloneResource=${isStandaloneResource}&preview=true&editMode=true&status=Review&reviewStatus=${res.reviewStatus}`, '_blank')
+                } else {
+                  this.snackBar.open("You are not authorized to view this content.")
+                }
+                break
+              } case 'Reviewed': {
+                if (this.roles.includes('CONTENT_PUBLISHER')) {
+                  window.open(`${environment.portalsForNotifications.cbp}/author/editor/${event.message.data.id}/collectionV2?isStandaloneResource=${isStandaloneResource}`, '_blank')
+                } else {
+                  this.snackBar.open("You are not authorized to view this content.")
+                }
+                break
+              }
+            }
+          } else if (res.status === 'Retired') {
+            this.snackBar.open('This content is retired.')
+          }
+        })
       } else {
         this.router.navigate(['/app/home/notifications'])
       }
