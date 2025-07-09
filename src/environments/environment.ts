@@ -22,6 +22,7 @@ export const environment: IEnvironment = {
   compentencyVersionKey: (window as { [key: string]: any })['env']['compentencyVersionKey'] || '',
   doptOrg: (window as { [key: string]: any })['env']['doptOrg'] || '',
   dicussV2Bucket: (window as { [key: string]: any })['env']['dicussV2Bucket'] || '',
+  portalsForNotifications: (((window as { [key: string]: any })['env']['portalsForNotifications'] || {})) || {}
 }
 interface IEnvironment {
   name: null | string
@@ -43,6 +44,7 @@ interface IEnvironment {
   compentencyVersionKey: string
   doptOrg?: string
   dicussV2Bucket: string
+  portalsForNotifications: any
 }
 
 /*
