@@ -36,13 +36,13 @@ export class NotificationsService {
     if (notification.category === 'PROFILE') {
       this.router.navigate([`app/home/approvals/approval`])
     } else if (notification.category === 'LEARN') {
-      let url = `${environment.portalsForNotifications.portal}/app/toc/${notification.message.data.id}`
+      let url = `${environment.portalsForNotifications.learner}/app/toc/${notification.message.data.id}`
       window.open(url, '_blank')
     } else if (notification.category === 'EVENT') {
-      let url = `${environment.portalsForNotifications.portal}/app/event-hub/home/${notification.message.data.id}`
+      let url = `${environment.portalsForNotifications.learner}/app/event-hub/home/${notification.message.data.id}`
       window.open(url, '_blank')
     } else if (notification.category === 'DISCUSSION') {
-      let url = `${environment.portalsForNotifications.portal}/app/discussion-forum-v2/community/${notification.message.data.communityId}/${notification.message.data.discussionId}`
+      let url = `${environment.portalsForNotifications.learner}/app/discussion-forum-v2/community/${notification.message.data.communityId}/${notification.message.data.discussionId}`
       window.open(url, '_blank')
     } else if (notification?.category?.includes('CONTENT')) {
       this.getContentData(notification.message.data.id).subscribe((res: any) => {
