@@ -4,10 +4,12 @@ import { Observable, Subject } from 'rxjs'
 import * as _ from 'lodash'
 import { map, retry } from 'rxjs/operators'
 import { Router } from '@angular/router'
+import { ConfigurationsService } from '@sunbird-cb/utils'
 const API_END_POINTS = {
   NOTIFICATIONS_COUNT: `apis/proxies/v8/v1/notifications/unread/count`,
   CONTENT_READ: (contentId: any) => `/apis/proxies/v8/action/content/v3/read/${contentId}`,
   RESET_NOTIFICATIONS_COUNT: `apis/proxies/v8/v1/notifications/reset/unread/count`,
+  WORKFLOW_SEARCH: `apis/protected/v8/workflowhandler/profileApprovalSearch`,
 }
 
 @Injectable({
@@ -17,9 +19,18 @@ const API_END_POINTS = {
 export class NotificationsService {
   closeDialogPop = new Subject()
   nofificationsCount = new Subject()
+  orgName = ''
   constructor(private http: HttpClient,
+    private configService: ConfigurationsService,
     private router: Router,
-  ) { }
+  ) {
+    if (this.configService && this.configService.unMappedUser
+      && this.configService.unMappedUser.profileDetails
+      && this.configService.unMappedUser.profileDetails.employmentDetails
+      && this.configService.unMappedUser.profileDetails.employmentDetails.departmentName) {
+      this.orgName = this.configService.unMappedUser.profileDetails.employmentDetails.departmentName
+    }
+  }
 
   getNotificationsData(): Observable<any> {
     return this.http.get(API_END_POINTS.NOTIFICATIONS_COUNT)
@@ -33,13 +44,45 @@ export class NotificationsService {
       retry(1))
   }
 
+  searchWorkflowSearch(req: any): Observable<any> {
+    return this.http.post(API_END_POINTS.WORKFLOW_SEARCH, req)
+  }
+
+
+
   resetNotificationsCount(): Observable<any> {
     return this.http.get(API_END_POINTS.RESET_NOTIFICATIONS_COUNT, {})
   }
 
   handleRedirection(notification: any, environment: any, roles: any[], snackBar: any): void {
     if (notification.category === 'PROFILE') {
-      this.router.navigate([`app/home/approvals/approval`])
+      let req: any = {
+        applicationStatus: 'SEND_FOR_APPROVAL',
+        deptName: this.orgName,
+        limit: 50,
+        serviceName: 'profile'
+      }
+      if (notification.sub_category === 'PROFILE_VERIFICATION') {
+        req["requestType"] = ['GROUP_CHANGE', 'DESIGNATION_CHANGE']
+      } else if (notification.sub_category === 'USER_TRANSFER') {
+        req["requestType"] = ['ORG_TRANSFER']
+      }
+      this.searchWorkflowSearch(req).subscribe((res: any) => {
+        let data = _.get(res, 'result.data', [])
+        let pendingUser = data.find((item: any) => {
+          return item.wfInfo[0] && item.wfInfo[0].userId === notification.message.data.id
+        })
+        if (pendingUser) {
+          this.router.navigate([`app/home/approvals/approval`])
+        } else if (notification.sub_category === 'PROFILE_VERIFICATION') {
+          snackBar.open('No pending profile verification request for the user')
+        } else if (notification.sub_category === 'USER_TRANSFER') {
+          snackBar.open('No pending transfer request for the user')
+        }
+      }, error => {
+        console.error('Error while fetching workflow search data', error)
+        snackBar.open('Error while fetching approval data')
+      })
     } else if (notification.category === 'LEARN') {
       let url = `${environment.portalsForNotifications.learner}/app/toc/${notification.message.data.id}`
       window.open(url, '_blank')
@@ -93,5 +136,7 @@ export class NotificationsService {
       this.router.navigate(['/app/home/notifications'])
     }
   }
+
+
 
 }
