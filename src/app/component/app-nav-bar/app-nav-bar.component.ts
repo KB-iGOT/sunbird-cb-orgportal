@@ -112,12 +112,12 @@ export class AppNavBarComponent implements OnInit, OnChanges, OnDestroy {
       }
     })
     if (this.configSvc.unMappedUser && this.configSvc.unMappedUser.identifier) {
-      //this.getMyCount()
+      this.getMyCount()
     }
 
     this.myNotificationsSubscription = this.libNotificationsService._unreadCount.subscribe((res: boolean) => {
       if (res === true) {
-        //this.getMyCount()
+        this.getMyCount()
       }
     })
   }
@@ -182,6 +182,15 @@ export class AppNavBarComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   onBellClick() {
+    if (this.notificationsCount > 0) {
+      this.notificationsService.resetNotificationsCount().subscribe((res: any) => {
+        if (res.responseCode === 'OK') {
+          this.notificationsCount = 0
+        }
+      }, error => {
+        console.error('Error while fetching notifications count', error)
+      })
+    }
     this.showDropdown = false
     setTimeout(() => {
       this.showDropdown = true

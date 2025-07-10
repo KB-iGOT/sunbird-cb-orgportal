@@ -6,7 +6,8 @@ import { map, retry } from 'rxjs/operators'
 import { Router } from '@angular/router'
 const API_END_POINTS = {
   NOTIFICATIONS_COUNT: `apis/proxies/v8/v1/notifications/unread/count`,
-  CONTENT_READ: (contentId: any) => `/apis/proxies/v8/action/content/v3/read/${contentId}`
+  CONTENT_READ: (contentId: any) => `/apis/proxies/v8/action/content/v3/read/${contentId}`,
+  RESET_NOTIFICATIONS_COUNT: `apis/proxies/v8/v1/notifications/reset/unread/count`,
 }
 
 @Injectable({
@@ -30,6 +31,10 @@ export class NotificationsService {
         return data.result.content
       }),
       retry(1))
+  }
+
+  resetNotificationsCount(): Observable<any> {
+    return this.http.get(API_END_POINTS.RESET_NOTIFICATIONS_COUNT, {})
   }
 
   handleRedirection(notification: any, environment: any, roles: any[], snackBar: any): void {
