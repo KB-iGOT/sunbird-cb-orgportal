@@ -59,7 +59,7 @@ export class NotificationsService {
       let req: any = {
         applicationStatus: 'SEND_FOR_APPROVAL',
         deptName: this.orgName,
-        limit: 100,
+        limit: 50,
         serviceName: 'profile'
       }
       if (notification.sub_category === 'PROFILE_VERIFICATION') {
