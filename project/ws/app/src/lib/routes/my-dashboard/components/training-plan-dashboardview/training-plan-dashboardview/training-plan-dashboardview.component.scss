@@ -1,0 +1,94 @@
+
+@import 'ws-common';
+@import 'ws-vars';
+
+.center {
+  max-height: calc(100vh - 2 * #{$mat-toolbar-gt-xs} - 2 * 52px);
+  padding: 0px;
+}
+
+.center3 {
+  max-height: calc(100vh - 88px - 56px - 2 * 46px);
+  padding: 0px;
+}
+.height {
+  height: -webkit-fill-available;
+}
+
+@media (min-width: 2053px)  {
+.looker-dashboard {
+  width:98vw ;
+  height: 150vh;
+}
+}
+
+
+@media (min-width: 1850px) and (max-width: 2052px) {
+.looker-dashboard {
+  width:98vw ;
+  height: 175vh;
+}
+}
+
+@media (min-width: 1848px) and (max-width: 1848px) {
+.looker-dashboard {
+  width:98vw ;
+  height: 120vh;
+}
+}
+
+@media (min-width: 1680px) and (max-width: 1847px) {
+.looker-dashboard {
+  width:98vw ;
+  height: 145vh;
+}
+}
+
+@media (min-width: 1511px) and (max-width: 1679px)  {
+.looker-dashboard {
+  width:98vw ;
+  height: 170vh;
+}
+}
+
+@media (min-width: 1344px) and (max-width: 1510px)  {
+.looker-dashboard {
+  width:98vw ;
+  height: 170vh;
+}
+}
+
+@media (min-width: 1233px) and (max-width: 1343px)  {
+.looker-dashboard {
+  width:98vw ;
+  height: 195vh;
+}
+}
+
+@media (min-width: 1098px) and (max-width: 1232px)  {
+.looker-dashboard {
+  width:98vw ;
+  height: 220vh;
+}
+}
+
+@media (min-width: 966px) and (max-width: 1097px)  {
+.looker-dashboard {
+  width:98vw ;
+  height: 320vh;
+}
+}
+
+// @media (min-width: 1056px) and (max-width: 1056px)  {
+// .looker-dashboard {
+//   width:98vw ;
+//   height: 450vh;
+// }
+// }
+
+@media (max-width: 965px)  {
+.looker-dashboard {
+  width:98vw ;
+  height: 520vh;
+}
+}
