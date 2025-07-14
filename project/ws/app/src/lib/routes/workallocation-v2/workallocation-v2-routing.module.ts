@@ -13,12 +13,17 @@ const routes: Routes = [
   {
     path: '',
     pathMatch: 'full',
-    redirectTo: 'create',
+    redirectTo: 'create/default',
   },
   {
     path: '',
     component: WorkallocationV2HomeComponent,
     children: [
+      {
+        path: 'create',
+        redirectTo: 'create/default',
+        pathMatch: 'full',
+      },
       {
         path: 'create/:workorder',
         component: CreateWorkallocationComponent,
@@ -63,14 +68,15 @@ const routes: Routes = [
           module: 'Work Allocation',
         },
       },
-      {
-        path: ':userId',
-        data: {
-          pageId: ':userId',
-          module: 'Work Allocation',
-        },
-        // component: UpdateWorkallocationComponent,
-      }],
+      // {
+      //   path: '/:userId',
+      //   data: {
+      //     pageId: ':userId',
+      //     module: 'Work Allocation',
+      //   },
+      //   component: UpdateWorkallocationComponent,
+      // }
+    ],
   },
 ]
 @NgModule({
