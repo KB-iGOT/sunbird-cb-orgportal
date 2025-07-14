@@ -1,6 +1,6 @@
 
 import { StepService } from '../../services/step.service'
-import { EventService } from '@sunbird-cb/utils'
+import { EventService } from '@sunbird-cb/utils-v2'
 import { SetupLeftMenuComponent } from './left-menu.component'
 
 describe('SetupLeftMenuComponent', () => {

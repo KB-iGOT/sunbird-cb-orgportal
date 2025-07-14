@@ -4,7 +4,7 @@ import { Observable, Subject } from 'rxjs'
 import * as _ from 'lodash'
 import { map, retry } from 'rxjs/operators'
 import { Router } from '@angular/router'
-import { ConfigurationsService } from '@sunbird-cb/utils'
+import { ConfigurationsService } from '@sunbird-cb/utils-v2'
 const API_END_POINTS = {
   NOTIFICATIONS_COUNT: `apis/proxies/v8/v1/notifications/unread/count`,
   CONTENT_READ: (contentId: any) => `/apis/proxies/v8/action/content/v3/read/${contentId}`,

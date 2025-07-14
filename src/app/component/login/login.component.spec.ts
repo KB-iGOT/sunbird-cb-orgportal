@@ -1,7 +1,7 @@
 
 import { DomSanitizer } from '@angular/platform-browser'
 import { ActivatedRoute } from '@angular/router'
-import { ConfigurationsService } from '@sunbird-cb/utils'
+import { ConfigurationsService } from '@sunbird-cb/utils-v2'
 import { LoginComponent } from './login.component'
 
 describe('LoginComponent', () => {

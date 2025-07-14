@@ -11,7 +11,7 @@ import { UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms
 import { StaffdetailspopupComponent } from '../../components/staffdetailspopup/staffdetailspopup.component'
 import { ActivatedRoute } from '@angular/router'
 import { MdoInfoService } from '../../services/mdoinfo.service'
-import { ConfigurationsService } from '@sunbird-cb/utils'
+import { ConfigurationsService } from '@sunbird-cb/utils-v2'
 import { preventHtmlAndJs } from '../../../validators/prevent-html-and-js.validator'
 
 @Component({

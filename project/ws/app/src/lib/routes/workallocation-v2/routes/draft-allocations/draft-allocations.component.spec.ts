@@ -7,7 +7,7 @@ jest.mock('@angular/router', () => ({
 }))
 
 jest.mock('../../services/uploadfile.service')
-jest.mock('@sunbird-cb/utils')
+jest.mock('@sunbird-cb/utils-v2')
 jest.mock('@angular/material/legacy-dialog')
 jest.mock('../../services/allocation.service')
 jest.mock('../../../../head/_services/telemetry.event.model')

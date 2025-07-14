@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http'
 import { Injectable } from '@angular/core'
 import { NSSearch } from '@sunbird-cb/collection'
-import { ConfigurationsService, EventService, WsEvents } from '@sunbird-cb/utils'
+import { ConfigurationsService, EventService, WsEvents } from '@sunbird-cb/utils-v2'
 import { Observable, of } from 'rxjs'
 import { SearchApiService } from '../apis/search-api.service'
 import { IFilterUnitItem, IFilterUnitResponse, ISearchAutoComplete, ISearchQuery, ISearchRequest, ISearchSocialSearchPartialRequest, ISocialSearchRequest } from '../models/search.model'

@@ -98,7 +98,7 @@ import {
   AuthorCardModule,
 } from '@sunbird-cb/collection'
 import { WidgetResolverModule } from '@sunbird-cb/resolver'
-import { LoggerService, PipeSafeSanitizerModule } from '@sunbird-cb/utils'
+import { LoggerService, NPSGridService, PipeSafeSanitizerModule } from '@sunbird-cb/utils-v2'
 import { SearchModule } from '@ws/app/src/public-api'
 import 'hammerjs'
 // import { KeycloakAngularModule } from 'keycloak-angular'
@@ -324,7 +324,8 @@ const getBaseHref = (platformLocation: PlatformLocation): string => {
     { provide: 'environment', useValue: environment },
     LoaderService,
     LibNotificationsService,
-    NotificationsService
+    NotificationsService,
+    NPSGridService
   ]
 })
 

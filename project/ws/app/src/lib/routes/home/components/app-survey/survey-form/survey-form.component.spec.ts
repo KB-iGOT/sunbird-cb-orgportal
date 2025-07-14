@@ -1,5 +1,5 @@
 import { ActivatedRoute, ActivatedRouteSnapshot } from '@angular/router'
-import { ConfigurationsService } from '@sunbird-cb/utils'
+import { ConfigurationsService } from '@sunbird-cb/utils-v2'
 import { SurveyFormComponent } from './survey-form.component'
 import { of } from 'rxjs'
 

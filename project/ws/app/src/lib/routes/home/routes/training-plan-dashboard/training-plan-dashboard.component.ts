@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
 // import { TelemetryEvents } from '../../../../head/_services/telemetry.event.model'
-// import { EventService } from '@sunbird-cb/utils'
+// import { EventService } from '@sunbird-cb/utils-v2'
 import { ITableData } from '@sunbird-cb/collection/lib/ui-org-table/interface/interfaces'
 import { TrainingPlanDashboardService } from '../../services/training-plan-dashboard.service'
 import moment from 'moment'

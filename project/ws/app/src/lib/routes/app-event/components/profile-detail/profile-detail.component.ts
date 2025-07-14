@@ -4,7 +4,7 @@ import { EventService } from '../../services/event.service'
 import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog'
 import { ViewUsersComponent } from './view-users/view-users.component'
 import { IUserDetails } from '../../interfaces/user-details.model'
-import { ValueService } from '@sunbird-cb/utils'
+import { ValueService } from '@sunbird-cb/utils-v2'
 import { Subscription } from 'rxjs'
 
 @Component({

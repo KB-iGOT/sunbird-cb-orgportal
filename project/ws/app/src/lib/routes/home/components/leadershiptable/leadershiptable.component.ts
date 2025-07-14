@@ -9,7 +9,7 @@ import { IColums, ITableData } from '../../interface/interfaces'
 import * as _ from 'lodash'
 import { AdduserpopupComponent } from '../adduserpopup/adduserpopup.component'
 import { MdoInfoService } from '../../services/mdoinfo.service'
-import { ConfigurationsService } from '@sunbird-cb/utils'
+import { ConfigurationsService } from '@sunbird-cb/utils-v2'
 import { ActivatedRoute, Router } from '@angular/router'
 import { ProfileV2UtillService } from '../../services/home-utill.service'
 

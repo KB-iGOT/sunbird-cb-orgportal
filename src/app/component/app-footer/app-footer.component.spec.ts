@@ -1,5 +1,5 @@
 import { AppFooterComponent } from './app-footer.component'
-import { ConfigurationsService, ValueService } from '@sunbird-cb/utils'
+import { ConfigurationsService, ValueService } from '@sunbird-cb/utils-v2'
 import { of } from 'rxjs'
 
 describe('AppFooterComponent', () => {

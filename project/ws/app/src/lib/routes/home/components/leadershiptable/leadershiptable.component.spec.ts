@@ -1,6 +1,6 @@
 import { LeadershiptableComponent } from './leadershiptable.component'
 import { MdoInfoService } from '../../services/mdoinfo.service'
-import { ConfigurationsService } from '@sunbird-cb/utils'
+import { ConfigurationsService } from '@sunbird-cb/utils-v2'
 import { ProfileV2UtillService } from '../../services/home-utill.service'
 import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar'
 import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog'

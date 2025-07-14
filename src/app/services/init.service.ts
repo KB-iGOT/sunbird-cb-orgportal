@@ -20,7 +20,7 @@ import {
   // NsUser,
   UserPreferenceService,
   // AuthKeycloakService,
-} from '@sunbird-cb/utils'
+} from '@sunbird-cb/utils-v2'
 import { map } from 'rxjs/operators'
 import { environment } from '../../environments/environment'
 /* tslint:disable*/
@@ -241,7 +241,7 @@ export class InitService {
     // TODO: set one org as default org :: use user preference
     this.configSvc.activeOrg = publicConfig.org[0]
     this.configSvc.appSetup = publicConfig.appSetup
-    this.configSvc.competency = publicConfig.competency
+    this.configSvc.compentency = publicConfig.compentency
 
     return publicConfig
   }

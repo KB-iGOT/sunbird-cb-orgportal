@@ -1,12 +1,12 @@
 import { TrainingRogramsComponent } from './training-rograms.component'
 import { OrgProfileService } from '../../services/org-profile.service'
-import { ConfigurationsService } from '@sunbird-cb/utils'
+import { ConfigurationsService } from '@sunbird-cb/utils-v2'
 import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog'
 import { UntypedFormGroup } from '@angular/forms'
 
 // Mock the dependencies
 jest.mock('../../services/org-profile.service')
-jest.mock('@sunbird-cb/utils')
+jest.mock('@sunbird-cb/utils-v2')
 jest.mock('@angular/material/legacy-dialog')
 
 describe('TrainingRogramsComponent', () => {

@@ -1,8 +1,8 @@
 
 import { ProfileV2Service } from '../services/home.servive'
-import { ConfigurationsService } from '@sunbird-cb/utils'
+import { ConfigurationsService } from '@sunbird-cb/utils-v2'
 import { of, throwError } from 'rxjs'
-import { IResolveResponse } from '@sunbird-cb/utils'
+import { IResolveResponse } from '@sunbird-cb/utils-v2'
 import { NSProfileDataV2 } from '../models/profile-v2.model'
 import { HomeResolve } from './home-resolve'
 

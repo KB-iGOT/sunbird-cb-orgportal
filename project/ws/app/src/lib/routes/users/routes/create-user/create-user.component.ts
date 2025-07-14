@@ -5,7 +5,7 @@ import { UsersService } from '../../services/users.service'
 import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar'
 import { ILeftMenu } from '@sunbird-cb/collection'
 import { NsWidgetResolver } from '@sunbird-cb/resolver'
-import { ValueService } from '@sunbird-cb/utils'
+import { ValueService } from '@sunbird-cb/utils-v2'
 /* tslint:disable */
 import * as _ from 'lodash'
 import { Subscription } from 'rxjs'

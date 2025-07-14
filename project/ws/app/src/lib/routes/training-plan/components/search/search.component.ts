@@ -37,7 +37,7 @@ export class SearchComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    this.compentencyKey = this.initService.configSvc.competency[environment.compentencyVersionKey]
+    this.compentencyKey = this.initService.configSvc.compentency[environment.compentencyVersionKey]
     this.tpdsSvc.handleContentPageChange.subscribe((pageData: any) => {
       if (pageData) {
         this.pageIndex = pageData.pageIndex

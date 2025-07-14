@@ -9,7 +9,7 @@ import {
   NsPage, LogoutComponent,
   SubapplicationRespondService,
   ValueService,
-} from '@sunbird-cb/utils'
+} from '@sunbird-cb/utils-v2'
 import { NsWidgetResolver } from '@sunbird-cb/resolver'
 import { ROOT_WIDGET_CONFIG, CustomTourService } from '@sunbird-cb/collection'
 import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog'

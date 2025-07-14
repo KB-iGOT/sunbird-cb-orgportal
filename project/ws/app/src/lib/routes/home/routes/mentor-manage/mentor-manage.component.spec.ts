@@ -1,7 +1,7 @@
 import { MentorManageComponent } from './mentor-manage.component'
 import { of } from 'rxjs'
 import { ActivatedRoute, Router } from '@angular/router'
-import { EventService } from '@sunbird-cb/utils'
+import { EventService } from '@sunbird-cb/utils-v2'
 import { DomSanitizer } from '@angular/platform-browser'
 import { UsersService } from '../../../users/services/users.service'
 import { LoaderService } from '../../../../../../../../../src/app/services/loader.service'

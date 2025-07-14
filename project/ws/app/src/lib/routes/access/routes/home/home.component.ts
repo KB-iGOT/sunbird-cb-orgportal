@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core'
 import { Router, Event, NavigationEnd, ActivatedRoute } from '@angular/router'
 import { ILeftMenuWithoutLogo } from '@sunbird-cb/collection'
 import { NsWidgetResolver } from '@sunbird-cb/resolver'
-import { ValueService } from '@sunbird-cb/utils'
+import { ValueService } from '@sunbird-cb/utils-v2'
 import { map } from 'rxjs/operators'
 /* tslint:disable */
 import * as _ from 'lodash'

@@ -1,4 +1,4 @@
-import { EventService } from '@sunbird-cb/utils'
+import { EventService } from '@sunbird-cb/utils-v2'
 import { LeftMenuComponent } from './left-menu.component'
 
 describe('LeftMenuComponent', () => {
