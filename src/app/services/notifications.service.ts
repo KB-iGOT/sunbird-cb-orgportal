@@ -86,6 +86,9 @@ export class NotificationsService {
     } else if (notification.category === 'LEARN') {
       let url = `${environment.portalsForNotifications.learner}/app/toc/${notification.message.data.id}`
       window.open(url, '_blank')
+    } else if (notification.category === 'NETWORK') {
+      let url = `${environment.portalsForNotifications.learner}/app/network-v2/connections`
+      window.open(url, '_blank')
     } else if (notification.category === 'EVENT') {
       let url = `${environment.portalsForNotifications.learner}/app/event-hub/home/${notification.message.data.id}`
       window.open(url, '_blank')
