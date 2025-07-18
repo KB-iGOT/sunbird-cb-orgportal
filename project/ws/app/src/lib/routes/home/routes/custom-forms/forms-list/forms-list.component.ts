@@ -6,9 +6,11 @@ import { MatTableDataSource } from '@angular/material/table'
 import * as _ from 'lodash'
 import { ActivatedRoute } from '@angular/router'
 import { MatSnackBar } from '@angular/material/snack-bar'
-import { MatDialog } from '@angular/material/dialog'
+import { ReportsVideoComponent } from '../../reports-video/reports-video.component'
+import { environment } from '../../../../../../../../../../src/environments/environment'
 import { ConfirmDeleteComponent } from '../confirm-delete/confirm-delete.component'
 import { CustomFieldsService } from '../../../../users/custom-fields.service'
+import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog'
 @Component({
   selector: 'ws-app-forms-list',
   templateUrl: './forms-list.component.html',
@@ -42,6 +44,7 @@ export class FormsListComponent implements OnInit, AfterViewInit {
   canEnable: boolean = false
   inputFormControls: { [key: string]: FormControl } = {};
   enabledFileds: any[] = []
+  panelOpenState = true
 
   constructor(private customFieldsService: CustomFieldsService,
     private activeRoute: ActivatedRoute, private matSnackBar: MatSnackBar, private matDialog: MatDialog
@@ -156,6 +159,20 @@ export class FormsListComponent implements OnInit, AfterViewInit {
       this.dataSource.paginator = this.paginator
       this.dataSource.sort = this.sort
     }
+  }
+
+  openVideoPopup() {
+    let url = ''
+    url = `${environment.karmYogiPath}/assets/public/content/guide-videos/MDO-leader-reports.MP4`
+    this.matDialog.open(ReportsVideoComponent, {
+      data: {
+        videoLink: url,
+      },
+      disableClose: true,
+      width: '50%',
+      height: '55%',
+      panelClass: 'overflow-visable',
+    })
   }
 
   onToggleChange(event: any, element: any) {
