@@ -44,6 +44,7 @@ export class FormsListComponent implements OnInit, AfterViewInit {
   canEnable: boolean = false
   inputFormControls: { [key: string]: FormControl } = {};
   enabledFileds: any[] = []
+  panelOpenState = true
 
   constructor(private customFieldsService: CustomFieldsService,
     private activeRoute: ActivatedRoute, private matSnackBar: MatSnackBar, private matDialog: MatDialog
