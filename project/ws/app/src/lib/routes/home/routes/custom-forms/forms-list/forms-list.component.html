@@ -7,10 +7,51 @@
   <mat-card>
     <div class="flex justify-between">
       <span class="mobile-margin mat-h2">Custom Fields</span>
+    </div>
+    <mat-accordion class="cutomDemo">
+      <mat-expansion-panel (opened)="panelOpenState = true" (closed)="panelOpenState = false">
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            <div class="flex-4 mobile-margin text-capitalize mat-h2 padding-10">Note:</div>
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+        <div class="flex gap-10 mt-2">
+          <div class="section-1 mt-4">
+            <div class="flex gap-4 mb-4">
+              <div>
+                <mat-icon class="infoIcon">info_outlined</mat-icon>
+              </div>
+              <div>This shows how the custom fields are displayed in the learner portal.</div>
+            </div>
+            <div class="flex gap-4 mb-4">
+              <div>
+                <mat-icon class="infoIcon">info_outlined</mat-icon>
+              </div>
+              <div>This shows how the custom fields are displayed in the learner portal.</div>
+            </div>
+            <div class="flex gap-4 mb-4">
+              <div>
+                <mat-icon class="infoIcon">info_outlined</mat-icon>
+              </div>
+              <div>This shows how the custom fields are displayed in the learner portal.</div>
+            </div>
+          </div>
+          <div class="cutomDemo flex justify-end section-2">
+            <div class="customDemoVideo flex flex-column flex-middle justify-center" (click)="openVideoPopup()">
+              <mat-icon class="video_icon mb-2">play_circle</mat-icon>
+              <div>
+                Watch how it works
+              </div>
+            </div>
+          </div>
+        </div>
+      </mat-expansion-panel>
+    </mat-accordion>
+    <div class="flex justify-end mt-5">
       <button mat-button class="createFormBtn" (click)="redirectToNewForm()" *ngIf="!showCreateForm">Create new custom
         field</button>
     </div>
-    <div class="flex flex justify-end my-5" *ngIf="!showCreateForm">
+    <div class="flex flex justify-end my-4" *ngIf="!showCreateForm">
       <div class="fieldOptions flex items-center gap-4 pr-2 font-bold toggle-background">
         <mat-slide-toggle class="example-margin" [checked]="canEnable" [disabled]="!enabledFileds?.length > 0"
           (change)="onToggle($event)">

@@ -76,3 +76,37 @@
 ::ng-deep .filedTextbox .mat-form-field-appearance-outline .mat-form-field-infix {
   padding: 0rem!important;
 }
+
+.section-1 {
+    width: 80%;
+  }
+
+  .section-2 {
+    width: 20%;
+  }
+
+  .infoIcon {
+    rotate: 180deg;
+    color: #000000;
+    opacity: 0.6;
+    font-size: 20px;
+    margin-top: -3px;
+    margin-left: -4px;
+  }
+
+  .cutomDemo {
+
+
+    .customDemoVideo {
+      width: 290px;
+      height: 163px;
+      border-radius: 5px;
+      background-color: #FDEAD5;
+      font-weight: 600;
+      pointer-events: all;
+      cursor: pointer;
+
+
+    }
+  }
+
