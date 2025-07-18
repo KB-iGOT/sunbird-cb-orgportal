@@ -163,7 +163,7 @@ export class FormsListComponent implements OnInit, AfterViewInit {
 
   openVideoPopup() {
     let url = ''
-    url = `${environment.karmYogiPath}/assets/public/content/guide-videos/MDO-leader-reports.MP4`
+    url = `${environment.karmYogiPath}/content-store/Karmayogi_Bharat_MDO.mp4`
     this.matDialog.open(ReportsVideoComponent, {
       data: {
         videoLink: url,
