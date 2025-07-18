@@ -10,6 +10,7 @@ const API_END_POINTS = {
   CONTENT_READ: (contentId: any) => `/apis/proxies/v8/action/content/v3/read/${contentId}`,
   RESET_NOTIFICATIONS_COUNT: `apis/proxies/v8/v1/notifications/reset/unread/count`,
   WORKFLOW_SEARCH: `apis/protected/v8/workflowhandler/profileApprovalSearch`,
+  CONNECTION_REQUEST: (pageNo: any, pageSize: any) => `apis/protected/v8/connections/v2/connections/requests/received?pageNo=${pageNo}&pageSize=${pageSize}`,
 }
 
 @Injectable({
@@ -48,10 +49,59 @@ export class NotificationsService {
     return this.http.post(API_END_POINTS.WORKFLOW_SEARCH, req)
   }
 
-
+  getMyRequests(): Observable<any> {
+    return this.http.get<any>(`${API_END_POINTS.CONNECTION_REQUEST(0, 100)}`).pipe(
+      map((data: any) => {
+        return data.result.data
+      }),
+      retry(1))
+  }
 
   resetNotificationsCount(): Observable<any> {
     return this.http.get(API_END_POINTS.RESET_NOTIFICATIONS_COUNT, {})
+  }
+
+  handleNetworkRedirection(notification: any, snackBar: any, environment: any): void {
+    if (notification.sub_category === 'REJECTED_CONNECTION_REQUEST') {
+      snackBar.open('Your connection request has been rejected.')
+    } else if (notification.sub_category === 'SEND_CONNECTION_REQUEST') {
+      this.getMyRequests().subscribe((res: any) => {
+        if (res && res.length) {
+          const connection = res.find((item: any) => item.userId === notification.message.data.id)
+          if (connection) {
+            let url = `${environment.portalsForNotifications.learner}/app/network-v2/connections`
+            window.open(url, '_blank')
+          } else {
+            snackBar.open('No pending request found for the user.')
+          }
+        } else {
+          snackBar.open('No pending request found for the user.')
+        }
+      })
+    } else {
+      let url = `${environment.portalsForNotifications.learner}/app/network-v2/connections`
+      window.open(url, '_blank')
+    }
+  }
+
+  handleReviewStatus(res: any, notification: any, isStandaloneResource: boolean, roles: string[], environment: any, snackBar: any): void {
+    switch (res.reviewStatus) {
+      case 'InReview': {
+        if (roles.includes('CONTENT_REVIEWER')) {
+          window.open(`${environment.portalsForNotifications.cbp}/author/editor/${notification.message.data.id}/collectionV2?isStandaloneResource=${isStandaloneResource}&preview=true&editMode=true&status=Review&reviewStatus=${res.reviewStatus}`, '_blank')
+        } else {
+          snackBar.open("You are not authorized to view this content.")
+        }
+        break
+      } case 'Reviewed': {
+        if (roles.includes('CONTENT_PUBLISHER')) {
+          window.open(`${environment.portalsForNotifications.cbp}/author/editor/${notification.message.data.id}/collectionV2?isStandaloneResource=${isStandaloneResource}`, '_blank')
+        } else {
+          snackBar.open("You are not authorized to view this content.")
+        }
+        break
+      }
+    }
   }
 
   handleRedirection(notification: any, environment: any, roles: any[], snackBar: any): void {
@@ -87,8 +137,7 @@ export class NotificationsService {
       let url = `${environment.portalsForNotifications.learner}/app/toc/${notification.message.data.id}`
       window.open(url, '_blank')
     } else if (notification.category === 'NETWORK') {
-      let url = `${environment.portalsForNotifications.learner}/app/network-v2/connections`
-      window.open(url, '_blank')
+      this.handleNetworkRedirection(notification, snackBar, environment)
     } else if (notification.category === 'EVENT') {
       let url = `${environment.portalsForNotifications.learner}/app/event-hub/home/${notification.message.data.id}`
       window.open(url, '_blank')
@@ -114,23 +163,7 @@ export class NotificationsService {
             snackBar.open('You are not authorized to view this content.')
           }
         } else if (res.status === 'Review') {
-          switch (res.reviewStatus) {
-            case 'InReview': {
-              if (roles.includes('CONTENT_REVIEWER')) {
-                window.open(`${environment.portalsForNotifications.cbp}/author/editor/${notification.message.data.id}/collectionV2?isStandaloneResource=${isStandaloneResource}&preview=true&editMode=true&status=Review&reviewStatus=${res.reviewStatus}`, '_blank')
-              } else {
-                snackBar.open("You are not authorized to view this content.")
-              }
-              break
-            } case 'Reviewed': {
-              if (roles.includes('CONTENT_PUBLISHER')) {
-                window.open(`${environment.portalsForNotifications.cbp}/author/editor/${notification.message.data.id}/collectionV2?isStandaloneResource=${isStandaloneResource}`, '_blank')
-              } else {
-                snackBar.open("You are not authorized to view this content.")
-              }
-              break
-            }
-          }
+          this.handleReviewStatus(res, notification, isStandaloneResource, roles, environment, snackBar)
         } else if (res.status === 'Retired') {
           snackBar.open('This content is retired.')
         }
