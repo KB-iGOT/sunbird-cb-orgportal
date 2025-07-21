@@ -99,7 +99,8 @@
   <div class="p-4" *ngIf="item.type === 'notificationButton'">
     <div #notificationTrigger [matMenuTriggerFor]="menu" class="relative cursor-pointer" (click)="onBellClick()"
       title="Notifications" role="button" aria-label="Notifications" tabindex="0"
-      (keydown.enter)="$event.preventDefault(); notificationTrigger.click(); onBellClick();">
+      (keydown.enter)="$event.preventDefault(); notificationTrigger.click(); onBellClick();"
+      (keydown.escape)="$event.preventDefault(); notificationTrigger.click();">
       <mat-icon class="bell-icon">notifications</mat-icon>
       <span class="counter" *ngIf="notificationsCount > 0">{{notificationsCount > 9 ? '9+' : notificationsCount}}</span>
     </div>
