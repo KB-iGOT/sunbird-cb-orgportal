@@ -1,6 +1,9 @@
 import { Component } from '@angular/core'
 import { Router } from '@angular/router'
-import { EventService } from '@sunbird-cb/utils'
+import { ConfigurationsService, EventService } from '@sunbird-cb/utils'
+import { environment } from '../../../../../../../../../src/environments/environment'
+import { NotificationsService } from '../../../../../../../../../src/app/services/notifications.service'
+import { MatSnackBar } from '@angular/material/snack-bar'
 
 @Component({
   selector: 'ws-app-my-notifications',
@@ -8,17 +11,24 @@ import { EventService } from '@sunbird-cb/utils'
   styleUrls: ['./my-notifications.component.scss']
 })
 export class MyNotificationsComponent {
+  environment: any
+  roles: string[] = []
 
-  constructor(private router: Router, private events: EventService) { }
+  constructor(private router: Router, private events: EventService,
+    private configSvc: ConfigurationsService,
+    private notificationsService: NotificationsService,
+    private snackBar: MatSnackBar,
+  ) {
+    if (this.configSvc && this.configSvc.unMappedUser && this.configSvc.unMappedUser.roles) {
+      this.roles = this.configSvc.unMappedUser.roles
+    }
+    this.environment = environment
+  }
 
   redirectTo(notification: any) {
     if (notification.category) {
       this.raiseTelemetryEventForNotification(notification)
-      if (notification.category === 'PROFILE') {
-        this.router.navigate([`app/home/approvals/approval`])
-      } else {
-        this.router.navigate(['/app/home/notifications'])
-      }
+      this.notificationsService.handleRedirection(notification, this.environment, this.roles, this.snackBar)
     } else {
       this.router.navigate(['/app/home/notifications'], { queryParams: { tab: notification } })
     }

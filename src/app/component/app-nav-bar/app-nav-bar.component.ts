@@ -8,6 +8,8 @@ import { LibNotificationsService } from '@sunbird-cb/notification'
 import { NotificationsService } from '../../services/notifications.service'
 import * as _ from 'lodash'
 import { Subscription } from 'rxjs'
+import { environment } from '../../../environments/environment'
+import { MatSnackBar } from '@angular/material/snack-bar'
 @Component({
   selector: 'ws-app-nav-bar',
   templateUrl: './app-nav-bar.component.html',
@@ -40,6 +42,8 @@ export class AppNavBarComponent implements OnInit, OnChanges, OnDestroy {
   popupTour: any
   showDropdown: boolean = false
   private myNotificationsSubscription!: Subscription
+  environment: any
+  roles: string[] = []
   constructor(
     private domSanitizer: DomSanitizer,
     private configSvc: ConfigurationsService,
@@ -47,8 +51,10 @@ export class AppNavBarComponent implements OnInit, OnChanges, OnDestroy {
     private router: Router,
     private libNotificationsService: LibNotificationsService,
     private notificationsService: NotificationsService,
-    private events: EventService
+    private events: EventService,
+    private snackBar: MatSnackBar,
   ) {
+    this.environment = environment
     this.btnAppsConfig = { ...this.basicBtnAppsConfig }
     if (this.configSvc.restrictedFeatures) {
       this.isHelpMenuRestricted = this.configSvc.restrictedFeatures.has('helpNavBarMenu')
@@ -61,6 +67,9 @@ export class AppNavBarComponent implements OnInit, OnChanges, OnDestroy {
         this.cancelTour()
       }
     })
+    if (this.configSvc && this.configSvc.unMappedUser && this.configSvc.unMappedUser.roles) {
+      this.roles = this.configSvc.unMappedUser.roles
+    }
   }
 
   ngOnInit() {
@@ -103,12 +112,12 @@ export class AppNavBarComponent implements OnInit, OnChanges, OnDestroy {
       }
     })
     if (this.configSvc.unMappedUser && this.configSvc.unMappedUser.identifier) {
-      //this.getMyCount()
+      this.getMyCount()
     }
 
     this.myNotificationsSubscription = this.libNotificationsService._unreadCount.subscribe((res: boolean) => {
       if (res === true) {
-        //this.getMyCount()
+        this.getMyCount()
       }
     })
   }
@@ -173,6 +182,15 @@ export class AppNavBarComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   onBellClick() {
+    if (this.notificationsCount > 0) {
+      this.notificationsService.resetNotificationsCount().subscribe((res: any) => {
+        if (res.responseCode === 'OK') {
+          this.notificationsCount = 0
+        }
+      }, error => {
+        console.error('Error while fetching notifications count', error)
+      })
+    }
     this.showDropdown = false
     setTimeout(() => {
       this.showDropdown = true
@@ -185,11 +203,7 @@ export class AppNavBarComponent implements OnInit, OnChanges, OnDestroy {
   viewAllClick(event: any) {
     if (event.category) {
       this.raiseTelemetryEventForNotification(event)
-      if (event.category === 'PROFILE') {
-        this.router.navigate([`app/home/approvals/approval`])
-      } else {
-        this.router.navigate(['/app/home/notifications'])
-      }
+      this.notificationsService.handleRedirection(event, this.environment, this.roles, this.snackBar)
     } else {
       this.router.navigate(['/app/home/notifications'], { queryParams: { tab: event } })
     }
