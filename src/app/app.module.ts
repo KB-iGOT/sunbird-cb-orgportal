@@ -134,6 +134,7 @@ import { LoaderService } from './services/loader.service'
 import { ConfirmationBoxComponent } from '../../project/ws/app/src/lib/routes/training-plan/components/confirmation-box/confirmation.box.component'
 import { LibNotificationsService, NotificationDropdownModule } from '@sunbird-cb/notification'
 import { NotificationsService } from './services/notifications.service'
+import { MatSnackBarModule } from '@angular/material/snack-bar'
 /** Collection Library Modules */
 
 // @Injectable()
@@ -278,6 +279,7 @@ const getBaseHref = (platformLocation: PlatformLocation): string => {
     UIORGTableModule,
     BreadcrumbsOrgModule,
     AuthorCardModule,
+    MatSnackBarModule,
     ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production }),
     NotificationDropdownModule,
   ],
