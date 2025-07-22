@@ -63,7 +63,7 @@ export class NotificationsService {
 
   handleNetworkRedirection(notification: any, snackBar: any, environment: any): void {
     if (notification.sub_category === 'REJECTED_CONNECTION_REQUEST') {
-      snackBar.open('Your connection request has been rejected.')
+      snackBar.open('This request has been resolved or is no longer available.')
     } else if (notification.sub_category === 'SEND_CONNECTION_REQUEST') {
       this.getMyRequests().subscribe((res: any) => {
         if (res && res.length) {
@@ -72,10 +72,10 @@ export class NotificationsService {
             let url = `${environment.portalsForNotifications.learner}/app/network-v2/connections`
             window.open(url, '_blank')
           } else {
-            snackBar.open('No pending request found for the user.')
+            snackBar.open('This request has been resolved or is no longer available.')
           }
         } else {
-          snackBar.open('No pending request found for the user.')
+          snackBar.open('This request has been resolved or is no longer available.')
         }
       })
     } else {
@@ -125,9 +125,9 @@ export class NotificationsService {
         if (pendingUser) {
           this.router.navigate([`app/home/approvals/approval`])
         } else if (notification.sub_category === 'PROFILE_VERIFICATION') {
-          snackBar.open('No pending profile verification request for the user')
+          snackBar.open('This request has been resolved or is no longer available.')
         } else if (notification.sub_category === 'USER_TRANSFER') {
-          snackBar.open('No pending transfer request for the user')
+          snackBar.open('This request has been resolved or is no longer available.')
         }
       }, error => {
         console.error('Error while fetching workflow search data', error)
