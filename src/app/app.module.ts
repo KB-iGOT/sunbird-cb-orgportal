@@ -97,7 +97,7 @@ import {
   BreadcrumbsOrgModule,
   AuthorCardModule,
 } from '@sunbird-cb/collection'
-import { WidgetResolverModule } from '@sunbird-cb/resolver'
+import { SbUiResolverModule } from '@sunbird-cb/resolver-v2'
 import { LoggerService, NPSGridService, PipeSafeSanitizerModule } from '@sunbird-cb/utils-v2'
 import { SearchModule } from '@ws/app/src/public-api'
 import 'hammerjs'
@@ -181,7 +181,7 @@ const getBaseHref = (platformLocation: PlatformLocation): string => {
     BrowserAnimationsModule,
     // KeycloakAngularModule,
     AppRoutingModule,
-    WidgetResolverModule.forRoot(WIDGET_REGISTRATION_CONFIG),
+    SbUiResolverModule.forRoot(WIDGET_REGISTRATION_CONFIG),
     StickyHeaderModule,
     ErrorResolverModule,
     // Material Imports

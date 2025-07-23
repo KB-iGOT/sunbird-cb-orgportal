@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy, AfterViewInit, ElementRef, HostListener, 
 import { Router, Event, NavigationEnd, ActivatedRoute } from '@angular/router'
 import { ConfigurationsService, ValueService } from '@sunbird-cb/utils-v2'
 import { map } from 'rxjs/operators'
-import { NsWidgetResolver } from '@sunbird-cb/resolver'
+import { NsWidgetResolver } from '@sunbird-cb/resolver-v2'
 /* tslint:disable */
 import _ from 'lodash'
 import { ILeftMenu } from '@sunbird-cb/collection'

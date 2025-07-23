@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
 import { NsContent, NsError, NSSearch, ROOT_WIDGET_CONFIG } from '@sunbird-cb/collection'
-import { NsWidgetResolver } from '@sunbird-cb/resolver'
+import { NsWidgetResolver } from '@sunbird-cb/resolver-v2'
 import { ConfigurationsService, ValueService, UtilityService } from '@sunbird-cb/utils-v2'
 import { Subscription } from 'rxjs'
 import { FilterDisplayComponent } from '../../components/filter-display/filter-display.component'

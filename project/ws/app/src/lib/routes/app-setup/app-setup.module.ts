@@ -19,7 +19,7 @@ import { MatStepperModule } from '@angular/material/stepper'
 import { MatToolbarModule } from '@angular/material/toolbar'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 // import { SettingsModule } from '../profile/routes/settings/settings.module'
-import { WidgetResolverModule } from '@sunbird-cb/resolver'
+import { SbUiResolverModule } from '@sunbird-cb/resolver-v2'
 import {
   LocaleTranslatorModule,
   LanguageSelectorModule,
@@ -71,7 +71,7 @@ import { Globals } from './globals'
 
     // SettingsModule,
     AboutVideoModule,
-    WidgetResolverModule,
+    SbUiResolverModule,
     LocaleTranslatorModule,
     InterestModules,
     LanguageSelectorModule,

@@ -11,7 +11,7 @@ import {
 } from '../../models/search.model'
 import { NsContent, NsError, ROOT_WIDGET_CONFIG } from '@sunbird-cb/collection'
 import { ValueService } from '@sunbird-cb/utils-v2'
-import { NsWidgetResolver } from '@sunbird-cb/resolver'
+import { NsWidgetResolver } from '@sunbird-cb/resolver-v2'
 
 @Component({
   selector: 'ws-app-social',

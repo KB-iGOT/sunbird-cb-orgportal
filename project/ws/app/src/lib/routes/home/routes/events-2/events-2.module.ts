@@ -40,7 +40,7 @@ import { EventsPreviewComponent } from './components/events-preview/events-previ
 import { YoutubePlayerComponent } from './dialogs/youtube-player/youtube-player.component'
 import { MatLegacyTabsModule } from '@angular/material/legacy-tabs'
 import { CardCompetencyComponent } from './components/card-competency/card-competency.component'
-import { WidgetResolverModule } from '@sunbird-cb/resolver'
+import { SbUiResolverModule } from '@sunbird-cb/resolver-v2'
 import { NgxMaterialTimepickerModule } from 'ngx-material-timepicker'
 import { RejectionReasonComponent } from './dialogs/rejection-reason/rejection-reason.component'
 import { CarouselModule } from 'ngx-owl-carousel-o'
@@ -93,7 +93,7 @@ import { ComponentSharedModule } from '../../../workallocation-v2/components/com
     MatDatepickerModule,
     MatLegacyAutocompleteModule,
     MatLegacyTabsModule,
-    WidgetResolverModule,
+    SbUiResolverModule,
     NgxMaterialTimepickerModule,
     CarouselModule,
     DragDropModule,

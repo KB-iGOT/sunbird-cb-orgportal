@@ -4,7 +4,7 @@ import { PipeDurationTransformModule, PipeFilterModule, PipeHtmlTagRemovalModule
 import { MatGridListModule } from '@angular/material/grid-list'
 import { MatExpansionModule } from '@angular/material/expansion'
 import { MatDividerModule } from '@angular/material/divider'
-import { WidgetResolverModule } from '@sunbird-cb/resolver'
+import { SbUiResolverModule } from '@sunbird-cb/resolver-v2'
 import { MatLegacyAutocompleteModule as MatAutocompleteModule } from '@angular/material/legacy-autocomplete'
 import { MatLegacyButtonModule as MatButtonModule } from '@angular/material/legacy-button'
 import { MatLegacyCheckboxModule as MatCheckboxModule } from '@angular/material/legacy-checkbox'
@@ -161,7 +161,6 @@ import { AllNotificationsModule } from '@sunbird-cb/notification'
     CommonModule,
     // Ng2SearchPipeModule,
     UIORGTableModule,
-    WidgetResolverModule,
     ReactiveFormsModule,
     HomeRoutingModule,
     FormsModule,
@@ -192,7 +191,7 @@ import { AllNotificationsModule } from '@sunbird-cb/notification'
     AvatarPhotoModule,
     PipeOrderByModule,
     BreadcrumbsOrgModule,
-    WidgetResolverModule,
+    SbUiResolverModule,
     ScrollspyLeftMenuModule,
     MatRadioModule,
     ExportAsModule,

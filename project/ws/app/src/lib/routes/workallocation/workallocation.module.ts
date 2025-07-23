@@ -22,7 +22,7 @@ import { MatLegacyTableModule as MatTableModule } from '@angular/material/legacy
 import { MatExpansionModule } from '@angular/material/expansion'
 import { MatDividerModule } from '@angular/material/divider'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
-import { WidgetResolverModule } from '@sunbird-cb/resolver'
+import { SbUiResolverModule } from '@sunbird-cb/resolver-v2'
 import { ExportAsModule } from 'ngx-export-as'
 import { UpdateWorkallocationComponent } from './routes/update-workallocation/update-workallocation.component'
 import { MatLegacyMenuModule as MatMenuModule } from '@angular/material/legacy-menu'
@@ -36,7 +36,7 @@ import { MatLegacyTabsModule as MatTabsModule } from '@angular/material/legacy-t
         MatSidenavModule, MatListModule, ScrollspyLeftMenuModule, MatCardModule, FormsModule,
         MatFormFieldModule, MatInputModule, MatButtonModule, MatIconModule, MatGridListModule,
         MatRadioModule, MatDialogModule, ReactiveFormsModule, MatSelectModule, MatProgressSpinnerModule,
-        MatExpansionModule, MatDividerModule, MatPaginatorModule, MatTableModule, WidgetResolverModule,
+        MatExpansionModule, MatDividerModule, MatPaginatorModule, MatTableModule, SbUiResolverModule,
         UIORGTableModule, ExportAsModule, MatMenuModule, MatTabsModule,
     ],
     exports: [DownloadAllocationComponent]

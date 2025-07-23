@@ -9,8 +9,8 @@ import {
   hasPermissions,
   hasUnitPermission,
   NsWidgetResolver,
-  WidgetResolverService,
-} from '@sunbird-cb/resolver'
+  SbUiResolverService,
+} from '@sunbird-cb/resolver-v2'
 import {
   // AuthKeycloakService,
   ConfigurationsService,
@@ -57,7 +57,7 @@ export class InitService {
     private logger: LoggerService,
     public configSvc: ConfigurationsService,
     // private authSvc: AuthKeycloakService,
-    private widgetResolverService: WidgetResolverService,
+    private widgetResolverService: SbUiResolverService,
     private settingsSvc: BtnSettingsService,
     private userPreference: UserPreferenceService,
     private http: HttpClient,
@@ -544,7 +544,7 @@ export class InitService {
             this.configSvc.restrictedFeatures,
           ),
         )
-        .map(u => WidgetResolverService.getWidgetKey(u)),
+        .map(u => SbUiResolverService.getWidgetKey(u)),
     )
     return this.configSvc.restrictedWidgets
   }

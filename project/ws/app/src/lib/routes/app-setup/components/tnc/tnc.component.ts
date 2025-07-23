@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core'
 import { NsTnc } from '../../../../../../../../../src/app/models/tnc.model'
 import { Subscription } from 'rxjs'
-import { NsWidgetResolver } from '@sunbird-cb/resolver'
+import { NsWidgetResolver } from '@sunbird-cb/resolver-v2'
 import {
   NsError,
   ROOT_WIDGET_CONFIG,

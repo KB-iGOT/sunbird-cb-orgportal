@@ -1,7 +1,7 @@
 import { Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges } from '@angular/core'
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser'
 import { IBtnAppsConfig, CustomTourService } from '@sunbird-cb/collection'
-import { NsWidgetResolver } from '@sunbird-cb/resolver'
+import { NsWidgetResolver } from '@sunbird-cb/resolver-v2'
 import { ConfigurationsService, EventService, NsInstanceConfig, NsPage } from '@sunbird-cb/utils-v2'
 import { Router, NavigationStart, NavigationEnd, Event } from '@angular/router'
 import { LibNotificationsService } from '@sunbird-cb/notification'

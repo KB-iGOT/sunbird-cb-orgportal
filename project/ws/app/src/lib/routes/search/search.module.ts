@@ -34,7 +34,7 @@ import {
   BtnKbAnalyticsModule,
   UserAutocompleteModule,
 } from '@sunbird-cb/collection'
-import { WidgetResolverModule } from '@sunbird-cb/resolver'
+import { SbUiResolverModule } from '@sunbird-cb/resolver-v2'
 import {
   DefaultThumbnailModule,
   HorizontalScrollerModule, PipeDurationTransformModule, PipeLimitToModule, PipePartialContentModule,
@@ -110,7 +110,7 @@ import { SearchInputHomeComponent } from './components/search-input-home/search-
     HorizontalScrollerModule,
     MatProgressSpinnerModule,
     DisplayContentTypeModule,
-    WidgetResolverModule,
+    SbUiResolverModule,
     // BtnKbModule,
     BtnChannelAnalyticsModule,
     MatDividerModule,

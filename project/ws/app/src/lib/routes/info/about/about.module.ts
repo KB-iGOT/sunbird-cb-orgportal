@@ -9,7 +9,7 @@ import { MatIconModule } from '@angular/material/icon'
 import { MatToolbarModule } from '@angular/material/toolbar'
 import { BtnPageBackNavModule } from '@sunbird-cb/collection'
 import { HorizontalScrollerModule, PipeSafeSanitizerModule } from '@sunbird-cb/utils-v2'
-import { WidgetResolverModule } from '@sunbird-cb/resolver'
+import { SbUiResolverModule } from '@sunbird-cb/resolver-v2'
 
 @NgModule({
   declarations: [AboutHomeComponent],
@@ -24,7 +24,7 @@ import { WidgetResolverModule } from '@sunbird-cb/resolver'
 
     BtnPageBackNavModule,
     HorizontalScrollerModule,
-    WidgetResolverModule,
+    SbUiResolverModule,
     PipeSafeSanitizerModule,
 
   ],
