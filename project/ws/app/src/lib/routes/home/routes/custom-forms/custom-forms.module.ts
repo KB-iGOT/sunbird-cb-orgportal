@@ -14,7 +14,6 @@ import { MatLegacyCheckboxModule } from '@angular/material/legacy-checkbox'
 import { FormsListComponent } from './forms-list/forms-list.component'
 import { MatLegacyCardModule as MatCardModule } from '@angular/material/legacy-card'
 import { MatLegacyTabsModule } from '@angular/material/legacy-tabs'
-import { MatDialogModule } from '@angular/material/dialog'
 import { MatLegacyTooltipModule } from '@angular/material/legacy-tooltip'
 import { MatSnackBarModule } from '@angular/material/snack-bar'
 import { MatLegacyPaginatorModule as MatPaginatorModule } from '@angular/material/legacy-paginator'
@@ -27,6 +26,8 @@ import { UIORGTableModule } from '@sunbird-cb/collection'
 import { MatLegacyProgressSpinnerModule as MatProgressSpinnerModule } from '@angular/material/legacy-progress-spinner'
 import { ConfirmDeleteComponent } from './confirm-delete/confirm-delete.component'
 import { CustomFieldsService } from '../../../users/custom-fields.service'
+import { MatExpansionModule } from '@angular/material/expansion'
+import { MatDialogModule } from '@angular/material/dialog'
 @NgModule({
   declarations: [
     FormsListComponent,
@@ -70,7 +71,8 @@ import { CustomFieldsService } from '../../../users/custom-fields.service'
     MatSlideToggleModule,
     UIORGTableModule,
     MatProgressSpinnerModule,
+    MatExpansionModule,
   ],
-  providers: [CustomFieldsService, MatDialogModule]
+  providers: [CustomFieldsService]
 })
 export class CustomFormsModule { }

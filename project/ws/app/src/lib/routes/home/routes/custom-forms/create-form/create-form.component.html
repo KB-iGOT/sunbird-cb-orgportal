@@ -61,20 +61,30 @@
             (customRegex)="customRegex($event)"></ws-app-custom-input-text>
         </ng-container>
       </div>
-      <div class="flex justify-end mt-5 gap-4" *ngIf="selectedTab === 'masterList'">
-        <div class="flex flex-col items-center" *ngIf="getQuestions?.length > 1">
-          <div class="text-primary cursor-pointer ws-mat-white-background round mat-raised-button mat-button-base"
-            (click)="fileInput.click()" (dblclick)="$event.preventDefault()">
-            Upload file</div>
-          <input hidden type="file" #fileInput (click)="handleFileClick($event)" (change)="handleOnFileChange($event)"
-            name="file" placeholder="Choose file" (dblclick)="$event.preventDefault();"
-            accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" />
+      <ng-container *ngIf="selectedTab === 'masterList'">
+        <div class="flex justify-end mt-5 gap-4">
+          <div class="flex flex-col items-center" *ngIf="getQuestions?.length > 1">
+            <div class="text-primary cursor-pointer ws-mat-white-background round mat-raised-button mat-button-base"
+              (click)="fileInput.click()" (dblclick)="$event.preventDefault()">
+              Upload file</div>
+            <input hidden type="file" #fileInput (click)="handleFileClick($event)" (change)="handleOnFileChange($event)"
+              name="file" placeholder="Choose file" (dblclick)="$event.preventDefault();"
+              accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" />
+          </div>
+          <button mat-button class="ws-mat-white-background round mat-raised-button mat-button-base"
+            (click)="addNewListQuestion()" *ngIf="selectedTab === 'masterList'">Add new list</button>
         </div>
-        <button mat-button class="ws-mat-white-background round mat-raised-button mat-button-base"
-          (click)="addNewListQuestion()" *ngIf="selectedTab === 'masterList'">Add new list</button>
-      </div>
-      <div class="flex justify-end mt-5 gap-4">
+      </ng-container>
+
+      <div class="flex gap-4 {{selectedTab === 'text' ? 'justify-between' : 'justify-end mt-5'}}">
         <ng-container>
+          <div class="mt-2 text-sm pl-1" *ngIf="selectedTab === 'text'">
+            <span class="font-red">Disclaimer</span> - The collection, use and monitoring of sensitive
+            or confidential data / information is prohibited without proper
+            authorization. Example: Aadhaar, PAN etc. The MDO’s are suggested to capture the data responsibly, and MDOs
+            take full
+            responsibility of any such data captured using Custom Fields facility on IGOT.
+          </div>
           <button mat-button class="text-white ws-mat-primary-background round mat-raised-button mat-button-base"
             [disabled]="customForm.invalid || validateForm()"
             (click)="customFieldObject?.customFieldId ? onUpdate() : onSave()">
