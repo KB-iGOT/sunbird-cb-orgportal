@@ -107,7 +107,7 @@ export class ProfileAvatarComponent {
           continue
         }
 
-        if (this.name.charAt(i) === this.name.charAt(i)) {
+        if (this.name.charAt(i)) {
           initials += this.name.charAt(i)
 
           if (initials.length === 2) {

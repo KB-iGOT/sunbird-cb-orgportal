@@ -12,7 +12,7 @@ import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack
 import { NSWatCompetency } from '../../models/competency-wat.model'
 import { NSWatActivity } from '../../models/activity-wot.model'
 // tslint:disable
-import _ from 'lodash'
+import * as _ from 'lodash'
 import { WatCompPopupComponent } from './wat-comp-popup/wat-comp-popup.component'
 import { ActivatedRoute } from '@angular/router'
 import { DialogConfirmComponent } from '../../../../../../../../../src/app/component/dialog-confirm/dialog-confirm.component'
@@ -53,14 +53,14 @@ export class CompetencyLabelsComponent implements OnInit, OnDestroy, AfterViewIn
   }
 
   get labelsList(): UntypedFormArray {
-    return this.activityForm.get('labelsArray') as UntypedFormArray
+    return this.activityForm?.get('labelsArray') as UntypedFormArray
   }
 
   get groupList(): UntypedFormArray {
-    return this.activityForm.get('groupsArray') as UntypedFormArray
+    return this.activityForm?.get('groupsArray') as UntypedFormArray
   }
   groupListByIndex(index: number): UntypedFormArray {
-    return ((this.activityForm.get('groupsArray') as UntypedFormArray).at(index) as any).get('compDescription')
+    return ((this.activityForm?.get('groupsArray') as UntypedFormArray).at(index) as any).get('compDescription')
   }
 
   get groupcompetencyList(): UntypedFormArray {
@@ -160,7 +160,7 @@ export class CompetencyLabelsComponent implements OnInit, OnDestroy, AfterViewIn
       moveItemInArray(this.groupcompetencyList.controls, event.previousIndex, event.currentIndex)
       moveItemInArray(this.groupcompetencyList.value, event.previousIndex, event.currentIndex)
     } else {
-      if (!event.item.data.compName) {
+      if (event.item && !event.item.data.compName) {
         this.snackBar.open('Competency Name is required to drag', undefined, { duration: 2000 })
         return
       }

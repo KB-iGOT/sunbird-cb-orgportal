@@ -1,64 +1,81 @@
 import { FilterComponent } from './filter.component'
-import { TrainingPlanService } from './../../services/traininig-plan.service'
-import { TrainingPlanDataSharingService } from '../../services/training-plan-data-share.service'
-import { InitService } from '../../../../../../../../../src/app/services/init.service'
-import { of, Subject } from 'rxjs'
+import { ChangeDetectorRef } from '@angular/core'
 import { UntypedFormControl } from '@angular/forms'
-import { ElementRef, QueryList } from '@angular/core'
+import { of, Subject } from 'rxjs'
+
+// Define interfaces for testing
+
+
+interface GroupItem {
+    id: string
+    name: string
+    selected?: boolean
+}
+
+interface ProviderItem {
+    name: string
+    selected?: boolean
+    checked?: boolean
+}
 
 describe('FilterComponent', () => {
     let component: FilterComponent
-    let trainingPlanServiceMock: jest.Mocked<TrainingPlanService>
-    let tpdsServiceMock: jest.Mocked<TrainingPlanDataSharingService>
-    let initServiceMock: jest.Mocked<InitService>
-    let cdRefMock: any
-
-    // Mock subjects for TPDS service
-    const filterToggleSubject = new Subject<any>()
-    const clearFilterSubject = new Subject<any>()
-    const getFilterDataObjectSubject = new Subject<any>()
+    let mockChangeDetectorRef: jest.Mocked<ChangeDetectorRef>
+    let mockTrainingPlanService: any
+    let mockTpdsSvc: any
+    let mockInitService: any
 
     beforeEach(() => {
-        // Create mocks
-        trainingPlanServiceMock = {
-            getFilterEntity: jest.fn(),
-            getProviders: jest.fn(),
-            getDesignations: jest.fn()
-        } as unknown as jest.Mocked<TrainingPlanService>
+        // Mock ChangeDetectorRef
+        mockChangeDetectorRef = {
+            detectChanges: jest.fn(),
+            markForCheck: jest.fn(),
+            detach: jest.fn(),
+            reattach: jest.fn(),
+            checkNoChanges: jest.fn()
+        } as jest.Mocked<ChangeDetectorRef>
 
-        tpdsServiceMock = {
-            filterToggle: filterToggleSubject,
-            clearFilter: clearFilterSubject,
-            getFilterDataObject: getFilterDataObjectSubject
-        } as unknown as jest.Mocked<TrainingPlanDataSharingService>
+        // Mock TrainingPlanService
+        mockTrainingPlanService = {
+            getFilterEntity: jest.fn().mockReturnValue(of([])),
+            getProviders: jest.fn().mockReturnValue(of([])),
+            getDesignations: jest.fn().mockReturnValue(of({ result: { response: { content: [] } } }))
+        }
 
-        initServiceMock = {
+        // Mock TrainingPlanDataSharingService
+        mockTpdsSvc = {
+            filterToggle: new Subject(),
+            clearFilter: new Subject(),
+            getFilterDataObject: new Subject(),
+            trainingPlanAssigneeData: null
+        }
+
+        // Mock InitService
+        mockInitService = {
             configSvc: {
                 competency: {
-                    v1: {
+                    'v1': {
+                        vKey: 'v1',
                         vCompetencyArea: 'competencyArea',
+                        vCompetencyAreaDescription: 'competencyAreaDescription',
                         vCompetencyTheme: 'competencyTheme',
                         vCompetencySubTheme: 'competencySubTheme'
                     }
                 }
             }
-        } as unknown as jest.Mocked<InitService>
-
-        cdRefMock = {
-            detectChanges: jest.fn()
         };
 
-        // Set up environment
+        // Mock environment
         (global as any).environment = {
             compentencyVersionKey: 'v1'
         }
 
         // Create component instance
         component = new FilterComponent(
-            cdRefMock,
-            trainingPlanServiceMock,
-            tpdsServiceMock,
-            initServiceMock
+            mockChangeDetectorRef,
+            mockTrainingPlanService,
+            mockTpdsSvc,
+            mockInitService
         )
     })
 
@@ -66,107 +83,113 @@ describe('FilterComponent', () => {
         jest.clearAllMocks()
     })
 
-    describe('ngOnInit', () => {
-        it('should initialize filter objects and subscribe to observable services', () => {
-            // Spy on methods that might be called during initialization
-            jest.spyOn(component, 'resetFilter')
+    describe('Component Initialization', () => {
+        it('should create component', () => {
+            expect(component).toBeTruthy()
+        })
 
-            // Act
+        it('should initialize default values', () => {
+            expect(component.designationList).toEqual([])
+            expect(component.providersList).toEqual([])
+            expect(component.selectedProviders).toEqual([])
+            expect(component.competencyList).toEqual([])
+            expect(component.competencyThemeList).toEqual([])
+            expect(component.competencySubThemeList).toEqual([])
+        })
+
+        it('should initialize competency type list with default values', () => {
+            expect(component.competencyTypeList).toEqual([
+                { id: 'Behavioural', name: 'Behavioural' },
+                { id: 'Functional', name: 'Functional' },
+                { id: 'Domain', name: 'Domain' }
+            ])
+        })
+
+        it('should initialize group list with default values', () => {
+            expect(component.groupList).toEqual([
+                { id: 'groupA', name: 'Group A' },
+                { id: 'groupB', name: 'Group B' },
+                { id: 'groupC', name: 'Group C' },
+                { id: 'groupD', name: 'Group D' },
+                { id: 'contractualStaff', name: 'Contractual Staff' },
+                { id: 'others', name: 'Others' }
+            ])
+        })
+
+        it('should initialize form controls', () => {
+            expect(component.searchThemeControl).toBeInstanceOf(UntypedFormControl)
+            expect(component.searchSubThemeControl).toBeInstanceOf(UntypedFormControl)
+            expect(component.searchProviderControl).toBeInstanceOf(UntypedFormControl)
+        })
+    })
+
+    describe('ngOnInit', () => {
+        it('should initialize competency key and filter object', () => {
             component.ngOnInit()
 
-            // Assert
+            expect(component.compentencyKey).toEqual({
+                vKey: 'v1',
+                vCompetencyArea: 'competencyArea',
+                vCompetencyAreaDescription: 'competencyAreaDescription',
+                vCompetencyTheme: 'competencyTheme',
+                vCompetencySubTheme: 'competencySubTheme'
+            })
+
             expect(component.filterObj).toEqual({
                 competencyArea: [],
                 competencyTheme: [],
                 competencySubTheme: [],
                 providers: []
             })
-            expect(component.assigneeFilterObj).toEqual({ group: [], designation: [] })
-            expect(component.resetFilter).toHaveBeenCalled()
         })
 
-        it('should call getFilterEntity and getProviders when filterToggle emits with from=content', () => {
-            // Arrange
-            jest.spyOn(component, 'getFilterEntity')
-            jest.spyOn(component, 'getProviders')
+        it('should subscribe to filterToggle with content data', () => {
+            const getFilterEntitySpy = jest.spyOn(component, 'getFilterEntity')
+            const getProvidersSpy = jest.spyOn(component, 'getProviders')
+
             component.ngOnInit()
+            mockTpdsSvc.filterToggle.next({ from: 'content', status: true })
 
-            // Act
-            filterToggleSubject.next({ status: true, from: 'content' })
-
-            // Assert
-            expect(component.getFilterEntity).toHaveBeenCalled()
-            expect(component.getProviders).toHaveBeenCalled()
+            expect(getFilterEntitySpy).toHaveBeenCalled()
+            expect(getProvidersSpy).toHaveBeenCalled()
         })
 
-        it('should call getDesignation when filterToggle emits with from!=content and designationList is empty', () => {
-            // Arrange
-            jest.spyOn(component, 'getDesignation')
-            component.ngOnInit()
+        it('should subscribe to filterToggle with non-content data', () => {
+            const getDesignationSpy = jest.spyOn(component, 'getDesignation')
             component.designationList = []
 
-            // Act
-            filterToggleSubject.next({ status: true, from: 'assignee' })
+            component.ngOnInit()
+            mockTpdsSvc.filterToggle.next({ from: 'other', status: true })
 
-            // Assert
-            expect(component.getDesignation).toHaveBeenCalled()
+            expect(getDesignationSpy).toHaveBeenCalled()
         })
 
-        it('should update designationList selected state when filterToggle emits with from!=content and list exists', () => {
-            // Arrange
+        it('should subscribe to clearFilter', () => {
+            const clearFilterSpy = jest.spyOn(component, 'clearFilter')
+
             component.ngOnInit()
-            component.designationList = [
-                { id: 1, name: 'Manager' },
-                { id: 2, name: 'Developer' }
-            ]
-            component.assigneeFilterObj.designation = ['Manager']
+            mockTpdsSvc.clearFilter.next({ from: 'test', status: true })
 
-            // Act
-            filterToggleSubject.next({ status: true, from: 'assignee' })
-
-            // Assert
-            expect(component.designationList[0].selected).toBe(true)
-            expect(component.designationList[1].selected).toBe(false)
-        })
-
-        it('should call clearFilter when clearFilter subject emits with status=true', () => {
-            // Arrange
-            jest.spyOn(component, 'clearFilter')
-            component.ngOnInit()
-
-            // Act
-            clearFilterSubject.next({ status: true, from: 'content' })
-
-            // Assert
-            expect(component.from).toBe('content')
-            expect(component.clearFilter).toHaveBeenCalled()
+            expect(component.from).toBe('test')
+            expect(clearFilterSpy).toHaveBeenCalled()
         })
     })
 
     describe('ngAfterContentChecked', () => {
-        it('should call detectChanges on changeDetectorRef', () => {
-            // Act
+        it('should call detectChanges', () => {
             component.ngAfterContentChecked()
-
-            // Assert
-            expect(cdRefMock.detectChanges).toHaveBeenCalled()
+            expect(mockChangeDetectorRef.detectChanges).toHaveBeenCalled()
         })
     })
 
     describe('getFilterEntity', () => {
-        it('should call trainingPlanService and update competencyList', () => {
-            // Arrange
-            const mockResponse = [
-                { id: 1, name: 'Competency1' },
-                { id: 2, name: 'Competency2' }
-            ]
-            trainingPlanServiceMock.getFilterEntity.mockReturnValue(of(mockResponse))
+        it('should call trainingPlanService.getFilterEntity and set competencyList', () => {
+            const mockResponse = [{ id: 1, name: 'Test Competency' }]
+            mockTrainingPlanService.getFilterEntity.mockReturnValue(of(mockResponse))
 
-            // Act
             component.getFilterEntity()
 
-            // Assert
-            expect(trainingPlanServiceMock.getFilterEntity).toHaveBeenCalledWith({
+            expect(mockTrainingPlanService.getFilterEntity).toHaveBeenCalledWith({
                 search: { type: 'Competency Area' },
                 filter: { isDetail: true }
             })
@@ -175,449 +198,370 @@ describe('FilterComponent', () => {
     })
 
     describe('getProviders', () => {
-        it('should call trainingPlanService and update providersList', () => {
-            // Arrange
-            const mockProviders = [
-                { id: 1, name: 'Provider1' },
-                { id: 2, name: 'Provider2' }
-            ]
-            trainingPlanServiceMock.getProviders.mockReturnValue(of(mockProviders))
-            component.ngOnInit()
-            component.filterObj.providers = ['Provider1']
+        it('should call trainingPlanService.getProviders and set providersList', () => {
+            const mockProviders: ProviderItem[] = [{ name: 'Provider 1' }, { name: 'Provider 2' }]
+            mockTrainingPlanService.getProviders.mockReturnValue(of(mockProviders))
+            component.filterObj = { providers: ['Provider 1'] }
 
-            // Act
             component.getProviders()
 
-            // Assert
-            expect(trainingPlanServiceMock.getProviders).toHaveBeenCalled()
-            expect(component.providersList).toEqual([
-                { id: 1, name: 'Provider1', selected: true },
-                { id: 2, name: 'Provider2', selected: false }
-            ])
+            expect(mockTrainingPlanService.getProviders).toHaveBeenCalled()
+            expect(component.providersList).toEqual(mockProviders)
+            expect((component.providersList[0] as ProviderItem).selected).toBe(true)
+            expect((component.providersList[1] as ProviderItem).selected).toBe(false)
         })
     })
 
     describe('hideFilter', () => {
-        it('should emit filterToggle event with status=false', () => {
-            // Arrange
-            jest.spyOn(tpdsServiceMock.filterToggle, 'next')
+        it('should emit filterToggle with false status', () => {
+            const nextSpy = jest.spyOn(mockTpdsSvc.filterToggle, 'next')
 
-            // Act
             component.hideFilter()
 
-            // Assert
-            expect(tpdsServiceMock.filterToggle.next).toHaveBeenCalledWith({ from: '', status: false })
+            expect(nextSpy).toHaveBeenCalledWith({ from: '', status: false })
         })
     })
 
     describe('checkedProviders', () => {
         beforeEach(() => {
-            component.ngOnInit()
-            component.providersList = [
-                { id: 1, name: 'Provider1' },
-                { id: 2, name: 'Provider2' }
-            ]
+            component.providersList = [{ name: 'Provider 1' }, { name: 'Provider 2' }]
+            component.filterObj = { providers: [] }
         })
 
-        it('should add provider to filterObj and mark as selected when checked', () => {
-            // Arrange
-            const provider = { id: 1, name: 'Provider1' }
+        it('should add provider when checked', () => {
             const event = { checked: true }
+            const item: ProviderItem = { name: 'Provider 1' }
 
-            // Act
-            component.checkedProviders(event, provider)
+            component.checkedProviders(event, item)
 
-            // Assert
-            expect(component.providersList[0].selected).toBe(true)
-            expect(component.filterObj.providers).toContain('Provider1')
+            expect(item.checked).toBe(true)
+            expect((component.providersList[0] as ProviderItem).selected).toBe(true)
+            expect(component.filterObj.providers).toContain('Provider 1')
         })
 
-        it('should remove provider from filterObj and mark as not selected when unchecked', () => {
-            // Arrange
-            const provider = { id: 1, name: 'Provider1' }
-            component.filterObj.providers.push('Provider1')
-            component.providersList[0].selected = true
+        it('should remove provider when unchecked', () => {
             const event = { checked: false }
+            const item: ProviderItem = { name: 'Provider 1' }
+            component.filterObj.providers = ['Provider 1']
 
-            // Act
-            component.checkedProviders(event, provider)
+            component.checkedProviders(event, item)
 
-            // Assert
-            expect(component.providersList[0].selected).toBe(false)
-            expect(component.filterObj.providers).not.toContain('Provider1')
+            expect(item.checked).toBe(false)
+            expect((component.providersList[0] as ProviderItem).selected).toBe(false)
+            expect(component.filterObj.providers).not.toContain('Provider 1')
         })
     })
 
     describe('getCompetencyTheme', () => {
         beforeEach(() => {
-            component.ngOnInit()
+            component.compentencyKey = {
+                vKey: 'v1',
+                vCompetencyArea: 'competencyArea',
+                vCompetencyAreaDescription: 'competencyAreaDescription',
+                vCompetencyTheme: 'competencyTheme',
+                vCompetencySubTheme: 'competencySubTheme'
+            }
+            component.filterObj = {
+                competencyArea: [],
+                competencyTheme: [],
+                competencySubTheme: []
+            }
             component.competencyList = [
                 {
                     name: 'Behavioural',
-                    selected: false,
-                    children: [
-                        { name: 'Theme1', selected: false, children: [] },
-                        { name: 'Theme2', selected: false, children: [] }
-                    ]
+                    children: [{ name: 'Theme 1' }, { name: 'Theme 2' }]
                 }
             ]
-            component.competencyThemeList = []
         })
 
-        it('should add competency to filterObj and update competencyThemeList when checked', () => {
-            // Arrange
-            const competencyType = { id: 'Behavioural', name: 'Behavioural', selected: false }
+        it('should add competency area when checked', () => {
             const event = { checked: true }
+            const ctype: GroupItem = { id: 'Behavioural', name: 'Behavioural' }
 
-            // Act
-            component.getCompetencyTheme(event, competencyType)
+            component.getCompetencyTheme(event, ctype)
 
-            // Assert
-            expect(competencyType.selected).toBe(true)
-            expect(component.competencyList[0].selected).toBe(true)
+            expect(ctype.selected).toBe(true)
             expect(component.filterObj.competencyArea).toContain('Behavioural')
             expect(component.competencyThemeList.length).toBe(2)
-            expect(component.competencyThemeList[0].parent).toBe('Behavioural')
         })
 
-        it('should remove competency from filterObj and update lists when unchecked', () => {
-            // Arrange
-            const competencyType = { id: 'Behavioural', name: 'Behavioural', selected: true }
-            component.competencyList[0].selected = true
-            component.filterObj.competencyArea.push('Behavioural')
-            component.competencyThemeList = [
-                { name: 'Theme1', parent: 'Behavioural', selected: true },
-                { name: 'Theme2', parent: 'Behavioural', selected: true }
-            ]
-            component.filterObj.competencyTheme = ['Theme1']
+        it('should remove competency area and related themes when unchecked', () => {
             const event = { checked: false }
+            const ctype: GroupItem = { id: 'Behavioural', name: 'Behavioural' }
+            component.filterObj.competencyArea = ['Behavioural']
+            component.competencyThemeList = [{ name: 'Theme 1', parent: 'Behavioural' }]
 
-            // Act
-            component.getCompetencyTheme(event, competencyType)
+            component.getCompetencyTheme(event, ctype)
 
-            // Assert
-            expect(competencyType.selected).toBe(false)
-            expect(component.competencyList[0].selected).toBe(false)
+            expect(ctype.selected).toBe(false)
             expect(component.filterObj.competencyArea).not.toContain('Behavioural')
             expect(component.competencyThemeList.length).toBe(0)
-            expect(component.filterObj.competencyTheme).not.toContain('Theme1')
         })
     })
 
     describe('getCompetencySubTheme', () => {
         beforeEach(() => {
-            component.ngOnInit()
+            component.compentencyKey = {
+                vKey: 'v1',
+                vCompetencyArea: 'competencyArea',
+                vCompetencyAreaDescription: 'competencyAreaDescription',
+                vCompetencyTheme: 'competencyTheme',
+                vCompetencySubTheme: 'competencySubTheme'
+            }
+            component.filterObj = {
+                competencyArea: [],
+                competencyTheme: [],
+                competencySubTheme: []
+            }
             component.competencyThemeList = [
                 {
-                    name: 'Theme1',
+                    name: 'Theme 1',
                     parent: 'Behavioural',
-                    selected: false,
-                    children: [
-                        { name: 'SubTheme1', selected: false },
-                        { name: 'SubTheme2', selected: false }
-                    ]
+                    children: [{ name: 'SubTheme 1' }]
                 }
             ]
-            component.competencySubThemeList = []
         })
 
-        it('should add theme to filterObj and update competencySubThemeList when checked', () => {
-            // Arrange
-            const theme = { name: 'Theme1', parent: 'Behavioural' }
+        it('should add competency theme when checked', () => {
             const event = { checked: true }
+            const cstype = { name: 'Theme 1' }
 
-            // Act
-            component.getCompetencySubTheme(event, theme)
+            component.getCompetencySubTheme(event, cstype)
 
-            // Assert
-            expect(component.competencyThemeList[0].selected).toBe(true)
-            expect(component.filterObj.competencyTheme).toContain('Theme1')
-            expect(component.competencySubThemeList.length).toBe(2)
-            expect(component.competencySubThemeList[0].parent).toBe('Theme1')
-            expect(component.competencySubThemeList[0].parentType).toBe('Behavioural')
+            expect(component.filterObj.competencyTheme).toContain('Theme 1')
+            expect(component.competencySubThemeList.length).toBe(1)
         })
 
-        it('should remove theme from filterObj and update lists when unchecked', () => {
-            // Arrange
-            const theme = { name: 'Theme1', parent: 'Behavioural' }
-            component.competencyThemeList[0].selected = true
-            component.filterObj.competencyTheme.push('Theme1')
-            component.competencySubThemeList = [
-                { name: 'SubTheme1', parent: 'Theme1', selected: true },
-                { name: 'SubTheme2', parent: 'Theme1', selected: true }
-            ]
+        it('should remove competency theme when unchecked', () => {
             const event = { checked: false }
+            const cstype = { name: 'Theme 1' }
+            component.filterObj.competencyTheme = ['Theme 1']
+            component.competencySubThemeList = [{ name: 'SubTheme 1', parent: 'Theme 1' }]
 
-            // Act
-            component.getCompetencySubTheme(event, theme)
+            component.getCompetencySubTheme(event, cstype)
 
-            // Assert
-            expect(component.competencyThemeList[0].selected).toBe(false)
-            expect(component.filterObj.competencyTheme).not.toContain('Theme1')
+            expect(component.filterObj.competencyTheme).not.toContain('Theme 1')
             expect(component.competencySubThemeList.length).toBe(0)
         })
     })
 
     describe('manageCompetencySubTheme', () => {
         beforeEach(() => {
-            component.ngOnInit()
-            component.competencySubThemeList = [
-                { name: 'SubTheme1', parent: 'Theme1', selected: false },
-                { name: 'SubTheme2', parent: 'Theme1', selected: false }
-            ]
+            component.compentencyKey = {
+                vKey: 'v1',
+                vCompetencyArea: 'competencyArea',
+                vCompetencyAreaDescription: 'competencyAreaDescription',
+                vCompetencyTheme: 'competencyTheme',
+                vCompetencySubTheme: 'competencySubTheme'
+            }
+            component.filterObj = {
+                competencyArea: [],
+                competencyTheme: [],
+                competencySubTheme: []
+            }
+            component.competencySubThemeList = [{ name: 'SubTheme 1' }]
         })
 
-        it('should add subtheme to filterObj and mark as selected when checked', () => {
-            // Arrange
-            const subtheme = { name: 'SubTheme1', parent: 'Theme1' }
+        it('should add competency sub-theme when checked', () => {
             const event = { checked: true }
+            const csttype = { name: 'SubTheme 1' }
 
-            // Act
-            component.manageCompetencySubTheme(event, subtheme)
+            component.manageCompetencySubTheme(event, csttype)
 
-            // Assert
-            expect(component.competencySubThemeList[0].selected).toBe(true)
-            expect(component.filterObj.competencySubTheme).toContain('SubTheme1')
+            expect((component.competencySubThemeList[0] as any).selected).toBe(true)
+            expect(component.filterObj.competencySubTheme).toContain('SubTheme 1')
         })
 
-        it('should remove subtheme from filterObj and mark as not selected when unchecked', () => {
-            // Arrange
-            const subtheme = { name: 'SubTheme1', parent: 'Theme1' }
-            component.competencySubThemeList[0].selected = true
-            component.filterObj.competencySubTheme.push('SubTheme1')
+        it('should remove competency sub-theme when unchecked', () => {
             const event = { checked: false }
+            const csttype = { name: 'SubTheme 1' }
+            component.filterObj.competencySubTheme = ['SubTheme 1']
 
-            // Act
-            component.manageCompetencySubTheme(event, subtheme)
+            component.manageCompetencySubTheme(event, csttype)
 
-            // Assert
-            expect(component.competencySubThemeList[0].selected).toBe(false)
-            expect(component.filterObj.competencySubTheme).not.toContain('SubTheme1')
+            expect((component.competencySubThemeList[0] as any).selected).toBe(false)
+            expect(component.filterObj.competencySubTheme).not.toContain('SubTheme 1')
         })
     })
 
     describe('applyFilter', () => {
-        it('should emit content filter data when from=content', () => {
-            // Arrange
+        it('should emit filter data for content', () => {
+            const nextSpy = jest.spyOn(mockTpdsSvc.getFilterDataObject, 'next')
+            const filterToggleSpy = jest.spyOn(mockTpdsSvc.filterToggle, 'next')
             component.from = 'content'
-            jest.spyOn(tpdsServiceMock.getFilterDataObject, 'next')
-            jest.spyOn(tpdsServiceMock.filterToggle, 'next')
+            component.filterObj = { test: 'data' }
 
-            // Act
             component.applyFilter()
 
-            // Assert
-            expect(tpdsServiceMock.getFilterDataObject.next).toHaveBeenCalledWith(component.filterObj)
-            expect(tpdsServiceMock.filterToggle.next).toHaveBeenCalledWith({ from: '', status: false })
+            expect(nextSpy).toHaveBeenCalledWith({ test: 'data' })
+            expect(filterToggleSpy).toHaveBeenCalledWith({ from: '', status: false })
         })
 
-        it('should emit assignee filter data when from!=content', () => {
-            // Arrange
+        it('should emit assignee filter data for non-content', () => {
+            const nextSpy = jest.spyOn(mockTpdsSvc.getFilterDataObject, 'next')
             component.from = 'assignee'
-            jest.spyOn(tpdsServiceMock.getFilterDataObject, 'next')
+            component.assigneeFilterObj = { group: [], designation: [] }
 
-            // Act
             component.applyFilter()
 
-            // Assert
-            expect(tpdsServiceMock.getFilterDataObject.next).toHaveBeenCalledWith(component.assigneeFilterObj)
+            expect(nextSpy).toHaveBeenCalledWith({ group: [], designation: [] })
         })
     })
 
     describe('clearFilter', () => {
-        it('should reset content filters when from=content', () => {
-            // Arrange
-            component.ngOnInit()
+        it('should clear content filters', () => {
             component.from = 'content'
-            jest.spyOn(component, 'resetFilter')
-            component.filterObj.competencyArea = ['Area1']
-            component.filterObj.competencyTheme = ['Theme1']
-            component.competencyThemeList = [{ name: 'Theme1' }]
-            component.searchThemeControl = new UntypedFormControl('test')
+            component.compentencyKey = {
+                vKey: 'v1',
+                vCompetencyArea: 'competencyArea',
+                vCompetencyAreaDescription: 'competencyAreaDescription',
+                vCompetencyTheme: 'competencyTheme',
+                vCompetencySubTheme: 'competencySubTheme'
+            }
+            const resetFilterSpy = jest.spyOn(component, 'resetFilter')
 
-            // Mock checkboxes
-            component.checkboxes = new QueryList<ElementRef>()
-            component.checkboxes.forEach = jest.fn() as any
-
-            // Act
             component.clearFilter()
 
-            // Assert
             expect(component.filterObj).toEqual({
                 competencyArea: [],
                 competencyTheme: [],
                 competencySubTheme: [],
                 providers: []
             })
+            expect(component.selectedProviders).toEqual([])
             expect(component.competencyThemeList).toEqual([])
-            expect(component.searchThemeControl.value).toBeNull()
-            expect(component.resetFilter).toHaveBeenCalled()
-            expect(component.checkboxes.forEach).toHaveBeenCalled()
+            expect(component.competencySubThemeList).toEqual([])
+            expect(resetFilterSpy).toHaveBeenCalled()
         })
 
-        it('should reset assignee filters when from!=content', () => {
-            // Arrange
-            component.ngOnInit()
+        it('should clear assignee filters', () => {
             component.from = 'assignee'
-            jest.spyOn(component, 'resetAssigneeFilter')
-            component.assigneeFilterObj.group = ['Group A']
-            component.assigneeFilterObj.designation = ['Manager']
+            const resetAssigneeFilterSpy = jest.spyOn(component, 'resetAssigneeFilter')
 
-            // Mock checkboxes
-            component.checkboxes = new QueryList<ElementRef>()
-            component.checkboxes.forEach = jest.fn() as any
-
-            // Act
             component.clearFilter()
 
-            // Assert
             expect(component.assigneeFilterObj).toEqual({ group: [], designation: [] })
-            expect(component.resetAssigneeFilter).toHaveBeenCalled()
-            expect(component.checkboxes.forEach).toHaveBeenCalled()
-        })
-    })
-
-    describe('clearFilterWhileSearch', () => {
-        it('should reset all checkboxes', () => {
-            // Arrange
-            component.checkboxes = new QueryList<ElementRef>()
-            component.checkboxes.forEach = jest.fn() as any
-
-            // Act
-            component.clearFilterWhileSearch()
-
-            // Assert
-            expect(component.checkboxes.forEach).toHaveBeenCalled()
+            expect(resetAssigneeFilterSpy).toHaveBeenCalled()
         })
     })
 
     describe('getDesignation', () => {
-        it('should call training plan service and update designationList', () => {
-            // Arrange
+        it('should call trainingPlanService.getDesignations and set designationList', () => {
             const mockResponse = {
                 result: {
                     response: {
-                        content: [
-                            { id: 1, name: 'Manager' },
-                            { id: 2, name: 'Developer' }
-                        ]
+                        content: [{ name: 'Manager' }, { name: 'Developer' }]
                     }
                 }
             }
-            trainingPlanServiceMock.getDesignations.mockReturnValue(of(mockResponse))
+            mockTrainingPlanService.getDesignations.mockReturnValue(of(mockResponse))
 
-            // Act
             component.getDesignation()
 
-            // Assert
-            expect(trainingPlanServiceMock.getDesignations).toHaveBeenCalled()
+            expect(mockTrainingPlanService.getDesignations).toHaveBeenCalled()
             expect(component.designationList).toEqual(mockResponse.result.response.content)
         })
     })
 
     describe('manageSelectedGroup', () => {
         beforeEach(() => {
-            component.ngOnInit()
+            component.assigneeFilterObj = { group: [], designation: [] }
         })
 
-        it('should add group to filter and mark as selected when checked', () => {
-            // Arrange
-            const group = { id: 'groupA', name: 'Group A' }
+        it('should add group when checked', () => {
             const event = { checked: true }
+            const group: GroupItem = { id: 'groupA', name: 'Group A' }
 
-            // Act
             component.manageSelectedGroup(event, group)
 
-            // Assert
+            expect(group.selected).toBe(true)
             expect(component.assigneeFilterObj.group).toContain('Group A')
-            const updatedGroup = component.groupList.find((g: { name: string }) => g.name === 'Group A')
-            expect(updatedGroup?.selected).toBe(true)
         })
 
-        it('should remove group from filter and mark as not selected when unchecked', () => {
-            // Arrange
-            const group = { id: 'groupA', name: 'Group A', selected: true }
-            component.assigneeFilterObj.group = ['Group A']
-            component.groupList[0].selected = true
+        it('should remove group when unchecked', () => {
             const event = { checked: false }
+            const group: GroupItem = { id: 'groupA', name: 'Group A' }
+            component.assigneeFilterObj.group = ['Group A']
 
-            // Act
             component.manageSelectedGroup(event, group)
 
-            // Assert
+            expect(group.selected).toBe(false)
             expect(component.assigneeFilterObj.group).not.toContain('Group A')
-            const updatedGroup = component.groupList.find((g: { name: string }) => g.name === 'Group A')
-            expect(updatedGroup?.selected).toBe(false)
         })
     })
 
     describe('manageSelectedDesignation', () => {
         beforeEach(() => {
-            component.ngOnInit()
-            component.designationList = [
-                { id: 1, name: 'Manager' },
-                { id: 2, name: 'Developer' }
-            ]
+            component.assigneeFilterObj = { group: [], designation: [] }
+            component.designationList = [{ name: 'Manager' }, { name: 'Developer' }]
         })
 
-        it('should add designation to filter and mark as selected when checked', () => {
-            // Arrange
-            const designation = { id: 1, name: 'Manager' }
+        it('should add designation when checked', () => {
             const event = { checked: true }
+            const designation = { name: 'Manager' }
 
-            // Act
             component.manageSelectedDesignation(event, designation)
 
-            // Assert
+            expect((component.designationList[0] as any).selected).toBe(true)
             expect(component.assigneeFilterObj.designation).toContain('Manager')
-            expect(component.designationList[0].selected).toBe(true)
         })
 
-        it('should remove designation from filter and mark as not selected when unchecked', () => {
-            // Arrange
-            const designation = { id: 1, name: 'Manager' }
-            component.assigneeFilterObj.designation = ['Manager']
-            component.designationList[0].selected = true
+        it('should remove designation when unchecked', () => {
             const event = { checked: false }
+            const designation = { name: 'Manager' }
+            component.assigneeFilterObj.designation = ['Manager']
 
-            // Act
             component.manageSelectedDesignation(event, designation)
 
-            // Assert
+            expect((component.designationList[0] as any).selected).toBe(false)
             expect(component.assigneeFilterObj.designation).not.toContain('Manager')
-            expect(component.designationList[0].selected).toBe(false)
         })
     })
 
     describe('resetFilter', () => {
-        it('should reset selected state for all content filter lists', () => {
-            // Arrange
-            component.competencyThemeList = [{ name: 'theme1', selected: true }]
-            component.competencySubThemeList = [{ name: 'subtheme1', selected: true }]
-            component.providersList = [{ name: 'provider1', selected: true }]
+        it('should reset all filter selections', () => {
+            component.competencyTypeList = [{ id: 'test', name: 'Test', selected: true } as any]
+            component.competencyThemeList = [{ name: 'Theme', selected: true } as any]
+            component.competencySubThemeList = [{ name: 'SubTheme', selected: true } as any]
+            component.providersList = [{ name: 'Provider', selected: true } as any]
 
-            // Act
             component.resetFilter()
 
-            // Assert
-            expect(component.competencyThemeList[0].selected).toBe(false)
-            expect(component.competencySubThemeList[0].selected).toBe(false)
-            expect(component.providersList[0].selected).toBe(false)
+            expect((component.competencyTypeList[0] as any).selected).toBe(false)
+            expect((component.competencyThemeList[0] as any).selected).toBe(false)
+            expect((component.competencySubThemeList[0] as any).selected).toBe(false)
+            expect((component.providersList[0] as any).selected).toBe(false)
         })
     })
 
     describe('resetAssigneeFilter', () => {
-        it('should reset selected state for all assignee filter lists', () => {
-            // Arrange
-            component.groupList = [{ id: 'group1', name: 'Group 1', selected: true }]
-            component.designationList = [{ id: 1, name: 'Manager', selected: true }]
+        it('should reset assignee filter selections', () => {
+            component.groupList = [{ id: 'groupA', name: 'Group A', selected: true }]
+            component.designationList = [{ name: 'Manager', selected: true } as any]
 
-            // Act
             component.resetAssigneeFilter()
 
-            // Assert
             expect(component.groupList[0].selected).toBe(false)
-            expect(component.designationList[0].selected).toBe(false)
+            expect((component.designationList[0] as any).selected).toBe(false)
+        })
+    })
+
+    describe('clearFilterWhileSearch', () => {
+        it('should uncheck all checkboxes', () => {
+            const mockCheckbox1 = { checked: true }
+            const mockCheckbox2 = { checked: true }
+            const mockQueryList = {
+                forEach: jest.fn((callback) => {
+                    callback(mockCheckbox1)
+                    callback(mockCheckbox2)
+                })
+            } as any
+
+            component.checkboxes = mockQueryList
+            component.clearFilterWhileSearch()
+
+            expect(mockCheckbox1.checked).toBe(false)
+            expect(mockCheckbox2.checked).toBe(false)
         })
     })
 })

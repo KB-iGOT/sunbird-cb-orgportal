@@ -7,7 +7,7 @@ import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack
 import { CompetencyViewComponent } from '../competency-view/competency-view.component'
 import { ConfirmationBoxComponent } from '../../../../training-plan/components/confirmation-box/confirmation.box.component'
 /* tslint:disable */
-import _ from 'lodash'
+import * as _ from 'lodash'
 import { debounceTime, distinctUntilChanged, startWith } from 'rxjs/operators'
 import { preventHtmlAndJs } from '../../../../validators/prevent-html-and-js.validator'
 import { ICompentencyKeys } from '../../../interface/interfaces'
@@ -89,12 +89,12 @@ export class CreateRequestFormComponent implements OnInit {
     this.initFromGroup()
     this.getRequestTypeList()
     this.fullProfile = _.get(this.activatedRouter.snapshot, 'data.configService')
-    this.userId = this.fullProfile.userProfile.userId
+    this.userId = this.fullProfile?.userProfile?.userId
     this.competencyArea = new UntypedFormControl('')
     this.competencyTheme = new UntypedFormControl('')
     this.competencySubtheme = new UntypedFormControl('')
 
-    if (this.compentencyKey.vKey === 'competencies_v5') {
+    if (this.compentencyKey && this.compentencyKey.vKey === 'competencies_v5') {
       this.getFilterEntity()
     } else {
       this.getFilterEntityV2()
@@ -112,22 +112,25 @@ export class CreateRequestFormComponent implements OnInit {
   }
 
   initFromGroup() {
-    this.requestForm = this.formBuilder.group({
-      TitleName: new UntypedFormControl('', [Validators.required, Validators.pattern(this.noSpecialChar), Validators.minLength(10)]),
-      Objective: new UntypedFormControl('', [Validators.required, Validators.pattern(this.noSpecialChar)]),
-      userType: new UntypedFormControl('', [Validators.pattern(this.noSpecialChar)]),
-      learningMode: new UntypedFormControl(''),
-      compArea: new UntypedFormControl(''),
-      referenceLink: new UntypedFormControl('', [preventHtmlAndJs()]),
-      requestType: new UntypedFormControl('', Validators.required),
-      assignee: new UntypedFormControl(''),
-      providers: new UntypedFormControl([[]]),
-      providerText: new UntypedFormControl(''),
-      queryThemeControl: new UntypedFormControl(''),
-      querySubThemeControl: new UntypedFormControl(''),
-      [this.compentencyKey.vKey]: [],
-      assigneeText: new UntypedFormControl(''),
-    })
+    if (this.compentencyKey) {
+      this.requestForm = this.formBuilder.group({
+        TitleName: new UntypedFormControl('', [Validators.required, Validators.pattern(this.noSpecialChar), Validators.minLength(10)]),
+        Objective: new UntypedFormControl('', [Validators.required, Validators.pattern(this.noSpecialChar)]),
+        userType: new UntypedFormControl('', [Validators.pattern(this.noSpecialChar)]),
+        learningMode: new UntypedFormControl(''),
+        compArea: new UntypedFormControl(''),
+        referenceLink: new UntypedFormControl('', [preventHtmlAndJs()]),
+        requestType: new UntypedFormControl('', Validators.required),
+        assignee: new UntypedFormControl(''),
+        providers: new UntypedFormControl([[]]),
+        providerText: new UntypedFormControl(''),
+        queryThemeControl: new UntypedFormControl(''),
+        querySubThemeControl: new UntypedFormControl(''),
+        [this.compentencyKey.vKey]: [],
+        assigneeText: new UntypedFormControl(''),
+      })
+    }
+
 
   }
 
@@ -142,12 +145,13 @@ export class CreateRequestFormComponent implements OnInit {
   }
 
   setRequestData() {
+
     this.requestForm.setValue({
       TitleName: this.requestObjData.title,
       Objective: this.requestObjData.objective,
       userType: this.requestObjData.typeOfUser ? this.requestObjData.typeOfUser : '',
       learningMode: this.requestObjData.learningMode ? this.requestObjData.learningMode : '',
-      [this.compentencyKey.vKey]: [],
+      [this.compentencyKey?.vKey]: [],
       referenceLink: this.requestObjData.referenceLink ? this.requestObjData.referenceLink : '',
       providers: [],
       assignee: {},
@@ -158,7 +162,7 @@ export class CreateRequestFormComponent implements OnInit {
       querySubThemeControl: '',
       assigneeText: '',
     })
-    const value = this.requestForm.controls[this.compentencyKey.vKey].value || []
+    const value = this.requestForm.controls[this.compentencyKey?.vKey]?.value || []
     this.requestObjData.competencies.map((comp: any) => {
       const obj = {
         competencyArea: comp.area || comp.select_area,
@@ -168,7 +172,7 @@ export class CreateRequestFormComponent implements OnInit {
       value.push(obj)
     })
 
-    this.requestForm.controls[this.compentencyKey.vKey].setValue(value)
+    this.requestForm.controls[this.compentencyKey?.vKey]?.setValue(value)
 
     this.selectRequestType(this.requestObjData.requestType)
     if (this.filteredRequestType) {
@@ -201,7 +205,7 @@ export class CreateRequestFormComponent implements OnInit {
   }
 
   valuechangeFuctions() {
-    if (this.requestForm.controls['providerText']) {
+    if (this.requestForm && this.requestForm.controls['providerText']) {
       this.requestForm.controls['providerText'].valueChanges.pipe(
         debounceTime(100),
         distinctUntilChanged(),
@@ -211,7 +215,7 @@ export class CreateRequestFormComponent implements OnInit {
       })
     }
 
-    if (this.requestForm.controls['assigneeText']) {
+    if (this.requestForm && this.requestForm.controls['assigneeText']) {
       this.requestForm.controls['assigneeText'].valueChanges.pipe(
         debounceTime(100),
         distinctUntilChanged(),
@@ -325,32 +329,35 @@ export class CreateRequestFormComponent implements OnInit {
   }
 
   selectRequestType(item: any) {
-    if (item === 'Single') {
-      this.isAssignee = true
-      this.isBroadCast = false
-      this.statusValue = 'Assigned'
-      this.requestForm.controls['providers'].setValue('')
-      this.requestForm.controls['providers'].clearValidators()
-      this.requestForm.controls['providers'].updateValueAndValidity()
-      this.requestForm.controls['assignee'].setValidators([Validators.required])
-      this.requestForm.controls['assignee'].updateValueAndValidity()
+    if (this.requestForm) {
+      if (item === 'Single') {
+        this.isAssignee = true
+        this.isBroadCast = false
+        this.statusValue = 'Assigned'
+        this.requestForm.controls['providers'].setValue('')
+        this.requestForm.controls['providers'].clearValidators()
+        this.requestForm.controls['providers'].updateValueAndValidity()
+        this.requestForm.controls['assignee'].setValidators([Validators.required])
+        this.requestForm.controls['assignee'].updateValueAndValidity()
 
-    } else if (item === 'Broadcast') {
-      this.statusValue = 'Unassigned'
-      this.isBroadCast = true
-      this.isAssignee = false
-      this.requestForm.controls['assignee'].setValue('')
-      this.requestForm.controls['assignee'].clearValidators()
-      this.requestForm.controls['assignee'].updateValueAndValidity()
-      this.requestForm.controls['providers'].setValidators([Validators.required])
-      this.requestForm.controls['providers'].updateValueAndValidity()
+      } else if (item === 'Broadcast') {
+        this.statusValue = 'Unassigned'
+        this.isBroadCast = true
+        this.isAssignee = false
+        this.requestForm.controls['assignee'].setValue('')
+        this.requestForm.controls['assignee'].clearValidators()
+        this.requestForm.controls['assignee'].updateValueAndValidity()
+        this.requestForm.controls['providers'].setValidators([Validators.required])
+        this.requestForm.controls['providers'].updateValueAndValidity()
+      }
     }
+
 
   }
 
   openedChange(e: any, searchControl: any) {
     // Set search textbox value as empty while opening selectbox
-    this.requestForm.controls[searchControl].patchValue('')
+    this.requestForm.controls[searchControl]?.patchValue('')
     // Focus to search textbox while clicking on selectbox
     if (e === true) {
       // this.contentForm.value.provider.focus()
@@ -360,7 +367,10 @@ export class CreateRequestFormComponent implements OnInit {
   // Method to clear search values from textbox
   clearSearch(event: any, searchControl: any) {
     event.stopPropagation()
-    this.requestForm.controls[searchControl].patchValue('')
+    if (this.requestForm) {
+      this.requestForm.controls[searchControl]?.patchValue('')
+    }
+
   }
 
   updateQuery(field: any) {
@@ -398,8 +408,11 @@ export class CreateRequestFormComponent implements OnInit {
     this.allCompetencySubtheme = []
     this.filteredallCompetencyTheme = []
     this.filteredallCompetencySubtheme = []
-    this.requestForm.controls['queryThemeControl'].setValue('')
-    this.requestForm.controls['querySubThemeControl'].setValue('')
+    if (this.requestForm) {
+      this.requestForm.controls['queryThemeControl'].setValue('')
+      this.requestForm.controls['querySubThemeControl'].setValue('')
+    }
+
     this.seletedCompetencyTheme = ''
     this.seletedCompetencySubTheme = ''
   }
@@ -475,7 +488,7 @@ export class CreateRequestFormComponent implements OnInit {
   addCompetency() {
     if (this.seletedCompetencyArea && this.seletedCompetencyTheme && this.seletedCompetencySubTheme) {
       let obj: any
-      if (this.compentencyKey.vKey === 'competencies_v5') {
+      if (this.compentencyKey && this.compentencyKey.vKey === 'competencies_v5') {
         obj = {
           competencyArea: this.seletedCompetencyArea.name,
           competencyAreaId: this.seletedCompetencyArea.id,
@@ -504,36 +517,45 @@ export class CreateRequestFormComponent implements OnInit {
           competecnySubThemeDescription: this.seletedCompetencySubTheme.description,
         }
       }
+      if (this.requestForm) {
+        if (this.requestForm.controls[this.compentencyKey && this.compentencyKey.vKey]) {
+          const value = this.requestForm.controls[this.compentencyKey && this.compentencyKey.vKey].value || []
+          if (this.canPush(value, obj)) {
+            value.push(obj)
+            this.requestForm.controls[this.compentencyKey.vKey].setValue(value)
+            this.resetCompfields()
+            this.refreshData()
+          } else {
+            this.snackBar.open('This competency is already added')
+            this.resetCompfields()
+          }
+        }
 
-      const value = this.requestForm.controls[this.compentencyKey.vKey].value || []
-      if (this.canPush(value, obj)) {
-        value.push(obj)
-        this.requestForm.controls[this.compentencyKey.vKey].setValue(value)
-        this.resetCompfields()
-        this.refreshData()
-      } else {
-        this.snackBar.open('This competency is already added')
-        this.resetCompfields()
       }
+
     }
 
   }
 
   removeCompetency(id: any): void {
     if (id && !id.competencyArea) {
-      const index = _.findIndex(this.requestForm.controls[this.compentencyKey.vKey].value, { id })
-      this.requestForm.controls[this.compentencyKey.vKey].value.splice(index, 1)
-      this.requestForm.controls[this.compentencyKey.vKey].setValue(this.requestForm.controls[this.compentencyKey.vKey].value)
+      if (this.requestForm && this.compentencyKey) {
+        const index = _.findIndex(this.requestForm.controls[this.compentencyKey.vKey].value, { id })
+        this.requestForm.controls[this.compentencyKey.vKey].value.splice(index, 1)
+        this.requestForm.controls[this.compentencyKey.vKey].setValue(this.requestForm.controls[this.compentencyKey.vKey].value)
+      }
       this.refreshData()
     } else {
-      this.requestForm.controls[this.compentencyKey.vKey].value.forEach((item: any, index: any) => {
-        if (item.competencyAreaId === id.competencyAreaId && item.competencyThemeId === id.competencyThemeId
-          && item.competencySubThemeId === id.competencySubThemeId) {
-          this.requestForm.controls[this.compentencyKey.vKey].value.splice(index, 1)
-          this.requestForm.controls[this.compentencyKey.vKey].setValue(this.requestForm.controls[this.compentencyKey.vKey].value)
-          this.refreshData()
-        }
-      })
+      if (this.requestForm) {
+        this.requestForm.controls[this.compentencyKey.vKey].value.forEach((item: any, index: any) => {
+          if (item.competencyAreaId === id.competencyAreaId && item.competencyThemeId === id.competencyThemeId
+            && item.competencySubThemeId === id.competencySubThemeId) {
+            this.requestForm.controls[this.compentencyKey.vKey].value.splice(index, 1)
+            this.requestForm.controls[this.compentencyKey.vKey].setValue(this.requestForm.controls[this.compentencyKey.vKey].value)
+            this.refreshData()
+          }
+        })
+      }
     }
 
   }
@@ -577,7 +599,7 @@ export class CreateRequestFormComponent implements OnInit {
     const control = this.requestForm.get('providers')
     if (control) {
       const selectedProviders = control.value
-      return selectedProviders.length >= 5 && !selectedProviders.includes(option)
+      return selectedProviders?.length >= 5 && !selectedProviders.includes(option)
     }
     return false
   }
@@ -613,74 +635,76 @@ export class CreateRequestFormComponent implements OnInit {
     }
 
     let competencyDataList: any[] = []
-    if (this.requestForm.value[this.compentencyKey.vKey]) {
-      competencyDataList = this.requestForm.value[this.compentencyKey.vKey].map((item: any) => ({
+    if (this.requestForm && this.requestForm.value[this.compentencyKey?.vKey]) {
+      competencyDataList = this.requestForm.value[this.compentencyKey?.vKey].map((item: any) => ({
         area: item.competencyArea,
         theme: item.competencyTheme,
         sub_theme: item.competencySubTheme,
       }))
     }
+    if (this.requestForm) {
+      const request: any = {
+        title: this.requestForm.value.TitleName,
+        objective: this.requestForm.value.Objective,
+        typeOfUser: this.requestForm.value.userType,
+        // learningMode: this.requestForm.value.learningMode.toLowerCase(),
+        competencies: competencyDataList,
+        referenceLink: this.requestForm.value.referenceLink,
+        requestType: this.requestForm.value.requestType,
+        // preferredProvider: providerList,
+        // assignedProvider: assigneeProvider,
+        // status: this.statusValue,
+        // source: this.userId,
 
-    const request: any = {
-      title: this.requestForm.value.TitleName,
-      objective: this.requestForm.value.Objective,
-      typeOfUser: this.requestForm.value.userType,
-      // learningMode: this.requestForm.value.learningMode.toLowerCase(),
-      competencies: competencyDataList,
-      referenceLink: this.requestForm.value.referenceLink,
-      requestType: this.requestForm.value.requestType,
-      // preferredProvider: providerList,
-      // assignedProvider: assigneeProvider,
-      // status: this.statusValue,
-      // source: this.userId,
-
-    }
-
-    let providerList: any[] = []
-    if (this.requestForm.value.providers && this.isBroadCast) {
-      providerList = this.requestForm.value.providers.map((item: any) => ({
-        providerName: item.orgName,
-        providerId: item.id,
-      }))
-      request.preferredProvider = providerList
-    }
-    let assigneeProvider: any
-    if (this.requestForm.value.assignee && this.isAssignee) {
-      assigneeProvider = {
-        providerName: this.requestForm.value.assignee.orgName,
-        providerId: this.requestForm.value.assignee.id,
       }
-      request.assignedProvider = assigneeProvider
-    }
 
-    if (this.requestForm.value.learningMode) {
-      request.learningMode = this.requestForm.value.learningMode.toLowerCase()
-    }
-
-    if (this.demandId && this.actionBtnName === 'reassign') {
-      request.demand_id = this.demandId
-
-    }
-    this.showDialogBox('progress')
-    this.homeService.createDemand(request).subscribe(res => {
-      this.resData = res
-      this.dialogRefs.close()
-      this.showDialogBox('progress-completed')
-
-      setTimeout(() => {
-        this.dialogRefs.close()
-        if (this.resData) {
-          this.router.navigateByUrl('/app/home/request-list')
-          this.snackBar.open('Request submitted successfully ')
+      let providerList: any[] = []
+      if (this.requestForm.value.providers && this.isBroadCast) {
+        providerList = this.requestForm.value.providers.map((item: any) => ({
+          providerName: item.orgName,
+          providerId: item.id,
+        }))
+        request.preferredProvider = providerList
+      }
+      let assigneeProvider: any
+      if (this.requestForm.value.assignee && this.isAssignee) {
+        assigneeProvider = {
+          providerName: this.requestForm.value.assignee.orgName,
+          providerId: this.requestForm.value.assignee.id,
         }
-      }, 1000)
-    },
-      (error: any) => {
-        this.dialogRefs.close({ error })
-        this.snackBar.open('Request Failed')
+        request.assignedProvider = assigneeProvider
+      }
+
+      if (this.requestForm.value.learningMode) {
+        request.learningMode = this.requestForm.value.learningMode.toLowerCase()
+      }
+
+      if (this.demandId && this.actionBtnName === 'reassign') {
+        request.demand_id = this.demandId
 
       }
-    )
+      this.showDialogBox('progress')
+      this.homeService.createDemand(request).subscribe(res => {
+        this.resData = res
+        this.dialogRefs.close()
+        this.showDialogBox('progress-completed')
+
+        setTimeout(() => {
+          this.dialogRefs.close()
+          if (this.resData) {
+            this.router.navigateByUrl('/app/home/request-list')
+            this.snackBar.open('Request submitted successfully ')
+          }
+        }, 1000)
+      },
+        (error: any) => {
+          this.dialogRefs.close({ error })
+          this.snackBar.open('Request Failed')
+
+        }
+      )
+    }
+
   }
 
   showDialogBox(event: any) {

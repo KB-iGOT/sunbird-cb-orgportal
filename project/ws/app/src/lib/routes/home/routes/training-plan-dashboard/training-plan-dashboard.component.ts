@@ -11,7 +11,7 @@ import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog'
 import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar'
 import { ConfirmationBoxComponent } from '../../../training-plan/components/confirmation-box/confirmation.box.component'
 /* tslint:disable */
-import _ from 'lodash'
+import * as _ from 'lodash'
 /* tslint:enable */
 
 @Component({
@@ -160,14 +160,17 @@ export class TrainingPlanDashboardComponent implements OnInit {
         },
       },
     }
-    const liveRes = await this.trainingDashboardSvc.getUserList(req).toPromise().catch(_error => { })
-    if (liveRes.params && liveRes.params.status && liveRes.params.status === 'success') {
-      this.completeDataRes = liveRes.result.content
-      this.trainingPlanData = this.completeDataRes.filter((v: any) => v.userType === this.currentTab)
-      this.convertDataAsPerTable()
-    } else {
-      this.loaderService.changeLoaderState(false)
+    if (this.trainingDashboardSvc.getUserList(req)) {
+      const liveRes = await this.trainingDashboardSvc.getUserList(req).toPromise().catch(_error => { })
+      if (liveRes && liveRes.params && liveRes.params.status && liveRes.params.status === 'success') {
+        this.completeDataRes = liveRes.result.content
+        this.trainingPlanData = this.completeDataRes.filter((v: any) => v.userType === this.currentTab)
+        this.convertDataAsPerTable()
+      } else {
+        this.loaderService.changeLoaderState(false)
+      }
     }
+
   }
 
   async getDraftData() {
@@ -180,14 +183,17 @@ export class TrainingPlanDashboardComponent implements OnInit {
         },
       },
     }
-    const draftRes = await this.trainingDashboardSvc.getUserList(req).toPromise().catch(_error => { })
-    if (draftRes.params && draftRes.params.status && draftRes.params.status === 'success') {
-      this.completeDataRes = draftRes.result.content
-      this.trainingPlanData = this.completeDataRes.filter((v: any) => v.userType === this.currentTab)
-      this.convertDataAsPerTable()
-    } else {
-      this.loaderService.changeLoaderState(false)
+    if (this.trainingDashboardSvc.getUserList(req)) {
+      const draftRes = await this.trainingDashboardSvc.getUserList(req).toPromise().catch(_error => { })
+      if (draftRes.params && draftRes.params.status && draftRes.params.status === 'success') {
+        this.completeDataRes = draftRes.result.content
+        this.trainingPlanData = this.completeDataRes.filter((v: any) => v.userType === this.currentTab)
+        this.convertDataAsPerTable()
+      } else {
+        this.loaderService.changeLoaderState(false)
+      }
     }
+
   }
 
   convertDataAsPerTable() {
@@ -268,7 +274,7 @@ export class TrainingPlanDashboardComponent implements OnInit {
       autoFocus: false,
     })
 
-    this.dialogRef.afterClosed().subscribe((_res: any) => {
+    this.dialogRef && this.dialogRef.afterClosed().subscribe((_res: any) => {
       if (_res === 'confirmed') {
         if (_type === 'deleteContent') {
           this.deleteContentData(_selectedRow)
@@ -292,7 +298,7 @@ export class TrainingPlanDashboardComponent implements OnInit {
       this.loaderService.changeLoaderState(false)
       this.filter(this.currentFilter)
       this.tabNavigate(_selectedRow.status.toLowerCase(), _selectedRow.userType)
-    },                                                  _error => {
+    }, _error => {
       this.loaderService.changeLoaderState(false)
     })
   }
@@ -314,7 +320,7 @@ export class TrainingPlanDashboardComponent implements OnInit {
         this.snackBar.open('Something went wrong while publishing CBP plan. Try again later')
         this.loaderService.changeLoaderState(false)
       }
-    },                                                  (_error: any) => {
+    }, (_error: any) => {
       this.snackBar.open('Something went wrong while publishing CBP plan. Try again later')
       this.loaderService.changeLoaderState(false)
     })

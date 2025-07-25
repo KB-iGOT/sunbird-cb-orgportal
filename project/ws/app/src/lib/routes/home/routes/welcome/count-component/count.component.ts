@@ -2,7 +2,7 @@
 import { Component, HostBinding, Input, OnInit } from '@angular/core'
 import { NsWidgetResolver, WidgetBaseComponent } from '@sunbird-cb/resolver'
 /* tslint:disable */
-import _ from 'lodash'
+import * as _ from 'lodash'
 import { IPrintCount } from './count.model'
 /* tslint:enable */
 

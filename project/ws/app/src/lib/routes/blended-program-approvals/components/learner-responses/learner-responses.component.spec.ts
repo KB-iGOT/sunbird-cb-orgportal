@@ -1,121 +1,467 @@
 import { LearnerResponsesComponent } from './learner-responses.component'
 import { BlendedApporvalService } from '../../services/blended-approval.service'
 import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog'
-import { RejectReasonDialogComponent } from '../reject-reason-dialog/reject-reason-dialog.component'
-import { DialogConfirmComponent } from '../../../../../../../../../src/app/component/dialog-confirm/dialog-confirm.component'
-import { of } from 'rxjs'
-import _ from 'lodash'
+import { of, throwError } from 'rxjs'
 
-jest.mock('../../services/blended-approval.service')
-jest.mock('@angular/material/legacy-dialog')
+// Mock lodash
+jest.mock('lodash', () => ({
+    get: jest.fn(),
+    sortBy: jest.fn()
+}))
+
+// Mock environment
+jest.mock('../../../../../../../../../src/environments/environment', () => ({
+    environment: {
+        doptOrg: 'test-org'
+    }
+}))
 
 describe('LearnerResponsesComponent', () => {
     let component: LearnerResponsesComponent
-    let bpService: jest.Mocked<BlendedApporvalService>
-    let dialog: jest.Mocked<MatDialog>
+    let mockBpService: jest.Mocked<BlendedApporvalService>
+    let mockDialog: jest.Mocked<MatDialog>
+
+    // Mock data
+    const mockContentData = {
+        wfSurveyLink: 'https://example.com/surveys/123',
+        createdFor: ['test-org']
+    }
+
+    const mockSelectedUser = {
+        wfInfo: [{
+            userId: 'user123',
+            currentStatus: 'SEND_FOR_MDO_APPROVAL'
+        }]
+    }
+
+    const mockBatchData = {
+        batchAttributes: {
+            bpEnrolMandatoryProfileFields: [
+                { field: 'profileDetails.professionalDetails.group' },
+                { field: 'profileDetails.professionalDetails.designation' }
+            ],
+            profileSurveyLink: 'https://example.com/surveys/456'
+        }
+    }
+
+    const mockUserData = {
+        firstName: 'John',
+        email: 'john@example.com',
+        userId: 'user123',
+        avatar: 'avatar-url',
+        profileDetails: {
+            userId: 'user123',
+            employmentDetails: {
+                departmentName: 'IT Department'
+            },
+            professionalDetails: [{
+                designation: 'Software Engineer'
+            }]
+        }
+    }
+
+    const mockFormResponse = {
+        responseData: {
+            fields: ['field1', 'field2'],
+            title: 'Test Form',
+            clientVersion: 1.1
+        }
+    }
+
+    const mockSurveyResponse = {
+        statusInfo: {
+            statusCode: 200
+        },
+        responseData: [
+            {
+                formId: '123',
+                timestamp: '2023-01-01',
+                dataObject: {
+                    Group: 'Test Group',
+                    Designation: 'Test Designation'
+                }
+            }
+        ]
+    }
 
     beforeEach(() => {
-        // Mocking dependencies
-        bpService = new BlendedApporvalService(null as any) as jest.Mocked<BlendedApporvalService>
-        dialog = new MatDialog(null as any, null as any, null as any, null as any, null as any, null as any, null as any, null as any) as jest.Mocked<MatDialog>
+        // Create mocked services
+        mockBpService = {
+            getSurveyByFormId: jest.fn(),
+            getUserById: jest.fn(),
+            getSurveyByUserID: jest.fn()
+        } as any
 
-        // Create component instance with mock dependencies
-        component = new LearnerResponsesComponent(bpService, dialog)
+        mockDialog = {
+            open: jest.fn()
+        } as any
 
-        // Mocking the data inputs
-        component.selectedUser = { wfInfo: [{ userId: 123, currentStatus: 'SEND_FOR_MDO_APPROVAL' }] }
-        component.contentData = { wfSurveyLink: 'https://example.com/surveys/123' }
-        component.batchData = {
-            batchAttributes: {
-                profileSurveyLink: 'https://example.com/surveys/123',
-                bpEnrolMandatoryProfileFields: [{ field: 'profileDetails.professionalDetails.group' }]
+        // Create component instance
+        component = new LearnerResponsesComponent(mockBpService, mockDialog)
+
+        // Set up input properties
+        component.contentData = mockContentData
+        component.selectedUser = mockSelectedUser
+        component.batchData = mockBatchData
+
+        // Mock lodash functions
+        const _ = require('lodash')
+        _.get.mockImplementation((obj: any, path: string) => {
+            const keys = path.split('.')
+            let result = obj
+            for (const key of keys) {
+                if (result && typeof result === 'object') {
+                    if (key.includes('[') && key.includes(']')) {
+                        const arrayKey = key.split('[')[0]
+                        const index = parseInt(key.split('[')[1].split(']')[0])
+                        result = result[arrayKey]?.[index]
+                    } else {
+                        result = result[key]
+                    }
+                } else {
+                    return undefined
+                }
             }
-        }
-    })
+            return result
+        })
 
-    it('should create the component', () => {
-        expect(component).toBeTruthy()
-    })
-
-    it('should initialize correctly in ngOnInit', () => {
-        const fetchLearnerSpy = jest.spyOn(component, 'fetchLearner')
-        const getFormByIdSpy = jest.spyOn(component, 'getFormById')
-        const getGroupAndDesignationFromSurevyFormSpy = jest.spyOn(component, 'getGroupAndDesignationFromSurevyForm')
-
-        component.ngOnInit()
-
-        expect(fetchLearnerSpy).toHaveBeenCalled()
-        expect(getFormByIdSpy).toHaveBeenCalled()
-        expect(getGroupAndDesignationFromSurevyFormSpy).toHaveBeenCalled()
-    })
-
-    it('should fetch learner data on fetchLearner', () => {
-        const mockUserData = { profileDetails: { employmentDetails: { departmentName: 'IT' }, professionalDetails: [{ designation: 'Software Engineer' }] }, avatar: 'profile.jpg', firstName: 'John', email: 'john@example.com', userId: 123 }
-        const getUserByIdMock = jest.spyOn(bpService, 'getUserById').mockReturnValue(of(mockUserData))
-
-        component.fetchLearner()
-
-        expect(getUserByIdMock).toHaveBeenCalledWith(123)
-        expect(component.learner).toEqual({
-            department: 'IT',
-            profileImage: 'profile.jpg',
-            name: 'John',
-            email: 'john@example.com',
-            profileLink: '/app/profile/123',
-            userId: 123,
-            designation: 'Software Engineer'
+        _.sortBy.mockImplementation((array: any[], key: string[]) => {
+            return [...array].sort((a, b) => a[key[0]] - b[key[0]])
         })
     })
 
-    it('should call onReject and emit data', () => {
-        const dialogRefMock = { afterClosed: jest.fn().mockReturnValue(of({ reason: 'Not qualified' })) }
-        const openMock = jest.spyOn(dialog, 'open').mockReturnValue(dialogRefMock as any)
-        const emitSpy = jest.spyOn(component.actionClick, 'emit')
+    afterEach(() => {
+        jest.clearAllMocks()
+    })
 
-        component.onReject()
-
-        expect(openMock).toHaveBeenCalledWith(RejectReasonDialogComponent, {
-            disableClose: true,
-            data: {
-                title: 'Please provide the reason for rejecting the user from the batch',
-                buttonText: 'Reject'
-            }
+    describe('Component Initialization', () => {
+        it('should create component instance', () => {
+            expect(component).toBeTruthy()
         })
 
-        dialogRefMock.afterClosed().subscribe(() => {
-            expect(emitSpy).toHaveBeenCalledWith({
-                action: 'Reject',
-                userData: component.selectedUser,
-                comment: 'Not qualified'
+        it('should initialize with default values', () => {
+            expect(component.showActions).toBe(false)
+            expect(component.isReadOnly).toBe(true)
+            expect(component.showSpinner).toBe(true)
+            expect(component.newForm).toBe(true)
+            expect(component.formTitle).toBe('')
+            expect(component.surveyGroup).toBe('')
+            expect(component.surevyDesignation).toBe('')
+        })
+    })
+
+    describe('ngOnInit', () => {
+        beforeEach(() => {
+            jest.spyOn(component, 'fetchLearner').mockImplementation()
+            jest.spyOn(component, 'getFormById').mockImplementation()
+            jest.spyOn(component, 'getGroupAndDesignationFromSurevyForm').mockImplementation()
+        })
+
+        it('should extract formId from contentData', () => {
+            component.ngOnInit()
+
+            expect(component.formId).toBe('123')
+        })
+
+        it('should set userId and showActions from selectedUser', () => {
+            component.ngOnInit()
+
+            expect(component.userId).toBe('user123')
+            expect(component.showActions).toBe(true)
+        })
+
+        it('should call required methods', () => {
+            component.ngOnInit()
+
+            expect(component.fetchLearner).toHaveBeenCalled()
+            expect(component.getFormById).toHaveBeenCalled()
+            expect(component.getGroupAndDesignationFromSurevyForm).toHaveBeenCalled()
+        })
+    })
+
+    describe('fetchLearner', () => {
+        it('should fetch user data and create learner object', () => {
+            mockBpService.getUserById.mockReturnValue(of(mockUserData))
+
+            component.userId = 'user123'
+            component.fetchLearner()
+
+            expect(mockBpService.getUserById).toHaveBeenCalledWith('user123')
+            expect(component.userData).toEqual(mockUserData)
+            expect(component.learner).toEqual({
+                department: 'IT Department',
+                profileImage: 'avatar-url',
+                name: 'John',
+                authorType: '',
+                email: 'john@example.com',
+                profileLink: '/app/profile/user123',
+                userId: 'user123',
+                designation: 'Software Engineer'
+            })
+        })
+
+        it('should handle service error gracefully', () => {
+            mockBpService.getUserById.mockReturnValue(throwError('Service error'))
+
+            component.userId = 'user123'
+
+            expect(() => component.fetchLearner()).not.toThrow()
+        })
+    })
+
+    describe('getFormById', () => {
+        it('should fetch form data and set component properties', async () => {
+            // Mock the service to return an Observable that converts to Promise
+            const mockObservable = of(mockFormResponse)
+            mockBpService.getSurveyByFormId.mockReturnValue(mockObservable)
+            jest.spyOn(component, 'getSurveyReport').mockImplementation()
+
+            component.formId = '123'
+            await component.getFormById()
+
+            expect(mockBpService.getSurveyByFormId).toHaveBeenCalledWith('123')
+            expect(component.formfields).toEqual(['field1', 'field2'])
+            expect(component.formTitle).toBe('Test Form')
+            expect(component.newForm).toBe(true)
+            expect(component.getSurveyReport).toHaveBeenCalled()
+        })
+
+        it('should handle service error gracefully', async () => {
+            const mockObservable = throwError('Service error')
+            mockBpService.getSurveyByFormId.mockReturnValue(mockObservable)
+
+            component.formId = '123'
+            await component.getFormById()
+
+            expect(component.formfields).toBeUndefined()
+        })
+    })
+
+    describe('getSurveyReport', () => {
+        beforeEach(() => {
+            component.formId = '123'
+            component.userId = 'user123'
+            jest.useFakeTimers()
+        })
+
+        afterEach(() => {
+            jest.useRealTimers()
+        })
+
+        it('should fetch survey report and set apiData', async () => {
+            const mockObservable = of(mockSurveyResponse)
+            mockBpService.getSurveyByUserID.mockReturnValue(mockObservable)
+
+            await component.getSurveyReport()
+
+            expect(mockBpService.getSurveyByUserID).toHaveBeenCalledWith({
+                searchObjects: [
+                    { key: 'formId', values: '123' },
+                    { key: 'updatedBy', values: 'user123' }
+                ]
+            })
+
+            expect(component.latestData).toEqual(mockSurveyResponse.responseData[0])
+            expect(component.apiData).toEqual({
+                getAPI: `/apis/proxies/v8/forms/getFormById?id=${mockSurveyResponse.responseData[0].formId}`,
+                postAPI: `/apis/proxies/v8/forms/v1/saveFormSubmit`,
+                getAllApplications: `/apis/proxies/v8/forms/getAllApplications`,
+                customizedHeader: {}
+            })
+
+            // Fast forward timer
+            jest.advanceTimersByTime(1000)
+            expect(component.showSpinner).toBe(false)
+        })
+
+        it('should handle service error gracefully', async () => {
+            const mockObservable = throwError('Service error')
+            mockBpService.getSurveyByUserID.mockReturnValue(mockObservable)
+
+            await component.getSurveyReport()
+
+            expect(component.latestData).toBeUndefined()
+        })
+    })
+
+    describe('getProfileSurevyReport', () => {
+        it('should fetch profile survey data and set group and designation', async () => {
+            const mockObservable = of(mockSurveyResponse)
+            mockBpService.getSurveyByUserID.mockReturnValue(mockObservable)
+
+            component.userId = 'user123'
+            await component.getProfileSurevyReport('456', true, true)
+
+            expect(mockBpService.getSurveyByUserID).toHaveBeenCalledWith({
+                searchObjects: [
+                    { key: 'formId', values: '456' },
+                    { key: 'updatedBy', values: 'user123' }
+                ]
+            })
+
+            expect(component.surveyGroup).toBe('Test Group')
+            expect(component.surevyDesignation).toBe('Test Designation')
+        })
+
+        it('should only set group when hasGroups is true', async () => {
+            const mockObservable = of(mockSurveyResponse)
+            mockBpService.getSurveyByUserID.mockReturnValue(mockObservable)
+
+            component.userId = 'user123'
+            await component.getProfileSurevyReport('456', true, false)
+
+            expect(component.surveyGroup).toBe('Test Group')
+            expect(component.surevyDesignation).toBe('')
+        })
+    })
+
+    describe('Dialog Methods', () => {
+        describe('onReject', () => {
+            it('should open reject dialog and emit action on confirmation', () => {
+                const mockDialogRef = {
+                    afterClosed: jest.fn().mockReturnValue(of({ reason: 'Test reason' }))
+                }
+                mockDialog.open.mockReturnValue(mockDialogRef as any)
+                jest.spyOn(component.actionClick, 'emit')
+
+                component.onReject()
+
+                expect(mockDialog.open).toHaveBeenCalled()
+                expect(component.actionClick.emit).toHaveBeenCalledWith({
+                    action: 'Reject',
+                    userData: mockSelectedUser,
+                    comment: 'Test reason'
+                })
+            })
+
+            it('should not emit action when dialog is cancelled', () => {
+                const mockDialogRef = {
+                    afterClosed: jest.fn().mockReturnValue(of(null))
+                }
+                mockDialog.open.mockReturnValue(mockDialogRef as any)
+                jest.spyOn(component.actionClick, 'emit')
+
+                component.onReject()
+
+                expect(component.actionClick.emit).not.toHaveBeenCalled()
+            })
+        })
+
+        describe('onApprove', () => {
+            it('should open confirm dialog and emit action on confirmation', () => {
+                const mockDialogRef = {
+                    afterClosed: jest.fn().mockReturnValue(of(true))
+                }
+                mockDialog.open.mockReturnValue(mockDialogRef as any)
+                jest.spyOn(component.actionClick, 'emit')
+
+                component.onApprove()
+
+                expect(mockDialog.open).toHaveBeenCalled()
+                expect(component.actionClick.emit).toHaveBeenCalledWith({
+                    action: 'Approve',
+                    userData: mockSelectedUser
+                })
             })
         })
     })
 
-    it('should call onApprove and emit data', () => {
-        const dialogRefMock = { afterClosed: jest.fn().mockReturnValue(of(true)) }
-        const openMock = jest.spyOn(dialog, 'open').mockReturnValue(dialogRefMock as any)
-        const emitSpy = jest.spyOn(component.actionClick, 'emit')
+    describe('Utility Methods', () => {
+        describe('getProfileLink', () => {
+            it('should return profile link when userId exists', () => {
+                const profile = { userId: 'user123' } as any
+                const result = component.getProfileLink(profile)
 
-        component.onApprove()
+                expect(result).toBe('/app/profile/user123')
+            })
 
-        expect(openMock).toHaveBeenCalledWith(DialogConfirmComponent, {
-            data: {
-                title: 'Are you sure?',
-                body: `Please click <strong>Yes</strong> to approve this request.`
-            }
+            it('should return # when profile or userId is missing', () => {
+                expect(component.getProfileLink(null as any)).toBe('#')
+                expect(component.getProfileLink({} as any)).toBe('#')
+            })
         })
 
-        dialogRefMock.afterClosed().subscribe(() => {
-            expect(emitSpy).toHaveBeenCalledWith({
-                action: 'Approve',
-                userData: component.selectedUser
+        describe('moveBack', () => {
+            it('should emit clickBack event', () => {
+                jest.spyOn(component.clickBack, 'emit')
+
+                component.moveBack()
+
+                expect(component.clickBack.emit).toHaveBeenCalledWith(true)
+            })
+        })
+
+        describe('getLearner getter', () => {
+            it('should return learner when it exists', () => {
+                component.learner = { name: 'Test User' } as any
+
+                expect(component.getLearner).toEqual({ name: 'Test User' })
+            })
+
+            it('should return null when learner does not exist', () => {
+                component.learner = null
+
+                expect(component.getLearner).toBe(null)
+            })
+        })
+
+        describe('getDateFromText', () => {
+            it('should handle ISO date string with T separator', () => {
+                const result = component.getDateFromText('2023-12-25T10:30:00')
+
+                expect(result).toBe('2023-12-25')
+            })
+
+            it('should handle DD-MM-YYYY format', () => {
+                const result = component.getDateFromText('25-12-2023')
+
+                expect(result).toEqual(new Date('2023-12-25'))
+            })
+
+            it('should handle YYYY-MM-DD format', () => {
+                const result = component.getDateFromText('2023-12-25')
+
+                expect(result).toEqual(new Date('2023-12-25'))
+            })
+
+            it('should return empty string for invalid input', () => {
+                expect(component.getDateFromText('')).toBe('')
+                expect(component.getDateFromText(null as any)).toBe('')
             })
         })
     })
 
-    it('should return a formatted date from getDateFromText', () => {
-        const dateStr = '25-12-2025'
-        const result = component.getDateFromText(dateStr)
-        expect(result).toEqual(new Date('2025-12-25'))
+    describe('getGroupAndDesignationFromSurevyForm', () => {
+        it('should call getProfileSurevyReport when conditions are met', () => {
+            jest.spyOn(component, 'getProfileSurevyReport').mockImplementation()
+
+            component.getGroupAndDesignationFromSurevyForm()
+
+            expect(component.getProfileSurevyReport).toHaveBeenCalledWith('456', true, true)
+        })
+
+        it('should not call getProfileSurevyReport when doptOrg does not match', () => {
+            jest.spyOn(component, 'getProfileSurevyReport').mockImplementation()
+
+            // Mock different org
+            component.contentData = { ...mockContentData, createdFor: ['different-org'] }
+            component.getGroupAndDesignationFromSurevyForm()
+
+            expect(component.getProfileSurevyReport).not.toHaveBeenCalled()
+        })
+
+        it('should not call getProfileSurevyReport when no mandatory fields exist', () => {
+            jest.spyOn(component, 'getProfileSurevyReport').mockImplementation()
+
+            component.batchData = {
+                batchAttributes: {
+                    bpEnrolMandatoryProfileFields: [],
+                    profileSurveyLink: 'https://example.com/surveys/456'
+                }
+            }
+            component.getGroupAndDesignationFromSurevyForm()
+
+            expect(component.getProfileSurevyReport).not.toHaveBeenCalled()
+        })
     })
 })

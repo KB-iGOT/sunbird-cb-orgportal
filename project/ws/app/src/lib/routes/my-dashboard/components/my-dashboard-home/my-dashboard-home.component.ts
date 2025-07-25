@@ -5,7 +5,7 @@ import { mapFilePath, dashboardEmptyData } from '../../../../../../../../../src/
 import { HttpClient } from '@angular/common/http'
 import { map } from 'rxjs/internal/operators/map'
 /* tslint:disable */
-import _ from 'lodash'
+import * as _ from 'lodash'
 /* tslint:enable */
 import { CreateMDOService } from '../../../../head/work-allocation-table/create-mdo.services'
 const endpoint = {

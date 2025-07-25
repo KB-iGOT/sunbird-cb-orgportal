@@ -5,7 +5,7 @@ import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack
 import { ActivatedRoute, Router, Event, NavigationEnd } from '@angular/router'
 import { NSProfileDataV2 } from '../../models/profile-v2.model'
 // tslint:disable
-import _ from 'lodash'
+import * as _ from 'lodash'
 import { EventService } from '@sunbird-cb/utils'
 import { TelemetryEvents } from '../../../../head/_services/telemetry.event.model'
 // tslint:enable

@@ -40,6 +40,7 @@ export class TncComponent implements OnInit, OnDestroy {
     },
   }
   expectedUrl = ''
+  component: { unsubscribe: jest.Mock<any, any, any> }
   constructor(
     private activatedRoute: ActivatedRoute,
     private router: Router,
@@ -49,7 +50,7 @@ export class TncComponent implements OnInit, OnDestroy {
     private tncProtectedSvc: TncAppResolverService,
     private tncPublicSvc: TncPublicResolverService,
     private globals: Globals,
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.routeSubscription = this.activatedRoute.data.subscribe((response: Data) => {

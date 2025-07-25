@@ -160,15 +160,33 @@ export class SearchInputHomeComponent implements OnInit, OnChanges {
     }
   }
 
-  getSearchAutoCompleteResults(q: string) {
-    if (this.searchLocale.split(',').length === 1) {
-      this.searchServSvc.searchAutoComplete({
-        q,
-        l: this.searchLocale,
-      }).then((result: ISearchAutoComplete[]) => {
-        this.autoCompleteResults = result
-      }).catch(() => { })
-    }
+  // getSearchAutoCompleteResults(q: string) {
+  //   if (this.searchLocale.split(',').length === 1) {
+  //     this.searchServSvc.searchAutoComplete({
+  //       q,
+  //       l: this.searchLocale,
+  //     }).then((result: ISearchAutoComplete[]) => {
+  //       this.autoCompleteResults = result
+  //     }).catch(() => { })
+  //   }
+  // }
+
+  getSearchAutoCompleteResults(q: string): Promise<void> {
+    return new Promise((resolve, reject) => {
+      if (this.searchLocale.split(',').length === 1) {
+        this.searchServSvc.searchAutoComplete({
+          q,
+          l: this.searchLocale,
+        }).then((result: ISearchAutoComplete[]) => {
+          this.autoCompleteResults = result
+          resolve() // Resolve the promise after successful completion
+        }).catch((error) => {
+          reject(error) // Reject the promise if there is an error
+        })
+      } else {
+        resolve() // Resolve the promise if the locale condition is not met
+      }
+    })
   }
 
   searchLanguage(lang: string) {

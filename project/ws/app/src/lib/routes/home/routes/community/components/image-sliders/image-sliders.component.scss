@@ -325,7 +325,9 @@ $banner-min-height: 243px;
     background: rgba(230, 239, 255, 1);
     width: fit-content;
     padding: 32px;
+    /* stylelint-disable */
     width: 500px;
+    /* stylelint-enable */
 
     p {
       word-break: break-word;

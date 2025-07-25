@@ -1,416 +1,415 @@
-import { HttpClient } from '@angular/common/http'
-import { DatePipe } from '@angular/common'
-import { of } from 'rxjs'
 import { EventsService } from './events.service'
-import * as _ from 'lodash'
+import { of } from 'rxjs'
 
-// Mock implementations
-jest.mock('@angular/common/http')
-jest.mock('@angular/common')
-jest.mock('lodash')
+// Mock HttpClient
+const mockHttpClient = {
+  post: jest.fn(),
+  get: jest.fn(),
+  patch: jest.fn()
+}
+
+// Mock DatePipe
+const mockDatePipe = {
+  transform: jest.fn()
+}
 
 describe('EventsService', () => {
   let service: EventsService
-  let httpClient: jest.Mocked<HttpClient>
-  let datePipe: jest.Mocked<DatePipe>
 
   beforeEach(() => {
-    // Clear mocks
+    // Reset all mocks before each test
     jest.clearAllMocks()
 
-    // Setup mocks
-    httpClient = {
-      post: jest.fn(),
-      get: jest.fn(),
-      patch: jest.fn(),
-    } as any
-
-    datePipe = {
-      transform: jest.fn(),
-    } as any;
-
-    // Mock lodash get function with proper implementation that uses all parameters
-    (_.get as jest.Mock) = jest.fn().mockImplementation((obj, path, defaultValue) => {
-      // Create a mock implementation that actually uses the obj parameter
-      if (!obj) return defaultValue
-
-      // Handle specific test cases
-      if (obj.result && path === 'result.Event') return obj.result.Event
-      if (obj.result && path === 'result.count') return obj.result.count
-      if (obj.request?.filters && path === 'request.filters.status') return obj.request.filters.status
-
-      // Use a simplified path resolution for other cases
-      const pathParts = path.split('.')
-      let value = obj
-
-      for (const part of pathParts) {
-        if (value === undefined || value === null) return defaultValue
-        value = value[part]
-      }
-
-      return value !== undefined ? value : defaultValue
-    })
-
-    // Create service instance
-    service = new EventsService(httpClient, datePipe)
-  })
-
-  it('should be created', () => {
-    expect(service).toBeTruthy()
+    // Create service instance with mocked dependencies
+    service = new EventsService(
+      mockHttpClient as any,
+      mockDatePipe as any
+    )
   })
 
   describe('getEvents', () => {
-    it('should fetch and format events', (done) => {
-      // Mock data
-      const mockRequest = {
-        request: {
-          filters: {
-            status: ['Live']
-          }
-        }
-      }
+    it('should fetch and format events data correctly', (done) => {
+      // Arrange
+      const mockRequest = { request: { filters: { status: ['Live'] } } }
+      const mockTab = 'current'
       const mockResponse = {
         result: {
           Event: [
             {
-              startDate: '2023-01-01',
-              createdOn: '2023-01-01',
-              cancelledOn: '2023-01-01',
-              submitedOn: '2023-01-01',
-              publishedOn: '2023-01-01',
-              rejectedOn: '2023-01-01',
-              startDateTime: '2023-01-01T10:00:00Z'
+              id: '1',
+              name: 'Test Event',
+              startDate: '2024-01-15',
+              createdOn: '2024-01-10',
+              startDateTime: '2024-01-15T10:00:00Z'
             }
           ],
           count: 1
         }
       }
 
-      // Mock datePipe transform
-      datePipe.transform.mockReturnValue('01 Jan, 2023')
+      mockHttpClient.post.mockReturnValue(of(mockResponse))
+      mockDatePipe.transform.mockReturnValue('15 Jan, 2024')
 
-      // Mock http post
-      httpClient.post.mockReturnValue(of(mockResponse))
-
-      // Execute test
-      service.getEvents(mockRequest, 'upcoming').subscribe(result => {
-        // Verify http post was called with correct params
-        expect(httpClient.post).toHaveBeenCalledWith('/apis/proxies/v8/sunbirdigot/search', mockRequest)
-
-        // Verify datePipe transformations
-        expect(datePipe.transform).toHaveBeenCalledTimes(6)
-
-        // Verify result format
-        expect(result).toEqual({
-          Event: [
-            {
-              startDate: '01 Jan, 2023',
-              createdOn: '01 Jan, 2023',
-              cancelledOn: '01 Jan, 2023',
-              submitedOn: '01 Jan, 2023',
-              publishedOn: '01 Jan, 2023',
-              rejectedOn: '01 Jan, 2023',
-              startDateTime: '2023-01-01T10:00:00Z',
-              buttonsToHide: ['edit', 'cancel']
-            }
-          ],
-          count: 1
-        })
+      // Act
+      service.getEvents(mockRequest, mockTab).subscribe(result => {
+        // Assert
+        expect(mockHttpClient.post).toHaveBeenCalledWith('/apis/proxies/v8/sunbirdigot/search', mockRequest)
+        expect(result.Event).toHaveLength(1)
+        expect(result.count).toBe(1)
+        expect(result.Event[0].startDate).toBe('15 Jan, 2024')
+        expect(result.Event[0].createdOn).toBe('15 Jan, 2024')
+        expect(mockDatePipe.transform).toHaveBeenCalledWith('2024-01-15', 'dd MMM, yyyy')
         done()
       })
     })
 
-    it('should not add buttonsToHide for past events', (done) => {
-      // Mock data
-      const mockRequest = {
-        request: {
-          filters: {
-            status: ['Live']
-          }
+    it('should handle empty events array', (done) => {
+      // Arrange
+      const mockRequest = { request: { filters: { status: ['Draft'] } } }
+      const mockTab = 'draft'
+      const mockResponse = {
+        result: {
+          Event: [],
+          count: 0
         }
       }
+
+      mockHttpClient.post.mockReturnValue(of(mockResponse))
+
+      // Act
+      service.getEvents(mockRequest, mockTab).subscribe(result => {
+        // Assert
+        expect(result.Event).toEqual([])
+        expect(result.count).toBe(0)
+        done()
+      })
+    })
+
+    it('should hide buttons for past live events', (done) => {
+      // Arrange
+      const pastDate = new Date()
+      pastDate.setDate(pastDate.getDate() - 1)
+
+      const mockRequest = { request: { filters: { status: ['Live'] } } }
+      const mockTab = 'current'
       const mockResponse = {
         result: {
           Event: [
             {
-              startDate: '2023-01-01',
-              startDateTime: '2023-01-01T10:00:00Z'
+              id: '1',
+              name: 'Past Event',
+              startDateTime: pastDate.toISOString()
             }
           ],
           count: 1
         }
       }
 
-      // Mock datePipe transform
-      datePipe.transform.mockReturnValue('01 Jan, 2023')
+      mockHttpClient.post.mockReturnValue(of(mockResponse))
+      mockDatePipe.transform.mockReturnValue('')
 
-      // Mock http post
-      httpClient.post.mockReturnValue(of(mockResponse))
+      // Act
+      service.getEvents(mockRequest, mockTab).subscribe(result => {
+        // Assert
+        expect(result.Event[0].buttonsToHide).toEqual(['edit', 'cancel'])
+        done()
+      })
+    })
 
-      // Execute test
-      service.getEvents(mockRequest, 'past').subscribe(result => {
-        expect(result.Event[0].buttonsToHide).toBeUndefined()
+    it('should format all date fields correctly', (done) => {
+      // Arrange
+      const mockRequest = { request: { filters: { status: ['Published'] } } }
+      const mockTab = 'published'
+      const mockResponse = {
+        result: {
+          Event: [
+            {
+              id: '1',
+              startDate: '2024-01-15',
+              createdOn: '2024-01-10',
+              cancelledOn: '2024-01-20',
+              submitedOn: '2024-01-12',
+              publishedOn: '2024-01-14',
+              rejectedOn: null
+            }
+          ],
+          count: 1
+        }
+      }
+
+      mockHttpClient.post.mockReturnValue(of(mockResponse))
+      mockDatePipe.transform.mockImplementation((date) => {
+        return date ? '15 Jan, 2024' : ''
+      })
+
+      // Act
+      service.getEvents(mockRequest, mockTab).subscribe(result => {
+        // Assert
+        expect(result.Event[0].startDate).toBe('15 Jan, 2024')
+        expect(result.Event[0].createdOn).toBe('15 Jan, 2024')
+        expect(result.Event[0].cancelledOn).toBe('15 Jan, 2024')
+        expect(result.Event[0].submitedOn).toBe('15 Jan, 2024')
+        expect(result.Event[0].publishedOn).toBe('15 Jan, 2024')
+        expect(result.Event[0].rejectedOn).toBe('')
         done()
       })
     })
   })
 
   describe('createContent', () => {
-    it('should call the create content API', (done) => {
-      const mockRequest = { name: 'testContent' }
-      const mockResponse = { id: '123', status: 'success' }
+    it('should create content with correct request', (done) => {
+      // Arrange
+      const mockRequest = { name: 'Test Content', type: 'Resource' }
+      const mockResponse = { result: { identifier: 'content123' } }
 
-      httpClient.post.mockReturnValue(of(mockResponse))
+      mockHttpClient.post.mockReturnValue(of(mockResponse))
 
-      service.createContent(mockRequest).subscribe(response => {
-        expect(httpClient.post).toHaveBeenCalledWith('apis/proxies/v8/action/content/v3/create', mockRequest)
-        expect(response).toEqual(mockResponse)
+      // Act
+      service.createContent(mockRequest).subscribe(result => {
+        // Assert
+        expect(mockHttpClient.post).toHaveBeenCalledWith('apis/proxies/v8/action/content/v3/create', mockRequest)
+        expect(result).toEqual(mockResponse)
         done()
       })
     })
   })
 
   describe('uploadContent', () => {
-    it('should call the upload content API', (done) => {
-      const mockVal = '123'
+    it('should upload content with correct parameters', (done) => {
+      // Arrange
+      const mockVal = 'content123'
       const mockFormData = new FormData()
-      const mockResponse = { id: '123', status: 'success' }
+      const mockResponse = { result: { url: 'uploaded-url' } }
 
-      httpClient.post.mockReturnValue(of(mockResponse))
+      mockHttpClient.post.mockReturnValue(of(mockResponse))
 
-      service.uploadContent(mockVal, mockFormData).subscribe(response => {
-        expect(httpClient.post).toHaveBeenCalledWith('apis/proxies/v8/upload/action/content/v3/upload/123', mockFormData)
-        expect(response).toEqual(mockResponse)
+      // Act
+      service.uploadContent(mockVal, mockFormData).subscribe(result => {
+        // Assert
+        expect(mockHttpClient.post).toHaveBeenCalledWith(
+          `apis/proxies/v8/upload/action/content/v3/upload/${mockVal}`,
+          mockFormData
+        )
+        expect(result).toEqual(mockResponse)
         done()
       })
     })
   })
 
   describe('createEvent', () => {
-    it('should call the create event API', (done) => {
-      const mockRequest = { name: 'testEvent' }
-      const mockResponse = { id: '123', status: 'success' }
+    it('should create event with correct request', (done) => {
+      // Arrange
+      const mockRequest = { name: 'Test Event', description: 'Test Description' }
+      const mockResponse = { result: { identifier: 'event123' } }
 
-      httpClient.post.mockReturnValue(of(mockResponse))
+      mockHttpClient.post.mockReturnValue(of(mockResponse))
 
-      service.createEvent(mockRequest).subscribe(response => {
-        expect(httpClient.post).toHaveBeenCalledWith('/apis/proxies/v8/event/v4/create', mockRequest)
-        expect(response).toEqual(mockResponse)
+      // Act
+      service.createEvent(mockRequest).subscribe(result => {
+        // Assert
+        expect(mockHttpClient.post).toHaveBeenCalledWith('/apis/proxies/v8/event/v4/create', mockRequest)
+        expect(result).toEqual(mockResponse)
         done()
       })
     })
   })
 
-  // describe('getEventDetailsByid', () => {
-  //   it('should call the event details API', (done) => {
-  //     const mockEventId = '123'
-  //     const mockResponse = { id: '123', name: 'Test Event' }
+  describe('getEventDetailsByid', () => {
+    it('should get live event details when getLiveData is true', (done) => {
+      // Arrange
+      const eventId = 'event123'
+      const getLiveData = true
+      const mockResponse = { result: { event: { id: eventId } } }
 
-  //     httpClient.get.mockReturnValue(of(mockResponse))
+      mockHttpClient.get.mockReturnValue(of(mockResponse))
 
-  //     service.getEventDetailsByid(mockEventId).subscribe(response => {
-  //       expect(httpClient.get).toHaveBeenCalledWith('apis/proxies/v8/event/v4/read/123?mode=edit')
-  //       expect(response).toEqual(mockResponse)
-  //       done()
-  //     })
-  //   })
-  // })
+      // Act
+      service.getEventDetailsByid(eventId, getLiveData).subscribe(result => {
+        // Assert
+        expect(mockHttpClient.get).toHaveBeenCalledWith(`apis/proxies/v8/event/v4/read/${eventId}`)
+        expect(result).toEqual(mockResponse)
+        done()
+      })
+    })
+
+    it('should get edit event details when getLiveData is false', (done) => {
+      // Arrange
+      const eventId = 'event123'
+      const getLiveData = false
+      const mockResponse = { result: { event: { id: eventId } } }
+
+      mockHttpClient.get.mockReturnValue(of(mockResponse))
+
+      // Act
+      service.getEventDetailsByid(eventId, getLiveData).subscribe(result => {
+        // Assert
+        expect(mockHttpClient.get).toHaveBeenCalledWith(`apis/proxies/v8/event/v4/read/${eventId}?mode=edit`)
+        expect(result).toEqual(mockResponse)
+        done()
+      })
+    })
+  })
 
   describe('updateEvent', () => {
-    it('should call the update event API', (done) => {
-      const mockEventId = '123'
-      const mockFormBody = { name: 'Updated Event' }
-      const mockResponse = { id: '123', status: 'success' }
+    it('should update event with correct parameters', (done) => {
+      // Arrange
+      const eventId = 'event123'
+      const formBody = { name: 'Updated Event' }
+      const mockResponse = { result: { identifier: eventId } }
 
-      httpClient.patch.mockReturnValue(of(mockResponse))
+      mockHttpClient.patch.mockReturnValue(of(mockResponse))
 
-      service.updateEvent(mockFormBody, mockEventId).subscribe(response => {
-        expect(httpClient.patch).toHaveBeenCalledWith('apis/proxies/v8/event/v4/update/123', mockFormBody)
-        expect(response).toEqual(mockResponse)
+      // Act
+      service.updateEvent(formBody, eventId).subscribe(result => {
+        // Assert
+        expect(mockHttpClient.patch).toHaveBeenCalledWith(`apis/proxies/v8/event/v4/update/${eventId}`, formBody)
+        expect(result).toEqual(mockResponse)
         done()
       })
     })
   })
 
   describe('publishEvent', () => {
-    it('should call the publish event API', (done) => {
-      const mockEventId = '123'
-      const mockFormBody = { publish: true }
-      const mockResponse = { id: '123', status: 'success' }
+    it('should publish event with correct parameters', (done) => {
+      // Arrange
+      const eventId = 'event123'
+      const formBody = { status: 'Live' }
+      const mockResponse = { result: { status: 'Published' } }
 
-      httpClient.post.mockReturnValue(of(mockResponse))
+      mockHttpClient.post.mockReturnValue(of(mockResponse))
 
-      service.publishEvent(mockEventId, mockFormBody).subscribe(response => {
-        expect(httpClient.post).toHaveBeenCalledWith('apis/proxies/v8/event/v4/publish/123', mockFormBody)
-        expect(response).toEqual(mockResponse)
+      // Act
+      service.publishEvent(eventId, formBody).subscribe(result => {
+        // Assert
+        expect(mockHttpClient.post).toHaveBeenCalledWith(`apis/proxies/v8/event/v4/publish/${eventId}`, formBody)
+        expect(result).toEqual(mockResponse)
         done()
       })
     })
   })
 
   describe('convertToTreeView', () => {
-    it('should convert competencies to tree view format', () => {
+    it('should convert competencies to tree view structure', () => {
+      // Arrange
       const mockCompetencies = [
         {
-          competencyAreaName: 'Area1',
-          competencyAreaDescription: 'Description1',
-          competencyAreaIdentifier: 'ID1',
-          competencyAreaRefId: 'RefID1',
-          competencyThemeDescription: 'ThemeDesc1',
-          competencyThemeIdentifier: 'ThemeID1',
-          competencyThemeName: 'Theme1',
-          competencyThemeRefId: 'ThemeRefID1',
+          competencyAreaName: 'Area 1',
+          competencyAreaDescription: 'Area 1 Description',
+          competencyAreaIdentifier: 'area1',
+          competencyAreaRefId: 'areaRef1',
+          competencyThemeName: 'Theme 1',
+          competencyThemeDescription: 'Theme 1 Description',
+          competencyThemeIdentifier: 'theme1',
+          competencyThemeRefId: 'themeRef1',
           competencyThemeType: 'Type1',
           competencyThemeAdditionalProperties: {
-            displayName: 'DisplayName1',
-            timeStamp: '123456789'
+            displayName: 'Theme Display',
+            timeStamp: '2024-01-01'
           },
-          competencySubThemeDescription: 'SubThemeDesc1',
-          competencySubThemeIdentifier: 'SubThemeID1',
-          competencySubThemeName: 'SubTheme1',
-          competencySubThemeRefId: 'SubThemeRefID1',
+          competencySubThemeName: 'SubTheme 1',
+          competencySubThemeDescription: 'SubTheme 1 Description',
+          competencySubThemeIdentifier: 'subtheme1',
+          competencySubThemeRefId: 'subthemeRef1',
           competencySubThemeAdditionalProperties: {
-            displayName: 'SubDisplayName1',
-            timeStamp: '123456789'
-          }
-        },
-        {
-          competencyAreaName: 'Area1',
-          competencyAreaDescription: 'Description1',
-          competencyAreaIdentifier: 'ID1',
-          competencyAreaRefId: 'RefID1',
-          competencyThemeDescription: 'ThemeDesc1',
-          competencyThemeIdentifier: 'ThemeID1',
-          competencyThemeName: 'Theme1',
-          competencyThemeRefId: 'ThemeRefID1',
-          competencyThemeType: 'Type1',
-          competencyThemeAdditionalProperties: {
-            displayName: 'DisplayName1',
-            timeStamp: '123456789'
-          },
-          competencySubThemeDescription: 'SubThemeDesc2',
-          competencySubThemeIdentifier: 'SubThemeID2',
-          competencySubThemeName: 'SubTheme2',
-          competencySubThemeRefId: 'SubThemeRefID2',
-          competencySubThemeAdditionalProperties: {
-            displayName: 'SubDisplayName2',
-            timeStamp: '123456789'
+            displayName: 'SubTheme Display',
+            timeStamp: '2024-01-01'
           }
         }
       ]
 
+      // Act
       const result = service.convertToTreeView(mockCompetencies)
 
-      // Check that the result is as expected
-      expect(result.length).toBe(1)
-      expect(result[0].competencyAreaName).toBe('Area1')
-      expect(result[0].themes.length).toBe(1)
-      expect(result[0].themes[0].competencyThemeName).toBe('Theme1')
-      expect(result[0].themes[0].subThems.length).toBe(2)
-      expect(result[0].themes[0].subThems[0].competencySubThemeName).toBe('SubTheme1')
-      expect(result[0].themes[0].subThems[1].competencySubThemeName).toBe('SubTheme2')
+      // Assert
+      expect(result).toHaveLength(1)
+      expect(result[0].competencyAreaName).toBe('Area 1')
+      expect(result[0].themes).toHaveLength(1)
+      expect(result[0].themes[0].competencyThemeName).toBe('Theme 1')
+      expect(result[0].themes[0].subThems).toHaveLength(1)
+      expect(result[0].themes[0].subThems[0].competencySubThemeName).toBe('SubTheme 1')
+      expect(result[0].collapsed).toBe(true)
     })
 
-    it('should handle multiple themes in the same area', () => {
+    it('should group competencies by area and theme correctly', () => {
+      // Arrange
       const mockCompetencies = [
         {
-          competencyAreaName: 'Area1',
-          competencyAreaDescription: 'Description1',
-          competencyAreaIdentifier: 'ID1',
-          competencyAreaRefId: 'RefID1',
-          competencyThemeDescription: 'ThemeDesc1',
-          competencyThemeIdentifier: 'ThemeID1',
-          competencyThemeName: 'Theme1',
-          competencyThemeRefId: 'ThemeRefID1',
+          competencyAreaName: 'Area 1',
+          competencyAreaDescription: 'Area 1 Description',
+          competencyAreaIdentifier: 'area1',
+          competencyAreaRefId: 'areaRef1',
+          competencyThemeName: 'Theme 1',
+          competencyThemeDescription: 'Theme 1 Description',
+          competencyThemeIdentifier: 'theme1',
+          competencyThemeRefId: 'themeRef1',
           competencyThemeType: 'Type1',
           competencyThemeAdditionalProperties: {
-            displayName: 'DisplayName1',
-            timeStamp: '123456789'
+            displayName: 'Theme Display',
+            timeStamp: '2024-01-01'
           },
-          competencySubThemeDescription: 'SubThemeDesc1',
-          competencySubThemeIdentifier: 'SubThemeID1',
-          competencySubThemeName: 'SubTheme1',
-          competencySubThemeRefId: 'SubThemeRefID1',
+          competencySubThemeName: 'SubTheme 1',
+          competencySubThemeDescription: 'SubTheme 1 Description',
+          competencySubThemeIdentifier: 'subtheme1',
+          competencySubThemeRefId: 'subthemeRef1',
           competencySubThemeAdditionalProperties: {
-            displayName: 'SubDisplayName1',
-            timeStamp: '123456789'
+            displayName: 'SubTheme Display',
+            timeStamp: '2024-01-01'
           }
         },
         {
-          competencyAreaName: 'Area1',
-          competencyAreaDescription: 'Description1',
-          competencyAreaIdentifier: 'ID1',
-          competencyAreaRefId: 'RefID1',
-          competencyThemeDescription: 'ThemeDesc2',
-          competencyThemeIdentifier: 'ThemeID2',
-          competencyThemeName: 'Theme2',
-          competencyThemeRefId: 'ThemeRefID2',
-          competencyThemeType: 'Type2',
+          competencyAreaName: 'Area 1',
+          competencyAreaDescription: 'Area 1 Description',
+          competencyAreaIdentifier: 'area1',
+          competencyAreaRefId: 'areaRef1',
+          competencyThemeName: 'Theme 1',
+          competencyThemeDescription: 'Theme 1 Description',
+          competencyThemeIdentifier: 'theme1',
+          competencyThemeRefId: 'themeRef1',
+          competencyThemeType: 'Type1',
           competencyThemeAdditionalProperties: {
-            displayName: 'DisplayName2',
-            timeStamp: '123456789'
+            displayName: 'Theme Display',
+            timeStamp: '2024-01-01'
           },
-          competencySubThemeDescription: 'SubThemeDesc3',
-          competencySubThemeIdentifier: 'SubThemeID3',
-          competencySubThemeName: 'SubTheme3',
-          competencySubThemeRefId: 'SubThemeRefID3',
+          competencySubThemeName: 'SubTheme 2',
+          competencySubThemeDescription: 'SubTheme 2 Description',
+          competencySubThemeIdentifier: 'subtheme2',
+          competencySubThemeRefId: 'subthemeRef2',
           competencySubThemeAdditionalProperties: {
-            displayName: 'SubDisplayName3',
-            timeStamp: '123456789'
+            displayName: 'SubTheme Display 2',
+            timeStamp: '2024-01-02'
           }
         }
       ]
 
+      // Act
       const result = service.convertToTreeView(mockCompetencies)
 
-      expect(result.length).toBe(1)
-      expect(result[0].themes.length).toBe(2)
-      expect(result[0].themes[0].competencyThemeName).toBe('Theme1')
-      expect(result[0].themes[1].competencyThemeName).toBe('Theme2')
+      // Assert
+      expect(result).toHaveLength(1)
+      expect(result[0].themes).toHaveLength(1)
+      expect(result[0].themes[0].subThems).toHaveLength(2)
     })
   })
 
   describe('convertToTabularView', () => {
-    it('should convert tree view to tabular view', () => {
+    it('should convert tree view to tabular format', () => {
+      // Arrange
       const mockTreeView = [
         {
-          competencyAreaDescription: 'Description1',
-          competencyAreaIdentifier: 'ID1',
-          competencyAreaName: 'Area1',
-          competencyAreaRefId: 'RefID1',
-          collapsed: true,
+          competencyAreaName: 'Area 1',
+          competencyAreaDescription: 'Area 1 Description',
           themes: [
             {
-              competencyThemeDescription: 'ThemeDesc1',
-              competencyThemeIdentifier: 'ThemeID1',
-              competencyThemeName: 'Theme1',
-              competencyThemeRefId: 'ThemeRefID1',
-              competencyThemeType: 'Type1',
-              collapsed: true,
-              competencyThemeAdditionalProperties: {
-                displayName: 'DisplayName1',
-                timeStamp: '123456789'
-              },
+              competencyThemeName: 'Theme 1',
+              competencyThemeDescription: 'Theme 1 Description',
               subThems: [
                 {
-                  competencySubThemeDescription: 'SubThemeDesc1',
-                  competencySubThemeIdentifier: 'SubThemeID1',
-                  competencySubThemeName: 'SubTheme1',
-                  competencySubThemeRefId: 'SubThemeRefID1',
-                  competencySubThemeAdditionalProperties: {
-                    displayName: 'SubDisplayName1',
-                    timeStamp: '123456789'
-                  }
+                  competencySubThemeName: 'SubTheme 1',
+                  competencySubThemeDescription: 'SubTheme 1 Description'
                 },
                 {
-                  competencySubThemeDescription: 'SubThemeDesc2',
-                  competencySubThemeIdentifier: 'SubThemeID2',
-                  competencySubThemeName: 'SubTheme2',
-                  competencySubThemeRefId: 'SubThemeRefID2',
-                  competencySubThemeAdditionalProperties: {
-                    displayName: 'SubDisplayName2',
-                    timeStamp: '123456789'
-                  }
+                  competencySubThemeName: 'SubTheme 2',
+                  competencySubThemeDescription: 'SubTheme 2 Description'
                 }
               ]
             }
@@ -418,75 +417,77 @@ describe('EventsService', () => {
         }
       ]
 
+      // Act
       const result = service.convertToTabularView(mockTreeView)
 
-      expect(result.length).toBe(2)
-      expect(result[0].competencyAreaName).toBe('Area1')
-      expect(result[0].competencyThemeName).toBe('Theme1')
-      expect(result[0].competencySubThemeName).toBe('SubTheme1')
-      expect(result[1].competencyAreaName).toBe('Area1')
-      expect(result[1].competencyThemeName).toBe('Theme1')
-      expect(result[1].competencySubThemeName).toBe('SubTheme2')
+      // Assert
+      expect(result).toHaveLength(2)
+      expect(result[0].competencyAreaName).toBe('Area 1')
+      expect(result[0].competencyThemeName).toBe('Theme 1')
+      expect(result[0].competencySubThemeName).toBe('SubTheme 1')
+      expect(result[1].competencySubThemeName).toBe('SubTheme 2')
+      expect(result[0].themes).toBeUndefined()
+      expect(result[0].subThems).toBeUndefined()
     })
   })
 
   describe('generateThemeObj', () => {
-    it('should generate theme object from input object', () => {
-      const mockInput = {
-        competencyThemeDescription: 'ThemeDesc1',
-        competencyThemeIdentifier: 'ThemeID1',
-        competencyThemeName: 'Theme1',
-        competencyThemeRefId: 'ThemeRefID1',
+    it('should generate theme object with correct structure', () => {
+      // Arrange
+      const mockObj = {
+        competencyThemeName: 'Theme 1',
+        competencyThemeDescription: 'Theme 1 Description',
+        competencyThemeIdentifier: 'theme1',
+        competencyThemeRefId: 'themeRef1',
         competencyThemeType: 'Type1',
         competencyThemeAdditionalProperties: {
-          displayName: 'DisplayName1',
-          timeStamp: '123456789'
+          displayName: 'Theme Display',
+          timeStamp: '2024-01-01'
         },
-        competencySubThemeDescription: 'SubThemeDesc1',
-        competencySubThemeIdentifier: 'SubThemeID1',
-        competencySubThemeName: 'SubTheme1',
-        competencySubThemeRefId: 'SubThemeRefID1',
+        competencySubThemeName: 'SubTheme 1',
+        competencySubThemeDescription: 'SubTheme 1 Description',
+        competencySubThemeIdentifier: 'subtheme1',
+        competencySubThemeRefId: 'subthemeRef1',
         competencySubThemeAdditionalProperties: {
-          displayName: 'SubDisplayName1',
-          timeStamp: '123456789'
+          displayName: 'SubTheme Display',
+          timeStamp: '2024-01-01'
         }
       }
 
-      const result = service.generateThemeObj(mockInput)
+      // Act
+      const result = service.generateThemeObj(mockObj)
 
-      expect(result.competencyThemeName).toBe('Theme1')
+      // Assert
+      expect(result.competencyThemeName).toBe('Theme 1')
       expect(result.collapsed).toBe(true)
-      expect(result.subThems.length).toBe(1)
-      expect(result.subThems[0].competencySubThemeName).toBe('SubTheme1')
+      expect(result.subThems).toHaveLength(1)
+      expect(result.subThems[0].competencySubThemeName).toBe('SubTheme 1')
+      expect(result.competencyThemeAdditionalProperties.displayName).toBe('Theme Display')
     })
   })
 
   describe('searchUser', () => {
-    it('should call the search users API', (done) => {
-      const mockValue = 'John'
-      const mockRootOrgId = 'org123'
-      const mockResponse = {
-        result: {
-          response: {
-            content: [{ name: 'John Doe', id: 'user123' }]
+    it('should search users with correct request body', (done) => {
+      // Arrange
+      const value = 'test user'
+      const rootOrgId = 'org123'
+      const expectedReqBody = {
+        request: {
+          query: value,
+          filters: {
+            rootOrgId
           }
         }
       }
+      const mockResponse = { result: { response: { content: [] } } }
 
-      httpClient.post.mockReturnValue(of(mockResponse))
+      mockHttpClient.post.mockReturnValue(of(mockResponse))
 
-      const expectedRequest = {
-        request: {
-          query: mockValue,
-          filters: {
-            rootOrgId: mockRootOrgId
-          },
-        },
-      }
-
-      service.searchUser(mockValue, mockRootOrgId).subscribe(response => {
-        expect(httpClient.post).toHaveBeenCalledWith('/apis/proxies/v8/user/v1/search', expectedRequest)
-        expect(response).toEqual(mockResponse)
+      // Act
+      service.searchUser(value, rootOrgId).subscribe(result => {
+        // Assert
+        expect(mockHttpClient.post).toHaveBeenCalledWith('/apis/proxies/v8/user/v1/search', expectedReqBody)
+        expect(result).toEqual(mockResponse)
         done()
       })
     })

@@ -2,7 +2,7 @@ import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core'
 import { UntypedFormArray, UntypedFormBuilder, UntypedFormControl, UntypedFormGroup } from '@angular/forms'
 import { ActivatedRoute } from '@angular/router'
 // tslint:disable
-import _ from 'lodash'
+import * as _ from 'lodash'
 // tslint:enable
 import { NSWatCompetency } from '../../models/competency-wat.model'
 import { WatStoreService } from '../../services/wat.store.service'

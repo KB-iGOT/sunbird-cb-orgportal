@@ -10,7 +10,7 @@ import { ParticipantsComponent } from '../../components/participants/participant
 import { SuccessComponent } from '../../components/success/success.component'
 import { Router, ActivatedRoute } from '@angular/router'
 import { ConfigurationsService, EventService } from '@sunbird-cb/utils'
-import * as moment from 'moment'
+import moment from 'moment'
 /* tslint:disable */
 import * as _ from 'lodash'
 import { TelemetryEvents } from '../../../../head/_services/telemetry.event.model'
@@ -514,12 +514,15 @@ export class CreateEventComponent implements OnInit {
     } else {
       this.eventsSvc.createEvent(form).subscribe(
         res => {
-          this.displayLoader = false
-          this.disableCreateButton = false
-          const identifier = res.result.identifier
-          const versionKey = res.result.versionKey
-          // this.fileSubmit(identifier)
-          this.publishEvent(identifier, versionKey)
+          if (res && res.result) {
+            this.displayLoader = false
+            this.disableCreateButton = false
+            const identifier = res.result.identifier
+            const versionKey = res.result.versionKey
+            // this.fileSubmit(identifier)
+            this.publishEvent(identifier, versionKey)
+          }
+
         },
         (err: any) => {
           this.displayLoader = false

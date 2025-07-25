@@ -52,7 +52,7 @@ export class LeadershipComponent implements OnInit, AfterViewInit, OnChanges {
   tabData = 'MDO_LEADER'
 
   constructor(private activeRoute: ActivatedRoute, private configSvc: ConfigurationsService,
-              private mdoinfoSrvc: MdoInfoService, private profileUtilSvc: ProfileV2UtillService) {
+    private mdoinfoSrvc: MdoInfoService, private profileUtilSvc: ProfileV2UtillService) {
     this.dataSource = new MatTableDataSource<any>()
     this.dataSource.paginator = this.paginator
   }
@@ -72,8 +72,10 @@ export class LeadershipComponent implements OnInit, AfterViewInit, OnChanges {
 
   ngOnChanges(data: SimpleChanges) {
     this.dataSource.data = _.get(data, 'data.currentValue')
-    this.length = this.dataSource.data.length
-    this.paginator.firstPage()
+    this.length = this.dataSource.data ? this.dataSource.data.length : 0
+    if (this.paginator && this.paginator.firstPage) {
+      this.paginator.firstPage()
+    }
   }
 
   ngAfterViewInit() { }
@@ -90,8 +92,10 @@ export class LeadershipComponent implements OnInit, AfterViewInit, OnChanges {
 
   applyFilter(filterValue: any) {
     if (filterValue) {
-      let fValue = filterValue.trim()
-      fValue = filterValue.toLowerCase()
+      // let fValue = filterValue.trim()
+      // fValue = filterValue.toLowerCase()
+      // this.dataSource.filter = fValue
+      let fValue = String(filterValue).trim().toLowerCase()
       this.dataSource.filter = fValue
     } else {
       this.dataSource.filter = ''
@@ -114,7 +118,9 @@ export class LeadershipComponent implements OnInit, AfterViewInit, OnChanges {
         columns.splice(0, 0, 'select')
       }
       if (this.tableData.needHash) {
-        columns.splice(0, 0, 'SR')
+        // columns.splice(0, 0, 'SR')
+        const insertIndex = this.tableData.needCheckBox ? 1 : 0
+        columns.splice(insertIndex, 0, 'SR')
       }
       if (this.tableData.needUserMenus) {
         columns.push('Menu')

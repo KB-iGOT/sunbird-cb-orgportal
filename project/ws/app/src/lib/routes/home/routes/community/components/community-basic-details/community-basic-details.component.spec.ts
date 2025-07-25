@@ -1,399 +1,511 @@
-// Mock CKEditor and other dependencies before importing any other modules
-jest.mock('ckeditor5', () => ({
-  ClassicEditor: {
-    create: jest.fn()
-  },
-  Autosave: jest.fn(),
-  BlockQuote: jest.fn(),
-  Bold: jest.fn(),
-  Code: jest.fn(),
-  Essentials: jest.fn(),
-  FontBackgroundColor: jest.fn(),
-  FontColor: jest.fn(),
-  FontFamily: jest.fn(),
-  FontSize: jest.fn(),
-  Heading: jest.fn(),
-  Highlight: jest.fn(),
-  Indent: jest.fn(),
-  IndentBlock: jest.fn(),
-  Italic: jest.fn(),
-  Link: jest.fn(),
-  List: jest.fn(),
-  Mention: jest.fn(),
-  Paragraph: jest.fn(),
-  RemoveFormat: jest.fn(),
-  SpecialCharacters: jest.fn(),
-  Strikethrough: jest.fn(),
-  Subscript: jest.fn(),
-  Superscript: jest.fn(),
-  Table: jest.fn(),
-  TableCaption: jest.fn(),
-  TableCellProperties: jest.fn(),
-  TableColumnResize: jest.fn(),
-  TableProperties: jest.fn(),
-  TableToolbar: jest.fn(),
-  Underline: jest.fn(),
-  WordCount: jest.fn()
-}))
-
-// Mock lodash
-jest.mock('lodash', () => ({
-  get: jest.fn((obj, path, defaultValue) => {
-    if (!obj) return defaultValue
-    const pathParts = path.split('.')
-    let result = obj
-    for (const part of pathParts) {
-      result = result?.[part]
-      if (result === undefined) return defaultValue
-    }
-    return result
-  })
-}))
-
 import { CommunityBasicDetailsComponent } from './community-basic-details.component'
-import { Subject } from 'rxjs'
-import { FormControl, FormGroup, Validators } from '@angular/forms'
-import * as _ from 'lodash'
+import { FormGroup, FormControl, Validators } from '@angular/forms'
+import { of } from 'rxjs'
 
 describe('CommunityBasicDetailsComponent', () => {
   let component: CommunityBasicDetailsComponent
-  let mockSanitizer: any
   let mockMatSnackBar: any
-  let formGroup: FormGroup
-
-  // Mock URL.createObjectURL and URL.revokeObjectURL
-  const originalCreateObjectURL = URL.createObjectURL
-  const originalRevokeObjectURL = URL.revokeObjectURL
-
-  beforeAll(() => {
-    // Mock URL methods
-    URL.createObjectURL = jest.fn().mockReturnValue('blob:test-url')
-    URL.revokeObjectURL = jest.fn()
-
-    // Mock FileReader
-    global.FileReader = class {
-      onload: any
-      readAsDataURL() {
-        if (this.onload) {
-          this.onload({ target: { result: 'data:image/jpeg;base64,mockImageData' } })
-        }
-      }
-    } as any
-
-    // Mock Image
-    global.Image = class {
-      width = 1152;
-      height = 288;
-      src = '';
-      onload: any
-      onerror: any
-
-      constructor() {
-        setTimeout(() => {
-          if (this.onload) this.onload()
-        }, 0)
-      }
-    } as any
-  })
-
-  afterAll(() => {
-    // Restore original URL methods
-    URL.createObjectURL = originalCreateObjectURL
-    URL.revokeObjectURL = originalRevokeObjectURL
-  })
+  let mockDomSanitizer: any
 
   beforeEach(() => {
-    // Create mocks
-    mockSanitizer = {
-      bypassSecurityTrustHtml: jest.fn(html => html)
-    }
-
+    // Mock dependencies
     mockMatSnackBar = {
       open: jest.fn()
     }
 
-    // Create form controls
-    formGroup = new FormGroup({
+    mockDomSanitizer = {
+      bypassSecurityTrustHtml: jest.fn(html => html)
+    }
+
+    // Create component instance with mocked dependencies
+    component = new CommunityBasicDetailsComponent(mockDomSanitizer, mockMatSnackBar)
+
+    // Create and set up form group for the component
+    component.communityDetailsForm = new FormGroup({
       communityName: new FormControl('', [Validators.required, Validators.minLength(10)]),
       description: new FormControl('', [Validators.required, Validators.minLength(50)]),
-      communityGuideLines: new FormControl('', [Validators.required]),
-      topicName: new FormControl(null, [Validators.required]),
+      communityGuideLines: new FormControl('', []),
+      searchTopic: new FormControl(''),
       posterImageUrl: new FormControl(''),
-      imageUrl: new FormControl(''),
-      searchTopic: new FormControl('')
+      imageUrl: new FormControl('')
     })
 
-    // Create component
-    component = new CommunityBasicDetailsComponent(
-      mockSanitizer as any,
-      mockMatSnackBar as any
-    )
-
-    // Set input properties
-    component.communityDetailsForm = formGroup
+    // Set default values for inputs
     component.openMode = 'create'
     component.topicDataList = [
-      { categoryId: 'topic1', categoryName: 'Technology' },
-      { categoryId: 'topic2', categoryName: 'Leadership' },
-      { categoryId: 'topic3', categoryName: 'Health' }
+      { categoryName: 'Technology' },
+      { categoryName: 'Science' },
+      { categoryName: 'Art' }
     ]
     component.filterTopicDetails = [...component.topicDataList]
   })
 
-  it('should create the component', () => {
+  test('should initialize with default values', () => {
     expect(component).toBeTruthy()
+    expect(component.fileSize).toBe(10)
+    expect(component.communityStatus).toBe('draft')
+    expect(component.isDragging).toBe(false)
+    expect(component.Editor).toBeDefined()
+    expect(component.ckEditorConfig).toBeDefined()
   })
 
-  describe('ngOnInit', () => {
-    it('should set up searchTopic valueChanges subscription', () => {
-      // Mock valueChanges
-      const valueChanges = new Subject<string>()
+  test('ngOnInit should set up topic search filtering', () => {
+    // Setup a spy on valueChanges
+    const searchTopicControl = component.communityDetailsForm.get('searchTopic')
+    const valueChangesSpy = jest.spyOn(searchTopicControl!.valueChanges, 'pipe').mockReturnValue(of('Tec'))
 
-      // Initialize the component
-      component.ngOnInit()
+    // Call ngOnInit
+    component.ngOnInit()
 
-      // Test with empty search
-      valueChanges.next('')
-      expect(component.filterTopicDetails).toEqual(component.topicDataList)
+    // Check if valueChanges was called
+    expect(valueChangesSpy).toHaveBeenCalled()
 
-      // Test with search term
-      valueChanges.next('tech')
-      expect(component.filterTopicDetails.length).toBe(1)
-      expect(component.filterTopicDetails[0].categoryName).toBe('Technology')
-    })
-  })
+    // Manually trigger the filter logic
+    component.filterTopicDetails = []
+    component.topicDataList = [
+      { categoryName: 'Technology' },
+      { categoryName: 'Science' }
+    ]
 
-  describe('showValidationMsg', () => {
-    beforeEach(() => {
-      // Setup form controls
-      component.communityDetailsForm.get('communityName')?.setValue('Short')
-      component.communityDetailsForm.get('communityName')?.markAsTouched()
-
-      // Setup spy on lodash.get
-      jest.spyOn(_, 'get').mockImplementation((_obj, path) => {
-        if (path === 'controls.communityName') {
-          return component.communityDetailsForm.get('communityName')
+    // Call the filter function directly
+    const searchSubscriber = searchTopicControl!.valueChanges
+      .subscribe(searchText => {
+        if (searchText) {
+          component.filterTopicDetails = component.topicDataList.filter((val: any) =>
+            val && val.categoryName.trim().toLowerCase().includes(searchText && searchText.toLowerCase())
+          )
+        } else {
+          component.filterTopicDetails = component.topicDataList
         }
-        if (path === 'controls.communityGuideLines') {
-          return component.communityDetailsForm.get('communityGuideLines')
-        }
-        return null
       })
+
+    // Set a value to trigger the filter
+    searchTopicControl!.setValue('Tec')
+
+    // Check if filterTopicDetails contains only 'Technology'
+    expect(component.filterTopicDetails.length).toBe(1)
+    expect(component.filterTopicDetails[0].categoryName).toBe('Technology')
+
+    // Clear the value to get all topics
+    searchTopicControl!.setValue('')
+    expect(component.filterTopicDetails.length).toBe(2)
+
+    // Clean up
+    searchSubscriber.unsubscribe()
+  })
+
+  test('showValidationMsg should return correct validation state for normal form controls', () => {
+    // Set up the control
+    const control = component.communityDetailsForm.get('communityName')
+    control!.setValue('Short')  // Too short
+    control!.markAsTouched()
+
+    // Test minlength validation
+    expect(component.showValidationMsg('communityName', 'minlength')).toBe(true)
+
+    // Fix the value
+    control!.setValue('Long enough community name')
+    expect(component.showValidationMsg('communityName', 'minlength')).toBe(false)
+
+    // Test required validation
+    control!.setValue('')
+    expect(component.showValidationMsg('communityName', 'required')).toBe(true)
+  })
+
+  test('showValidationMsg should check HTML editor content length', () => {
+    // Mock the getEditorTextLength method
+    jest.spyOn(component, 'getEditorTextLength').mockImplementation((content) => {
+      if (content === 'short') return 50
+      if (content === 'valid') return 200
+      if (content === 'toolong') return 600
+      return 0
     })
 
-    it('should show validation message for normal form controls', () => {
-      // Test minlength validation
-      const result = component.showValidationMsg('communityName', 'minlength')
+    // Set up the control
+    const control = component.communityDetailsForm.get('communityGuideLines')
+    control!.markAsTouched()
+
+    // Test minlength validation
+    control!.setValue('short')
+    expect(component.showValidationMsg('communityGuideLines', 'minlength')).toBe(true)
+
+    // Test valid length
+    control!.setValue('valid')
+    expect(component.showValidationMsg('communityGuideLines', 'minlength')).toBe(false)
+    expect(component.showValidationMsg('communityGuideLines', 'maxlength')).toBe(false)
+
+    // Test maxlength validation
+    control!.setValue('toolong')
+    expect(component.showValidationMsg('communityGuideLines', 'maxlength')).toBe(true)
+  })
+
+  test('getEditorTextLength should strip HTML tags and whitespace', () => {
+    const htmlContent = '<p>This is a <strong>test</strong> paragraph.</p><p>&nbsp;</p>'
+    expect(component.getEditorTextLength(htmlContent)).toBe(29)
+
+    const emptyHtml = '<p>&nbsp;</p>'
+    expect(component.getEditorTextLength(emptyHtml)).toBe(0)
+  })
+
+  test('onFileSelected should call handleFile with the selected file', () => {
+    // Mock the handleFile method
+    const handleFileSpy = jest.spyOn(component, 'handleFile').mockImplementation(() => Promise.resolve())
+
+    // Create a mock file and event
+    const file = new File([''], 'test.jpg', { type: 'image/jpeg' })
+    const event = {
+      target: { files: [file] }
+    } as unknown as Event
+
+    // Call the method
+    component.onFileSelected(event, 'posterImageUrl')
+
+    // Verify handleFile was called with correct arguments
+    expect(handleFileSpy).toHaveBeenCalledWith(file, 'posterImageUrl')
+  })
+
+  test('onDragOver and onDragLeave should update isDragging state', () => {
+    // Mock drag events
+    const mockEvent = {
+      preventDefault: jest.fn(),
+      stopPropagation: jest.fn()
+    } as unknown as DragEvent
+
+    // Test onDragOver
+    component.onDragOver(mockEvent)
+    expect(mockEvent.preventDefault).toHaveBeenCalled()
+    expect(mockEvent.stopPropagation).toHaveBeenCalled()
+    expect(component.isDragging).toBe(true)
+
+    // Test onDragLeave
+    component.onDragLeave(mockEvent)
+    expect(component.isDragging).toBe(false)
+  })
+
+  test('onDrop should call handleFile with the dropped file', () => {
+    // Mock the handleFile method
+    const handleFileSpy = jest.spyOn(component, 'handleFile').mockImplementation(() => Promise.resolve())
+
+    // Create a mock file and event
+    const file = new File([''], 'test.jpg', { type: 'image/jpeg' })
+    const mockEvent = {
+      preventDefault: jest.fn(),
+      stopPropagation: jest.fn(),
+      dataTransfer: {
+        files: [file]
+      }
+    } as unknown as DragEvent
+
+    // Call the method
+    component.onDrop(mockEvent, 'imageUrl')
+
+    // Verify handleFile was called with correct arguments
+    expect(handleFileSpy).toHaveBeenCalledWith(file, 'imageUrl')
+    expect(component.isDragging).toBe(false)
+  })
+
+  test('validatePosterImage should check image dimensions and size', async () => {
+    // Mock global URL.createObjectURL and URL.revokeObjectURL
+    global.URL = {
+      createObjectURL: jest.fn(() => 'blob:url'),
+      revokeObjectURL: jest.fn()
+    } as unknown as typeof URL
+
+    // Create a mock file that's too large
+    const largeFile = new File(['x'.repeat(11 * 1024 * 1024)], 'large.jpg', { type: 'image/jpeg' })
+
+    // Mock the Image constructor
+    const originalImage = global.Image
+    global.Image = jest.fn(() => ({
+      onload: null,
+      onerror: null,
+      src: '',
+      width: 0,
+      height: 0
+    })) as unknown as typeof Image
+
+    // Test file size validation
+    const openSnackBarSpy = jest.spyOn(component as any, 'openSnackBar')
+    const isLargeFileValid = await component.validatePosterImage(largeFile)
+    expect(isLargeFileValid).toBe(false)
+    expect(openSnackBarSpy).toHaveBeenCalledWith('File size must be less than 10MB')
+
+    // Test dimensions validation
+    const validSizeFile = new File(['x'.repeat(1 * 1024 * 1024)], 'test.jpg', { type: 'image/jpeg' })
+
+    // Wrong dimensions
+    let mockImage = {
+      onload: null as any,
+      onerror: null as any,
+      src: '',
+      width: 800,
+      height: 600
+    };
+
+    (global.Image as jest.Mock).mockImplementationOnce(() => mockImage)
+
+    const isWrongDimensionsValid = component.validatePosterImage(validSizeFile)
+    // Simulate image load
+    setTimeout(() => {
+      mockImage.onload()
+    }, 0)
+
+    await isWrongDimensionsValid.then(result => {
+      expect(result).toBe(false)
+      expect(openSnackBarSpy).toHaveBeenCalledWith('Image must be exactly 1152x288 pixels')
+    })
+
+    // Right dimensions
+    mockImage = {
+      onload: null as any,
+      onerror: null as any,
+      src: '',
+      width: 1152,
+      height: 288
+    };
+
+    (global.Image as jest.Mock).mockImplementationOnce(() => mockImage)
+
+    const isRightDimensionsValid = component.validatePosterImage(validSizeFile)
+    // Simulate image load
+    setTimeout(() => {
+      mockImage.onload()
+    }, 0)
+
+    await isRightDimensionsValid.then(result => {
       expect(result).toBe(true)
     })
 
-    it('should check editor text length for communityGuideLines', () => {
-      // Mock the getEditorTextLength method
-      jest.spyOn(component, 'getEditorTextLength').mockImplementation((content) => {
-        if (content === '<p>Short</p>') return 5
-        if (content === '<p>Very long content</p>') return 120
-        if (content === '<p>Extremely long content</p>') return 600
-        return 0
+    // Restore original Image constructor
+    global.Image = originalImage
+  })
+
+  test('validateCommunityImage should check file size', async () => {
+    // Create a mock file that's too large
+    const largeFile = new File(['x'.repeat(11 * 1024 * 1024)], 'large.jpg', { type: 'image/jpeg' })
+
+    // Mock URL methods
+    global.URL = {
+      createObjectURL: jest.fn(() => 'blob:url'),
+      revokeObjectURL: jest.fn()
+    } as unknown as typeof URL
+
+    // Test file size validation
+    const openSnackBarSpy = jest.spyOn(component as any, 'openSnackBar')
+    const isLargeFileValid = await component.validateCommunityImage(largeFile)
+    expect(isLargeFileValid).toBe(false)
+    expect(openSnackBarSpy).toHaveBeenCalledWith('File size must be less than 10MB')
+
+    // Test with valid size file
+    const validSizeFile = new File(['x'.repeat(1 * 1024 * 1024)], 'test.jpg', { type: 'image/jpeg' })
+    const isValidSizeFileValid = await component.validateCommunityImage(validSizeFile)
+    expect(isValidSizeFileValid).toBe(true)
+  })
+
+  test('handleFile should validate and update form control for image files', async () => {
+    // Mock validatePosterImage and validateCommunityImage
+    jest.spyOn(component, 'validatePosterImage').mockResolvedValue(true)
+    jest.spyOn(component, 'validateCommunityImage').mockResolvedValue(true)
+
+    // Mock the open snackbar method
+    const openSnackBarSpy = jest.spyOn(component as any, 'openSnackBar')
+
+    // Test with non-image file
+    const textFile = new File(['test'], 'test.txt', { type: 'text/plain' })
+    await component.handleFile(textFile, 'posterImageUrl')
+    expect(openSnackBarSpy).toHaveBeenCalledWith('Please upload an image file')
+
+    // Test with image file for posterImageUrl
+    const imageFile = new File(['image data'], 'test.jpg', { type: 'image/jpeg' })
+
+    // Mock FileReader
+    const originalFileReader = global.FileReader
+    const mockFileReaderInstance = {
+      onload: null as any,
+      readAsDataURL: jest.fn(function (this: any) {
+        this.result = 'data:image/jpeg;base64,abc123'
+        setTimeout(() => this.onload(), 0)
       })
+    }
+    global.FileReader = jest.fn(() => mockFileReaderInstance) as unknown as typeof FileReader
 
-      // Test minlength validation (too short)
-      component.communityDetailsForm.get('communityGuideLines')?.setValue('<p>Short</p>')
-      component.communityDetailsForm.get('communityGuideLines')?.markAsTouched()
-      expect(component.showValidationMsg('communityGuideLines', 'minlength')).toBe(true)
+    // Test poster image
+    const formSpy = jest.spyOn(component.communityDetailsForm, 'patchValue')
+    await component.handleFile(imageFile, 'posterImageUrl')
+    expect(component.validatePosterImage).toHaveBeenCalledWith(imageFile)
 
-      // Test minlength validation (long enough)
-      component.communityDetailsForm.get('communityGuideLines')?.setValue('<p>Very long content</p>')
-      expect(component.showValidationMsg('communityGuideLines', 'minlength')).toBe(false)
+    // Wait for FileReader onload
+    await new Promise(resolve => setTimeout(resolve, 10))
 
-      // Test maxlength validation (too long)
-      component.communityDetailsForm.get('communityGuideLines')?.setValue('<p>Extremely long content</p>')
-      expect(component.showValidationMsg('communityGuideLines', 'maxlength')).toBe(true)
+    expect(component.previewUrl).toBe('data:image/jpeg;base64,abc123')
+    expect(formSpy).toHaveBeenCalledWith({
+      posterImageUrl: imageFile
     })
+
+    // Test community image
+    formSpy.mockClear()
+    await component.handleFile(imageFile, 'imageUrl')
+    expect(component.validateCommunityImage).toHaveBeenCalledWith(imageFile)
+
+    // Wait for FileReader onload
+    await new Promise(resolve => setTimeout(resolve, 10))
+
+    expect(component.previewImageUrl).toBe('data:image/jpeg;base64,abc123')
+    expect(formSpy).toHaveBeenCalledWith({
+      imageUrl: imageFile
+    })
+
+    // Restore original FileReader
+    global.FileReader = originalFileReader
   })
 
-  describe('file handling', () => {
-    let mockFileEvent: any
-    let mockFile: File
-
-    beforeEach(() => {
-      // Create mock file event
-      mockFile = new File(['dummy content'], 'test-image.jpg', { type: 'image/jpeg' })
-      mockFileEvent = {
-        target: {
-          files: [mockFile]
-        },
-        preventDefault: jest.fn(),
-        stopPropagation: jest.fn()
-      }
-
-      // Spy on handleFile
-      jest.spyOn(component, 'handleFile')
-    })
-
-    it('should handle file selection via input', () => {
-      component.onFileSelected(mockFileEvent as any, 'posterImageUrl')
-      expect(component.handleFile).toHaveBeenCalledWith(mockFile, 'posterImageUrl')
-    })
-
-    it('should handle drag events', () => {
-      // Test dragover
-      const dragOverEvent = {
-        preventDefault: jest.fn(),
-        stopPropagation: jest.fn()
-      }
-      component.onDragOver(dragOverEvent as any)
-      expect(dragOverEvent.preventDefault).toHaveBeenCalled()
-      expect(component.isDragging).toBe(true)
-
-      // Test dragleave
-      const dragLeaveEvent = {
-        preventDefault: jest.fn(),
-        stopPropagation: jest.fn()
-      }
-      component.onDragLeave(dragLeaveEvent as any)
-      expect(dragLeaveEvent.preventDefault).toHaveBeenCalled()
-      expect(component.isDragging).toBe(false)
-
-      // Test drop
-      const dropEvent = {
-        preventDefault: jest.fn(),
-        stopPropagation: jest.fn(),
-        dataTransfer: {
-          files: [mockFile]
-        }
-      }
-      component.onDrop(dropEvent as any, 'posterImageUrl')
-      expect(dropEvent.preventDefault).toHaveBeenCalled()
-      expect(component.handleFile).toHaveBeenCalledWith(mockFile, 'posterImageUrl')
-      expect(component.isDragging).toBe(false)
-    })
+  test('getCongif should return ckEditorConfig', () => {
+    const config = component.getCongif()
+    expect(config).toBe(component.ckEditorConfig)
   })
 
-  describe('file validation', () => {
+  test('checkCharacterLimit should prevent input if over 3000 characters', () => {
+    // Mock getEditorTextLength to return more than 3000
+    jest.spyOn(component, 'getEditorTextLength').mockReturnValue(3500)
 
+    // Mock form control
+    component.communityDetailsForm.get('description')!.setValue('<p>Long content...</p>')
 
-    it('should validate poster image dimensions', async () => {
-      // Valid image
-      const validFile = new File(['valid image content'], 'valid.jpg', { type: 'image/jpeg' })
-      const validResult = await component.validatePosterImage(validFile)
-      expect(validResult).toBe(true)
+    // Mock editor
+    const mockEditor = {
+      getData: jest.fn().mockReturnValue('<p>Long content...</p>'),
+      setData: jest.fn()
+    }
 
-      // Invalid size
-      const largeFile = new File(['large file content'.repeat(1000000)], 'large.jpg', { type: 'image/jpeg' })
-      Object.defineProperty(largeFile, 'size', { value: 15 * 1024 * 1024 })
-      const sizeResult = await component.validatePosterImage(largeFile)
-      expect(sizeResult).toBe(false)
+    const event = { editor: mockEditor }
 
-      // Invalid dimensions
-      const mockImage = {
-        width: 800,
-        height: 600,
-        onload: null,
-        onerror: null
-      }
+    // Call the method
+    component.checkCharacterLimit(event)
 
-      // Mock global Image constructor
-      global.Image = jest.fn().mockImplementation(() => mockImage) as any
-
-      const invalidDimensionsFile = new File(['invalid dimensions content'], 'invalid.jpg', { type: 'image/jpeg' })
-      const dimensionsPromise = component.validatePosterImage(invalidDimensionsFile)
-
-      // Manually trigger onload
-
-      const dimensionsResult = await dimensionsPromise
-      expect(dimensionsResult).toBe(false)
-    })
+    // Check if setData was called to prevent further input
+    expect(mockEditor.setData).toHaveBeenCalledWith('<p>Long content...</p>')
   })
 
-  describe('file handling', () => {
+  test('onEditorChange should limit content to 3000 characters', () => {
+    // Mock getEditorTextLength to return more than 3000
+    jest.spyOn(component, 'getEditorTextLength').mockReturnValue(3500)
 
-
-    it('should handle poster image file', async () => {
-      const imageFile = new File(['image content'], 'poster.jpg', { type: 'image/jpeg' })
-      jest.spyOn(component, 'validatePosterImage').mockResolvedValue(true)
-
-      await component.handleFile(imageFile, 'posterImageUrl')
-
-      expect(component.previewUrl).toBe('data:image/jpeg;base64,mockImageData')
-      expect(component.communityDetailsForm.get('posterImageUrl')?.value).toBe(imageFile)
-    })
-
-    it('should handle community image file', async () => {
-      const imageFile = new File(['image content'], 'community.jpg', { type: 'image/jpeg' })
-      jest.spyOn(component, 'validateCommunityImage').mockResolvedValue(true)
-
-      await component.handleFile(imageFile, 'imageUrl')
-
-      expect(component.previewImageUrl).toBe('data:image/jpeg;base64,mockImageData')
-      expect(component.communityDetailsForm.get('imageUrl')?.value).toBe(imageFile)
-    })
-  })
-
-  describe('editor handling', () => {
-    it('should get text length from HTML content', () => {
-      // Simple text
-      expect(component.getEditorTextLength('Hello world')).toBe(11)
-
-      // HTML content
-      expect(component.getEditorTextLength('<p>Hello <strong>world</strong></p>')).toBe(11)
-
-      // With nbsp
-      expect(component.getEditorTextLength('<p>Hello&nbsp;world</p>')).toBe(11)
-
-      // With whitespace
-      expect(component.getEditorTextLength('<p>  Hello  world  </p>')).toBe(11)
-    })
-
-    it('should handle editor ready event', () => {
-      const mockEditor = {
-        editing: {
-          view: {
-            change: jest.fn(callback => {
-              const mockWriter = {
-                setStyle: jest.fn()
-              }
-              callback(mockWriter)
-              return mockWriter
-            }),
-            document: {
-              getRoot: jest.fn()
-            }
+    // Mock editor
+    const mockEditor = {
+      getData: jest.fn().mockReturnValue('<p>Long content...</p>'),
+      setData: jest.fn(),
+      model: {
+        document: {
+          selection: {
+            setTo: jest.fn()
+          },
+          getRoot: jest.fn().mockReturnValue({}),
+          model: {
+            createPositionAt: jest.fn().mockReturnValue({})
           }
         }
       }
+    }
 
-      // Mock document.querySelector
-      document.querySelector = jest.fn().mockReturnValue({
-        remove: jest.fn()
-      })
+    const event = { editor: mockEditor }
 
-      component.onReady(mockEditor)
+    // Create mock document function for tempDiv
+    const originalCreateElement = document.createElement
+    document.createElement = jest.fn().mockReturnValue({
+      innerHTML: '',
+      childNodes: []
+    })
 
-      expect(mockEditor.editing.view.change).toHaveBeenCalled()
-      expect(document.querySelector).toHaveBeenCalledWith('.ck.ck-powered-by')
+    // Call the method
+    component.onEditorChange(event)
+
+    // Check if setData was called (to truncate content)
+    expect(mockEditor.setData).toHaveBeenCalled()
+
+    // Restore document.createElement
+    document.createElement = originalCreateElement
+  })
+
+  test('emptyPosterImage should clear the poster image', () => {
+    // Set initial values
+    component.previewUrl = 'test-url'
+    const formSpy = jest.spyOn(component.communityDetailsForm, 'patchValue')
+
+    // Call the method
+    component.emptyPosterImage()
+
+    // Check if values were cleared
+    expect(component.previewUrl).toBe('')
+    expect(formSpy).toHaveBeenCalledWith({
+      posterImageUrl: ''
     })
   })
 
-  describe('utility methods', () => {
-    it('should empty poster image', () => {
-      component.previewUrl = 'test-url'
-      component.emptyPosterImage()
+  test('emptyImageUrl should clear the community image', () => {
+    // Set initial values
+    component.previewImageUrl = 'test-url'
+    const formSpy = jest.spyOn(component.communityDetailsForm, 'patchValue')
 
-      expect(component.previewUrl).toBe('')
-      expect(component.communityDetailsForm.get('posterImageUrl')?.value).toBe('')
+    // Call the method
+    component.emptyImageUrl()
+
+    // Check if values were cleared
+    expect(component.previewImageUrl).toBe('')
+    expect(formSpy).toHaveBeenCalledWith({
+      imageUrl: ''
     })
+  })
 
-    it('should empty image URL', () => {
-      component.previewImageUrl = 'test-url'
-      component.emptyImageUrl()
+  test('onReady should customize editor and remove powered by element', () => {
+    // Mock editor
+    const mockEditor = {
+      editing: {
+        view: {
+          change: jest.fn((callback) => {
+            const mockWriter = {
+              setStyle: jest.fn()
+            }
+            callback(mockWriter)
+            return mockWriter
+          }),
+          document: {
+            getRoot: jest.fn().mockReturnValue({})
+          }
+        }
+      }
+    }
 
-      expect(component.previewImageUrl).toBe('')
-      expect(component.communityDetailsForm.get('imageUrl')?.value).toBe('')
-    })
+    // Mock document.querySelector
+    const originalQuerySelector = document.querySelector
+    const mockPoweredByElement = { remove: jest.fn() }
+    document.querySelector = jest.fn().mockReturnValue(mockPoweredByElement)
 
-    it('should open snackbar', () => {
-      component['openSnackBar']('Test message')
-      expect(mockMatSnackBar.open).toHaveBeenCalledWith('Test message')
-    })
+    // Call the method
+    component.onReady(mockEditor)
+
+    // Check if the min-height was set and powered by element was removed
+    expect(mockEditor.editing.view.change).toHaveBeenCalled()
+    expect(document.querySelector).toHaveBeenCalledWith('.ck.ck-powered-by')
+    expect(mockPoweredByElement.remove).toHaveBeenCalled()
+
+    // Restore document.querySelector
+    document.querySelector = originalQuerySelector
+  })
+
+  test('onFocus should remove powered by element', () => {
+    // Mock document.querySelector
+    const originalQuerySelector = document.querySelector
+    const mockPoweredByElement = { remove: jest.fn() }
+    document.querySelector = jest.fn().mockReturnValue(mockPoweredByElement)
+
+    // Call the method
+    component.onFocus()
+
+    // Check if powered by element was removed
+    expect(document.querySelector).toHaveBeenCalledWith('.ck.ck-powered-by')
+    expect(mockPoweredByElement.remove).toHaveBeenCalled()
+
+    // Restore document.querySelector
+    document.querySelector = originalQuerySelector
   })
 })

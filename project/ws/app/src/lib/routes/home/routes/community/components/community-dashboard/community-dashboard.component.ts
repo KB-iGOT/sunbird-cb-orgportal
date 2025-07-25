@@ -97,11 +97,11 @@ export class CommunityDashboardComponent implements OnInit {
       this.userProfile = _.get(this.activatedRoute, 'snapshot.data.configService.unMappedUser')
       const userRole = this.userProfile.roles
       const targetRoles = ['COMMUNITY_MODERATOR', 'MDO_LEADER']
-      const itemPresent = targetRoles.some((role: any) => userRole.includes(role))
+      const itemPresent = targetRoles?.some((role: any) => userRole?.includes(role))
       if (itemPresent) {
         this.isCommunityModeratorRole = true
       }
-      const mdoLeaderPresent = userRole.some((role: any) => role.includes('MDO_LEADER'))
+      const mdoLeaderPresent = userRole?.some((role: any) => role?.includes('MDO_LEADER'))
       if (mdoLeaderPresent) {
         this.isCommunityCreateRole = true
       }

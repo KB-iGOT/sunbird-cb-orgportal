@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http'
 import { Observable } from 'rxjs'
 import { map } from 'rxjs/operators'
 // tslint:disable
-import _ from 'lodash'
+import * as _ from 'lodash'
 // tslint:enable
 
 const API_END_POINTS = {

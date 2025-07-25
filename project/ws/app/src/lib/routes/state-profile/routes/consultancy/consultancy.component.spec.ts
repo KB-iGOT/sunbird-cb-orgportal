@@ -4,7 +4,7 @@ import { ConfigurationsService } from '@sunbird-cb/utils'
 import { Router } from '@angular/router'
 import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog'
 import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar'
-import _ from 'lodash'
+import * as _ from 'lodash'
 
 // Mock dependencies
 jest.mock('../../services/org-profile.service')

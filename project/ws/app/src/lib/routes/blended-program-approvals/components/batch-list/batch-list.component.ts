@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
 
 import moment from 'moment'
+// import * as moment from 'moment'
 import { BlendedApporvalService } from '../../services/blended-approval.service'
 
 @Component({
@@ -47,7 +48,7 @@ export class BatchListComponent implements OnInit {
               applicationIds: [b.batchId],
               limit: 100,
               offset: 0,
-              deptName: this.userProfile.channel,
+              deptName: this.userProfile?.channel,
             }
             // b.newrequestsCount = Math.floor(Math.random() * (100 - 0 + 0)) + 0
             b.learnersCount = 0
@@ -56,7 +57,7 @@ export class BatchListComponent implements OnInit {
                 b.newrequestsCount = resnew.result.data.length
               }
             })
-            this.bpService.getLearners(b.batchId, this.userProfile.channel).subscribe((r: any) => {
+            this.bpService.getLearners(b.batchId, this.userProfile?.channel).subscribe((r: any) => {
               if (r && r.length > 0) {
                 b.learnersCount = r.length
               }
@@ -77,7 +78,7 @@ export class BatchListComponent implements OnInit {
 
   getBPDetails(programID: any) {
     this.bpService.getBlendedProgramsDetails(programID).subscribe((res: any) => {
-      this.programData = res.result.content
+      this.programData = res?.result?.content
       if (this.programData && this.programData.name) {
         this.breadcrumbs = {
           titles: [{ title: 'Blended programs', url: '/app/home/blended-approvals' },
@@ -101,7 +102,7 @@ export class BatchListComponent implements OnInit {
               applicationIds: [b.batchId],
               limit: 100,
               offset: 0,
-              deptName: this.userProfile.channel,
+              deptName: this.userProfile?.channel,
             }
             b.learnersCount = 0
             // b.newrequestsCount = Math.floor(Math.random() * (100 - 0 + 0)) + 0
@@ -110,7 +111,7 @@ export class BatchListComponent implements OnInit {
                 b.newrequestsCount = resnew.result.data.length
               }
             })
-            this.bpService.getLearners(b.batchId, this.userProfile.channel).subscribe((r: any) => {
+            this.bpService.getLearners(b.batchId, this.userProfile?.channel).subscribe((r: any) => {
               if (r && r.length > 0) {
                 b.learnersCount = r.length
               }

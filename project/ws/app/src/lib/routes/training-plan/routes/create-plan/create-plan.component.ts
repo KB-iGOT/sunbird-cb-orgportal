@@ -3,7 +3,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
 import { TrainingPlanDataSharingService } from '../../services/training-plan-data-share.service'
 /* tslint:disable */
-import _ from 'lodash'
+import * as _ from 'lodash'
 /* tslint:enable */
 @Component({
   selector: 'ws-app-create-plan',
