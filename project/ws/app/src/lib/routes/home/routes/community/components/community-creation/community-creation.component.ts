@@ -293,7 +293,7 @@ export class CommunityCreationComponent implements AfterViewInit {
         && this.communityDetailsForm.value.moderators.length) {
         currentFormIsValid = true
       } else {
-        this.openSnackBar('Please add atleast one speaker')
+        this.openSnackBar('Please add atleast one Moderator')
       }
     }
     return currentFormIsValid
@@ -327,31 +327,34 @@ export class CommunityCreationComponent implements AfterViewInit {
 
       const formBody = this.getFormBodyOfEvent(status, forceCreation)
       this.loaderService.changeLoaderState(true)
-      this.communitySvc.createCommunity(formBody).subscribe({
-        next: (res: any) => {
-          if (res) {
-            const communityId = res.result.communityId
-            this.uploadCommunityImage(communityId)
-            // Success message will be shown in uploadCommunityImage's success callback
-          } else {
-            this.loaderService.changeLoaderState(false)
-          }
-        },
-        error: (error: HttpErrorResponse) => {
-          this.loaderService.changeLoaderState(false)
-          if (error && error.status === 412) {
-            this.getConfirmationForCreation(error.error, status, 'saveAndExit')
-          } else {
-            let errorMessage = ''
-            if (error && error.error && error.error.responseCode === "CONFLICT") {
-              errorMessage = error.error.params && error.error.params.errMsg && error.error.params.errMsg || 'Community name already exists, please try with a different name'
+      if (formBody) {
+        this.communitySvc.createCommunity(formBody).subscribe({
+          next: (res: any) => {
+            if (res) {
+              const communityId = res.result.communityId
+              this.uploadCommunityImage(communityId)
+              // Success message will be shown in uploadCommunityImage's success callback
             } else {
-              errorMessage = _.get(error, 'error.message', 'Something went wrong while creating community, please try again')
+              this.loaderService.changeLoaderState(false)
             }
-            this.openSnackBar(errorMessage, 'red-snackbar')
+          },
+          error: (error: HttpErrorResponse) => {
+            this.loaderService.changeLoaderState(false)
+            if (error && error.status === 412) {
+              this.getConfirmationForCreation(error.error, status, 'saveAndExit')
+            } else {
+              let errorMessage = ''
+              if (error && error.error && error.error.responseCode === "CONFLICT") {
+                errorMessage = error.error.params && error.error.params.errMsg && error.error.params.errMsg || 'Community name already exists, please try with a different name'
+              } else {
+                errorMessage = _.get(error, 'error.message', 'Something went wrong while creating community, please try again')
+              }
+              this.openSnackBar(errorMessage, 'red-snackbar')
+            }
           }
-        }
-      })
+        })
+      }
+
     }
   }
 

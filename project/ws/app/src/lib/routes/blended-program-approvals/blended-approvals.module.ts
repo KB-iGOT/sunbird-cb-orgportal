@@ -39,15 +39,24 @@ import { ViewReportDialogComponent } from './components/view-report-dialog/view-
 import { MicroSurveyModule } from '@sunbird-cb/micro-surveys'
 import { LearnerResponsesComponent } from './components/learner-responses/learner-responses.component'
 import { LeftMenuModule } from '../../head/left-menu/left-menu.module'
+import { ContentNominateLearnerComponent } from './components/content-nominate-learner/content-nominate-learner.component'
+import { MatRadioModule } from '@angular/material/radio'
+import { SelectLearnersToBatchComponent } from './components/select-learners-to-batch/select-learners-to-batch.component'
+import { SnackbarComponent } from './components/snackbar/snackbar.component'
+import { DialogConfirmComponent } from './components/dialog-confirm/dialog-confirm.component'
+import { UserBulkUploadComponent } from './components/user-bulk-upload/user-bulk-upload.component'
+import { MatLegacySelectModule as MatSelectModule } from '@angular/material/legacy-select'
+import { UserRequestBulkUploadComponent } from './components/user-request-bulk-upload/user-request-bulk-upload.component'
 
 @NgModule({
     declarations: [BlendedHomeComponent, BatchListComponent, BatchDetailsComponent, UsersCardComponent, ProfileViewComponent,
-        SessionCardComponent, NominateUsersDialogComponent, RejectReasonDialogComponent, ViewReportDialogComponent, LearnerResponsesComponent],
+        SessionCardComponent, NominateUsersDialogComponent, RejectReasonDialogComponent, ViewReportDialogComponent, LearnerResponsesComponent, ContentNominateLearnerComponent,
+        SelectLearnersToBatchComponent, UserBulkUploadComponent, DialogConfirmComponent, SnackbarComponent, UserRequestBulkUploadComponent],
     imports: [CommonModule, BlendedApprovalsRoutingModule, BreadcrumbsOrgModule, LeftMenuWithoutLogoModule, WidgetResolverModule,
         MatSidenavModule, MatButtonModule, MatIconModule, HomeModule, RouterModule, UIORGTableModule,
         MatCardModule, AvatarPhotoModule, MatListModule, PipeEmailModule, PipeOrderByModule, ProfileCertificateDialogModule,
         MatBadgeModule, MatTableModule, MatCheckboxModule, MatSortModule, FormsModule, ReactiveFormsModule,
-        MatFormFieldModule, MatDialogModule, MatInputModule, MicroSurveyModule, MatProgressSpinnerModule, LeftMenuModule,],
+        MatFormFieldModule, MatDialogModule, MatInputModule, MicroSurveyModule, MatProgressSpinnerModule, LeftMenuModule, MatRadioModule, MatSelectModule],
     exports: [],
     providers: []
 })

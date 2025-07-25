@@ -2,7 +2,8 @@
   <div class="header">
     <h1>Communities</h1>
 
-    <button mat-button class="createBtn" (click)="onCreateCommunity()">Create New Community</button>
+    <button mat-button class="createBtn" (click)="onCreateCommunity()" *ngIf="isCommunityCreateRole">Create New
+      Community</button>
   </div>
 
   <!-- <mat-form-field class="search-field">
@@ -10,13 +11,34 @@
     <input matInput (keyup)="applyFilter($event)" placeholder="Search communities..." #input>
     <mat-icon matSuffix>search</mat-icon>
   </mat-form-field> -->
-  <mat-tab-group [(selectedIndex)]="selectedTabIndex" (selectedTabChange)="onTabChange($event)">
+  <!-- <mat-tab-group [(selectedIndex)]="selectedTabIndex" (selectedTabChange)="onTabChange($event)">
     <mat-tab *ngFor="let tab of tabs">
       <ng-template mat-tab-label>
         {{tab?.label}}
       </ng-template>
       <ng-container *ngTemplateOutlet="tabContent"></ng-container>
     </mat-tab>
+  </mat-tab-group> -->
+
+  <mat-tab-group [(selectedIndex)]="selectedTabIndex" (selectedTabChange)="onTabChange($event)">
+    <ng-container *ngIf="isCommunityModeratorOnly">
+      <mat-tab>
+        <ng-template mat-tab-label>
+          Community
+        </ng-template>
+        <ng-container *ngTemplateOutlet="tabContent"></ng-container>
+      </mat-tab>
+    </ng-container>
+
+    <ng-container *ngIf="!isCommunityModeratorOnly">
+      <mat-tab *ngFor="let tab of tabs">
+        <ng-template mat-tab-label>
+          {{tab?.label}}
+        </ng-template>
+        <ng-container *ngTemplateOutlet="tabContent"></ng-container>
+      </mat-tab>
+    </ng-container>
+
   </mat-tab-group>
 </div>
 
@@ -93,20 +115,39 @@
           <button mat-icon-button [matMenuTriggerFor]="menu">
             <mat-icon class="align-top-icon">more_vert</mat-icon>
           </button>
-          <mat-menu #menu="matMenu">
-            <button mat-menu-item (click)="onActionClick('edit', row)" [disabled]="!canEdit(row)">
+          <!-- <mat-menu #menu="matMenu">
+            <button mat-menu-item (click)="onActionClick('edit', row)"
+              [disabled]="!canEdit(row) || isCommunityModeratorRole">
               <mat-icon>edit</mat-icon>
               <span>Edit</span>
             </button>
-            <!-- <button mat-menu-item *ngIf="canDelete(row)" (click)="onActionClick('delete', row)">
+
+            <button mat-menu-item (click)="onActionClick('manage', row)" *ngIf="isCommunityModeratorRole">
+              <mat-icon>settings</mat-icon>
+              <span>Manage</span>
+            </button>
+            <button mat-menu-item *ngIf="canDelete(row)" (click)="onActionClick('delete', row)">
               <mat-icon>delete</mat-icon>
               <span>Delete</span>
             </button>
             <button mat-menu-item *ngIf="canArchive(row)" (click)="onActionClick('archive', row)">
               <mat-icon>archive</mat-icon>
               <span>Archive</span>
-            </button> -->
+            </button>
+          </mat-menu> -->
+          <mat-menu #menu="matMenu">
+            <button mat-menu-item *ngIf="currentStatus==='draft'" (click)="onActionClick('edit', row)">
+              <mat-icon>edit</mat-icon>
+              <span>Edit</span>
+            </button>
+
+            <button mat-menu-item (click)="onActionClick('manage', row)"
+              *ngIf="isCommunityModeratorRole && currentStatus==='active'">
+              <mat-icon>settings</mat-icon>
+              <span>Manage</span>
+            </button>
           </mat-menu>
+
         </td>
       </ng-container>
 

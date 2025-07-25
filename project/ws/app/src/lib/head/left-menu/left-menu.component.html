@@ -15,7 +15,7 @@
   </div>
 </div>
 <ng-container *ngFor="let menu of menulist; let mi = index">
-  <ng-container *ngIf="menu.subMenu">
+  <ng-container *ngIf="menu.subMenu && isAllowed(menu)">
     <mat-accordion [multi]="true" class="custom-leftmenu">
       <mat-expansion-panel class="menuPannel bg-gray-accordian" hideToggle="true" [expanded]="menu.defaultExpanded"
         #example>

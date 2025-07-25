@@ -43,6 +43,13 @@ import { MatLegacyChipsModule as MatChipsModule } from '@angular/material/legacy
 import { TooltipDirective } from './directive/tooltip.directive'
 import { TooltipComponent } from './directive/tooltip/tooltip.component'
 import { CompTooltipDirective } from '../../../state-profile/directives/tooltip.directive'
+import { CommunityManageComponent } from './components/community-manage/community-manage.component'
+import { ReportIssueComponent } from './components/report-issue/report-issue.component'
+import { MatLegacyProgressBarModule as MatProgressBarModule } from '@angular/material/legacy-progress-bar';
+import { StripHtmlPipe } from './pipes/strip-html.pipe';
+import { ImageSlidersComponent } from './components/image-sliders/image-sliders.component';
+import { PipeRelativeTimePipe } from './pipes/pipe-relative-time/pipe-relative-time.pipe';
+import { ProfileAvatarComponent } from './components/profile-avatar/profile-avatar.component'
 
 
 @NgModule({
@@ -54,7 +61,13 @@ import { CompTooltipDirective } from '../../../state-profile/directives/tooltip.
     CommunityCompetencyComponent,
     TooltipComponent,
     TooltipDirective,
-    CompTooltipDirective
+    CompTooltipDirective,
+    CommunityManageComponent,
+    ReportIssueComponent,
+    StripHtmlPipe,
+    ImageSlidersComponent,
+    PipeRelativeTimePipe,
+    ProfileAvatarComponent
   ],
   imports: [
     CommonModule,
@@ -89,7 +102,8 @@ import { CompTooltipDirective } from '../../../state-profile/directives/tooltip.
     ComponentSharedModule,
     CKEditorModule,
     CompetencyAddModule,
-    MatChipsModule
+    MatChipsModule,
+    MatProgressBarModule
   ],
   providers: [
     DatePipe,

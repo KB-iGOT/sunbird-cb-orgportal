@@ -13,6 +13,7 @@ import { TelemetryEvents } from '../../../../../head/_services/telemetry.event.m
 import { ReportsVideoComponent } from '../../reports-video/reports-video.component'
 import { ApprovalsService } from '../../../services/approvals.service'
 import { LoaderService } from '../../../../../../../../../../src/app/services/loader.service'
+import { environment } from 'src/environments/environment'
 
 @Component({
   selector: 'ws-approval-pending',
@@ -88,7 +89,7 @@ export class ApprovalPendingComponent implements OnInit, OnDestroy {
   openVideoPopup() {
     this.dialog.open(ReportsVideoComponent, {
       data: {
-        videoLink: 'https://www.youtube.com/embed/tgbNymZ7vqY?autoplay=1&mute=1',
+        videoLink: `${environment?.karmYogiPath}/assets/public/content/guide-videos/MDO-User.mp4`,
       },
       disableClose: true,
       width: '50%',

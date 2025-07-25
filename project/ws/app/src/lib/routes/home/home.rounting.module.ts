@@ -31,6 +31,7 @@ import { OdcsMappingComponent } from './routes/odcs-mapping/odcs-mapping.compone
 import { MentorManageComponent } from './routes/mentor-manage/mentor-manage.component'
 import { BulkUploadOdcsComponent } from './routes/odcs-mapping/bulk-upload-odcs/bulk-upload-odcs.component'
 import { GroupsGradeComponent } from './components/groups-grade/groups-grade.component'
+import { MyNotificationsComponent } from './routes/my-notifications/my-notifications.component'
 const routes: Routes = [
   {
     path: '',
@@ -324,6 +325,18 @@ const routes: Routes = [
           pageId: 'blended-approvals',
           module: 'Home',
         },
+      },
+      {
+        path: 'notifications',
+        component: MyNotificationsComponent,
+        data: {
+          pageId: 'my-notifications',
+          module: 'Notifications',
+        },
+      },
+      {
+        path: 'custom-fields',
+        loadChildren: () => import('./routes/custom-forms/custom-forms.module').then(m => m.CustomFormsModule),
       },
       {
         path: 'events',

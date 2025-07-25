@@ -118,12 +118,23 @@ export class FileService {
     }
   }
 
+
   validateExcelFile(type: string): boolean {
     const allowedTypes = [
       'application/vnd.ms-excel',
       'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
     ]
     return allowedTypes.includes(type)
+  }
+
+  validateXlFile(name: string) {
+    const allowedFormats = ['xlsx', 'xls']
+    const ext = name.substring(name.lastIndexOf('.') + 1).toLowerCase()
+    if (allowedFormats.indexOf(ext) > -1) {
+      return true
+    } else {
+      return false
+    }
   }
 
   async getBulkUploadData() {

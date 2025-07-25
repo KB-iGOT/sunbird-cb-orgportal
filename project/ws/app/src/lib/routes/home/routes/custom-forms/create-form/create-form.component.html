@@ -1,0 +1,96 @@
+<ng-container>
+  <div class="flex items-center mx-auto fixed-spinner-create" *ngIf="isLoading">
+    <mat-spinner [diameter]="30" [strokeWidth]="3"></mat-spinner>
+  </div>
+</ng-container>
+<div class="flex flex-4 flex-column background-color">
+  <div class="flex justify-between">
+    <span class="mobile-margin mat-h2">Create Custom Profile Form</span>
+    <mat-icon class="cursor-pointer" (click)="close()">close</mat-icon>
+  </div>
+</div>
+<div class="form-content form-padding">
+  <form [formGroup]="customForm">
+    <div class="flex flex-wrapped">
+      <div class="flex-1 items-center ">
+        <span class="mat-subheading-2 margin-remove flex required"
+          i18n="Title label|Label which explains the user to enter title">
+          Description
+        </span>
+        <mat-form-field appearance="outline" class="surveytitle w-full">
+          <input matInput #title formControlName="description" i18n-placeholder placeholder="Enter description"
+            tabindex="1" autocomplete="off" maxlength="50" />
+          <mat-error [hidden]="false" *ngIf="customForm?.controls['description'].errors?.required"
+            i18n="Title Error | Explains title is required">
+            Title is mandatory
+          </mat-error>
+          <mat-error [hidden]="false"
+            *ngIf="!customForm?.controls['description'].errors?.required && customForm?.controls['description'].errors?.whitespace"
+            i18n-aria-label aria-label="Title Error | Explains title must be alphanumeric value">
+            Please enter alphanumeric value
+          </mat-error>
+          <mat-error [hidden]="false" *ngIf="!customForm?.controls['description'].errors?.required && !customForm?.controls['description'].errors?.whitespace &&
+                              customForm?.controls['description'].errors?.hasHtml" i18n-aria-label
+            aria-label="Title Error | Explains title must be alphanumeric value">
+            HTML or Js is not allowed
+          </mat-error>
+          <mat-hint align="end">{{title.value.length}} of 50</mat-hint>
+        </mat-form-field>
+      </div>
+    </div>
+  </form>
+
+  <div class="w-full flex">
+    <div class="form-options">
+      <ng-container *ngFor="let section of sections">
+        <div
+          class="form-option mb-5 flex items-center p-4 gap-3 {{isEditMode ? '' : 'cursor-pointer'}} {{selectedTab === section.type ? 'active' : ''}}"
+          (click)="isEditMode ? '' : addContent(section.type)">
+          <div class="icons"><mat-icon class="">{{section.icon}}</mat-icon></div>
+          <div class="{{selectedTab === section.type ? 'text-white' : ''}}">
+            <div class="icon-title">{{section.title}}</div>
+            <div class="icon-sub-title pt-1">{{section.subTitle}}</div>
+          </div>
+        </div>
+      </ng-container>
+    </div>
+    <div class="form-questions" *ngIf="getQuestions?.controls?.length">
+      <div *ngFor="let row of getQuestions?.controls; let i = index">
+        <ng-container>
+          <ws-app-custom-input-text [question]="row" [customForm]="customForm" [index]="i" (removeRow)="removeItem(i)"
+            (customRegex)="customRegex($event)"></ws-app-custom-input-text>
+        </ng-container>
+      </div>
+      <ng-container *ngIf="selectedTab === 'masterList'">
+        <div class="flex justify-end mt-5 gap-4">
+          <div class="flex flex-col items-center" *ngIf="getQuestions?.length > 1">
+            <div class="text-primary cursor-pointer ws-mat-white-background round mat-raised-button mat-button-base"
+              (click)="fileInput.click()" (dblclick)="$event.preventDefault()">
+              Upload file</div>
+            <input hidden type="file" #fileInput (click)="handleFileClick($event)" (change)="handleOnFileChange($event)"
+              name="file" placeholder="Choose file" (dblclick)="$event.preventDefault();"
+              accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" />
+          </div>
+          <button mat-button class="ws-mat-white-background round mat-raised-button mat-button-base"
+            (click)="addNewListQuestion()" *ngIf="selectedTab === 'masterList'">Add new list</button>
+        </div>
+      </ng-container>
+
+      <div class="flex gap-4 {{selectedTab === 'text' ? 'justify-between' : 'justify-end mt-5'}}">
+        <ng-container>
+          <div class="mt-2 text-sm pl-1" *ngIf="selectedTab === 'text'">
+            <span class="font-red">Disclaimer</span> - The collection, use and monitoring of sensitive
+            or confidential data / information is prohibited without proper
+            authorization. Example: Aadhaar, PAN etc. The MDO’s are suggested to capture the data responsibly, and MDOs
+            take full
+            responsibility of any such data captured using Custom Fields facility on IGOT.
+          </div>
+          <button mat-button class="text-white ws-mat-primary-background round mat-raised-button mat-button-base"
+            [disabled]="customForm.invalid || validateForm()"
+            (click)="customFieldObject?.customFieldId ? onUpdate() : onSave()">
+            {{customFieldObject?.customFieldId ? 'Update' : 'Save'}}
+          </button>
+        </ng-container>
+      </div>
+    </div>
+  </div>

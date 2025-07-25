@@ -1,6 +1,6 @@
 <mat-toolbar *ngIf="showAppNavBar" [color]="primaryNavbarBackground?.color" [ngStyle]="primaryNavbarBackground?.styles"
   class="mat-elevation-z3 custom mobile">
-  <div class="fix-ww" id="root-tool-bar" title="toolbar" role="toolbar">
+  <div class="fix-ww" id="root-tool-bar" title="Home" role="toolbar">
     <ng-container *ngIf="mode === 'top'">
       <a routerLink="/app/home" class="logo-dim" role="link" title="Home">
         <img [src]="appIcon" alt="Application Logo" class="app-logo" />
@@ -96,6 +96,22 @@
   <ng-container *ngIf="item.type === 'widgetButton'" [wsResolverWidget]="item.config"></ng-container>
   <ws-widget-btn-feature *ngIf="item.type === 'featureButton' && item.config.actionBtnId !== 'feature_notification'"
     [id]="item.config.actionBtnId" [widgetData]="item.config" [showFixedLength]="true"></ws-widget-btn-feature>
+  <div class="p-4" *ngIf="item.type === 'notificationButton'">
+    <div #notificationTrigger [matMenuTriggerFor]="menu" class="relative cursor-pointer" (click)="onBellClick()"
+      title="Notifications" role="button" aria-label="Notifications" tabindex="0"
+      (keydown.enter)="$event.preventDefault(); notificationTrigger.click(); onBellClick();"
+      (keydown.escape)="$event.preventDefault(); notificationTrigger.click();">
+      <mat-icon class="bell-icon">notifications</mat-icon>
+      <span class="counter" *ngIf="notificationsCount > 0">{{notificationsCount > 9 ? '9+' : notificationsCount}}</span>
+    </div>
+    <mat-menu #menu="matMenu" xPosition="before" class="my-notifications" (closed)="onMenuClosed()">
+      <div class="notification-container">
+        <sb-uin-notification-dropdown (viewAllClick)="viewAllClick($event)" [unRead]="notificationsCount"
+          *ngIf="showDropdown">
+        </sb-uin-notification-dropdown>
+      </div>
+    </mat-menu>
+  </div>
 </ng-template>
 
 <mat-menu #helpMenu="matMenu">

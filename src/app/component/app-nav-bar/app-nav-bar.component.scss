@@ -183,3 +183,44 @@
 }
 // @media
 // 760px
+
+.bell-icon {
+  color: rgba(27, 76, 161, 1) !important;
+}
+
+::ng-deep.my-notifications {
+  min-width: 386px !important;
+  margin-top: 15px;
+
+}
+
+::ng-deep.mat-menu {
+  display: block !important;
+}
+
+.notification-container {
+  padding: 16px;
+  width: 353px;
+  background: white;
+  border-radius: 10px;
+  font-weight: normal;
+  //border: 1px solid #ebe5e5;
+  cursor: default;
+}
+
+.counter {
+  position: absolute;
+  top: -5px;
+  left: 13px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: rgba(209, 57, 36, 1);
+  color: white;
+  text-align: center;
+  font-size: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: Lato;
+ }

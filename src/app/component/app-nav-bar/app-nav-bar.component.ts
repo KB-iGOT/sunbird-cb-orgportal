@@ -1,17 +1,23 @@
-import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core'
+import { Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges } from '@angular/core'
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser'
 import { IBtnAppsConfig, CustomTourService } from '@sunbird-cb/collection'
 import { NsWidgetResolver } from '@sunbird-cb/resolver'
-import { ConfigurationsService, NsInstanceConfig, NsPage } from '@sunbird-cb/utils'
+import { ConfigurationsService, EventService, NsInstanceConfig, NsPage } from '@sunbird-cb/utils'
 import { Router, NavigationStart, NavigationEnd, Event } from '@angular/router'
-
+import { LibNotificationsService } from '@sunbird-cb/notification'
+import { NotificationsService } from '../../services/notifications.service'
+import * as _ from 'lodash'
+import { Subscription } from 'rxjs'
+import { environment } from '../../../environments/environment'
+import { MatSnackBar } from '@angular/material/snack-bar'
 @Component({
   selector: 'ws-app-nav-bar',
   templateUrl: './app-nav-bar.component.html',
   styleUrls: ['./app-nav-bar.component.scss'],
 })
-export class AppNavBarComponent implements OnInit, OnChanges {
+export class AppNavBarComponent implements OnInit, OnChanges, OnDestroy {
   @Input() mode: 'top' | 'bottom' = 'top'
+  @Input() notificationsCount: any = 0
   // @Input()
   // @HostBinding('id')
   // public id!: string
@@ -34,12 +40,21 @@ export class AppNavBarComponent implements OnInit, OnChanges {
   showAppNavBar = false
   isSetUpPage = false
   popupTour: any
+  showDropdown: boolean = false
+  private myNotificationsSubscription!: Subscription
+  environment: any
+  roles: string[] = []
   constructor(
     private domSanitizer: DomSanitizer,
     private configSvc: ConfigurationsService,
     private tourService: CustomTourService,
     private router: Router,
+    private libNotificationsService: LibNotificationsService,
+    private notificationsService: NotificationsService,
+    private events: EventService,
+    private snackBar: MatSnackBar,
   ) {
+    this.environment = environment
     this.btnAppsConfig = { ...this.basicBtnAppsConfig }
     if (this.configSvc.restrictedFeatures) {
       this.isHelpMenuRestricted = this.configSvc.restrictedFeatures.has('helpNavBarMenu')
@@ -52,6 +67,9 @@ export class AppNavBarComponent implements OnInit, OnChanges {
         this.cancelTour()
       }
     })
+    if (this.configSvc && this.configSvc.unMappedUser && this.configSvc.unMappedUser.roles) {
+      this.roles = this.configSvc.unMappedUser.roles
+    }
   }
 
   ngOnInit() {
@@ -91,6 +109,15 @@ export class AppNavBarComponent implements OnInit, OnChanges {
       ) {
         this.isTourGuideAvailable = canShow
         this.popupTour = this.tourService.createPopupTour()
+      }
+    })
+    if (this.configSvc.unMappedUser && this.configSvc.unMappedUser.identifier) {
+      this.getMyCount()
+    }
+
+    this.myNotificationsSubscription = this.libNotificationsService._unreadCount.subscribe((res: boolean) => {
+      if (res === true) {
+        this.getMyCount()
       }
     })
   }
@@ -152,5 +179,62 @@ export class AppNavBarComponent implements OnInit, OnChanges {
 
   showDashboard() {
     this.router.navigateByUrl('app/my-dashboard-temp/temp')
+  }
+
+  onBellClick() {
+    if (this.notificationsCount > 0) {
+      this.notificationsService.resetNotificationsCount().subscribe((res: any) => {
+        if (res.responseCode === 'OK') {
+          this.notificationsCount = 0
+        }
+      }, error => {
+        console.error('Error while fetching notifications count', error)
+      })
+    }
+    this.showDropdown = false
+    setTimeout(() => {
+      this.showDropdown = true
+    })
+  }
+  onMenuClosed() {
+    this.showDropdown = false
+  }
+
+  viewAllClick(event: any) {
+    if (event.category) {
+      this.raiseTelemetryEventForNotification(event)
+      this.notificationsService.handleRedirection(event, this.environment, this.roles, this.snackBar)
+    } else {
+      this.router.navigate(['/app/home/notifications'], { queryParams: { tab: event } })
+    }
+  }
+
+  getMyCount() {
+    this.notificationsService.getNotificationsData().subscribe((res: any) => {
+      this.notificationsCount = _.get(res, 'result.unread', 0)
+    }, error => {
+      console.error('Error while fetching notifications count', error)
+      this.notificationsCount = 0
+    })
+  }
+
+  raiseTelemetryEventForNotification(notification: any) {
+    this.events.raiseInteractTelemetry(
+      {
+        type: 'click',
+        subType: 'notification-engine',
+        id: notification.notification_id,
+      },
+      {},
+      {
+        module: 'Home',
+      }
+    )
+  }
+
+  ngOnDestroy() {
+    if (this.myNotificationsSubscription) {
+      this.myNotificationsSubscription.unsubscribe()
+    }
   }
 }

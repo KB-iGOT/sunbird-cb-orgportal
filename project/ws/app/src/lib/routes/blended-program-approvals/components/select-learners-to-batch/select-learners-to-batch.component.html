@@ -1,0 +1,172 @@
+<div class="select-learner-block margin-top-l">
+  <h4>Select Learners</h4>
+  <p class="search-title">Search the learner who should be able to view the {{(contentMeta &&
+    contentMeta.primaryCategory === 'Program') ? 'program' : 'assessment'}}.</p>
+  <div class="mat-full-radius-select">
+    <mat-form-field appearance="outline" class="search-input-block">
+      <input matInput (keydown.enter)="globalSearch($event)" [(ngModel)]="globalSearchText" class="search-input"
+        placeholder="Search" #globalInput>
+      <mat-icon class="search-icon">search</mat-icon>
+    </mat-form-field>
+  </div>
+
+  <form [formGroup]="filterForm" (keydown.enter)="$event.preventDefault()">
+    <div class="flex filter-block filter-gap  items-end">
+      <div class="mat-full-radius-select">
+        <mat-form-field appearance="outline" class="mat-form-learner">
+          <mat-select multiple placeholder="Organisation" #selectOrgg="matSelect" formControlName="selectedOrg"
+            (openedChange)="openedChangeOrg($event)">
+            <mat-select-trigger>
+              <!-- jgdjkgdjgkj -->
+              <span class="select-label">Organisation
+                <span *ngIf="filterForm?.value?.selectedOrg?.length > 0" class="additional-selection">
+                  ({{filterForm?.value?.selectedOrg?.length}})
+                </span>
+              </span>
+            </mat-select-trigger>
+            <div class="mat-full-radius text-center">
+              <mat-form-field appearance="outline" class="mat-form-learner-search">
+                <input matInput #searchTextBox focused="'true'" (keyup)="onFilterOrg($event)" placeholder="Search">
+                <mat-icon class="search-icon">search</mat-icon>
+              </mat-form-field>
+            </div>
+            <!-- <mat-option>None</mat-option> -->
+            <mat-optgroup *ngIf="filterOrgList.length === 0">
+              <div>No results found!</div>
+            </mat-optgroup>
+            <ng-container *ngIf="filterOrgList">
+              <mat-option *ngFor="let org of filterOrgList" (onSelectionChange)="selectOrg($event)"
+                [value]="org">{{org.channel | titlecase}}</mat-option>
+            </ng-container>
+          </mat-select>
+        </mat-form-field>
+      </div>
+      <div class="mat-full-radius-select">
+        <mat-form-field appearance="outline" class="mat-form-learner">
+          <mat-select multiple placeholder="Designation" #selectDeptt="matSelect" (openedChange)="openedChange($event)"
+            formControlName="selectedDept">
+            <mat-select-trigger>
+              <span class="select-label">Designation
+                <span *ngIf="filterForm?.value?.selectedDept?.length > 0" class="additional-selection">
+                  ({{filterForm?.value?.selectedDept?.length}})
+                </span>
+              </span>
+            </mat-select-trigger>
+            <div class="mat-full-radius text-center">
+              <mat-form-field appearance="outline" class="mat-form-learner-search">
+                <input matInput #searchDeptTextBox focused="'true'" (keyup)="onFilterDept($event)" placeholder="Search">
+                <mat-icon class="search-icon">search</mat-icon>
+              </mat-form-field>
+            </div>
+            <!-- <mat-option *ngIf="filterDeptList.length === 0">None</mat-option> -->
+            <mat-optgroup *ngIf="filterDeptList.length === 0">
+              <div>No results found!</div>
+            </mat-optgroup>
+            <ng-container *ngIf="filterDeptList">
+              <mat-option *ngFor="let dept of filterDeptList" (onSelectionChange)="selectDepartment($event)"
+                [value]="dept">{{dept.name | titlecase}}</mat-option>
+            </ng-container>
+          </mat-select>
+        </mat-form-field>
+      </div>
+      <div>
+        <div class="flex flex-middle  swith-block margin-bottom-xs filter-gap ">
+          <label class="switch">
+            <input type="checkbox" formControlName="userType" [checked]="false">
+            <span class="slider round"></span>
+          </label>
+          <span>{{ filterForm?.value?.userType? 'Only Verified Karmayogis': 'All Users'}}</span>
+        </div>
+      </div>
+    </div>
+  </form>
+  <div class="flex margin-top-m">
+    <button type="button" (click)="applyUserFilter()" mat-flat-button [disabled]="!filterForm.valid"
+      [ngClass]="{'diable-btn': !filterForm.valid,'ws-mat-primary-background':filterForm.valid}"
+      class="flex items-center rounded-full px-4 py-2 new-bg-color font-bold text-sm text-white ">
+      Apply
+    </button>
+  </div>
+</div>
+<ng-container *ngIf="showTable">
+  <div class="flex filter-gap flex-end" *ngIf="selectedLearnersList.length">
+    <button type="button" (click)="checkData()" mat-button
+      class="text-white apply-filter selected-user-btn ws-mat-primary-background">
+      Selected Learners <span>({{selectedLearnersList.length}})</span>
+    </button>
+  </div>
+  <!-- {{filterForm.value|json}} {{filterForm.valid}} -->
+  <div class="table-data-block margin-top-l">
+    <div class="flex flex-between flex-middle title-search mat-full-radius-select">
+      <h4>All Learners</h4>
+      <mat-form-field appearance="outline" class="search-input-block">
+        <input matInput (keyup)="applyTableFilter($event)" class="search-input" placeholder="Search" #input>
+        <mat-icon class="search-icon">search</mat-icon>
+      </mat-form-field>
+    </div>
+    <div>
+      <table aria-describedby="all-learners" mat-table [dataSource]="dataSource"
+        class=" responsiveTable mat-table width-1-1">
+
+        <!-- Checkbox Column -->
+        <ng-container matColumnDef="select">
+          <th mat-header-cell *matHeaderCellDef class="mat-custom-headder">
+            <mat-checkbox (change)="$event ? toggleAllRows($event) : null" [checked]="checkForSelectedUsersAll()">
+            </mat-checkbox>
+          </th>
+          <td mat-cell *matCellDef="let row" class="mat-custom-body">
+            <mat-checkbox (click)="$event.stopPropagation()"
+              (change)="$event ? changeFunc($event,row) : $event.stopPropagation()"
+              [checked]="checkForSelectedUsers(row)">
+            </mat-checkbox>
+          </td>
+        </ng-container>
+
+        <!-- Full Name Column -->
+        <ng-container matColumnDef="fullName">
+          <th mat-header-cell *matHeaderCellDef class="mat-custom-headder"> Full Name </th>
+          <td mat-cell *matCellDef="let element" class="mat-custom-body"> {{element.fullName}} </td>
+        </ng-container>
+
+        <!-- Email Column -->
+        <ng-container matColumnDef="email">
+          <th mat-header-cell *matHeaderCellDef class="mat-custom-headder"> Email </th>
+          <td mat-cell *matCellDef="let element" class="mat-custom-body"> {{element.email}} </td>
+        </ng-container>
+
+        <!-- Ministry Column -->
+        <ng-container matColumnDef="ministry">
+          <th mat-header-cell *matHeaderCellDef class="mat-custom-headder"> Ministry </th>
+          <td mat-cell *matCellDef="let element" class="mat-custom-body"> {{element.ministry}} </td>
+        </ng-container>
+
+        <!-- mobile Column -->
+        <ng-container matColumnDef="mobile">
+          <th mat-header-cell *matHeaderCellDef class="mat-custom-headder"> Mobile No </th>
+          <td mat-cell *matCellDef="let element" class="mat-custom-body"> {{element.mobile? element.mobile: '-'}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="empty">
+          <mat-cell *matCellDef="let element">No Data</mat-cell>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row
+          *matRowDef="let row; columns: dataSource.data.length > 0 && dataSource.filteredData.length > 0 ? displayedColumns : ['empty'];"
+          (click)="selection.toggle(row)">
+        </tr>
+      </table>
+      <ng-container *ngIf="!globalSearchText">
+        <mat-paginator #paginator [pageSize]="10" [length]="filterCount" (page)="getNext($event)"
+          aria-label="Select page of periodic elements">
+        </mat-paginator>
+
+      </ng-container>
+      <ng-container *ngIf="dataSource.data.length === 0 || dataSource.filteredData.length === 0 ">
+        <div class="flex flex-middle flex-center margin-top-xl">
+          <p>No Record Found</p>
+        </div>
+      </ng-container>
+    </div>
+  </div>
+</ng-container>

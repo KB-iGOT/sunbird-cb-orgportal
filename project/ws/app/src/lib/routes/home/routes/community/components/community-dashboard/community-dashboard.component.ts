@@ -7,8 +7,13 @@ import { FormControl } from '@angular/forms'
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators'
 import { ActivatedRoute, Router } from '@angular/router'
 import * as _ from 'lodash'
+// import { RolesService } from '../../../../../users/services/roles.service'
+// import { Subject } from 'rxjs'
+// import { HttpErrorResponse } from '@angular/common/http'
+
+
 interface Community {
-  name: string
+  communityName: string
   startDate: Date
   createdBy: string
   publishedOn: Date
@@ -29,8 +34,8 @@ interface Community {
 
 
 export class CommunityDashboardComponent implements OnInit {
-  // displayedColumns: string[] = ['name', 'startDate', 'createdBy', 'publishedOn', 'members', 'mods', 'actions'];
-  displayedColumns: string[] = []
+  displayedColumns: string[] = ['name', 'startDate', 'createdBy', 'publishedOn', 'members', 'mods', 'actions'];
+  // displayedColumns: string[] = []
   dataSource: MatTableDataSource<Community>
   userProfile: any
   searchControl = new FormControl('');
@@ -40,6 +45,12 @@ export class CommunityDashboardComponent implements OnInit {
   totalElements = 0  // Add this to store total count
   currentSearchString = ''  // Add this to store current search
   currentStatus = 'active'
+  // private destroySubject$ = new Subject()
+  masterData: any = {}
+  isCommunityModeratorRole = false
+  isCommunityCreateRole = false
+  isCommunityModeratorOnly = false
+
   tabs = [
     {
       label: 'Community',
@@ -62,7 +73,9 @@ export class CommunityDashboardComponent implements OnInit {
   @ViewChild(MatPaginator) paginator!: MatPaginator
   @ViewChild(MatSort) sort!: MatSort
 
-  constructor(private router: Router, private communitySvc: CommunityService, private activatedRoute: ActivatedRoute) {
+  constructor(private router: Router, private communitySvc: CommunityService, private activatedRoute: ActivatedRoute,
+    // private rolesService: RolesService,
+  ) {
     // Initialize with sample data
     const sampleData: Community[] = [
 
@@ -79,8 +92,31 @@ export class CommunityDashboardComponent implements OnInit {
     }
   }
 
+  getOrgRolesList(): void {
+    if (_.get(this.activatedRoute, 'snapshot.data.configService.unMappedUser')) {
+      this.userProfile = _.get(this.activatedRoute, 'snapshot.data.configService.unMappedUser')
+      const userRole = this.userProfile.roles
+      const targetRoles = ['COMMUNITY_MODERATOR', 'MDO_LEADER']
+      const itemPresent = targetRoles.some((role: any) => userRole.includes(role))
+      if (itemPresent) {
+        this.isCommunityModeratorRole = true
+      }
+      const mdoLeaderPresent = userRole.some((role: any) => role.includes('MDO_LEADER'))
+      if (mdoLeaderPresent) {
+        this.isCommunityCreateRole = true
+      }
+      const isCommunityModeratorOnlyPresent = userRole?.some((role: any) => role?.includes('COMMUNITY_MODERATOR'))
+      if (isCommunityModeratorOnlyPresent) {
+        this.isCommunityModeratorOnly = true
+      }
+
+    }
+
+  }
+
   ngOnInit() {
     // Setup search subscription with debounce
+    'component called !!!!!!!!'
     this.searchControl.valueChanges.pipe(
       debounceTime(300), // Wait 300ms after last input
       distinctUntilChanged() // Only emit if value has changed
@@ -88,13 +124,19 @@ export class CommunityDashboardComponent implements OnInit {
       this.fetchCommunityData(searchString || '')
     })
 
-    this.getDisplayColumns()
+
+    this.getOrgRolesList()
+
+    // this.getDisplayColumns()
   }
+
+
 
   ngAfterViewInit() {
     this.dataSource.sort = this.sort
     this.dataSource.sortingDataAccessor = (item: any, property: string) => {
       switch (property) {
+
         case 'name': return item.communityName?.toLowerCase() || ''
         case 'startDate': return new Date(item.createdOn).getTime()
         case 'createdBy': return this.additionalUserInfo[item.createdBy]?.first_name?.toLowerCase() || ''
@@ -128,6 +170,9 @@ export class CommunityDashboardComponent implements OnInit {
     if (action === 'edit') {
       this.router.navigate(['/app/home/community/edit', community.communityId])
     }
+    if (action === 'manage') {
+      this.router.navigate(['/app/home/community/manage', community.communityId])
+    }
   }
 
   canEdit(community: Community) {
@@ -155,7 +200,7 @@ export class CommunityDashboardComponent implements OnInit {
 
     }
 
-    this.getDisplayColumns()
+    // this.getDisplayColumns()
     this.fetchCommunityData(this.currentSearchString)
   }
 
