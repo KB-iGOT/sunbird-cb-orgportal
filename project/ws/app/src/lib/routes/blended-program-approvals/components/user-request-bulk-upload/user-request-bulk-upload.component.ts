@@ -118,7 +118,7 @@ export class UserRequestBulkUploadComponent implements OnInit {
     const files: any = [input]
     const fileTypes = ['csv']  // acceptable file types
     if (files && files.length) {
-      const extension = files[0].name.split('.').pop().toLowerCase()  // file extension from input file
+      const extension = files[0]?.name.split('.').pop().toLowerCase()  // file extension from input file
       const isSuccess = fileTypes.indexOf(extension) > -1  // is extension in acceptable types
       // console.log(isSuccess)
       // console.log('Filename: ' + files[0].name)
@@ -280,13 +280,13 @@ export class UserRequestBulkUploadComponent implements OnInit {
       //   })
       // }
       const formData = new FormData()
-      formData.append('file', this.selectedFile, this.selectedFile.name)
+      formData.append('file', this.selectedFile, this.selectedFile?.name)
 
       // this.http.post('http://localhost:3000/upload', formData).subscribe({
       //   next: (res) => (this.uploadResponse = 'Upload successful'),
       //   error: (err) => (this.uploadResponse = 'Upload failed'),
       // });
-      this.contentSvc.approveRejectUser(formData, this.collectionId).toPromise().then(async (res: any) => {
+      this.contentSvc.approveRejectUser(formData, this.collectionId)?.toPromise().then(async (res: any) => {
         if (res) {
           this.fileUploading = false
           const lines = res.trim().split('\n')
@@ -352,7 +352,7 @@ export class UserRequestBulkUploadComponent implements OnInit {
         ...request.request.filters, phone: userData,
       }
     }
-    return this.contentSvc.approveRejectUser(request, this.collectionId).toPromise().then(async (res: any) => {
+    return this.contentSvc.approveRejectUser(request, this.collectionId)?.toPromise().then(async (res: any) => {
       if (res.result.response) {
         return await res.result.response
       }

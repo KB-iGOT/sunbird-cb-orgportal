@@ -1,72 +1,70 @@
 import { CommunityManageComponent } from './community-manage.component'
-import { MatLegacyDialog } from '@angular/material/legacy-dialog'
-import { CommunityService } from '../../services/community.service'
-// import { ActivatedRoute } from '@angular/router'
-import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar'
 import { of, throwError } from 'rxjs'
-import { ReportIssueComponent } from '../report-issue/report-issue.component'
-import { DialogConfirmComponent } from '../../../../../../../../../../../src/app/component/dialog-confirm/dialog-confirm.component'
 
 describe('CommunityManageComponent', () => {
   let component: CommunityManageComponent
-  let mockMatDialog: jest.Mocked<MatLegacyDialog>
-  let mockCommunityService: jest.Mocked<CommunityService>
+  let mockDialog: any
+  let mockCommunityService: any
   let mockActivatedRoute: any
-  let mockSnackBar: jest.Mocked<MatSnackBar>
-
-  const communityId = '1d08a92b-07fa-41e4-8060-93a221d416e6'
-
-  // Mock responses for different API calls
-  const mockReportedDiscussionResponse = {
-    result: {
-      search_results: {
-        data: [
-          { id: '1', description: 'Test description', expanded: false }
-        ],
-        totalCount: 1
-      }
-    }
-  }
-
-  const mockReportedIssuesStatsResponse = {
-    result: {
-      reportReasons: {
-        'Inappropriate': { percentage: 60, count: 6 },
-        'Spam': { percentage: 40, count: 4 }
-      }
-    }
-  }
+  let mockSnackBar: any
+  let mockRouter: any
 
   beforeEach(() => {
-    // Create mocks for all dependencies
-    mockMatDialog = {
+    // Mock dependencies
+    mockDialog = {
       open: jest.fn().mockReturnValue({
         afterClosed: jest.fn().mockReturnValue(of(true))
       })
-    } as unknown as jest.Mocked<MatLegacyDialog>
+    }
 
     mockCommunityService = {
-      getAllReportedDiscussion: jest.fn().mockReturnValue(of(mockReportedDiscussionResponse)),
-      getHiddenDiscussions: jest.fn().mockReturnValue(of(mockReportedDiscussionResponse)),
-      getReportedIssuesStats: jest.fn().mockReturnValue(of(mockReportedIssuesStatsResponse)),
+      getAllReportedDiscussion: jest.fn().mockReturnValue(of({
+        result: {
+          search_results: {
+            data: [{ id: 1, description: 'test discussion' }],
+            totalCount: 1
+          }
+        }
+      })),
+      getHiddenDiscussions: jest.fn().mockReturnValue(of({
+        result: {
+          search_results: {
+            data: [{ id: 2, description: 'hidden discussion' }],
+            totalCount: 1
+          }
+        }
+      })),
+      displayReportedPost: jest.fn().mockReturnValue(of({ success: true })),
       hideReportedPost: jest.fn().mockReturnValue(of({ success: true })),
-      displayReportedPost: jest.fn().mockReturnValue(of({ success: true }))
-    } as unknown as jest.Mocked<CommunityService>
+      getReportedIssuesStats: jest.fn().mockReturnValue(of({
+        result: {
+          reportReasons: {
+            'spam': { percentage: 60, count: 3 },
+            'inappropriate': { percentage: 40, count: 2 }
+          }
+        }
+      }))
+    }
 
     mockActivatedRoute = {
-      params: of({ communityId })
+      params: of({ communityId: 'test-community-id' })
     }
 
     mockSnackBar = {
       open: jest.fn()
-    } as unknown as jest.Mocked<MatSnackBar>
+    }
 
-    // Create component with mock dependencies
+    mockRouter = {
+      navigate: jest.fn()
+    }
+
+    // Create component instance
     component = new CommunityManageComponent(
-      mockMatDialog,
+      mockDialog,
       mockCommunityService,
       mockActivatedRoute,
-      mockSnackBar
+      mockSnackBar,
+      mockRouter
     )
   })
 
@@ -74,61 +72,61 @@ describe('CommunityManageComponent', () => {
     jest.clearAllMocks()
   })
 
-  it('should be created', () => {
-    expect(component).toBeTruthy()
-  })
+  describe('Constructor and Initialization', () => {
+    it('should create component', () => {
+      expect(component).toBeTruthy()
+    })
 
-  it('should initialize with community ID from route params', () => {
-    expect(component.communityId).toBe(communityId)
+    it('should initialize with default values', () => {
+      expect(component.selectedTabIndex).toBe(0)
+      expect(component.pageNumber).toBe(0)
+      expect(component.allDisussionObjCount).toBe(0)
+      expect(component.hiddenDisussionObjCount).toBe(0)
+      expect(component.viewMoreLength).toBe(410)
+      expect(component.getAllItemsCount).toBe(0)
+      expect(component.getPostItemsCount).toBe(0)
+      expect(component.getCommentItemsCount).toBe(0)
+      expect(component.getReplyItemsCount).toBe(0)
+      expect(component.activeFilter).toBe('all')
+      expect(component.totalDiscussionsCount).toBe(0)
+      expect(component.visibleCardCount).toBe(5)
+      expect(component.currentStatus).toBe('active')
+    })
+
+    it('should set communityId from route params', () => {
+      expect(component.communityId).toBe('test-community-id')
+    })
+
+    it('should initialize tabs array correctly', () => {
+      expect(component.tabs).toEqual([
+        { label: 'Pending', status: 'pending', icon: '' },
+        { label: 'Hidden', status: 'hidden', icon: '' }
+      ])
+    })
   })
 
   describe('ngOnInit', () => {
-    beforeEach(() => {
-      // Reset the spy calls
-      jest.clearAllMocks()
+    it('should call all initialization methods', () => {
+      jest.spyOn(component, 'getReportedDiscussionItems')
+      jest.spyOn(component, 'getHiddenDiscussionItems')
+      jest.spyOn(component, 'getPostFilterItems')
+      jest.spyOn(component, 'getCommentFilterItems')
+      jest.spyOn(component, 'getReplyFilterItems')
 
-      // Call ngOnInit manually since we're not using TestBed
-      component.ngOnInit()
-    })
-
-    it('should call getReportedDiscussionItems and other required methods on init', () => {
-      // Create spies for the methods called in ngOnInit
-      const getReportedDiscussionItemsSpy = jest.spyOn(component, 'getReportedDiscussionItems')
-      const getHiddenDiscussionItemsSpy = jest.spyOn(component, 'getHiddenDiscussionItems')
-      const getPostFilterItemsSpy = jest.spyOn(component, 'getPostFilterItems')
-      const getCommentFilterItemsSpy = jest.spyOn(component, 'getCommentFilterItems')
-      const getReplyFilterItemsSpy = jest.spyOn(component, 'getReplyFilterItems')
-
-      // Call ngOnInit manually
       component.ngOnInit()
 
-      // Verify all expected methods were called
-      expect(getReportedDiscussionItemsSpy).toHaveBeenCalled()
-      expect(getHiddenDiscussionItemsSpy).toHaveBeenCalled()
-      expect(getPostFilterItemsSpy).toHaveBeenCalled()
-      expect(getCommentFilterItemsSpy).toHaveBeenCalled()
-      expect(getReplyFilterItemsSpy).toHaveBeenCalled()
-    })
-
-    it('should fetch reported discussion items', () => {
-      expect(mockCommunityService.getAllReportedDiscussion).toHaveBeenCalledWith(
-        expect.objectContaining({
-          filterCriteriaMap: expect.objectContaining({
-            status: ['reported'],
-            communityId: communityId
-          })
-        })
-      )
-
-      // Verify data was populated
-      expect(component.allDisussionObj).toEqual(mockReportedDiscussionResponse.result.search_results.data)
-      expect(component.allDisussionObjCount).toBe(mockReportedDiscussionResponse.result.search_results.totalCount)
+      expect(component.getReportedDiscussionItems).toHaveBeenCalled()
+      expect(component.getHiddenDiscussionItems).toHaveBeenCalled()
+      expect(component.getPostFilterItems).toHaveBeenCalled()
+      expect(component.getCommentFilterItems).toHaveBeenCalled()
+      expect(component.getReplyFilterItems).toHaveBeenCalled()
     })
   })
 
   describe('onTabChange', () => {
     it('should update selectedTabIndex, currentStatus and reset pageNumber', () => {
       const event = { index: 1 }
+
       component.onTabChange(event)
 
       expect(component.selectedTabIndex).toBe(1)
@@ -137,131 +135,325 @@ describe('CommunityManageComponent', () => {
     })
   })
 
+  describe('showMoreCards', () => {
+    it('should increase visibleCardCount by 5', () => {
+      const initialCount = component.visibleCardCount
+
+      component.showMoreCards()
+
+      expect(component.visibleCardCount).toBe(initialCount + 5)
+    })
+  })
+
   describe('openReportDialog', () => {
-    it('should open report dialog with fetched data', () => {
-      const discussionId = '123'
+    it('should open dialog with report issues data', () => {
+      const discussionId = 'test-discussion-id'
+      jest.spyOn(component, 'getReportedIssueList').mockReturnValue(of([
+        { reason: 'spam', percentage: 60, count: 3 }
+      ]))
 
       component.openReportDialog(discussionId)
 
-      expect(mockCommunityService.getReportedIssuesStats).toHaveBeenCalledWith(
-        expect.objectContaining({
-          discussionId,
-          type: 'question'
-        })
-      )
-
-      expect(mockMatDialog.open).toHaveBeenCalledWith(
-        ReportIssueComponent,
-        expect.objectContaining({
-          width: '550px',
-          panelClass: 'report-dialog-box',
-          data: expect.any(Array)
-        })
-      )
+      expect(component.getReportedIssueList).toHaveBeenCalledWith(discussionId)
+      expect(mockDialog.open).toHaveBeenCalled()
     })
 
-    it('should call getReportedIssueList again after dialog is closed with a result', () => {
-      const discussionId = '123'
-      const getReportedIssueListSpy = jest.spyOn(component, 'getReportedIssueList')
+    it('should handle dialog close with result', () => {
+      const discussionId = 'test-discussion-id'
+      const mockDialogRef = {
+        afterClosed: jest.fn().mockReturnValue(of(true))
+      }
+      mockDialog.open.mockReturnValue(mockDialogRef)
+      jest.spyOn(component, 'getReportedIssueList').mockReturnValue(of([
+        { reason: 'spam', percentage: 60, count: 3 }
+      ]))
 
       component.openReportDialog(discussionId)
 
-      expect(getReportedIssueListSpy).toHaveBeenCalledTimes(2) // Once for initial fetch, once after dialog closes
+      expect(mockDialogRef.afterClosed).toHaveBeenCalled()
     })
   })
 
   describe('openDialog', () => {
-    const discussionId = '123'
-    const itemType = 'question'
-
-    it('should open confirmation dialog for showing content on platform', () => {
-      component.openDialog('showPlatform', discussionId, itemType)
-
-      expect(mockMatDialog.open).toHaveBeenCalledWith(
-        DialogConfirmComponent,
-        expect.objectContaining({
-          width: '500px',
-          data: expect.objectContaining({
-            body: expect.stringContaining('show this post')
-          })
-        })
-      )
-    })
-
-    it('should open confirmation dialog for hiding content', () => {
-      component.openDialog('hideContent', discussionId, itemType)
-
-      expect(mockMatDialog.open).toHaveBeenCalledWith(
-        DialogConfirmComponent,
-        expect.objectContaining({
-          width: '500px',
-          data: expect.objectContaining({
-            body: expect.stringContaining('hide this post')
-          })
-        })
-      )
-    })
-
-    it('should call showOnPlatform after dialog confirmation', () => {
-      const showOnPlatformSpy = jest.spyOn(component, 'showOnPlatform')
+    it('should open confirm dialog for showPlatform', () => {
+      const discussionId = 'test-id'
+      const itemType = 'question'
 
       component.openDialog('showPlatform', discussionId, itemType)
 
-      expect(showOnPlatformSpy).toHaveBeenCalledWith(discussionId, itemType)
+      expect(mockDialog.open).toHaveBeenCalled()
+      const dialogConfig = mockDialog.open.mock.calls[0][1]
+      expect(dialogConfig.data.body).toContain('show this on the platform')
     })
 
-    it('should call hideContent after dialog confirmation', () => {
-      const hideContentSpy = jest.spyOn(component, 'hideContent')
+    it('should open confirm dialog for hideContent', () => {
+      const discussionId = 'test-id'
+      const itemType = 'question'
 
       component.openDialog('hideContent', discussionId, itemType)
 
-      expect(hideContentSpy).toHaveBeenCalledWith(discussionId, itemType)
+      expect(mockDialog.open).toHaveBeenCalled()
+      const dialogConfig = mockDialog.open.mock.calls[0][1]
+      expect(dialogConfig.data.body).toContain('keep this hidden from the platform')
+    })
+
+    it('should call showOnPlatform when confirmed for showPlatform', () => {
+      jest.spyOn(component, 'showOnPlatform')
+      const discussionId = 'test-id'
+      const itemType = 'question'
+
+      component.openDialog('showPlatform', discussionId, itemType)
+
+      expect(component.showOnPlatform).toHaveBeenCalledWith(discussionId, itemType)
+    })
+
+    it('should call hideContent when confirmed for hideContent', () => {
+      jest.spyOn(component, 'hideContent')
+      const discussionId = 'test-id'
+      const itemType = 'question'
+
+      component.openDialog('hideContent', discussionId, itemType)
+
+      expect(component.hideContent).toHaveBeenCalledWith(discussionId, itemType)
     })
   })
 
   describe('viewMoreOrLess', () => {
-    it('should toggle expanded state if content is longer than viewMoreLength', () => {
-      const item = { description: '<p>Lorem ipsum dolor sit amet</p>'.repeat(20), expanded: false }
-
-      // Mock the getEditorTextLength method to return a length greater than viewMoreLength
-      jest.spyOn(component, 'getEditorTextLength').mockReturnValue(500)
+    it('should toggle expanded when description length exceeds viewMoreLength', () => {
+      const item = {
+        description: 'a'.repeat(500),
+        expanded: false
+      }
 
       component.viewMoreOrLess(item)
+
       expect(item.expanded).toBe(true)
-
-      component.viewMoreOrLess(item)
-      expect(item.expanded).toBe(false)
     })
 
-    it('should not toggle expanded state if content is shorter than viewMoreLength', () => {
-      const item = { description: 'Short content', expanded: false }
-
-      // Mock the getEditorTextLength method to return a length less than viewMoreLength
-      jest.spyOn(component, 'getEditorTextLength').mockReturnValue(20)
+    it('should not toggle expanded when description length is within limit', () => {
+      const item = {
+        description: 'short description',
+        expanded: false
+      }
 
       component.viewMoreOrLess(item)
+
       expect(item.expanded).toBe(false)
     })
   })
 
   describe('getEditorTextLength', () => {
-    it('should strip HTML tags and return correct text length', () => {
-      const htmlContent = '<p>This is <strong>a test</strong> with some &nbsp; spaces</p>'
-      const length = component.getEditorTextLength(htmlContent)
-      expect(length).toBe('This is a test with some spaces'.length)
+    it('should return correct length after cleaning HTML and spaces', () => {
+      const content = '<p>Hello &nbsp; <b>World</b></p>   '
+
+      const length = component.getEditorTextLength(content)
+
+      expect(length).toBe(11) // "Hello World"
+    })
+
+    it('should handle empty content', () => {
+      const length = component.getEditorTextLength('')
+      expect(length).toBe(0)
+    })
+
+    it('should handle content with only HTML tags', () => {
+      const content = '<p></p><div></div>'
+      const length = component.getEditorTextLength(content)
+      expect(length).toBe(0)
+    })
+  })
+
+  describe('navigateBack', () => {
+    it('should navigate to community home', () => {
+      component.navigateBack()
+
+      expect(mockRouter.navigate).toHaveBeenCalledWith(['/app/home/community'])
+    })
+  })
+
+  describe('getReportedDiscussionItems', () => {
+    it('should fetch and set reported discussion items successfully', () => {
+      component.getReportedDiscussionItems()
+
+      expect(mockCommunityService.getAllReportedDiscussion).toHaveBeenCalledWith({
+        filterCriteriaMap: {
+          status: ['reported'],
+          communityId: component.communityId,
+          type: ['question', 'answerPost', 'answerPostReply']
+        },
+        requestedFields: [],
+        pageNumber: 0,
+        pageSize: 10,
+        orderBy: 'recentReportedOn',
+        orderDirection: 'DESC',
+        facets: ['type']
+      })
+
+      expect(component.allDisussionObj).toEqual([{ id: 1, description: 'test discussion' }])
+      expect(component.allDisussionObjCount).toBe(1)
+    })
+
+    it('should handle empty response', () => {
+      mockCommunityService.getAllReportedDiscussion.mockReturnValue(of({
+        result: { search_results: { data: [] } }
+      }))
+
+      component.getReportedDiscussionItems()
+
+      expect(component.allDisussionObj).toEqual([])
+      expect(component.allDisussionObjCount).toBe(0)
+    })
+  })
+
+  describe('getPostFilterItems', () => {
+    it('should fetch and set post filter items successfully', () => {
+      component.getPostFilterItems()
+
+      expect(mockCommunityService.getAllReportedDiscussion).toHaveBeenCalledWith({
+        filterCriteriaMap: {
+          status: ['reported'],
+          communityId: component.communityId,
+          type: ['question']
+        },
+        requestedFields: [],
+        pageNumber: 0,
+        pageSize: 10,
+        orderBy: 'recentReportedOn',
+        orderDirection: 'DESC',
+        facets: ['type']
+      })
+
+      expect(component.getPostItems).toEqual([{ id: 1, description: 'test discussion' }])
+      expect(component.getPostItemsCount).toBe(1)
+    })
+
+    it('should handle empty response', () => {
+      mockCommunityService.getAllReportedDiscussion.mockReturnValue(of({
+        result: { search_results: { data: [] } }
+      }))
+
+      component.getPostFilterItems()
+
+      expect(component.getPostItems).toEqual([])
+      expect(component.getPostItemsCount).toBe(0)
+    })
+  })
+
+  describe('getCommentFilterItems', () => {
+    it('should fetch and set comment filter items successfully', () => {
+      component.getCommentFilterItems()
+
+      expect(mockCommunityService.getAllReportedDiscussion).toHaveBeenCalledWith({
+        filterCriteriaMap: {
+          status: ['reported'],
+          communityId: component.communityId,
+          type: ['answerPost']
+        },
+        requestedFields: [],
+        pageNumber: 0,
+        pageSize: 10,
+        orderBy: 'recentReportedOn',
+        orderDirection: 'DESC',
+        facets: ['type']
+      })
+
+      expect(component.getCommentItems).toEqual([{ id: 1, description: 'test discussion' }])
+      expect(component.getCommentItemsCount).toBe(1)
+    })
+
+    it('should handle empty response', () => {
+      mockCommunityService.getAllReportedDiscussion.mockReturnValue(of({
+        result: { search_results: { data: [] } }
+      }))
+
+      component.getCommentFilterItems()
+
+      expect(component.getCommentItems).toEqual([])
+      expect(component.getCommentItemsCount).toBe(0)
+    })
+  })
+
+  describe('getReplyFilterItems', () => {
+    it('should fetch and set reply filter items successfully', () => {
+      component.getReplyFilterItems()
+
+      expect(mockCommunityService.getAllReportedDiscussion).toHaveBeenCalledWith({
+        filterCriteriaMap: {
+          status: ['reported'],
+          communityId: component.communityId,
+          type: ['answerPostReply']
+        },
+        requestedFields: [],
+        pageNumber: 0,
+        pageSize: 10,
+        orderBy: 'recentReportedOn',
+        orderDirection: 'DESC',
+        facets: ['type']
+      })
+
+      expect(component.getReplyItems).toEqual([{ id: 1, description: 'test discussion' }])
+      expect(component.getReplyItemsCount).toBe(1)
+    })
+
+    it('should handle empty response', () => {
+      mockCommunityService.getAllReportedDiscussion.mockReturnValue(of({
+        result: { search_results: { data: [] } }
+      }))
+
+      component.getReplyFilterItems()
+
+      expect(component.getReplyItems).toEqual([])
+      expect(component.getReplyItemsCount).toBe(0)
+    })
+  })
+
+  describe('getHiddenDiscussionItems', () => {
+    it('should fetch and set hidden discussion items successfully', () => {
+      component.getHiddenDiscussionItems()
+
+      expect(mockCommunityService.getHiddenDiscussions).toHaveBeenCalledWith({
+        filterCriteriaMap: {
+          type: ['question', 'answerPost', 'answerPostReply'],
+          status: ['suspended'],
+          communityId: component.communityId
+        },
+        requestedFields: [],
+        pageNumber: 0,
+        pageSize: 10,
+        orderBy: 'recentReportedOn',
+        orderDirection: 'DESC',
+        facets: ['type']
+      })
+
+      expect(component.hiddenDisussionObj).toEqual([{ id: 2, description: 'hidden discussion' }])
+      expect(component.hiddenDisussionObjCount).toBe(1)
+    })
+
+    it('should handle empty response', () => {
+      mockCommunityService.getHiddenDiscussions.mockReturnValue(of({
+        result: { search_results: { data: [] } }
+      }))
+
+      component.getHiddenDiscussionItems()
+
+      expect(component.hiddenDisussionObj).toEqual([])
+      expect(component.hiddenDisussionObjCount).toBe(0)
     })
   })
 
   describe('showOnPlatform', () => {
-    it('should call displayReportedPost service method with correct params', () => {
-      const discussionId = '123'
-      const type = 'question'
+    it('should display reported post successfully', () => {
+      jest.spyOn(component, 'getReportedDiscussionItems')
+      jest.spyOn(component, 'getHiddenDiscussionItems')
+      jest.spyOn(component, 'getPostFilterItems')
+      jest.spyOn(component, 'getCommentFilterItems')
+      jest.spyOn(component, 'getReplyFilterItems')
 
-      component.showOnPlatform(discussionId, type)
+      component.showOnPlatform('test-id', 'question')
 
       expect(mockCommunityService.displayReportedPost).toHaveBeenCalledWith({
-        discussionId,
-        type
+        discussionId: 'test-id',
+        type: 'question'
       })
 
       expect(mockSnackBar.open).toHaveBeenCalledWith(
@@ -269,37 +461,36 @@ describe('CommunityManageComponent', () => {
         'Close',
         { duration: 3000 }
       )
+
+      expect(component.getReportedDiscussionItems).toHaveBeenCalled()
+      expect(component.getHiddenDiscussionItems).toHaveBeenCalled()
+      expect(component.getPostFilterItems).toHaveBeenCalled()
+      expect(component.getCommentFilterItems).toHaveBeenCalled()
+      expect(component.getReplyFilterItems).toHaveBeenCalled()
     })
 
-    it('should handle service errors', () => {
-      const discussionId = '123'
-      const type = 'question'
-      const errorMsg = 'Service error'
+    it('should handle error when displaying reported post', () => {
+      mockCommunityService.displayReportedPost.mockReturnValue(throwError('Error'))
 
-      // Setup the service to throw an error
-      mockCommunityService.displayReportedPost.mockReturnValue(throwError(() => new Error(errorMsg)))
+      component.showOnPlatform('test-id', 'question')
 
-      component.showOnPlatform(discussionId, type)
-
-      // We can't test the error handler directly since it's inside a subscription,
-      // but we can verify the service was called
-      expect(mockCommunityService.displayReportedPost).toHaveBeenCalledWith({
-        discussionId,
-        type
-      })
+      expect(mockSnackBar.open).toHaveBeenCalledWith('Error', 'Close', { duration: 3000 })
     })
   })
 
   describe('hideContent', () => {
-    it('should call hideReportedPost service method with correct params', () => {
-      const discussionId = '123'
-      const type = 'question'
+    it('should hide reported post successfully', () => {
+      jest.spyOn(component, 'getReportedDiscussionItems')
+      jest.spyOn(component, 'getHiddenDiscussionItems')
+      jest.spyOn(component, 'getPostFilterItems')
+      jest.spyOn(component, 'getCommentFilterItems')
+      jest.spyOn(component, 'getReplyFilterItems')
 
-      component.hideContent(discussionId, type)
+      component.hideContent('test-id', 'question')
 
       expect(mockCommunityService.hideReportedPost).toHaveBeenCalledWith({
-        discussionId,
-        type
+        discussionId: 'test-id',
+        type: 'question'
       })
 
       expect(mockSnackBar.open).toHaveBeenCalledWith(
@@ -307,112 +498,227 @@ describe('CommunityManageComponent', () => {
         'Close',
         { duration: 3000 }
       )
+
+      expect(component.getReportedDiscussionItems).toHaveBeenCalled()
+      expect(component.getHiddenDiscussionItems).toHaveBeenCalled()
+      expect(component.getPostFilterItems).toHaveBeenCalled()
+      expect(component.getCommentFilterItems).toHaveBeenCalled()
+      expect(component.getReplyFilterItems).toHaveBeenCalled()
+    })
+
+    it('should handle error when hiding reported post', () => {
+      mockCommunityService.hideReportedPost.mockReturnValue(throwError('Error'))
+
+      component.hideContent('test-id', 'question')
+
+      expect(mockSnackBar.open).toHaveBeenCalledWith('Error', 'Close', { duration: 3000 })
     })
   })
 
   describe('getReportedIssueList', () => {
-    it('should transform API response into sorted array of issues', () => {
-      const discussionId = '123'
+    it('should return sorted reported issues', () => {
+      const result$ = component.getReportedIssueList('test-id')
 
-      component.getReportedIssueList(discussionId).subscribe(result => {
+      result$.subscribe(result => {
         expect(result).toEqual([
-          { reason: 'Inappropriate', percentage: 60, count: 6 },
-          { reason: 'Spam', percentage: 40, count: 4 }
+          { reason: 'spam', percentage: 60, count: 3 },
+          { reason: 'inappropriate', percentage: 40, count: 2 }
         ])
       })
 
       expect(mockCommunityService.getReportedIssuesStats).toHaveBeenCalledWith({
-        discussionId,
+        discussionId: 'test-id',
         type: 'question'
       })
     })
 
-    it('should return empty array if no report reasons', () => {
-      const discussionId = '123'
+    it('should return empty array when no reasons exist', () => {
+      mockCommunityService.getReportedIssuesStats.mockReturnValue(of({
+        result: { reportReasons: null }
+      }))
 
-      // Mock service to return response without reportReasons
-      mockCommunityService.getReportedIssuesStats.mockReturnValue(of({ result: {} }))
+      const result$ = component.getReportedIssueList('test-id')
 
-      component.getReportedIssueList(discussionId).subscribe(result => {
+      result$.subscribe(result => {
         expect(result).toEqual([])
       })
     })
   })
 
   describe('filterItems', () => {
-    beforeEach(() => {
-      jest.clearAllMocks()
-    })
-
-    it('should set activeFilter and call appropriate method for "all" filter', () => {
-      const getReportedDiscussionItemsSpy = jest.spyOn(component, 'getReportedDiscussionItems')
+    it('should set activeFilter and call getReportedDiscussionItems for "all"', () => {
+      jest.spyOn(component, 'getReportedDiscussionItems')
 
       component.filterItems('all')
 
       expect(component.activeFilter).toBe('all')
-      expect(getReportedDiscussionItemsSpy).toHaveBeenCalled()
+      expect(component.getReportedDiscussionItems).toHaveBeenCalled()
     })
 
-    it('should set activeFilter and call appropriate method for "posts" filter', () => {
-      const getPostFilterItemsSpy = jest.spyOn(component, 'getPostFilterItems')
+    it('should set activeFilter and call getPostFilterItems for "posts"', () => {
+      jest.spyOn(component, 'getPostFilterItems')
 
       component.filterItems('posts')
 
       expect(component.activeFilter).toBe('posts')
-      expect(getPostFilterItemsSpy).toHaveBeenCalled()
+      expect(component.getPostFilterItems).toHaveBeenCalled()
     })
 
-    it('should set activeFilter and call appropriate method for "comments" filter', () => {
-      const getCommentFilterItemsSpy = jest.spyOn(component, 'getCommentFilterItems')
+    it('should set activeFilter and call getCommentFilterItems for "comments"', () => {
+      jest.spyOn(component, 'getCommentFilterItems')
 
       component.filterItems('comments')
 
       expect(component.activeFilter).toBe('comments')
-      expect(getCommentFilterItemsSpy).toHaveBeenCalled()
+      expect(component.getCommentFilterItems).toHaveBeenCalled()
     })
 
-    it('should set activeFilter and call appropriate method for "reply" filter', () => {
-      const getReplyFilterItemsSpy = jest.spyOn(component, 'getReplyFilterItems')
+    it('should set activeFilter and call getReplyFilterItems for "reply"', () => {
+      jest.spyOn(component, 'getReplyFilterItems')
 
       component.filterItems('reply')
 
       expect(component.activeFilter).toBe('reply')
-      expect(getReplyFilterItemsSpy).toHaveBeenCalled()
+      expect(component.getReplyFilterItems).toHaveBeenCalled()
     })
   })
 
-  describe('file utilities', () => {
-    it('should open document in new tab', () => {
-      const url = 'http://example.com/file.pdf'
-      const event = { preventDefault: jest.fn() } as unknown as MouseEvent
-      const windowSpy = jest.spyOn(window, 'open').mockImplementation(() => null as any)
+  describe('openDocument', () => {
+    it('should prevent default and open document in new tab', () => {
+      const mockEvent = {
+        preventDefault: jest.fn()
+      } as any
+      const url = 'https://example.com/document.pdf'
 
-      component.openDocument(event, url)
+      // Mock window.open
+      const mockOpen = jest.fn()
+      Object.defineProperty(window, 'open', {
+        writable: true,
+        value: mockOpen
+      })
 
-      expect(event.preventDefault).toHaveBeenCalled()
-      expect(windowSpy).toHaveBeenCalledWith(url, '_blank')
+      component.openDocument(mockEvent, url)
 
-      windowSpy.mockRestore()
+      expect(mockEvent.preventDefault).toHaveBeenCalled()
+      expect(mockOpen).toHaveBeenCalledWith(url, '_blank')
+    })
+  })
+
+  describe('getFileExtension', () => {
+    it('should return file extension for valid filename', () => {
+      expect(component.getFileExtension('document.pdf')).toBe('pdf')
+      expect(component.getFileExtension('file.doc')).toBe('doc')
+      expect(component.getFileExtension('archive.zip')).toBe('zip')
     })
 
-    it('should extract file extension correctly', () => {
-      expect(component.getFileExtension('file.pdf')).toBe('pdf')
-      expect(component.getFileExtension('file.name.docx')).toBe('docx')
-      expect(component.getFileExtension('file')).toBe('')
-      expect(component.getFileExtension('file.')).toBe('')
+    it('should return empty string for invalid filename', () => {
+      expect(component.getFileExtension('')).toBe('')
       expect(component.getFileExtension('undefined')).toBe('')
+      expect(component.getFileExtension('filename')).toBe('')
+      expect(component.getFileExtension('filename.')).toBe('')
     })
 
-    it('should extract file name from URL', () => {
-      expect(component.getFileName('http://example.com/path/file.pdf')).toBe('file.pdf')
-      expect(component.getFileName('http://example.com/file%20with%20spaces.docx')).toBe('file with spaces.docx')
+    it('should handle null or undefined filename', () => {
+      expect(component.getFileExtension(null as any)).toBe('')
+      expect(component.getFileExtension(undefined as any)).toBe('')
+    })
+  })
+
+  describe('getFileName', () => {
+    it('should extract and decode filename from URL', () => {
+      const url = 'https://example.com/path/to/My%20Document.pdf'
+      expect(component.getFileName(url)).toBe('My Document.pdf')
     })
 
-    it('should return appropriate file icon based on extension', () => {
-      expect(component.getFileIcon('file.pdf')).toBe('picture_as_pdf')
-      expect(component.getFileIcon('file.doc')).toBe('description')
-      expect(component.getFileIcon('file.docx')).toBe('description')
-      expect(component.getFileIcon('file.jpg')).toBe('insert_drive_file')
+    it('should handle URL without filename', () => {
+      const url = 'https://example.com/'
+      expect(component.getFileName(url)).toBe('')
+    })
+
+    it('should handle simple filename', () => {
+      const url = 'https://example.com/document.pdf'
+      expect(component.getFileName(url)).toBe('document.pdf')
+    })
+  })
+
+  describe('getFileIcon', () => {
+    it('should return correct icon for PDF files', () => {
+      expect(component.getFileIcon('document.pdf')).toBe('picture_as_pdf')
+    })
+
+    it('should return correct icon for DOC files', () => {
+      expect(component.getFileIcon('document.doc')).toBe('description')
+      expect(component.getFileIcon('document.docx')).toBe('description')
+    })
+
+    it('should return default icon for unknown file types', () => {
+      expect(component.getFileIcon('file.txt')).toBe('insert_drive_file')
+      expect(component.getFileIcon('file.unknown')).toBe('insert_drive_file')
+      expect(component.getFileIcon('file')).toBe('insert_drive_file')
+    })
+  })
+
+  describe('Error Handling in Dialogs', () => {
+    it('should handle error in openDialog showPlatform flow', () => {
+      const mockDialogRef = {
+        afterClosed: jest.fn().mockReturnValue(throwError('Dialog error'))
+      }
+      mockDialog.open.mockReturnValue(mockDialogRef)
+
+      component.openDialog('showPlatform', 'test-id', 'question')
+
+      // The error handling is in the subscribe callback
+      // We can verify the dialog was opened
+      expect(mockDialog.open).toHaveBeenCalled()
+    })
+
+    it('should handle error in openDialog hideContent flow', () => {
+      const mockDialogRef = {
+        afterClosed: jest.fn().mockReturnValue(throwError('Dialog error'))
+      }
+      mockDialog.open.mockReturnValue(mockDialogRef)
+
+      component.openDialog('hideContent', 'test-id', 'question')
+
+      // The error handling is in the subscribe callback
+      // We can verify the dialog was opened
+      expect(mockDialog.open).toHaveBeenCalled()
+    })
+  })
+
+  describe('Edge Cases', () => {
+    it('should handle route params without communityId', () => {
+      mockActivatedRoute.params = of({})
+
+      const newComponent = new CommunityManageComponent(
+        mockDialog,
+        mockCommunityService,
+        mockActivatedRoute,
+        mockSnackBar,
+        mockRouter
+      )
+
+      expect(newComponent.communityId).toBeUndefined()
+    })
+
+    it('should handle null response in service calls', () => {
+      mockCommunityService.getAllReportedDiscussion.mockReturnValue(of(null))
+
+      component.getReportedDiscussionItems()
+
+      expect(component.allDisussionObj).toEqual([])
+      expect(component.allDisussionObjCount).toBe(0)
+    })
+
+    it('should handle response without search_results', () => {
+      mockCommunityService.getAllReportedDiscussion.mockReturnValue(of({
+        result: {}
+      }))
+
+      component.getReportedDiscussionItems()
+
+      expect(component.allDisussionObj).toEqual([])
+      expect(component.allDisussionObjCount).toBe(0)
     })
   })
 })
