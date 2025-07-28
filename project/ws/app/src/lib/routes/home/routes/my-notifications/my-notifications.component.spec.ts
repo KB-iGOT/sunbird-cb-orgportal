@@ -1,205 +1,272 @@
 import { MyNotificationsComponent } from './my-notifications.component'
 import { Router } from '@angular/router'
+import { ConfigurationsService, EventService } from '@sunbird-cb/utils'
+import { NotificationsService } from '../../../../../../../../../src/app/services/notifications.service'
+import { MatSnackBar } from '@angular/material/snack-bar'
+import { environment } from '../../../../../../../../../src/environments/environment'
+
+// Mock the environment import
+jest.mock('../../../../../../../../../src/environments/environment', () => ({
+  environment: {
+    production: false,
+    appName: 'test-app'
+  }
+}))
 
 describe('MyNotificationsComponent', () => {
   let component: MyNotificationsComponent
   let mockRouter: jest.Mocked<Router>
+  let mockEventService: jest.Mocked<EventService>
+  let mockConfigService: jest.Mocked<ConfigurationsService>
+  let mockNotificationsService: jest.Mocked<NotificationsService>
+  let mockSnackBar: jest.Mocked<MatSnackBar>
 
   beforeEach(() => {
-    // Create mock router
+    // Create mocks for all dependencies
     mockRouter = {
       navigate: jest.fn()
     } as any
 
-    // Create component instance
-    component = new MyNotificationsComponent(mockRouter)
+    mockEventService = {
+      raiseInteractTelemetry: jest.fn()
+    } as any
+
+    mockConfigService = {
+      unMappedUser: {
+        roles: ['user', 'admin']
+      }
+    } as any
+
+    mockNotificationsService = {
+      handleRedirection: jest.fn()
+    } as any
+
+    mockSnackBar = {
+      open: jest.fn()
+    } as any
   })
 
-  afterEach(() => {
-    jest.clearAllMocks()
-  })
+  describe('Constructor', () => {
+    it('should initialize component with roles when configSvc.unMappedUser.roles exists', () => {
+      // Arrange & Act
+      component = new MyNotificationsComponent(
+        mockRouter,
+        mockEventService,
+        mockConfigService,
+        mockNotificationsService,
+        mockSnackBar
+      )
 
-  describe('Component Initialization', () => {
-    it('should create component', () => {
-      expect(component).toBeTruthy()
+      // Assert
+      expect(component.roles).toEqual(['user', 'admin'])
+      expect(component.environment).toBe(environment)
     })
 
-    it('should inject router dependency', () => {
-      expect(mockRouter).toBeDefined()
-    })
-  })
+    it('should initialize component with empty roles when configSvc is undefined', () => {
+      // Arrange
+      mockConfigService = undefined as any
 
-  describe('redirectTo method', () => {
-    describe('when notification has category', () => {
-      it('should navigate to approvals page when category is PROFILE', () => {
-        const notification = {
-          category: 'PROFILE',
-          id: '123',
-          message: 'Profile update notification'
-        }
+      // Act
+      component = new MyNotificationsComponent(
+        mockRouter,
+        mockEventService,
+        mockConfigService,
+        mockNotificationsService,
+        mockSnackBar
+      )
 
-        component.redirectTo(notification)
-
-        expect(mockRouter.navigate).toHaveBeenCalledWith(['app/home/approvals/approval'])
-        expect(mockRouter.navigate).toHaveBeenCalledTimes(1)
-      })
-
-      it('should navigate to notifications page when category is not PROFILE', () => {
-        const notification = {
-          category: 'GENERAL',
-          id: '456',
-          message: 'General notification'
-        }
-
-        component.redirectTo(notification)
-
-        expect(mockRouter.navigate).toHaveBeenCalledWith(['/app/home/notifications'])
-        expect(mockRouter.navigate).toHaveBeenCalledTimes(1)
-      })
-
-      it('should navigate to notifications page when category is any other value', () => {
-        const testCategories = ['EVENT', 'TASK', 'MESSAGE', 'ALERT', 'UPDATE']
-
-        testCategories.forEach(category => {
-          const notification = {
-            category: category,
-            id: '999',
-            message: `${category} notification`
-          }
-
-          component.redirectTo(notification)
-
-          expect(mockRouter.navigate).toHaveBeenCalledWith(['/app/home/notifications'])
-        })
-
-        expect(mockRouter.navigate).toHaveBeenCalledTimes(testCategories.length)
-      })
-
-      it('should handle case sensitivity for PROFILE category', () => {
-        const testCases = [
-          { category: 'profile', shouldGoToApprovals: false },
-          { category: 'Profile', shouldGoToApprovals: false },
-          { category: 'PROFILE', shouldGoToApprovals: true },
-          { category: 'PrOfIlE', shouldGoToApprovals: false }
-        ]
-
-        testCases.forEach(testCase => {
-          jest.clearAllMocks()
-
-          const notification = {
-            category: testCase.category,
-            id: '123'
-          }
-
-          component.redirectTo(notification)
-
-          if (testCase.shouldGoToApprovals) {
-            expect(mockRouter.navigate).toHaveBeenCalledWith(['app/home/approvals/approval'])
-          } else {
-            expect(mockRouter.navigate).toHaveBeenCalledWith(['/app/home/notifications'])
-          }
-        })
-      })
+      // Assert
+      expect(component.roles).toEqual([])
+      expect(component.environment).toBe(environment)
     })
 
-    describe('when notification has no category', () => {
-      it('should navigate to notifications with query params when category is undefined', () => {
-        const notification = {
-          id: '123',
-          message: 'No category notification',
-          type: 'info'
-        }
+    it('should initialize component with empty roles when unMappedUser is undefined', () => {
+      // Arrange
+      mockConfigService.unMappedUser = undefined as any
 
-        component.redirectTo(notification)
+      // Act
+      component = new MyNotificationsComponent(
+        mockRouter,
+        mockEventService,
+        mockConfigService,
+        mockNotificationsService,
+        mockSnackBar
+      )
 
-        expect(mockRouter.navigate).toHaveBeenCalledWith(
-          ['/app/home/notifications'],
-          { queryParams: { tab: notification } }
-        )
-        expect(mockRouter.navigate).toHaveBeenCalledTimes(1)
-      })
-
-      it('should navigate to notifications with query params when category is null', () => {
-        const notification = {
-          category: null,
-          id: '456',
-          message: 'Null category notification'
-        }
-
-        component.redirectTo(notification)
-
-        expect(mockRouter.navigate).toHaveBeenCalledWith(
-          ['/app/home/notifications'],
-          { queryParams: { tab: notification } }
-        )
-        expect(mockRouter.navigate).toHaveBeenCalledTimes(1)
-      })
-
-      it('should pass entire notification object as tab query parameter', () => {
-        const notification = {
-          id: '789',
-          message: 'Complex notification',
-          timestamp: '2024-01-01T10:00:00Z',
-          read: false,
-          priority: 'high',
-          metadata: {
-            source: 'system',
-            type: 'alert'
-          }
-        }
-
-        component.redirectTo(notification)
-
-        expect(mockRouter.navigate).toHaveBeenCalledWith(
-          ['/app/home/notifications'],
-          { queryParams: { tab: notification } }
-        )
-      })
+      // Assert
+      expect(component.roles).toEqual([])
+      expect(component.environment).toBe(environment)
     })
 
-    describe('router navigation verification', () => {
-      it('should call router.navigate exactly once per method call', () => {
-        const notification = { category: 'PROFILE' }
+    it('should initialize component with empty roles when unMappedUser.roles is undefined', () => {
+      // Arrange
+      mockConfigService.unMappedUser = { roles: undefined } as any
 
-        component.redirectTo(notification)
+      // Act
+      component = new MyNotificationsComponent(
+        mockRouter,
+        mockEventService,
+        mockConfigService,
+        mockNotificationsService,
+        mockSnackBar
+      )
 
-        expect(mockRouter.navigate).toHaveBeenCalledTimes(1)
-      })
-
-      it('should not call router.navigate multiple times for same notification', () => {
-        const notification = { category: 'EVENT' }
-
-        component.redirectTo(notification)
-        component.redirectTo(notification)
-
-        expect(mockRouter.navigate).toHaveBeenCalledTimes(2)
-        expect(mockRouter.navigate).toHaveBeenNthCalledWith(1, ['/app/home/notifications'])
-        expect(mockRouter.navigate).toHaveBeenNthCalledWith(2, ['/app/home/notifications'])
-      })
-
-      it('should handle router navigation errors gracefully', () => {
-        mockRouter.navigate.mockImplementation(() => {
-          throw new Error('Navigation failed')
-        })
-
-        const notification = { category: 'PROFILE' }
-
-        expect(() => component.redirectTo(notification)).toThrow('Navigation failed')
-        expect(mockRouter.navigate).toHaveBeenCalledWith(['app/home/approvals/approval'])
-      })
+      // Assert
+      expect(component.roles).toEqual([])
+      expect(component.environment).toBe(environment)
     })
   })
 
-  describe('component structure', () => {
-    it('should have correct selector', () => {
-      // This would typically be tested in integration tests, but we can verify the component metadata
-      expect(MyNotificationsComponent).toBeDefined()
+  describe('redirectTo', () => {
+    beforeEach(() => {
+      component = new MyNotificationsComponent(
+        mockRouter,
+        mockEventService,
+        mockConfigService,
+        mockNotificationsService,
+        mockSnackBar
+      )
     })
 
-    it('should only have router dependency', () => {
-      // Verify that the component constructor only expects router
-      const constructorParams = MyNotificationsComponent.length
-      expect(constructorParams).toBe(1)
+    it('should call raiseTelemetryEventForNotification and handleRedirection when notification has category', () => {
+      // Arrange
+      const notification = {
+        category: 'test-category',
+        notification_id: 'test-id'
+      }
+      jest.spyOn(component, 'raiseTelemetryEventForNotification')
+
+      // Act
+      component.redirectTo(notification)
+
+      // Assert
+      expect(component.raiseTelemetryEventForNotification).toHaveBeenCalledWith(notification)
+      expect(mockNotificationsService.handleRedirection).toHaveBeenCalledWith(
+        notification,
+        component.environment,
+        component.roles,
+        mockSnackBar
+      )
+    })
+
+    it('should navigate to notifications page when notification has no category', () => {
+      // Arrange
+      const notification = {
+        notification_id: 'test-id'
+        // no category property
+      }
+      jest.spyOn(component, 'raiseTelemetryEventForNotification')
+
+      // Act
+      component.redirectTo(notification)
+
+      // Assert
+      expect(component.raiseTelemetryEventForNotification).not.toHaveBeenCalled()
+      expect(mockNotificationsService.handleRedirection).not.toHaveBeenCalled()
+      expect(mockRouter.navigate).toHaveBeenCalledWith(
+        ['/app/home/notifications'],
+        { queryParams: { tab: notification } }
+      )
+    })
+
+    it('should navigate to notifications page when notification category is falsy', () => {
+      // Arrange
+      const notification = {
+        category: null,
+        notification_id: 'test-id'
+      }
+      jest.spyOn(component, 'raiseTelemetryEventForNotification')
+
+      // Act
+      component.redirectTo(notification)
+
+      // Assert
+      expect(component.raiseTelemetryEventForNotification).not.toHaveBeenCalled()
+      expect(mockNotificationsService.handleRedirection).not.toHaveBeenCalled()
+      expect(mockRouter.navigate).toHaveBeenCalledWith(
+        ['/app/home/notifications'],
+        { queryParams: { tab: notification } }
+      )
+    })
+
+    it('should navigate to notifications page when notification category is empty string', () => {
+      // Arrange
+      const notification = {
+        category: '',
+        notification_id: 'test-id'
+      }
+      jest.spyOn(component, 'raiseTelemetryEventForNotification')
+
+      // Act
+      component.redirectTo(notification)
+
+      // Assert
+      expect(component.raiseTelemetryEventForNotification).not.toHaveBeenCalled()
+      expect(mockNotificationsService.handleRedirection).not.toHaveBeenCalled()
+      expect(mockRouter.navigate).toHaveBeenCalledWith(
+        ['/app/home/notifications'],
+        { queryParams: { tab: notification } }
+      )
+    })
+  })
+
+  describe('raiseTelemetryEventForNotification', () => {
+    beforeEach(() => {
+      component = new MyNotificationsComponent(
+        mockRouter,
+        mockEventService,
+        mockConfigService,
+        mockNotificationsService,
+        mockSnackBar
+      )
+    })
+
+    it('should call raiseInteractTelemetry with correct parameters', () => {
+      // Arrange
+      const notification = {
+        notification_id: 'test-notification-id',
+        category: 'test-category'
+      }
+
+      // Act
+      component.raiseTelemetryEventForNotification(notification)
+
+      // Assert
+      expect(mockEventService.raiseInteractTelemetry).toHaveBeenCalledWith(
+        {
+          type: 'click',
+          subType: 'notification-engine',
+          id: 'test-notification-id'
+        },
+        {},
+        {
+          module: 'Home'
+        }
+      )
+    })
+
+    it('should handle notification with undefined notification_id', () => {
+      // Arrange
+      const notification = {
+        category: 'test-category'
+        // notification_id is undefined
+      }
+
+      // Act
+      component.raiseTelemetryEventForNotification(notification)
+
+      // Assert
+      expect(mockEventService.raiseInteractTelemetry).toHaveBeenCalledWith(
+        {
+          type: 'click',
+          subType: 'notification-engine',
+          id: undefined
+        },
+        {},
+        {
+          module: 'Home'
+        }
+      )
     })
   })
 })
