@@ -120,7 +120,7 @@ export class UpdateWorkallocationComponent implements OnInit {
       pageSize: 1000,
       departmentName: this.departmentName,
     }
-    this.allocateSrvc.getUsers(req).subscribe(res => {
+    this.allocateSrvc.getUsers(req)?.subscribe(res => {
       const userslist = res.result.data
       userslist.forEach((user: any) => {
         // if (user.userDetails) {
