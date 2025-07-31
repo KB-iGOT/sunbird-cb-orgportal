@@ -60,6 +60,8 @@ export class SingleUserCreationComponent implements OnInit, AfterViewInit, OnDes
   desigantionFilterEnable = false
 
   displayLoader = false
+  isMdoLeader = false
+  filteredRoles: string[] = []
   // emailRegix = `^[\\w\-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$`
   userCreationForm = this.formBuilder.group({
     email: new UntypedFormControl('', [Validators.required, Validators.pattern(EMAIL_PATTERN)]),
@@ -136,6 +138,10 @@ export class SingleUserCreationComponent implements OnInit, AfterViewInit, OnDes
     this.getMasterLanguages()
     this.getGroups()
     this.getOrgRolesList()
+    const fullProfile = _.get(this.activatedRouter?.snapshot, 'data.configService')
+    if (fullProfile?.unMappedUser && fullProfile?.unMappedUser?.roles) {
+      this.isMdoLeader = fullProfile?.unMappedUser?.roles.includes('MDO_LEADER')
+    }
   }
 
   ngAfterViewInit(): void {
@@ -202,7 +208,13 @@ export class SingleUserCreationComponent implements OnInit, AfterViewInit, OnDes
           this.masterData['rolesList'] = JSON.parse(res.result.response.value)
           if (Array.isArray(this.masterData.rolesList.orgTypeList)) {
             const mdoArray = this.masterData.rolesList.orgTypeList.find((elem: any) => elem.name === 'MDO')
-            this.masterData['mdoRoles'] = mdoArray.roles
+            this.masterData['mdoRoles'] = mdoArray.roles || []
+            // Filter based on isMdoLeader flag
+            if (this.isMdoLeader) {
+              this.filteredRoles = this.masterData?.mdoRoles  // show all roles
+            } else {
+              this.filteredRoles = this.masterData?.mdoRoles.filter((role: any) => role === 'PUBLIC')  // show only PUBLIC
+            }
           }
         }
         // tslint:disable-next-line
