@@ -23,10 +23,24 @@ describe('CreateContentComponent', () => {
     })
 
     // Test case 1: Component initialization
-    it('should initialize category data correctly on ngOnInit', () => {
+    it('should initialize category data and isAparEnabled correctly when isApar is truthy', () => {
+        tpdsSvcMock.trainingPlanStepperData = { isApar: true }
+        component = new CreateContentComponent(tpdsSvcMock, dialogMock, routerMock)
         component.ngOnInit()
         expect(component.categoryData.length).toBe(5)
         expect(component.categoryData[0].name).toBe('Courses')
+        expect(component.isAparEnabled).toBe(true)
+        expect(tpdsSvcMock.trainingPlanStepperData.isApar).toBe(true)
+    })
+
+    it('should initialize category data and set isApar on service when isApar is falsy', () => {
+        tpdsSvcMock.trainingPlanStepperData = { isApar: undefined }
+        component = new CreateContentComponent(tpdsSvcMock, dialogMock, routerMock)
+        component.isAparEnabled = false
+        component.ngOnInit()
+        expect(component.categoryData.length).toBe(5)
+        expect(component.categoryData[0].name).toBe('Courses')
+        expect(tpdsSvcMock.trainingPlanStepperData.isApar).toBe(false)
     })
 
     // Test case 2: handleApiData when trainingPlanContentData and content exist
@@ -71,6 +85,12 @@ describe('CreateContentComponent', () => {
 
     // Test case 5: itemsRemovedFromChip should call handleSelectedChips
     it('should call handleSelectedChips when items are removed from chip', () => {
+        // Provide mock data to avoid undefined error
+        tpdsSvcMock.trainingPlanContentData = {
+            data: {
+                content: [{ identifier: '1', selected: false }, { identifier: '2', selected: true }]
+            }
+        } as any
         const spy = jest.spyOn(component, 'handleSelectedChips')
         component.itemsRemovedFromChip()
         expect(spy).toHaveBeenCalledWith(true)
@@ -78,12 +98,10 @@ describe('CreateContentComponent', () => {
 
     // Test case 6: showAddContentDialog should open dialog and navigate
     it('should open dialog and navigate on confirmation', () => {
-        // const dialogRefMock = {
-        //     afterClosed: jest.fn().mockReturnValue({
-        //         subscribe: (callback: Function) => callback('confirmed')
-        //     })
-        // }
-        // dialogMock.open.mockReturnValue(dialogRefMock)
+        const afterClosedMock = { subscribe: (cb: any) => cb('confirmed') }
+        const dialogRefMock = { afterClosed: jest.fn(() => afterClosedMock) }
+        // @ts-ignore
+        dialogMock.open.mockImplementation(() => dialogRefMock)
         const navigateSpy = jest.spyOn(routerMock, 'navigate')
 
         component.showAddContentDialog()
@@ -94,12 +112,10 @@ describe('CreateContentComponent', () => {
 
     // Test case 7: showAddContentDialog should not navigate if not confirmed
     it('should not navigate if dialog is not confirmed', () => {
-        // const dialogRefMock = {
-        //     afterClosed: jest.fn().mockReturnValue({
-        //         subscribe: (callback: Function) => callback('cancelled')
-        //     })
-        // }
-        // dialogMock.open.mockReturnValue(dialogRefMock)
+        const afterClosedMock = { subscribe: (cb: any) => cb('cancelled') }
+        const dialogRefMock = { afterClosed: jest.fn(() => afterClosedMock) }
+        // @ts-ignore
+        dialogMock.open.mockImplementation(() => dialogRefMock)
         const navigateSpy = jest.spyOn(routerMock, 'navigate')
 
         component.showAddContentDialog()
