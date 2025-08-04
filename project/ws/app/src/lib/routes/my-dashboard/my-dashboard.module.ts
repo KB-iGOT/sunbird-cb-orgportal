@@ -8,9 +8,10 @@ import { BreadcrumbsOrgModule } from '@sunbird-cb/collection'
 import { MyDashboardHomeComponent } from './components/my-dashboard-home/my-dashboard-home.component'
 import { MyDashboardRoutingModule } from './my-dashboard-routing.module'
 import { RainDashboardsModule } from '@sunbird-cb/rain-dashboards'
+import { TrainingPlanDashboardviewComponent } from './components/training-plan-dashboardview/training-plan-dashboardview/training-plan-dashboardview.component'
 
 @NgModule({
-  declarations: [MyDashboardHomeComponent],
+  declarations: [MyDashboardHomeComponent, TrainingPlanDashboardviewComponent],
   imports: [
     CommonModule,
     MyDashboardRoutingModule,

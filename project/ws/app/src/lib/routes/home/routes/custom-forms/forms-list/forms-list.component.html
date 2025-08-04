@@ -7,15 +7,49 @@
   <mat-card>
     <div class="flex justify-between">
       <span class="mobile-margin mat-h2">Custom Fields</span>
-      <button mat-button class="createFormBtn" (click)="redirectToNewForm()" *ngIf="!showCreateForm">Create new custom
-        field</button>
     </div>
-    <div class="flex flex justify-end my-5" *ngIf="!showCreateForm">
-      <div class="fieldOptions flex items-center gap-4 pr-2 font-bold toggle-background">
+    <mat-accordion class="cutomDemo">
+      <mat-expansion-panel [expanded]='panelOpenState' (opened)="panelOpenState = true"
+        (closed)="panelOpenState = false">
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            <div class="flex-4 mobile-margin text-capitalize mat-h2 padding-10">Note:</div>
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+        <div class="flex gap-10 mt-2">
+          <div class="section-1 mt-4">
+            <div class="flex gap-4 mb-4">
+              <div>
+                <mat-icon class="infoIcon">info_outlined</mat-icon>
+              </div>
+              <div>
+                The collection, use and monitoring of sensitive or confidential data / information is prohibited without
+                proper
+                authorization. Example: Aadhaar, PAN etc. The MDO’s are suggested to capture the data responsibly, and
+                MDOs take full
+                responsibility of any such data captured using Custom Fields facility on IGOT.
+              </div>
+            </div>
+          </div>
+          <div class="cutomDemo flex justify-end section-2">
+            <div class="customDemoVideo flex flex-column flex-middle justify-center" (click)="openVideoPopup()">
+              <mat-icon class="video_icon mb-2">play_circle</mat-icon>
+              <div>
+                Watch how it works
+              </div>
+            </div>
+          </div>
+        </div>
+      </mat-expansion-panel>
+    </mat-accordion>
+    <div class="flex justify-end my-5 gap-10">
+      <div class="fieldOptions flex items-center gap-4 pr-2 font-bold toggle-background" *ngIf="!showCreateForm">
         <mat-slide-toggle class="example-margin" [checked]="canEnable" [disabled]="!enabledFileds?.length > 0"
           (change)="onToggle($event)">
           Show popup in the learner portal</mat-slide-toggle>
       </div>
+      <button mat-button class="createFormBtn" (click)="redirectToNewForm()" *ngIf="!showCreateForm">Create new custom
+        field</button>
     </div>
     <div class="create-new p-5 mb-5" *ngIf="showCreateForm">
       <ws-app-create-form [customFieldObject]="customFieldObject" (closeForm)="closeForm($event)"></ws-app-create-form>

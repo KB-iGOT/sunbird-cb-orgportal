@@ -193,7 +193,7 @@
       <div class="input-container">
         <div class="label required mb-2">Role</div>
         <div class="custom-roles">
-          <ng-container *ngFor="let role of masterData?.mdoRoles">
+          <ng-container *ngFor="let role of filteredRoles">
             <div class="rolehead" *ngIf="role !== 'MDO_LEADER'">
               <div class="roletitle">{{ role }}</div>
               <mat-checkbox value="{{ role }}" #rolesCheckbox [checked]="role === 'PUBLIC'"
