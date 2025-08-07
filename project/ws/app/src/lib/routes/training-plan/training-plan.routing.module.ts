@@ -6,6 +6,7 @@ import { CreatePlanComponent } from './routes/create-plan/create-plan.component'
 import { PreviewPlanComponent } from './routes/preview-plan/preview-plan.component'
 import { UpdatePlanResolveService } from './resolvers/update-plan-resolve.service'
 import { ResetDataSharingResolveService } from './resolvers/reset-data-sharing-resolve.service'
+import { PageResolve } from '@sunbird-cb/utils'
 
 const routes: Routes = [
   {
@@ -26,9 +27,13 @@ const routes: Routes = [
         data: {
           pageId: 'create-plan',
           module: 'Create Plan',
+          pageType: 'feature',
+          pageKey: 'content-access-settings',
         },
         resolve: {
           tpdsSvcReset: ResetDataSharingResolveService,
+          pageData: PageResolve,
+          configService: ConfigResolveService,
         },
       },
       {

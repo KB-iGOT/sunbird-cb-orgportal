@@ -101,4 +101,11 @@ export class CreatePlanComponent implements OnInit, OnDestroy {
     }
   }
 
+  isAddAccessSettingsInvalid(_event: any) {
+    this.createCheck = {
+      ...this.createCheck,
+      addAccessSettingsIsInvalid: _event,
+    }
+  }
+
 }
