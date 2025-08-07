@@ -25,6 +25,7 @@ export class StandardCardComponent implements OnInit, AfterViewChecked {
   pageSize = 20
   defaultPosterImage: SafeUrl | null = '/assets/instances/eagle/app_logos/default.png'
   defaultThumbnail: SafeUrl | null = 'assets/instances/eagle/app_logos/KarmayogiBharat_Logo.svg'
+  multilingualCourses = 'Multilingual Course'
   constructor(
     private tpdsSvc: TrainingPlanDataSharingService,
     private changeDetectorRef: ChangeDetectorRef
