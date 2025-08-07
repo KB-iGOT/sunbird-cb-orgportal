@@ -54,9 +54,12 @@ export class BreadcrumbComponent implements OnInit {
         this.changeToNextTab.emit(TrainingPlanContent.TTabLabelKey.ADD_CONTENT)
         break
       case TrainingPlanContent.TTabLabelKey.ADD_CONTENT:
-        this.changeToNextTab.emit(TrainingPlanContent.TTabLabelKey.ADD_ASSIGNEE)
+        this.changeToNextTab.emit(TrainingPlanContent.TTabLabelKey.ADD_ACCESS_SETTINGS)
         break
-      case TrainingPlanContent.TTabLabelKey.ADD_ASSIGNEE:
+      // case TrainingPlanContent.TTabLabelKey.ADD_ASSIGNEE:
+      //   this.changeToNextTab.emit(TrainingPlanContent.TTabLabelKey.ADD_TIMELINE)
+      //   break
+      case TrainingPlanContent.TTabLabelKey.ADD_ACCESS_SETTINGS:
         this.changeToNextTab.emit(TrainingPlanContent.TTabLabelKey.ADD_TIMELINE)
         break
       case TrainingPlanContent.TTabLabelKey.ADD_TIMELINE:
@@ -164,6 +167,9 @@ export class BreadcrumbComponent implements OnInit {
     }
     if (this.tabType.ADD_ASSIGNEE === this.selectedTab && this.validationList && !this.validationList.addAssigneeIsInvalid) {
       return this.validationList.addAssigneeIsInvalid
+    }
+    if (this.tabType.ADD_ACCESS_SETTINGS === this.selectedTab && this.validationList && !this.validationList.addAccessSettingDisable) {
+      return this.validationList.addaccessSettingDisable
     }
     return true
   }

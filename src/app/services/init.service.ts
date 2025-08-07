@@ -100,6 +100,14 @@ export class InitService {
       'verified',
       domSanitizer.bypassSecurityTrustResourceUrl('mdo-assets/icons/verified.svg'),
     )
+    iconRegistry.addSvgIcon(
+      'svg_search',
+      domSanitizer.bypassSecurityTrustResourceUrl('assets/icons/search-selections.svg'),
+    )
+    iconRegistry.addSvgIcon(
+      'info-outline',
+      domSanitizer.bypassSecurityTrustResourceUrl('assets/icons/icon-wrapper.svg'),
+    )
   }
 
   async init() {
