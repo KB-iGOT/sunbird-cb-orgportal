@@ -54,11 +54,13 @@ export class StandardCardComponent implements OnInit, AfterViewChecked {
   selectContentItem(event: any, item: any) {
     if (event.checked) {
       // this.selectedContent.push(item);
-      this.tpdsSvc.trainingPlanContentData.data.content.map((sitem: any, index: any) => {
+      this.tpdsSvc?.trainingPlanContentData?.data?.content.map((sitem: any, index: any) => {
         if (sitem.identifier === item.identifier) {
           sitem['selected'] = true
           this.tpdsSvc.trainingPlanContentData.data.content.splice(index, 1)
-          this.tpdsSvc.trainingPlanContentData.data.content.unshift(sitem)
+          setTimeout(() => {
+            this.tpdsSvc.trainingPlanContentData.data.content.unshift(sitem)
+          }, 0)
         }
       })
 
