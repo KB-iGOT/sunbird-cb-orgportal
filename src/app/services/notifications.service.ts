@@ -104,20 +104,25 @@ export class NotificationsService {
     }
   }
 
-  handleRedirection(notification: any, environment: any, roles: any[], snackBar: any): void {
-    if (notification.category === 'PROFILE') {
-      let req: any = {
-        applicationStatus: 'SEND_FOR_APPROVAL',
-        deptName: this.orgName,
-        limit: 50,
-        serviceName: 'profile'
-      }
-      if (notification.sub_category === 'PROFILE_VERIFICATION') {
-        req["requestType"] = ['GROUP_CHANGE', 'DESIGNATION_CHANGE']
-      } else if (notification.sub_category === 'USER_TRANSFER') {
-        req["requestType"] = ['ORG_TRANSFER']
-      }
-      this.searchWorkflowSearch(req).subscribe((res: any) => {
+  constrctPayload(notification: any): any {
+    let req: any = {
+      applicationStatus: 'SEND_FOR_APPROVAL',
+      deptName: this.orgName,
+      limit: 50,
+      serviceName: 'profile'
+    }
+    if (notification.sub_category === 'PROFILE_VERIFICATION') {
+      req["requestType"] = ['GROUP_CHANGE', 'DESIGNATION_CHANGE']
+    } else if (notification.sub_category === 'USER_TRANSFER') {
+      req["requestType"] = ['ORG_TRANSFER']
+    }
+    return req
+  }
+
+  handleProfileCategory(notification: any, environment: any, snackBar: any): void {
+    if (notification.sub_category === 'PROFILE_VERIFICATION' || notification.sub_category === 'USER_TRANSFER') {
+      let payload = this.constrctPayload(notification)
+      this.searchWorkflowSearch(payload).subscribe((res: any) => {
         let data = _.get(res, 'result.data', [])
         let pendingUser = data.find((item: any) => {
           return item.wfInfo[0] && item.wfInfo[0].userId === notification.message.data.id
@@ -133,17 +138,50 @@ export class NotificationsService {
         console.error('Error while fetching workflow search data', error)
         snackBar.open('Error while fetching approval data')
       })
+    } else if (['TRANSFER_UPDATE', 'PROFILE_UPDATE'].includes(notification.sub_category)) {
+      let url = `${environment.portalsForNotifications.learner}/app/person-profile/me`
+      window.open(url, '_blank')
+    }
+  }
+
+  handleDiscussionCategory(notification: any, environment: any, roles: any): void {
+    if (notification.sub_category === 'LEARN_DISCUSSION_POST_COMMENT' || notification.sub_category === 'LEARN_DISCUSSION_POST_REPLY') {
+      if (roles.includes('CONTENT_CREATOR')) {
+        let url = `${environment.portalsForNotifications.cbp}/author/content-detail/${notification.message.data.id}/overview-v2?preview=true&editMode=true&commentId=${notification.message.data.id}`
+        window.open(url, '_blank')
+      } else {
+        let url = `${environment.portalsForNotifications.learner}/app/toc/${notification.message.data.id}?commentId=${notification.message.data.courseId}`
+        window.open(url, '_blank')
+      }
+    } else {
+      let url = `${environment.portalsForNotifications.learner}/app/discussion-forum-v2/community/${notification.message.data.communityId}/${notification.message.data.discussionId}`
+      window.open(url, '_blank')
+    }
+  }
+
+  handleEventCategory(notification: any, environment: any): void {
+    if (notification.sub_category === 'EVENT_PUBLISHED') {
+      let url = `${environment.portalsForNotifications.learner}/app/event-hub/home/${notification.message.data.id}`
+      window.open(url, '_blank')
+    } else if (notification.sub_category === 'EVENT_ENROLLED') {
+      this.router.navigate([`/app/home/events`])
+    }
+  }
+
+  handleRedirection(notification: any, environment: any, roles: any[], snackBar: any): void {
+    if (notification.category === 'PROFILE') {
+      this.handleProfileCategory(notification, environment, snackBar)
     } else if (notification.category === 'LEARN') {
       let url = `${environment.portalsForNotifications.learner}/app/toc/${notification.message.data.id}`
       window.open(url, '_blank')
     } else if (notification.category === 'NETWORK') {
       this.handleNetworkRedirection(notification, snackBar, environment)
     } else if (notification.category === 'EVENT') {
+      this.handleEventCategory(notification, environment)
       let url = `${environment.portalsForNotifications.learner}/app/event-hub/home/${notification.message.data.id}`
       window.open(url, '_blank')
     } else if (notification.category === 'DISCUSSION') {
-      let url = `${environment.portalsForNotifications.learner}/app/discussion-forum-v2/community/${notification.message.data.communityId}/${notification.message.data.discussionId}`
-      window.open(url, '_blank')
+      this.handleDiscussionCategory(notification, environment, roles)
     } else if (notification?.category?.includes('CONTENT')) {
       this.getContentData(notification.message.data.id).subscribe((res: any) => {
         let isStandaloneResource = false
@@ -172,7 +210,4 @@ export class NotificationsService {
       this.router.navigate(['/app/home/notifications'])
     }
   }
-
-
-
 }
