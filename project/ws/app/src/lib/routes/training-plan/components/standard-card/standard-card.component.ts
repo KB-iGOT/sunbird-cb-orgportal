@@ -60,13 +60,13 @@ export class StandardCardComponent implements OnInit, AfterViewChecked {
           this.tpdsSvc.trainingPlanContentData.data.content.splice(index, 1)
           setTimeout(() => {
             this.tpdsSvc.trainingPlanContentData.data.content.unshift(sitem)
+            if (this.tpdsSvc.trainingPlanStepperData['contentList']) {
+              this.tpdsSvc.trainingPlanStepperData['contentList'].push(item.identifier)
+            }
           }, 0)
         }
       })
 
-      if (this.tpdsSvc.trainingPlanStepperData['contentList']) {
-        this.tpdsSvc.trainingPlanStepperData['contentList'].push(item.identifier)
-      }
     } else {
       // this.selectedContent = this.selectedContent.filter( sitem  => sitem.identifier !== item.identifier)
       this.tpdsSvc.trainingPlanContentData.data.content.map((sitem: any) => {
@@ -80,7 +80,9 @@ export class StandardCardComponent implements OnInit, AfterViewChecked {
         }
       })
     }
-    this.handleSelectedChips.emit(true)
+    setTimeout(() => {
+      this.handleSelectedChips.emit(true)
+    }, 0)
   }
 
   deleteItem(item: any) {
