@@ -158,7 +158,7 @@ export class SearchComponent implements OnInit {
             'gradeLevel', 'identifier', 'medium', 'resourceType',
             'primaryCategory', 'contentType', 'channel', 'organisation', 'trackable', 'posterImage',
             'idealScreenSize', 'learningMode', 'creatorLogo', 'duration', 'programDuration',
-            'version', 'avgRating', `${this.compentencyKey.vKey}`, 'secureSettings'],
+            'version', 'avgRating', `${this.compentencyKey.vKey}`, 'secureSettings', 'courseCategory'],
         },
       }
       this.trainingPlanService.getAllContent(filterObj).subscribe((res: any) => {
