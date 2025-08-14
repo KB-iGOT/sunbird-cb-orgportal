@@ -104,6 +104,7 @@ import { GroupsGradeComponent } from './components/groups-grade/groups-grade.com
 import { MAT_DATE_LOCALE } from '@angular/material/core'
 import { MyNotificationsComponent } from './routes/my-notifications/my-notifications.component'
 import { AllNotificationsModule } from '@sunbird-cb/notification'
+import { TranslateModule } from '@ngx-translate/core'
 
 @NgModule({
   declarations: [
@@ -214,7 +215,8 @@ import { AllNotificationsModule } from '@sunbird-cb/notification'
     DesignationModule,
     TaxonomyEditorModule,
     ImageResponsiveModule,
-    AllNotificationsModule
+    AllNotificationsModule,
+    TranslateModule.forChild()
   ],
   providers: [
     { provide: 'environment', useValue: environment },
