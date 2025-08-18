@@ -12,6 +12,7 @@ import { ConfirmationBoxComponent } from '../../components/confirmation-box/conf
 export class CreateContentComponent implements OnInit, OnChanges {
   @Output() addContentInvalid = new EventEmitter<any>()
   @Input() tabSelected: string = ''
+  @Input() isLiveContent!: boolean
 
   categoryData: any[] = []
   contentData: any[] = []
