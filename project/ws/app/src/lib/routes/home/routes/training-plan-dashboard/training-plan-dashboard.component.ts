@@ -263,7 +263,7 @@ export class TrainingPlanDashboardComponent implements OnInit {
         icon: 'radio_on',
         title: (_type === 'deleteContent') ? 'Are you sure you want to delete the plan?' :
           (_type === 'publishContent') ? 'Are you sure you want to publish the plan?' : '',
-        subTitle: 'You wont be able to revert this',
+        subTitle: "You won't be able to revert this",
         primaryAction: 'Confirm',
         secondaryAction: 'Cancel',
       },

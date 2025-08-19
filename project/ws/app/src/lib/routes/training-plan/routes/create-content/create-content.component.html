@@ -11,10 +11,10 @@
     </div>
 </ng-container>
 <ng-container>
-    <ws-app-search [categoryData]="categoryData" [from]="from" (handleApiData)="handleApiData($event)"></ws-app-search>
+    <ws-app-search  [ngClass]="{'disable': isLiveContent}" [categoryData]="categoryData" [from]="from" (handleApiData)="handleApiData($event)"></ws-app-search>
 </ng-container>
 <ng-container>
-    <div class="flex flex-row" *ngIf="contentData?.length > 0">
+    <div class="flex flex-row" [ngClass]="{'disable': isLiveContent}" *ngIf="contentData?.length > 0">
         <div class="flex-1">
             <ws-app-chip [selectedContentChips]="selectedContentChips" [from]="from"
                 [selectContentCount]="selectContentCount" (itemRemoved)="itemsRemovedFromChip()"></ws-app-chip>
