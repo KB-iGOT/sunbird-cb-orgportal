@@ -1,7 +1,7 @@
 import { Injectable, LOCALE_ID, Inject } from '@angular/core'
 import { HttpInterceptor, HttpRequest, HttpHandler, HttpEvent, HttpErrorResponse } from '@angular/common/http'
 import { Observable, throwError } from 'rxjs'
-import { ConfigurationsService, AuthKeycloakService } from '@sunbird-cb/utils'
+import { ConfigurationsService, AuthKeycloakService } from '@sunbird-cb/utils-v2'
 import { catchError } from 'rxjs/operators'
 import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar'
 

@@ -5,7 +5,7 @@ import { MatLegacyTableDataSource as MatTableDataSource } from '@angular/materia
 import { UploadService } from '../../services/upload.service'
 // import { Observable } from 'rxjs'
 // import { HttpEventType, HttpResponse } from '@angular/common/http'
-// import { ConfigurationsService } from '@sunbird-cb/utils'
+// import { ConfigurationsService } from '@sunbird-cb/utils-v2'
 import { SelectionModel } from '@angular/cdk/collections'
 
 // tslint:disable-next-line:interface-name

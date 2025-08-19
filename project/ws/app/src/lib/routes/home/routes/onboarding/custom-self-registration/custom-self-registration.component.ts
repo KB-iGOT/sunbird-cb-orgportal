@@ -9,7 +9,7 @@ import { LoadingPopupComponent } from '../loading-popup/loading-popup.component'
 import { OnboardingService } from '../../../services/onboarding.service'
 import { DesignationsService } from '../../designation/services/designations.service'
 import _ from 'lodash'
-import { EventService } from '@sunbird-cb/utils'
+import { EventService } from '@sunbird-cb/utils-v2'
 
 @Component({
   selector: 'ws-app-custom-self-registration',

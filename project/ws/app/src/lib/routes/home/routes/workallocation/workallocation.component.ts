@@ -8,7 +8,7 @@ import { ExportAsService, ExportAsConfig } from 'ngx-export-as'
 import * as _ from 'lodash'
 import { WorkallocationService } from '../../services/workallocation.service'
 import { WorkAllocationPopUpComponent } from '../../../../head/work-allocation-table/work-order-popup/pop-up.component'
-import { EventService } from '@sunbird-cb/utils'
+import { EventService } from '@sunbird-cb/utils-v2'
 import { NsContent } from '@sunbird-cb/collection'
 import { TelemetryEvents } from '../../../../head/_services/telemetry.event.model'
 

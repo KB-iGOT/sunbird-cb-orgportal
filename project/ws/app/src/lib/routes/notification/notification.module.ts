@@ -9,7 +9,7 @@ import { MatLegacyProgressSpinnerModule as MatProgressSpinnerModule } from '@ang
 import { MatToolbarModule } from '@angular/material/toolbar'
 import { NotificationRoutingModule } from './notification-routing.module'
 import { NotificationComponent } from './components/notification/notification.component'
-import { PipeLimitToModule } from '@sunbird-cb/utils'
+import { PipeLimitToModule } from '@sunbird-cb/utils-v2'
 import { BreadcrumbsOrgModule } from '@sunbird-cb/collection'
 
 @NgModule({

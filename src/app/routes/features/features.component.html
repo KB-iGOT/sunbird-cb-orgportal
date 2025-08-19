@@ -25,7 +25,7 @@
       <span>{{ group.name }}</span>
     </h2>
     <div class="flex flex-wrap">
-      <ng-container [wsResolverWidget]="featureWidget" *ngFor="let featureWidget of group.featureWidgets">
+      <ng-container [sbUiResolverWidget]="featureWidget" *ngFor="let featureWidget of group.featureWidgets">
       </ng-container>
     </div>
   </div>

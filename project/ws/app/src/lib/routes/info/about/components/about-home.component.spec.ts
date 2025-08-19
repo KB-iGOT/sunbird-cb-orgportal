@@ -2,7 +2,7 @@ import { AboutHomeComponent } from './about-home.component'
 import { BehaviorSubject, of, Subscription } from 'rxjs'
 import { BreakpointObserver, BreakpointState } from '@angular/cdk/layout'
 import { DomSanitizer } from '@angular/platform-browser'
-import { ConfigurationsService } from '@sunbird-cb/utils'
+import { ConfigurationsService } from '@sunbird-cb/utils-v2'
 import { ActivatedRoute } from '@angular/router'
 import { IAboutObject } from '../../../../../../../../../src/app/routes/public/public-about/about.model'
 

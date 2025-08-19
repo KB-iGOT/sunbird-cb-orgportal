@@ -5,7 +5,7 @@ import { CreateWorkallocationComponent } from './routes/create-workallocation/cr
 import { WorkallocationV2HomeComponent } from './routes/workallocation-v2-home/workallocation-v2-home.component'
 import { DraftAllocationsComponent } from './routes/draft-allocations/draft-allocations.component'
 import { PublishedAllocationsComponent } from './routes/published-allocations/published-allocations.component'
-import { PageResolve } from '@sunbird-cb/utils'
+import { PageResolve } from '@sunbird-cb/utils-v2'
 import { UserWorkResolverService } from './services/user-work-resolver.service'
 // import { UpdateWorkallocationComponent } from './routes/update-workallocation/update-workallocation.component'
 

@@ -19,7 +19,7 @@ import { WelcomeComponent } from './routes/welcome/welcome.component'
 // import { AllUsersComponent } from './routes/users-view/all-users/all-users.component'
 // import { BulkUploadComponent } from './routes/users-view/bulk-upload/bulk-upload.component'
 
-import { PageResolve } from '@sunbird-cb/utils'
+import { PageResolve } from '@sunbird-cb/utils-v2'
 import { HomeResolve } from './resolvers/home-resolve'
 import { ConfigResolveService } from './resolvers/config-resolve.service'
 import { UsersListResolve } from './resolvers/users-list-resolve.service'

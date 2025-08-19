@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy, ViewChild, ElementRef, HostListener } from '@angular/core'
-import { ValueService, ConfigurationsService, WidgetContentService } from '@sunbird-cb/utils'
+import { ValueService, ConfigurationsService, WidgetContentService } from '@sunbird-cb/utils-v2'
 import { map } from 'rxjs/operators'
 import { ActivatedRoute, Router, Event, NavigationEnd  } from '@angular/router'
 import { MDOinfo } from '../../models/mdoinfo.model'

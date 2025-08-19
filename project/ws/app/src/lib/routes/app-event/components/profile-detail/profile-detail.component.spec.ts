@@ -4,7 +4,7 @@ import { Router } from '@angular/router'
 import { ActivatedRoute } from '@angular/router'
 import { EventService } from '../../services/event.service'
 import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog'
-import { ValueService } from '@sunbird-cb/utils'
+import { ValueService } from '@sunbird-cb/utils-v2'
 import { ViewUsersComponent } from './view-users/view-users.component'
 
 jest.mock('@angular/router', () => ({
@@ -20,7 +20,7 @@ jest.mock('../../services/event.service', () => ({
     })),
 }))
 
-jest.mock('@sunbird-cb/utils', () => ({
+jest.mock('@sunbird-cb/utils-v2', () => ({
     ValueService: jest.fn().mockImplementation(() => ({
         isLtMedium$: of(false),
     })),

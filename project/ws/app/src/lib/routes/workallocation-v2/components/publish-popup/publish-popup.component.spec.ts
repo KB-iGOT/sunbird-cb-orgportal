@@ -2,7 +2,7 @@
 import { Router } from '@angular/router'
 import { MatDialogRef } from '@angular/material/dialog'
 import { UploadFileService } from '../../services/uploadfile.service'
-import { ConfigurationsService } from '@sunbird-cb/utils'
+import { ConfigurationsService } from '@sunbird-cb/utils-v2'
 import { PublishPopupComponent } from './publish-popup.component'
 import { of } from 'rxjs'
 

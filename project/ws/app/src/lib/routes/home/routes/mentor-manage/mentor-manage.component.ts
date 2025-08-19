@@ -6,7 +6,7 @@ import _ from 'lodash'
 /* tslint:enable */
 // import { environment } from 'src/environments/environment'
 import { LegacyPageEvent as PageEvent } from '@angular/material/legacy-paginator'
-import { EventService } from '@sunbird-cb/utils'
+import { EventService } from '@sunbird-cb/utils-v2'
 import { NsContent } from '@sunbird-cb/collection'
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser'
 import { NSProfileDataV2 } from '../../models/profile-v2.model'

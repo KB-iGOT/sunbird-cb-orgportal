@@ -19,7 +19,7 @@ import { MatStepperModule } from '@angular/material/stepper'
 import { MatToolbarModule } from '@angular/material/toolbar'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 // import { SettingsModule } from '../profile/routes/settings/settings.module'
-import { WidgetResolverModule } from '@sunbird-cb/resolver'
+import { SbUiResolverModule } from '@sunbird-cb/resolver-v2'
 import {
   LocaleTranslatorModule,
   LanguageSelectorModule,
@@ -31,7 +31,7 @@ import { HomeComponent } from './components/home/home.component'
 import { LangSelectComponent } from './components/lang-select/lang-select.component'
 import { TncComponent } from './components/tnc/tnc.component'
 import { TncRendererComponent } from './components/tnc-renderer/tnc-renderer.component'
-import { PipeSafeSanitizerModule } from '@sunbird-cb/utils'
+import { PipeSafeSanitizerModule } from '@sunbird-cb/utils-v2'
 import { TncAppResolverService } from '../../../../../../../src/app/services/tnc-app-resolver.service'
 import { SetupDoneComponent } from './components/setup-done/setup-done.component'
 import { InterestModules } from './module/interest/interest.module'
@@ -71,7 +71,7 @@ import { Globals } from './globals'
 
     // SettingsModule,
     AboutVideoModule,
-    WidgetResolverModule,
+    SbUiResolverModule,
     LocaleTranslatorModule,
     InterestModules,
     LanguageSelectorModule,

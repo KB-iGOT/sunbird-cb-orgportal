@@ -2,13 +2,13 @@
 </ws-widget-breadcrumbs-org> -->
 
 <!-- <div *ngIf="currentRoute === 'home'" class="container-balanced-banner margin-top-s">
-  <ng-container [wsResolverWidget]="banner"></ng-container>
+  <ng-container [sbUiResolverWidget]="banner"></ng-container>
 </div> -->
 
 <mat-sidenav-container autosize name="discuss-menu" class="nav-container" name="exp">
   <mat-sidenav [mode]="mode$ | async" [(opened)]="sideNavBarOpened" class="left-nav border-0">
     <div class="container2">
-      <ng-container [wsResolverWidget]="widgetData"></ng-container>
+      <ng-container [sbUiResolverWidget]="widgetData"></ng-container>
     </div>
   </mat-sidenav>
   <mat-sidenav-content>
