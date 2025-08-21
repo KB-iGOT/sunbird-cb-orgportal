@@ -115,8 +115,8 @@ export class AppNavBarComponent implements OnInit, OnChanges, OnDestroy {
       this.getMyCount()
     }
 
-    this.myNotificationsSubscription = this.libNotificationsService._unreadCount.subscribe((res: boolean) => {
-      if (res === true) {
+    this.myNotificationsSubscription = this.libNotificationsService.unreadCount$.subscribe((res: number) => {
+      if (res > 0) {
         this.getMyCount()
       }
     })
