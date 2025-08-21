@@ -32,6 +32,7 @@ import { MentorManageComponent } from './routes/mentor-manage/mentor-manage.comp
 import { BulkUploadOdcsComponent } from './routes/odcs-mapping/bulk-upload-odcs/bulk-upload-odcs.component'
 import { GroupsGradeComponent } from './components/groups-grade/groups-grade.component'
 import { MyNotificationsComponent } from './routes/my-notifications/my-notifications.component'
+import { FormDataResolverService } from './resolvers/form-data-resolver.service'
 const routes: Routes = [
   {
     path: '',
@@ -346,6 +347,15 @@ const routes: Routes = [
         path: 'community',
         loadChildren: () => import('./routes/community/community.module').then(m => m.CommunityModule),
         resolve: {
+          configService: ConfigResolveService,
+        },
+      },
+
+      {
+        path: 'microsite',
+        loadChildren: () => import('./routes/microsite/microsite.module').then(m => m.MicrositeModule),
+        resolve: {
+          formData: FormDataResolverService,
           configService: ConfigResolveService,
         },
       },
