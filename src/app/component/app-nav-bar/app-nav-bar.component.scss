@@ -146,6 +146,9 @@
     max-width: 650px;
 }
 
+.search-container {
+  min-width: 650px !important;
+}
 .mobile {
   @include breakpoint-xs {
     padding: $size-xs;
