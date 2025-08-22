@@ -1,7 +1,7 @@
 import { SocialComponent } from './social.component'
 import { Router, ActivatedRoute } from '@angular/router'
 import { SearchServService } from '../../services/search-serv.service'
-import { ValueService } from '@sunbird-cb/utils'
+import { ValueService } from '@sunbird-cb/utils-v2'
 import { of, throwError } from 'rxjs'
 
 describe('SocialComponent', () => {

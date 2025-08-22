@@ -1,7 +1,7 @@
 import { AppEventComponent } from './app-event.component'
 import { ActivatedRoute } from '@angular/router'
 import { EventService } from '../../services/event.service'
-import { ConfigurationsService } from '@sunbird-cb/utils'
+import { ConfigurationsService } from '@sunbird-cb/utils-v2'
 import { of } from 'rxjs'
 
 // Mock the necessary services

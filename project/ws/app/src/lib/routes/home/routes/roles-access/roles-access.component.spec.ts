@@ -1,5 +1,5 @@
 import { Router, ActivatedRoute } from '@angular/router'
-import { EventService } from '@sunbird-cb/utils'
+import { EventService } from '@sunbird-cb/utils-v2'
 import { RolesService } from '../../../users/services/roles.service'
 import { UsersService } from '../../../users/services/users.service'
 import { RolesAccessComponent } from './roles-access.component'

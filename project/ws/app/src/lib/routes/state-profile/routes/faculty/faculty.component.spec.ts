@@ -2,13 +2,13 @@ import { FacultyComponent } from './faculty.component'
 import { UntypedFormGroup } from '@angular/forms'
 import { Subject, of } from 'rxjs'
 import { OrgProfileService } from '../../services/org-profile.service'
-import { ConfigurationsService } from '@sunbird-cb/utils'
+import { ConfigurationsService } from '@sunbird-cb/utils-v2'
 import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog'
 import { DialogBoxComponent } from '../../components/dialog-box/dialog-box.component'
 
 // Mock services
 jest.mock('../../services/org-profile.service')
-jest.mock('@sunbird-cb/utils')
+jest.mock('@sunbird-cb/utils-v2')
 
 describe('FacultyComponent', () => {
     let component: FacultyComponent

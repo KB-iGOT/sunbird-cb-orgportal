@@ -1,6 +1,6 @@
 import { EventListViewComponent } from './event-list-view.component'
 import { Router } from '@angular/router'
-import { EventService } from '@sunbird-cb/utils'
+import { EventService } from '@sunbird-cb/utils-v2'
 import { ActivatedRoute } from '@angular/router'
 import { ChangeDetectorRef } from '@angular/core'
 import { SelectionModel } from '@angular/cdk/collections'

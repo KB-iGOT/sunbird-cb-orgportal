@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core'
 import { ActivatedRouteSnapshot, RouterStateSnapshot, UrlTree, Router } from '@angular/router'
 import { Observable } from 'rxjs'
-import { ConfigurationsService } from '@sunbird-cb/utils'
-// import { ConfigurationsService, AuthKeycloakService } from '@sunbird-cb/utils'
+import { ConfigurationsService } from '@sunbird-cb/utils-v2'
+// import { ConfigurationsService, AuthKeycloakService } from '@sunbird-cb/utils-v2'
 
 @Injectable({
   providedIn: 'root',

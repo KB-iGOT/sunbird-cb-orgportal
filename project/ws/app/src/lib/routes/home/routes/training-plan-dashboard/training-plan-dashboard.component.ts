@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
 // import { TelemetryEvents } from '../../../../head/_services/telemetry.event.model'
-// import { EventService } from '@sunbird-cb/utils'
+// import { EventService } from '@sunbird-cb/utils-v2'
 import { ITableData } from '@sunbird-cb/collection/lib/ui-org-table/interface/interfaces'
 import { TrainingPlanDashboardService } from '../../services/training-plan-dashboard.service'
 import moment from 'moment'
@@ -83,6 +83,7 @@ export class TrainingPlanDashboardComponent implements OnInit {
         { displayName: 'Total content', key: 'contentCount' },
         { displayName: 'Content type', key: 'contentType' },
         { displayName: 'Timeline', key: 'endDate' },
+        { displayName: 'Plan type', key: 'planType' },
         { displayName: 'Created by', key: 'createdByName' },
         { displayName: 'Created on', key: 'updatedAt' },
       ],
@@ -218,6 +219,7 @@ export class TrainingPlanDashboardComponent implements OnInit {
       }
       res.userNameList = userName
       res.userDesignationList = userDesignation
+      res.planType = res.isApar === true ? 'APAR' : 'Non-APAR'
     })
     this.fetchContentDone = true
     this.loaderService.changeLoaderState(false)
@@ -261,7 +263,7 @@ export class TrainingPlanDashboardComponent implements OnInit {
         icon: 'radio_on',
         title: (_type === 'deleteContent') ? 'Are you sure you want to delete the plan?' :
           (_type === 'publishContent') ? 'Are you sure you want to publish the plan?' : '',
-        subTitle: 'You wont be able to revert this',
+        subTitle: "You won't be able to revert this",
         primaryAction: 'Confirm',
         secondaryAction: 'Cancel',
       },
@@ -292,7 +294,7 @@ export class TrainingPlanDashboardComponent implements OnInit {
       this.loaderService.changeLoaderState(false)
       this.filter(this.currentFilter)
       this.tabNavigate(_selectedRow.status.toLowerCase(), _selectedRow.userType)
-    },                                                  _error => {
+    }, _error => {
       this.loaderService.changeLoaderState(false)
     })
   }
@@ -314,7 +316,7 @@ export class TrainingPlanDashboardComponent implements OnInit {
         this.snackBar.open('Something went wrong while publishing CBP plan. Try again later')
         this.loaderService.changeLoaderState(false)
       }
-    },                                                  (_error: any) => {
+    }, (_error: any) => {
       this.snackBar.open('Something went wrong while publishing CBP plan. Try again later')
       this.loaderService.changeLoaderState(false)
     })

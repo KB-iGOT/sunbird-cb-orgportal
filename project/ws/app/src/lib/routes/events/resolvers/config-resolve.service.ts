@@ -1,7 +1,7 @@
 import { Injectable, SkipSelf } from '@angular/core'
 
 import { Observable, of } from 'rxjs'
-import { ConfigurationsService } from '@sunbird-cb/utils'
+import { ConfigurationsService } from '@sunbird-cb/utils-v2'
 @Injectable()
 export class ConfigResolveService
    {

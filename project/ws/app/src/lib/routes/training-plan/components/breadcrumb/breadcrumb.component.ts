@@ -154,7 +154,7 @@ export class BreadcrumbComponent implements OnInit {
             tabSelected: this.tpdsSvc.trainingPlanStepperData.assignmentType,
           },
         })
-      },         1000)
+      }, 1000)
     })
   }
 
@@ -182,12 +182,15 @@ export class BreadcrumbComponent implements OnInit {
       ]
     }
     const obj: any = { request: { ...this.tpdsSvc.trainingPlanStepperData, id: this.activeRoute.snapshot.data['contentData'].id } }
-    if (obj.request.status.toLowerCase() === 'live') {
+    if (obj.request.status && obj.request.status.toLowerCase() === 'live') {
       delete obj.request.contentList
       delete obj.request.contentType
       delete obj.request.assignmentType
     }
     delete obj.request.status
+    // if (this.isLiveContent) {
+    //   delete obj.request.isApar
+    // }
     this.showDialogBox('progress')
     this.tpSvc.updatePlan(obj).subscribe((_data: any) => {
       this.dialogRef.close()
@@ -204,7 +207,7 @@ export class BreadcrumbComponent implements OnInit {
               tabSelected: this.tpdsSvc.trainingPlanStepperData.assignmentType,
             },
           })
-        },         1000)
+        }, 1000)
       }
     })
   }
@@ -228,12 +231,12 @@ export class BreadcrumbComponent implements OnInit {
               tabSelected: this.tpdsSvc.trainingPlanStepperData.assignmentType,
             },
           })
-        },         1000)
+        }, 1000)
       } else {
         this.snackBar.open('Something went wrong while publishing CBP plan. Try again later')
         this.dialogRef.close()
       }
-    },                                    (_error: any) => {
+    }, (_error: any) => {
       this.snackBar.open('Something went wrong while publishing CBP plan. Try again later')
       this.dialogRef.close()
     })

@@ -11,7 +11,7 @@ import { ITableData, IColums, IAction } from '../../interfaces/interfaces'
 import { ActivatedRoute, Router } from '@angular/router'
 import { MatLegacyDialog as MatDialog, MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA } from '@angular/material/legacy-dialog'
 import { EventThumbnailComponent } from '../event-thumbnail/event-thumbnail.component'
-import { EventService } from '@sunbird-cb/utils'
+import { EventService } from '@sunbird-cb/utils-v2'
 import { NsContent } from '@sunbird-cb/collection'
 import { TelemetryEvents } from '../../../../head/_services/telemetry.event.model'
 

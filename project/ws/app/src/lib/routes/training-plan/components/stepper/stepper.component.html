@@ -17,7 +17,7 @@
             </ng-template>
             <ng-template matTabContent>
                 <ws-app-create-content (addContentInvalid)="checkForaddContent($event)"
-                    [ngClass]="{'disable': isContentLive}"></ws-app-create-content>
+                    [tabSelected]="tabType?.ADD_CONTENT" [isLiveContent]="isContentLive"></ws-app-create-content>
             </ng-template>
         </mat-tab>
         <mat-tab [label]="tabType.ADD_ACCESS_SETTINGS" [disabled]="addCotnentDisable || addAccessSettingDisable">

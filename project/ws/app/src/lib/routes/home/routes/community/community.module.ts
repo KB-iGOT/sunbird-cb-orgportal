@@ -22,7 +22,7 @@ import { MatLegacyPaginatorModule } from '@angular/material/legacy-paginator'
 import { MatLegacyCheckboxModule } from '@angular/material/legacy-checkbox'
 import { MatLegacyAutocompleteModule } from '@angular/material/legacy-autocomplete'
 import { MatLegacyTabsModule as MatTabsModule } from '@angular/material/legacy-tabs'
-import { WidgetResolverModule } from '@sunbird-cb/resolver'
+import { SbUiResolverModule } from '@sunbird-cb/resolver-v2'
 import { NgxMaterialTimepickerModule } from 'ngx-material-timepicker'
 import { CarouselModule } from 'ngx-owl-carousel-o'
 import { DragDropModule } from '@angular/cdk/drag-drop'
@@ -94,7 +94,7 @@ import { ProfileAvatarComponent } from './components/profile-avatar/profile-avat
     MatDatepickerModule,
     MatLegacyAutocompleteModule,
     MatTabsModule,
-    WidgetResolverModule,
+    SbUiResolverModule,
     NgxMaterialTimepickerModule,
     CarouselModule,
     DragDropModule,

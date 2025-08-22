@@ -1,10 +1,10 @@
 import { CUSTOM_ELEMENTS_SCHEMA, NgModule } from '@angular/core'
 import { CommonModule } from '@angular/common'
-import { PipeDurationTransformModule, PipeFilterModule, PipeHtmlTagRemovalModule, PipeOrderByModule, PipeRelativeTimeModule, ImageResponsiveModule } from '@sunbird-cb/utils'
+import { PipeDurationTransformModule, PipeFilterModule, PipeHtmlTagRemovalModule, PipeOrderByModule, PipeRelativeTimeModule, ImageResponsiveModule } from '@sunbird-cb/utils-v2'
 import { MatGridListModule } from '@angular/material/grid-list'
 import { MatExpansionModule } from '@angular/material/expansion'
 import { MatDividerModule } from '@angular/material/divider'
-import { WidgetResolverModule } from '@sunbird-cb/resolver'
+import { SbUiResolverModule } from '@sunbird-cb/resolver-v2'
 import { MatLegacyAutocompleteModule as MatAutocompleteModule } from '@angular/material/legacy-autocomplete'
 import { MatLegacyButtonModule as MatButtonModule } from '@angular/material/legacy-button'
 import { MatLegacyCheckboxModule as MatCheckboxModule } from '@angular/material/legacy-checkbox'
@@ -104,6 +104,7 @@ import { GroupsGradeComponent } from './components/groups-grade/groups-grade.com
 import { MAT_DATE_LOCALE } from '@angular/material/core'
 import { MyNotificationsComponent } from './routes/my-notifications/my-notifications.component'
 import { AllNotificationsModule } from '@sunbird-cb/notification'
+import { TranslateModule } from '@ngx-translate/core'
 
 @NgModule({
   declarations: [
@@ -161,7 +162,6 @@ import { AllNotificationsModule } from '@sunbird-cb/notification'
     CommonModule,
     // Ng2SearchPipeModule,
     UIORGTableModule,
-    WidgetResolverModule,
     ReactiveFormsModule,
     HomeRoutingModule,
     FormsModule,
@@ -192,7 +192,7 @@ import { AllNotificationsModule } from '@sunbird-cb/notification'
     AvatarPhotoModule,
     PipeOrderByModule,
     BreadcrumbsOrgModule,
-    WidgetResolverModule,
+    SbUiResolverModule,
     ScrollspyLeftMenuModule,
     MatRadioModule,
     ExportAsModule,
@@ -215,7 +215,8 @@ import { AllNotificationsModule } from '@sunbird-cb/notification'
     DesignationModule,
     TaxonomyEditorModule,
     ImageResponsiveModule,
-    AllNotificationsModule
+    AllNotificationsModule,
+    TranslateModule.forChild()
   ],
   providers: [
     { provide: 'environment', useValue: environment },

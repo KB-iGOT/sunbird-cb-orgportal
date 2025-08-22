@@ -25,6 +25,7 @@ export class StandardCardComponent implements OnInit, AfterViewChecked {
   pageSize = 20
   defaultPosterImage: SafeUrl | null = '/assets/instances/eagle/app_logos/default.png'
   defaultThumbnail: SafeUrl | null = 'assets/instances/eagle/app_logos/KarmayogiBharat_Logo.svg'
+  multilingualCourses = 'Multilingual Course'
   constructor(
     private tpdsSvc: TrainingPlanDataSharingService,
     private changeDetectorRef: ChangeDetectorRef
@@ -53,17 +54,19 @@ export class StandardCardComponent implements OnInit, AfterViewChecked {
   selectContentItem(event: any, item: any) {
     if (event.checked) {
       // this.selectedContent.push(item);
-      this.tpdsSvc.trainingPlanContentData.data.content.map((sitem: any, index: any) => {
+      this.tpdsSvc?.trainingPlanContentData?.data?.content.map((sitem: any, index: any) => {
         if (sitem.identifier === item.identifier) {
           sitem['selected'] = true
           this.tpdsSvc.trainingPlanContentData.data.content.splice(index, 1)
-          this.tpdsSvc.trainingPlanContentData.data.content.unshift(sitem)
+          setTimeout(() => {
+            this.tpdsSvc.trainingPlanContentData.data.content.unshift(sitem)
+            if (this.tpdsSvc.trainingPlanStepperData['contentList']) {
+              this.tpdsSvc.trainingPlanStepperData['contentList'].push(item.identifier)
+            }
+          }, 0)
         }
       })
 
-      if (this.tpdsSvc.trainingPlanStepperData['contentList']) {
-        this.tpdsSvc.trainingPlanStepperData['contentList'].push(item.identifier)
-      }
     } else {
       // this.selectedContent = this.selectedContent.filter( sitem  => sitem.identifier !== item.identifier)
       this.tpdsSvc.trainingPlanContentData.data.content.map((sitem: any) => {
@@ -77,7 +80,9 @@ export class StandardCardComponent implements OnInit, AfterViewChecked {
         }
       })
     }
-    this.handleSelectedChips.emit(true)
+    setTimeout(() => {
+      this.handleSelectedChips.emit(true)
+    }, 0)
   }
 
   deleteItem(item: any) {

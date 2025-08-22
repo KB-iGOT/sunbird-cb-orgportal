@@ -1,6 +1,6 @@
 import { Component } from '@angular/core'
 import { Router } from '@angular/router'
-import { ConfigurationsService, EventService } from '@sunbird-cb/utils'
+import { ConfigurationsService, EventService } from '@sunbird-cb/utils-v2'
 import { environment } from '../../../../../../../../../src/environments/environment'
 import { NotificationsService } from '../../../../../../../../../src/app/services/notifications.service'
 import { MatSnackBar } from '@angular/material/snack-bar'

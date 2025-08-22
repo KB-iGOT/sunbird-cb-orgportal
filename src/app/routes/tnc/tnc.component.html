@@ -1,5 +1,5 @@
 <div>
-  <!-- <ng-container *ngIf="errorFetchingTnc" [wsResolverWidget]="errorWidget"></ng-container> -->
+  <!-- <ng-container *ngIf="errorFetchingTnc" [sbUiResolverWidget]="errorWidget"></ng-container> -->
   <ws-tnc-renderer *ngIf="tncData" (tncChange)="getTnc($event)" (dpChange)="getDp($event)" [tncData]="tncData">
   </ws-tnc-renderer>
 </div>

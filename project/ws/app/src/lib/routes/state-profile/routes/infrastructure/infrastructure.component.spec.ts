@@ -1,6 +1,6 @@
 import { InfrastructureComponent } from './infrastructure.component'
 import { OrgProfileService } from '../../services/org-profile.service'
-import { ConfigurationsService } from '@sunbird-cb/utils'
+import { ConfigurationsService } from '@sunbird-cb/utils-v2'
 import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog'
 import { of } from 'rxjs'
 import { UntypedFormGroup } from '@angular/forms'
@@ -8,7 +8,7 @@ import { DialogBoxComponent } from '../../components/dialog-box/dialog-box.compo
 import _ from 'lodash'
 
 jest.mock('../../services/org-profile.service')
-jest.mock('@sunbird-cb/utils')
+jest.mock('@sunbird-cb/utils-v2')
 jest.mock('@angular/material/legacy-dialog')
 
 describe('InfrastructureComponent', () => {

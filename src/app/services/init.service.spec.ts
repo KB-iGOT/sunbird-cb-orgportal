@@ -10,8 +10,8 @@ import { HttpClient } from '@angular/common/http'
 import { MatIconRegistry } from '@angular/material/icon'
 import { DomSanitizer } from '@angular/platform-browser'
 import { BtnSettingsService } from '@sunbird-cb/collection'
-import { WidgetResolverService } from '@sunbird-cb/resolver'
-import { ConfigurationsService, LoggerService, UserPreferenceService } from '@sunbird-cb/utils'
+import { WidgetResolverService } from '@sunbird-cb/resolver-v2'
+import { ConfigurationsService, LoggerService, UserPreferenceService } from '@sunbird-cb/utils-v2'
 import { InitService } from './init.service'
 
 describe('InitService', () => {

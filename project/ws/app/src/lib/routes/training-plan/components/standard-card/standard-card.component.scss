@@ -574,13 +574,14 @@ $title-line-count: 2;
     width: 32px;
     margin: 18px;
     border: 1px solid rgba(0,0,0,0.16);
+    display: flex;
+      align-items: center;
+      justify-content: center;
 }
 
 .card-select-check {
-    padding:8px;
     height: 20px;
-    width: 20px;
-    vertical-align: middle;
+    width: 17px;
 }
 
 .card-cross-icon {
@@ -612,8 +613,11 @@ $title-line-count: 2;
   background: #1b4ca1 !important;
 }
 
-::ng-deep .card-select-box .mat-checkbox-layout {
+:host ::ng-deep .card-select-box .mat-checkbox-layout {
   width: 16px;
+  align-items: center;
+    justify-content: center;
+    vertical-align: unset;
 }
 
 .font-size-20 {

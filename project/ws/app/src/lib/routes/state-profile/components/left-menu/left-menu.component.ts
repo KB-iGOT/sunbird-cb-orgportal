@@ -4,7 +4,7 @@ import _ from 'lodash'
 import { Subscription } from 'rxjs'
 import { NSProfileDataV3 } from '../../models/state-profile.models'
 import { StepService } from '../../services/step.service'
-import { EventService, WsEvents } from '@sunbird-cb/utils'
+import { EventService, WsEvents } from '@sunbird-cb/utils-v2'
 
 @Component({
   selector: 'ws-app-l-menu',

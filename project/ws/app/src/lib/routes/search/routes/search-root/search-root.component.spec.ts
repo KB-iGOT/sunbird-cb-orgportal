@@ -1,6 +1,6 @@
 
 import { Router, ActivatedRoute } from '@angular/router'
-import { ConfigurationsService } from '@sunbird-cb/utils'
+import { ConfigurationsService } from '@sunbird-cb/utils-v2'
 import { SearchRootComponent } from './search-root.component'
 
 describe('SearchRootComponent', () => {

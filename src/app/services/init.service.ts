@@ -9,8 +9,8 @@ import {
   hasPermissions,
   hasUnitPermission,
   NsWidgetResolver,
-  WidgetResolverService,
-} from '@sunbird-cb/resolver'
+  SbUiResolverService,
+} from '@sunbird-cb/resolver-v2'
 import {
   // AuthKeycloakService,
   ConfigurationsService,
@@ -20,7 +20,7 @@ import {
   // NsUser,
   UserPreferenceService,
   // AuthKeycloakService,
-} from '@sunbird-cb/utils'
+} from '@sunbird-cb/utils-v2'
 import { map } from 'rxjs/operators'
 import { environment } from '../../environments/environment'
 /* tslint:disable*/
@@ -57,7 +57,7 @@ export class InitService {
     private logger: LoggerService,
     public configSvc: ConfigurationsService,
     // private authSvc: AuthKeycloakService,
-    private widgetResolverService: WidgetResolverService,
+    private widgetResolverService: SbUiResolverService,
     private settingsSvc: BtnSettingsService,
     private userPreference: UserPreferenceService,
     private http: HttpClient,
@@ -249,7 +249,7 @@ export class InitService {
     // TODO: set one org as default org :: use user preference
     this.configSvc.activeOrg = publicConfig.org[0]
     this.configSvc.appSetup = publicConfig.appSetup
-    this.configSvc.competency = publicConfig.competency
+    this.configSvc.compentency = publicConfig.compentency
 
     return publicConfig
   }
@@ -552,7 +552,7 @@ export class InitService {
             this.configSvc.restrictedFeatures,
           ),
         )
-        .map(u => WidgetResolverService.getWidgetKey(u)),
+        .map(u => SbUiResolverService.getWidgetKey(u)),
     )
     return this.configSvc.restrictedWidgets
   }

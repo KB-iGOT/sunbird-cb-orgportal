@@ -10,7 +10,7 @@ import { MatSidenavModule } from '@angular/material/sidenav'
 import { MatToolbarModule } from '@angular/material/toolbar'
 import { RouterModule } from '@angular/router'
 import { BreadcrumbsOrgModule } from '@sunbird-cb/collection'
-import { PipeSafeSanitizerModule } from '@sunbird-cb/utils'
+import { PipeSafeSanitizerModule } from '@sunbird-cb/utils-v2'
 
 @NgModule({
   declarations: [FaqHomeComponent],

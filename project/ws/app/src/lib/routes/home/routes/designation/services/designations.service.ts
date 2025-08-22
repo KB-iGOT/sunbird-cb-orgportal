@@ -6,7 +6,7 @@ import { v4 as uuidv4 } from 'uuid'
 // tslint:disable
 import * as _ from 'lodash'
 import { environment } from '../../../../../../../../../../src/environments/environment'
-import { ConfigurationsService } from '@sunbird-cb/utils'
+import { ConfigurationsService } from '@sunbird-cb/utils-v2'
 /* tslint:enable */
 
 const API_END_POINTS = {

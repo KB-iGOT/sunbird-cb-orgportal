@@ -1,6 +1,6 @@
 import { Component, ElementRef, ViewChild } from '@angular/core'
 import { Router } from '@angular/router'
-import { ConfigurationsService, NsPage } from '@sunbird-cb/utils'
+import { ConfigurationsService, NsPage } from '@sunbird-cb/utils-v2'
 // import { mapFilePath, dashboardEmptyData } from '../../../../../../../../../src/mdo-assets/data/data'
 import { HttpClient } from '@angular/common/http'
 import { map } from 'rxjs/internal/operators/map'

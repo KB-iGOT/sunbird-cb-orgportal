@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http'
 import { of } from 'rxjs'
-import { ConfigurationsService, EventService } from '@sunbird-cb/utils'
+import { ConfigurationsService, EventService } from '@sunbird-cb/utils-v2'
 import { SearchApiService } from './search-api.service'
 import { SearchServService } from './search-serv.service'
 

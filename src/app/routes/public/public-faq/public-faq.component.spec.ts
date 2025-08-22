@@ -1,6 +1,6 @@
 
 import { ActivatedRoute } from '@angular/router'
-import { ValueService, ConfigurationsService } from '@sunbird-cb/utils'
+import { ValueService, ConfigurationsService } from '@sunbird-cb/utils-v2'
 import { PublicFaqComponent } from './public-faq.component'
 import { of } from 'rxjs'
 

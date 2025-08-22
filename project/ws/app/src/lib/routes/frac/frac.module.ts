@@ -4,7 +4,7 @@ import { MatLegacyButtonModule as MatButtonModule } from '@angular/material/lega
 import { MatLegacyCardModule as MatCardModule } from '@angular/material/legacy-card'
 import { MatIconModule } from '@angular/material/icon'
 import { RouterModule } from '@angular/router'
-import { HorizontalScrollerModule } from '@sunbird-cb/utils'
+import { HorizontalScrollerModule } from '@sunbird-cb/utils-v2'
 import { FracComponent } from './components/frac/frac.component'
 import { FracRoutingModule } from './frac-routing.module'
 

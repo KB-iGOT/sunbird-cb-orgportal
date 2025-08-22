@@ -1,7 +1,7 @@
 import { Router } from '@angular/router'
 import { DomSanitizer } from '@angular/platform-browser'
 import { of } from 'rxjs'
-import { EventService } from '@sunbird-cb/utils'
+import { EventService } from '@sunbird-cb/utils-v2'
 import { ApprovalPendingComponent } from './approval-pending.component'
 import { ApprovalsService } from '../../../services/approvals.service'
 import { ReportsVideoComponent } from '../../reports-video/reports-video.component'

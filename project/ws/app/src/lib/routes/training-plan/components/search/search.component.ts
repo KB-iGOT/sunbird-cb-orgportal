@@ -37,7 +37,7 @@ export class SearchComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    this.compentencyKey = this.initService.configSvc.competency[environment.compentencyVersionKey]
+    this.compentencyKey = this.initService.configSvc.compentency[environment.compentencyVersionKey]
     this.tpdsSvc.handleContentPageChange.subscribe((pageData: any) => {
       if (pageData) {
         this.pageIndex = pageData.pageIndex
@@ -158,7 +158,7 @@ export class SearchComponent implements OnInit {
             'gradeLevel', 'identifier', 'medium', 'resourceType',
             'primaryCategory', 'contentType', 'channel', 'organisation', 'trackable', 'posterImage',
             'idealScreenSize', 'learningMode', 'creatorLogo', 'duration', 'programDuration',
-            'version', 'avgRating', `${this.compentencyKey.vKey}`, 'secureSettings'],
+            'version', 'avgRating', `${this.compentencyKey.vKey}`, 'secureSettings', 'courseCategory'],
         },
       }
       this.trainingPlanService.getAllContent(filterObj).subscribe((res: any) => {
