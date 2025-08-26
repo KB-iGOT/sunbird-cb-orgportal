@@ -62,15 +62,18 @@ export class LeftMenuComponent implements OnInit, OnDestroy {
     const input = event.target as HTMLInputElement
     if (input.files && input.files[0]) {
       const file = input.files[0]
-      if (file.type.startsWith('image/')) {
-        if (file.size > 5 * 1024 * 1024) { // Limit file size to 5MB
-          this.matSnackBar.open(`File size exceeds 5 MB. Please select a smaller file.`, 'X', { panelClass: ['error'] })
-          return
-        }
-        this.openCropperDialog(file)
-      } else {
-        this.matSnackBar.open('Invalid file type', 'X', { panelClass: ['error'] })
+      // Allow only jpg, jpeg, png
+      const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png']
+      if (!allowedTypes.includes(file.type)) {
+        this.matSnackBar.open('Only JPG, JPEG, and PNG formats are allowed.', 'X', { panelClass: ['error'] })
+        return
       }
+      // File size check (5 MB limit)
+      if (file.size > 5 * 1024 * 1024) {
+        this.matSnackBar.open(`File size exceeds 5 MB. Please select a smaller file.`, 'X', { panelClass: ['error'] })
+        return
+      }
+      this.openCropperDialog(file)
     }
   }
   openCropperDialog(file: File): void {
