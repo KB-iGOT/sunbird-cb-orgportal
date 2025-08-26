@@ -11,9 +11,12 @@ import { MatLegacyListModule as MatListModule } from '@angular/material/legacy-l
 import { MatLegacyProgressSpinnerModule as MatProgressSpinnerModule } from '@angular/material/legacy-progress-spinner'
 import { MatSidenavModule } from '@angular/material/sidenav'
 import { MatLegacyTooltipModule as MatTooltipModule } from '@angular/material/legacy-tooltip'
+import { UploadLogoDialogComponent } from './upload-logo-dialog/upload-logo-dialog/upload-logo-dialog.component'
+import { MatDialogModule } from '@angular/material/dialog'
+import { ImageCropperModule } from 'ngx-image-cropper'
 
 @NgModule({
-    declarations: [LeftMenuComponent],
+    declarations: [LeftMenuComponent, UploadLogoDialogComponent],
     imports: [
         CommonModule,
         RouterModule,
@@ -26,6 +29,8 @@ import { MatLegacyTooltipModule as MatTooltipModule } from '@angular/material/le
         MatCardModule,
         MatListModule,
         MatExpansionModule,
+        MatDialogModule,
+        ImageCropperModule,
     ],
     exports: [
         LeftMenuComponent,
