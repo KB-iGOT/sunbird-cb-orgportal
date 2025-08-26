@@ -1,0 +1,142 @@
+/* upload-logo-dialog.component.scss */
+
+/* Loader */
+.fixed-spinner-create {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  z-index: 2000;
+  transform: translate(-50%, -50%);
+  background: rgba(255, 255, 255, 0.6);
+  padding: 40px;
+  border-radius: 8px;
+}
+
+/* Dialog box */
+.dialog-main {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  width: 100%;
+  max-width: 600px;
+  background: #fcfcfc;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+/* Fixed header */
+.header-fixed {
+  font-weight: 600;
+  font-size: 1.25rem;
+  padding: 10px 20px;
+  margin: 0;
+  background: #fff;
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  text-align: center;
+}
+
+/* Body */
+.dialog-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+/* Cropper area */
+.cropper-section {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 270px;
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+image-cropper {
+  width: 300px !important;
+  height: 270px !important;
+  display: block;
+  border-radius: 14px;
+  box-shadow: 0 2px 10px rgba(50, 74, 120, 0.06);
+  object-fit: contain;
+}
+
+// .custom-cropper {
+//   display: block;
+//   width: 100%;
+//   height: 250px !important;
+//   max-height: 250px;
+// }
+/* force inner canvas */
+// .custom-cropper image-cropper canvas {
+//   max-height: 100% !important;
+//   height: 100% !important;
+//   width: auto !important;
+// }
+// .cropper-section img {
+//   height: 250px !important;
+// }
+
+
+/* Instructions block */
+.instructions-text {
+  font-size: 0.95rem;
+  // color: #345381;
+  // background: #f4f7fa;
+  padding: 2px 16px;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  // box-shadow: 0 1px 4px rgba(40, 72, 80, 0.05);
+}
+
+/* Button section fixed at bottom */
+.button-section {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  padding: 2px 0;
+  // border-top: 1px solid #e0e0e0;
+  // background: #fff;
+  position: sticky;
+  bottom: 0;
+  z-index: 5;
+}
+
+/* Cancel button */
+.app-btn {
+  color: #1b4ca1 !important;
+  border: 1px solid #1b4ca1 !important;
+  background: #fff !important;
+  height: 36px !important;
+  padding: 0 18px !important;
+  font: 700 14px 'Lato', Arial, sans-serif;
+  border-radius: 18px;
+  cursor: pointer;
+}
+
+.app-btn:hover {
+  background-color: #1b4ca1 !important;
+  color: #fff !important;
+}
+
+/* Upload button */
+.save-button {
+  background-color: #1b4ca1 !important;
+  color: #fff !important;
+  border: 1px solid #1b4ca1 !important;
+  height: 36px !important;
+  padding: 0 18px !important;
+  font: 700 14px 'Lato', Arial, sans-serif;
+  border-radius: 18px;
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(40,72,80,0.06);
+}
+
+.save-button:hover {
+  background-color: #153175 !important;
+  border-color: #153175 !important;
+}

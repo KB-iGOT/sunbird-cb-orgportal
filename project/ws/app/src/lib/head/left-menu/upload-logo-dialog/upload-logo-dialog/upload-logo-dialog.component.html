@@ -1,0 +1,38 @@
+<!-- upload-logo-dialog.component.html -->
+<ng-container>
+  <!-- Loader -->
+  <div class="flex items-center mx-auto fixed-spinner-create" *ngIf="isLoading">
+    <mat-spinner [diameter]="40" [strokeWidth]="4"></mat-spinner>
+  </div>
+</ng-container>
+
+<div class="dialog-main">
+  <!-- Fixed header -->
+  <h2 mat-dialog-title class="font-text header-fixed">Update organisation logo</h2>
+
+  <div class="dialog-body">
+    <!-- Cropper Section -->
+    <div class="cropper-section">
+      <image-cropper [imageChangedEvent]="imageChangedEvent" [aspectRatio]="1" [resizeToWidth]="300"
+        [maintainAspectRatio]="true" [roundCropper]="false" format="jpeg" (imageCropped)="onImageCropped($event)"
+        (imageLoaded)="imageLoaded()" (cropperReady)="cropperReady()" (loadImageFailed)="loadImageFailed($event)"
+        class="custom-cropper">
+      </image-cropper>
+    </div>
+
+    <!-- Instructions fixed after cropper -->
+    <div class="instructions-text">
+      <p><strong>Instructions:</strong></p>
+      <div>
+        Maximum file size - 5MB.<br>
+        Supported file formats: <strong>PNG, JPG, JPEG</strong>
+      </div>
+    </div>
+
+    <!-- Fixed button section -->
+    <div class="button-section">
+      <button mat-flat-button class="app-btn" (click)="onCancel()">Cancel</button>
+      <button mat-flat-button class="save-button" (click)="onUpload()" [disabled]="isLoading">Upload</button>
+    </div>
+  </div>
+</div>
