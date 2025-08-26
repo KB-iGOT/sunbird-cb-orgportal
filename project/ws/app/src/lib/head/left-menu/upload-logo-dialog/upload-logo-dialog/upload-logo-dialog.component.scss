@@ -35,6 +35,8 @@
   top: 0;
   z-index: 5;
   text-align: center;
+  font-family: Lato;
+  letter-spacing: normal;
 }
 
 /* Body */
@@ -51,35 +53,24 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 270px;
+  max-height: 270px;
   width: 100%;
   margin-bottom: 16px;
+  overflow-x: auto;
+  // overflow-y: hidden;
 }
 
 image-cropper {
-  width: 300px !important;
-  height: 270px !important;
+  // width: 300px !important;
+  // height: 270px !important;
   display: block;
   border-radius: 14px;
   box-shadow: 0 2px 10px rgba(50, 74, 120, 0.06);
   object-fit: contain;
+  width: auto !important;
 }
 
-// .custom-cropper {
-//   display: block;
-//   width: 100%;
-//   height: 250px !important;
-//   max-height: 250px;
-// }
-/* force inner canvas */
-// .custom-cropper image-cropper canvas {
-//   max-height: 100% !important;
-//   height: 100% !important;
-//   width: auto !important;
-// }
-// .cropper-section img {
-//   height: 250px !important;
-// }
+
 
 
 /* Instructions block */
@@ -90,6 +81,8 @@ image-cropper {
   padding: 2px 16px;
   border-radius: 8px;
   margin-bottom: 10px;
+  font-family: Lato;
+    letter-spacing: normal;
   // box-shadow: 0 1px 4px rgba(40, 72, 80, 0.05);
 }
 
@@ -119,8 +112,8 @@ image-cropper {
 }
 
 .app-btn:hover {
-  background-color: #1b4ca1 !important;
-  color: #fff !important;
+  background-color: #f0f0f0 !important;
+  color: #1b4ca1 !important;
 }
 
 /* Upload button */

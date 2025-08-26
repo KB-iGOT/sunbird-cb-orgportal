@@ -31,7 +31,8 @@
 
     <!-- Fixed button section -->
     <div class="button-section">
-      <button mat-flat-button class="app-btn" (click)="onCancel()">Cancel</button>
+      <button mat-stroked-button class="flex justify-center items-center mat-btn-outline cancel-button app-btn"
+        (click)="onCancel()">Cancel</button>
       <button mat-flat-button class="save-button" (click)="onUpload()" [disabled]="isLoading">Upload</button>
     </div>
   </div>

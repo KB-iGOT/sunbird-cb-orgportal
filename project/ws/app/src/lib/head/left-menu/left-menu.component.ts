@@ -78,8 +78,8 @@ export class LeftMenuComponent implements OnInit, OnDestroy {
   }
   openCropperDialog(file: File): void {
     const dialogRef = this.dialog.open(UploadLogoDialogComponent, {
-      width: '670px', // Adjust as needed for better display
-      height: '530px',
+      width: 'auto', // Adjust as needed for better display
+      height: 'auto',
       data: {
         file: file,
         orgName: this.orgName,
