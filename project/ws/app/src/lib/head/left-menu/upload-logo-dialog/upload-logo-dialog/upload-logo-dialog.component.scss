@@ -55,15 +55,14 @@
   max-height: 270px;        /* limit visible height */
   width: 100%;
   margin-bottom: 16px;
-
-  overflow-y: auto;         /* allow vertical scrolling */
-  overflow-x: hidden;       /* no horizontal scroll */
+  overflow-y: auto;
+  overflow-x: hidden;
   position: relative;
 }
 
 ::ng-deep .ngx-ic-cropper .ngx-ic-resize-bar,
 ::ng-deep .ngx-ic-cropper .ngx-ic-move {
-  border: none !important;   /* ensure it stays blue-theme, not default */
+  border: none !important;
 }
 ::ng-deep .fixed-spinner-create {
  background: none !important;

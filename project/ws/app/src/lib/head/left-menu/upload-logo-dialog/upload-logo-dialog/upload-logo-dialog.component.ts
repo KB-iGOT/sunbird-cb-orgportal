@@ -18,7 +18,7 @@ export class UploadLogoDialogComponent {
   uploadedLogo = ''
   rootOrgId = ''
   orgName = ''
-  isLoading = false   // ✅ loader flag
+  isLoading = false
 
   constructor(
     private dialogRef: MatDialogRef<UploadLogoDialogComponent>,
@@ -26,18 +26,17 @@ export class UploadLogoDialogComponent {
     private matSnackBar: MatSnackBar,
     @Inject(MAT_DIALOG_DATA) public data: { file: File, orgName?: string, rootOrgId?: string }
   ) {
-    this.loadFile(data.file)
-    if (data.file.name) this.fileName = data.file.name
-    if (data.orgName) this.orgName = data.orgName
-    if (data.rootOrgId) this.rootOrgId = data.rootOrgId
+    this.loadFile(data?.file)
+    if (data?.file?.name) this.fileName = data.file.name
+    if (data?.orgName) this.orgName = data.orgName
+    if (data?.rootOrgId) this.rootOrgId = data.rootOrgId
   }
 
   loadFile(file: File): void {
-    if (!file.type.startsWith('image/')) {
+    if (!file?.type?.startsWith('image/')) {
       this.matSnackBar.open('Invalid file type', 'X', { panelClass: ['error'] })
       return
     }
-
     const reader = new FileReader()
     reader.onload = () => {
       this.imageChangedEvent = { target: { files: [file] } }
@@ -49,7 +48,7 @@ export class UploadLogoDialogComponent {
   }
 
   onImageCropped(event: any): void {
-    this.croppedImage = event.base64
+    this.croppedImage = event?.base64
   }
 
   imageLoaded(): void { }
@@ -61,7 +60,7 @@ export class UploadLogoDialogComponent {
   }
 
   b64toBlob(dataURI: string): Blob {
-    const byteString = atob(dataURI.split(',')[1])
+    const byteString = atob(dataURI?.split(',')[1] || '')
     const ab = new ArrayBuffer(byteString.length)
     const ia = new Uint8Array(ab)
     for (let i = 0; i < byteString.length; i++) {
@@ -75,18 +74,14 @@ export class UploadLogoDialogComponent {
       this.matSnackBar.open('Please crop the image first.', 'X', { panelClass: ['error'] })
       return
     }
-
-    this.isLoading = true  // ✅ loader ON
-
+    this.isLoading = true
     const maxFileSize = this.maxFileSize * 1024 * 1024
     this.imageFileBase64 = this.croppedImage
     const file = new File([this.b64toBlob(this.imageFileBase64)], this.fileName, { type: 'image/png' })
     this.cropimageFile = file
-
-    if (this.cropimageFile.size < maxFileSize) {
+    if (this.cropimageFile?.size < maxFileSize) {
       const formData = new FormData()
       formData.append('file', this.cropimageFile)
-
       this.widgetService.uploadOrgLogo(formData).subscribe({
         next: (response) => {
           if (response?.result?.qrcodepath) {
@@ -98,8 +93,8 @@ export class UploadLogoDialogComponent {
             }
             this.widgetService.updateUrlLogo(req).subscribe({
               next: (res) => {
-                this.isLoading = false  // ✅ loader OFF
-                if (res.result.response === 'SUCCESS') {
+                this.isLoading = false
+                if (res?.result?.response?.toLowerCase() === 'success') {
                   this.matSnackBar.open('Logo Updated Successfully')
                   this.dialogRef.close(this.uploadedLogo)
                 }
