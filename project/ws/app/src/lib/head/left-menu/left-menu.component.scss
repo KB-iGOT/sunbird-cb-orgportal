@@ -155,11 +155,11 @@
   background: transparent !important;
 }
 .custom-font {
-  font-size: 20px;
+  font-size: 16px;
   color: #1b4ca1;
 }
 .pencil-icon:focus,
 .pencil-icon:active {
   background-color: transparent !important; /* or a subtle highlight */
-  outline: none !important; /* caution: this may hurt accessibility! */
+  outline: none !important;
 }
