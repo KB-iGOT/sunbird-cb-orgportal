@@ -14,6 +14,7 @@ import { MatLegacyTooltipModule as MatTooltipModule } from '@angular/material/le
 import { UploadLogoDialogComponent } from './upload-logo-dialog/upload-logo-dialog/upload-logo-dialog.component'
 import { MatDialogModule } from '@angular/material/dialog'
 import { ImageCropperModule } from 'ngx-image-cropper'
+import { MatLegacySliderModule as MatSliderModule } from '@angular/material/legacy-slider'
 
 @NgModule({
     declarations: [LeftMenuComponent, UploadLogoDialogComponent],
@@ -31,6 +32,7 @@ import { ImageCropperModule } from 'ngx-image-cropper'
         MatExpansionModule,
         MatDialogModule,
         ImageCropperModule,
+        MatSliderModule,
     ],
     exports: [
         LeftMenuComponent,

@@ -8,8 +8,8 @@
           <!-- <mat-icon class="custom-font">cloud_upload</mat-icon> -->
           <mat-icon class="custom-font">edit</mat-icon>
         </button>
-        <input #fileInput type="file" accept=".png, .jpeg, .jpg" (change)="fileChangeEvent($event)"
-          style="display: none;" />
+        <input #fileInput type="file" class="file-display" accept=".png, .jpeg, .jpg"
+          (change)="fileChangeEvent($event)" />
       </div>
       <span class="mat-subheading-2 margin-top-m dept-name">
         {{ channelName | titlecase}}

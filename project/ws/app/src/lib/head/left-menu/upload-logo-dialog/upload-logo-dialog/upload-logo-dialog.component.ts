@@ -2,6 +2,7 @@ import { Component, Inject } from '@angular/core'
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog'
 import { MatSnackBar } from '@angular/material/snack-bar'
 import { WidgetContentService } from '../../../_services/widget-content.service'
+import { ImageTransform } from 'ngx-image-cropper'
 
 @Component({
   selector: 'ws-widget-upload-logo-dialog',
@@ -19,6 +20,9 @@ export class UploadLogoDialogComponent {
   rootOrgId = ''
   orgName = ''
   isLoading = false
+
+  transform: ImageTransform = {}
+  zoomValue: number = 1  // Default zoom
 
   constructor(
     private dialogRef: MatDialogRef<UploadLogoDialogComponent>,
@@ -61,12 +65,16 @@ export class UploadLogoDialogComponent {
 
   b64toBlob(dataURI: string): Blob {
     const byteString = atob(dataURI?.split(',')[1] || '')
-    const ab = new ArrayBuffer(byteString.length)
-    const ia = new Uint8Array(ab)
-    for (let i = 0; i < byteString.length; i++) {
-      ia[i] = byteString.charCodeAt(i)
+    if (byteString) {
+      const ab = new ArrayBuffer(byteString.length)
+      const ia = new Uint8Array(ab)
+      for (let i = 0; i < byteString?.length; i++) {
+        ia[i] = byteString.charCodeAt(i)
+      }
+      return new Blob([ab], { type: 'image/jpeg' })
+    } else {
+      return new Blob([], { type: 'image/jpeg' })
     }
-    return new Blob([ab], { type: 'image/jpeg' })
   }
 
   onUpload(): void {
@@ -118,6 +126,31 @@ export class UploadLogoDialogComponent {
     } else {
       this.isLoading = false
       this.matSnackBar.open(`File size exceeds ${this.maxFileSize} MB. Please select a smaller file.`, 'X', { panelClass: ['error'] })
+    }
+  }
+  zoomChange(value: number) {
+    this.zoomValue = Math.min(Math.max(value, 0.3), 3)
+    this.updateZoom()
+  }
+
+  zoomIn() {
+    if (this.zoomValue < 3) {
+      this.zoomValue = parseFloat((this.zoomValue + 0.05).toFixed(2))
+      this.updateZoom()
+    }
+  }
+
+  zoomOut() {
+    if (this.zoomValue > 0.3) {
+      this.zoomValue = parseFloat((this.zoomValue - 0.05).toFixed(2))
+      this.updateZoom()
+    }
+  }
+
+  updateZoom() {
+    this.transform = {
+      ...this.transform,
+      scale: this.zoomValue
     }
   }
 }

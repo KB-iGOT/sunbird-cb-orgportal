@@ -13,10 +13,22 @@
     <!-- Cropper Section -->
     <div class="cropper-section">
       <image-cropper [imageChangedEvent]="imageChangedEvent" [aspectRatio]="1" [resizeToWidth]="300"
-        [maintainAspectRatio]="true" [roundCropper]="false" format="jpeg" (imageCropped)="onImageCropped($event)"
-        (imageLoaded)="imageLoaded()" (cropperReady)="cropperReady()" (loadImageFailed)="loadImageFailed($event)"
-        class="custom-cropper">
+        [maintainAspectRatio]="true" [roundCropper]="false" [transform]="transform" format="jpeg"
+        (imageCropped)="onImageCropped($event)" (imageLoaded)="imageLoaded()" (cropperReady)="cropperReady()"
+        (loadImageFailed)="loadImageFailed($event)" class="custom-cropper">
       </image-cropper>
+    </div>
+    <!-- Zoom Controls: Minus Button + Slider + Plus Button -->
+    <div class="zoom-controls items-center mx-auto">
+      <mat-slider min="0.3" max="3" step="0.05" thumbLabel [value]="zoomValue" (input)="zoomChange($event.value)">
+      </mat-slider>
+      <button mat-mini-fab color="primary" (click)="zoomOut()" [disabled]="zoomValue <= 0.3" aria-label="Zoom out">
+        <mat-icon>remove</mat-icon>
+      </button>
+
+      <button mat-mini-fab color="primary" (click)="zoomIn()" [disabled]="zoomValue >= 3" aria-label="Zoom in">
+        <mat-icon>add</mat-icon>
+      </button>
     </div>
 
     <!-- Instructions fixed after cropper -->
