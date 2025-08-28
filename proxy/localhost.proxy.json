@@ -1,6 +1,6 @@
 {
   "/apis/*": {
-    "target": "https://mdo.dev.karmayogibharat.net/",
+    "target": "https://igot-dev.in",
     "secure": false,
     "logLevel": "debug",
     "changeOrigin": true,
@@ -8,11 +8,11 @@
       "/apis": "/apis"
     },
     "headers": {
-      "Cookie": "connect.sid=s%3Av1mOnSDwCaneU49LXb56K7kESjB9nFC5.wFtrz6kBY%2FdBQcZgOyjY2Zi10w2rqOrQEZzuGlwYekU"
+      "Cookie": "connect.sid=s%3Aejx2T5VMPKvL9b3QdLxpeq-YwdbkUbb7.d3K6oDSmLMIbs3ncKTkvPdnfs2lP8zmQE%2Bzo%2FwLa5is"
     }
   },
   "/api/*": {
-    "target": "https://mdo.dev.karmayogibharat.net/",
+    "target": "https://igot-dev.in",
     "secure": false,
     "logLevel": "debug",
     "changeOrigin": true,
@@ -21,7 +21,7 @@
     }
   },
   "/event/*": {
-    "target": "https://mdo.dev.karmayogibharat.net/",
+    "target": "https://igot-dev.in",
     "secure": false,
     "logLevel": "debug",
     "changeOrigin": true,
