@@ -32,6 +32,7 @@ import { MentorManageComponent } from './routes/mentor-manage/mentor-manage.comp
 import { BulkUploadOdcsComponent } from './routes/odcs-mapping/bulk-upload-odcs/bulk-upload-odcs.component'
 import { GroupsGradeComponent } from './components/groups-grade/groups-grade.component'
 import { MyNotificationsComponent } from './routes/my-notifications/my-notifications.component'
+import { DirectoryComponent } from './routes/directory/directory.component'
 const routes: Routes = [
   {
     path: '',
@@ -443,6 +444,14 @@ const routes: Routes = [
         },
         resolve: {
           configService: ConfigResolveService,
+        },
+      },
+      {
+        path: 'directory',
+        component: DirectoryComponent,
+        data: {
+          pageId: 'Directory',
+          // module: 'Notifications',
         },
       },
     ],

@@ -105,6 +105,7 @@ import { MAT_DATE_LOCALE } from '@angular/material/core'
 import { MyNotificationsComponent } from './routes/my-notifications/my-notifications.component'
 import { AllNotificationsModule } from '@sunbird-cb/notification'
 import { TranslateModule } from '@ngx-translate/core'
+import { DirectoryComponent } from './routes/directory/directory.component'
 
 @NgModule({
   declarations: [
@@ -156,7 +157,8 @@ import { TranslateModule } from '@ngx-translate/core'
     CapitalizePipe,
     BulkUploadOdcsComponent,
     GroupsGradeComponent,
-    MyNotificationsComponent
+    MyNotificationsComponent,
+    DirectoryComponent,
   ],
   imports: [
     CommonModule,

@@ -1,0 +1,45 @@
+<div class="flex flex-4 flex-column">
+  <mat-card class="flex-custom">
+    <mat-card-header class="flex-custom-m mb-3" id="directorycs">
+      <div class="flex-1" role="link" tabindex="0">
+        <div class="flex flex-1">
+          <mat-card-title class="flex-4 mobile-margin text-capitalize margin-remove-bottom">
+            <span class="mat-title">Directory</span>
+          </mat-card-title>
+        </div>
+      </div>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="flex flex-1 flex-column margin-fix">
+        <mat-tab-group (selectedTabChange)="onTabChange($event)">
+          <mat-tab>
+            <ng-template mat-tab-label>
+              <span>Organisation</span>
+            </ng-template>
+            <ng-template matTabContent>
+              <ng-container *ngTemplateOutlet="organisationTabContent"></ng-container>
+            </ng-template>
+          </mat-tab>
+
+          <mat-tab>
+            <ng-template mat-tab-label>
+              <span>Organisation Hierarchies</span>
+            </ng-template>
+            <ng-template matTabContent>
+              <ng-container *ngTemplateOutlet="organisationHierarchiesTabContent"></ng-container>
+            </ng-template>
+          </mat-tab>
+        </mat-tab-group>
+
+        <ng-template #organisationTabContent>
+          <p>Organisation content goes here...</p>
+        </ng-template>
+
+        <ng-template #organisationHierarchiesTabContent>
+          <p>Organisation Hierarchies content goes here...</p>
+        </ng-template>
+
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>
