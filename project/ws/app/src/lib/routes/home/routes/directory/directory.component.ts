@@ -1,16 +1,26 @@
-import { Component } from '@angular/core'
+//#region (imports)
+import { Component, OnInit } from '@angular/core'
+//#endregion (imports)
 
 @Component({
   selector: 'ws-app-directory',
   templateUrl: './directory.component.html',
   styleUrls: ['./directory.component.scss']
 })
-export class DirectoryComponent {
 
-  departmentHearders: string[] = ['CBC', 'CBP Providers', 'Organisation'];
+export class DirectoryComponent implements OnInit {
+
+  //#region (global variables)
+  selectedTabIndex: number = 0;
+  //#endregion (global variables)
+
+  constructor() { }
+
+  ngOnInit(): void {
+  }
 
   onTabChange(event: any) {
-    console.log(event)
+    this.selectedTabIndex = event.index
   }
 
 }
