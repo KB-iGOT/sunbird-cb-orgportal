@@ -38,8 +38,9 @@ export class CreateAssigneeComponent implements OnInit {
   }
 
   handleApiData(event: any) {
+    debugger
     if (event && this.tpdsSvc.trainingPlanAssigneeData) {
-      if (this.tpdsSvc.trainingPlanStepperData &&
+      if (this.tpdsSvc.trainingPlanStepperData && this.tpdsSvc.trainingPlanAssigneeData.data &&
         this.tpdsSvc.trainingPlanAssigneeData.category === 'Designation' &&
         this.tpdsSvc.trainingPlanStepperData.assignmentTypeInfo) {
         this.tpdsSvc.trainingPlanAssigneeData.data.map((sitem: any) => {
@@ -55,7 +56,7 @@ export class CreateAssigneeComponent implements OnInit {
         })
         this.assigneeData = this.tpdsSvc.trainingPlanAssigneeData
         this.handleSelectedChips(true)
-      } else if (this.tpdsSvc.trainingPlanStepperData &&
+      } else if (this.tpdsSvc.trainingPlanStepperData && this.tpdsSvc.trainingPlanAssigneeData.data &&
         this.tpdsSvc.trainingPlanAssigneeData.category === 'CustomUser' &&
         this.tpdsSvc.trainingPlanStepperData.assignmentTypeInfo) {
         this.tpdsSvc.trainingPlanAssigneeData.data.map((sitem: any) => {

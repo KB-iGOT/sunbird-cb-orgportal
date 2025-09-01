@@ -18,8 +18,10 @@ const API_END_POINTS = {
   GET_PROVIDERS: 'apis/proxies/v8/searchBy/provider',
   GET_FILTER_ENTITY: 'apis/proxies/v8/competency/v4/search',
   CREATE_NEWCONTENT: 'apis/proxies/v8/cbplan/v1/admin/requestcontent',
+  SEARCH_V4: 'apis/proxies/v8/sunbirdigot/v4/search'
 
 }
+
 @Injectable({
   providedIn: 'root',
 })
@@ -64,6 +66,10 @@ export class TrainingPlanService {
 
   getDesignations() {
     return this.http.get<any>(API_END_POINTS.GET_ALL_DESIGNATIONS)
+  }
+
+  getDesignationsV2(requestData: any) {
+    return this.http.post<any>(API_END_POINTS.SEARCH_V4, requestData)
   }
 
   getFilterEntity(filter: object): Observable<any> {

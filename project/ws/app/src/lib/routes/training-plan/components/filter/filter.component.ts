@@ -339,11 +339,37 @@ export class FilterComponent implements OnInit, AfterContentChecked {
   }
 
   getDesignation() {
-    this.trainingPlanService.getDesignations().subscribe((res: any) => {
-      if (res && res.result && res.result.response) {
-        this.designationList = res.result.response.content
+    let frameworkId = ""
+    if (this.initService.configSvc.orgReadData && this.initService.configSvc.orgReadData.frameworkid) {
+      frameworkId = this.initService.configSvc.orgReadData.frameworkid
+    }
+    let requestData = {
+      "request": {
+        "filters": {
+          "status": "Live",
+          "category": "designation",
+          "categories": [
+            `${frameworkId}_designation`
+          ],
+          "objectType": "Term"
+        },
+        "fields": [
+          "name"
+        ],
+        "offset": 0,
+        "limit": 6000,
+        "sort_by": {
+          "lastUpdatedOn": "desc",
+          "objectType": "Term"
+        },
+        "facets": []
       }
-
+    }
+    this.trainingPlanService.getDesignationsV2(requestData).subscribe((res: any) => {
+      this.designationList = []
+      if (res && res.result && res.result.Term && res.result.Term.length) {
+        this.designationList = res.result.Term
+      }
     })
   }
 

@@ -253,9 +253,39 @@ export class SearchComponent implements OnInit {
 
   getDesignations(event: any) {
     this.loadingService.changeLoaderState(true)
-    this.trainingPlanService.getDesignations().subscribe((res: any) => {
+    let frameworkId = ""
+    if (this.initService.configSvc.orgReadData && this.initService.configSvc.orgReadData.frameworkid) {
+      frameworkId = this.initService.configSvc.orgReadData.frameworkid
+    }
+    let request = {
+      "request": {
+        "filters": {
+          "status": "Live",
+          "category": "designation",
+          "categories": [
+            `${frameworkId}_designation`
+          ],
+          "objectType": "Term"
+        },
+        "fields": [
+          "name"
+        ],
+        "offset": 0,
+        "limit": 6000,
+        "sort_by": {
+          "name": "asc",
+          "objectType": "Term"
+        },
+        "query": this.searchText ? this.searchText : '',
+        "facets": []
+      }
+    }
+    this.trainingPlanService.getDesignationsV2(request).subscribe((res: any) => {
+      if (res.result.count === 0) {
+        res.result['Term'] = []
+      }
       if (this.searchText) {
-        const resArr = res.result.response.content.filter((ditem: any) => {
+        const resArr = res.result.Term.filter((ditem: any) => {
           if (ditem.name.toLowerCase().includes(this.searchText.toLowerCase())) {
             return ditem
           }
@@ -272,8 +302,8 @@ export class SearchComponent implements OnInit {
         }
 
       } else {
-        this.tpdsSvc.trainingPlanAssigneeData = { category: event, data: res.result.response.content }
-        this.designationList = res.result.response.content
+        this.tpdsSvc.trainingPlanAssigneeData = { category: event, data: res.result.Term }
+        this.designationList = res.result.Term
       }
 
       this.handleApiData.emit(true)
