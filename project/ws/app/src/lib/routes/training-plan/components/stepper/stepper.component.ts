@@ -2,6 +2,7 @@ import { AfterViewInit, Component, EventEmitter, Input, OnChanges, OnInit, Outpu
 import { TrainingPlanContent } from '../../models/training-plan.model'
 import { ActivatedRoute } from '@angular/router'
 import { TrainingPlanDataSharingService } from '../../services/training-plan-data-share.service'
+import { NsAccessControlConfig } from '@sunbird-cb/access-settings'
 @Component({
   selector: 'ws-app-stepper',
   templateUrl: './stepper.component.html',
@@ -14,19 +15,31 @@ export class StepperComponent implements OnInit, OnChanges, AfterViewInit {
   @Output() titleInvalid = new EventEmitter<any>()
   @Output() addContentIsInvalid = new EventEmitter<any>()
   @Output() addAssigneeIsInvalid = new EventEmitter<any>()
+  @Output() addAccessSettingsIsInvalid = new EventEmitter<any>()
 
   tabType = TrainingPlanContent.TTabLabelKey
   tabIndexValue = 0
   addCotnentDisable!: boolean
   addAssigneeDisable!: boolean
   addTimelineDisable!: boolean
+  addAccessSettingDisable!: boolean
   editState = false
   isContentLive = false
+  accessSettingsParameters!: NsAccessControlConfig.IAccessControlConfig
+
+  tempSavedAccessControl: any
   constructor(private route: ActivatedRoute,
-              private tpdsSvc: TrainingPlanDataSharingService
+    private tpdsSvc: TrainingPlanDataSharingService
   ) { }
 
   ngOnInit() {
+    const configSvc = this.route.snapshot.data?.configService
+    this.accessSettingsParameters = this.route.snapshot.data?.pageData?.data
+
+    this.accessSettingsParameters.userConfig = {
+      ...configSvc?.userProfile, userRoles: configSvc?.userRoles, org: configSvc?.orgReadData
+    }
+
     this.editState = this.route.snapshot.data['contentData'] ? true : false
     if (this.tpdsSvc.trainingPlanStepperData.status && this.tpdsSvc.trainingPlanStepperData.status.toLowerCase() === 'live') {
       this.isContentLive = true
@@ -37,6 +50,9 @@ export class StepperComponent implements OnInit, OnChanges, AfterViewInit {
     this.addCotnentDisable = true
     this.addAssigneeDisable = true
     this.addTimelineDisable = true
+    this.addAccessSettingDisable = true
+    this.checkForaddAccessSettings(true)
+
   }
 
   ngOnChanges() {
@@ -48,7 +64,8 @@ export class StepperComponent implements OnInit, OnChanges, AfterViewInit {
         case TrainingPlanContent.TTabLabelKey.ADD_CONTENT:
           this.tabIndexValue = 1
           break
-        case TrainingPlanContent.TTabLabelKey.ADD_ASSIGNEE:
+        // case TrainingPlanContent.TTabLabelKey.ADD_ASSIGNEE:
+        case TrainingPlanContent.TTabLabelKey.ADD_ACCESS_SETTINGS:
           this.tabIndexValue = 2
           break
         case TrainingPlanContent.TTabLabelKey.ADD_TIMELINE:
@@ -68,28 +85,48 @@ export class StepperComponent implements OnInit, OnChanges, AfterViewInit {
     setTimeout(() => {
       this.addCotnentDisable = _event
       this.titleInvalid.emit(_event)
-    },         0)
+    }, 0)
   }
 
   checkForaddContent(_event: any) {
     setTimeout(() => {
-      this.addAssigneeDisable = _event
+      this.addAccessSettingDisable = _event
       this.addContentIsInvalid.emit(_event)
-    },         0)
+    }, 0)
   }
 
-  checkForaddAssignee(_event: any) {
+  // checkForaddAssignee(_event: any) {
+  //   setTimeout(() => {
+  //     this.addTimelineDisable = _event
+  //     this.addAssigneeIsInvalid.emit(_event)
+  //   },         0)
+  // }
+
+  checkForaddAccessSettings(_event: any) {
     setTimeout(() => {
       this.addTimelineDisable = _event
-      this.addAssigneeIsInvalid.emit(_event)
-    },         0)
+      this.addAccessSettingsIsInvalid.emit(_event)
+    }, 0)
   }
 
   tabChangeToTimeline(_event: any) {
     setTimeout(() => {
       this.addTimelineDisable = _event
-      this.addAssigneeIsInvalid.emit(_event)
-    },         0)
+      this.addAccessSettingsIsInvalid.emit(_event)
+    }, 0)
     this.tabIndexValue = 3
+  }
+
+  getAccessControlData(_event: any) {
+    this.tempSavedAccessControl = _event?.userGroup?.accessControl
+    this.tpdsSvc.trainingPlanStepperData.accessControl = this.tempSavedAccessControl
+    if (this.tempSavedAccessControl?.userGroups?.length) {
+      this.checkForaddAccessSettings(false)
+      this.addAccessSettingDisable = false
+    } else {
+      this.checkForaddAccessSettings(true)
+      this.addAccessSettingDisable = true
+    }
+
   }
 }
