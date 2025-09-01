@@ -26,8 +26,7 @@
             </ng-template>
             <ng-template matTabContent>
                 <sb-uic-access-control [config]="accessSettingsParameters" [contentId]=""
-                  [content]="undefined" (accessControlData)="getAccessControlData($event)"
-                  (refreshContentMeta)="refreshContentMetaEvent($event)">
+                  [content]="undefined" (accessControlData)="getAccessControlData($event)" [tempAccessControl]="tempSavedAccessControl">
                 </sb-uic-access-control>
             </ng-template>
         </mat-tab>
@@ -41,7 +40,7 @@
             </ng-template>
         </mat-tab> -->
         <mat-tab [label]="tabType.ADD_TIMELINE"
-            [disabled]="addCotnentDisable || addAssigneeDisable || addTimelineDisable">
+            [disabled]="addCotnentDisable || addAccessSettingDisable || addTimelineDisable">
             <ng-template mat-tab-label>
                 <span>4.&nbsp;<span *ngIf="!editState">Add</span><span *ngIf="editState">Edit</span> Timeline</span>
             </ng-template>

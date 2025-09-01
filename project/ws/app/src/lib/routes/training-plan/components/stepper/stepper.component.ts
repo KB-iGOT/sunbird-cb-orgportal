@@ -26,6 +26,8 @@ export class StepperComponent implements OnInit, OnChanges, AfterViewInit {
   editState = false
   isContentLive = false
   accessSettingsParameters!: NsAccessControlConfig.IAccessControlConfig
+
+  tempSavedAccessControl: any
   constructor(private route: ActivatedRoute,
     private tpdsSvc: TrainingPlanDataSharingService
   ) { }
@@ -33,7 +35,10 @@ export class StepperComponent implements OnInit, OnChanges, AfterViewInit {
   ngOnInit() {
     const configSvc = this.route.snapshot.data?.configService
     this.accessSettingsParameters = this.route.snapshot.data?.pageData?.data
-    this.accessSettingsParameters.userConfig = { ...configSvc?.userProfile, userRoles: configSvc?.userRoles }
+
+    this.accessSettingsParameters.userConfig = {
+      ...configSvc?.userProfile, userRoles: configSvc?.userRoles, org: configSvc?.orgReadData
+    }
 
     this.editState = this.route.snapshot.data['contentData'] ? true : false
     if (this.tpdsSvc.trainingPlanStepperData.status && this.tpdsSvc.trainingPlanStepperData.status.toLowerCase() === 'live') {
@@ -46,6 +51,8 @@ export class StepperComponent implements OnInit, OnChanges, AfterViewInit {
     this.addAssigneeDisable = true
     this.addTimelineDisable = true
     this.addAccessSettingDisable = true
+    this.checkForaddAccessSettings(true)
+
   }
 
   ngOnChanges() {
@@ -83,7 +90,7 @@ export class StepperComponent implements OnInit, OnChanges, AfterViewInit {
 
   checkForaddContent(_event: any) {
     setTimeout(() => {
-      this.addAssigneeDisable = _event
+      this.addAccessSettingDisable = _event
       this.addContentIsInvalid.emit(_event)
     }, 0)
   }
@@ -111,17 +118,15 @@ export class StepperComponent implements OnInit, OnChanges, AfterViewInit {
   }
 
   getAccessControlData(_event: any) {
-    // this.accessControlData = event
-  }
+    this.tempSavedAccessControl = _event?.userGroup?.accessControl
+    this.tpdsSvc.trainingPlanStepperData.accessControl = this.tempSavedAccessControl
+    if (this.tempSavedAccessControl?.userGroups?.length) {
+      this.checkForaddAccessSettings(false)
+      this.addAccessSettingDisable = false
+    } else {
+      this.checkForaddAccessSettings(true)
+      this.addAccessSettingDisable = true
+    }
 
-  async refreshContentMetaEvent(_event: any) {
-    // if (event) {
-    //   const getUpdatedData = await this.editorService.readcontentV3(this.contentMeta.identifier).toPromise().catch((_error: any) => { })
-    //   if (getUpdatedData && Object.keys(getUpdatedData).length > 0) {
-    //     this.contentService.resetOriginalMetaWithHierarchy(getUpdatedData)
-    //     this.currentContents = this.contentService.getUpdatedMeta(this.contentService.currentContent)
-
-    //   }
-    // }
   }
 }

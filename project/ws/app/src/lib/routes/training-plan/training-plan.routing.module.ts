@@ -42,10 +42,14 @@ const routes: Routes = [
         data: {
           pageId: 'update-plan',
           module: 'Create Plan',
+          pageType: 'feature',
+          pageKey: 'content-access-settings',
         },
         resolve: {
           tpdsSvcReset: ResetDataSharingResolveService,
           contentData: UpdatePlanResolveService,
+          pageData: PageResolve,
+          configService: ConfigResolveService,
         },
       },
       {
@@ -53,8 +57,14 @@ const routes: Routes = [
         component: PreviewPlanComponent,
         data: {
           pageId: 'preview-plan',
-          module: 'Preview Plan',
+          module: 'Create Plan',
+          pageType: 'feature',
+          pageKey: 'content-access-settings',
         },
+        resolve: {
+          pageData: PageResolve,
+          configService: ConfigResolveService,
+        }
       },
       {
         path: 'preview-plan-for-dashboard/:planId',

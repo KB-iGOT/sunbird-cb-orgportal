@@ -60,6 +60,7 @@ export class CreatePlanComponent implements OnInit, OnDestroy {
       this.tpdsSvc.trainingPlanStepperData['endDate'] = contentData.endDate
       this.tpdsSvc.trainingPlanStepperData['status'] = contentData.status
       this.tpdsSvc.trainingPlanStepperData['isApar'] = contentData.isApar
+      // add accesssetting data here
     }
 
     this.tpdsSvc.filterToggle.subscribe((data: any) => {
