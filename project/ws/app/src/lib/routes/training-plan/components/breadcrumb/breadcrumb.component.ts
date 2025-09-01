@@ -140,9 +140,10 @@ export class BreadcrumbComponent implements OnInit {
 
   createPlanDraftView() {
     this.tpdsSvc.trainingPlanStepperData.name = this.tpdsSvc.trainingPlanTitle
-    const obj = { request: this.tpdsSvc.trainingPlanStepperData }
+    const transformedData = this.generateRequestPayload(this.tpdsSvc.trainingPlanStepperData, 'create')
     this.showDialogBox('progress')
-    this.tpSvc.createPlan(obj).subscribe((_data: any) => {
+
+    this.tpSvc.createPlanV2(transformedData).subscribe((_data: any) => {
       this.dialogRef.close()
       this.showDialogBox('progress-completed')
       setTimeout(() => {
@@ -158,6 +159,73 @@ export class BreadcrumbComponent implements OnInit {
     })
   }
 
+  generateRequestPayload(trainingPlanStepperData: any, type: string): any {
+    let orgScope = "Single" // Default value
+    const userGroups = trainingPlanStepperData.accessControl?.userGroups || []
+
+    let hasMultipleCriteriaValues = false
+    let hasRootOrgId = false
+
+    for (const group of userGroups) {
+      const criteriaList = group.userGroupCriteriaList || []
+      for (const criteria of criteriaList) {
+        if (criteria.criteriaValue && criteria.criteriaValue.length > 1) {
+          hasMultipleCriteriaValues = true
+        }
+        if (criteria.criteriaKey === "rootOrgId") {
+          hasRootOrgId = true
+        }
+      }
+    }
+
+    // Set orgScope based on conditions
+    if (!hasRootOrgId) {
+      orgScope = "All"
+    } else if (hasMultipleCriteriaValues) {
+      orgScope = "Custom"
+    }
+
+    if (type === 'create') {
+      return {
+        request: {
+          comment: trainingPlanStepperData?.comment ?? 'cbPlanId1 is created',
+          contentList: trainingPlanStepperData?.contentList || [],
+          contentType: trainingPlanStepperData?.contentType || "Course",
+          contextData: {
+            accessControl: {
+              userGroups: userGroups,
+              version: trainingPlanStepperData?.accessControl?.version || 1
+            }
+          },
+          endDate: trainingPlanStepperData?.endDate,
+          isApar: trainingPlanStepperData?.isApar,
+          name: trainingPlanStepperData?.name,
+          orgScope: orgScope
+        }
+      }
+
+    } else if (type === 'update') {
+      return {
+        request: {
+          contentList: trainingPlanStepperData?.contentList || [],
+          contentType: trainingPlanStepperData?.contentType || "Course",
+          contextData: {
+            accessControl: {
+              userGroups: userGroups,
+              version: trainingPlanStepperData?.accessControl?.version || 1
+            }
+          },
+          endDate: trainingPlanStepperData?.endDate,
+          isApar: trainingPlanStepperData?.isApar,
+          name: trainingPlanStepperData?.name,
+          orgScope: orgScope,
+          id: this.activeRoute.snapshot.data['contentData'].id
+        }
+      }
+    }
+    return null
+  }
+
   checkIfDisabled() {
     if (this.tabType.CREATE_PLAN === this.selectedTab && this.validationList && !this.validationList.titleIsInvalid) {
       return this.validationList.titleIsInvalid
@@ -168,8 +236,8 @@ export class BreadcrumbComponent implements OnInit {
     if (this.tabType.ADD_ASSIGNEE === this.selectedTab && this.validationList && !this.validationList.addAssigneeIsInvalid) {
       return this.validationList.addAssigneeIsInvalid
     }
-    if (this.tabType.ADD_ACCESS_SETTINGS === this.selectedTab && this.validationList && !this.validationList.addAccessSettingDisable) {
-      return this.validationList.addaccessSettingDisable
+    if (this.tabType.ADD_ACCESS_SETTINGS === this.selectedTab && this.validationList && !this.validationList.addAccessSettingsIsInvalid) {
+      return this.validationList.addAccessSettingsIsInvalid
     }
     return true
   }
@@ -193,6 +261,41 @@ export class BreadcrumbComponent implements OnInit {
     // }
     this.showDialogBox('progress')
     this.tpSvc.updatePlan(obj).subscribe((_data: any) => {
+      this.dialogRef.close()
+      if (this.isLiveContent) {
+        this.publishPlan()
+      } else {
+        this.showDialogBox('progress-completed')
+        setTimeout(() => {
+          this.dialogRef.close()
+          this.tpdsSvc.trainingPlanTitle = ''
+          this.router.navigate(['app', 'home', 'training-plan-dashboard'], {
+            queryParams: {
+              type: this.tpdsSvc.trainingPlanStepperData.status.toLowerCase(),
+              tabSelected: this.tpdsSvc.trainingPlanStepperData.assignmentType,
+            },
+          })
+        }, 1000)
+      }
+    })
+  }
+
+  updatePlan_v2() {
+    this.tpdsSvc.trainingPlanStepperData.name = this.tpdsSvc.trainingPlanTitle
+    if (this.tpdsSvc.trainingPlanStepperData.assignmentType === 'AllUser') {
+      this.tpdsSvc.trainingPlanStepperData.assignmentTypeInfo = [
+        'AllUser',
+      ]
+    }
+    const obj = this.generateRequestPayload(this.tpdsSvc.trainingPlanStepperData, 'update')
+    if (obj.request.status && obj.request.status.toLowerCase() === 'live') {
+      delete obj.request.contentList
+      delete obj.request.contentType
+      delete obj.request.assignmentType
+    }
+    delete obj.request.status
+    this.showDialogBox('progress')
+    this.tpSvc.updatePlanV2(obj).subscribe((_data: any) => {
       this.dialogRef.close()
       if (this.isLiveContent) {
         this.publishPlan()
@@ -244,7 +347,7 @@ export class BreadcrumbComponent implements OnInit {
 
   checkIfValid() {
     if (this.tpdsSvc.trainingPlanStepperData.contentList.length === 0 ||
-      this.tpdsSvc.trainingPlanStepperData.assignmentTypeInfo.length === 0 ||
+      !this.tpdsSvc.trainingPlanStepperData.accessControl ||
       !this.tpdsSvc.trainingPlanStepperData.endDate
     ) {
       return true
@@ -305,7 +408,7 @@ export class BreadcrumbComponent implements OnInit {
             break
           case 'update':
           case 'updateAndPublish':
-            this.updatePlan()
+            this.updatePlan_v2()
             break
         }
       }

@@ -19,6 +19,12 @@ const API_END_POINTS = {
   GET_FILTER_ENTITY: 'apis/proxies/v8/competency/v4/search',
   CREATE_NEWCONTENT: 'apis/proxies/v8/cbplan/v1/admin/requestcontent',
 
+  CREATE_PLAN_V2: 'apis/proxies/v8/cbplan/v2/create',
+  UPDATE_PLAN_V2: 'apis/proxies/v8/cbplan/v2/update',
+  PUBLISH_PLAN_V2: 'apis/proxies/v8/cbplan/v2/publish',
+  READ_PLAN_V2: 'apis/proxies/v8/cbplan/v2/read',
+
+
 }
 @Injectable({
   providedIn: 'root',
@@ -76,6 +82,22 @@ export class TrainingPlanService {
 
   createNewContentrequest(obj: any) {
     return this.http.post<any>(`${API_END_POINTS.CREATE_NEWCONTENT}`, obj)
+  }
+
+  createPlanV2(obj: any) {
+    return this.http.post<any>(`${API_END_POINTS.CREATE_PLAN_V2}`, obj).pipe(map(res => _.get(res, 'result')))
+  }
+
+  updatePlanV2(obj: any) {
+    return this.http.post<any>(`${API_END_POINTS.UPDATE_PLAN_V2}`, obj).pipe(map(res => _.get(res, 'result')))
+  }
+
+  publishPlanV2(obj: any) {
+    return this.http.post<any>(`${API_END_POINTS.PUBLISH_PLAN_V2}`, obj)
+  }
+
+  readPlanV2(planId: any) {
+    return this.http.get<any>(`${API_END_POINTS.READ_PLAN_V2}/${planId}`)
   }
 
 }
