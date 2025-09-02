@@ -108,6 +108,7 @@ import { TranslateModule } from '@ngx-translate/core'
 import { DirectoryComponent } from './routes/directory/directory.component'
 import { DirectoryTableComponent } from './components/directory-table/directory-table.component'
 import { CreateOrganisationComponent } from './components/create-organisation/create-organisation.component'
+import { InfoModalComponent } from './components/info-modal/info-modal.component'
 
 @NgModule({
   declarations: [
@@ -162,7 +163,8 @@ import { CreateOrganisationComponent } from './components/create-organisation/cr
     MyNotificationsComponent,
     DirectoryComponent,
     DirectoryTableComponent,
-    CreateOrganisationComponent
+    CreateOrganisationComponent,
+    InfoModalComponent
   ],
   imports: [
     CommonModule,

@@ -13,16 +13,18 @@
     <mat-card-content>
       <div class="flex flex-1 flex-column margin-fix">
         <mat-tab-group (selectedTabChange)="onTabChange($event)">
-          <mat-tab>
-            <ng-template mat-tab-label>
-              <span>Organisation</span>
-            </ng-template>
-            <ng-template matTabContent>
-              <ng-container *ngIf="selectedTabIndex === 0">
-                <ng-container *ngTemplateOutlet="organisationTabContent"></ng-container>
-              </ng-container>
-            </ng-template>
-          </mat-tab>
+          <ng-container *ngIf="showOrganisationTab">
+            <mat-tab>
+              <ng-template mat-tab-label>
+                <span>Organisation</span>
+              </ng-template>
+              <ng-template matTabContent>
+                <ng-container *ngIf="selectedTabIndex === 0">
+                  <ng-container *ngTemplateOutlet="organisationTabContent"></ng-container>
+                </ng-container>
+              </ng-template>
+            </mat-tab>
+          </ng-container>
 
           <mat-tab>
             <ng-template mat-tab-label>
@@ -42,7 +44,7 @@
 
   <!-- #region (Organisation Tab Content) -->
   <ng-template #organisationTabContent>
-    <p>Organisation content goes here...</p>
+    <ws-app-directory-table></ws-app-directory-table>
   </ng-template>
   <!-- #endregion (Organisation Tab Content) -->
 

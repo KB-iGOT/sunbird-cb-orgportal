@@ -1,8 +1,14 @@
-import { Component, OnInit } from '@angular/core'
+import { Component, OnInit, ViewChild } from '@angular/core'
 import { BehaviorSubject } from 'rxjs'
 import { DirectoryService } from '../../services/directory.service'
 import * as _ from 'lodash'
 import { DatePipe } from '@angular/common'
+import { MatTableDataSource } from '@angular/material/table'
+import { MatPaginator } from '@angular/material/paginator'
+import { MatSort } from '@angular/material/sort'
+import { InfoModalComponent } from '../info-modal/info-modal.component'
+import { MatLegacyDialog } from '@angular/material/legacy-dialog'
+import { Router } from '@angular/router'
 
 @Component({
   selector: 'ws-app-directory-table',
@@ -12,10 +18,27 @@ import { DatePipe } from '@angular/common'
 export class DirectoryTableComponent implements OnInit {
 
   //#region (global variables)
+  @ViewChild(MatPaginator) private paginator!: MatPaginator
+  @ViewChild(MatSort, { static: true }) sort: MatSort | null = null;
+
   openCreateNavBar = false;
   filterSubject: BehaviorSubject<any> = new BehaviorSubject<any>('');
   moreThanTwoChar = false;
+  searchValue: string = '';
+  dialogRef: any
+  customSelfRegistration = false
+  selfRegistrationData: any = {}
+  openMode = ''
+  rowData: any
+  dropdownList: {
+    statesList: any[],
+    ministriesList: any[]
+  } = {
+      statesList: [],
+      ministriesList: [],
+    }
 
+  dataSource!: MatTableDataSource<any>
   tableData: any = [];
   formatedData: any = []
   wholeData2: any = []
@@ -24,6 +47,9 @@ export class DirectoryTableComponent implements OnInit {
   //#region (pagination variables)
   pagination = { limit: 20, offset: 0 }
   pageIndex = 0
+  length!: number
+  pageSize = 20
+  pageSizeOptions = [20, 30, 40]
   //#endregion (pagination variables)
 
   //#endregion (global variables)
@@ -31,13 +57,18 @@ export class DirectoryTableComponent implements OnInit {
 
   constructor(
     private directoryService: DirectoryService,
-    private datePipe: DatePipe
-  ) { }
+    private datePipe: DatePipe,
+    private dialog: MatLegacyDialog,
+    private router: Router,
+  ) {
+    this.dataSource = new MatTableDataSource<any>()
+  }
 
   //#region (initialization)
   ngOnInit(): void {
     this.initializetableData()
     this.getAllDepartments('')
+    this.initializeValuesAndAPIs()
   }
 
   initializetableData() {
@@ -60,6 +91,7 @@ export class DirectoryTableComponent implements OnInit {
     }
   }
 
+  //#region (get all departments and formate the data for table)
   getAllDepartments(queryText: any) {
     this.tableData.loader = true
     const query = queryText ? queryText : ''
@@ -69,11 +101,6 @@ export class DirectoryTableComponent implements OnInit {
       this.totalCount = res.result.response.count
       this.tableData.loader = false
       this.getFormatedData()
-      // if (this.departmentHearders && this.departmentHearders.length) {
-      //   this.getDepartDataByKey(this.currentFilter)
-      // } else {
-      //   this.tableData.loader = false
-      // }
     }, () => {
       this.tableData.loader = false
     })
@@ -133,6 +160,14 @@ export class DirectoryTableComponent implements OnInit {
       this.formatedData = [...this.formatedData]
     }
     this.tableData.loader = false
+    this.setDataSource()
+  }
+
+  setDataSource() {
+    this.dataSource.data = this.formatedData
+    this.dataSource.paginator = this.paginator
+    this.dataSource.sort = this.sort
+    this.length = this.tableData.tableDataCount
   }
 
   transformDate(dateString: string): string | null {
@@ -143,11 +178,55 @@ export class DirectoryTableComponent implements OnInit {
 
     return this.datePipe.transform(isoDateString, 'dd/MM/yyyy, hh:mm a')
   }
+  //#endregion (get all departments and formate the data for table)
+
+  initializeValuesAndAPIs() {
+    this.directoryService.getStatesOrMinisteries('state').subscribe(res => {
+      if (res && res.result && res.result && res.result.response && res.result.response.content) {
+        this.dropdownList.statesList = _.orderBy(res.result.response.content, ['orgName'], ['asc'])
+      }
+    })
+
+    this.directoryService.getStatesOrMinisteries('ministry').subscribe(res => {
+      if (res && res.result && res.result && res.result.response && res.result.response.content) {
+        this.dropdownList.ministriesList = _.orderBy(res.result.response.content, ['orgName'], ['asc'])
+      }
+    })
+  }
 
   //#endregion (initialization)
 
 
   //#region (interactions)
+  gotoCreateNew() {
+    this.openCreateNavBar = true
+    this.openMode = 'createNew'
+    this.toggleOverlay(true)
+    this.rowData = {}
+  }
+
+  editOrganization(data: any) {
+    this.openCreateNavBar = true
+    this.openMode = 'editMode'
+    this.rowData = data
+    this.toggleOverlay(true)
+  }
+
+  buttonClickAction() {
+    this.openCreateNavBar = false
+    this.customSelfRegistration = false
+    this.toggleOverlay(false)
+  }
+
+  organizationCreatedEmit(_event: any) {
+    setTimeout(() => {
+      this.pageIndex = 0
+      this.searchValue = ''
+      this.getAllDepartments(this.searchValue)
+    }, 1000)
+
+  }
+
   getFinalColumns() {
     if (this.tableData !== undefined) {
       const columns = _.map(this.tableData.columns, c => c.key)
@@ -191,6 +270,114 @@ export class DirectoryTableComponent implements OnInit {
       this.onEnterkySearch('')
     } else if (filterValue?.length > 2) {
       this.onEnterkySearch(filterValue)
+    }
+  }
+
+  onRowClick(e: any) {
+    this.goToRoute('users', e)
+    // this.raiseTelemetryForRow('row', e)
+  }
+
+  generateCustRegistrationLink(row: any) {
+    this.directoryService.getOrgReadData(row.id).subscribe((res: any) => {
+      const frameworkId = _.get(res, 'frameworkid')
+
+      if (frameworkId) {
+        this.directoryService.getFrameworkInfo(frameworkId).subscribe({
+          next: res => {
+            const frameworkDetails = _.get(res, 'result.framework')
+            if (frameworkDetails && Array.isArray(frameworkDetails.categories) && frameworkDetails.categories.length > 0) {
+              const categoryDesignation = frameworkDetails.categories[0]
+
+              if (
+                categoryDesignation?.terms &&
+                Array.isArray(categoryDesignation.terms) &&
+                categoryDesignation.terms.length > 0 &&
+                Array.isArray(categoryDesignation.terms[0]?.associations) &&
+                categoryDesignation.terms[0].associations.length > 0
+              ) {
+                this.dialogRef = this.dialog.open(InfoModalComponent, {
+                  panelClass: 'info-dialog',
+                  data: { type: 'import-igot-master-review' }
+                })
+              } else {
+                this.dialogRef = this.dialog.open(InfoModalComponent, {
+                  panelClass: 'info-dialog',
+                  data: { type: 'import-igot-master-create' }
+                })
+              }
+              this.subscribeToAfterClosedModal(row)
+
+            }
+
+          },
+          error: () => {
+          },
+        })
+
+      } else {
+        this.dialogRef = this.dialog.open(InfoModalComponent, {
+          panelClass: 'info-dialog',
+          data: { type: 'import-igot-master-create' }
+        })
+        this.subscribeToAfterClosedModal(row)
+      }
+
+    })
+
+  }
+
+  subscribeToAfterClosedModal(row: any) {
+    this.dialogRef.afterClosed().subscribe((result: any) => {
+      if (result && result.hasOwnProperty('reviewImporting') && !result.reviewImporting) {
+        this.customSelfRegistration = true
+        this.selfRegistrationData.title = 'Custom Self Registration'
+        this.selfRegistrationData.QRGenerated = false
+        this.selfRegistrationData.openMode = 'edit'
+        this.selfRegistrationData.orgId = row.id
+        this.selfRegistrationData.qrRegistrationLink = row.qrRegistrationLink
+        this.selfRegistrationData.registrationLink = row.registrationLink
+        this.selfRegistrationData.startDateRegistration = row.startDateRegistration
+        this.selfRegistrationData.endDateRegistration = row.endDateRegistration
+        this.selfRegistrationData.orgName = row.organisation
+
+        this.toggleOverlay(true)
+      }
+      else if (result && result.reviewImporting || result.startImporting) {
+        this.goToRoute('designation_master/import-designation', row)
+      }
+      else return
+
+    })
+  }
+
+  toggleOverlay(showOverlay: boolean): void {
+    const sidenav = document.querySelector('ws-app-home mat-sidenav') as HTMLElement
+    if (sidenav) {
+      sidenav.style.zIndex = showOverlay ? '0' : '2'
+    }
+  }
+
+  goToRoute(type: string, data: any) {
+    this.router.navigate([`/app/roles/${data.id}/users`], {
+      queryParams:
+      {
+        currentDept: 'organisation',
+        roleId: data.id,
+        depatName: data.channel,
+        orgName: data.mdo || data.organisation,
+        tab: type,
+        subOrgType: 'ministry'
+      }
+    })
+  }
+
+  onOrgPageChange(event: any) {
+    if (event) {
+      this.pageIndex = event.pageIndex
+      this.pagination.limit = event.pageSize
+      this.pagination.offset = (event.pageIndex) * event.pageSize
+      this.getAllDepartments(this.searchValue)
     }
   }
 
