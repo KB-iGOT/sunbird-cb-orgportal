@@ -142,8 +142,8 @@ export class SearchComponent implements OnInit {
         request: {
           secureSettings: contentType === 'Moderated Course' ? true : false, // for moderated course
           filters: {
-            primaryCategory: [contentType === 'Moderated Course' ? 'Course' : contentType],
-            // courseCategory: [contentType === 'Moderated Course' ? 'Course' : contentType],
+            //primaryCategory: [contentType === 'Moderated Course' ? 'Course' : contentType],
+            courseCategory: [contentType === 'Moderated Course' ? 'Course' : contentType],
             /* tslint:disable */
             organisation: applyFilterObj && applyFilterObj['providers'] && applyFilterObj['providers'].length ? applyFilterObj['providers'] : [],
             [`${this.compentencyKey.vKey}.${this.compentencyKey.vCompetencyArea}`]: applyFilterObj && applyFilterObj[this.compentencyKey.vCompetencyArea] && applyFilterObj[this.compentencyKey.vCompetencyArea].length ? applyFilterObj[this.compentencyKey.vCompetencyArea] : [],
