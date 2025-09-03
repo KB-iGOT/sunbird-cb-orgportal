@@ -68,7 +68,7 @@ export class PreviewPlanComponent implements OnInit {
         contentData.contentList) {
         this.contentList = contentData.contentList
       }
-      if (category.toLowerCase() !== 'alluser') {
+      if (category?.toLowerCase() !== 'alluser') {
         arr.push({
           name: contentData.contentType,
           tab: 'content',
