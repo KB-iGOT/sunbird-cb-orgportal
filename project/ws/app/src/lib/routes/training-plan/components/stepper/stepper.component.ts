@@ -41,6 +41,9 @@ export class StepperComponent implements OnInit, OnChanges, AfterViewInit {
     }
 
     this.editState = this.route.snapshot.data['contentData'] ? true : false
+    if (this.tpdsSvc.trainingPlanStepperData['accessControl']) {
+      this.tempSavedAccessControl = this.tpdsSvc.trainingPlanStepperData['accessControl']
+    }
     if (this.tpdsSvc.trainingPlanStepperData.status && this.tpdsSvc.trainingPlanStepperData.status.toLowerCase() === 'live') {
       this.isContentLive = true
     }
@@ -50,8 +53,14 @@ export class StepperComponent implements OnInit, OnChanges, AfterViewInit {
     this.addCotnentDisable = true
     this.addAssigneeDisable = true
     this.addTimelineDisable = true
-    this.addAccessSettingDisable = true
-    this.checkForaddAccessSettings(true)
+
+    if (this.tempSavedAccessControl?.userGroups?.length) {
+      this.checkForaddAccessSettings(false)
+      this.addAccessSettingDisable = false
+    } else {
+      this.checkForaddAccessSettings(true)
+      this.addAccessSettingDisable = true
+    }
 
   }
 
