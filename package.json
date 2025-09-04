@@ -45,7 +45,7 @@
     "@angular/service-worker": "^16.2.12",
     "@ckeditor/ckeditor5-angular": "^9.1.0",
     "@project-sunbird/telemetry-sdk": "0.0.26",
-    "@sunbird-cb/access-settings": "^0.0.1-cbrelease-4.8.28",
+    "@sunbird-cb/access-settings": "^0.0.3-cbrelease-4.8.28",
     "@sunbird-cb/collection": "1.0.56-ang-13-16",
     "@sunbird-cb/design-system": "0.0.1",
     "@sunbird-cb/micro-surveys": "2.0.20-ang-13-16",
