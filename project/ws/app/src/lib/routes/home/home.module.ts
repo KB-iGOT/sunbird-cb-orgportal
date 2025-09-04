@@ -106,6 +106,9 @@ import { MyNotificationsComponent } from './routes/my-notifications/my-notificat
 import { AllNotificationsModule } from '@sunbird-cb/notification'
 import { TranslateModule } from '@ngx-translate/core'
 import { DirectoryComponent } from './routes/directory/directory.component'
+import { DirectoryTableComponent } from './components/directory-table/directory-table.component'
+import { CreateOrganisationComponent } from './components/create-organisation/create-organisation.component'
+import { InfoModalComponent } from './components/info-modal/info-modal.component'
 
 @NgModule({
   declarations: [
@@ -159,6 +162,9 @@ import { DirectoryComponent } from './routes/directory/directory.component'
     GroupsGradeComponent,
     MyNotificationsComponent,
     DirectoryComponent,
+    DirectoryTableComponent,
+    CreateOrganisationComponent,
+    InfoModalComponent
   ],
   imports: [
     CommonModule,
