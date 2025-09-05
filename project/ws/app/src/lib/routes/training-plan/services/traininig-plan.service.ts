@@ -23,7 +23,7 @@ const API_END_POINTS = {
   UPDATE_PLAN_V2: 'apis/proxies/v8/cbplan/v2/update',
   PUBLISH_PLAN_V2: 'apis/proxies/v8/cbplan/v2/publish',
   READ_PLAN_V2: 'apis/proxies/v8/cbplan/v2/read',
-
+  ARCHIVE_PLAN_V2: 'apis/proxies/v8/cbplan/v2/archive',
 
 }
 @Injectable({
@@ -98,6 +98,16 @@ export class TrainingPlanService {
 
   readPlanV2(planId: any) {
     return this.http.get<any>(`${API_END_POINTS.READ_PLAN_V2}/${planId}`)
+  }
+
+  archivePlanV2(obj: any) {
+    const options = {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json',
+      }),
+      body: obj,
+    }
+    return this.http.delete<any>(`${API_END_POINTS.ARCHIVE_PLAN_V2}`, options)
   }
 
 }
