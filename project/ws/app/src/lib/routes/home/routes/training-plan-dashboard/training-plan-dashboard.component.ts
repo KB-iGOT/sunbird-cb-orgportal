@@ -306,7 +306,7 @@ export class TrainingPlanDashboardComponent implements OnInit {
         comment: 'Content deleted',
       },
     }
-    this.trainingPlanService.archivePlan(obj).subscribe((_data: any) => {
+    this.trainingPlanService.archivePlanV2(obj).subscribe((_data: any) => {
       this.snackBar.open('CBP plan deleted successfully.')
       this.loaderService.changeLoaderState(false)
       this.filter(this.currentFilter)
