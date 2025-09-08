@@ -359,7 +359,7 @@ export class DirectoryTableComponent implements OnInit {
   }
 
   goToRoute(type: string, data: any) {
-    this.router.navigate([`/app/roles/${data.id}/users`], {
+    this.router.navigate([`app/home/roles/${data.id}/users`], {
       queryParams:
       {
         currentDept: 'organisation',
