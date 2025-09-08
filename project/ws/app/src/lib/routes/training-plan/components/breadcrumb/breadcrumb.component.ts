@@ -200,7 +200,8 @@ export class BreadcrumbComponent implements OnInit {
           endDate: trainingPlanStepperData?.endDate,
           isApar: trainingPlanStepperData?.isApar,
           name: trainingPlanStepperData?.name,
-          orgScope: orgScope
+          orgScope: orgScope,
+          status: trainingPlanStepperData?.status
         }
       }
 
@@ -218,8 +219,9 @@ export class BreadcrumbComponent implements OnInit {
           endDate: trainingPlanStepperData?.endDate,
           isApar: trainingPlanStepperData?.isApar,
           name: trainingPlanStepperData?.name,
-          orgScope: orgScope,
-          id: this.activeRoute.snapshot.data['contentData'].id
+          // orgScope: orgScope,
+          id: this.activeRoute.snapshot.data['contentData'].id,
+          status: trainingPlanStepperData?.status
         }
       }
     }
