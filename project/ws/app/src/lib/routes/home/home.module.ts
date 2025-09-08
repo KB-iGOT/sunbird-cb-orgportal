@@ -110,6 +110,10 @@ import { DirectoryComponent } from './routes/directory/directory.component'
 import { DirectoryTableComponent } from './components/directory-table/directory-table.component'
 import { CreateOrganisationComponent } from './components/create-organisation/create-organisation.component'
 import { InfoModalComponent } from './components/info-modal/info-modal.component'
+import { OrganisationUsersComponent } from './routes/directory/organisation-users/organisation-users.component'
+import { DesignationsMasterComponent } from './routes/directory/designations-master/designations-master.component'
+import { ImportDesignationComponent } from './routes/directory/import-designation/import-designation.component'
+import { DesignationsBuilkUploadComponent } from './routes/directory/designations-builk-upload/designations-builk-upload.component'
 
 @NgModule({
   declarations: [
@@ -167,6 +171,10 @@ import { InfoModalComponent } from './components/info-modal/info-modal.component
     DirectoryTableComponent,
     CreateOrganisationComponent,
     InfoModalComponent,
+    OrganisationUsersComponent,
+    DesignationsMasterComponent,
+    ImportDesignationComponent,
+    DesignationsBuilkUploadComponent
   ],
   imports: [
     CommonModule,
