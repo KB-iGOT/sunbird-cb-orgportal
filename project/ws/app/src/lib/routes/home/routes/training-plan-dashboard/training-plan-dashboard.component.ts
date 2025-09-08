@@ -123,7 +123,7 @@ export class TrainingPlanDashboardComponent implements OnInit {
   filterData(searchString: string) {
     if (this.currentFilter === 'live') {
       // this.getLiveData()
-      this.getTrainingPlanCBP('Live', searchString)
+      this.getTrainingPlanCBP('live', searchString)
     } else if (this.currentFilter === 'draft') {
       // this.getDraftData()
       this.getTrainingPlanCBP('draft', searchString)
@@ -198,8 +198,8 @@ export class TrainingPlanDashboardComponent implements OnInit {
     this.trainingDashboardSvc.getTrainingPlansV2(payload).subscribe({
       next: (response: any) => {
         if (response.params && response.params.status && response.params.status === 'success') {
-          this.completeDataRes = response?.result?.result?.data
-          this.trainingPlanData = response?.result?.result?.data
+          this.completeDataRes = response?.result?.result?.data || []
+          this.trainingPlanData = response?.result?.result?.data || []
           this.convertDataAsPerTable()
         } else {
           this.loaderService.changeLoaderState(false)
