@@ -324,7 +324,7 @@ export class BreadcrumbComponent implements OnInit {
         comment: 'CBP plan approved',
       },
     }
-    this.tpSvc.publishPlan(obj).subscribe((data: any) => {
+    this.tpSvc.publishPlanV2(obj).subscribe((data: any) => {
       if (data && data.params && data.params.status && data.params.status.toLowerCase() === 'success') {
         this.showDialogBox('progress-completed')
         setTimeout(() => {
