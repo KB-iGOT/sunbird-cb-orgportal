@@ -100,6 +100,25 @@ export class InitService {
       'verified',
       domSanitizer.bypassSecurityTrustResourceUrl('mdo-assets/icons/verified.svg'),
     )
+    iconRegistry.addSvgIcon(
+      'frac',
+      domSanitizer.bypassSecurityTrustResourceUrl('assets/icons/Frac.svg')
+    )
+
+    iconRegistry.addSvgIcon(
+      'users',
+      domSanitizer.bypassSecurityTrustResourceUrl('assets/icons/users.svg')
+    )
+
+    iconRegistry.addSvgIcon(
+      'frac-no-connection',
+      domSanitizer.bypassSecurityTrustResourceUrl('assets/icons/Frac_NoConnection.svg')
+    )
+
+    iconRegistry.addSvgIcon(
+      'download-icon',
+      domSanitizer.bypassSecurityTrustResourceUrl('assets/icons/download_icon.svg')
+    )
   }
 
   async init() {

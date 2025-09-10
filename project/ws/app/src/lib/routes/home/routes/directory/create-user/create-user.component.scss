@@ -1,0 +1,20 @@
+.sinput {
+ width: 400px;
+  border-radius: 20px;
+  border: 1px solid #d5d0d0;
+  padding: 3px 16px;
+  box-sizing: border-box;
+  // margin-bottom: 10px;
+  height: 35px;
+
+  .material-icons {
+    vertical-align: bottom;
+    font-size: 20px;
+    margin-right: 7px;
+  }
+
+  input {
+    border: 0 !important;
+    outline: none !important;
+  }
+}

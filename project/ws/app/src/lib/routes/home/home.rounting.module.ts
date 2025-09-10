@@ -514,6 +514,7 @@ const routes: Routes = [
     },
     resolve: {
       pageData: PageResolve,
+      configService: ConfigResolveService,
     },
   },
 

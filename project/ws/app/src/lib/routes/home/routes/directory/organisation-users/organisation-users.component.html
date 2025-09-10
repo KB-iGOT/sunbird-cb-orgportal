@@ -1,25 +1,23 @@
 <div class="m-8">
-
-  <!-- #region (tabs content) -->
+  <ws-widget-breadcrumbs-org
+    [widgetData]="{titles:[{title:'Organisation', url:'/app/home/directory', path: '/app/home/directory'},{title: getCurrentTabDetails()?.name || '', url:'none'}] }">
+  </ws-widget-breadcrumbs-org>
   <div class="vertical-tabs-container">
-    <mat-tab-group class="vertical-tabs" [selectedIndex]="selectedTabIndex"
-      (selectedIndexChange)="selectedTabIndex = $event">
-      <mat-tab label="Users">
-        <ws-app-create-user></ws-app-create-user>
-      </mat-tab>
-
-      <mat-tab label="Roles and access">
-        <p>Roles and access content</p>
-      </mat-tab>
-
-      <mat-tab label="Mentor Management">
-        <p>Mentor Management content</p>
-      </mat-tab>
-
-      <mat-tab label="Designation Master">
-        <ws-app-designations-master></ws-app-designations-master>
+    <mat-tab-group class="vertical-tabs" [selectedIndex]="selectedTabIndex" (selectedIndexChange)="onTabChange($event)">
+      <mat-tab *ngFor="let tab of tabs; let i = index" [label]="tab.name">
+        <ng-container *ngIf="tab.value === 'users'">
+          <ws-app-create-user></ws-app-create-user>
+        </ng-container>
+        <ng-container *ngIf="tab.value === 'rolesAndAccess'">
+          <p>Roles and access content</p>
+        </ng-container>
+        <ng-container *ngIf="tab.value === 'mentorManagement'">
+          <p>Mentor Management content</p>
+        </ng-container>
+        <ng-container *ngIf="tab.value === 'designationMaster'">
+          <ws-app-designations-master></ws-app-designations-master>
+        </ng-container>
       </mat-tab>
     </mat-tab-group>
   </div>
-  <!-- #endregion (tabs content)  -->
 </div>

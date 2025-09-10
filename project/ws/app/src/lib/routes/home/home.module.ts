@@ -114,6 +114,10 @@ import { OrganisationUsersComponent } from './routes/directory/organisation-user
 import { DesignationsMasterComponent } from './routes/directory/designations-master/designations-master.component'
 import { ImportDesignationComponent } from './routes/directory/import-designation/import-designation.component'
 import { DesignationsBuilkUploadComponent } from './routes/directory/designations-builk-upload/designations-builk-upload.component'
+import { OrgHierarchyService } from './services/org-hierarchy.service'
+import { BulkUploadOrgComponent } from './routes/directory/bulk-upload-org/bulk-upload-org.component'
+import { TreeHierarchyModule } from '@sunbird-cb/tree-hierarchy'
+import { OrgHierarchyMappingComponent } from './routes/directory/org-hierarchy-mapping/org-hierarchy-mapping/org-hierarchy-mapping.component'
 
 @NgModule({
   declarations: [
@@ -174,7 +178,9 @@ import { DesignationsBuilkUploadComponent } from './routes/directory/designation
     OrganisationUsersComponent,
     DesignationsMasterComponent,
     ImportDesignationComponent,
-    DesignationsBuilkUploadComponent
+    DesignationsBuilkUploadComponent,
+    OrgHierarchyMappingComponent,
+    BulkUploadOrgComponent
   ],
   imports: [
     CommonModule,
@@ -234,7 +240,8 @@ import { DesignationsBuilkUploadComponent } from './routes/directory/designation
     TaxonomyEditorModule,
     ImageResponsiveModule,
     AllNotificationsModule,
-    TranslateModule.forChild()
+    TranslateModule.forChild(),
+    TreeHierarchyModule
   ],
   providers: [
     { provide: 'environment', useValue: environment },
@@ -244,7 +251,8 @@ import { DesignationsBuilkUploadComponent } from './routes/directory/designation
     UploadService,
     TrainingPlanDashboardService,
     UsersService,
-    { provide: MAT_DATE_LOCALE, useValue: 'en-GB' }
+    { provide: MAT_DATE_LOCALE, useValue: 'en-GB' },
+    OrgHierarchyService
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   exports: [LeftMenuComponent]

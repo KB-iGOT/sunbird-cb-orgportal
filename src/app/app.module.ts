@@ -140,6 +140,7 @@ import { TranslateHttpLoader } from '@ngx-translate/http-loader'
 import {
   WIDGET_REGISTRATION_LIB_CONFIG,
 } from '@sunbird-cb/consumption'
+import { GlobalEventsService } from './services/global-events.service'
 /** Collection Library Modules */
 
 // @Injectable()
@@ -349,7 +350,8 @@ export function HttpLoaderFactory(http: HttpClient) {
     LoaderService,
     LibNotificationsService,
     NotificationsService,
-    NPSGridService
+    NPSGridService,
+    GlobalEventsService
   ]
 })
 

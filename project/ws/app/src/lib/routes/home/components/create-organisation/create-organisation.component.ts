@@ -56,6 +56,7 @@ export class CreateOrganisationComponent implements OnInit, OnDestroy {
   disableStateBlock = false
   EXCLUDED_MINISRIES: string[] = []
   stateName: string = ''
+  loggedInUserOrg: any
   constructor(
     private formBuilder: FormBuilder,
     private snackBar: MatSnackBar,
@@ -70,6 +71,7 @@ export class CreateOrganisationComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.loggedInUserId = _.get(this.configService, 'userProfile.userId')
+    this.loggedInUserOrg = _.get(this.configService, 'userProfile.rootOrgId')
     this.EXCLUDED_MINISRIES = this.activatedRoute.snapshot.parent ? // need to check this logic
       this.activatedRoute.snapshot.parent?.data?.pageData?.data?.excludedOrganizationsSborgId : []
 
@@ -113,7 +115,6 @@ export class CreateOrganisationComponent implements OnInit, OnDestroy {
   }
 
   initialization() {
-
     if (this.dropdownList) {
       this.statesList = _.get(this.dropdownList, 'statesList', [])
       this.filteredStates = [...this.statesList]
@@ -125,6 +126,7 @@ export class CreateOrganisationComponent implements OnInit, OnDestroy {
       } else {
         this.ministriesList = _.get(this.dropdownList, 'ministriesList', [])
       }
+      this.ministriesList = this.ministriesList.filter((ministry: any) => ministry?.sbOrgId === this.loggedInUserOrg)
       this.filteredMinistry = [...this.ministriesList]
 
     }
@@ -135,12 +137,12 @@ export class CreateOrganisationComponent implements OnInit, OnDestroy {
           Validators.maxLength(100),
           Validators.pattern(this.ORG_NAME_PATTERN)
         ]),
-      category: new FormControl(_.get(this.rowData, 'type', '') || 'State', [Validators.required]),
+      category: new FormControl('ministry', [Validators.required]),
       state: new FormControl(_.get(this.rowData, 'state', '')),
-      ministry: new FormControl(_.get(this.rowData, 'ministry', '')),
+      ministry: new FormControl(this.ministriesList.find((ministry: any) => ministry?.sbOrgId === this.loggedInUserOrg) || ''),
       description: new FormControl(_.get(this.rowData, 'description', ''), [Validators.required, Validators.maxLength(1000)])
     })
-
+    this.organisationForm.controls['ministry'].disable()
     this.selectedLogo = this.rowData?.logo || ''
     this.valueChangeEvents()
   }
