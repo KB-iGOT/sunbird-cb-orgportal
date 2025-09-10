@@ -186,7 +186,20 @@
           </mat-chip>
         </mat-chip-list>
       </div>
-      <div class="input-container"></div>
+      <div class="input-container">
+        <ng-container *ngIf="userCreationForm?.get('department')">
+          <div class="label required">Department</div>
+          <input type="text" class="input-text" formControlName="department" placeholder="Type here" />
+          <mat-error class="text-xs"
+            *ngIf="userCreationForm?.get('department')?.touched && userCreationForm?.controls['department'].errors?.pattern">
+            Please enter a valid name
+          </mat-error>
+          <mat-error class="text-xs"
+            *ngIf="userCreationForm?.get('department')?.touched && userCreationForm?.controls['department'].errors?.required">
+            Department is mandatory
+          </mat-error>
+        </ng-container>
+      </div>
     </div>
 
     <div class="flex flex-row gap-6">

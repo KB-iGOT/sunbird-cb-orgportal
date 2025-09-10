@@ -5,16 +5,16 @@
   <div class="vertical-tabs-container">
     <mat-tab-group class="vertical-tabs" [selectedIndex]="selectedTabIndex" (selectedIndexChange)="onTabChange($event)">
       <mat-tab *ngFor="let tab of tabs; let i = index" [label]="tab.name">
-        <ng-container *ngIf="tab.value === 'users'">
+        <ng-container *ngIf="tab.value === 'users' && selectedTabIndex === i">
           <ws-app-create-user></ws-app-create-user>
         </ng-container>
-        <ng-container *ngIf="tab.value === 'rolesAndAccess'">
+        <ng-container *ngIf="tab.value === 'rolesAndAccess' && selectedTabIndex === i">
           <p>Roles and access content</p>
         </ng-container>
-        <ng-container *ngIf="tab.value === 'mentorManagement'">
+        <ng-container *ngIf="tab.value === 'mentorManagement' && selectedTabIndex === i">
           <p>Mentor Management content</p>
         </ng-container>
-        <ng-container *ngIf="tab.value === 'designationMaster'">
+        <ng-container *ngIf="tab.value === 'designationMaster' && selectedTabIndex === i">
           <ws-app-designations-master></ws-app-designations-master>
         </ng-container>
       </mat-tab>

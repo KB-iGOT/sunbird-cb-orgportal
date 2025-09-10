@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, QueryList, ViewChildren } from '@angular/core'
+import { AfterViewInit, Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output, QueryList, ViewChildren } from '@angular/core'
 import { UntypedFormBuilder, UntypedFormControl, Validators } from '@angular/forms'
 import { MomentDateAdapter } from '@angular/material-moment-adapter'
 import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE } from '@angular/material/core'
@@ -44,6 +44,9 @@ const PIN_CODE_PATTERN = /^[1-9][0-9]{5}$/
   ],
 })
 export class SingleUserCreationComponent implements OnInit, AfterViewInit, OnDestroy {
+
+  @Input() selectedOrgData: any
+  @Output() closeCreateuser = new EventEmitter<void>()
 
   @ViewChildren('rolesCheckbox') checkboxes!: QueryList<ElementRef>
   defaultRole = ['PUBLIC']
@@ -134,6 +137,9 @@ export class SingleUserCreationComponent implements OnInit, AfterViewInit, OnDes
   }
 
   ngOnInit() {
+    if (this.selectedOrgData && this.selectedOrgData.roleId && !this.userCreationForm.contains('department')) {
+      this.userCreationForm.addControl('department', new UntypedFormControl({ value: this.selectedOrgData.depatName, disabled: true }))
+    }
     this.getDesignation()
     this.getMasterLanguages()
     this.getGroups()
@@ -292,6 +298,10 @@ export class SingleUserCreationComponent implements OnInit, AfterViewInit, OnDes
       dataToSubmit.dob = `${new Date(dataToSubmit.dob).getDate()}-${new Date(dataToSubmit.dob).getMonth() + 1}-${new Date(dataToSubmit.dob).getFullYear()}`
     }
 
+    if (this.selectedOrgData && this.selectedOrgData.roleId) {
+      dataToSubmit.channel = this.selectedOrgData.depatName
+    }
+
     if (!this.userCreationForm.value.channel) {
       this.matSnackBar.open('Channel info is empty! So unable to create user')
       return
@@ -301,18 +311,59 @@ export class SingleUserCreationComponent implements OnInit, AfterViewInit, OnDes
       personalDetails: '',
     }
     postData.personalDetails = dataToSubmit
-
     this.usersService.createUser(postData)
       .pipe(takeUntil(this.destroySubject$))
       .subscribe((_res: any) => {
         this.displayLoader = false
         this.matSnackBar.open('User created successfully!')
         this.handleFormClear()
+        if (this.selectedOrgData && this.selectedOrgData.roleId) {
+          this.closeCreateuser.emit()
+        }
         // tslint:disable-next-line
       }, (_err: HttpErrorResponse) => {
         if (!_err.ok) {
           this.displayLoader = false
           this.matSnackBar.open(_.get(_err, 'error.params.errmsg') || 'Unable to create user, please try again later!')
+        }
+      })
+  }
+
+  updateUserData(): void {
+    this.displayLoader = true
+    const dataToSubmit = { ...this.userCreationForm.value }
+    if (dataToSubmit.dob) {
+      // tslint:disable-next-line
+      dataToSubmit.dob = `${new Date(dataToSubmit.dob).getDate()}-${new Date(dataToSubmit.dob).getMonth() + 1}-${new Date(dataToSubmit.dob).getFullYear()}`
+    }
+
+    if (this.selectedOrgData && this.selectedOrgData.roleId) {
+      dataToSubmit.channel = this.selectedOrgData.depatName
+    }
+
+    if (!this.userCreationForm.value.channel) {
+      this.matSnackBar.open('Channel info is empty! So unable to create user')
+      return
+    }
+
+    const postData = {
+      personalDetails: '',
+    }
+    postData.personalDetails = dataToSubmit
+    this.usersService.updateUserDetails(postData)
+      .pipe(takeUntil(this.destroySubject$))
+      .subscribe((_res: any) => {
+        this.displayLoader = false
+        this.matSnackBar.open('User updated successfully!')
+        this.handleFormClear()
+        if (this.selectedOrgData && this.selectedOrgData.roleId) {
+          this.closeCreateuser.emit()
+        }
+        // tslint:disable-next-line
+      }, (_err: HttpErrorResponse) => {
+        if (!_err.ok) {
+          this.displayLoader = false
+          this.matSnackBar.open(_.get(_err, 'error.params.errmsg') || 'Unable to update user, please try again later!')
         }
       })
   }

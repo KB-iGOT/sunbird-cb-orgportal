@@ -31,9 +31,12 @@ export class CreateUserComponent implements OnInit {
   dataSource = new MatTableDataSource<UserData>([]);
   createUserTabs: TabDetails[] = [];
   createUser = false;
+  orgData: any = {};
 
   @ViewChild(MatPaginator) paginator!: MatPaginator
   @ViewChild(MatSort) sort!: MatSort
+  selectedTab: any
+  selectedUserData: any
 
   constructor(
     private orgSvc: OrgHierarchyService,
@@ -41,11 +44,15 @@ export class CreateUserComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    const queryParam = _.get(this.activeRouter, 'snapshot.queryParams')
+    if (queryParam) {
+      this.orgData = queryParam
+    }
     this.orgSvc.setConfigService(_.get(this.activeRouter, 'snapshot.data.configService'))
     this.getUserList('')
     this.createUserTabs = [
-      { id: 0, name: 'Bulk Creation', value: 'bulkCreation' },
-      { id: 1, name: 'Custom Registration Link', value: 'customRegLink' },
+      // { id: 0, name: 'Bulk Creation', value: 'bulkCreation' },
+      // { id: 1, name: 'Custom Registration Link', value: 'customRegLink' },
       { id: 2, name: 'Individual Creation', value: 'individualCreation' }
     ]
   }
@@ -64,7 +71,7 @@ export class CreateUserComponent implements OnInit {
       const payload = {
         request: {
           filters: {
-            rootOrgId: "01439730656738508813",
+            rootOrgId: this.orgData.roleId,
             status: 1
           },
           sort_by: {
@@ -124,13 +131,28 @@ export class CreateUserComponent implements OnInit {
     }
   }
 
+  createNewUser() {
+    this.createUser = !this.createUser
+    this.selectedTab = this.createUserTabs.find(tab => tab.value === 'individualCreation')
+  }
+
   editUser(user: UserData) {
-    console.log('Edit user:', user)
-    // Implement edit functionality
+    this.selectedUserData = user
+    this.createUser = true
+    this.selectedTab = this.createUserTabs.find(tab => tab.value === 'individualCreation')
   }
 
   deleteUser(user: UserData) {
     console.log('Delete user:', user)
     // Implement delete functionality
+  }
+
+  onTabChange(item: any) {
+    this.selectedTab = item
+  }
+
+  closeCreate() {
+    this.getUserList('')
+    this.createUser = false
   }
 }

@@ -9,7 +9,7 @@
       <button mat-button type="button" class="btn-common btn-primary">Search</button>
     </div>
     <div class="buttonContainer flex ml-auto">
-      <button mat-button type="button" class="btn-common btn-primary" (click)="createUser = !createUser">Create
+      <button mat-button type="button" class="btn-common btn-primary" (click)="createNewUser()">Create
         User</button>
     </div>
   </div>
@@ -71,12 +71,26 @@
 </ng-container>
 
 <ng-container *ngIf="createUser">
-  <mat-tab-group (selectedTabChange)="onTabChange($event)">
-    <mat-tab *ngFor="let tab of createUserTabs; let i = index" [label]="tab.name">
-      <ng-container *ngIf="tab.value === 'individualCreation'">
-        <ws-single-user-creation></ws-single-user-creation>
-      </ng-container>
-    </mat-tab>
-  </mat-tab-group>
-
+  <div class="flex">
+    <ng-container *ngFor="let item of createUserTabs">
+      <button mat-button type="button" (click)="onTabChange(item)"
+        [ngClass]="{'activeTab': selectedTab?.value === item?.value}">{{item.name}}</button>
+    </ng-container>
+    <div class="ml-auto">
+      <button mat-icon-button aria-label="Close create user tabs" (click)="createUser = false" type="button">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+  </div>
+  <div class="divider mb-5"></div>
+  <ng-container *ngIf="selectedTab?.value === 'individualCreation'">
+    <ws-single-user-creation [editUserData]="selectedUserData" [selectedOrgData]="orgData"
+      (closeCreateuser)="closeCreate()"></ws-single-user-creation>
+  </ng-container>
+  <ng-container *ngIf="selectedTab?.value === 'customRegLink'">
+    <ws-app-custom-self-registration></ws-app-custom-self-registration>
+  </ng-container>
+  <ng-container *ngIf="selectedTab?.value === 'bulkCreation'">
+    <ws-bulk-upload></ws-bulk-upload>
+  </ng-container>
 </ng-container>
