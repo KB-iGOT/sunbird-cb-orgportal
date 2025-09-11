@@ -37,10 +37,10 @@
             [ngClass]="{'btn-disabled': checkIfDisabled()}">
             <span *ngIf="!editState">Next: {{(tabType.CREATE_PLAN === selectedTab) ? 'Add Content' :
                 (tabType.ADD_CONTENT === selectedTab)
-                ? 'Add Access Settings' : (tabType.ADD_ACCESS_SETTINGS === selectedTab) ? 'Add Timeline' : ''}}</span>
+                ? 'Add Access Control' : (tabType.ADD_ACCESS_SETTINGS === selectedTab) ? 'Add Timeline' : ''}}</span>
             <span *ngIf="editState">Next: {{(tabType.CREATE_PLAN === selectedTab) ? 'Edit Content' :
                 (tabType.ADD_CONTENT === selectedTab)
-                ? 'Edit Access Settings' : (tabType.ADD_ACCESS_SETTINGS === selectedTab) ? 'Edit Timeline' : ''}}</span>
+                ? 'Edit Access Control' : (tabType.ADD_ACCESS_SETTINGS === selectedTab) ? 'Edit Timeline' : ''}}</span>
         </button>
         <ng-container *ngIf="!editState">
             <button mat-button class="next-btn margin-left-m" (click)="showConformationPopUp('saveToDraft')"

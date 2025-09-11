@@ -36,8 +36,12 @@ export class StepperComponent implements OnInit, OnChanges, AfterViewInit {
     const configSvc = this.route.snapshot.data?.configService
     this.accessSettingsParameters = this.route.snapshot.data?.pageData?.data
 
-    this.accessSettingsParameters.userConfig = {
-      ...configSvc?.userProfile, userRoles: configSvc?.userRoles, org: configSvc?.orgReadData
+
+    if (this.accessSettingsParameters) {
+      this.accessSettingsParameters.userConfig = {
+        ...configSvc?.userProfile, userRoles: configSvc?.userRoles, org: configSvc?.orgReadData
+      }
+      this.accessSettingsParameters.mdoContent = this.tpdsSvc.trainingPlanStepperData
     }
 
     this.editState = this.route.snapshot.data['contentData'] ? true : false
