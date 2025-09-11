@@ -22,7 +22,7 @@
         </mat-tab>
         <mat-tab [label]="tabType.ADD_ACCESS_SETTINGS" [disabled]="addCotnentDisable || addAccessSettingDisable">
             <ng-template mat-tab-label>
-                <span>3.&nbsp;<span *ngIf="!editState">Add</span><span *ngIf="editState">Edit</span> Access Settings</span>
+                <span>3.&nbsp;<span *ngIf="!editState">Add</span><span *ngIf="editState">Edit</span> Access Control</span>
             </ng-template>
             <ng-template matTabContent>
                 <sb-uic-access-control [config]="accessSettingsParameters" [contentId]=""

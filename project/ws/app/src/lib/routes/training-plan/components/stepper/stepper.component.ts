@@ -39,6 +39,7 @@ export class StepperComponent implements OnInit, OnChanges, AfterViewInit {
     this.accessSettingsParameters.userConfig = {
       ...configSvc?.userProfile, userRoles: configSvc?.userRoles, org: configSvc?.orgReadData
     }
+    this.accessSettingsParameters.mdoContent = this.tpdsSvc.trainingPlanStepperData
 
     this.editState = this.route.snapshot.data['contentData'] ? true : false
     if (this.tpdsSvc.trainingPlanStepperData['accessControl']) {
