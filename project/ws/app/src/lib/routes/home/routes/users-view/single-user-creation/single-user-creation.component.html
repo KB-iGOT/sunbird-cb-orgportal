@@ -209,7 +209,7 @@
           <ng-container *ngFor="let role of filteredRoles">
             <div class="rolehead" *ngIf="role !== 'MDO_LEADER'">
               <div class="roletitle">{{ role }}</div>
-              <mat-checkbox value="{{ role }}" #rolesCheckbox [checked]="role === 'PUBLIC'"
+              <mat-checkbox value="{{ role }}" #rolesCheckbox [checked]="getCheckedRoles(role)"
                 [disabled]="role === 'PUBLIC'" (change)="handleRolesCheck($event, role)"></mat-checkbox>
             </div>
           </ng-container>
@@ -219,8 +219,14 @@
     </div>
 
     <div class="flex flex-row gap-4">
-      <button class="action-button" [ngClass]="{'disable-button': (userCreationForm?.invalid || displayLoader)}"
-        [disabled]="userCreationForm?.invalid || displayLoader" (click)="handleUserCreation()">Create user</button>
+      <ng-container *ngIf="!editUserData">
+        <button class="action-button" [ngClass]="{'disable-button': (userCreationForm?.invalid || displayLoader)}"
+          [disabled]="userCreationForm?.invalid || displayLoader" (click)="handleUserCreation()">Create user</button>
+      </ng-container>
+      <ng-container *ngIf="editUserData">
+        <button class="action-button" [ngClass]="{'disable-button': (userCreationForm?.invalid || displayLoader)}"
+          [disabled]="userCreationForm?.invalid || displayLoader" (click)="confirmUpdateUser()">Update user</button>
+      </ng-container>
       <button class="outline-button" (click)="handleFormClear()">Clear</button>
       <div *ngIf="displayLoader" class="pr-4 flex items-center justify-center">
         <mat-spinner [diameter]="30"></mat-spinner>
@@ -228,3 +234,21 @@
     </div>
   </form>
 </div>
+
+<ng-template #updateconfirm>
+  <div class="confirm-dialog text-center padding-l">
+    <mat-icon class="infoIcon orangeicon-dialog">error_outline</mat-icon>
+    <div mat-dialog-contentclass="margin-top-xs blue-text">
+      Are you sure you want to update?
+      <div mat-dialog-actions class="flex-center margin-top-s">
+        <button mat-button type="submit" [mat-dialog-close]="false"
+          class="margin-right-m  btn-success btn-responsive cancelbtn">
+          <span> No </span>
+        </button>
+        <button mat-button type="submit" [mat-dialog-close]="true" class="btn-success btn-responsive successbtn">
+          <span class="text-white"> Yes </span>
+        </button>
+      </div>
+    </div>
+  </div>
+</ng-template>

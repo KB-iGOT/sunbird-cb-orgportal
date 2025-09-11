@@ -119,6 +119,7 @@ import { BulkUploadOrgComponent } from './routes/directory/bulk-upload-org/bulk-
 import { TreeHierarchyModule } from '@sunbird-cb/tree-hierarchy'
 import { OrgHierarchyMappingComponent } from './routes/directory/org-hierarchy-mapping/org-hierarchy-mapping/org-hierarchy-mapping.component'
 import { CustomSelfRegistrationComponent } from './routes/onboarding/custom-self-registration/custom-self-registration.component'
+import { UsersComponent } from '../access/routes/users/users.component'
 
 @NgModule({
   declarations: [
@@ -182,7 +183,8 @@ import { CustomSelfRegistrationComponent } from './routes/onboarding/custom-self
     DesignationsBuilkUploadComponent,
     OrgHierarchyMappingComponent,
     BulkUploadOrgComponent,
-    CustomSelfRegistrationComponent
+    CustomSelfRegistrationComponent,
+    UsersComponent
   ],
   imports: [
     CommonModule,

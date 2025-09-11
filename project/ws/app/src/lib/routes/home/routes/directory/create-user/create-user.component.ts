@@ -134,6 +134,7 @@ export class CreateUserComponent implements OnInit {
   createNewUser() {
     this.createUser = !this.createUser
     this.selectedTab = this.createUserTabs.find(tab => tab.value === 'individualCreation')
+    this.selectedUserData = ''
   }
 
   editUser(user: UserData) {

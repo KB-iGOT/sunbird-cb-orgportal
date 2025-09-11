@@ -1,5 +1,5 @@
-import { AfterViewInit, Component, OnInit, OnDestroy } from '@angular/core'
-import { Router, ActivatedRoute } from '@angular/router'
+import { AfterViewInit, Component, OnInit, OnDestroy, Input } from '@angular/core'
+import { ActivatedRoute } from '@angular/router'
 import { ITableData } from '@sunbird-cb/collection/lib/ui-org-table/interface/interfaces'
 import { EventService } from '@sunbird-cb/utils-v2'
 // tslint:disable-next-line
@@ -7,6 +7,7 @@ import _ from 'lodash'
 import { TelemetryEvents } from '../../../../head/_services/telemetry.event.model'
 import { RolesService } from '../../../users/services/roles.service'
 import { UsersService } from '../../../users/services/users.service'
+import { map } from 'rxjs/operators'
 @Component({
   selector: 'ws-app-roles-access',
   templateUrl: './roles-access.component.html',
@@ -19,13 +20,17 @@ export class RolesAccessComponent implements OnInit, AfterViewInit, OnDestroy {
   parseRoledata: any = []
   rolesObject: any = []
   uniqueRoles: any = []
+  showSelectedRoleUsers: boolean = false
 
-  constructor(private router: Router,
-              private activeRouter: ActivatedRoute,
-              private usersService: UsersService,
+  @Input() selectedOrgData: any
+  selectedRole: any
+
+  constructor(
+    private activeRouter: ActivatedRoute,
+    private usersService: UsersService,
     // private telemetrySvc: TelemetryService,
-              private events: EventService,
-              private roleservice: RolesService) { }
+    private events: EventService,
+    private roleservice: RolesService) { }
 
   ngOnInit() {
     this.tabledata = {
@@ -51,7 +56,9 @@ export class RolesAccessComponent implements OnInit, AfterViewInit, OnDestroy {
 
   /* Click event to navigate to a particular role */
   onRoleClick(role: any) {
-    this.router.navigate([`/app/roles/${role.role}/users`])
+    this.showSelectedRoleUsers = true
+    this.selectedRole = role.role
+    // this.router.navigate([`/app/roles/${role.role}/users`])
     // this.router.navigate([`/app/home/roles-users`], { queryParams: { role: event.role, orgID: rootOrgId } })
     // this.telemetrySvc.impression()
     this.events.raiseInteractTelemetry(
@@ -66,6 +73,11 @@ export class RolesAccessComponent implements OnInit, AfterViewInit, OnDestroy {
       }
     )
 
+  }
+
+  backToRoles() {
+    this.showSelectedRoleUsers = false
+    this.selectedRole = ''
   }
   fetchIndidualRoleData(rootOrgId: string, rolename: string) {
     this.usersService.getAllRoleUsers(rootOrgId, rolename).subscribe(data => {
@@ -82,7 +94,8 @@ export class RolesAccessComponent implements OnInit, AfterViewInit, OnDestroy {
     if (evt.action === 'ViewCount') {
       this.roleCountSpinner = false
       const individualRole = evt.row.role
-      const rootOrgId = _.get(this.activeRouter.snapshot.parent, 'data.configService.unMappedUser.rootOrg.rootOrgId')
+      const rootOrgId = (this.selectedOrgData) ? this.selectedOrgData.roleId :
+        _.get(this.activeRouter.snapshot.parent, 'data.configService.unMappedUser.rootOrg.rootOrgId')
       this.fetchIndidualRoleData(rootOrgId, individualRole)
     }
   }
@@ -101,19 +114,41 @@ export class RolesAccessComponent implements OnInit, AfterViewInit, OnDestroy {
         this.uniqueRoles.push({ role: rolesObject, count: '0' })
       })
       this.data = _.uniq(this.uniqueRoles)
+      this.getRolesCount()
     })
-    // Old code
-    // let totalUsers: any[] = []
-    // const usrsList = _.get(this.activeRouter.snapshot, 'data.usersList.data.content') || []
-    // totalUsers = _.map(_.groupBy(_.flatten(_.map(_.flatten(_.map(usrsList, 'organisations')), 'roles'))), (_k, v) => {
-    //   return {
-    //     role: (v || ''),
-    //     // .replace(/[/_/]/g, ' '),
-    //     // count: (k || []).length || 0,
-    //     count: 0,
-    //   }
-    // })
-    // this.data = totalUsers
+  }
+
+  getRolesCount() {
+    const rootOrgId = (this.selectedOrgData) ? this.selectedOrgData.roleId :
+      _.get(this.activeRouter.snapshot.parent, 'data.configService.unMappedUser.rootOrg.rootOrgId')
+    const reqBody = {
+      request: {
+        filters: {
+          rootOrgId: rootOrgId,
+          status: 1
+        },
+        limit: 1,
+        fields: [
+          'userId'
+        ],
+        facets: [
+          "roles.role"
+        ]
+      }
+    }
+    this.usersService.getRolesCountsApi(reqBody).pipe(
+      map((res: any) => {
+        return res?.result?.response?.facets[0]?.values || []
+      })
+    ).subscribe((ele: any) => {
+      this.data.forEach((roleEle: any) => {
+        const matchingRole = ele.find((role: any) => role.name.toLowerCase() === roleEle.role.toLowerCase())
+        if (matchingRole) {
+          roleEle.count = matchingRole.count
+        }
+      })
+      console.log(this.data)
+    })
   }
 
   ngOnDestroy() { }

@@ -1,27 +1,33 @@
 <div class="flex flex-4 flex-column">
-  <mat-card>
+  <mat-card [ngClass]="{'padding-remove': selectedOrgData}">
     <!-- <mat-card-header class="flex-custom-m">
-      <div class="flex-1" role="link" tabindex="1">
-        <div class="flex flex-1">
-          <mat-card-title class="flex-4 mobile-margin mat-h2">
-            Roles and access
-          </mat-card-title>
+        <div class="flex-1" role="link" tabindex="1">
+          <div class="flex flex-1">
+            <mat-card-title class="flex-4 mobile-margin mat-h2">
+              Roles and access
+            </mat-card-title>
+          </div>
         </div>
-      </div>
-    </mat-card-header> -->
+      </mat-card-header> -->
     <mat-card-title class="flex-4 mobile-margin mat-h2">
-      Roles and access
+      <a [ngClass]="{'cursor-pointer': selectedRole}" (click)="selectedRole ? backToRoles() : null">Roles and access</a>
+      {{ selectedRole ? ('> ' + selectedRole) : '' }}
     </mat-card-title>
     <mat-card-content>
-      <ng-container *ngIf="data?.length > 0">
-        <ws-widget-org-user-table [tableData]="tabledata" [data]="data" (eOnRowClick)="onRoleClick($event)"
-          (actionsClick)="actionsClick($event)">
-        </ws-widget-org-user-table>
+      <ng-container *ngIf="!showSelectedRoleUsers">
+        <ng-container *ngIf="data?.length > 0">
+          <ws-widget-org-user-table [tableData]="tabledata" [data]="data" (eOnRowClick)="onRoleClick($event)"
+            (actionsClick)="actionsClick($event)">
+          </ws-widget-org-user-table>
+        </ng-container>
+        <ng-container *ngIf="!roleCountSpinner">
+          <div class="flex flex-1 loader-box">
+            <mat-spinner strokeWidth="3" diameter="50"></mat-spinner>
+          </div>
+        </ng-container>
       </ng-container>
-      <ng-container *ngIf="!roleCountSpinner">
-        <div class="flex flex-1 loader-box">
-          <mat-spinner strokeWidth="3" diameter="50"></mat-spinner>
-        </div>
+      <ng-container *ngIf="showSelectedRoleUsers">
+        <ws-app-users></ws-app-users>
       </ng-container>
     </mat-card-content>
   </mat-card>

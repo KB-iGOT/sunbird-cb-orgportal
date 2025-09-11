@@ -9,10 +9,10 @@
           <ws-app-create-user></ws-app-create-user>
         </ng-container>
         <ng-container *ngIf="tab.value === 'rolesAndAccess' && selectedTabIndex === i">
-          <p>Roles and access content</p>
+          <ws-app-roles-access [selectedOrgData]="orgData"></ws-app-roles-access>
         </ng-container>
         <ng-container *ngIf="tab.value === 'mentorManagement' && selectedTabIndex === i">
-          <p>Mentor Management content</p>
+          <ws-app-mentor-manage [selectedOrgData]="orgData"></ws-app-mentor-manage>
         </ng-container>
         <ng-container *ngIf="tab.value === 'designationMaster' && selectedTabIndex === i">
           <ws-app-designations-master></ws-app-designations-master>

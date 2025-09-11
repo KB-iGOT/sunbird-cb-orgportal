@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
+import * as _ from 'lodash'
 
 interface TabDetails {
   id: number
@@ -16,6 +17,7 @@ interface TabDetails {
 export class OrganisationUsersComponent implements OnInit {
   selectedTabIndex = 0;
   tabs: TabDetails[] = [];
+  orgData: any
 
   constructor(
     private activatedRoute: ActivatedRoute,
@@ -23,6 +25,10 @@ export class OrganisationUsersComponent implements OnInit {
   ) { }
 
   ngOnInit() {
+    const queryParam = _.get(this.activatedRoute, 'snapshot.queryParams')
+    if (queryParam) {
+      this.orgData = queryParam
+    }
     this.tabs = [
       { id: 0, name: 'Users', value: 'users' },
       { id: 1, name: 'Roles and access', value: 'rolesAndAccess' },
