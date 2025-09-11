@@ -1,4 +1,4 @@
-import { Component, EventEmitter, OnInit, Output } from '@angular/core'
+import { Component, EventEmitter, OnInit, Output, Input, OnChanges, SimpleChanges } from '@angular/core'
 import { TrainingPlanDataSharingService } from './../../services/training-plan-data-share.service'
 import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog'
 // import { AddContentDialogComponent } from '../../components/add-content-dialog/add-content-dialog.component'
@@ -9,8 +9,10 @@ import { ConfirmationBoxComponent } from '../../components/confirmation-box/conf
   templateUrl: './create-content.component.html',
   styleUrls: ['./create-content.component.scss'],
 })
-export class CreateContentComponent implements OnInit {
+export class CreateContentComponent implements OnInit, OnChanges {
   @Output() addContentInvalid = new EventEmitter<any>()
+  @Input() tabSelected: string = ''
+  @Input() isLiveContent!: boolean
 
   categoryData: any[] = []
   contentData: any[] = []
@@ -69,6 +71,14 @@ export class CreateContentComponent implements OnInit {
       this.isAparEnabled = this.tpdsSvc.trainingPlanStepperData.isApar
     } else {
       this.tpdsSvc.trainingPlanStepperData.isApar = this.isAparEnabled
+    }
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['tabSelected'] && this.tabSelected === 'addContent') {
+      if (this.tpdsSvc.trainingPlanContentData?.data?.content) {
+        this.contentData = [...this.tpdsSvc.trainingPlanContentData.data.content]
+      }
     }
   }
 

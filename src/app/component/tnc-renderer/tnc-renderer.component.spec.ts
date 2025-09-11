@@ -1,5 +1,5 @@
 
-import { ConfigurationsService } from '@sunbird-cb/utils'
+import { ConfigurationsService } from '@sunbird-cb/utils-v2'
 import { TncRendererComponent } from './tnc-renderer.component'
 
 describe('TncRendererComponent', () => {

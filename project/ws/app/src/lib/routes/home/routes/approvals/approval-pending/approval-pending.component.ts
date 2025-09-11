@@ -4,7 +4,7 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser'
 import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog'
 import { LegacyPageEvent as PageEvent } from '@angular/material/legacy-paginator'
 import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar'
-import { EventService } from '@sunbird-cb/utils'
+import { EventService } from '@sunbird-cb/utils-v2'
 
 /* tslint:disable */
 import * as _ from 'lodash'

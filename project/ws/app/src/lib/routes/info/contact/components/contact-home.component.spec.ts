@@ -1,5 +1,5 @@
 
-import { ConfigurationsService } from '@sunbird-cb/utils'
+import { ConfigurationsService } from '@sunbird-cb/utils-v2'
 import { ContactHomeComponent } from './contact-home.component'
 
 describe('ContactHomeComponent', () => {

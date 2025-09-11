@@ -7,7 +7,7 @@
 
 import { ProfileV2Service } from '../../services/home.servive'
 import { Router } from '@angular/router'
-import { EventService } from '@sunbird-cb/utils'
+import { EventService } from '@sunbird-cb/utils-v2'
 import { WelcomeComponent } from './welcome.component'
 
 describe('WelcomeComponent', () => {

@@ -9,7 +9,7 @@ import {
   GroupCheckboxModule,
   UIORGTableModule,
 } from '@sunbird-cb/collection'
-import { WidgetResolverModule } from '@sunbird-cb/resolver'
+import { SbUiResolverModule } from '@sunbird-cb/resolver-v2'
 import { HomeModule } from '../home/home.module'
 import { RouterModule } from '@angular/router'
 import { UsersComponent } from './routes/users/users.component'
@@ -20,7 +20,7 @@ import { MatLegacyCardModule as MatCardModule } from '@angular/material/legacy-c
 
 @NgModule({
   declarations: [HomeComponent, PrivilegesComponent, UsersComponent],
-  imports: [CommonModule, AccessRoutingModule, BreadcrumbsOrgModule, LeftMenuWithoutLogoModule, WidgetResolverModule,
+  imports: [CommonModule, AccessRoutingModule, BreadcrumbsOrgModule, LeftMenuWithoutLogoModule, SbUiResolverModule,
     MatSidenavModule, MatIconModule, GroupCheckboxModule, HomeModule, RouterModule, UIORGTableModule, MatCardModule],
   exports: [UsersComponent],
   providers: [UsersService],

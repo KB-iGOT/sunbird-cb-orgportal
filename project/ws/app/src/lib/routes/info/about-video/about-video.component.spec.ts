@@ -1,5 +1,5 @@
 import { AboutVideoComponent } from './about-video.component'
-import { ConfigurationsService } from '@sunbird-cb/utils'
+import { ConfigurationsService } from '@sunbird-cb/utils-v2'
 
 describe('AboutVideoComponent', () => {
     let component: AboutVideoComponent

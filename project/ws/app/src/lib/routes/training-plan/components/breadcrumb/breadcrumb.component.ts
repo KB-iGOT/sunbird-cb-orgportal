@@ -182,9 +182,9 @@ export class BreadcrumbComponent implements OnInit {
       delete obj.request.assignmentType
     }
     delete obj.request.status
-    if (this.isLiveContent) {
-      delete obj.request.isApar
-    }
+    // if (this.isLiveContent) {
+    //   delete obj.request.isApar
+    // }
     this.showDialogBox('progress')
     this.tpSvc.updatePlan(obj).subscribe((_data: any) => {
       this.dialogRef.close()

@@ -24,12 +24,12 @@ import { MatLegacyTableModule as MatTableModule } from '@angular/material/legacy
 import { MatExpansionModule } from '@angular/material/expansion'
 import { MatDividerModule } from '@angular/material/divider'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
-import { WidgetResolverModule } from '@sunbird-cb/resolver'
+import { SbUiResolverModule } from '@sunbird-cb/resolver-v2'
 import { RolesService } from './services/roles.service'
 import { FileService } from './services/upload.service'
 import { UsersUploadComponent } from './components/users-upload/users-upload.component'
 import { PipeEmailModule } from '../pipes/pipe-email/pipe-email.module'
-import { PipeDurationTransformModule } from '@sunbird-cb/utils'
+import { PipeDurationTransformModule } from '@sunbird-cb/utils-v2'
 import { OtpService } from './services/otp.service'
 
 @NgModule({
@@ -39,7 +39,7 @@ import { OtpService } from './services/otp.service'
     MatSidenavModule, MatListModule, ScrollspyLeftMenuModule, MatCardModule, FormsModule,
     MatFormFieldModule, MatInputModule, MatButtonModule, MatIconModule, MatGridListModule,
     MatRadioModule, MatDialogModule, ReactiveFormsModule, MatSelectModule, MatProgressSpinnerModule,
-    MatExpansionModule, MatDividerModule, MatPaginatorModule, MatTableModule, WidgetResolverModule, MatSortModule, PipeEmailModule,
+    MatExpansionModule, MatDividerModule, MatPaginatorModule, MatTableModule, SbUiResolverModule, MatSortModule, PipeEmailModule,
     UIORGTableModule, MatChipsModule, PipeDurationTransformModule,
   ],
   providers: [RolesService, FileService, DatePipe, OtpService],

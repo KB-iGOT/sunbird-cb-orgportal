@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild, AfterViewInit, OnChanges, SimpleChanges } from '@angular/core'
-import { ConfigurationsService } from '@sunbird-cb/utils'
+import { ConfigurationsService } from '@sunbird-cb/utils-v2'
 import { MatLegacyPaginator as MatPaginator } from '@angular/material/legacy-paginator'
 import { MatLegacyTableDataSource as MatTableDataSource } from '@angular/material/legacy-table'
 import { MatLegacyTabChangeEvent as MatTabChangeEvent } from '@angular/material/legacy-tabs'

@@ -1,4 +1,4 @@
-import { ValueService, ConfigurationsService, WidgetContentService } from '@sunbird-cb/utils'
+import { ValueService, ConfigurationsService, WidgetContentService } from '@sunbird-cb/utils-v2'
 import { ActivatedRoute, Router } from '@angular/router'
 import { MdoinfoComponent } from './mdoinfo.component'
 import { of } from 'rxjs'

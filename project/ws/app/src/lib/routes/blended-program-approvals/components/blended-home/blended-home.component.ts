@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core'
 import { Router, Event, NavigationEnd, ActivatedRoute } from '@angular/router'
 import { ILeftMenuWithoutLogo } from '@sunbird-cb/collection'
-import { NsWidgetResolver } from '@sunbird-cb/resolver'
+import { NsWidgetResolver } from '@sunbird-cb/resolver-v2'
 /* tslint:disable */
 import * as _ from 'lodash'
 /* tslint:enable */

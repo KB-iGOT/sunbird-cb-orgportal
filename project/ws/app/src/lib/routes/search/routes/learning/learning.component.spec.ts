@@ -1,7 +1,7 @@
 import { LearningComponent } from './learning.component'
 import { of, Subject } from 'rxjs'
 import { ActivatedRoute, Router } from '@angular/router'
-import { ValueService, ConfigurationsService, UtilityService } from '@sunbird-cb/utils'
+import { ValueService, ConfigurationsService, UtilityService } from '@sunbird-cb/utils-v2'
 import { SearchServService } from '../../services/search-serv.service'
 
 describe('LearningComponent', () => {

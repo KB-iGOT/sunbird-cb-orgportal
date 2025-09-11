@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
 // import { TelemetryEvents } from '../../../../head/_services/telemetry.event.model'
-// import { EventService } from '@sunbird-cb/utils'
+// import { EventService } from '@sunbird-cb/utils-v2'
 import { ITableData } from '@sunbird-cb/collection/lib/ui-org-table/interface/interfaces'
 import { TrainingPlanDashboardService } from '../../services/training-plan-dashboard.service'
 import moment from 'moment'
@@ -263,7 +263,7 @@ export class TrainingPlanDashboardComponent implements OnInit {
         icon: 'radio_on',
         title: (_type === 'deleteContent') ? 'Are you sure you want to delete the plan?' :
           (_type === 'publishContent') ? 'Are you sure you want to publish the plan?' : '',
-        subTitle: 'You wont be able to revert this',
+        subTitle: "You won't be able to revert this",
         primaryAction: 'Confirm',
         secondaryAction: 'Cancel',
       },

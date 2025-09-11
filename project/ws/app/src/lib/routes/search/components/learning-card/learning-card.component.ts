@@ -1,6 +1,6 @@
 import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core'
 import { NsContent } from '@sunbird-cb/collection'
-import { ConfigurationsService, EventService } from '@sunbird-cb/utils'
+import { ConfigurationsService, EventService } from '@sunbird-cb/utils-v2'
 import { SafeHtml, DomSanitizer } from '@angular/platform-browser'
 @Component({
   selector: 'ws-app-learning-card',

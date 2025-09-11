@@ -1,12 +1,12 @@
 import { SetupDoneComponent } from './setup-done.component'
-import { ConfigurationsService } from '@sunbird-cb/utils'
+import { ConfigurationsService } from '@sunbird-cb/utils-v2'
 import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog'
 import { Router, ActivatedRoute } from '@angular/router'
 import { DomSanitizer } from '@angular/platform-browser'
 import { Globals } from '../../globals'
 import { AppTourDialogComponent } from '@sunbird-cb/collection'
 
-jest.mock('@sunbird-cb/utils')
+jest.mock('@sunbird-cb/utils-v2')
 jest.mock('@angular/router')
 jest.mock('@angular/platform-browser')
 jest.mock('@angular/material/legacy-dialog')

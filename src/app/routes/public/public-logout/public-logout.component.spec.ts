@@ -1,10 +1,10 @@
 import { PublicLogoutComponent } from './public-logout.component'
-import { ConfigurationsService } from '@sunbird-cb/utils'
+import { ConfigurationsService } from '@sunbird-cb/utils-v2'
 import { ActivatedRoute } from '@angular/router'
 import { of } from 'rxjs'
 
 // Mock the dependencies
-jest.mock('@sunbird-cb/utils', () => ({
+jest.mock('@sunbird-cb/utils-v2', () => ({
     ConfigurationsService: jest.fn().mockImplementation(() => ({
         pageNavBar: { background: 'blue' },
         instanceConfig: { mailIds: { contactUs: 'contact@domain.com' } }

@@ -1,6 +1,6 @@
 import '@angular/compiler'
 import { Router, ActivatedRoute } from '@angular/router'
-import { ConfigurationsService, EventService, ValueService } from '@sunbird-cb/utils'
+import { ConfigurationsService, EventService, ValueService } from '@sunbird-cb/utils-v2'
 import { HomeComponent } from './home.component'
 import { LeftMenuService } from '@sunbird-cb/collection'
 

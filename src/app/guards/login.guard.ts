@@ -1,4 +1,4 @@
-import { ConfigurationsService } from '@sunbird-cb/utils' // AuthKeycloakService
+import { ConfigurationsService } from '@sunbird-cb/utils-v2' // AuthKeycloakService
 import { Injectable } from '@angular/core'
 import { ActivatedRouteSnapshot, RouterStateSnapshot, UrlTree, Router } from '@angular/router'
 import { Observable } from 'rxjs'
