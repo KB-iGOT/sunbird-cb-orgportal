@@ -38,7 +38,7 @@ export class PreviewPlanComponent implements OnInit {
       const arr = []
       this.tab = this.selectedTab = 'content'
 
-      if (category === 'CustomUser') {
+      if (category && category === 'CustomUser') {
         const assignmentDataArr: any = []
         if (contentData && contentData.userDetails) {
           contentData.userDetails.map((item: any) => {
@@ -57,7 +57,7 @@ export class PreviewPlanComponent implements OnInit {
           this.assigneeData = { category, data: assignmentDataArr }
         }
       }
-      if (category === 'Designation') {
+      if (category && category === 'Designation') {
         const assignmentDataArr: any = []
         contentData.assignmentTypeInfo.map((item: any) => {
           assignmentDataArr.push({ name: item })
@@ -68,7 +68,7 @@ export class PreviewPlanComponent implements OnInit {
         contentData.contentList) {
         this.contentList = contentData.contentList
       }
-      if (category.toLowerCase() !== 'alluser') {
+      if (category && category?.toLowerCase() !== 'alluser') {
         arr.push({
           name: contentData.contentType,
           tab: 'content',

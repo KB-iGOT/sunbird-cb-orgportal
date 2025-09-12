@@ -25,17 +25,18 @@
               </ng-template>
             </mat-tab>
           </ng-container>
-
-          <mat-tab>
-            <ng-template mat-tab-label>
-              <span>Organisation Hierarchies</span>
-            </ng-template>
-            <ng-template matTabContent>
-              <ng-container *ngIf="selectedTabIndex === 1">
-                <ng-container *ngTemplateOutlet="organisationHierarchiesTabContent"></ng-container>
-              </ng-container>
-            </ng-template>
-          </mat-tab>
+          <ng-container *ngIf="showOrganisationTab">
+            <mat-tab>
+              <ng-template mat-tab-label>
+                <span>Organisation Hierarchies</span>
+              </ng-template>
+              <ng-template matTabContent>
+                <ng-container *ngIf="selectedTabIndex === 1">
+                  <ng-container *ngTemplateOutlet="organisationHierarchiesTabContent"></ng-container>
+                </ng-container>
+              </ng-template>
+            </mat-tab>
+          </ng-container>
         </mat-tab-group>
       </div>
     </mat-card-content>

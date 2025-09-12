@@ -119,6 +119,18 @@ export class InitService {
       'download-icon',
       domSanitizer.bypassSecurityTrustResourceUrl('assets/icons/download_icon.svg')
     )
+    iconRegistry.addSvgIcon(
+      'svg_search',
+      domSanitizer.bypassSecurityTrustResourceUrl('assets/icons/search-selections.svg'),
+    )
+    iconRegistry.addSvgIcon(
+      'info-outline',
+      domSanitizer.bypassSecurityTrustResourceUrl('assets/icons/icon-wrapper.svg'),
+    )
+    iconRegistry.addSvgIcon(
+      'radio-on',
+      domSanitizer.bypassSecurityTrustResourceUrl('assets/icons/radio-on.svg'),
+    )
   }
 
   async init() {

@@ -20,7 +20,17 @@
                     [tabSelected]="tabType?.ADD_CONTENT" [isLiveContent]="isContentLive"></ws-app-create-content>
             </ng-template>
         </mat-tab>
-        <mat-tab [label]="tabType.ADD_ASSIGNEE" [disabled]="addCotnentDisable || addAssigneeDisable">
+        <mat-tab [label]="tabType.ADD_ACCESS_SETTINGS" [disabled]="addCotnentDisable || addAccessSettingDisable">
+            <ng-template mat-tab-label>
+                <span>3.&nbsp;<span *ngIf="!editState">Add</span><span *ngIf="editState">Edit</span> Access Control</span>
+            </ng-template>
+            <ng-template matTabContent>
+                <sb-uic-access-control [config]="accessSettingsParameters" [contentId]=""
+                  [content]="undefined" (accessControlData)="getAccessControlData($event)" [tempAccessControl]="tempSavedAccessControl">
+                </sb-uic-access-control>
+            </ng-template>
+        </mat-tab>
+        <!-- <mat-tab [label]="tabType.ADD_ASSIGNEE" [disabled]="addCotnentDisable || addAssigneeDisable">
             <ng-template mat-tab-label>
                 <span>3.&nbsp;<span *ngIf="!editState">Add</span><span *ngIf="editState">Edit</span> Assignee</span>
             </ng-template>
@@ -28,9 +38,9 @@
                 <ws-app-create-assignee (addAssigneeInvalid)="checkForaddAssignee($event)"
                     (changeTabToTimeline)="tabChangeToTimeline($event)"></ws-app-create-assignee>
             </ng-template>
-        </mat-tab>
+        </mat-tab> -->
         <mat-tab [label]="tabType.ADD_TIMELINE"
-            [disabled]="addCotnentDisable || addAssigneeDisable || addTimelineDisable">
+            [disabled]="addCotnentDisable || addAccessSettingDisable || addTimelineDisable">
             <ng-template mat-tab-label>
                 <span>4.&nbsp;<span *ngIf="!editState">Add</span><span *ngIf="editState">Edit</span> Timeline</span>
             </ng-template>
