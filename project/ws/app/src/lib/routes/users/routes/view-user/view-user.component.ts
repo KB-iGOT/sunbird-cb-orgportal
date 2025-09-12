@@ -488,7 +488,7 @@ export class ViewUserComponent implements OnInit, AfterViewInit {
           },
         }
 
-        this.usersSvc.addUserToDepartment(dreq).subscribe(dres => {
+        this.usersSvc.addUserToRole(dreq).subscribe(dres => {
           if (dres) {
             this.updateUserRoleForm.reset({ roles: '' })
             this.openSnackbar('User role updated Successfully')

@@ -73,12 +73,11 @@
                 <ng-template matMenuContent>
                   <button mat-menu-item (click)="editOrganization(row)">Edit</button>
                   <button mat-menu-item (click)="goToRoute('users', row)">Users</button>
-                  <button mat-menu-item (click)="goToRoute('rolesandaccess', row)">Roles &
+                  <button mat-menu-item (click)="goToRoute('rolesAndAccess', row)">Roles &
                     Access</button>
-                  <button mat-menu-item (click)="goToRoute('mentormanage', row)">Mentor
+                  <button mat-menu-item (click)="goToRoute('mentorManagement', row)">Mentor
                     Management</button>
-                  <button mat-menu-item (click)="goToRoute('designation_master', row)"
-                    *ngIf="needCreate && currentTab === 'organisation'">Manage
+                  <button mat-menu-item (click)="goToRoute('designationMaster', row)">Manage
                     Designations</button>
                 </ng-template>
               </mat-menu>

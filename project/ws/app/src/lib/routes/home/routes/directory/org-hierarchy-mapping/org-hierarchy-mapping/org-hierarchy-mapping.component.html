@@ -1,0 +1,35 @@
+<div class="org-hierarchy-container">
+  <div class="flex my-3">
+    <ng-container *ngIf="hasOrgHierarchyFrameworkId()">
+      <div class="bulk-upload-container flex gap-4 ml-auto">
+        <button mat-button class="btn-common btn-with-out-border flex flex-middle" type="button"
+          (click)="downloadTemplate()">
+          Download template
+          <mat-icon svgIcon="download-icon" class="btn-icon"></mat-icon>
+        </button>
+        <button mat-button class="btn-common btn-secondary" type="button" (click)="exportData()">Export</button>
+        <input type="file" #fileInput accept=".xlsx" style="display: none" (change)="onFileSelected($event)">
+        <button mat-button class="btn-common btn-primary" type="button" (click)="openBulkUploadDialog()">
+          Bulk Upload
+        </button>
+      </div>
+    </ng-container>
+  </div>
+  <ng-container *ngIf="organizationCtrl?.value && hasOrgHierarchyFrameworkId() && !bulkUploadRefresh">
+    <div class="tree-view-container">
+      <lib-tree-view [environment]="environmentVal" [taxonomyConfig]="defaultOrgConfig"
+        [orgSelectedData]="getOrgDetails()" (loaderEnable)="checkloader($event)"
+        (manageOrg)="redirectOrg($event)"></lib-tree-view>
+    </div>
+  </ng-container>
+  <ng-container *ngIf="organizationCtrl?.value && !hasOrgHierarchyFrameworkId()">
+    <div class="no-hierarchy-container">
+      <p>The selected organization does not have a hierarchy framework configured.</p>
+      <p>Do you want to crate a new framework?</p>
+      <div class="flex gap-4 btn-container justify-center">
+        <button mat-button class="btn-common btn-primary" (click)="createNewHierarchy()">Create</button>
+        <button mat-button class="btn-common btn-secondary" (click)="cancelHierarchyCreation()">Cancel</button>
+      </div>
+    </div>
+  </ng-container>
+</div>

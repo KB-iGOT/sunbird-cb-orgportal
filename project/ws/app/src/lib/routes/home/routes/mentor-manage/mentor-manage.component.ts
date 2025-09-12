@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core'
+import { Component, Input, OnDestroy, OnInit } from '@angular/core'
 import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog'
 import { ActivatedRoute, Router } from '@angular/router'
 /* tslint:disable */
@@ -24,6 +24,9 @@ import { ReportsVideoComponent } from '../reports-video/reports-video.component'
   /* tslint:enable */
 })
 export class MentorManageComponent implements OnInit, OnDestroy {
+
+  @Input() selectedOrgData: any
+
   /* tslint:disable */
   Math: any
   /* tslint:enable */
@@ -79,10 +82,6 @@ export class MentorManageComponent implements OnInit, OnDestroy {
     private usersService: UsersService
   ) {
     this.Math = Math
-    this.configSvc = this.route.parent && this.route.parent.snapshot.data.configService
-    this.currentUser = this.configSvc.userProfile && this.configSvc.userProfile.userId
-    this.currentUserStatus = this.configSvc.unMappedUser.profileDetails.profileStatus
-
     // this.usersData = _.get(this.route, 'snapshot.data.usersList.data') || {}
     // this.filterData()
   }
@@ -94,8 +93,16 @@ export class MentorManageComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
+    if (this.selectedOrgData) {
+      this.configSvc = _.get(this.route, 'snapshot.data.configService')
+    } else {
+      this.configSvc = this.route.parent && this.route.parent.snapshot.data.configService
+    }
+    this.currentUser = this.configSvc.userProfile && this.configSvc.userProfile.userId
+    this.currentUserStatus = this.configSvc.unMappedUser.profileDetails.profileStatus
     this.currentFilter = this.route.snapshot.params['tab'] || 'verified'
-    this.rootOrgId = _.get(this.route.snapshot.parent, 'data.configService.unMappedUser.rootOrg.rootOrgId')
+    this.rootOrgId = (this.selectedOrgData) ? this.selectedOrgData.roleId :
+      _.get(this.route.snapshot.parent, 'data.configService.unMappedUser.rootOrg.rootOrgId')
     this.searchQuery = ''
     if (this.configSvc.unMappedUser && this.configSvc.unMappedUser.roles) {
       this.isMdoAdmin = this.configSvc.unMappedUser.roles.includes('MDO_ADMIN')
@@ -106,7 +113,7 @@ export class MentorManageComponent implements OnInit, OnDestroy {
       setTimeout(() => {
         this.getAllVerifiedUsers('')
         this.getMentorUsers('')
-      },         1000)
+      }, 1000)
 
     })
     this.getAllVerifiedUsers('')
