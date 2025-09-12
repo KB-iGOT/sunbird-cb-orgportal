@@ -156,4 +156,21 @@ export class CreateUserComponent implements OnInit {
     this.getUserList('')
     this.createUser = false
   }
+
+  emailTransform(value: any): any {
+    // return value.split('.').join('[dot]').replace('@', '[at]')
+    if (value !== undefined) {
+      return value?.profileDetails?.personalDetails?.primaryEmail?.replace(/\./g, '[dot]').replace('@', '[at]')
+    }
+
+  }
+
+  getRoleList(roles: any) {
+    if (roles && roles.length > 0) {
+      // tslint:disable-next-line
+      return _.join(_.map(roles, role => `<li>${role}</li>`), '')
+    }
+    return []
+  }
+
 }

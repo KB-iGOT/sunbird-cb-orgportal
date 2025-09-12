@@ -138,7 +138,7 @@ export class RolesAccessComponent implements OnInit, AfterViewInit, OnDestroy {
     }
     this.usersService.getRolesCountsApi(reqBody).pipe(
       map((res: any) => {
-        return res?.result?.response?.facets[0]?.values || []
+        return res?.result?.response?.facets?.[0]?.values || []
       })
     ).subscribe((ele: any) => {
       this.data.forEach((roleEle: any) => {
@@ -147,7 +147,6 @@ export class RolesAccessComponent implements OnInit, AfterViewInit, OnDestroy {
           roleEle.count = matchingRole.count
         }
       })
-      console.log(this.data)
     })
   }
 

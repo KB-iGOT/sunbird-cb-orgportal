@@ -1,5 +1,5 @@
-import { AfterViewInit, Component, OnInit, OnDestroy, ChangeDetectorRef, AfterContentChecked } from '@angular/core'
-import { Router, ActivatedRoute } from '@angular/router'
+import { AfterViewInit, Component, OnInit, OnDestroy, ChangeDetectorRef, AfterContentChecked, Input } from '@angular/core'
+import { ActivatedRoute } from '@angular/router'
 import { environment } from '../../../../../../../../../src/environments/environment'
 import { UsersService } from '../../services/users.service'
 import { UsersService as UsersService2 } from '../../../users/services/users.service'
@@ -17,31 +17,27 @@ import { ProfileV2UtillService } from '../../../home/services/home-utill.service
 })
 
 export class UsersComponent implements OnInit, AfterViewInit, AfterContentChecked, OnDestroy {
+
+  @Input() selectedOrgData: any
+  @Input() selectedRole: any
+
   tabledata!: ITableData
   configSvc: any
   data: any = []
   usersData: any
   data2: any
-  role: any
   roleName: string | undefined
-  currentRole: any
   private defaultSideNavBarOpenedSubscription: any
   rootOrgId: any
 
-  constructor(private usersSvc: UsersService, private router: Router, private activatedRoute: ActivatedRoute, private route: ActivatedRoute,
-              private profileUtilSvc: ProfileV2UtillService, private userS: UsersService2, private cdref: ChangeDetectorRef) { }
+  constructor(private usersSvc: UsersService, private route: ActivatedRoute,
+    private profileUtilSvc: ProfileV2UtillService, private userS: UsersService2, private cdref: ChangeDetectorRef) { }
 
   ngOnInit() {
-    const url = this.router.url.split('/')
-    this.role = url[url.length - 2]
-    this.roleName = this.role.replace('%20', ' ')
-    this.configSvc = _.get(this.route, 'snapshot.parent.data.configService') || {}
-    this.rootOrgId = _.get(this.route.snapshot.parent, 'data.configService.unMappedUser.rootOrg.rootOrgId')
-
-    // int left blank
-    this.activatedRoute.params.subscribe(params => {
-      this.currentRole = params['role']
-    })
+    this.configSvc = (this.selectedOrgData) ? _.get(this.route, 'snapshot.data.configService') || {} :
+      _.get(this.route, 'snapshot.parent.data.configService') || {}
+    this.rootOrgId = (this.selectedOrgData) ? this.selectedOrgData.roleId : this.configSvc?.unMappedUser?.rootOrg?.rootOrgId
+    this.roleName = this.selectedRole.replace('%20', ' ')
     this.tabledata = {
       // actions: [{ name: 'Details', label: 'Details', icon: 'remove_red_eye', type: 'link' }],
       actions: [],
@@ -61,7 +57,7 @@ export class UsersComponent implements OnInit, AfterViewInit, AfterContentChecke
   }
 
   fetchAllUsersWithRole() {
-    this.userS.getTotalRoleUsers(this.rootOrgId, this.currentRole).subscribe((data: any) => {
+    this.userS.getTotalRoleUsers(this.rootOrgId, this.selectedRole).subscribe((data: any) => {
       this.usersData = data.count
       this.getMyDepartment()
     })
@@ -79,7 +75,7 @@ export class UsersComponent implements OnInit, AfterViewInit, AfterContentChecke
 
   /* API call to get all roles*/
   fetchUsersWithRole() {
-    this.usersSvc.getUsers(this.role).subscribe(res => {
+    this.usersSvc.getUsers(this.selectedRole).subscribe(res => {
       this.data2 = res
       this.data = res.users.map((user: any) => {
         return {
@@ -87,7 +83,7 @@ export class UsersComponent implements OnInit, AfterViewInit, AfterContentChecke
           // fullName: `${user.first_name} ${user.last_name}`,
           email: this.profileUtilSvc.emailTransform(user.email),
           position: user.department_name,
-          role: this.role,
+          role: this.selectedRole,
           wid: user.wid,
         }
       })
@@ -96,7 +92,7 @@ export class UsersComponent implements OnInit, AfterViewInit, AfterContentChecke
   getRoleList(user: any) {
     if (user.organisations && user.organisations.length > 0) {
       // tslint:disable-next-line
-      return _.join(_.map(_.get(_.first(_.filter(user.organisations, { organisationId: _.get(this.configSvc, 'unMappedUser.rootOrg.id') })), 'roles'), role => `<li>${role}</li>`), '')
+      return _.join(_.map(_.get(_.first(_.filter(user.organisations, { organisationId: (this.selectedOrgData) ? this.selectedOrgData.roleId : _.get(this.configSvc, 'unMappedUser.rootOrg.id') })), 'roles'), role => `<li>${role}</li>`), '')
     }
     return []
   }
@@ -128,27 +124,6 @@ export class UsersComponent implements OnInit, AfterViewInit, AfterContentChecke
         })
     }
     this.data = users
-
-    // this.profile.getMyDepartmentAll().subscribe(res => {
-    //   res.active_users.map((user: any) => {
-    //     if (user.roleInfo.length > 0) {
-    //       user.roleInfo.forEach((eachrole: any) => {
-    //         eachrole.roleName = eachrole.roleName.replace('_', ' ')
-    //         if (eachrole.roleName === this.roleName) {
-    //           users.push({
-    //             fullName: `${user.firstName} ${user.lastName}`,
-    //             email: user.emailId,
-    //             position: user.department_name,
-    //             role: this.roleName,
-    //             wid: user.wid,
-    //           })
-    //         }
-    //       })
-    //     }
-    //     this.data = users
-    //   })
-    // })
-
   }
 
   ngOnDestroy() {
@@ -184,15 +159,11 @@ export class UsersComponent implements OnInit, AfterViewInit, AfterContentChecke
         _.set(user, 'roles', _.map(_.get($event.row, 'roleInfo'), i => i.roleName))
         this.usersSvc.activeUser(user)
         break
-      //   case 'delete':
-      //     _.set(user, 'isBlocked', false)
-      //     this.usersSvc.deleteUser(user)
-      //     break
     }
   }
 
   onEnterkySearch(enterValue: any) {
-    const rootOrgId = _.get(this.route.snapshot.parent, 'data.configService.unMappedUser.rootOrg.rootOrgId')
+    const rootOrgId = (this.selectedOrgData) ? this.selectedOrgData.roleId : this.configSvc?.unMappedUser?.rootOrg?.rootOrgId
     this.usersSvc.searchUserByenter(enterValue, rootOrgId).subscribe(data => {
       this.usersData = data.result.response
 

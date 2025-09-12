@@ -1,5 +1,5 @@
 <div class="flex flex-4 flex-column">
-  <mat-card [ngClass]="{'padding-remove': selectedOrgData}">
+  <div [ngClass]="{'padding-remove': selectedOrgData}">
     <!-- <mat-card-header class="flex-custom-m">
         <div class="flex-1" role="link" tabindex="1">
           <div class="flex flex-1">
@@ -10,12 +10,22 @@
         </div>
       </mat-card-header> -->
     <mat-card-title class="flex-4 mobile-margin mat-h2">
-      <a [ngClass]="{'cursor-pointer': selectedRole}" (click)="selectedRole ? backToRoles() : null">Roles and access</a>
-      {{ selectedRole ? ('> ' + selectedRole) : '' }}
+      <ng-container *ngIf="!selectedRole">
+        Roles and access
+      </ng-container>
+      <ng-container *ngIf="selectedRole">
+        <div class="flex flex-middle gap-1">
+          <button mat-icon-button (click)="backToRoles()" type="button">
+            <mat-icon class="backicon">arrow_back</mat-icon>
+          </button>
+
+          <div class="mat-h2 header-text margin-remove">{{selectedRole}}</div>
+        </div>
+      </ng-container>
     </mat-card-title>
     <mat-card-content>
       <ng-container *ngIf="!showSelectedRoleUsers">
-        <ng-container *ngIf="data?.length > 0">
+        <!-- <ng-container *ngIf="data?.length > 0">
           <ws-widget-org-user-table [tableData]="tabledata" [data]="data" (eOnRowClick)="onRoleClick($event)"
             (actionsClick)="actionsClick($event)">
           </ws-widget-org-user-table>
@@ -24,11 +34,40 @@
           <div class="flex flex-1 loader-box">
             <mat-spinner strokeWidth="3" diameter="50"></mat-spinner>
           </div>
+        </ng-container> -->
+        <ng-container>
+          <div class="roles-cards-container">
+            <div *ngIf="data?.length === 0" class="no-roles-message">
+              <mat-icon class="empty-icon">assignment_ind</mat-icon>
+              <p>No roles available</p>
+            </div>
+            <div class="roles-grid" *ngIf="data?.length > 0">
+              <ng-container *ngFor="let role of data">
+                <mat-card *ngIf="role.count > 0" class="role-card" (click)="onRoleClick(role)" role="button"
+                  tabindex="0">
+                  <mat-card-header class="flex-center">
+                    <mat-card-title>{{(role.role).split('_').join(' ')}}</mat-card-title>
+                  </mat-card-header>
+                  <mat-card-content>
+                    <div class="role-stats">
+                      <div class="stat-item">
+                        <span class="stat-label">Users</span>
+                        <div class="flex flex-middle gap-1">
+                          <mat-icon class="user-icon">person</mat-icon>
+                          <span class="stat-value">{{role.count || 0}}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </mat-card-content>
+                </mat-card>
+              </ng-container>
+            </div>
+          </div>
         </ng-container>
       </ng-container>
       <ng-container *ngIf="showSelectedRoleUsers">
-        <ws-app-users></ws-app-users>
+        <ws-app-users [selectedOrgData]="selectedOrgData" [selectedRole]="selectedRole"></ws-app-users>
       </ng-container>
     </mat-card-content>
-  </mat-card>
+  </div>
 </div>
