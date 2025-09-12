@@ -28,6 +28,7 @@ export class CreateContentComponent implements OnInit, OnChanges {
   confirmationText: string = 'You have unsaved progress on your CBP plan. Clicking "Yes" will discard it and take you to request new content screen. Would you like to continue?'
   /* tslint:enable */
   isAparEnabled = false
+  aparCheckboxDisabled = false
   constructor(private tpdsSvc: TrainingPlanDataSharingService, public dialog: MatDialog,
     //  private snackbar: MatSnackBar,
     private router: Router
@@ -69,6 +70,7 @@ export class CreateContentComponent implements OnInit, OnChanges {
     // this.handleApiData(true)
     if (this.tpdsSvc.trainingPlanStepperData?.isApar) {
       this.isAparEnabled = this.tpdsSvc.trainingPlanStepperData.isApar
+      this.aparCheckboxDisabled = this.tpdsSvc.trainingPlanStepperData.isApar
     } else {
       this.tpdsSvc.trainingPlanStepperData.isApar = this.isAparEnabled
     }
