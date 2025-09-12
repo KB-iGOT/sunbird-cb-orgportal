@@ -19,12 +19,12 @@
         <ws-widget-org-user-table [tableData]="tabledata" [data]="trainingPlanData" [isTrainingPlan]="true"
           [trainingTagList]="tagListData" [actionMenuItem]="pageConfig?.data?.actionMenu" [userId]="currentUser"
           (eOnButtonClick)="clickHandler($event)" (actionsClick)="menuSelected($event)"
-          (tagSelectedData)="filterDataAsPerTab($event)" *ngIf="currentFilter === 'live' && fetchContentDone">
+          (tagSelectedData)="filterDataAsPerTab($event)" *ngIf="currentFilter === 'live' && fetchContentDone" (searchByEnterKey)="searchTrainingPlan($event)">
         </ws-widget-org-user-table>
         <ws-widget-org-user-table [tableData]="tabledata" [data]="trainingPlanData" [isTrainingPlan]="true"
           [trainingTagList]="tagListData" [actionMenuItem]="pageConfig?.data?.actionMenu" [userId]="currentUser"
           (eOnButtonClick)="clickHandler($event)" (actionsClick)="menuSelected($event)"
-          (tagSelectedData)="filterDataAsPerTab($event)" *ngIf="currentFilter === 'draft' && fetchContentDone">
+          (tagSelectedData)="filterDataAsPerTab($event)" *ngIf="currentFilter === 'draft' && fetchContentDone" (searchByEnterKey)="searchTrainingPlan($event)">
         </ws-widget-org-user-table>
       </ng-container>
     </mat-card-content>

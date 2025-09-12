@@ -25,6 +25,7 @@ export class TrainingPlanDataSharingService {
     assignmentTypeInfo: [
     ],
     endDate: '',
+    accessControl: null
   }
   constructor() {
 
@@ -44,6 +45,7 @@ export class TrainingPlanDataSharingService {
       assignmentTypeInfo: [
       ],
       endDate: '',
+      accessControl: null
     }
   }
 }
