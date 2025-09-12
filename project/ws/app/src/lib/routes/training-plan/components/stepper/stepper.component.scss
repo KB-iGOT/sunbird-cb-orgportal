@@ -2,8 +2,9 @@
 @import 'ws-mixins';
 
 .stepper {
-    margin:20px 0;
+    margin: 20px 0;
 }
+
 .relative {
     /* min-height: auto; */
     position: absolute;
@@ -146,11 +147,15 @@
 }
 
 .disable {
-  opacity: 0.3;
-  pointer-events: none;
-  cursor: none;
+    opacity: 0.3;
+        pointer-events: none;
+        cursor: none;
 }
 
 ::ng-deep .stepper .mat-tab-header {
     border-bottom: none !important;
+}
+::ng-deep .mat-mdc-dialog-container .mdc-dialog__surface,
+.mat-dialog-container {
+    padding: 0 !important;
 }
