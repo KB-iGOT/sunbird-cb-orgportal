@@ -1,5 +1,5 @@
 //#region (imports)
-import { Component, OnInit } from '@angular/core'
+import { AfterViewInit, Component, OnInit, TemplateRef, ViewChild } from '@angular/core'
 import { ConfigurationsService } from '@sunbird-cb/utils-v2'
 import * as _ from 'lodash'
 //#endregion (imports)
@@ -10,12 +10,19 @@ import * as _ from 'lodash'
   styleUrls: ['./directory.component.scss']
 })
 
-export class DirectoryComponent implements OnInit {
+export class DirectoryComponent implements OnInit, AfterViewInit {
+
+  @ViewChild('organisationTabContent') organisationTabContent!: TemplateRef<any>
+  @ViewChild('organisationHierarchiesTabContent') organisationHierarchiesTabContent!: TemplateRef<any>
 
   //#region (global variables)
   selectedTabIndex: number = 0;
-  showOrganisationTab: boolean = false;
   //#endregion (global variables)
+
+  tabs: any = [
+    { name: 'Organisation', value: 'organisation' },
+    { name: 'Organisation Hierarchies', value: 'organisationHierarchies' }
+  ]
 
   constructor(
     private configSvc: ConfigurationsService
@@ -25,12 +32,21 @@ export class DirectoryComponent implements OnInit {
     this.setOrganisationTabVisibility()
   }
 
+  ngAfterViewInit() {
+    this.tabs?.map((tab: any) => {
+      if (tab.value === 'organisation') {
+        tab.temp = this.organisationTabContent
+      } else if (tab.value === 'organisationHierarchies') {
+        tab.temp = this.organisationHierarchiesTabContent
+      }
+      return tab
+    })
+  }
+
   setOrganisationTabVisibility() {
     const sbOrgType = _.get(this.configSvc, 'orgReadData.sbOrgType', '')
-    if (sbOrgType === 'ministry') {
-      this.showOrganisationTab = true
-    } else {
-      this.showOrganisationTab = false
+    if (sbOrgType === 'mdo') {
+      this.tabs = this.tabs.filter((tab: any) => tab.value !== 'organisation')
     }
   }
 

@@ -61,6 +61,7 @@ export class OrgHierarchyMappingComponent implements OnInit, AfterViewInit {
   // Form controls
   public organizationCtrl: FormControl = new FormControl();
   public searchControl: FormControl = new FormControl();
+  parentOrgReadData: any
 
   constructor(
     private snackbar: MatSnackBar,
@@ -173,13 +174,14 @@ export class OrgHierarchyMappingComponent implements OnInit, AfterViewInit {
   }
 
   getOrgDetails(): any {
-    if (!this.organizationCtrl.value || (!this.checkIfMdoL0() && !this.filteredOrganizations?.length)) {
+    if (!this.organizationCtrl.value || (!this.checkIfMdoL0() && !this.checkIfParentIsMdoL0() && !this.filteredOrganizations?.length)) {
       return null
     }
     let selectedOrg: any
-
     if (this.checkIfMdoL0()) {
       selectedOrg = this.orgReadData
+    } else if (!this.checkIfMdoL0() && this.checkIfParentIsMdoL0()) {
+      selectedOrg = this.parentOrgReadData
     } else {
       selectedOrg = this.filteredOrganizations.find(organization =>
         organization.identifier === this.organizationCtrl.value
@@ -195,10 +197,11 @@ export class OrgHierarchyMappingComponent implements OnInit, AfterViewInit {
     let selectedOrg: any
     if (this.checkIfMdoL0()) {
       selectedOrg = this.orgReadData
+    } else if (!this.checkIfMdoL0() && this.checkIfParentIsMdoL0()) {
+      selectedOrg = this.parentOrgReadData
     } else {
       selectedOrg = this.filteredOrganizations.find(org => org.identifier === this.organizationCtrl.value)
     }
-
     return !!selectedOrg && !!selectedOrg.orgHierarchyFrameworkId
   }
 
@@ -362,7 +365,12 @@ export class OrgHierarchyMappingComponent implements OnInit, AfterViewInit {
   }
 
   checkIfMdoL0() {
-    return (this.orgReadData && this.orgReadData.sbOrgType === 'ministry')
+    return (this.orgReadData?.sbOrgType?.toLowerCase() === 'ministry')
+  }
+
+  checkIfParentIsMdoL0() {
+    return (this.parentOrgReadData?.sbOrgType?.toLowerCase() === 'ministry' ||
+      this.parentOrgReadData?.sbOrgType?.toLowerCase() === 'state')
   }
 
   getOrgReadAndDetails() {
@@ -375,20 +383,48 @@ export class OrgHierarchyMappingComponent implements OnInit, AfterViewInit {
     this.orgHieService.getOrgReadData(requestBody).pipe(
       switchMap((res: any) => {
         if (res && res.params && res.params.status.toLowerCase() === 'success') {
-          // Get the organization ID from the first response
           this.orgReadData = res.result?.response || null
-          if (this.orgReadData) {
-            const secondRequestBody = {
+          if (res.result?.response && res.result?.response?.sbOrgType?.toLowerCase() === 'mdo') {
+            const reqBody = {
               request: {
-                filters: {
-                  status: 1,
-                  ministryOrStateType: this.orgReadData.sbOrgType,
-                  ministryOrStateId: this.orgReadData.ministryOrStateId
-                }
+                organisationId: res.result?.response?.ministryOrStateId || '',
               }
             }
-            this.organizationCtrl.setValue(this.orgReadData.ministryOrStateId)
-            return this.orgHieService.getOrganizationDetails(secondRequestBody)
+            return this.orgHieService.getOrgReadData(reqBody).pipe(
+              switchMap((parentRes: any) => {
+                this.parentOrgReadData = parentRes.result?.response || null
+                if (this.parentOrgReadData) {
+                  const secondRequestBody = {
+                    request: {
+                      filters: {
+                        status: 1,
+                        ministryOrStateType: this.parentOrgReadData.sbOrgType,
+                        ministryOrStateId: this.parentOrgReadData.ministryOrStateId
+                      }
+                    }
+                  }
+                  this.organizationCtrl.setValue(this.parentOrgReadData.ministryOrStateId)
+                  return this.orgHieService.getOrganizationDetails(secondRequestBody)
+                } else {
+                  return of(null)
+                }
+              })
+            )
+          } else {
+            this.orgReadData = res.result?.response || null
+            if (this.orgReadData) {
+              const secondRequestBody = {
+                request: {
+                  filters: {
+                    status: 1,
+                    ministryOrStateType: this.orgReadData.sbOrgType,
+                    ministryOrStateId: this.orgReadData.ministryOrStateId
+                  }
+                }
+              }
+              this.organizationCtrl.setValue(this.orgReadData.ministryOrStateId)
+              return this.orgHieService.getOrganizationDetails(secondRequestBody)
+            }
           }
         }
         this.loaderService.changeLoaderState(false)
