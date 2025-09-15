@@ -28,19 +28,7 @@ export class TrainingPlanDashboardComponent implements OnInit {
   searchQuery = ''
   tabledata!: ITableData
   trainingPlanData: any = []
-  tagListData: any = [{
-    name: 'Designation',
-    value: 'Designation',
-    selected: false,
-  }, {
-    name: 'All users',
-    value: 'AllUser',
-    selected: false,
-  }, {
-    name: 'Custom users',
-    value: 'CustomUser',
-    selected: false,
-  }]
+  tagListData: any = []
   fetchContentDone!: boolean
   completeDataRes: any
   dialogRef: any
@@ -79,17 +67,17 @@ export class TrainingPlanDashboardComponent implements OnInit {
       columns: [
         // { displayName: 'Id', key: 'identifier' },
         { displayName: 'Plan name', key: 'name' },
-        { displayName: 'Assignee', key: 'assigneeCount' },
+        // { displayName: 'Assignee', key: 'assigneeCount' },
         { displayName: 'Total content', key: 'contentCount' },
         { displayName: 'Content type', key: 'contentType' },
         { displayName: 'Timeline', key: 'endDate' },
         { displayName: 'Plan type', key: 'planType' },
         { displayName: 'Created by', key: 'createdByName' },
-        { displayName: 'Created on', key: 'updatedAt' },
+        { displayName: 'Created on', key: 'createdAt' },
       ],
       needCheckBox: false,
       needHash: false,
-      sortColumn: 'updatedAt',
+      sortColumn: 'createdAt',
       sortState: 'desc',
       needUserMenus: false,
       actions: [],
@@ -129,14 +117,16 @@ export class TrainingPlanDashboardComponent implements OnInit {
       })
     }
     this.currentFilter = filter
-    this.filterData()
+    this.filterData('')
   }
 
-  filterData() {
+  filterData(searchString: string) {
     if (this.currentFilter === 'live') {
-      this.getLiveData()
+      // this.getLiveData()
+      this.getTrainingPlanCBP('live', searchString)
     } else if (this.currentFilter === 'draft') {
-      this.getDraftData()
+      // this.getDraftData()
+      this.getTrainingPlanCBP('draft', searchString)
     }
   }
 
@@ -191,12 +181,39 @@ export class TrainingPlanDashboardComponent implements OnInit {
     }
   }
 
+  async getTrainingPlanCBP(type: string, searchString: string, page: number = 0, pageSize: number = 50) {
+    this.loaderService.changeLoaderState(true)
+
+    const payload = {
+      "filter": {
+        "status": [type]
+      },
+      "pageNumber": page,
+      "pageSize": pageSize,
+      "searchString": searchString,
+      "orderBy": "createdAt",
+      "orderDirection": "desc"
+    }
+
+    this.trainingDashboardSvc.getTrainingPlansV2(payload).subscribe({
+      next: (response: any) => {
+        if (response.params && response.params.status && response.params.status === 'success') {
+          this.completeDataRes = response?.result?.result?.data || []
+          this.trainingPlanData = response?.result?.result?.data || []
+          this.convertDataAsPerTable()
+        } else {
+          this.loaderService.changeLoaderState(false)
+        }
+      }
+    })
+  }
+
   convertDataAsPerTable() {
     this.completeDataRes.map((res: any) => {
       res.contentCount = (res.contentList) ? res.contentList.length : 0
-      res.assigneeCount = (res.userType === 'AllUser') ? 'All Users' : (res.userDetails) ? res.userDetails.length : 0
+      // res.assigneeCount = (res.userType === 'AllUser') ? 'All Users' : (res.userDetails) ? res.userDetails.length : 0
       res.endDate = (res.endDate) ? moment(res.endDate).format('MMM DD[,] YYYY') : ''
-      res.updatedAt = (res.updatedAt) ? moment(res.updatedAt).format('MMM DD[,] YYYY') : ''
+      res.createdAt = (res.createdAt) ? moment(res.createdAt).format('MMM DD[,] YYYY') : ''
       res.createdByName = (res.createdBy === this.currentUser) ? 'You' : res.createdByName
       const compyData: any = []
       if (res.contentList && res.contentList.length > 0) {
@@ -209,16 +226,16 @@ export class TrainingPlanDashboardComponent implements OnInit {
         })
         res.competencies = _.uniq(compyData)
       }
-      const userName: any = []
-      const userDesignation: any = []
-      if (res.userType === 'CustomUser' && res.userDetails && res.userDetails.length > 0) {
-        res.userDetails.forEach((ele: any) => {
-          userName.push((ele && ele.firstName) ? ele.firstName : '')
-          userDesignation.push((ele && ele.designation) ? ele.designation : '')
-        })
-      }
-      res.userNameList = userName
-      res.userDesignationList = userDesignation
+      // const userName: any = []
+      // const userDesignation: any = []
+      // if (res.userType === 'CustomUser' && res.userDetails && res.userDetails.length > 0) {
+      //   res.userDetails.forEach((ele: any) => {
+      //     userName.push((ele && ele.firstName) ? ele.firstName : '')
+      //     userDesignation.push((ele && ele.designation) ? ele.designation : '')
+      //   })
+      // }
+      // res.userNameList = userName
+      // res.userDesignationList = userDesignation
       res.planType = res.isApar === true ? 'APAR' : 'Non-APAR'
     })
     this.fetchContentDone = true
@@ -289,7 +306,7 @@ export class TrainingPlanDashboardComponent implements OnInit {
         comment: 'Content deleted',
       },
     }
-    this.trainingPlanService.archivePlan(obj).subscribe((_data: any) => {
+    this.trainingPlanService.archivePlanV2(obj).subscribe((_data: any) => {
       this.snackBar.open('CBP plan deleted successfully.')
       this.loaderService.changeLoaderState(false)
       this.filter(this.currentFilter)
@@ -307,7 +324,7 @@ export class TrainingPlanDashboardComponent implements OnInit {
         comment: 'CBP plan approved',
       },
     }
-    this.trainingPlanService.publishPlan(obj).subscribe((data: any) => {
+    this.trainingPlanService.publishPlanV2(obj).subscribe((data: any) => {
       if (data && data.params && data.params.status && data.params.status.toLowerCase() === 'success') {
         this.snackBar.open('CBP plan published successfully.')
         this.loaderService.changeLoaderState(false)
@@ -367,5 +384,9 @@ export class TrainingPlanDashboardComponent implements OnInit {
         tabSelected: _tabSelected,
       },
     })
+  }
+
+  searchTrainingPlan(searchString: string) {
+    this.filterData(searchString)
   }
 }
