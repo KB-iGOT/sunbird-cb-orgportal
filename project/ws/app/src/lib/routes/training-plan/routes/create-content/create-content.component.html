@@ -1,6 +1,6 @@
 <ng-container class="m-4" >
     <div class="appar-wrapper p-4">
-        <div class="flex justify-between items-center">
+        <div class="flex justify-between items-center" [ngClass]="{'disable': aparCheckboxDisabled && isLiveContent}">
             <span class="apar-labels-heading">APAR Assignment</span>
             <div class="apar-checkbox-toggle">
               <input [(ngModel)]="isAparEnabled" type="checkbox" id="switch" (change)="onAparCheckboxChange($event)" />

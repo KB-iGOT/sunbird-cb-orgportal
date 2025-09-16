@@ -65,6 +65,8 @@ import { ResetDataSharingResolveService } from './resolvers/reset-data-sharing-r
 import { PreviewDialogBoxComponent } from './components/preview-dialog-box/preview-dialog-box.component'
 import { AddContentDialogComponent } from './components/add-content-dialog/add-content-dialog.component'
 import { PipeAcsendingOrderModule } from '../pipes/pipe-ascendingorder/pipe-ascendingorder.module'
+import { AccessControlModule } from '@sunbird-cb/access-settings'
+
 @NgModule({
     declarations: [
         TrainingPlanHomeComponent,
@@ -140,6 +142,7 @@ import { PipeAcsendingOrderModule } from '../pipes/pipe-ascendingorder/pipe-asce
         FilterSearchPipeModule,
         MatAutocompleteModule,
         PipeAcsendingOrderModule,
+        AccessControlModule
     ],
     providers: [
         InitResolver,
