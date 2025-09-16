@@ -384,7 +384,7 @@ export class OrgHierarchyMappingComponent implements OnInit, AfterViewInit {
       switchMap((res: any) => {
         if (res && res.params && res.params.status.toLowerCase() === 'success') {
           this.orgReadData = res.result?.response || null
-          if (res.result?.response && res.result?.response?.sbOrgType?.toLowerCase() === 'mdo') {
+          if (res.result?.response && res.result?.response?.ministryOrStateType?.toLowerCase() === 'ministry') {
             const reqBody = {
               request: {
                 organisationId: res.result?.response?.ministryOrStateId || '',

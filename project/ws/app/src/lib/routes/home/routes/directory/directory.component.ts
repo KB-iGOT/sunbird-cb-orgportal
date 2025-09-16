@@ -44,9 +44,11 @@ export class DirectoryComponent implements OnInit, AfterViewInit {
   }
 
   setOrganisationTabVisibility() {
-    const sbOrgType = _.get(this.configSvc, 'orgReadData.sbOrgType', '')
-    if (sbOrgType === 'mdo') {
-      this.tabs = this.tabs.filter((tab: any) => tab.value !== 'organisation')
+    const ministryOrStateType = _.get(this.configSvc, 'orgReadData.ministryOrStateType', '')
+    switch (ministryOrStateType) {
+      case 'ministry':
+        this.tabs = this.tabs.filter((tab: any) => tab.value !== 'organisation')
+        break
     }
   }
 
