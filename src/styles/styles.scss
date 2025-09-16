@@ -880,10 +880,6 @@ h3.shepherd-title {
   background: #D12E2E !important;
 }
 
-.mat-flat-button[disabled] {
-  opacity: 50% !important;
-}
-
 .mat-full-radius,
 .mat-full-radius-select {
   .mat-form-field-appearance-outline .mat-form-field-outline {
@@ -936,21 +932,6 @@ h3.shepherd-title {
   }
 }
 
-.mat-btn-outline {
-  color: #1B4CA1 !important;
-  height: 36px !important;
-  display: flex !important;
-  padding: 12px 16px !important;
-  justify-content: center;
-  align-items: center;
-  border: 1px solid !important;
-  border-color: #1B4CA1 !important;
-
-  span,
-  mat-icon {
-    color: #1B4CA1;
-  }
-}
 
 .new-bg-color {
   background-color: #1B4CA1 !important;

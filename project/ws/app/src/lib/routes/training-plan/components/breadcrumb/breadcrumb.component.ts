@@ -6,6 +6,7 @@ import { ConfirmationBoxComponent } from '../confirmation-box/confirmation.box.c
 import { TrainingPlanContent } from '../../models/training-plan.model'
 import { TrainingPlanService } from '../../services/traininig-plan.service'
 import { TrainingPlanDataSharingService } from '../../services/training-plan-data-share.service'
+import { NsAccessControlConfig } from '@sunbird-cb/access-settings'
 @Component({
   selector: 'ws-app-breadcrumb',
   templateUrl: './breadcrumb.component.html',
@@ -301,6 +302,7 @@ export class BreadcrumbComponent implements OnInit {
       this.dialogRef.close()
       if (this.isLiveContent) {
         this.publishPlan()
+        localStorage.removeItem(`${NsAccessControlConfig.Application.MDO}_access_control_${this.activeRoute?.snapshot?.params?.planId}`)
       } else {
         this.showDialogBox('progress-completed')
         setTimeout(() => {
