@@ -1,0 +1,91 @@
+.search-container {
+  padding: 8px 16px;
+  position: sticky;
+  top: 0;
+  background-color: white;
+  z-index: 100;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.search-input {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+  font-size: 14px;
+}
+
+:host {
+  .custom-height-select {
+    width: 250px;
+
+    // Main field height
+    ::ng-deep .mat-form-field-wrapper {
+      height: 35px;
+      padding: 0;
+      margin: 0;
+    }
+
+    // Infix (content area) height and alignment
+    ::ng-deep .mat-form-field-infix {
+      min-height: 35px !important;
+      height: 35px !important;
+      display: flex;
+      align-items: center;
+      border: 0;
+      position: relative;
+      padding: 4px 8px 0px 8px;
+    }
+
+    // Force mat-select dropdown to appear below
+    ::ng-deep .mat-select-panel-below {
+      margin-top: 36px !important; // Adjust this value as needed
+      transform-origin: top center !important;
+    }
+
+    // Round border for select
+    ::ng-deep .mat-form-field-outline {
+      border-radius: 20px !important;
+    }
+
+    ::ng-deep .mat-form-field-outline-start {
+      display: none !important;
+    }
+
+    ::ng-deep .mat-form-field-outline-end {
+      border-radius: 20px !important;
+      border-left-style: solid !important;
+    }
+
+    ::ng-deep .mat-select-arrow-wrapper {
+      padding-top: 15px;
+    }
+  }
+}
+
+// Global styles to ensure dropdown appears below
+::ng-deep .cdk-overlay-pane {
+  transform-origin: top center !important;
+}
+
+.no-hierarchy-container {
+  max-width: 60%;
+  margin: 50px auto;
+  text-align: center;
+  padding: 50px;
+}
+
+.tree-view-container {
+  height: 50vh;
+}
+
+.no-org-selected {
+  width: 20px;
+  height: 20px;
+  padding: 10px;
+  background: #0000000A;
+  border-radius: 8px;
+  color: #1B4CA1;
+}
+

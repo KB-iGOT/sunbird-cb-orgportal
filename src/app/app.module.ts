@@ -140,6 +140,7 @@ import { TranslateHttpLoader } from '@ngx-translate/http-loader'
 import {
   WIDGET_REGISTRATION_LIB_CONFIG,
 } from '@sunbird-cb/consumption'
+import { GlobalEventsService } from './services/global-events.service'
 /** Collection Library Modules */
 
 import { SearchListingModule } from '@sunbird-cb/search-listing'
@@ -357,6 +358,7 @@ export function HttpLoaderFactory(http: HttpClient) {
       useFactory: HttpLoaderFactory,
       deps: [HttpClient],
     },
+    GlobalEventsService
   ]
 })
 

@@ -57,6 +57,7 @@
     "@sunbird-cb/resolver-v2": "^0.0.7-ang-13-16",
     "@sunbird-cb/taxonomy-editor": "0.0.7-ang-13-16",
     "@sunbird-cb/utils-v2": "0.1.0-cbrelease-4.8.28",
+    "@sunbird-cb/tree-hierarchy": "0.0.2-cbrelease-4.8.29",
     "@sunbird-cb/notification": "0.0.5-cbrelease-4.8.28",
     "@sunbird-cb/utils": "1.0.21-ang-13-16",
     "@types/file-saver": "^2.0.1",

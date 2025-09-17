@@ -105,6 +105,21 @@ import { MAT_DATE_LOCALE } from '@angular/material/core'
 import { MyNotificationsComponent } from './routes/my-notifications/my-notifications.component'
 import { AllNotificationsModule } from '@sunbird-cb/notification'
 import { TranslateModule } from '@ngx-translate/core'
+import { CreateUserComponent } from './routes/directory/create-user/create-user.component'
+import { DirectoryComponent } from './routes/directory/directory.component'
+import { DirectoryTableComponent } from './components/directory-table/directory-table.component'
+import { CreateOrganisationComponent } from './components/create-organisation/create-organisation.component'
+import { InfoModalComponent } from './components/info-modal/info-modal.component'
+import { OrganisationUsersComponent } from './routes/directory/organisation-users/organisation-users.component'
+import { DesignationsMasterComponent } from './routes/directory/designations-master/designations-master.component'
+import { ImportDesignationComponent } from './routes/directory/import-designation/import-designation.component'
+import { DesignationsBuilkUploadComponent } from './routes/directory/designations-builk-upload/designations-builk-upload.component'
+import { OrgHierarchyService } from './services/org-hierarchy.service'
+import { BulkUploadOrgComponent } from './routes/directory/bulk-upload-org/bulk-upload-org.component'
+import { TreeHierarchyModule } from '@sunbird-cb/tree-hierarchy'
+import { OrgHierarchyMappingComponent } from './routes/directory/org-hierarchy-mapping/org-hierarchy-mapping/org-hierarchy-mapping.component'
+import { CustomSelfRegistrationComponent } from './routes/onboarding/custom-self-registration/custom-self-registration.component'
+import { UsersComponent } from '../access/routes/users/users.component'
 
 @NgModule({
   declarations: [
@@ -156,7 +171,20 @@ import { TranslateModule } from '@ngx-translate/core'
     CapitalizePipe,
     BulkUploadOdcsComponent,
     GroupsGradeComponent,
-    MyNotificationsComponent
+    MyNotificationsComponent,
+    DirectoryComponent,
+    CreateUserComponent,
+    DirectoryTableComponent,
+    CreateOrganisationComponent,
+    InfoModalComponent,
+    OrganisationUsersComponent,
+    DesignationsMasterComponent,
+    ImportDesignationComponent,
+    DesignationsBuilkUploadComponent,
+    OrgHierarchyMappingComponent,
+    BulkUploadOrgComponent,
+    CustomSelfRegistrationComponent,
+    UsersComponent
   ],
   imports: [
     CommonModule,
@@ -216,7 +244,8 @@ import { TranslateModule } from '@ngx-translate/core'
     TaxonomyEditorModule,
     ImageResponsiveModule,
     AllNotificationsModule,
-    TranslateModule.forChild()
+    TranslateModule.forChild(),
+    TreeHierarchyModule
   ],
   providers: [
     { provide: 'environment', useValue: environment },
@@ -226,7 +255,8 @@ import { TranslateModule } from '@ngx-translate/core'
     UploadService,
     TrainingPlanDashboardService,
     UsersService,
-    { provide: MAT_DATE_LOCALE, useValue: 'en-GB' }
+    { provide: MAT_DATE_LOCALE, useValue: 'en-GB' },
+    OrgHierarchyService
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   exports: [LeftMenuComponent]
