@@ -25,7 +25,7 @@
                 <span>3.&nbsp;<span *ngIf="!editState">Add</span><span *ngIf="editState">Edit</span> Access Control</span>
             </ng-template>
             <ng-template matTabContent>
-                <sb-uic-access-control [config]="accessSettingsParameters" [contentId]=""
+                <sb-uic-access-control [config]="accessSettingsParameters" [contentId]="route?.snapshot?.params?.planId"
                   [content]="undefined" (accessControlData)="getAccessControlData($event)" [tempAccessControl]="tempSavedAccessControl">
                 </sb-uic-access-control>
             </ng-template>
