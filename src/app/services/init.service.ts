@@ -27,6 +27,7 @@ import { environment } from '../../environments/environment'
 import _ from 'lodash'
 import { v4 as uuid } from 'uuid'
 import { Subscription } from 'rxjs'
+import { TranslateService } from '@ngx-translate/core'
 /* tslint:enable*/
 // interface IDetailsResponse {
 //   tncStatus: boolean
@@ -62,6 +63,8 @@ export class InitService {
     private userPreference: UserPreferenceService,
     private http: HttpClient,
     // private widgetContentSvc: WidgetContentService,
+    private translate: TranslateService,
+
 
     @Inject(APP_BASE_HREF) private baseHref: string,
     // private router: Router,
@@ -101,20 +104,45 @@ export class InitService {
       domSanitizer.bypassSecurityTrustResourceUrl('mdo-assets/icons/verified.svg'),
     )
     iconRegistry.addSvgIcon(
+      'video-library',
+      domSanitizer.bypassSecurityTrustResourceUrl('assets/icons/hubs/video-library.svg'),
+    )
+    iconRegistry.addSvgIcon(
+      'school-search',
+      domSanitizer.bypassSecurityTrustResourceUrl('assets/icons/hubs/school-grey.svg'),
+    )
+    iconRegistry.addSvgIcon(
+      'calender-event',
+      domSanitizer.bypassSecurityTrustResourceUrl('assets/icons/hubs/event-grey.svg'),
+    )
+    iconRegistry.addSvgIcon(
+      'people-search',
+      domSanitizer.bypassSecurityTrustResourceUrl('assets/icons/hubs/group-grey.svg'),
+    )
+    iconRegistry.addSvgIcon(
+      'menu_book',
+      domSanitizer.bypassSecurityTrustResourceUrl('assets/icons/hubs/knowledge-resources-grey.svg'),
+    )
+    iconRegistry.addSvgIcon(
+      'diversity_3',
+      domSanitizer.bypassSecurityTrustResourceUrl('assets/icons/hubs/Jan-karmayogi-grey.svg'),
+    )
+    iconRegistry.addSvgIcon(
+      'handshake',
+      domSanitizer.bypassSecurityTrustResourceUrl('assets/icons/hubs/handshake.svg'),
+    )
+    iconRegistry.addSvgIcon(
       'frac',
       domSanitizer.bypassSecurityTrustResourceUrl('assets/icons/Frac.svg')
     )
-
     iconRegistry.addSvgIcon(
       'users',
       domSanitizer.bypassSecurityTrustResourceUrl('assets/icons/users.svg')
     )
-
     iconRegistry.addSvgIcon(
       'frac-no-connection',
       domSanitizer.bypassSecurityTrustResourceUrl('assets/icons/Frac_NoConnection.svg')
     )
-
     iconRegistry.addSvgIcon(
       'download-icon',
       domSanitizer.bypassSecurityTrustResourceUrl('assets/icons/download_icon.svg')
@@ -222,6 +250,37 @@ export class InitService {
         await this.fetchOrgReadDataCopy(value)
       }
     })
+
+    if (this.configSvc.instanceConfig && this.configSvc.instanceConfig.locals) {
+      if (this.configSvc.unMappedUser) {
+        if (this.configSvc.unMappedUser.profileDetails
+          && this.configSvc.unMappedUser.profileDetails.additionalProperties
+          && this.configSvc.unMappedUser.profileDetails.additionalProperties.webPortalLang) {
+          const lang = this.configSvc.unMappedUser.profileDetails.additionalProperties.webPortalLang
+          this.translate.use(lang)
+          localStorage.setItem('websiteLanguage', lang)
+        } else {
+          if (localStorage.getItem('websiteLanguage')) {
+            let lang = JSON.stringify(localStorage.getItem('websiteLanguage'))
+            lang = lang.replace(/\"/g, '')
+            this.translate.use(lang)
+          } else {
+            this.translate.setDefaultLang('en')
+            localStorage.setItem('websiteLanguage', 'en')
+          }
+        }
+      } else if (localStorage.getItem('websiteLanguage')) {
+        let lang = JSON.stringify(localStorage.getItem('websiteLanguage'))
+        lang = lang.replace(/\"/g, '')
+        this.translate.use(lang)
+      } else {
+        this.translate.setDefaultLang('en')
+        localStorage.setItem('websiteLanguage', 'en')
+      }
+    } else {
+      this.translate.setDefaultLang('en')
+      localStorage.setItem('websiteLanguage', 'en')
+    }
     // await this.widgetContentSvc
     //   .setS3ImageCookie()
     //   .toPromise()
@@ -272,7 +331,7 @@ export class InitService {
     // TODO: set one org as default org :: use user preference
     this.configSvc.activeOrg = publicConfig.org[0]
     this.configSvc.appSetup = publicConfig.appSetup
-    this.configSvc.compentency = publicConfig.compentency
+    this.configSvc.compentency = publicConfig.competency
 
     return publicConfig
   }

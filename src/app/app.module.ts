@@ -143,6 +143,8 @@ import {
 import { GlobalEventsService } from './services/global-events.service'
 /** Collection Library Modules */
 
+import { SearchListingModule } from '@sunbird-cb/search-listing'
+
 // @Injectable()
 // export class HammerConfig extends GestureConfig {
 //   buildHammer(element: HTMLElement) {
@@ -293,7 +295,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     MatSnackBarModule,
     ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production }),
     NotificationDropdownModule,
-
+    SearchListingModule,
     TranslateModule.forRoot({
       loader: {
         provide: TranslateLoader,
@@ -351,6 +353,11 @@ export function HttpLoaderFactory(http: HttpClient) {
     LibNotificationsService,
     NotificationsService,
     NPSGridService,
+    {
+      provide: TranslateLoader,
+      useFactory: HttpLoaderFactory,
+      deps: [HttpClient],
+    },
     GlobalEventsService
   ]
 })

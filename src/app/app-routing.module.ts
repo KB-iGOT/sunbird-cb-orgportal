@@ -219,6 +219,11 @@ const routes: Routes = [
     },
   },
   {
+    path: 'app/globalsearch',
+    loadChildren: () =>
+      import('./routes/route-search-listing.module').then(u => u.RouteSearchListingModule)
+  },
+  {
     path: 'error-access-forbidden',
     component: ErrorResolverComponent,
     data: {
