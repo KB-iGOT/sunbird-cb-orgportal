@@ -50,6 +50,7 @@
     "@sunbird-cb/collection": "1.0.56-cbrelease-4.8.28",
     "@sunbird-cb/consumption": "0.1.21-cbrelease-4.8.28",
     "@sunbird-cb/access-settings": "^0.0.13-cbrelease-4.8.28",
+    "@sunbird-cb/search-listing": "^0.0.1-cbrelease-4.8.29",
     "@sunbird-cb/design-system": "0.0.1",
     "@sunbird-cb/micro-surveys": "2.0.20-ang-13-16",
     "@sunbird-cb/rain-dashboards": "0.0.36-ang-13-16",
