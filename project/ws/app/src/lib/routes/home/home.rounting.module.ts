@@ -32,6 +32,8 @@ import { MentorManageComponent } from './routes/mentor-manage/mentor-manage.comp
 import { BulkUploadOdcsComponent } from './routes/odcs-mapping/bulk-upload-odcs/bulk-upload-odcs.component'
 import { GroupsGradeComponent } from './components/groups-grade/groups-grade.component'
 import { MyNotificationsComponent } from './routes/my-notifications/my-notifications.component'
+import { DirectoryComponent } from './routes/directory/directory.component'
+import { OrganisationUsersComponent } from './routes/directory/organisation-users/organisation-users.component'
 const routes: Routes = [
   {
     path: '',
@@ -445,6 +447,14 @@ const routes: Routes = [
           configService: ConfigResolveService,
         },
       },
+      {
+        path: 'directory',
+        component: DirectoryComponent,
+        data: {
+          pageId: 'Directory',
+          // module: 'Notifications',
+        },
+      },
     ],
   },
   {
@@ -492,6 +502,20 @@ const routes: Routes = [
         },
       },
     ],
+  },
+  {
+    path: 'roles/:department/users',
+    component: OrganisationUsersComponent,
+    data: {
+      pageId: 'home/odcs-mapping',
+      module: 'odcs-mapping',
+      pageType: 'feature',
+      pageKey: 'my_designations',
+    },
+    resolve: {
+      pageData: PageResolve,
+      configService: ConfigResolveService,
+    },
   },
 
 ]

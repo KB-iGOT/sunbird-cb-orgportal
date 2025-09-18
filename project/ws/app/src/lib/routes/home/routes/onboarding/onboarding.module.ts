@@ -87,7 +87,7 @@ const routes: Routes = [
 ]
 
 @NgModule({
-  declarations: [OnboardingComponent, CustomSelfRegistrationComponent, LoadingPopupComponent],
+  declarations: [OnboardingComponent, LoadingPopupComponent],
   imports: [
     CommonModule,
     RouterModule.forChild(routes),

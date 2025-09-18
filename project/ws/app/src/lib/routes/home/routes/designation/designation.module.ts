@@ -98,6 +98,7 @@ const routes: Routes = [
   ],
   exports: [
     RouterModule,
+    SelectedDesignationPopupComponent
   ],
 })
 export class DesignationModule { }

@@ -1,0 +1,124 @@
+<div class="bulk-upload-container">
+  <!-- Modal Header -->
+  <div class="modal-header flex">
+    <h2 class="mat-dialog-title">Upload Organizations</h2>
+    <div class="btn-container flex gap-4 ml-auto">
+      <button mat-button class="btn-common btn-secondary" type="button" [mat-dialog-close]>
+        Cancel</button>
+      <button mat-button class="btn-common btn-secondary flex flex-middle" type="button"
+        (click)="getBulkuploadPrgressData()">
+        <mat-icon class="btn-icon">refresh</mat-icon>
+        Refresh</button>
+    </div>
+  </div>
+
+  <!-- Modal Content -->
+  <div class="modal-content mat-dialog-content">
+    <div class="flex flex-col gap-4 bulk-container">
+      <div class="flex font-bold">{{bulkUploadConfig?.mainHeading}}</div>
+      <div class="flex flex-row gap-8">
+        <div class="flex-1 dashed-card">
+          <div class="flex flex-col gap-3">
+            <div>{{bulkUploadConfig?.sampleFileDownloadInstructuons?.title}}</div>
+            <div class="flex flex-col gap-4">
+              <ol class="custom-ol">
+                <ng-container *ngIf="bulkUploadConfig && bulkUploadConfig.sampleFileDownloadInstructuons.instructions">
+                  <li *ngFor="let text of bulkUploadConfig.sampleFileDownloadInstructuons.instructions;">
+                    {{text}}
+                  </li>
+                </ng-container>
+              </ol>
+            </div>
+            <div class="flex flex-row gap-6">
+              <button mat-button type="button" class="btn-common btn-secondary flex flex-middle"
+                (click)="handleDownloadSampleFile()">
+                <mat-icon class="btn-icon" svgIcon="download-icon"></mat-icon>
+                {{bulkUploadConfig?.sampleFileDownloadText}}
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="flex-1 dashed-card">
+          <div class="flex flex-col gap-2 items-center">
+            <div class="flex cursor-pointer margin-top-m" (click)="fileInput.click()"
+              (dblclick)="$event.preventDefault()">
+              <img src="/assets/icons/csv-file.svg" class="csv-file" alt="CSV file logo" />
+            </div>
+            <div *ngIf="showFileError" class="error-msg">{{bulkUploadConfig?.supportedFileTypeText2}}</div>
+            <div class="flex flex-col items-center">
+              <div class="text-primary cursor-pointer" (click)="fileInput.click()" (dblclick)="$event.preventDefault()">
+                Browse files</div>
+              <input hidden type="file" id="fileInput" #fileInput (click)="handleFileClick($event)"
+                (change)="onFileSelected($event)" name="file" placeholder="Choose file"
+                (dblclick)="$event.preventDefault();" accept=".xlsx, .xls" />
+              <!-- <div class="flex">or</div>
+                <div class="flex">Drag file to upload</div> -->
+            </div>
+            <div class="flex flex-col items-center margin-bottom-m">
+              <div class="flex">Max file size: {{bulkUploadConfig?.maxFileSizeText}}</div>
+              <div class="flex">Supported file types: {{bulkUploadConfig?.supportedFileTypeText}}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex flex-col gap-6 margin-bottom-l margin-top-l">
+      <div class="file-container"
+        *ngFor="let list of lastUploadList | slice : startIndex : lastIndex | orderBy:'dateUpdatedOn':'desc'">
+        <div class="flex flex-col gap-4">
+          <div class="flex flex-row justify-between items-center">
+            <div class="flex flex-row gap-1">
+              <div class="font-bold">File Information</div>
+            </div>
+            <ng-container *ngIf="list?.status !== 'IN-PROGRESS'">
+              <button mat-button type="button" class="btn-common btn-secondary flex flex-middle"
+                (click)="handleDownloadFile(list)">
+                <mat-icon class="btn-icon" svgIcon="download-icon"></mat-icon>
+                {{ list?.status !== 'SUCCESSFUL' ? ' Download error log' : ' Download file' }}
+              </button>
+            </ng-container>
+          </div>
+          <div class="flex flex-wrap">
+            <div class="flex flex-col w-full box">
+              <div class="label">Name</div>
+              <div class="value">{{ list?.fileName }}</div>
+            </div>
+            <div class="flex flex-col w-full box">
+              <div class="label">Status</div>
+              <div class="value"
+                [ngClass]="{'failed-text': list?.status !== 'SUCCESSFUL', 'success-text': list?.status === 'SUCCESSFUL', 'in-progress-text': list?.status === 'IN-PROGRESS'}">
+                {{ list?.status }}</div>
+            </div>
+            <div class="flex flex-col w-full box">
+              <div class="label">Failed Records</div>
+              <div class="value">{{ list?.failedRecordsCount }}</div>
+            </div>
+            <div class="flex flex-col w-full box">
+              <div class="label">Success Records</div>
+              <div class="value">{{ list?.successfulRecordsCount }}</div>
+            </div>
+          </div>
+          <div class="flex flex-wrap">
+            <div class="flex flex-col w-full box">
+              <div class="label">Total Records</div>
+              <div class="value">{{ list?.totalRecords }}</div>
+            </div>
+            <div class="flex flex-col w-full box">
+              <div class="label">Initiated On</div>
+              <div class="value">{{ list?.dateCreatedOn | date: 'dd MMM yyyy h:mm a' }}</div>
+            </div>
+            <div class="flex flex-col w-full box">
+              <div class="label">Completed On</div>
+              <div class="value">{{ list?.dateUpdatedOn | date: 'dd MMM yyyy h:mm a' }}</div>
+            </div>
+            <!-- <div class="flex flex-col w-full box">
+              <div class="label">Uploaded By</div>
+              <div class="value">{{ list?.userDetails?.firstName }}</div>
+            </div> -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
