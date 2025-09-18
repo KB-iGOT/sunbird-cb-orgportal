@@ -51,7 +51,7 @@ export class CreateUserComponent implements OnInit {
     this.orgSvc.setConfigService(_.get(this.activeRouter, 'snapshot.data.configService'))
     this.getUserList('')
     this.createUserTabs = [
-      // { id: 0, name: 'Bulk Creation', value: 'bulkCreation' },
+      { id: 0, name: 'Bulk Creation', value: 'bulkCreation' },
       // { id: 1, name: 'Custom Registration Link', value: 'customRegLink' },
       { id: 2, name: 'Individual Creation', value: 'individualCreation' }
     ]

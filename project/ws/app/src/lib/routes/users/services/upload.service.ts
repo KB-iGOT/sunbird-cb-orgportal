@@ -8,6 +8,7 @@ import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack
 const API_ENDPOINTS = {
   // bulkUpload: `/apis/proxies/v8/user/v1/bulkupload`,
   bulkUpload: `/apis/proxies/v8/user/v2/bulkupload`, // csv support
+  bulkUploadV3: `/apis/proxies/v8/user/v3/bulkupload`, // csv support
   downloadReport: `/apis/protected/v8/admin/userRegistration/bulkUploadReport`,
   getBulkUploadData: '/apis/proxies/v8/user/v1/bulkupload',
   getBulkApproval: '/apis/proxies/v8/workflow/admin/bulkupdate/getstatus',
@@ -51,9 +52,13 @@ export class FileService {
     return this.displayLoader$
   }
 
-  public upload(_fileName: string, fileContent: FormData): Observable<any> {
+  public upload(_fileName: string, fileContent: FormData, selectedOrgData?: any): Observable<any> {
     this.displayLoader$.next(true)
-    return this.http.post<any>(API_ENDPOINTS.bulkUpload, fileContent)
+    let url = API_ENDPOINTS.bulkUpload
+    if (selectedOrgData) {
+      url = `${API_ENDPOINTS.bulkUploadV3}?orgId=${selectedOrgData.roleId}&channel=${selectedOrgData.depatName}`
+    }
+    return this.http.post<any>(url, fileContent)
       .pipe(finalize(() => this.displayLoader$.next(false)))
   }
 
