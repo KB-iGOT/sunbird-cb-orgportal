@@ -94,6 +94,6 @@
     <ws-app-custom-self-registration></ws-app-custom-self-registration>
   </ng-container>
   <ng-container *ngIf="selectedTab?.value === 'bulkCreation'">
-    <ws-bulk-upload></ws-bulk-upload>
+    <ws-bulk-upload [selectedOrgData]="orgData"></ws-bulk-upload>
   </ng-container>
 </ng-container>
