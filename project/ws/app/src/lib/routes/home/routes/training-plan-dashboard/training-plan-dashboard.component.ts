@@ -184,15 +184,17 @@ export class TrainingPlanDashboardComponent implements OnInit {
   async getTrainingPlanCBP(type: string, searchString: string, page: number = 0, pageSize: number = 100) {
     this.loaderService.changeLoaderState(true)
 
-    const payload = {
+    const payload: any = {
       "filter": {
         "status": [type]
       },
       "pageNumber": page,
       "pageSize": pageSize,
       "searchString": searchString,
-      "orderBy": "createdAt",
-      "orderDirection": "desc"
+    }
+    if (!searchString) {
+      payload.orderBy = "createdAt"
+      payload.orderDirection = "desc"
     }
 
     this.trainingDashboardSvc.getTrainingPlansV2(payload).subscribe({
