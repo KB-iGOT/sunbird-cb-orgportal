@@ -253,7 +253,7 @@ export class InitService {
     // TODO: set one org as default org :: use user preference
     this.configSvc.activeOrg = publicConfig.org[0]
     this.configSvc.appSetup = publicConfig.appSetup
-    this.configSvc.compentency = publicConfig.compentency
+    this.configSvc.compentency = publicConfig.compentency || publicConfig.competency
 
     return publicConfig
   }
