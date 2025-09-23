@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core'
+import { Component, EventEmitter, OnInit, Output, ViewChild } from '@angular/core'
 import { OrgHierarchyService } from '../../../services/org-hierarchy.service'
 import { map } from 'rxjs/operators'
 import { MatTableDataSource } from '@angular/material/table'
@@ -15,12 +15,6 @@ interface UserData {
   id?: string
 }
 
-interface TabDetails {
-  id: number
-  name: string
-  value: string
-}
-
 @Component({
   selector: 'ws-app-create-user',
   templateUrl: './create-user.component.html',
@@ -29,14 +23,15 @@ interface TabDetails {
 export class CreateUserComponent implements OnInit {
   displayedColumns: string[] = ['fullName', 'email', 'roles', 'actions'];
   dataSource = new MatTableDataSource<UserData>([]);
-  createUserTabs: TabDetails[] = [];
-  createUser = false;
   orgData: any = {};
+  editUser: boolean = false
 
   @ViewChild(MatPaginator) paginator!: MatPaginator
   @ViewChild(MatSort) sort!: MatSort
   selectedTab: any
   selectedUserData: any
+
+  @Output() createUser = new EventEmitter<any>()
 
   constructor(
     private orgSvc: OrgHierarchyService,
@@ -50,11 +45,6 @@ export class CreateUserComponent implements OnInit {
     }
     this.orgSvc.setConfigService(_.get(this.activeRouter, 'snapshot.data.configService'))
     this.getUserList('')
-    this.createUserTabs = [
-      { id: 0, name: 'Bulk Creation', value: 'bulkCreation' },
-      // { id: 1, name: 'Custom Registration Link', value: 'customRegLink' },
-      { id: 2, name: 'Individual Creation', value: 'individualCreation' }
-    ]
   }
 
   ngAfterViewInit() {
@@ -132,15 +122,12 @@ export class CreateUserComponent implements OnInit {
   }
 
   createNewUser() {
-    this.createUser = !this.createUser
-    this.selectedTab = this.createUserTabs.find(tab => tab.value === 'individualCreation')
-    this.selectedUserData = ''
+    this.createUser.emit(true)
   }
 
-  editUser(user: UserData) {
+  showEditUser(user: UserData) {
     this.selectedUserData = user
-    this.createUser = true
-    this.selectedTab = this.createUserTabs.find(tab => tab.value === 'individualCreation')
+    this.editUser = true
   }
 
   deleteUser(user: UserData) {
@@ -154,7 +141,6 @@ export class CreateUserComponent implements OnInit {
 
   closeCreate() {
     this.getUserList('')
-    this.createUser = false
   }
 
   emailTransform(value: any): any {
@@ -171,6 +157,17 @@ export class CreateUserComponent implements OnInit {
       return _.join(_.map(roles, role => `<li>${role}</li>`), '')
     }
     return []
+  }
+
+  updateUserStatus(_event: any) {
+    switch (_event?.toLowerCase()) {
+      case 'cancel':
+      case 'updated':
+        this.selectedUserData = ''
+        this.editUser = false
+        this.getUserList('')
+        break
+    }
   }
 
 }
