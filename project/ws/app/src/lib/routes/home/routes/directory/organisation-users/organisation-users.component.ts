@@ -3,7 +3,6 @@ import { ActivatedRoute, Router } from '@angular/router'
 import * as _ from 'lodash'
 
 interface TabDetails {
-  id: number
   name: string
   content?: any
   value?: string
@@ -30,10 +29,12 @@ export class OrganisationUsersComponent implements OnInit {
       this.orgData = queryParam
     }
     this.tabs = [
-      { id: 0, name: 'Users', value: 'users' },
-      { id: 1, name: 'Roles and access', value: 'rolesAndAccess' },
-      { id: 2, name: 'Mentor Management', value: 'mentorManagement' },
-      { id: 3, name: 'Designation Master', value: 'designationMaster' }
+      { name: 'Users', value: 'users' },
+      { name: 'Roles and access', value: 'rolesAndAccess' },
+      { name: 'Mentor Management', value: 'mentorManagement' },
+      { name: 'Designation Master', value: 'designationMaster' },
+      { name: 'User Onboarding', value: 'userOnboarding' },
+      // { name: 'User Transfer', value: 'userTransfer' }
     ]
 
     this.activatedRoute.queryParams.subscribe(params => {
@@ -63,6 +64,18 @@ export class OrganisationUsersComponent implements OnInit {
         queryParams: { tab: selectedTab.value },
         queryParamsHandling: 'merge'
       })
+    }
+  }
+
+  onCreateUser(_event: any) {
+    if (_event) {
+      this.onTabChange(this.tabs.findIndex(tab => tab.value === 'userOnboarding'))
+    }
+  }
+
+  onUserCreated(_event: any) {
+    if (_event) {
+      this.onTabChange(this.tabs.findIndex(tab => tab.value === 'users'))
     }
   }
 }

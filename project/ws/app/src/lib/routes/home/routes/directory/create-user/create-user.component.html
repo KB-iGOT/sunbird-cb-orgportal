@@ -1,7 +1,7 @@
 <mat-card-title class="flex-4 mobile-margin mat-h2">
   Users
 </mat-card-title>
-<ng-container *ngIf="!createUser">
+<ng-container *ngIf="!editUser">
   <div class="flex">
     <div class="searchContainer flex gap-5">
       <div class="sinput flex flex-middle">
@@ -48,7 +48,7 @@
             <mat-icon>more_vert</mat-icon>
           </button>
           <mat-menu #menu="matMenu">
-            <button mat-menu-item (click)="editUser(user)">
+            <button mat-menu-item (click)="showEditUser(user)">
               <mat-icon>edit</mat-icon>
               <span>Edit</span>
             </button>
@@ -72,28 +72,6 @@
     <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" aria-label="Select page of users"></mat-paginator>
   </div>
 </ng-container>
-
-<ng-container *ngIf="createUser">
-  <div class="flex">
-    <ng-container *ngFor="let item of createUserTabs">
-      <button mat-button type="button" (click)="onTabChange(item)"
-        [ngClass]="{'activeTab': selectedTab?.value === item?.value}">{{item.name}}</button>
-    </ng-container>
-    <div class="ml-auto">
-      <button mat-icon-button aria-label="Close create user tabs" (click)="createUser = false" type="button">
-        <mat-icon>close</mat-icon>
-      </button>
-    </div>
-  </div>
-  <div class="divider mb-5"></div>
-  <ng-container *ngIf="selectedTab?.value === 'individualCreation'">
-    <ws-single-user-creation [editUserData]="selectedUserData" [selectedOrgData]="orgData"
-      (closeCreateuser)="closeCreate()"></ws-single-user-creation>
-  </ng-container>
-  <ng-container *ngIf="selectedTab?.value === 'customRegLink'">
-    <ws-app-custom-self-registration></ws-app-custom-self-registration>
-  </ng-container>
-  <ng-container *ngIf="selectedTab?.value === 'bulkCreation'">
-    <ws-bulk-upload [selectedOrgData]="orgData"></ws-bulk-upload>
-  </ng-container>
+<ng-container *ngIf="editUser">
+  <ws-app-user-update [userId]="selectedUserData?.userId" (updateEvent)="updateUserStatus($event)"></ws-app-user-update>
 </ng-container>
