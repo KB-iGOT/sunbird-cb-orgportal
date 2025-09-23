@@ -48,7 +48,7 @@ export class SingleUserCreationComponent implements OnInit, AfterViewInit, OnDes
 
   @Input() selectedOrgData: any
   @Input() editUserData: any
-  @Output() closeCreateuser = new EventEmitter<void>()
+  @Output() userCreated = new EventEmitter<any>()
 
   @ViewChildren('rolesCheckbox') checkboxes!: QueryList<ElementRef>
   @ViewChild('updateconfirm') updateConfirmTemplate!: TemplateRef<any>
@@ -362,7 +362,7 @@ export class SingleUserCreationComponent implements OnInit, AfterViewInit, OnDes
         this.matSnackBar.open('User created successfully!')
         this.handleFormClear()
         if (this.selectedOrgData && this.selectedOrgData.roleId) {
-          this.closeCreateuser.emit()
+          this.userCreated.emit(true)
         }
         // tslint:disable-next-line
       }, (_err: HttpErrorResponse) => {
@@ -451,7 +451,7 @@ export class SingleUserCreationComponent implements OnInit, AfterViewInit, OnDes
         this.matSnackBar.open('User updated successfully!')
         this.handleFormClear()
         if (this.selectedOrgData && this.selectedOrgData.roleId) {
-          this.closeCreateuser.emit()
+          this.userCreated.emit(true)
         }
       }, (_err: HttpErrorResponse) => {
         if (!_err.ok) {
