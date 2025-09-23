@@ -191,6 +191,7 @@ export class TrainingPlanDashboardComponent implements OnInit {
       "pageNumber": page,
       "pageSize": pageSize,
       "searchString": searchString,
+      "orgIdList": [this.configSvc.userProfile.rootOrgId]
     }
     if (!searchString) {
       payload.orderBy = "createdAt"

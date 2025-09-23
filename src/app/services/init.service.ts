@@ -15,6 +15,7 @@ import {
   // AuthKeycloakService,
   ConfigurationsService,
   LoggerService,
+  MultilingualTranslationsService,
   NsAppsConfig,
   NsInstanceConfig,
   // NsUser,
@@ -62,6 +63,7 @@ export class InitService {
     private userPreference: UserPreferenceService,
     private http: HttpClient,
     // private widgetContentSvc: WidgetContentService,
+    private multilingualService: MultilingualTranslationsService,
 
     @Inject(APP_BASE_HREF) private baseHref: string,
     // private router: Router,
@@ -203,6 +205,8 @@ export class InitService {
         await this.fetchOrgReadDataCopy(value)
       }
     })
+
+    this.multilingualService.getLanguage()
     // await this.widgetContentSvc
     //   .setS3ImageCookie()
     //   .toPromise()
