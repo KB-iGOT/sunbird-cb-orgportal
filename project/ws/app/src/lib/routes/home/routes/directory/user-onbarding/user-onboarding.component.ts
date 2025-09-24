@@ -1,6 +1,9 @@
 import { Component, EventEmitter, OnInit, Output } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
 import * as _ from 'lodash'
+import { LoaderService } from '../../../../../../../../../../src/app/services/loader.service'
+import { OrgHierarchyService } from '../../../services/org-hierarchy.service'
+import { map } from 'rxjs/operators'
 
 interface TabDetails {
   name: string
@@ -17,11 +20,15 @@ export class UserOnboardingComponent implements OnInit {
   createUserTabs: TabDetails[] = [];
   selectedTab: any
   orgData: any
+  frameworkOrgData: any
 
   @Output() userCreated = new EventEmitter<boolean>()
+  @Output() showDesignationTab = new EventEmitter<boolean>()
 
   constructor(
-    private activeRouter: ActivatedRoute
+    private activeRouter: ActivatedRoute,
+    private loaderService: LoaderService,
+    private orgHieService: OrgHierarchyService,
   ) { }
 
   ngOnInit(): void {
@@ -31,15 +38,44 @@ export class UserOnboardingComponent implements OnInit {
     }
     this.createUserTabs = [
       { name: 'Bulk Creation', value: 'bulkCreation' },
-      // { name: 'Custom Registration Link', value: 'customRegLink' },
+      { name: 'Custom Registration Link', value: 'customRegLink' },
       { name: 'Individual Creation', value: 'individualCreation' }
     ]
 
     this.selectedTab = this.createUserTabs.find(tab => tab.value === 'individualCreation')
   }
 
-  onTabChange(item: any) {
+  async onTabChange(item: any) {
+    if (item.value === 'customRegLink') {
+      const orgReadPromise: Promise<any>[] = []
+      orgReadPromise.push(this.getOrgData())
+      await Promise.all(orgReadPromise)
+    }
     this.selectedTab = item
+  }
+
+  getOrgData() {
+    return new Promise<boolean>((resolve) => {
+      const requestBody = {
+        request: {
+          organisationId: this.orgData.roleId,
+        }
+      }
+      this.loaderService.changeLoaderState(true)
+      this.orgHieService.getOrgReadData(requestBody).pipe(
+        map((data: any) => {
+          return data.result.response
+        })
+      ).subscribe((_res) => {
+        this.frameworkOrgData = _res
+        resolve(true)
+        this.loaderService.changeLoaderState(false)
+      })
+    })
+  }
+
+  navigateToDesignation(event: any) {
+    this.showDesignationTab.emit(event)
   }
 
   onUserCreated(event: boolean) {

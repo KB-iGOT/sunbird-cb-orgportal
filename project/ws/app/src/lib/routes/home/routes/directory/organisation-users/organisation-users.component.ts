@@ -73,6 +73,12 @@ export class OrganisationUsersComponent implements OnInit {
     }
   }
 
+  showDesTab(event: any) {
+    if (event) {
+      this.onTabChange(this.tabs.findIndex(tab => tab.value === 'designationMaster'))
+    }
+  }
+
   onUserCreated(_event: any) {
     if (_event) {
       this.onTabChange(this.tabs.findIndex(tab => tab.value === 'users'))

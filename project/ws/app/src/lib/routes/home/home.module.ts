@@ -118,11 +118,11 @@ import { OrgHierarchyService } from './services/org-hierarchy.service'
 import { BulkUploadOrgComponent } from './routes/directory/bulk-upload-org/bulk-upload-org.component'
 import { TreeHierarchyModule } from '@sunbird-cb/tree-hierarchy'
 import { OrgHierarchyMappingComponent } from './routes/directory/org-hierarchy-mapping/org-hierarchy-mapping/org-hierarchy-mapping.component'
-import { CustomSelfRegistrationComponent } from './routes/onboarding/custom-self-registration/custom-self-registration.component'
 import { UsersComponent } from '../access/routes/users/users.component'
 import { UserOnboardingComponent } from './routes/directory/user-onbarding/user-onboarding.component'
 import { UserBulkTransferComponent } from './routes/directory/user-bulk-transfer/user-bulk-transfer.component'
 import { UserUpdateModule } from '@sunbird-cb/consumption'
+import { OnboardingModule } from './routes/onboarding/onboarding.module'
 
 @NgModule({
   declarations: [
@@ -186,7 +186,6 @@ import { UserUpdateModule } from '@sunbird-cb/consumption'
     DesignationsBuilkUploadComponent,
     OrgHierarchyMappingComponent,
     BulkUploadOrgComponent,
-    CustomSelfRegistrationComponent,
     UsersComponent,
     UserOnboardingComponent,
     UserBulkTransferComponent
@@ -251,7 +250,8 @@ import { UserUpdateModule } from '@sunbird-cb/consumption'
     AllNotificationsModule,
     TranslateModule.forChild(),
     TreeHierarchyModule,
-    UserUpdateModule
+    UserUpdateModule,
+    OnboardingModule
   ],
   providers: [
     { provide: 'environment', useValue: environment },
