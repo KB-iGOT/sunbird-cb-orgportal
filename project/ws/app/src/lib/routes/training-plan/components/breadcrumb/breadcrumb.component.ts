@@ -300,6 +300,7 @@ export class BreadcrumbComponent implements OnInit {
       delete obj.request.contentList
       delete obj.request.contentType
       delete obj.request.assignmentType
+      delete obj.request.orgIdList
     }
     delete obj.request.status
     this.showDialogBox('progress')
