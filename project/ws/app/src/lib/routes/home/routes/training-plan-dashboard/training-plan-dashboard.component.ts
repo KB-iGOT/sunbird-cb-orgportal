@@ -246,7 +246,7 @@ export class TrainingPlanDashboardComponent implements OnInit, AfterViewInit {
           hasAccess = _v.isMdoLeader ? true : isOwner
           break
         case 'publishContent':
-          hasAccess = isDraft && isOwner
+          hasAccess = isDraft && _v.isMdoLeader ? true : isOwner
           break
         default:
           hasAccess = flag
