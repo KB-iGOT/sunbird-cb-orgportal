@@ -33,48 +33,45 @@
               <!-- Plan Name Column -->
               <ng-container matColumnDef="name">
                 <th mat-header-cell *matHeaderCellDef mat-sort-header="name">Plan Name</th>
-                <td mat-cell *matCellDef="let element" class="color-87 h-400-r-14-l">{{element.name}}</td>
+                <td mat-cell *matCellDef="let element" class="color-87 h-400-r-14-l">{{element?.name}}</td>
               </ng-container>
 
               <!-- Total Content Column -->
               <ng-container matColumnDef="contentCount">
                 <th mat-header-cell *matHeaderCellDef mat-sort-header="contentCount">Total Content</th>
-                <td mat-cell *matCellDef="let element" class="color-87 h-400-r-14-l">{{element.contentCount}}</td>
+                <td mat-cell *matCellDef="let element" class="color-87 h-400-r-14-l">{{element?.contentCount}}</td>
               </ng-container>
 
               <!-- Content Type Column -->
               <ng-container matColumnDef="contentType">
                 <th mat-header-cell *matHeaderCellDef mat-sort-header="contentType">Content Type</th>
-                <td mat-cell *matCellDef="let element" class="color-87 h-400-r-14-l">{{element.contentType}}</td>
+                <td mat-cell *matCellDef="let element" class="color-87 h-400-r-14-l">{{element?.contentType}}</td>
               </ng-container>
 
               <!-- Timeline Column -->
               <ng-container matColumnDef="endDate">
                 <th mat-header-cell *matHeaderCellDef mat-sort-header="endDate">Timeline</th>
-                <td mat-cell *matCellDef="let element" class="color-87 h-400-r-14-l">{{element.endDate}}</td>
+                <td mat-cell *matCellDef="let element" class="color-87 h-400-r-14-l">{{element?.endDate}}</td>
               </ng-container>
 
               <!-- Plan Type Column -->
               <ng-container matColumnDef="planType">
                 <th mat-header-cell *matHeaderCellDef mat-sort-header="planType">Plan Type</th>
                 <td mat-cell *matCellDef="let element" class="color-87 h-400-r-14-l">
-                  <!-- <mat-chip-set>
-                    <mat-chip selected>{{element.planType}}</mat-chip>
-                  </mat-chip-set> -->
-                  {{element.planType}}
+                  {{element?.planType}}
                 </td>
               </ng-container>
 
               <!-- Created By Column -->
               <ng-container matColumnDef="createdByName">
                 <th mat-header-cell *matHeaderCellDef mat-sort-header="createdByName">Created By</th>
-                <td mat-cell *matCellDef="let element" class="color-87 h-400-r-14-l">{{element.createdByName}}</td>
+                <td mat-cell *matCellDef="let element" class="color-87 h-400-r-14-l">{{element?.createdByName}}</td>
               </ng-container>
 
               <!-- Created On Column -->
               <ng-container matColumnDef="createdAt">
                 <th mat-header-cell *matHeaderCellDef mat-sort-header="createdAt">Created On</th>
-                <td mat-cell *matCellDef="let element" class="color-87 h-400-r-14-l">{{element.createdAt}}</td>
+                <td mat-cell *matCellDef="let element" class="color-87 h-400-r-14-l">{{element?.createdAt}}</td>
               </ng-container>
 
               <!-- Actions Column -->
