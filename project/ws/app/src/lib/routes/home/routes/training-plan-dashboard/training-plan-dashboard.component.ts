@@ -181,18 +181,21 @@ export class TrainingPlanDashboardComponent implements OnInit {
     }
   }
 
-  async getTrainingPlanCBP(type: string, searchString: string, page: number = 0, pageSize: number = 50) {
+  async getTrainingPlanCBP(type: string, searchString: string, page: number = 0, pageSize: number = 100) {
     this.loaderService.changeLoaderState(true)
 
-    const payload = {
+    const payload: any = {
       "filter": {
-        "status": [type]
+        "status": [type],
+        "orgIdList": [this.configSvc.userProfile.rootOrgId]
       },
       "pageNumber": page,
       "pageSize": pageSize,
-      "searchString": searchString,
-      "orderBy": "createdAt",
-      "orderDirection": "desc"
+      "searchString": searchString
+    }
+    if (!searchString) {
+      payload.orderBy = "createdAt"
+      payload.orderDirection = "desc"
     }
 
     this.trainingDashboardSvc.getTrainingPlansV2(payload).subscribe({
