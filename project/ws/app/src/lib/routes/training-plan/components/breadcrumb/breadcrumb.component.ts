@@ -172,24 +172,34 @@ export class BreadcrumbComponent implements OnInit {
     let isCCA = this.configSvc?.orgReadData?.isCCA || false
     for (const group of userGroups) {
       const criteriaList = group.userGroupCriteriaList || []
-      if (!isCCA) {
-        let orgData = {
-          "criteriaKey": "rootOrgId",
-          "criteriaValue": [
-            orgIdList
-          ]
+      // Check if rootOrgId criteria exists
+      let rootOrgIdCriteria = criteriaList.find((criteria: any) => criteria.criteriaKey === "rootOrgId")
+
+      if (!rootOrgIdCriteria) {
+        // If rootOrgId criteria doesn't exist, add it
+        criteriaList.push({
+          criteriaKey: "rootOrgId",
+          criteriaValue: [orgIdList]
+        })
+        hasRootOrgId = true
+      } else {
+        // If rootOrgId criteria exists, check if user's orgId is present
+        if (rootOrgIdCriteria.criteriaValue && rootOrgIdCriteria.criteriaValue.length > 0) {
+          if (!rootOrgIdCriteria.criteriaValue.includes(orgIdList)) {
+            // Add user's orgId if not present
+            rootOrgIdCriteria.criteriaValue.push(orgIdList)
+          }
+        } else {
+          // If criteriaValue is empty or undefined, initialize it with user's orgId
+          rootOrgIdCriteria.criteriaValue = [orgIdList]
         }
-        criteriaList.push(orgData)
+        hasRootOrgId = true
       }
+
+      // Check for multiple criteria values
       for (const criteria of criteriaList) {
         if (criteria.criteriaValue && criteria.criteriaValue.length > 1) {
           hasMultipleCriteriaValues = true
-        }
-        if (criteria.criteriaKey === "rootOrgId") {
-          if (criteria.criteriaValue && criteria.criteriaValue.length > 0 && criteria.criteriaValue?.includes(orgIdList) === false) {
-            criteria.criteriaValue.push(orgIdList)
-          }
-          hasRootOrgId = true
         }
       }
     }
