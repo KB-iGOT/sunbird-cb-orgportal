@@ -7,6 +7,7 @@ import { TrainingPlanContent } from '../../models/training-plan.model'
 import { TrainingPlanService } from '../../services/traininig-plan.service'
 import { TrainingPlanDataSharingService } from '../../services/training-plan-data-share.service'
 import { NsAccessControlConfig } from '@sunbird-cb/access-settings'
+import { ConfigurationsService } from '@sunbird-cb/utils-v2'
 @Component({
   selector: 'ws-app-breadcrumb',
   templateUrl: './breadcrumb.component.html',
@@ -31,6 +32,7 @@ export class BreadcrumbComponent implements OnInit {
     public tpdsSvc: TrainingPlanDataSharingService,
     private tpSvc: TrainingPlanService,
     private snackBar: MatSnackBar,
+    private configSvc: ConfigurationsService
   ) { }
 
   ngOnInit() {
@@ -185,10 +187,12 @@ export class BreadcrumbComponent implements OnInit {
     } else if (hasMultipleCriteriaValues) {
       orgScope = "Custom"
     }
+    let orgIdList = this.configSvc?.userProfile?.rootOrgId || this.configSvc?.unMappedUser?.rootOrgId || ''
 
     if (type === 'create') {
       return {
         request: {
+          orgIdList: [orgIdList],
           comment: trainingPlanStepperData?.comment ?? 'cbPlanId1 is created',
           contentList: trainingPlanStepperData?.contentList || [],
           contentType: trainingPlanStepperData?.contentType || "Course",
@@ -209,6 +213,7 @@ export class BreadcrumbComponent implements OnInit {
     } else if (type === 'update') {
       return {
         request: {
+          orgIdList: [orgIdList],
           contentList: trainingPlanStepperData?.contentList || [],
           contentType: trainingPlanStepperData?.contentType || "Course",
           contextData: {
@@ -295,6 +300,7 @@ export class BreadcrumbComponent implements OnInit {
       delete obj.request.contentList
       delete obj.request.contentType
       delete obj.request.assignmentType
+      delete obj.request.orgIdList
     }
     delete obj.request.status
     this.showDialogBox('progress')
