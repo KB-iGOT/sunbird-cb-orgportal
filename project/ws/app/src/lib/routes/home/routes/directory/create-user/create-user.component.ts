@@ -90,7 +90,6 @@ export class CreateUserComponent implements OnInit {
           resolve(false)
         },
         complete: () => {
-          console.log('Request complete')
         }
       })
     })

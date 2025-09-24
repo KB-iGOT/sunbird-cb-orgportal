@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core'
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core'
 import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog'
 import { ActivatedRoute, Router } from '@angular/router'
 import { ICustomRegistrationQRCodeResponse, IOnBoardingConfig, IRegisteredLinksList } from '../interface/onboarding.interface'
@@ -17,6 +17,10 @@ import { EventService } from '@sunbird-cb/utils-v2'
   styleUrls: ['./custom-self-registration.component.scss'],
 })
 export class CustomSelfRegistrationComponent implements OnInit {
+
+  @Input() selectedOrgData: any
+  @Output() navigatToDesignations = new EventEmitter<boolean>()
+
   configSvc: any
   onboardingConfig: IOnBoardingConfig | undefined
   selfRegistrationForm!: FormGroup
@@ -44,13 +48,14 @@ export class CustomSelfRegistrationComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.configSvc = this.activatedRoute.parent && this.activatedRoute.parent.snapshot.data.configService
+    this.configSvc = (this.selectedOrgData) ? _.get(this.activatedRoute, 'snapshot.data.configService') || {} :
+      _.get(this.activatedRoute, 'parent.snapshot.data.configService') || {}
     this.onboardingConfig = this.activatedRoute.parent && this.activatedRoute.parent.snapshot.data.pageData.data
-    this.rootOrdId = this.configSvc.userProfile.rootOrgId
-    this.framewordId = this.configSvc.orgReadData.frameworkid
+    this.rootOrdId = (this.selectedOrgData) ? this.selectedOrgData.rootOrgId : this.configSvc.userProfile.rootOrgId
+    this.framewordId = (this.selectedOrgData) ? this.selectedOrgData.frameworkid : this.configSvc.orgReadData.frameworkid
     this.initializeForm()
 
-    if (this.framewordId && this.configSvc.orgReadData) {
+    if (this.framewordId && (this.configSvc.orgReadData || this.selectedOrgData)) {
       this.getFrameworkInfo(this.framewordId)
     }
   }
@@ -141,7 +146,6 @@ export class CustomSelfRegistrationComponent implements OnInit {
     const dialogRef = this.dialog.open(LoadingPopupComponent, {
       autoFocus: false,
       width: '365px',
-      height: '201px',
       maxWidth: '80vw',
       maxHeight: '90vh',
       disableClose: true,
@@ -234,7 +238,6 @@ export class CustomSelfRegistrationComponent implements OnInit {
       this.dialogRef = this.dialog.open(LoadingPopupComponent, {
         autoFocus: false,
         width: '504px',
-        height: '275px',
         maxWidth: '80vw',
         maxHeight: '90vh',
         data: { type: 'import-igot-master-review' },
@@ -244,7 +247,6 @@ export class CustomSelfRegistrationComponent implements OnInit {
       this.dialogRef = this.dialog.open(LoadingPopupComponent, {
         autoFocus: false,
         width: '504px',
-        height: '275px',
         maxWidth: '80vw',
         maxHeight: '90vh',
         data: { type: 'import-igot-master-create' },
@@ -286,7 +288,6 @@ export class CustomSelfRegistrationComponent implements OnInit {
     this.dialogRef = this.dialog.open(LoadingPopupComponent, {
       autoFocus: false,
       width: '504px',
-      height: '275px',
       maxWidth: '80vw',
       maxHeight: '90vh',
       data: { type: 'import-igot-master-review' },
@@ -294,16 +295,16 @@ export class CustomSelfRegistrationComponent implements OnInit {
     })
 
     this.dialogRef.afterClosed().subscribe((result: any) => {
-      if (result && result.hasOwnProperty('reviewImporting') && result?.reviewImporting) {
-        this.onboardingService.setFlagToCheckRoute(true)
-        this.navigateTo('/app/home/org-designations')
+      if (result?.reviewImporting) {
+        if (!this.selectedOrgData) {
+          this.onboardingService.setFlagToCheckRoute(true)
+          this.navigateTo('/app/home/org-designations')
+        } else {
+          this.navigatToDesignations.emit(true)
+        }
+      } else {
+        this.generateRegistrationLink()
       }
-      else if (result && result.reviewImporting || result?.startImporting) {
-        this.onboardingService.setFlagToCheckRoute(true)
-        this.navigateTo('/app/home/org-designations')
-      }
-      else this.generateRegistrationLink()
-
     })
   }
 

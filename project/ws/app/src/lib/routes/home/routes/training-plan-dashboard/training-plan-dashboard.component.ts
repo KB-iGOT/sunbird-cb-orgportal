@@ -186,11 +186,12 @@ export class TrainingPlanDashboardComponent implements OnInit {
 
     const payload: any = {
       "filter": {
-        "status": [type]
+        "status": [type],
+        "orgIdList": [this.configSvc.userProfile.rootOrgId]
       },
       "pageNumber": page,
       "pageSize": pageSize,
-      "searchString": searchString,
+      "searchString": searchString
     }
     if (!searchString) {
       payload.orderBy = "createdAt"

@@ -15,7 +15,8 @@
     (userCreated)="onUserCreated($event)"></ws-single-user-creation>
 </ng-container>
 <ng-container *ngIf="selectedTab?.value === 'customRegLink'">
-  <ws-app-custom-self-registration></ws-app-custom-self-registration>
+  <ws-app-custom-self-registration [selectedOrgData]="frameworkOrgData"
+    (navigatToDesignations)="navigateToDesignation($event)"></ws-app-custom-self-registration>
 </ng-container>
 <ng-container *ngIf="selectedTab?.value === 'bulkCreation'">
   <ws-bulk-upload [selectedOrgData]="orgData"></ws-bulk-upload>

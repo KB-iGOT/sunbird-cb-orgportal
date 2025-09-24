@@ -18,7 +18,8 @@
           <ws-app-designations-master></ws-app-designations-master>
         </ng-container>
         <ng-container *ngIf="tab.value === 'userOnboarding' && selectedTabIndex === i">
-          <ws-app-user-onboarding (userCreated)="onUserCreated($event)"></ws-app-user-onboarding>
+          <ws-app-user-onboarding (userCreated)="onUserCreated($event)"
+            (showDesignationTab)="showDesTab($event)"></ws-app-user-onboarding>
         </ng-container>
         <ng-container *ngIf="tab.value === 'userTransfer' && selectedTabIndex === i">
           <ws-app-user-bulk-transfer></ws-app-user-bulk-transfer>
