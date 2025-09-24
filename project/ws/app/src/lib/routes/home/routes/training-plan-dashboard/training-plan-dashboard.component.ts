@@ -37,6 +37,7 @@ export class TrainingPlanDashboardComponent implements OnInit {
   currentUser: any
   urlQueryParams: any
   currentTab = 'Designation'
+  totalTrainingPlanCount: number = 0
 
   constructor(
     // private events: EventService,
@@ -87,6 +88,7 @@ export class TrainingPlanDashboardComponent implements OnInit {
   }
 
   tabSelected(item: string) {
+    this.searchQuery = ''
     this.currentFilter = item
   }
 
@@ -117,10 +119,14 @@ export class TrainingPlanDashboardComponent implements OnInit {
       })
     }
     this.currentFilter = filter
+    this.searchQuery = ''
     this.filterData('')
   }
 
   filterData(searchString: string) {
+    this.limit = 20
+    this.pageIndex = 0
+    this.searchQuery = searchString
     if (this.currentFilter === 'live') {
       // this.getLiveData()
       this.getTrainingPlanCBP('live', searchString)
@@ -181,7 +187,7 @@ export class TrainingPlanDashboardComponent implements OnInit {
     }
   }
 
-  async getTrainingPlanCBP(type: string, searchString: string, page: number = 0, pageSize: number = 100) {
+  async getTrainingPlanCBP(type: string, searchString: string) {
     this.loaderService.changeLoaderState(true)
 
     const payload: any = {
@@ -189,8 +195,8 @@ export class TrainingPlanDashboardComponent implements OnInit {
         "status": [type],
         "orgIdList": [this.configSvc.userProfile.rootOrgId]
       },
-      "pageNumber": page,
-      "pageSize": pageSize,
+      "pageNumber": this.pageIndex,
+      "pageSize": this.limit,
       "searchString": searchString
     }
     if (!searchString) {
@@ -203,6 +209,7 @@ export class TrainingPlanDashboardComponent implements OnInit {
         if (response.params && response.params.status && response.params.status === 'success') {
           this.completeDataRes = response?.result?.result?.data || []
           this.trainingPlanData = response?.result?.result?.data || []
+          this.totalTrainingPlanCount = response?.result?.result?.totalCount || 0
           this.convertDataAsPerTable()
         } else {
           this.loaderService.changeLoaderState(false)
@@ -391,5 +398,16 @@ export class TrainingPlanDashboardComponent implements OnInit {
 
   searchTrainingPlan(searchString: string) {
     this.filterData(searchString)
+  }
+  onPaginateChange(pageData: any) {
+    this.pageIndex = pageData?.pageIndex || 0
+    this.limit = pageData?.pageSize || 0
+    if (this.currentFilter === 'live') {
+      // this.getLiveData()
+      this.getTrainingPlanCBP('live', this.searchQuery)
+    } else if (this.currentFilter === 'draft') {
+      // this.getDraftData()
+      this.getTrainingPlanCBP('draft', this.searchQuery)
+    }
   }
 }
