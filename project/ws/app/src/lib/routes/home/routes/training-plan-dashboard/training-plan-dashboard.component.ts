@@ -157,6 +157,19 @@ export class TrainingPlanDashboardComponent implements OnInit, AfterViewInit {
       // Add sortable date values
       res.endDateSort = res.endDate ? moment(res.endDate, 'MMM DD, YYYY').valueOf() : 0
       res.createdAtSort = res.createdAt ? moment(res.createdAt, 'MMM DD, YYYY').valueOf() : 0
+
+      // Add competencies if needed
+      const compyData: any = []
+      if (res.contentList && res.contentList.length > 0) {
+        res.contentList.forEach((contentEle: any) => {
+          if (contentEle?.competencies_v5?.length > 0) {
+            contentEle.competencies_v5.forEach((compeEle: any) => {
+              compyData.push(compeEle.competencyArea)
+            })
+          }
+        })
+        res.competencies = _.uniq(compyData)
+      }
     })
 
     this.dataSource = new MatTableDataSource(this.completeDataRes)
@@ -406,13 +419,6 @@ export class TrainingPlanDashboardComponent implements OnInit, AfterViewInit {
   }
 
   public tabTelemetry(_label: string, _index: number) {
-    // const data: TelemetryEvents.ITelemetryTabData = {
-    //   label,
-    //   index,
-    // }
-    // this.events.handleTabTelemetry(
-    //   TelemetryEvents.EnumInteractSubTypes.USER_TAB,
-    //   data,
-    // )
+    // Telemetry implementation if needed
   }
 }
