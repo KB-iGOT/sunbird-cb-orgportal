@@ -15,6 +15,7 @@ import {
   // AuthKeycloakService,
   ConfigurationsService,
   LoggerService,
+  MultilingualTranslationsService,
   NsAppsConfig,
   NsInstanceConfig,
   // NsUser,
@@ -64,7 +65,7 @@ export class InitService {
     private http: HttpClient,
     // private widgetContentSvc: WidgetContentService,
     private translate: TranslateService,
-
+    private multilingualService: MultilingualTranslationsService,
 
     @Inject(APP_BASE_HREF) private baseHref: string,
     // private router: Router,
@@ -281,6 +282,7 @@ export class InitService {
       this.translate.setDefaultLang('en')
       localStorage.setItem('websiteLanguage', 'en')
     }
+    this.multilingualService.getLanguage()
     // await this.widgetContentSvc
     //   .setS3ImageCookie()
     //   .toPromise()
