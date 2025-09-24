@@ -181,7 +181,7 @@ export class TrainingPlanDashboardComponent implements OnInit {
     }
   }
 
-  async getTrainingPlanCBP(type: string, searchString: string, page: number = 0, pageSize: number = 100) {
+  async getTrainingPlanCBP(type: string, searchString: string, page: number = 0, pageSize: number = 500) {
     this.loaderService.changeLoaderState(true)
 
     const payload: any = {
