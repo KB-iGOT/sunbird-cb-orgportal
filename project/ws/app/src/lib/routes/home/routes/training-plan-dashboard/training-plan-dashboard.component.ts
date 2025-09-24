@@ -148,19 +148,19 @@ export class TrainingPlanDashboardComponent implements OnInit, AfterViewInit {
     this.cachedActions = {}
 
     this.completeDataRes.forEach((res: any) => {
-      res.contentCount = res.contentList?.length || 0
-      res.endDate = res.endDate ? moment(res.endDate).format('MMM DD[,] YYYY') : ''
-      res.createdAt = res.createdAt ? moment(res.createdAt).format('MMM DD[,] YYYY') : ''
-      res.createdByName = res.createdBy === this.currentUser ? 'You' : res.createdByName
-      res.planType = res.isApar ? 'APAR' : 'Non-APAR'
+      res.contentCount = res?.contentList?.length || 0
+      res.endDate = res?.endDate ? moment(res.endDate).format('MMM DD[,] YYYY') : ''
+      res.createdAt = res?.createdAt ? moment(res.createdAt).format('MMM DD[,] YYYY') : ''
+      res.createdByName = res?.createdBy === this.currentUser ? 'You' : res?.createdByName
+      res.planType = res?.isApar ? 'APAR' : 'Non-APAR'
 
       // Add sortable date values
-      res.endDateSort = res.endDate ? moment(res.endDate, 'MMM DD, YYYY').valueOf() : 0
-      res.createdAtSort = res.createdAt ? moment(res.createdAt, 'MMM DD, YYYY').valueOf() : 0
+      res.endDateSort = res?.endDate ? moment(res.endDate, 'MMM DD, YYYY').valueOf() : 0
+      res.createdAtSort = res?.createdAt ? moment(res.createdAt, 'MMM DD, YYYY').valueOf() : 0
 
       // Add competencies if needed
       const compyData: any = []
-      if (res.contentList && res.contentList.length > 0) {
+      if (res?.contentList && res.contentList.length > 0) {
         res.contentList.forEach((contentEle: any) => {
           if (contentEle?.competencies_v5?.length > 0) {
             contentEle.competencies_v5.forEach((compeEle: any) => {

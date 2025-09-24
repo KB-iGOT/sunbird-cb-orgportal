@@ -28,7 +28,7 @@
           <div class="mat-elevation-1">
             <!-- Table - Show only when data exists -->
             <table mat-table [dataSource]="dataSource" matSort (matSortChange)="onSortChange($event)" class="full-width"
-              *ngIf="trainingPlanData.length > 0">
+              *ngIf="trainingPlanData?.length > 0">
 
               <!-- Plan Name Column -->
               <ng-container matColumnDef="name">
@@ -98,7 +98,7 @@
             </table>
 
             <!-- No Data Message -->
-            <div *ngIf="trainingPlanData.length === 0" class="no-data-container-table">
+            <div *ngIf="trainingPlanData?.length === 0" class="no-data-container-table">
               <img src="/assets/images/no-content-data-search.svg" alt="No training plans found" class="no-data-image">
               <h3>No Training Plans Found</h3>
               <p>There are no training plans available for the selected filter.</p>
