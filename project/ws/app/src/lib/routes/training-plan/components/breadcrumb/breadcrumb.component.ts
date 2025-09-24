@@ -168,14 +168,27 @@ export class BreadcrumbComponent implements OnInit {
 
     let hasMultipleCriteriaValues = false
     let hasRootOrgId = false
-
+    let orgIdList = this.configSvc?.userProfile?.rootOrgId || this.configSvc?.unMappedUser?.rootOrgId || ''
+    let isCCA = this.configSvc?.orgReadData?.isCCA || false
     for (const group of userGroups) {
       const criteriaList = group.userGroupCriteriaList || []
+      if (!isCCA) {
+        let orgData = {
+          "criteriaKey": "rootOrgId",
+          "criteriaValue": [
+            orgIdList
+          ]
+        }
+        criteriaList.push(orgData)
+      }
       for (const criteria of criteriaList) {
         if (criteria.criteriaValue && criteria.criteriaValue.length > 1) {
           hasMultipleCriteriaValues = true
         }
         if (criteria.criteriaKey === "rootOrgId") {
+          if (criteria.criteriaValue && criteria.criteriaValue.length > 0 && criteria.criteriaValue?.includes(orgIdList) === false) {
+            criteria.criteriaValue.push(orgIdList)
+          }
           hasRootOrgId = true
         }
       }
@@ -187,8 +200,6 @@ export class BreadcrumbComponent implements OnInit {
     } else if (hasMultipleCriteriaValues) {
       orgScope = "Custom"
     }
-    let orgIdList = this.configSvc?.userProfile?.rootOrgId || this.configSvc?.unMappedUser?.rootOrgId || ''
-
     if (type === 'create') {
       return {
         request: {
@@ -205,7 +216,7 @@ export class BreadcrumbComponent implements OnInit {
           endDate: trainingPlanStepperData?.endDate,
           isApar: trainingPlanStepperData?.isApar,
           name: trainingPlanStepperData?.name,
-          orgScope: orgScope,
+          orgScope: isCCA ? orgScope : 'Single',
           status: trainingPlanStepperData?.status
         }
       }
