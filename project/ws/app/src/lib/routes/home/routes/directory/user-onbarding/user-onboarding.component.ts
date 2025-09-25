@@ -1,9 +1,7 @@
 import { Component, EventEmitter, OnInit, Output } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
 import * as _ from 'lodash'
-import { LoaderService } from '../../../../../../../../../../src/app/services/loader.service'
 import { OrgHierarchyService } from '../../../services/org-hierarchy.service'
-import { map } from 'rxjs/operators'
 
 interface TabDetails {
   name: string
@@ -27,7 +25,6 @@ export class UserOnboardingComponent implements OnInit {
 
   constructor(
     private activeRouter: ActivatedRoute,
-    private loaderService: LoaderService,
     private orgHieService: OrgHierarchyService,
   ) { }
 
@@ -47,32 +44,12 @@ export class UserOnboardingComponent implements OnInit {
 
   async onTabChange(item: any) {
     if (item.value === 'customRegLink') {
-      const orgReadPromise: Promise<any>[] = []
-      orgReadPromise.push(this.getOrgData())
-      await Promise.all(orgReadPromise)
+      this.frameworkOrgData = this.orgHieService.getOrgData()
     }
     this.selectedTab = item
   }
 
-  getOrgData() {
-    return new Promise<boolean>((resolve) => {
-      const requestBody = {
-        request: {
-          organisationId: this.orgData.roleId,
-        }
-      }
-      this.loaderService.changeLoaderState(true)
-      this.orgHieService.getOrgReadData(requestBody).pipe(
-        map((data: any) => {
-          return data.result.response
-        })
-      ).subscribe((_res) => {
-        this.frameworkOrgData = _res
-        resolve(true)
-        this.loaderService.changeLoaderState(false)
-      })
-    })
-  }
+
 
   navigateToDesignation(event: any) {
     this.showDesignationTab.emit(event)

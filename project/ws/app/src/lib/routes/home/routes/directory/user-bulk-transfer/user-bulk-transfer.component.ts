@@ -13,6 +13,7 @@ import { FileService } from '../../../../users/services/upload.service'
 import { UsersService } from '../../../../users/services/users.service'
 import { FileProgressComponent } from '../../users-view/file-progress/file-progress.component'
 import { VerifyOtpComponent } from '../../users-view/verify-otp/verify-otp.component'
+import { OrgHierarchyService } from '../../../services/org-hierarchy.service'
 @Component({
   selector: 'ws-app-user-bulk-transfer',
   templateUrl: './user-bulk-transfer.component.html',
@@ -39,18 +40,25 @@ export class UserBulkTransferComponent implements OnInit, AfterViewInit, OnDestr
   startIndex = 0
   lastIndex: any
   pageSize = 10
+  completeOrgData: any
+  parentOrgData: any
 
   constructor(
     private fileService: FileService,
     private matSnackBar: MatSnackBar,
     private router: ActivatedRoute,
     public dialog: MatDialog,
-    private usersService: UsersService
+    private usersService: UsersService,
+    private orgHieService: OrgHierarchyService,
   ) { }
 
   ngOnInit() {
     this.rootOrgId = (this.selectedOrgData) ? (this.selectedOrgData.roleId) : _.get(this.router.snapshot.parent, 'data.configService.unMappedUser.rootOrg.rootOrgId')
-    this.userProfile = _.get(this.router.snapshot.parent, 'data.configService.userProfileV2')
+    this.userProfile = (this.selectedOrgData) ? _.get(this.router.snapshot, 'data.configService.userProfileV2') : _.get(this.router.snapshot.parent, 'data.configService.userProfileV2')
+    if (this.selectedOrgData) {
+      this.completeOrgData = _.cloneDeep(this.orgHieService.getOrgData())
+      this.parentOrgData = _.cloneDeep(this.orgHieService.getParentOrgData())
+    }
     this.getBulkStatusList()
   }
 
@@ -66,7 +74,7 @@ export class UserBulkTransferComponent implements OnInit, AfterViewInit, OnDestr
   }
 
   getBulkStatusList(): void {
-    this.fileService.getBulkUploadDataV1(this.rootOrgId)
+    this.fileService.statusOfBulkUserTransfer(this.completeOrgData?.rootOrgId)
       .pipe(takeUntil(this.destroySubject$))
       .subscribe((res: any) => {
         this.lastUploadList = res.result.content.sort((a: any, b: any) =>
@@ -88,12 +96,16 @@ export class UserBulkTransferComponent implements OnInit, AfterViewInit, OnDestr
   }
 
   handleDownloadFile(listObj: any): void {
-    const filePath = `/apis/proxies/v8/user/v1/bulkuser/download/${listObj.fileName}`
+    const filePath = `/apis/proxies/v8/user/v1/org-migration/bulk-upload/result/${listObj.fileName}`
     window.open(filePath, '_blank')
   }
 
   handleDownloadSampleFile(): void {
-    this.fileService.download(this.downloadSampleFilePath, this.downloadAsFileName)
+    if (this.parentOrgData?.orgHierarchyFrameworkStatus?.toLowerCase() === 'completed') {
+      this.fileService.downloadSampleBulkUserTransferFile('orgUserBulkTransferSample.xlsx', this.parentOrgData?.orgHierarchyFrameworkId)
+    } else {
+      this.matSnackBar.open('Please complete the framework setup of parent organisation to download the sample file')
+    }
   }
 
   handleFileClick(event: any): void {
@@ -164,9 +176,9 @@ export class UserBulkTransferComponent implements OnInit, AfterViewInit, OnDestr
   uploadCSVFile(): void {
     if (this.fileService.validateFile(this.fileName)) {
       if (this.fileSelected) {
-        const formData: FormData = new FormData()
-        formData.append('data', this.fileSelected, this.fileName)
-        this.fileService.upload(this.fileName, formData, (this.selectedOrgData) ? this.selectedOrgData : '')
+        const formData = new FormData()
+        formData.append('file', this.fileSelected)
+        this.fileService.uploadBulkUserTransfer(formData, this.completeOrgData, (this.parentOrgData) ? this.parentOrgData : '')
           .pipe(takeUntil(this.destroySubject$))
           .subscribe((_res: any) => {
             this.fileUploadDialogInstance.close()
