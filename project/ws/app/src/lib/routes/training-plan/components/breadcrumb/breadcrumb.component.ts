@@ -7,6 +7,7 @@ import { TrainingPlanContent } from '../../models/training-plan.model'
 import { TrainingPlanService } from '../../services/traininig-plan.service'
 import { TrainingPlanDataSharingService } from '../../services/training-plan-data-share.service'
 import { NsAccessControlConfig } from '@sunbird-cb/access-settings'
+import { ConfigurationsService } from '@sunbird-cb/utils-v2'
 @Component({
   selector: 'ws-app-breadcrumb',
   templateUrl: './breadcrumb.component.html',
@@ -31,6 +32,7 @@ export class BreadcrumbComponent implements OnInit {
     public tpdsSvc: TrainingPlanDataSharingService,
     private tpSvc: TrainingPlanService,
     private snackBar: MatSnackBar,
+    private configSvc: ConfigurationsService
   ) { }
 
   ngOnInit() {
@@ -166,15 +168,45 @@ export class BreadcrumbComponent implements OnInit {
 
     let hasMultipleCriteriaValues = false
     let hasRootOrgId = false
-
+    let userRootOrgId = this.configSvc?.userProfile?.rootOrgId || this.configSvc?.unMappedUser?.rootOrgId || ''
+    let orgIdList = [userRootOrgId]
+    let isCCA = this.configSvc?.orgReadData?.isCCA || false
     for (const group of userGroups) {
       const criteriaList = group.userGroupCriteriaList || []
+      // Check if rootOrgId criteria exists
+      let rootOrgIdCriteria = criteriaList.find((criteria: any) => criteria.criteriaKey === "rootOrgId")
+
+      if (!rootOrgIdCriteria) {
+        // If rootOrgId criteria doesn't exist, add it
+        criteriaList.push({
+          criteriaKey: "rootOrgId",
+          criteriaValue: [userRootOrgId]
+        })
+        hasRootOrgId = true
+      } else {
+        // If rootOrgId criteria exists, check if user's orgId is present
+        if (rootOrgIdCriteria.criteriaValue && rootOrgIdCriteria.criteriaValue.length > 0) {
+
+          if (!rootOrgIdCriteria.criteriaValue.includes(userRootOrgId)) {
+            // Add user's orgId if not present
+            rootOrgIdCriteria.criteriaValue.push(userRootOrgId)
+          }
+          rootOrgIdCriteria.criteriaValue.forEach((item: any) => {
+            if (!orgIdList.includes(item)) {
+              orgIdList.push(item)
+            }
+          })
+        } else {
+          // If criteriaValue is empty or undefined, initialize it with user's orgId
+          rootOrgIdCriteria.criteriaValue = [userRootOrgId]
+        }
+        hasRootOrgId = true
+      }
+
+      // Check for multiple criteria values
       for (const criteria of criteriaList) {
         if (criteria.criteriaValue && criteria.criteriaValue.length > 1) {
           hasMultipleCriteriaValues = true
-        }
-        if (criteria.criteriaKey === "rootOrgId") {
-          hasRootOrgId = true
         }
       }
     }
@@ -185,10 +217,10 @@ export class BreadcrumbComponent implements OnInit {
     } else if (hasMultipleCriteriaValues) {
       orgScope = "Custom"
     }
-
     if (type === 'create') {
       return {
         request: {
+          orgIdList: orgIdList,
           comment: trainingPlanStepperData?.comment ?? 'cbPlanId1 is created',
           contentList: trainingPlanStepperData?.contentList || [],
           contentType: trainingPlanStepperData?.contentType || "Course",
@@ -201,7 +233,7 @@ export class BreadcrumbComponent implements OnInit {
           endDate: trainingPlanStepperData?.endDate,
           isApar: trainingPlanStepperData?.isApar,
           name: trainingPlanStepperData?.name,
-          orgScope: orgScope,
+          orgScope: isCCA ? orgScope : 'Single',
           status: trainingPlanStepperData?.status
         }
       }
@@ -209,6 +241,7 @@ export class BreadcrumbComponent implements OnInit {
     } else if (type === 'update') {
       return {
         request: {
+          orgIdList: orgIdList,
           contentList: trainingPlanStepperData?.contentList || [],
           contentType: trainingPlanStepperData?.contentType || "Course",
           contextData: {
@@ -295,6 +328,7 @@ export class BreadcrumbComponent implements OnInit {
       delete obj.request.contentList
       delete obj.request.contentType
       delete obj.request.assignmentType
+      delete obj.request.orgIdList
     }
     delete obj.request.status
     this.showDialogBox('progress')
