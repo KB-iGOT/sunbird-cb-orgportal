@@ -25,8 +25,8 @@
   <ng-container *ngIf="organizationCtrl?.value && !hasOrgHierarchyFrameworkId()">
     <div class="no-hierarchy-container">
       <p>The selected organization does not have a hierarchy framework configured.</p>
-      <p>Do you want to crate a new framework?</p>
-      <div class="flex gap-4 btn-container justify-center">
+      <p *ngIf="checkIfMdoL0()">Do you want to crate a new framework?</p>
+      <div class="flex gap-4 btn-container justify-center" *ngIf="checkIfMdoL0()">
         <button mat-button class="btn-common btn-primary" (click)="createNewHierarchy()">Create</button>
         <button mat-button class="btn-common btn-secondary" (click)="cancelHierarchyCreation()">Cancel</button>
       </div>

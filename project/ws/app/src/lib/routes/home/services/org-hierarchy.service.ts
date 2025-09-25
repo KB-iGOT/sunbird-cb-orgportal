@@ -20,6 +20,8 @@ const API_END_POINTS = {
 export class OrgHierarchyService {
 
   configService: any
+  orgData: any
+  parentOrgData: any
 
   constructor(private http: HttpClient) { }
 
@@ -72,6 +74,22 @@ export class OrgHierarchyService {
 
   getConfigService(): any {
     return this.configService
+  }
+
+  setOrgData(orgData: any): void {
+    this.orgData = orgData
+  }
+
+  getOrgData(): any {
+    return this.orgData
+  }
+
+  setParentOrgData(parentOrgData: any): void {
+    this.parentOrgData = parentOrgData
+  }
+
+  getParentOrgData(): any {
+    return this.parentOrgData
   }
 
 }
