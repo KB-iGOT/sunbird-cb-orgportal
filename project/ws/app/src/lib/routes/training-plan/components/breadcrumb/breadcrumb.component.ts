@@ -168,7 +168,8 @@ export class BreadcrumbComponent implements OnInit {
 
     let hasMultipleCriteriaValues = false
     let hasRootOrgId = false
-    let orgIdList = this.configSvc?.userProfile?.rootOrgId || this.configSvc?.unMappedUser?.rootOrgId || ''
+    let userRootOrgId = this.configSvc?.userProfile?.rootOrgId || this.configSvc?.unMappedUser?.rootOrgId || ''
+    let orgIdList = [userRootOrgId]
     let isCCA = this.configSvc?.orgReadData?.isCCA || false
     for (const group of userGroups) {
       const criteriaList = group.userGroupCriteriaList || []
@@ -179,19 +180,25 @@ export class BreadcrumbComponent implements OnInit {
         // If rootOrgId criteria doesn't exist, add it
         criteriaList.push({
           criteriaKey: "rootOrgId",
-          criteriaValue: [orgIdList]
+          criteriaValue: [userRootOrgId]
         })
         hasRootOrgId = true
       } else {
         // If rootOrgId criteria exists, check if user's orgId is present
         if (rootOrgIdCriteria.criteriaValue && rootOrgIdCriteria.criteriaValue.length > 0) {
-          if (!rootOrgIdCriteria.criteriaValue.includes(orgIdList)) {
+
+          if (!rootOrgIdCriteria.criteriaValue.includes(userRootOrgId)) {
             // Add user's orgId if not present
-            rootOrgIdCriteria.criteriaValue.push(orgIdList)
+            rootOrgIdCriteria.criteriaValue.push(userRootOrgId)
           }
+          rootOrgIdCriteria.criteriaValue.forEach((item: any) => {
+            if (!orgIdList.includes(item)) {
+              orgIdList.push(item)
+            }
+          })
         } else {
           // If criteriaValue is empty or undefined, initialize it with user's orgId
-          rootOrgIdCriteria.criteriaValue = [orgIdList]
+          rootOrgIdCriteria.criteriaValue = [userRootOrgId]
         }
         hasRootOrgId = true
       }
@@ -213,7 +220,7 @@ export class BreadcrumbComponent implements OnInit {
     if (type === 'create') {
       return {
         request: {
-          orgIdList: [orgIdList],
+          orgIdList: orgIdList,
           comment: trainingPlanStepperData?.comment ?? 'cbPlanId1 is created',
           contentList: trainingPlanStepperData?.contentList || [],
           contentType: trainingPlanStepperData?.contentType || "Course",
@@ -234,7 +241,7 @@ export class BreadcrumbComponent implements OnInit {
     } else if (type === 'update') {
       return {
         request: {
-          orgIdList: [orgIdList],
+          orgIdList: orgIdList,
           contentList: trainingPlanStepperData?.contentList || [],
           contentType: trainingPlanStepperData?.contentType || "Course",
           contextData: {
