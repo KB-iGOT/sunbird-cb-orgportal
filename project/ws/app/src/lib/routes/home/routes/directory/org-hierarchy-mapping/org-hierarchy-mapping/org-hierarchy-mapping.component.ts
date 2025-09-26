@@ -174,11 +174,16 @@ export class OrgHierarchyMappingComponent implements OnInit, AfterViewInit {
   }
 
   getOrgDetails(): any {
-    if (!this.organizationCtrl.value || (!this.checkIfMdoL0() && !this.checkIfParentIsMdoL0() && !this.filteredOrganizations?.length)) {
+    if (!this.organizationCtrl.value ||
+      (!this.checkIfMdoL0() &&
+        !this.checkIfParentIsMdoL0() &&
+        !this.filteredOrganizations?.length && !this.checkIfMdoL0Admin())) {
       return null
     }
     let selectedOrg: any
     if (this.checkIfMdoL0()) {
+      selectedOrg = this.orgReadData
+    } else if (!this.checkIfMdoL0() && this.checkIfMdoL0Admin()) {
       selectedOrg = this.orgReadData
     } else if (!this.checkIfMdoL0() && this.checkIfParentIsMdoL0()) {
       selectedOrg = this.parentOrgReadData
@@ -196,6 +201,8 @@ export class OrgHierarchyMappingComponent implements OnInit, AfterViewInit {
     }
     let selectedOrg: any
     if (this.checkIfMdoL0()) {
+      selectedOrg = this.orgReadData
+    } else if (!this.checkIfMdoL0() && this.checkIfMdoL0Admin()) {
       selectedOrg = this.orgReadData
     } else if (!this.checkIfMdoL0() && this.checkIfParentIsMdoL0()) {
       selectedOrg = this.parentOrgReadData
@@ -369,6 +376,11 @@ export class OrgHierarchyMappingComponent implements OnInit, AfterViewInit {
     return (this.orgReadData?.sbOrgType?.toLowerCase() === 'ministry' && userRoles.has('mdo_leader'))
   }
 
+  checkIfMdoL0Admin() {
+    const userRoles = this.orgHieService.getUserRoles()
+    return (this.orgReadData?.sbOrgType?.toLowerCase() === 'ministry' && userRoles.has('mdo_admin'))
+  }
+
   checkIfParentIsMdoL0() {
     return (this.parentOrgReadData?.sbOrgType?.toLowerCase() === 'ministry' ||
       this.parentOrgReadData?.sbOrgType?.toLowerCase() === 'state')
@@ -419,11 +431,11 @@ export class OrgHierarchyMappingComponent implements OnInit, AfterViewInit {
                   filters: {
                     status: 1,
                     ministryOrStateType: this.orgReadData.sbOrgType,
-                    ministryOrStateId: this.orgReadData.ministryOrStateId
+                    ministryOrStateId: this.orgReadData.rootOrgId
                   }
                 }
               }
-              this.organizationCtrl.setValue(this.orgReadData.ministryOrStateId)
+              this.organizationCtrl.setValue(this.orgReadData.rootOrgId)
               return this.orgHieService.getOrganizationDetails(secondRequestBody)
             }
           }

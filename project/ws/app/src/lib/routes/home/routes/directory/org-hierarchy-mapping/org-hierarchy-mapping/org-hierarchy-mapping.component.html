@@ -1,6 +1,6 @@
 <div class="org-hierarchy-container">
   <div class="flex my-3">
-    <ng-container *ngIf="hasOrgHierarchyFrameworkId() && !checkIfParentIsMdoL0()">
+    <ng-container *ngIf="hasOrgHierarchyFrameworkId() && !checkIfParentIsMdoL0() && !this.checkIfMdoL0Admin()">
       <div class="bulk-upload-container flex gap-4 ml-auto">
         <button mat-button class="btn-common btn-with-out-border flex flex-middle" type="button"
           (click)="downloadTemplate()">
@@ -18,8 +18,8 @@
   <ng-container *ngIf="organizationCtrl?.value && hasOrgHierarchyFrameworkId() && !bulkUploadRefresh">
     <div class="tree-view-container">
       <lib-tree-view [environment]="environmentVal" [taxonomyConfig]="defaultOrgConfig"
-        [orgSelectedData]="getOrgDetails()" [childOrgData]="orgReadData" (loaderEnable)="checkloader($event)"
-        (manageOrg)="redirectOrg($event)"></lib-tree-view>
+        [orgSelectedData]="getOrgDetails()" [childOrgData]="orgReadData" [userRolesData]="userRoles"
+        (loaderEnable)="checkloader($event)" (manageOrg)="redirectOrg($event)"></lib-tree-view>
     </div>
   </ng-container>
   <ng-container *ngIf="organizationCtrl?.value && !hasOrgHierarchyFrameworkId()">
