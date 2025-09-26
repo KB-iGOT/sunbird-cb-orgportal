@@ -365,7 +365,8 @@ export class OrgHierarchyMappingComponent implements OnInit, AfterViewInit {
   }
 
   checkIfMdoL0() {
-    return (this.orgReadData?.sbOrgType?.toLowerCase() === 'ministry')
+    const userRoles = this.orgHieService.getUserRoles()
+    return (this.orgReadData?.sbOrgType?.toLowerCase() === 'ministry' && userRoles.has('mdo_leader'))
   }
 
   checkIfParentIsMdoL0() {

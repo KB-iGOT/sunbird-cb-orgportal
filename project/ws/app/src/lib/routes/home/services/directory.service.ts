@@ -60,23 +60,20 @@ export class DirectoryService {
   //   return this.http.get<any>(`${API_END_POINTS.GET_ALL_DEPARTMENTS}`)
   // }
 
-  getAllDepartmentsKong(queryText: any, pagination: { limit: number, offset: number }): Observable<any> {
+  getAllDepartmentsKong(queryText: any, pagination: { limit: number, offset: number }, _orgData?: any): Observable<any> {
     let filters = {
-      isTenant: true,
       status: 1,
-      isMdo: true
+      ministryOrStateType: (_orgData) ?
+        _orgData.sbOrgType : '',
+      ministryOrStateId: (_orgData) ?
+        _orgData.rootOrgId : ''
       // ...(state === 'organisation' ? { isMdo: true } : { isCbp: true }),
     }
 
     if (queryText) {
       const req1 = {
         request: {
-          filters: {
-            isTenant: true,
-            status: 1,
-            isMdo: true
-            // ...(state === 'organisation' ? { isMdo: true } : { isCbp: true }),
-          },
+          filters,
           query: queryText,
           limit: pagination.limit || 20,
           offset: pagination.offset || 0,

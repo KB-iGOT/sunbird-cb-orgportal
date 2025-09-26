@@ -22,6 +22,7 @@ export class OrgHierarchyService {
   configService: any
   orgData: any
   parentOrgData: any
+  userRoles: any
 
   constructor(private http: HttpClient) { }
 
@@ -90,6 +91,14 @@ export class OrgHierarchyService {
 
   getParentOrgData(): any {
     return this.parentOrgData
+  }
+
+  setUserRoles(roles: any): void {
+    this.userRoles = roles
+  }
+
+  getUserRoles(): any {
+    return this.userRoles
   }
 
 }

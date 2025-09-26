@@ -22,7 +22,8 @@ export const environment: IEnvironment = {
   compentencyVersionKey: (window as { [key: string]: any })['env']['compentencyVersionKey'] || '',
   doptOrg: (window as { [key: string]: any })['env']['doptOrg'] || '',
   dicussV2Bucket: (window as { [key: string]: any })['env']['dicussV2Bucket'] || '',
-  portalsForNotifications: (((window as { [key: string]: any })['env']['portalsForNotifications'] || {})) || {}
+  portalsForNotifications: (((window as { [key: string]: any })['env']['portalsForNotifications'] || {})) || {},
+  debug: (window as { [key: string]: any })['env']['debug'] || false  // Add this missing property
 }
 interface IEnvironment {
   name: null | string
@@ -45,6 +46,7 @@ interface IEnvironment {
   doptOrg?: string
   dicussV2Bucket: string
   portalsForNotifications: any
+  debug?: boolean  // Add this missing property
 }
 
 /*
