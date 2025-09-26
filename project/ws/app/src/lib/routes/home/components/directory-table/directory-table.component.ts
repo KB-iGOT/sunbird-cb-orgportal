@@ -71,7 +71,7 @@ export class DirectoryTableComponent implements OnInit {
     this.configData = _.get(this.activatedRoute, 'snapshot.data.configService', {})
     this.initializetableData()
     this.getAllDepartments('')
-    // this.initializeValuesAndAPIs()
+    this.initializeValuesAndAPIs()
   }
 
   initializetableData() {
@@ -184,11 +184,11 @@ export class DirectoryTableComponent implements OnInit {
   //#endregion (get all departments and formate the data for table)
 
   initializeValuesAndAPIs() {
-    this.directoryService.getStatesOrMinisteries('state').subscribe(res => {
-      if (res && res.result && res.result && res.result.response && res.result.response.content) {
-        this.dropdownList.statesList = _.orderBy(res.result.response.content, ['orgName'], ['asc'])
-      }
-    })
+    // this.directoryService.getStatesOrMinisteries('state').subscribe(res => {
+    //   if (res && res.result && res.result && res.result.response && res.result.response.content) {
+    //     this.dropdownList.statesList = _.orderBy(res.result.response.content, ['orgName'], ['asc'])
+    //   }
+    // })
 
     this.directoryService.getStatesOrMinisteries('ministry').subscribe(res => {
       if (res && res.result && res.result && res.result.response && res.result.response.content) {
