@@ -100,5 +100,4 @@ export class OrgHierarchyService {
   getUserRoles(): any {
     return this.userRoles
   }
-
 }
