@@ -8,7 +8,7 @@ import { MatPaginator } from '@angular/material/paginator'
 import { MatSort } from '@angular/material/sort'
 import { InfoModalComponent } from '../info-modal/info-modal.component'
 import { MatLegacyDialog } from '@angular/material/legacy-dialog'
-import { Router } from '@angular/router'
+import { ActivatedRoute, Router } from '@angular/router'
 
 @Component({
   selector: 'ws-app-directory-table',
@@ -50,6 +50,7 @@ export class DirectoryTableComponent implements OnInit {
   length!: number
   pageSize = 20
   pageSizeOptions = [20, 30, 40]
+  configData: any
   //#endregion (pagination variables)
 
   //#endregion (global variables)
@@ -60,12 +61,14 @@ export class DirectoryTableComponent implements OnInit {
     private datePipe: DatePipe,
     private dialog: MatLegacyDialog,
     private router: Router,
+    private activatedRoute: ActivatedRoute
   ) {
     this.dataSource = new MatTableDataSource<any>()
   }
 
   //#region (initialization)
   ngOnInit(): void {
+    this.configData = _.get(this.activatedRoute, 'snapshot.data.configService', {})
     this.initializetableData()
     this.getAllDepartments('')
     this.initializeValuesAndAPIs()
@@ -92,10 +95,10 @@ export class DirectoryTableComponent implements OnInit {
   }
 
   //#region (get all departments and formate the data for table)
-  getAllDepartments(queryText: any) {
+  async getAllDepartments(queryText: any) {
     this.tableData.loader = true
     const query = queryText ? queryText : ''
-    this.directoryService.getAllDepartmentsKong(query, this.pagination).subscribe(res => {
+    this.directoryService.getAllDepartmentsKong(query, this.pagination, this.configData?.orgReadData).subscribe(res => {
       this.wholeData2 = res.result.response.content
       this.tableData.tableDataCount = res.result.response.count
       this.totalCount = res.result.response.count
@@ -181,11 +184,11 @@ export class DirectoryTableComponent implements OnInit {
   //#endregion (get all departments and formate the data for table)
 
   initializeValuesAndAPIs() {
-    this.directoryService.getStatesOrMinisteries('state').subscribe(res => {
-      if (res && res.result && res.result && res.result.response && res.result.response.content) {
-        this.dropdownList.statesList = _.orderBy(res.result.response.content, ['orgName'], ['asc'])
-      }
-    })
+    // this.directoryService.getStatesOrMinisteries('state').subscribe(res => {
+    //   if (res && res.result && res.result && res.result.response && res.result.response.content) {
+    //     this.dropdownList.statesList = _.orderBy(res.result.response.content, ['orgName'], ['asc'])
+    //   }
+    // })
 
     this.directoryService.getStatesOrMinisteries('ministry').subscribe(res => {
       if (res && res.result && res.result && res.result.response && res.result.response.content) {

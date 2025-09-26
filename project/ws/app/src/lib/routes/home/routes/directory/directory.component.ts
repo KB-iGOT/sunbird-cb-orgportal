@@ -2,6 +2,7 @@
 import { AfterViewInit, Component, OnInit, TemplateRef, ViewChild } from '@angular/core'
 import { ConfigurationsService } from '@sunbird-cb/utils-v2'
 import * as _ from 'lodash'
+import { OrgHierarchyService } from '../../services/org-hierarchy.service'
 //#endregion (imports)
 
 @Component({
@@ -25,7 +26,8 @@ export class DirectoryComponent implements OnInit, AfterViewInit {
   ]
 
   constructor(
-    private configSvc: ConfigurationsService
+    private configSvc: ConfigurationsService,
+    private orgHieService: OrgHierarchyService,
   ) { }
 
   ngOnInit(): void {
@@ -45,9 +47,16 @@ export class DirectoryComponent implements OnInit, AfterViewInit {
 
   setOrganisationTabVisibility() {
     const ministryOrStateType = _.get(this.configSvc, 'orgReadData.ministryOrStateType', '')
-    switch (ministryOrStateType) {
+    this.orgHieService.setUserRoles(_.get(this.configSvc, 'userRoles', []))
+    switch (ministryOrStateType?.toLowerCase()) {
       case 'ministry':
         this.tabs = this.tabs.filter((tab: any) => tab.value !== 'organisation')
+        break
+      case 'spv':
+        const userRoles = this.orgHieService.getUserRoles()
+        if (userRoles && userRoles.has('mdo_admin')) {
+          this.tabs = this.tabs.filter((tab: any) => tab.value !== 'organisation')
+        }
         break
     }
   }

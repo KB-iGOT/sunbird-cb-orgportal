@@ -454,6 +454,9 @@ const routes: Routes = [
           pageId: 'Directory',
           // module: 'Notifications',
         },
+        resolve: {
+          configService: ConfigResolveService,
+        }
       },
     ],
   },
