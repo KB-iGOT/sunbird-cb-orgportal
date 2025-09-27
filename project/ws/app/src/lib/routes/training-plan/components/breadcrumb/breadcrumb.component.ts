@@ -163,64 +163,44 @@ export class BreadcrumbComponent implements OnInit {
   }
 
   generateRequestPayload(trainingPlanStepperData: any, type: string): any {
-    let orgScope = "Single" // Default value
+    // let orgScope = "Single" // Default value
     const userGroups = trainingPlanStepperData.accessControl?.userGroups || []
 
-    let hasMultipleCriteriaValues = false
-    let hasRootOrgId = false
+    // let hasMultipleCriteriaValues = false
+    // let hasRootOrgId = false
     let userRootOrgId = this.configSvc?.userProfile?.rootOrgId || this.configSvc?.unMappedUser?.rootOrgId || ''
-    let orgIdList = [userRootOrgId]
     let isCCA = this.configSvc?.orgReadData?.isCCA || false
     for (const group of userGroups) {
       const criteriaList = group.userGroupCriteriaList || []
       // Check if rootOrgId criteria exists
       let rootOrgIdCriteria = criteriaList.find((criteria: any) => criteria.criteriaKey === "rootOrgId")
 
-      if (!rootOrgIdCriteria) {
+      if (!rootOrgIdCriteria && !isCCA) {
         // If rootOrgId criteria doesn't exist, add it
         criteriaList.push({
           criteriaKey: "rootOrgId",
           criteriaValue: [userRootOrgId]
         })
-        hasRootOrgId = true
-      } else {
-        // If rootOrgId criteria exists, check if user's orgId is present
-        if (rootOrgIdCriteria.criteriaValue && rootOrgIdCriteria.criteriaValue.length > 0) {
-
-          if (!rootOrgIdCriteria.criteriaValue.includes(userRootOrgId)) {
-            // Add user's orgId if not present
-            rootOrgIdCriteria.criteriaValue.push(userRootOrgId)
-          }
-          rootOrgIdCriteria.criteriaValue.forEach((item: any) => {
-            if (!orgIdList.includes(item)) {
-              orgIdList.push(item)
-            }
-          })
-        } else {
-          // If criteriaValue is empty or undefined, initialize it with user's orgId
-          rootOrgIdCriteria.criteriaValue = [userRootOrgId]
-        }
-        hasRootOrgId = true
       }
 
       // Check for multiple criteria values
-      for (const criteria of criteriaList) {
-        if (criteria.criteriaValue && criteria.criteriaValue.length > 1) {
-          hasMultipleCriteriaValues = true
-        }
-      }
+      // for (const criteria of criteriaList) {
+      //   if (criteria.criteriaValue && criteria.criteriaValue.length > 1) {
+      //     // hasMultipleCriteriaValues = true
+      //   }
+      // }
     }
 
     // Set orgScope based on conditions
-    if (!hasRootOrgId) {
-      orgScope = "All"
-    } else if (hasMultipleCriteriaValues) {
-      orgScope = "Custom"
-    }
+    // if (!hasRootOrgId) {
+    //   orgScope = "All"
+    // } else if (hasMultipleCriteriaValues) {
+    //   orgScope = "Custom"
+    // }
     if (type === 'create') {
       return {
         request: {
-          orgIdList: orgIdList,
+          orgIdList: [userRootOrgId],
           comment: trainingPlanStepperData?.comment ?? 'cbPlanId1 is created',
           contentList: trainingPlanStepperData?.contentList || [],
           contentType: trainingPlanStepperData?.contentType || "Course",
@@ -233,7 +213,7 @@ export class BreadcrumbComponent implements OnInit {
           endDate: trainingPlanStepperData?.endDate,
           isApar: trainingPlanStepperData?.isApar,
           name: trainingPlanStepperData?.name,
-          orgScope: isCCA ? orgScope : 'Single',
+          // orgScope: isCCA ? orgScope : 'Single',
           status: trainingPlanStepperData?.status
         }
       }
@@ -241,7 +221,7 @@ export class BreadcrumbComponent implements OnInit {
     } else if (type === 'update') {
       return {
         request: {
-          orgIdList: orgIdList,
+          orgIdList: [userRootOrgId],
           contentList: trainingPlanStepperData?.contentList || [],
           contentType: trainingPlanStepperData?.contentType || "Course",
           contextData: {
