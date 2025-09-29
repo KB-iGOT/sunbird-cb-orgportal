@@ -176,7 +176,7 @@ export class BreadcrumbComponent implements OnInit {
       // Check if rootOrgId criteria exists
       let rootOrgIdCriteria = criteriaList.find((criteria: any) => criteria.criteriaKey === "rootOrgId")
 
-      if (!rootOrgIdCriteria) {
+      if (!rootOrgIdCriteria && !isCCA) {
         // If rootOrgId criteria doesn't exist, add it
         criteriaList.push({
           criteriaKey: "rootOrgId",
@@ -209,6 +209,13 @@ export class BreadcrumbComponent implements OnInit {
           hasMultipleCriteriaValues = true
         }
       }
+
+      // Check for multiple criteria values
+      // for (const criteria of criteriaList) {
+      //   if (criteria.criteriaValue && criteria.criteriaValue.length > 1) {
+      //     // hasMultipleCriteriaValues = true
+      //   }
+      // }
     }
 
     // Set orgScope based on conditions
@@ -233,7 +240,7 @@ export class BreadcrumbComponent implements OnInit {
           endDate: trainingPlanStepperData?.endDate,
           isApar: trainingPlanStepperData?.isApar,
           name: trainingPlanStepperData?.name,
-          orgScope: isCCA ? orgScope : 'Single',
+          // orgScope: isCCA ? orgScope : 'Single',
           status: trainingPlanStepperData?.status
         }
       }
@@ -241,7 +248,7 @@ export class BreadcrumbComponent implements OnInit {
     } else if (type === 'update') {
       return {
         request: {
-          orgIdList: orgIdList,
+          orgIdList: [userRootOrgId],
           contentList: trainingPlanStepperData?.contentList || [],
           contentType: trainingPlanStepperData?.contentType || "Course",
           contextData: {
