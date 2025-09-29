@@ -163,7 +163,7 @@ export class BreadcrumbComponent implements OnInit {
   }
 
   generateRequestPayload(trainingPlanStepperData: any, type: string): any {
-    let orgScope = "Single" // Default value
+    // let orgScope = "Single" // Default value
     const userGroups = trainingPlanStepperData.accessControl?.userGroups || []
 
     let hasMultipleCriteriaValues = false
@@ -219,11 +219,11 @@ export class BreadcrumbComponent implements OnInit {
     }
 
     // Set orgScope based on conditions
-    if (!hasRootOrgId) {
-      orgScope = "All"
-    } else if (hasMultipleCriteriaValues) {
-      orgScope = "Custom"
-    }
+    // if (!hasRootOrgId) {
+    //   orgScope = "All"
+    // } else if (hasMultipleCriteriaValues) {
+    //   orgScope = "Custom"
+    // }
     if (type === 'create') {
       return {
         request: {
