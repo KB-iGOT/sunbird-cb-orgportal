@@ -330,6 +330,12 @@ export class BreadcrumbComponent implements OnInit {
           })
         }, 1000)
       }
+    }, (_err: any) => {
+      let errorMessage = _err?.error?.params?.err || 'Something went wrong while publishing CBP plan. Try again later'
+      this.snackBar.open(errorMessage, 'X', {
+        duration: 10000,
+      })
+      this.dialogRef.close()
     })
   }
 
