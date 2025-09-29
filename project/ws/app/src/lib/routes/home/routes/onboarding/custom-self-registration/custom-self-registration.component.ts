@@ -149,7 +149,8 @@ export class CustomSelfRegistrationComponent implements OnInit {
       maxWidth: '80vw',
       maxHeight: '90vh',
       disableClose: true,
-      data: { type: 'generate-link-loader' }
+      data: { type: 'generate-link-loader' },
+      panelClass: 'loading-popup-dialog-container',
     })
 
     const payload = {
@@ -241,7 +242,9 @@ export class CustomSelfRegistrationComponent implements OnInit {
         maxWidth: '80vw',
         maxHeight: '90vh',
         data: { type: 'import-igot-master-review' },
-        disableClose: true
+        disableClose: true,
+        panelClass: 'loading-popup-dialog-container',
+
       })
     } else {
       this.dialogRef = this.dialog.open(LoadingPopupComponent, {
@@ -250,7 +253,9 @@ export class CustomSelfRegistrationComponent implements OnInit {
         maxWidth: '80vw',
         maxHeight: '90vh',
         data: { type: 'import-igot-master-create' },
-        disableClose: true
+        disableClose: true,
+        panelClass: 'loading-popup-dialog-container',
+
       })
     }
     this.subscribeToAfterClosedModal()
@@ -292,6 +297,7 @@ export class CustomSelfRegistrationComponent implements OnInit {
       maxHeight: '90vh',
       data: { type: 'import-igot-master-review' },
       disableClose: true,
+      panelClass: 'loading-popup-dialog-container',
     })
 
     this.dialogRef.afterClosed().subscribe((result: any) => {
