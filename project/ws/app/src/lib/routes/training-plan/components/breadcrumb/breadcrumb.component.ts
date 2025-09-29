@@ -166,8 +166,8 @@ export class BreadcrumbComponent implements OnInit {
     // let orgScope = "Single" // Default value
     const userGroups = trainingPlanStepperData.accessControl?.userGroups || []
 
-    let hasMultipleCriteriaValues = false
-    let hasRootOrgId = false
+    // let hasMultipleCriteriaValues = false
+    // let hasRootOrgId = false
     let userRootOrgId = this.configSvc?.userProfile?.rootOrgId || this.configSvc?.unMappedUser?.rootOrgId || ''
     let orgIdList = [userRootOrgId]
     let isCCA = this.configSvc?.orgReadData?.isCCA || false
@@ -182,7 +182,7 @@ export class BreadcrumbComponent implements OnInit {
           criteriaKey: "rootOrgId",
           criteriaValue: [userRootOrgId]
         })
-        hasRootOrgId = true
+        // hasRootOrgId = true
       } else {
         // If rootOrgId criteria exists, check if user's orgId is present
         if (rootOrgIdCriteria.criteriaValue && rootOrgIdCriteria.criteriaValue.length > 0) {
@@ -200,13 +200,13 @@ export class BreadcrumbComponent implements OnInit {
           // If criteriaValue is empty or undefined, initialize it with user's orgId
           rootOrgIdCriteria.criteriaValue = [userRootOrgId]
         }
-        hasRootOrgId = true
+        // hasRootOrgId = true
       }
 
       // Check for multiple criteria values
       for (const criteria of criteriaList) {
         if (criteria.criteriaValue && criteria.criteriaValue.length > 1) {
-          hasMultipleCriteriaValues = true
+          // hasMultipleCriteriaValues = true
         }
       }
 
