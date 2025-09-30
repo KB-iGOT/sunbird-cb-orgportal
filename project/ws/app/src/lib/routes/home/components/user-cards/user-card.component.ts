@@ -842,7 +842,7 @@ export class UserCardComponent implements OnInit, OnChanges, AfterViewChecked, A
                   roles: Array.from(this.userRoles),
                 },
               }
-              this.usersSvc.addUserToDepartment(dreq).subscribe(res => {
+              this.usersSvc.addUserToRole(dreq).subscribe(res => {
                 if (res) {
                   this.updateUserDataForm.reset({ roles: '' })
                   // this.openSnackbar('User role updated Successfully')q
@@ -1301,7 +1301,7 @@ export class UserCardComponent implements OnInit, OnChanges, AfterViewChecked, A
         roles: Array.from(this.userRoles),
       },
     }
-    this.usersSvc.addUserToDepartment(dreq).subscribe(res => {
+    this.usersSvc.addUserToRole(dreq).subscribe(res => {
       if (res) {
         if (this.activeTab === 'mentor') {
           this.usersSvc.mentorList$.next('mentor')

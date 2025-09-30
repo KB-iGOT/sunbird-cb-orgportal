@@ -1,6 +1,6 @@
 <ng-container class="m-4" >
     <div class="appar-wrapper p-4">
-        <div class="flex justify-between items-center">
+        <div class="flex justify-between items-center" [ngClass]="{'disable': aparCheckboxDisabled && isLiveContent}">
             <span class="apar-labels-heading">APAR Assignment</span>
             <div class="apar-checkbox-toggle">
               <input [(ngModel)]="isAparEnabled" type="checkbox" id="switch" (change)="onAparCheckboxChange($event)" />
@@ -11,10 +11,10 @@
     </div>
 </ng-container>
 <ng-container>
-    <ws-app-search [categoryData]="categoryData" [from]="from" (handleApiData)="handleApiData($event)"></ws-app-search>
+    <ws-app-search  [ngClass]="{'disable': isLiveContent}" [categoryData]="categoryData" [from]="from" (handleApiData)="handleApiData($event)"></ws-app-search>
 </ng-container>
 <ng-container>
-    <div class="flex flex-row" *ngIf="contentData?.length > 0">
+    <div class="flex flex-row" [ngClass]="{'disable': isLiveContent}" *ngIf="contentData?.length > 0">
         <div class="flex-1">
             <ws-app-chip [selectedContentChips]="selectedContentChips" [from]="from"
                 [selectContentCount]="selectContentCount" (itemRemoved)="itemsRemovedFromChip()"></ws-app-chip>

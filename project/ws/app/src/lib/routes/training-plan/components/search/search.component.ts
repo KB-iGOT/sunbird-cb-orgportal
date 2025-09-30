@@ -142,7 +142,8 @@ export class SearchComponent implements OnInit {
         request: {
           secureSettings: contentType === 'Moderated Course' ? true : false, // for moderated course
           filters: {
-            primaryCategory: [contentType === 'Moderated Course' ? 'Course' : contentType],
+            //primaryCategory: [contentType === 'Moderated Course' ? 'Course' : contentType],
+            courseCategory: [contentType],
             /* tslint:disable */
             organisation: applyFilterObj && applyFilterObj['providers'] && applyFilterObj['providers'].length ? applyFilterObj['providers'] : [],
             [`${this.compentencyKey.vKey}.${this.compentencyKey.vCompetencyArea}`]: applyFilterObj && applyFilterObj[this.compentencyKey.vCompetencyArea] && applyFilterObj[this.compentencyKey.vCompetencyArea].length ? applyFilterObj[this.compentencyKey.vCompetencyArea] : [],
@@ -158,7 +159,7 @@ export class SearchComponent implements OnInit {
             'gradeLevel', 'identifier', 'medium', 'resourceType',
             'primaryCategory', 'contentType', 'channel', 'organisation', 'trackable', 'posterImage',
             'idealScreenSize', 'learningMode', 'creatorLogo', 'duration', 'programDuration',
-            'version', 'avgRating', `${this.compentencyKey.vKey}`, 'secureSettings'],
+            'version', 'avgRating', `${this.compentencyKey.vKey}`, 'secureSettings', 'courseCategory'],
         },
       }
       this.trainingPlanService.getAllContent(filterObj).subscribe((res: any) => {

@@ -121,3 +121,8 @@
     cursor: not-allowed;
   }
 }
+.disable {
+  opacity: 0.3;
+  pointer-events: none;
+  cursor: none;
+}

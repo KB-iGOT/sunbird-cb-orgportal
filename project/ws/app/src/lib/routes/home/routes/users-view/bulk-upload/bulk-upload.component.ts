@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, AfterViewInit } from '@angular/core'
+import { Component, OnInit, OnDestroy, AfterViewInit, Input } from '@angular/core'
 import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog'
 import { LegacyPageEvent as PageEvent } from '@angular/material/legacy-paginator'
 import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar'
@@ -20,6 +20,8 @@ import { FileProgressComponent } from '../file-progress/file-progress.component'
   styleUrls: ['./bulk-upload.component.scss'],
 })
 export class BulkUploadComponent implements OnInit, AfterViewInit, OnDestroy {
+
+  @Input() selectedOrgData: any
 
   lastUploadList: any[] = []
   private destroySubject$ = new Subject()
@@ -45,8 +47,7 @@ export class BulkUploadComponent implements OnInit, AfterViewInit, OnDestroy {
     public dialog: MatDialog,
     private usersService: UsersService
   ) {
-    this.rootOrgId = _.get(this.router.snapshot.parent, 'data.configService.unMappedUser.rootOrg.rootOrgId')
-    this.userProfile = _.get(this.router.snapshot.parent, 'data.configService.userProfileV2')
+
 
     this.router.data.subscribe(data => {
       if (data && data.pageData) {
@@ -57,6 +58,8 @@ export class BulkUploadComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngOnInit() {
+    this.rootOrgId = (this.selectedOrgData) ? (this.selectedOrgData.roleId) : _.get(this.router.snapshot.parent, 'data.configService.unMappedUser.rootOrg.rootOrgId')
+    this.userProfile = _.get(this.router.snapshot.parent, 'data.configService.userProfileV2')
     this.getBulkStatusList()
   }
 
@@ -137,7 +140,8 @@ export class BulkUploadComponent implements OnInit, AfterViewInit, OnDestroy {
       this.fileSelected = file
       if (this.fileService.validateFile(this.fileName)) {
         // this.sendOTP()
-        this.verifyOTP(this.userProfile.email ? 'email' : 'phone')
+        // this.verifyOTP(this.userProfile.email ? 'email' : 'phone')
+        this.uploadWithOtp() // dont use this function this is for dev purposes only
       } else {
         this.showFileError = true
       }
@@ -161,12 +165,17 @@ export class BulkUploadComponent implements OnInit, AfterViewInit, OnDestroy {
     })
   }
 
+  uploadWithOtp() { // dont use this function this is for dev purposes only
+    this.showFileUploadProgress()
+    this.uploadCSVFile()
+  }
+
   uploadCSVFile(): void {
     if (this.fileService.validateFile(this.fileName)) {
       if (this.fileSelected) {
         const formData: FormData = new FormData()
         formData.append('data', this.fileSelected, this.fileName)
-        this.fileService.upload(this.fileName, formData)
+        this.fileService.upload(this.fileName, formData, (this.selectedOrgData) ? this.selectedOrgData : '')
           .pipe(takeUntil(this.destroySubject$))
           .subscribe((_res: any) => {
             this.fileUploadDialogInstance.close()

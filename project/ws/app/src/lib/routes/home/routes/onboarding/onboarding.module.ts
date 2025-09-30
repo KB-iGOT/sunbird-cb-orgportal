@@ -87,7 +87,7 @@ const routes: Routes = [
 ]
 
 @NgModule({
-  declarations: [OnboardingComponent, CustomSelfRegistrationComponent, LoadingPopupComponent],
+  declarations: [OnboardingComponent, LoadingPopupComponent, CustomSelfRegistrationComponent],
   imports: [
     CommonModule,
     RouterModule.forChild(routes),
@@ -104,6 +104,7 @@ const routes: Routes = [
     MatProgressSpinnerModule
 
   ],
-  providers: [MatDialogModule]
+  exports: [LoadingPopupComponent, CustomSelfRegistrationComponent],
+  providers: []
 })
 export class OnboardingModule { }

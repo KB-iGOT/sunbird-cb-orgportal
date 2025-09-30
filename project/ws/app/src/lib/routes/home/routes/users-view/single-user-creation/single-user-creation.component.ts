@@ -1,14 +1,15 @@
-import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, QueryList, ViewChildren } from '@angular/core'
+import { AfterViewInit, Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output, QueryList, TemplateRef, ViewChild, ViewChildren } from '@angular/core'
 import { UntypedFormBuilder, UntypedFormControl, Validators } from '@angular/forms'
 import { MomentDateAdapter } from '@angular/material-moment-adapter'
 import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE } from '@angular/material/core'
 import { MatLegacyCheckboxChange as MatCheckboxChange } from '@angular/material/legacy-checkbox'
 import { MatLegacyChipInputEvent as MatChipInputEvent } from '@angular/material/legacy-chips'
 import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar'
+import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog'
 import { HttpErrorResponse } from '@angular/common/http'
 import { COMMA, ENTER } from '@angular/cdk/keycodes'
 import { Subject } from 'rxjs'
-import { debounceTime, distinctUntilChanged, startWith, takeUntil } from 'rxjs/operators'
+import { debounceTime, distinctUntilChanged, map, startWith, switchMap, takeUntil } from 'rxjs/operators'
 /* tslint:disable */
 import * as _ from 'lodash'
 /* tslint:enable */
@@ -45,7 +46,12 @@ const PIN_CODE_PATTERN = /^[1-9][0-9]{5}$/
 })
 export class SingleUserCreationComponent implements OnInit, AfterViewInit, OnDestroy {
 
+  @Input() selectedOrgData: any
+  @Input() editUserData: any
+  @Output() userCreated = new EventEmitter<any>()
+
   @ViewChildren('rolesCheckbox') checkboxes!: QueryList<ElementRef>
+  @ViewChild('updateconfirm') updateConfirmTemplate!: TemplateRef<any>
   defaultRole = ['PUBLIC']
   private destroySubject$ = new Subject()
   separatorKeysCodes: number[] = [ENTER, COMMA]
@@ -86,7 +92,8 @@ export class SingleUserCreationComponent implements OnInit, AfterViewInit, OnDes
     private usersService: UsersService,
     private matSnackBar: MatSnackBar,
     private rolesService: RolesService,
-    private activatedRouter: ActivatedRoute
+    private activatedRouter: ActivatedRoute,
+    private dialog: MatDialog,
   ) {
 
     this.fullProfile = _.get(this.activatedRouter.snapshot, 'data.configService')
@@ -134,6 +141,12 @@ export class SingleUserCreationComponent implements OnInit, AfterViewInit, OnDes
   }
 
   ngOnInit() {
+    if (this.selectedOrgData && this.selectedOrgData.roleId && !this.userCreationForm.contains('department')) {
+      this.userCreationForm.addControl('department', new UntypedFormControl({ value: this.selectedOrgData.depatName, disabled: true }))
+      if (this.editUserData) {
+        this.assignData()
+      }
+    }
     this.getDesignation()
     this.getMasterLanguages()
     this.getGroups()
@@ -149,8 +162,45 @@ export class SingleUserCreationComponent implements OnInit, AfterViewInit, OnDes
 
   }
 
+  assignData() {
+    Object.keys(this.userCreationForm.controls).forEach((ele: any) => {
+      switch (ele) {
+        case 'designation':
+        case 'group':
+          this.userCreationForm.get(ele)?.patchValue(this.editUserData?.profileDetails?.professionalDetails?.[0][ele] || '')
+          break
+        case 'tags':
+          this.userCreationForm.get(ele)?.patchValue(this.editUserData?.profileDetails?.additionalProperties?.tag || [])
+          break
+        case 'pincode':
+          this.userCreationForm.get(ele)?.patchValue(this.editUserData?.profileDetails?.employmentDetails?.pinCode || '')
+          break
+        case 'roles':
+          this.userCreationForm.get(ele)?.patchValue(this.editUserData?.[ele] || [])
+          break
+        case 'email':
+          this.userCreationForm.get(ele)?.patchValue(this.editUserData?.profileDetails?.personalDetails?.primaryEmail || '')
+          break
+        case 'phone':
+          this.userCreationForm.get(ele)?.patchValue(this.editUserData?.profileDetails?.personalDetails?.mobile || '')
+          break
+        case 'firstName':
+          this.userCreationForm.get(ele)?.patchValue(this.editUserData?.profileDetails?.personalDetails?.firstname || '')
+          break
+        case 'dob':
+          this.userCreationForm.get(ele)?.patchValue(this.getDateFromText(this.editUserData?.profileDetails?.personalDetails?.[ele]) || '')
+          break
+        case 'category':
+        case 'domicileMedium':
+        case 'gender':
+          this.userCreationForm.get(ele)?.patchValue(this.editUserData?.profileDetails?.personalDetails?.[ele] || '')
+          break
+      }
+    })
+  }
+
   setDefaultValue(): void {
-    if (this.userCreationForm.get('roles')) {
+    if (!this.userCreationForm.get('roles')?.value) {
       // tslint:disable-next-line
       this.userCreationForm.get('roles')!.patchValue(this.defaultRole)
     }
@@ -292,6 +342,10 @@ export class SingleUserCreationComponent implements OnInit, AfterViewInit, OnDes
       dataToSubmit.dob = `${new Date(dataToSubmit.dob).getDate()}-${new Date(dataToSubmit.dob).getMonth() + 1}-${new Date(dataToSubmit.dob).getFullYear()}`
     }
 
+    if (this.selectedOrgData && this.selectedOrgData.roleId) {
+      dataToSubmit.channel = this.selectedOrgData.depatName
+    }
+
     if (!this.userCreationForm.value.channel) {
       this.matSnackBar.open('Channel info is empty! So unable to create user')
       return
@@ -301,18 +355,108 @@ export class SingleUserCreationComponent implements OnInit, AfterViewInit, OnDes
       personalDetails: '',
     }
     postData.personalDetails = dataToSubmit
-
     this.usersService.createUser(postData)
       .pipe(takeUntil(this.destroySubject$))
       .subscribe((_res: any) => {
         this.displayLoader = false
         this.matSnackBar.open('User created successfully!')
         this.handleFormClear()
+        if (this.selectedOrgData && this.selectedOrgData.roleId) {
+          this.userCreated.emit(true)
+        }
         // tslint:disable-next-line
       }, (_err: HttpErrorResponse) => {
         if (!_err.ok) {
           this.displayLoader = false
           this.matSnackBar.open(_.get(_err, 'error.params.errmsg') || 'Unable to create user, please try again later!')
+        }
+      })
+  }
+
+  confirmUpdateUser(): void {
+    const dialog = this.dialog.open(this.updateConfirmTemplate, {
+      width: '500px',
+      autoFocus: false
+    })
+    dialog.afterClosed().subscribe(result => {
+      if (result) {
+        this.updateUser()
+      }
+    })
+  }
+
+  updateUser() {
+    this.displayLoader = true
+    const dataToSubmit = { ...this.userCreationForm.value }
+    if (dataToSubmit.dob) {
+      dataToSubmit.dob = `${new Date(dataToSubmit.dob).getDate()}-${new Date(dataToSubmit.dob).getMonth() + 1}-${new Date(dataToSubmit.dob).getFullYear()}`
+    }
+
+    if (this.selectedOrgData && this.selectedOrgData.roleId) {
+      dataToSubmit.channel = this.selectedOrgData.depatName
+    }
+
+    if (!this.userCreationForm.value.channel) {
+      this.matSnackBar.open('Channel info is empty! So unable to create user')
+      return
+    }
+
+    const requestBody = {
+      request: {
+        userId: this.editUserData.userId,
+        profileDetails: {
+          personalDetails: {
+            dob: dataToSubmit.dob,
+            domicileMedium: dataToSubmit.domicileMedium,
+            gender: dataToSubmit.gender,
+            category: dataToSubmit.category,
+            mobile: dataToSubmit.phone,
+            primaryEmail: dataToSubmit.email,
+            firstname: dataToSubmit.firstName
+          },
+          professionalDetails: [
+            {
+              designation: dataToSubmit.designation,
+              group: dataToSubmit.group
+            }
+          ],
+          additionalProperties: {
+            tag: dataToSubmit.tags
+          },
+          employmentDetails: {
+            pinCode: dataToSubmit.pincode
+          }
+        }
+      }
+    }
+    this.usersService.updateUserDetails(requestBody)
+      .pipe(
+        switchMap((update: any) => {
+          const reqPayload = {
+            request: {
+              organisationId: this.selectedOrgData.roleId,
+              roles: dataToSubmit.roles,
+              userId: this.editUserData.userId
+            }
+          }
+          return this.usersService.addUserToRole(reqPayload).pipe(
+            map((roleUpdate: any) => {
+              return { updateRes: update, roleUpdateRes: roleUpdate }
+            })
+          )
+        })
+      )
+      .subscribe((_res: any) => {
+        this.displayLoader = false
+        this.matSnackBar.open('User updated successfully!')
+        this.handleFormClear()
+        if (this.selectedOrgData && this.selectedOrgData.roleId) {
+          this.userCreated.emit(true)
+        }
+      }, (_err: HttpErrorResponse) => {
+        if (!_err.ok) {
+          this.displayLoader = false
+          this.matSnackBar.open(_.get(_err, 'error.params.errmsg') || 'Unable to update user, please try again later!')
         }
       })
   }
@@ -417,6 +561,24 @@ export class SingleUserCreationComponent implements OnInit, AfterViewInit, OnDes
         }
       }
     }, 100)
+  }
+
+  getDateFromText(dateString: string): any {
+    if (dateString) {
+      const sv: string[] = dateString.split('T')
+      if (sv && sv.length > 1) {
+        return sv[0]
+      }
+      const splitValues: string[] = dateString.split('-')
+      const [dd, mm, yyyy] = splitValues
+      const dateToBeConverted = dd.length !== 4 ? `${yyyy}-${mm}-${dd}` : `${dd}-${mm}-${yyyy}`
+      return new Date(dateToBeConverted)
+    }
+    return ''
+  }
+
+  getCheckedRoles(role: string): boolean {
+    return role === 'PUBLIC' || (this.userCreationForm?.get('roles')?.value || []).includes(role)
   }
 
 }

@@ -140,7 +140,10 @@ import { TranslateHttpLoader } from '@ngx-translate/http-loader'
 import {
   WIDGET_REGISTRATION_LIB_CONFIG,
 } from '@sunbird-cb/consumption'
+import { GlobalEventsService } from './services/global-events.service'
 /** Collection Library Modules */
+
+import { SearchListingModule } from '@sunbird-cb/search-listing'
 
 // @Injectable()
 // export class HammerConfig extends GestureConfig {
@@ -292,7 +295,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     MatSnackBarModule,
     ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production }),
     NotificationDropdownModule,
-
+    SearchListingModule,
     TranslateModule.forRoot({
       loader: {
         provide: TranslateLoader,
@@ -349,7 +352,13 @@ export function HttpLoaderFactory(http: HttpClient) {
     LoaderService,
     LibNotificationsService,
     NotificationsService,
-    NPSGridService
+    NPSGridService,
+    {
+      provide: TranslateLoader,
+      useFactory: HttpLoaderFactory,
+      deps: [HttpClient],
+    },
+    GlobalEventsService
   ]
 })
 
