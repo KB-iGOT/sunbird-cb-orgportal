@@ -15,8 +15,12 @@
         <!-- <ws-app-search-input-home placeHolder="Search" class="my-search flex-1" [ref]="'home'">
         </ws-app-search-input-home> -->
         <span class="spacer"></span>
+        <ws-app-search-input-lib-home class="my-search flex-1" placeHolder="{{ 'appnavbar.searchforLearningContentsV2' | translate}}"
+              class="my-search flex-1" [ref]="'home'"></ws-app-search-input-lib-home>
+
+        <span class="spacer"></span>
         <div ngClass="search-small-logo">
-          <ng-container [wsResolverWidget]="{
+          <ng-container [sbUiResolverWidget]="{
         'widgetType': 'actionButton',
         'widgetSubType': 'buttonFeature',
         'widgetData': {
@@ -43,7 +47,7 @@
         <!-- <div class="mat-icon-button pipe-icon">
         |
       </div> -->
-        <!-- <ng-container [wsResolverWidget]="btnAppsConfig"></ng-container> -->
+        <!-- <ng-container [sbUiResolverWidget]="btnAppsConfig"></ng-container> -->
       </ng-container>
 
     </ng-container>
@@ -69,11 +73,11 @@
           *ngFor="let item of primaryNavbarConfig?.smallScreen?.right">
         </ng-container>
       </ng-container>
-      <ng-container [wsResolverWidget]="btnAppsConfig"></ng-container>
+      <ng-container [sbUiResolverWidget]="btnAppsConfig"></ng-container>
     </div>
   </div>
   <!-- <div class="fix-ww" *ngIf="mode === 'top'">
-    <ng-container [wsResolverWidget]="{ 'widgetType': 'card',
+    <ng-container [sbUiResolverWidget]="{ 'widgetType': 'card',
       'widgetSubType': 'cardHomeHubs',
       widgetData: {}}">
     </ng-container>
@@ -93,7 +97,7 @@
   </div>
 </mat-toolbar>
 <ng-template #navbarSide let-item="item">
-  <ng-container *ngIf="item.type === 'widgetButton'" [wsResolverWidget]="item.config"></ng-container>
+  <ng-container *ngIf="item.type === 'widgetButton'" [sbUiResolverWidget]="item.config"></ng-container>
   <ws-widget-btn-feature *ngIf="item.type === 'featureButton' && item.config.actionBtnId !== 'feature_notification'"
     [id]="item.config.actionBtnId" [widgetData]="item.config" [showFixedLength]="true"></ws-widget-btn-feature>
   <div class="p-4" *ngIf="item.type === 'notificationButton'">

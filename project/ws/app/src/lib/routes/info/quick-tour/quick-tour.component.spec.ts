@@ -1,5 +1,5 @@
 
-import { ConfigurationsService } from '@sunbird-cb/utils'
+import { ConfigurationsService } from '@sunbird-cb/utils-v2'
 import { QuickTourComponent } from './quick-tour.component'
 
 describe('QuickTourComponent', () => {

@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy } from '@angular/core'
-import { ConfigurationsService, NsPage } from '@sunbird-cb/utils'
+import { ConfigurationsService, NsPage } from '@sunbird-cb/utils-v2'
 import { Subscription } from 'rxjs'
 import { ActivatedRoute } from '@angular/router'
 

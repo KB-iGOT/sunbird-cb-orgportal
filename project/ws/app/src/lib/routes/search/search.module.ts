@@ -34,11 +34,11 @@ import {
   BtnKbAnalyticsModule,
   UserAutocompleteModule,
 } from '@sunbird-cb/collection'
-import { WidgetResolverModule } from '@sunbird-cb/resolver'
+import { SbUiResolverModule } from '@sunbird-cb/resolver-v2'
 import {
   DefaultThumbnailModule,
   HorizontalScrollerModule, PipeDurationTransformModule, PipeLimitToModule, PipePartialContentModule,
-} from '@sunbird-cb/utils'
+} from '@sunbird-cb/utils-v2'
 import { BlogsCardComponent } from './components/blogs-card/blogs-card.component'
 import { FilterDisplayComponent } from './components/filter-display/filter-display.component'
 import { ItemTileComponent } from './components/item-tile/item-tile.component'
@@ -110,7 +110,7 @@ import { SearchInputHomeComponent } from './components/search-input-home/search-
     HorizontalScrollerModule,
     MatProgressSpinnerModule,
     DisplayContentTypeModule,
-    WidgetResolverModule,
+    SbUiResolverModule,
     // BtnKbModule,
     BtnChannelAnalyticsModule,
     MatDividerModule,

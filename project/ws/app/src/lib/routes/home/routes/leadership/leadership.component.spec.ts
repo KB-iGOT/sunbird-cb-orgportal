@@ -1,4 +1,4 @@
-import { ConfigurationsService } from '@sunbird-cb/utils'
+import { ConfigurationsService } from '@sunbird-cb/utils-v2'
 import { ActivatedRoute } from '@angular/router'
 import { MdoInfoService } from '../../services/mdoinfo.service'
 import { ProfileV2UtillService } from '../../services/home-utill.service'

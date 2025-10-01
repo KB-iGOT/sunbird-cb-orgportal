@@ -9,7 +9,7 @@ import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog'
 import { ParticipantsComponent } from '../../components/participants/participants.component'
 import { SuccessComponent } from '../../components/success/success.component'
 import { Router, ActivatedRoute } from '@angular/router'
-import { ConfigurationsService, EventService } from '@sunbird-cb/utils'
+import { ConfigurationsService, EventService } from '@sunbird-cb/utils-v2'
 import * as moment from 'moment'
 /* tslint:disable */
 import * as _ from 'lodash'

@@ -1,6 +1,6 @@
 
 import { HttpClient } from '@angular/common/http'
-import { ConfigurationsService } from '@sunbird-cb/utils'
+import { ConfigurationsService } from '@sunbird-cb/utils-v2'
 import { TncAppResolverService } from './tnc-app-resolver.service'
 
 describe('TncAppResolverService', () => {

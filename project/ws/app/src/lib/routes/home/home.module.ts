@@ -1,10 +1,10 @@
 import { CUSTOM_ELEMENTS_SCHEMA, NgModule } from '@angular/core'
 import { CommonModule } from '@angular/common'
-import { PipeDurationTransformModule, PipeFilterModule, PipeHtmlTagRemovalModule, PipeOrderByModule, PipeRelativeTimeModule, ImageResponsiveModule } from '@sunbird-cb/utils'
+import { PipeDurationTransformModule, PipeFilterModule, PipeHtmlTagRemovalModule, PipeOrderByModule, PipeRelativeTimeModule, ImageResponsiveModule } from '@sunbird-cb/utils-v2'
 import { MatGridListModule } from '@angular/material/grid-list'
 import { MatExpansionModule } from '@angular/material/expansion'
 import { MatDividerModule } from '@angular/material/divider'
-import { WidgetResolverModule } from '@sunbird-cb/resolver'
+import { SbUiResolverModule } from '@sunbird-cb/resolver-v2'
 import { MatLegacyAutocompleteModule as MatAutocompleteModule } from '@angular/material/legacy-autocomplete'
 import { MatLegacyButtonModule as MatButtonModule } from '@angular/material/legacy-button'
 import { MatLegacyCheckboxModule as MatCheckboxModule } from '@angular/material/legacy-checkbox'
@@ -104,6 +104,25 @@ import { GroupsGradeComponent } from './components/groups-grade/groups-grade.com
 import { MAT_DATE_LOCALE } from '@angular/material/core'
 import { MyNotificationsComponent } from './routes/my-notifications/my-notifications.component'
 import { AllNotificationsModule } from '@sunbird-cb/notification'
+import { TranslateModule } from '@ngx-translate/core'
+import { CreateUserComponent } from './routes/directory/create-user/create-user.component'
+import { DirectoryComponent } from './routes/directory/directory.component'
+import { DirectoryTableComponent } from './components/directory-table/directory-table.component'
+import { CreateOrganisationComponent } from './components/create-organisation/create-organisation.component'
+import { InfoModalComponent } from './components/info-modal/info-modal.component'
+import { OrganisationUsersComponent } from './routes/directory/organisation-users/organisation-users.component'
+import { DesignationsMasterComponent } from './routes/directory/designations-master/designations-master.component'
+import { ImportDesignationComponent } from './routes/directory/import-designation/import-designation.component'
+import { DesignationsBuilkUploadComponent } from './routes/directory/designations-builk-upload/designations-builk-upload.component'
+import { OrgHierarchyService } from './services/org-hierarchy.service'
+import { BulkUploadOrgComponent } from './routes/directory/bulk-upload-org/bulk-upload-org.component'
+import { TreeHierarchyModule } from '@sunbird-cb/tree-hierarchy'
+import { OrgHierarchyMappingComponent } from './routes/directory/org-hierarchy-mapping/org-hierarchy-mapping/org-hierarchy-mapping.component'
+import { UsersComponent } from '../access/routes/users/users.component'
+import { UserOnboardingComponent } from './routes/directory/user-onbarding/user-onboarding.component'
+import { UserBulkTransferComponent } from './routes/directory/user-bulk-transfer/user-bulk-transfer.component'
+import { UserUpdateModule } from '@sunbird-cb/consumption'
+import { OnboardingModule } from './routes/onboarding/onboarding.module'
 
 @NgModule({
   declarations: [
@@ -155,13 +174,26 @@ import { AllNotificationsModule } from '@sunbird-cb/notification'
     CapitalizePipe,
     BulkUploadOdcsComponent,
     GroupsGradeComponent,
-    MyNotificationsComponent
+    MyNotificationsComponent,
+    DirectoryComponent,
+    CreateUserComponent,
+    DirectoryTableComponent,
+    CreateOrganisationComponent,
+    InfoModalComponent,
+    OrganisationUsersComponent,
+    DesignationsMasterComponent,
+    ImportDesignationComponent,
+    DesignationsBuilkUploadComponent,
+    OrgHierarchyMappingComponent,
+    BulkUploadOrgComponent,
+    UsersComponent,
+    UserOnboardingComponent,
+    UserBulkTransferComponent
   ],
   imports: [
     CommonModule,
     // Ng2SearchPipeModule,
     UIORGTableModule,
-    WidgetResolverModule,
     ReactiveFormsModule,
     HomeRoutingModule,
     FormsModule,
@@ -192,7 +224,7 @@ import { AllNotificationsModule } from '@sunbird-cb/notification'
     AvatarPhotoModule,
     PipeOrderByModule,
     BreadcrumbsOrgModule,
-    WidgetResolverModule,
+    SbUiResolverModule,
     ScrollspyLeftMenuModule,
     MatRadioModule,
     ExportAsModule,
@@ -215,7 +247,11 @@ import { AllNotificationsModule } from '@sunbird-cb/notification'
     DesignationModule,
     TaxonomyEditorModule,
     ImageResponsiveModule,
-    AllNotificationsModule
+    AllNotificationsModule,
+    TranslateModule.forChild(),
+    TreeHierarchyModule,
+    UserUpdateModule,
+    OnboardingModule
   ],
   providers: [
     { provide: 'environment', useValue: environment },
@@ -225,7 +261,8 @@ import { AllNotificationsModule } from '@sunbird-cb/notification'
     UploadService,
     TrainingPlanDashboardService,
     UsersService,
-    { provide: MAT_DATE_LOCALE, useValue: 'en-GB' }
+    { provide: MAT_DATE_LOCALE, useValue: 'en-GB' },
+    OrgHierarchyService
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   exports: [LeftMenuComponent]

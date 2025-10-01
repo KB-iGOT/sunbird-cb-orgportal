@@ -1,0 +1,30 @@
+<div class="m-8">
+  <ws-widget-breadcrumbs-org
+    [widgetData]="{titles:[{title:'Organisation', url:'/app/home/directory', path: '/app/home/directory'},{title: getCurrentTabDetails()?.name || '', url:'none'}] }">
+  </ws-widget-breadcrumbs-org>
+  <div class="vertical-tabs-container">
+    <mat-tab-group class="vertical-tabs" [selectedIndex]="selectedTabIndex" (selectedIndexChange)="onTabChange($event)">
+      <mat-tab *ngFor="let tab of tabs; let i = index" [label]="tab.name">
+        <ng-container *ngIf="tab.value === 'users' && selectedTabIndex === i && orgDataLoaded">
+          <ws-app-create-user (createUser)="onCreateUser($event)"></ws-app-create-user>
+        </ng-container>
+        <ng-container *ngIf="tab.value === 'rolesAndAccess' && selectedTabIndex === i && orgDataLoaded">
+          <ws-app-roles-access [selectedOrgData]="orgData"></ws-app-roles-access>
+        </ng-container>
+        <ng-container *ngIf="tab.value === 'mentorManagement' && selectedTabIndex === i && orgDataLoaded">
+          <ws-app-mentor-manage [selectedOrgData]="orgData"></ws-app-mentor-manage>
+        </ng-container>
+        <ng-container *ngIf="tab.value === 'designationMaster' && selectedTabIndex === i && orgDataLoaded">
+          <ws-app-designations-master></ws-app-designations-master>
+        </ng-container>
+        <ng-container *ngIf="tab.value === 'userOnboarding' && selectedTabIndex === i && orgDataLoaded">
+          <ws-app-user-onboarding (userCreated)="onUserCreated($event)"
+            (showDesignationTab)="showDesTab($event)"></ws-app-user-onboarding>
+        </ng-container>
+        <ng-container *ngIf="tab.value === 'userTransfer' && selectedTabIndex === i && orgDataLoaded">
+          <ws-app-user-bulk-transfer [selectedOrgData]="orgData"></ws-app-user-bulk-transfer>
+        </ng-container>
+      </mat-tab>
+    </mat-tab-group>
+  </div>
+</div>

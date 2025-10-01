@@ -1,7 +1,7 @@
 import { CreateWorkallocationComponent } from './create-workallocation.component'
 import { of, Subject } from 'rxjs'
 import { Router } from '@angular/router'
-import { EventService } from '@sunbird-cb/utils'
+import { EventService } from '@sunbird-cb/utils-v2'
 import { WatStoreService } from '../../services/wat.store.service'
 import { AllocationService } from '../../services/allocation.service'
 import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog'

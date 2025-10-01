@@ -31,7 +31,7 @@ import {
   EventService,
   WsEvents,
   AuthKeycloakService,
-} from '@sunbird-cb/utils'
+} from '@sunbird-cb/utils-v2'
 import { delay, first } from 'rxjs/operators'
 import { MobileAppsService } from '../../services/mobile-apps.service'
 import { RootService } from './root.service'
@@ -69,6 +69,7 @@ export class RootComponent implements OnInit, AfterViewInit {
   currentRouteData: any = []
   isLoading = false
   loaderSubscription!: Subscription
+  showFooter = true
   constructor(
     public router: Router,
     private route: ActivatedRoute,
@@ -167,7 +168,10 @@ export class RootComponent implements OnInit, AfterViewInit {
         }
 
         this.currentRouteData = []
+        if (window.location.pathname.includes('/globalsearch')) {
+          this.showFooter = false
 
+        }
         // this.telemetrySvc.impression()
         // if (this.appStartRaised) {
         //   this.telemetrySvc.audit(WsEvents.WsAuditTypes.Created, 'Login', {})

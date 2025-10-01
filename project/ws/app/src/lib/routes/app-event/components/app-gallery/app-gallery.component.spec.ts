@@ -1,7 +1,7 @@
 import { AppGalleryComponent } from './app-gallery.component'
 import { of } from 'rxjs'
 
-jest.mock('@sunbird-cb/utils') // Mock the ValueService
+jest.mock('@sunbird-cb/utils-v2') // Mock the ValueService
 jest.mock('@angular/router')  // Mock ActivatedRoute
 
 describe('AppGalleryComponent', () => {

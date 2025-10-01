@@ -1,6 +1,6 @@
 import { BtnContentFeedbackV2Component } from './btn-content-feedback-v2.component'
 import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog'
-import { ConfigurationsService } from '@sunbird-cb/utils'
+import { ConfigurationsService } from '@sunbird-cb/utils-v2'
 import { BtnContentFeedbackDialogV2Component } from '../btn-content-feedback-dialog-v2/btn-content-feedback-dialog-v2.component'
 
 describe('BtnContentFeedbackV2Component', () => {

@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild, ElementRef } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
 import { WidgetContentService, NsContent, BtnPlaylistService, NsPlaylist } from '@sunbird-cb/collection'
-import { TFetchStatus, NsPage, ConfigurationsService } from '@sunbird-cb/utils'
+import { TFetchStatus, NsPage, ConfigurationsService } from '@sunbird-cb/utils-v2'
 import { UntypedFormControl } from '@angular/forms'
 import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar'
 import { Subscription } from 'rxjs'

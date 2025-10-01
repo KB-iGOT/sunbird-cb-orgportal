@@ -30,3 +30,99 @@
   font-size: 60px;
   color: #1b4ca1 !important;
 }
+
+.apar-labels-heading {
+  font-family: Montserrat;
+  font-weight: 600;
+  font-style: SemiBold;
+  font-size: 14px;
+}
+
+.apar-labels-desc {
+  font-family: Lato;
+  font-weight: 400;
+  font-style: Regular;
+  font-size: 12px;
+}
+
+.appar-wrapper {
+  border: 1px solid #00000014;
+  margin-top: 24px;
+}
+
+// Toggle Switch Styles
+.apar-checkbox-toggle {
+  input[type="checkbox"] {
+    height: 0;
+    width: 0;
+    visibility: hidden;
+    display: none;
+  }
+
+  label {
+    cursor: pointer;
+    width: 60px;
+    height: 28px;
+    background: #666666;
+    display: block;
+    border-radius: 100px;
+    position: relative;
+  }
+
+  label::before {
+    content: "OFF";
+    color: white;
+    position: absolute;
+    left: 28px;
+    top: 2px;
+    z-index: 1;
+    transition: 0.3s;
+    font-family: Montserrat;
+    font-weight: 600;
+    font-size: 11.57px;
+  }
+
+  label:after {
+    content: "";
+    position: absolute;
+    top: 4px;
+    left: 5px;
+    width: 20px;
+    height: 20px;
+    background: #fff;
+    border-radius: 90px;
+    transition: 0.3s;
+    z-index: 2;
+  }
+
+  input:checked+label {
+    background: #1d8923;
+  }
+
+  input:checked+label::before {
+    content: "ON";
+    left: 10px;
+    font-family: Montserrat;
+    font-weight: 600;
+    font-size: 11.57px;
+    transition: 0.3s;
+  }
+
+  input:checked+label:after {
+    left: calc(100% - 5px);
+    transform: translateX(-100%);
+  }
+
+  label:active:after {
+    width: 30px;
+  }
+
+  label[disabled] {
+    cursor: not-allowed;
+  }
+}
+.disable {
+  opacity: 0.3;
+  pointer-events: none;
+  cursor: none;
+}

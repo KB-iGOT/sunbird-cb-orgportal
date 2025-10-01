@@ -11,8 +11,8 @@ import { MatLegacyTooltipModule as MatTooltipModule } from '@angular/material/le
 import { ReactiveFormsModule, FormsModule } from '@angular/forms'
 import { RouterModule } from '@angular/router'
 import { BtnFeatureModule, BreadcrumbsOrgModule } from '@sunbird-cb/collection'
-import { WidgetResolverModule } from '@sunbird-cb/resolver'
-import { LogoutModule } from '@sunbird-cb/utils'
+import { SbUiResolverModule } from '@sunbird-cb/resolver-v2'
+import { LogoutModule } from '@sunbird-cb/utils-v2'
 // import { AccessControlService } from '../../../../project/ws/author/src/public-api'
 
 @NgModule({
@@ -23,7 +23,7 @@ import { LogoutModule } from '@sunbird-cb/utils'
     BtnFeatureModule,
     BreadcrumbsOrgModule,
     LogoutModule,
-    WidgetResolverModule,
+    SbUiResolverModule,
     ReactiveFormsModule,
     RouterModule,
     MatInputModule,

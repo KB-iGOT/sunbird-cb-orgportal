@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core'
 import { HttpClient, HttpErrorResponse, HttpResponse } from '@angular/common/http'
 import { forkJoin, Observable, of } from 'rxjs'
-import { ConfigurationsService } from '@sunbird-cb/utils'
+import { ConfigurationsService } from '@sunbird-cb/utils-v2'
 import { catchError, map } from 'rxjs/operators'
 import * as _ from 'lodash'
 

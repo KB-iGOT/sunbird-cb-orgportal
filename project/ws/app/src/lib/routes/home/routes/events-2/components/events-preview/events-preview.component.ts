@@ -1,6 +1,6 @@
 import { Component, ElementRef, HostListener, Input, OnChanges, OnInit, SimpleChanges, ViewChild } from '@angular/core'
 import { MatLegacyDialog } from '@angular/material/legacy-dialog'
-import { NsWidgetResolver } from '@sunbird-cb/resolver'
+import { NsWidgetResolver } from '@sunbird-cb/resolver-v2'
 import { environment } from '../../../../../../../../../../../src/environments/environment'
 import { OwlOptions } from 'ngx-owl-carousel-o'
 import { EventsService } from '../../services/events.service'

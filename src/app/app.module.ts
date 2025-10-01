@@ -1,6 +1,6 @@
 import { FullscreenOverlayContainer, OverlayContainer } from '@angular/cdk/overlay'
 import { APP_BASE_HREF, PlatformLocation } from '@angular/common'
-import { HttpClientJsonpModule, HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http'
+import { HttpClientJsonpModule, HttpClientModule, HTTP_INTERCEPTORS, HttpClient } from '@angular/common/http'
 // Injectable
 import { APP_INITIALIZER, NgModule, ErrorHandler } from '@angular/core'
 import { MatLegacyButtonModule as MatButtonModule } from '@angular/material/legacy-button'
@@ -97,8 +97,8 @@ import {
   BreadcrumbsOrgModule,
   AuthorCardModule,
 } from '@sunbird-cb/collection'
-import { WidgetResolverModule } from '@sunbird-cb/resolver'
-import { LoggerService, PipeSafeSanitizerModule } from '@sunbird-cb/utils'
+import { SbUiResolverModule } from '@sunbird-cb/resolver-v2'
+import { LoggerService, NPSGridService, PipeSafeSanitizerModule } from '@sunbird-cb/utils-v2'
 import { SearchModule } from '@ws/app/src/public-api'
 import 'hammerjs'
 // import { KeycloakAngularModule } from 'keycloak-angular'
@@ -135,7 +135,15 @@ import { ConfirmationBoxComponent } from '../../project/ws/app/src/lib/routes/tr
 import { LibNotificationsService, NotificationDropdownModule } from '@sunbird-cb/notification'
 import { NotificationsService } from './services/notifications.service'
 import { MatSnackBarModule } from '@angular/material/snack-bar'
+import { TranslateModule, TranslateLoader, } from '@ngx-translate/core'
+import { TranslateHttpLoader } from '@ngx-translate/http-loader'
+import {
+  WIDGET_REGISTRATION_LIB_CONFIG,
+} from '@sunbird-cb/consumption'
+import { GlobalEventsService } from './services/global-events.service'
 /** Collection Library Modules */
+
+import { SearchListingModule } from '@sunbird-cb/search-listing'
 
 // @Injectable()
 // export class HammerConfig extends GestureConfig {
@@ -154,6 +162,11 @@ const appInitializer = (initSvc: InitService, logger: LoggerService) => async ()
 
 const getBaseHref = (platformLocation: PlatformLocation): string => {
   return platformLocation.getBaseHrefFromDOM()
+}
+
+export function HttpLoaderFactory(http: HttpClient) {
+  // @ts-ignore - Version compatibility issue between core and http-loader
+  return new TranslateHttpLoader(http, './assets/i18n/', '.json')
 }
 
 // tslint:disable-next-line: max-classes-per-file
@@ -181,7 +194,7 @@ const getBaseHref = (platformLocation: PlatformLocation): string => {
     BrowserAnimationsModule,
     // KeycloakAngularModule,
     AppRoutingModule,
-    WidgetResolverModule.forRoot(WIDGET_REGISTRATION_CONFIG),
+    SbUiResolverModule.forRoot([...WIDGET_REGISTRATION_CONFIG, ...WIDGET_REGISTRATION_LIB_CONFIG]),
     StickyHeaderModule,
     ErrorResolverModule,
     // Material Imports
@@ -282,6 +295,14 @@ const getBaseHref = (platformLocation: PlatformLocation): string => {
     MatSnackBarModule,
     ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production }),
     NotificationDropdownModule,
+    SearchListingModule,
+    TranslateModule.forRoot({
+      loader: {
+        provide: TranslateLoader,
+        useFactory: HttpLoaderFactory,
+        deps: [HttpClient],
+      },
+    }),
   ],
   exports: [
     TncComponent,
@@ -317,6 +338,12 @@ const getBaseHref = (platformLocation: PlatformLocation): string => {
       useFactory: getBaseHref,
       deps: [PlatformLocation],
     },
+    {
+      provide: TranslateLoader,
+      useFactory: HttpLoaderFactory,
+      deps: [HttpClient],
+    },
+
     { provide: OverlayContainer, useClass: FullscreenOverlayContainer },
     // { provide: HAMMER_GESTURE_CONFIG, useClass: HammerConfig },
     { provide: ErrorHandler, useClass: GlobalErrorHandlingService },
@@ -324,7 +351,14 @@ const getBaseHref = (platformLocation: PlatformLocation): string => {
     { provide: 'environment', useValue: environment },
     LoaderService,
     LibNotificationsService,
-    NotificationsService
+    NotificationsService,
+    NPSGridService,
+    {
+      provide: TranslateLoader,
+      useFactory: HttpLoaderFactory,
+      deps: [HttpClient],
+    },
+    GlobalEventsService
   ]
 })
 

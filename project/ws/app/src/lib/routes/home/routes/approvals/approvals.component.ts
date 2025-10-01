@@ -7,7 +7,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core'
 // import { MatDialog, MatSnackBar, PageEvent } from '@angular/material'
 // /* tslint:disable */
 // import _ from 'lodash'
-// import { EventService } from '@sunbird-cb/utils'
+// import { EventService } from '@sunbird-cb/utils-v2'
 // import { TelemetryEvents } from '../../../../head/_services/telemetry.event.model'
 // import { DomSanitizer, SafeHtml } from '@angular/platform-browser'
 // import { ReportsVideoComponent } from '../reports-video/reports-video.component'

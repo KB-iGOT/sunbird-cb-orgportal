@@ -1,7 +1,7 @@
 import { FilterDisplayComponent } from './filter-display.component'
 import { ActivatedRoute, Router } from '@angular/router'
 import { SearchServService } from '../../services/search-serv.service'
-import { ConfigurationsService } from '@sunbird-cb/utils'
+import { ConfigurationsService } from '@sunbird-cb/utils-v2'
 import { of } from 'rxjs'
 
 jest.mock('@angular/router', () => ({
@@ -17,7 +17,7 @@ jest.mock('../../services/search-serv.service', () => ({
     })),
 }))
 
-jest.mock('@sunbird-cb/utils', () => ({
+jest.mock('@sunbird-cb/utils-v2', () => ({
     ConfigurationsService: jest.fn().mockImplementation(() => ({
         userPreference: { selectedLocale: 'en' },
     })),

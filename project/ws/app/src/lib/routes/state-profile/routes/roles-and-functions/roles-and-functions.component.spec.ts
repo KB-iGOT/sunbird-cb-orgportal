@@ -1,6 +1,6 @@
 
 import { OrgProfileService } from '../../services/org-profile.service'
-import { ConfigurationsService } from '@sunbird-cb/utils'
+import { ConfigurationsService } from '@sunbird-cb/utils-v2'
 import { RolesAndFunctionsComponent } from './roles-and-functions.component'
 
 describe('RolesAndFunctionsComponent', () => {

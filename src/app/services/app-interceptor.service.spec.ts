@@ -1,7 +1,7 @@
 import { AppInterceptorService } from './app-interceptor.service'
-import { ConfigurationsService } from '@sunbird-cb/utils'
+import { ConfigurationsService } from '@sunbird-cb/utils-v2'
 import { MatLegacySnackBar } from '@angular/material/legacy-snack-bar'
-import { AuthKeycloakService } from '@sunbird-cb/utils'
+import { AuthKeycloakService } from '@sunbird-cb/utils-v2'
 import { HttpRequest, HttpHandler, HttpErrorResponse } from '@angular/common/http'
 import { of, throwError } from 'rxjs'
 

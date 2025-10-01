@@ -1,6 +1,6 @@
 
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router'
-import { EventService } from '@sunbird-cb/utils'
+import { EventService } from '@sunbird-cb/utils-v2'
 import { HomeComponent } from './home.component'
 import { of } from 'rxjs'
 

@@ -17,7 +17,7 @@ import { MatLegacyTableModule as MatTableModule } from '@angular/material/legacy
 import { UIORGTableModule } from '@sunbird-cb/collection'
 import { SelectedDesignationPopupComponent } from './dialog-boxes/selected-designation-popup/selected-designation-popup.component'
 import { ConformationPopupComponent } from './dialog-boxes/conformation-popup/conformation-popup.component'
-import { PageResolve, PipeOrderByModule } from '@sunbird-cb/utils'
+import { PageResolve, PipeOrderByModule } from '@sunbird-cb/utils-v2'
 import { ConfigResolveService } from '../../resolvers/config-resolve.service'
 import { BulkUploadComponent } from './components/bulk-upload/bulk-upload.component'
 import { MatLegacyTooltipModule as MatTooltipModule } from '@angular/material/legacy-tooltip'
@@ -98,6 +98,7 @@ const routes: Routes = [
   ],
   exports: [
     RouterModule,
+    SelectedDesignationPopupComponent
   ],
 })
 export class DesignationModule { }

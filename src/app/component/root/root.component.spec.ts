@@ -4,15 +4,15 @@ import { ActivatedRoute } from '@angular/router'
 import { BreadcrumbsOrgService } from '@sunbird-cb/collection'
 import { MatLegacyDialog } from '@angular/material/legacy-dialog'
 import { SwUpdate } from '@angular/service-worker'
-import { TelemetryService } from '@sunbird-cb/utils'
-import { LoggerService } from '@sunbird-cb/utils'
+import { TelemetryService } from '@sunbird-cb/utils-v2'
+import { LoggerService } from '@sunbird-cb/utils-v2'
 import { of } from 'rxjs'
 import { RootService } from './root.service'
-import { ValueService } from '@sunbird-cb/utils' // Ensure ValueService is imported
+import { ValueService } from '@sunbird-cb/utils-v2' // Ensure ValueService is imported
 
 jest.mock('@angular/router')
 jest.mock('@sunbird-cb/collection')
-jest.mock('@sunbird-cb/utils')
+jest.mock('@sunbird-cb/utils-v2')
 jest.mock('@angular/material/legacy-dialog')
 jest.mock('@angular/service-worker')
 jest.mock('@angular/core', () => ({

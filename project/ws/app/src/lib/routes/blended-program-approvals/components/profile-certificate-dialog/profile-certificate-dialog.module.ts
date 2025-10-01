@@ -8,7 +8,7 @@ import { MatIconModule } from '@angular/material/icon'
 import { MatLegacyMenuModule as MatMenuModule } from '@angular/material/legacy-menu'
 import { MatLegacySnackBarModule as MatSnackBarModule } from '@angular/material/legacy-snack-bar'
 import { MatLegacyTooltipModule as MatTooltipModule } from '@angular/material/legacy-tooltip'
-import { PipeSafeSanitizerModule } from '@sunbird-cb/utils'
+import { PipeSafeSanitizerModule } from '@sunbird-cb/utils-v2'
 
 @NgModule({
     declarations: [ProfileCertificateDialogComponent],

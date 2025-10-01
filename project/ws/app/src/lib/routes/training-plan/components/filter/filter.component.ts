@@ -49,7 +49,7 @@ export class FilterComponent implements OnInit, AfterContentChecked {
   ) { }
 
   ngOnInit() {
-    this.compentencyKey = this.initService.configSvc.competency[environment.compentencyVersionKey]
+    this.compentencyKey = this.initService.configSvc.compentency[environment.compentencyVersionKey]
     this.filterObj = {
       [this.compentencyKey.vCompetencyArea]: [],
       [this.compentencyKey.vCompetencyTheme]: [],

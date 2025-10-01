@@ -1,7 +1,7 @@
 
 import { UsersService } from '../services/users.service'
 import { of, throwError } from 'rxjs'
-import { IResolveResponse } from '@sunbird-cb/utils'
+import { IResolveResponse } from '@sunbird-cb/utils-v2'
 import { NSProfileDataV2 } from '../../home/models/profile-v2.model'
 import { DepartmentResolve } from './department-resolve'
 

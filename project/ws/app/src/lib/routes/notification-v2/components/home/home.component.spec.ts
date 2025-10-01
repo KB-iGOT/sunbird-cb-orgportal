@@ -1,5 +1,5 @@
 
-import { ConfigurationsService } from '@sunbird-cb/utils'
+import { ConfigurationsService } from '@sunbird-cb/utils-v2'
 import { NotificationApiService } from '../../services/notification-api.service'
 import { NotificationService } from '../../services/notification.service'
 import { Router } from '@angular/router'

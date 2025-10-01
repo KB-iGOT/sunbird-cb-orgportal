@@ -12,7 +12,7 @@ import { UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms
 import { BudgetschemepopupComponent } from '../../components/budgetschemepopup/budgetschemepopup.component'
 import { BudgetproofspopupComponent } from '../../components/budgetproofspopup/budgetproofspopup.component'
 import { MdoInfoService } from '../../services/mdoinfo.service'
-import { ConfigurationsService } from '@sunbird-cb/utils'
+import { ConfigurationsService } from '@sunbird-cb/utils-v2'
 import { ActivatedRoute } from '@angular/router'
 import { preventHtmlAndJs } from '../../../validators/prevent-html-and-js.validator'
 

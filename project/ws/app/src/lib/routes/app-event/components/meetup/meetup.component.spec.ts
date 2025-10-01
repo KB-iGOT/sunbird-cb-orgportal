@@ -1,6 +1,6 @@
 
 import { MeetupComponent } from './meetup.component'
-import { ConfigurationsService, ValueService } from '@sunbird-cb/utils'
+import { ConfigurationsService, ValueService } from '@sunbird-cb/utils-v2'
 
 describe('MeetupComponent', () => {
     let component: MeetupComponent

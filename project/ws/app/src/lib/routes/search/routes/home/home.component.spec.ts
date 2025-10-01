@@ -1,6 +1,6 @@
 
 import { ActivatedRoute, ActivatedRouteSnapshot, Router } from '@angular/router'
-import { ConfigurationsService } from '@sunbird-cb/utils'
+import { ConfigurationsService } from '@sunbird-cb/utils-v2'
 import { SearchServService } from '../../services/search-serv.service'
 import { HomeComponent } from './home.component'
 

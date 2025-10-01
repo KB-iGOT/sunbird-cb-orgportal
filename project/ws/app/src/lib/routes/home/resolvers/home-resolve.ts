@@ -3,7 +3,7 @@ import { ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router'
 import { Observable, of } from 'rxjs'
 import { map, catchError } from 'rxjs/operators'
 import { } from '@sunbird-cb/collection'
-import { ConfigurationsService, IResolveResponse } from '@sunbird-cb/utils'
+import { ConfigurationsService, IResolveResponse } from '@sunbird-cb/utils-v2'
 import { ProfileV2Service } from '../services/home.servive'
 import { NSProfileDataV2 } from '../models/profile-v2.model'
 

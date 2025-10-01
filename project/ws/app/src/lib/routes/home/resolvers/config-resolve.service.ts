@@ -1,7 +1,7 @@
 import { Injectable, SkipSelf } from '@angular/core'
 
 import { Observable, of } from 'rxjs'
-import { ConfigurationsService } from '@sunbird-cb/utils'
+import { ConfigurationsService } from '@sunbird-cb/utils-v2'
 @Injectable()
 export class ConfigResolveService {
   constructor(
@@ -9,7 +9,6 @@ export class ConfigResolveService {
   ) { }
   resolve(
   ): Observable<any> {
-
     return of({ ...this.confService })
   }
 }

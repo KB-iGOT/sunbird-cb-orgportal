@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core'
 import { RouterModule, Routes } from '@angular/router'
 import { ErrorResolverComponent, PageComponent, PageModule } from '@sunbird-cb/collection'
-import { ExploreDetailResolve, PageResolve } from '@sunbird-cb/utils'
+import { ExploreDetailResolve, PageResolve } from '@sunbird-cb/utils-v2'
 // import { LearningGuard } from '../../project/ws/app/src/lib/routes/my-learning/guards/my-learning.guard'
 import { InvalidUserComponent } from './component/invalid-user/invalid-user.component'
 import { LoginRootComponent } from './component/login-root/login-root.component'
@@ -217,6 +217,11 @@ const routes: Routes = [
     resolve: {
       pageData: PageResolve,
     },
+  },
+  {
+    path: 'app/globalsearch',
+    loadChildren: () =>
+      import('./routes/route-search-listing.module').then(u => u.RouteSearchListingModule)
   },
   {
     path: 'error-access-forbidden',

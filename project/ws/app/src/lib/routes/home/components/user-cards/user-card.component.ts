@@ -22,11 +22,11 @@ import { Observable, Subscription } from 'rxjs'
 import { debounceTime, distinctUntilChanged, map, startWith } from 'rxjs/operators'
 import { environment } from '../../../../../../../../../src/environments/environment'
 // import { OtpService } from '../../../users/services/otp.service'
-// import { ConfigurationsService } from '@sunbird-cb/utils'
+// import { ConfigurationsService } from '@sunbird-cb/utils-v2'
 // import { RejectionPopupComponent } from '../rejection-popup/rejection-popup.component'
 import { APP_DATE_FORMATS, AppDateAdapter } from '../../../events/routes/format-datepicker'
 import { ApprovalsService } from '../../services/approvals.service'
-import { EventService } from '@sunbird-cb/utils'
+import { EventService } from '@sunbird-cb/utils-v2'
 import { TelemetryEvents } from '../../../../head/_services/telemetry.event.model'
 import { DatePipe } from '@angular/common'
 
@@ -842,7 +842,7 @@ export class UserCardComponent implements OnInit, OnChanges, AfterViewChecked, A
                   roles: Array.from(this.userRoles),
                 },
               }
-              this.usersSvc.addUserToDepartment(dreq).subscribe(res => {
+              this.usersSvc.addUserToRole(dreq).subscribe(res => {
                 if (res) {
                   this.updateUserDataForm.reset({ roles: '' })
                   // this.openSnackbar('User role updated Successfully')q
@@ -1301,7 +1301,7 @@ export class UserCardComponent implements OnInit, OnChanges, AfterViewChecked, A
         roles: Array.from(this.userRoles),
       },
     }
-    this.usersSvc.addUserToDepartment(dreq).subscribe(res => {
+    this.usersSvc.addUserToRole(dreq).subscribe(res => {
       if (res) {
         if (this.activeTab === 'mentor') {
           this.usersSvc.mentorList$.next('mentor')

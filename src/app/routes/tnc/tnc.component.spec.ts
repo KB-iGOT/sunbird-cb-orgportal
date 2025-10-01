@@ -1,6 +1,6 @@
 import '@angular/compiler'
 import { ActivatedRoute, Router } from '@angular/router'
-import { LoggerService, ConfigurationsService } from '@sunbird-cb/utils'
+import { LoggerService, ConfigurationsService } from '@sunbird-cb/utils-v2'
 import { HttpClient } from '@angular/common/http'
 import { TncAppResolverService } from '../../services/tnc-app-resolver.service'
 import { TncPublicResolverService } from '../../services/tnc-public-resolver.service'

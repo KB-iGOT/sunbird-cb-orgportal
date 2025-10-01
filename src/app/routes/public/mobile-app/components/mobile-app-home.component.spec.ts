@@ -4,7 +4,7 @@ import { of } from 'rxjs'
 jest.mock('@angular/router')
 jest.mock('@angular/platform-browser')
 jest.mock('../../../../services/mobile-apps.service')
-jest.mock('@sunbird-cb/utils')
+jest.mock('@sunbird-cb/utils-v2')
 
 describe('MobileAppHomeComponent', () => {
     let component: MobileAppHomeComponent

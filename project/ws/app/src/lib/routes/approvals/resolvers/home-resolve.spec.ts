@@ -1,6 +1,6 @@
 
 import { NeedApprovalsService } from '../services/need-approvals.service'
-import { ConfigurationsService } from '@sunbird-cb/utils'
+import { ConfigurationsService } from '@sunbird-cb/utils-v2'
 import { of, throwError } from 'rxjs'
 import { HomeResolve } from './home-resolve'
 

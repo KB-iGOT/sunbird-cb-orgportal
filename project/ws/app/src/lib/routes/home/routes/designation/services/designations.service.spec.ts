@@ -1,11 +1,11 @@
 import { DesignationsService } from './designations.service'
 import { HttpClient } from '@angular/common/http'
-import { ConfigurationsService } from '@sunbird-cb/utils'
+import { ConfigurationsService } from '@sunbird-cb/utils-v2'
 import { of } from 'rxjs'
 
 // Mock the HttpClient and ConfigurationsService
 jest.mock('@angular/common/http')
-jest.mock('@sunbird-cb/utils')
+jest.mock('@sunbird-cb/utils-v2')
 
 describe('DesignationsService', () => {
   let service: DesignationsService
