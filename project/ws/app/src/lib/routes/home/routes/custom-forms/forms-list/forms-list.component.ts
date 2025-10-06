@@ -22,13 +22,13 @@ export class FormsListComponent implements OnInit, AfterViewInit {
   searchControl = new FormControl()
   tableData: any = []
   data: any = []
-  pageSizeOptions = [10, 30, 40]
+  pageSizeOptions = [20, 50, 100]
   columnsList: any = []
   dataSource!: any
   displayedColumns: any = []
   showCreateForm: boolean = false
   length!: number
-  pageSize = 10
+  pageSize = 20
   pageNumber = 0
   rootOrgId: any
   searchResults: any[] = []
