@@ -55,7 +55,7 @@ export class RequestListComponent implements OnInit {
   dialogRef: any
   queryParams: any
   pageNo = 0
-  pageSize = 10
+  pageSize = 20
   requestCount: any
   invalidRes: any
   detailsEvent: any
@@ -65,6 +65,8 @@ export class RequestListComponent implements OnInit {
   statusKey = statusValue
   fullProfile: any
   rootOrgId: any
+  defaultPageSizeOptions = [20, 50, 100]
+
   constructor(private sanitizer: DomSanitizer,
               private homeService: ProfileV2Service,
               private datePipe: DatePipe,

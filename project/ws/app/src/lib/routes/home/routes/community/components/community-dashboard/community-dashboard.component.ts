@@ -29,10 +29,6 @@ interface Community {
   styleUrls: ['./community-dashboard.component.scss']
 })
 
-
-
-
-
 export class CommunityDashboardComponent implements OnInit {
   displayedColumns: string[] = ['name', 'startDate', 'createdBy', 'publishedOn', 'members', 'mods', 'actions'];
   // displayedColumns: string[] = []
@@ -40,7 +36,9 @@ export class CommunityDashboardComponent implements OnInit {
   userProfile: any
   searchControl = new FormControl('');
   pageNumber = 0;
-  pageSize = 10;
+  pageSize = 20;
+  defaultPageSizeOptions = [20, 50, 100]
+
   additionalUserInfo: any = {}
   totalElements = 0  // Add this to store total count
   currentSearchString = ''  // Add this to store current search
