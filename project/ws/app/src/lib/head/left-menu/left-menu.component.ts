@@ -27,7 +27,7 @@ export class LeftMenuComponent implements OnInit, OnDestroy {
   orgName = ''
   rootOrgId = ''
   channelName = ''
-
+  expandedParentMenuKey: string | null = null;
   constructor(private activatedRoute: ActivatedRoute, private router: Router, public dialog: MatDialog,
     private matSnackBar: MatSnackBar,
 
@@ -41,7 +41,10 @@ export class LeftMenuComponent implements OnInit, OnDestroy {
     this.menulist = this.widgetData ? this.widgetData.widgetData.menusList : []
     this.orgRead()
 
+    this.setExpandedMenu(this.router.url)
+
   }
+
   onEditLogoClick(): void {
     this.fileInput.nativeElement.click()
   }
@@ -135,4 +138,31 @@ export class LeftMenuComponent implements OnInit, OnDestroy {
     }
     return returnValue
   }
+
+
+  findMenuAndParentByRouterLink(data: any[], routerLink: string, parent: any = null): any {
+    for (const item of data) {
+      if (item.routerLink === routerLink) {
+        return { parent, child: item }
+      }
+      if (item.subMenu && Array.isArray(item.subMenu)) {
+        const result = this.findMenuAndParentByRouterLink(item.subMenu, routerLink, item)
+        if (result) {
+          return result
+        }
+      }
+    }
+    return null
+  }
+
+  setExpandedMenu(currentRoute: string) {
+    const result = this.findMenuAndParentByRouterLink(this.menulist, currentRoute)
+    this.expandedParentMenuKey = result && result.parent ? result.parent.key : null
+  }
+
+  // Determine whether to expand a menu based on the current route
+  shouldMenuExpand(menu: any): boolean {
+    return menu.defaultExpanded || this.expandedParentMenuKey === menu.key
+  }
+
 }

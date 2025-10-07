@@ -59,7 +59,7 @@ export class OdcsMappingComponent implements OnInit {
   callResizeEvent(_event: any) {
     setTimeout(() => {
       window.dispatchEvent(new Event('resize'))
-    },         100)
+    }, 100)
   }
 
   createFreamwork() {
@@ -71,7 +71,7 @@ export class OdcsMappingComponent implements OnInit {
         if (_.get(res, 'result.framework')) {
           setTimeout(() => {
             this.getOrgReadData()
-          },         5000)
+          }, 5000)
         }
       },
       error: () => {
