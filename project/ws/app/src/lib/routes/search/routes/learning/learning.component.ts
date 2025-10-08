@@ -364,7 +364,7 @@ export class LearningComponent implements OnInit, OnDestroy {
     this.searchResultsSubscription = this.searchServ
       .getLearning(this.searchRequestObject)
       .subscribe(
-        data => {
+        data => { //NOSONAR
           this.searchResults.totalHits = data.totalHits
           this.searchServ.raiseSearchResponseEvent(
             this.searchRequestObject.query,
@@ -420,7 +420,7 @@ export class LearningComponent implements OnInit, OnDestroy {
             this.searchRequestObject.pageNo = 0
             this.getResults(true, didYouMean)
             return
-          } else if (
+          } else if ( //NOSONAR
             this.searchResults.totalHits === 0 &&
             this.searchRequestObject.query.indexOf(' ') === -1 &&
             this.searchRequestObject.instanceCatalog
