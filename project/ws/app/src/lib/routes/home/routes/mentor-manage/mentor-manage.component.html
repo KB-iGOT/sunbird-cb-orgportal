@@ -27,7 +27,7 @@
         </div>
         <div class="reportsDemo flex justify-end section-2">
           <div class="reportsDemoVideo flex flex-column flex-middle justify-center margin-top-m"
-            (click)="openVideoPopup()">
+            (click)="openVideoPopup()" (keydown)="$event.preventDefault()">
             <mat-icon class="video_icon mb-2">play_circle</mat-icon>
             <div>
               Watch how it works
@@ -57,13 +57,15 @@
 
           <a routerLink="/app/home/mentor-manage/verified" routerLinkActive="router-link-active" class="filter-option"
             [ngClass]="{'ws-mat-accent-border-active' : currentFilter === 'verified','ws-mat-accent-border font-medium':currentFilter !== 'verified'}"
-            mat-button (click)="filter('verified'); tabTelemetry('verified', 0)" role="button">All Verified <span
+            mat-button (click)="filter('verified'); tabTelemetry('verified', 0)" role="button"
+            (keydown)="$event.preventDefault()">All Verified <span
               *ngIf="verifiedUsersDataCount === 1 || verifiedUsersDataCount === 0">User</span> <span
               *ngIf="verifiedUsersDataCount > 1">Users</span>
             ({{verifiedUsersDataCount}})</a>
           <a routerLink="/app/home/mentor-manage/mentor" routerLinkActive="router-link-active" class="filter-option"
             [ngClass]="{'ws-mat-accent-border-active' : currentFilter === 'mentor','ws-mat-accent-border font-medium':currentFilter !== 'verified'}"
-            mat-button (click)="filter('mentor'); tabTelemetry('mentor', 0)" role="button">Assigned <span
+            mat-button (click)="filter('mentor'); tabTelemetry('mentor', 0)" role="button"
+            (keydown)="$event.preventDefault()">Assigned <span
               *ngIf="mentorUsersDataCount === 1 || mentorUsersDataCount === 0">Mentor</span> <span
               *ngIf="mentorUsersDataCount > 1">Mentors</span>
             ({{mentorUsersDataCount}})</a>

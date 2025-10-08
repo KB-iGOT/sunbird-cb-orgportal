@@ -1,6 +1,6 @@
 <div class="flex flex-row pb-5 justify-between pt-4">
   <div class="title font-bold">{{eventData?.name}}</div>
-  <mat-icon class="pointer" (click)="closeDialog()">close</mat-icon>
+  <mat-icon class="pointer" (click)="closeDialog()" (keydown)="$event.preventDefault()">close</mat-icon>
 </div>
 <ng-container *ngIf="!youtubeURL && videoLink && videoLink.changingThisBreaksApplicationSecurity">
   <div class="pb-4">

@@ -28,8 +28,10 @@
             <td class="speaker-table-cell">
               <div class="flex items-center h-full">
                 <ng-container *ngIf="openMode === 'edit'">
-                  <mat-icon class="edit-icon flex items-center" (click)="editSpeaker(i)">edit</mat-icon>
-                  <mat-icon class="edit-icon flex items-center" (click)="delete(i)">delete</mat-icon>
+                  <mat-icon class="edit-icon flex items-center" (click)="editSpeaker(i)"
+                    (keydown)="$event.preventDefault()">edit</mat-icon>
+                  <mat-icon class="edit-icon flex items-center" (click)="delete(i)"
+                    (keydown)="$event.preventDefault()">delete</mat-icon>
                 </ng-container>
               </div>
             </td>

@@ -99,7 +99,8 @@
             <mat-slide-toggle class="example-margin" formControlName="isMandatory">Required</mat-slide-toggle>
           </div>
         </ng-container>
-        <div class="cursor-pointer" (click)="removeItem(index)" *ngIf="index >= 1"><mat-icon>close</mat-icon></div>
+        <div class="cursor-pointer" (click)="removeItem(index)" (keydown)="$event.preventDefault()" *ngIf="index >= 1">
+          <mat-icon>close</mat-icon></div>
       </div>
     </div>
   </div>

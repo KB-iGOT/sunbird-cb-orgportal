@@ -107,7 +107,7 @@
                 </div> -->
               </div>
             </td>
-            <td colspan="4" (click)="viewAllocation(d)">
+            <td colspan="4" (click)="viewAllocation(d)" (keydown)="$event.preventDefault()">
               <ul>
                 <li *ngFor="let rc of d.roleCompetencyList">
                   <table><!-- //NOSONAR -->

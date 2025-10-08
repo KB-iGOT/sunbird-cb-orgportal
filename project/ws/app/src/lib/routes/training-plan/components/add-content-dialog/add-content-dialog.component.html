@@ -20,8 +20,8 @@
         <p class="mat-subheading-2 required">Competency theme</p>
         <div>
           <span class="display-inline-block complabels mat-caption cursor-pointer"
-            [ngClass]="{active: (option.selected === true)}" (click)="compThemeSelected(option)"
-            *ngFor="let option of allCompetencyTheme">{{option.name}}</span>
+            [ngClass]="{active: (option.selected === true)}" (keydown)="$event.preventDefault()"
+            (click)="compThemeSelected(option)" *ngFor="let option of allCompetencyTheme">{{option.name}}</span>
         </div>
       </div>
 
@@ -29,8 +29,8 @@
         <p class="mat-subheading-2 required">Competency sub theme</p>
         <div>
           <span class="display-inline-block complabels mat-caption cursor-pointer"
-            [ngClass]="{active: (option.selected === true)}" (click)="compSubThemeSelected(option)"
-            *ngFor="let option of allCompetencySubtheme">{{option.name}}</span>
+            [ngClass]="{active: (option.selected === true)}" (keydown)="$event.preventDefault()"
+            (click)="compSubThemeSelected(option)" *ngFor="let option of allCompetencySubtheme">{{option.name}}</span>
         </div>
       </div>
     </div>

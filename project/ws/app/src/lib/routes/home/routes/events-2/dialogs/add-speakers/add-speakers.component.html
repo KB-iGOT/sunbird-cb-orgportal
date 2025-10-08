@@ -1,7 +1,7 @@
 <div>
   <div class="add-speaker-header flex justify-between items-center px-6">
     <span class="add-speaker-text">Add Speaker</span>
-    <mat-icon class="close-icon" (click)="dialogRef.close()">close</mat-icon>
+    <mat-icon class="close-icon" (click)="dialogRef.close()" (keydown)="$event.preventDefault()">close</mat-icon>
   </div>
   <form [formGroup]="speakerForm" class="flex flex-column gap-4 add-speaker-content p-6">
     <div class="flex flex-column gap-2 event-form w-full">
@@ -12,7 +12,8 @@
         <input matInput placeholder="Enter email" formControlName="email" [matAutocomplete]="auto">
         <mat-autocomplete #auto="matAutocomplete">
           <ng-container *ngFor="let user of filteredUsers">
-            <mat-option class="users-option" [value]="user.maskedEmail" (click)="selected(user)">
+            <mat-option class="users-option" [value]="user.maskedEmail" (click)="selected(user)"
+              (keydown)="$event.preventDefault()">
               <div class="flex gap-3">
                 <div class="iconDiv">
                   <span class="iconText">{{user.iconText.substring(0,2)}}</span>

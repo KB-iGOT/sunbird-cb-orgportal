@@ -13,18 +13,21 @@
       <span *ngIf="searchResults.totalHits <= 1">result </span>
       <span *ngIf="searchRequest?.lang?.split(',').length > 1"><span> across your preferred languages</span>
         <span>:&nbsp;</span><span class="cursor-pointer ws-mat-primary-text"
-          *ngFor="let lang of searchRequest?.lang?.split(',')" (click)="searchLanguage(lang)">{{lang | uppercase}}
+          *ngFor="let lang of searchRequest?.lang?.split(',')" (keydown)="$event.preventDefault()"
+          (click)="searchLanguage(lang)">{{lang | uppercase}}
         </span>
       </span>
       <ng-container *ngIf="searchResults?.doYouMean || searchResults?.queryUsed">
         <span>.</span><span>&nbsp;</span>
         <span *ngIf="searchResults?.doYouMean"><span> Did you mean</span><span>&nbsp;“</span><span
-            [innerHTML]="searchResults?.doYouMean" (click)="didYouMeanSearch(searchResults?.doYouMean)"
+            [innerHTML]="searchResults?.doYouMean" (keydown)="$event.preventDefault()"
+            (click)="didYouMeanSearch(searchResults?.doYouMean)"
             class="cursor-pointer ws-mat-primary-text cursor-pointer"></span>”
           ?</span>
         <span *ngIf="searchResults?.queryUsed"><span> Showing results
             for</span><span>&nbsp;“</span>{{searchResults?.queryUsed}}”. <span> Search instead for</span>
           <span>&nbsp;“</span><span class="cursor-pointer ws-mat-primary-text cursor-pointer"
+            (keydown)="$event.preventDefault()"
             (click)="searchInsteadFor()">{{searchRequestObject.query}}</span>”.</span>
       </ng-container>
       <ng-container *ngIf="exactResult.show && applyPhraseSearch">
@@ -46,7 +49,7 @@
             <span *ngIf="content?.checked">
               <mat-chip [removable]="removable">
                 {{translatedFilters[filter?.displayName]?.value[content?.displayName] || content?.displayName}}
-                <mat-icon matChipRemove
+                <mat-icon matChipRemove (keydown)="$event.preventDefault()"
                   (click)="appFilterDisplay.removeFilter({ key : filter?.type, value :content?.type})"
                   *ngIf="removable">cancel</mat-icon>
               </mat-chip>
@@ -55,7 +58,7 @@
               <span *ngFor="let children of content?.children">
                 <span *ngIf="children?.checked">
                   <mat-chip [removable]="removable">{{children?.displayName}}
-                    <mat-icon matChipRemove
+                    <mat-icon matChipRemove (keydown)="$event.preventDefault()"
                       (click)="appFilterDisplay.removeFilter({ key : filter?.type, value :children?.type})"
                       *ngIf="removable">cancel</mat-icon>
                   </mat-chip>

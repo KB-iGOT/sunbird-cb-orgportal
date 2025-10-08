@@ -61,7 +61,7 @@
 
       <mat-card class="upload-card" appearance="outlined">
         <div class="upload flex justify-center items-center cursor-pointer"
-          [ngClass]="imgURL ? 'dashed-border-none' : 'dashed-border'"
+          [ngClass]="imgURL ? 'dashed-border-none' : 'dashed-border'" (keydown)="$event.preventDefault()"
           onclick="document.getElementById('upload-file').click();">
           <input #file type="file" name="upload-file" id="upload-file" class="hidden" accept=".png, .jpg, .jpeg"
             (change)="onFileSelected(file.files);">

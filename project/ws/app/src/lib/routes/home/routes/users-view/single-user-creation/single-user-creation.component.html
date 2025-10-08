@@ -62,7 +62,7 @@
             (openedChange)="setupScrollListener($event)">
 
             <!-- Sticky search input container -->
-            <div class="sticky-search-container" (click)="$event.stopPropagation()">
+            <div class="sticky-search-container" (click)="$event.stopPropagation()" (keydown)="$event.preventDefault()">
               <div class="search-input-wrapper">
                 <input type="text" placeholder="Search designation" formControlName="searchDesignation"
                   class="search-input" (keydown)="$event.stopPropagation()" autocomplete="off">

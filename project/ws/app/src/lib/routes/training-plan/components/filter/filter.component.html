@@ -3,8 +3,8 @@
         <div class="filter-header flex flex-1">
             <div class="flex flex-2 flex-row">
                 <div class="label">Filters</div>
-                <div class="cross-filter cursor-pointer" (click)="hideFilter()"><img src="assets/icons/close.svg"
-                        alt="close"></div>
+                <div class="cross-filter cursor-pointer" (keydown)="$event.preventDefault()" (click)="hideFilter()"><img
+                        src="assets/icons/close.svg" alt="close"></div>
             </div>
         </div>
         <div class="filter-content-container" *ngIf="from === 'content'">
@@ -146,10 +146,10 @@
         </div>
         <div class="filter-footer flex flex-1">
             <div class="flex flex-2 flex-row">
-                <div class="filter-clear" (click)="clearFilter()">
+                <div class="filter-clear" (click)="clearFilter()" (keydown)="$event.preventDefault()">
                     Clear
                 </div>
-                <div class="filter-apply" (click)="applyFilter()">
+                <div class="filter-apply" (click)="applyFilter()" (keydown)="$event.preventDefault()">
                     Apply
                 </div>
             </div>

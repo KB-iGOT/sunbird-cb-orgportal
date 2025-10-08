@@ -317,7 +317,7 @@
                 <div class="flex flex-row justify-between">
                     <h2 class="margin-remove-bottom">Attached training institutes/centres</h2>
                     <a class="mat-subheading-2 hint_span margin-remove-bottom" type="button" tabindex="0" role="button"
-                        (click)="openActivityDialog()">
+                        (keydown)="$event.preventDefault()" (click)="openActivityDialog()">
                         <mat-icon class="mat-icon margin-right-xs notranslate material-icons mat-icon-no-color"
                             role="img" aria-hidden="true">info_outlined</mat-icon>
                         <!-- <ng-template #tooltipTemplate>
@@ -359,7 +359,8 @@
                                         formControlName="attachedTrainingInstitute"
                                         aria-label="Attached training institute input">
                                         <mat-radio-button class="mat-radio-button radio-unselect"
-                                            (click)="buttonSelect($event)" [value]="'Attached training Institute'"
+                                            (keydown)="$event.preventDefault()" (click)="buttonSelect($event)"
+                                            [value]="'Attached training Institute'"
                                             [ngClass]="attachedTrainingInstitute? 'radio-select': 'radio-unselect'">
                                             Attached training Institute
                                         </mat-radio-button>

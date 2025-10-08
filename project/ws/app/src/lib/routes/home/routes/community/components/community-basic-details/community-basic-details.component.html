@@ -72,8 +72,8 @@
       <div class="flex flex-row gap-4" *ngIf="!previewUrl && !communityDetailsForm?.value?.posterImageUrl">
         <div class="upload flex justify-center items-center cursor-pointer dashed-border w-full"
           [ngClass]="{'disable': (openMode === 'view' || disableUpload) }" [class.dragover]="isDragging"
-          (dragover)="onDragOver($event)" (dragleave)="onDragLeave($event)" (drop)="onDrop($event,'posterImageUrl')"
-          (click)="fileInput.click()">
+          (dragover)="onDragOver($event)" (keydown)="$event.preventDefault()" (dragleave)="onDragLeave($event)"
+          (drop)="onDrop($event,'posterImageUrl')" (click)="fileInput.click()">
           <input #fileInput type="file" name="upload-video" id="upload-video" class="hidden"
             (change)="onFileSelected($event,'posterImageUrl')" accept="image/*" />
           <div class="flex flex-column items-center gap-2">
@@ -101,7 +101,8 @@
         <div class="relative w-full">
           <img [src]="previewUrl || communityDetailsForm?.value?.posterImageUrl" alt="Preview"
             class="preview-image w-full" />
-          <mat-icon class="cursor-pointer delete-image" (click)="emptyPosterImage()">close</mat-icon>
+          <mat-icon class="cursor-pointer delete-image" (click)="emptyPosterImage()"
+            (keydown)="$event.preventDefault()">close</mat-icon>
         </div>
       </div>
     </div>
@@ -114,7 +115,7 @@
         <div class="upload flex justify-center items-center cursor-pointer dashed-border w-full"
           [ngClass]="{'disable': (openMode === 'view' || disableUpload) }" [class.dragover]="isDragging"
           (dragover)="onDragOver($event)" (dragleave)="onDragLeave($event)" (drop)="onDrop($event,'imageUrl')"
-          (click)="fileInput.click()">
+          (click)="fileInput.click()" (keydown)="$event.preventDefault()">
           <input #fileInput type="file" name="upload-video" id="upload-video" class="hidden"
             (change)="onFileSelected($event,'imageUrl')" accept="image/*" />
           <div class="flex flex-column items-center gap-2">
@@ -136,7 +137,8 @@
       <div class="w-full community-image-container" *ngIf="previewImageUrl || communityDetailsForm?.value?.imageUrl">
         <div class="relative w-1/2 community-img-block">
           <img [src]="previewImageUrl || communityDetailsForm?.value?.imageUrl" alt="Preview" class="community-image" />
-          <mat-icon class="cursor-pointer delete-image" (click)="emptyImageUrl()">close</mat-icon>
+          <mat-icon class="cursor-pointer delete-image" (click)="emptyImageUrl()"
+            (keydown)="$event.preventDefault()">close</mat-icon>
         </div>
       </div>
     </div>

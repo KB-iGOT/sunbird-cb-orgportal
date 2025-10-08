@@ -1,7 +1,8 @@
 <div class="flex flex-column">
   <div class="flex w-full justify-between items-center">
     <div class="flex gap-5 items-center">
-      <mat-icon class="backicon" (click)="navigateToMyDesignations()">arrow_back</mat-icon>
+      <mat-icon class="backicon" (click)="navigateToMyDesignations()"
+        (keydown)="$event.preventDefault()">arrow_back</mat-icon>
       <div class="mat-h2 header-text">Import from iGOT master</div>
     </div>
 
@@ -36,7 +37,7 @@
                   <div class="chips-content">
                     <span class="color-60">{{item?.designation | titlecase}}</span>
                   </div>
-                  <div class="cross-icon" (click)="removeDesignation([item])">
+                  <div class="cross-icon" (click)="removeDesignation([item])" (keydown)="$event.preventDefault()">
                     <img class="cursor-pointer" src="assets/icons/close.svg" alt="close" />
                   </div>
                 </div>
@@ -57,7 +58,8 @@
       <div class="w-full flex flex-4 flex-row designations-card-container flex-wrap gap-2">
         <ng-container *ngFor="let designation of igotDesignationsList let i = index">
           <div class="flex flex-4 custom-user-card items-center" [ngClass]="{'active-card': (designation?.selected && !designation?.isOrgDesignation),
-              'disableCard': designation?.isOrgDesignation}" (click)="selectDesignation(i)">
+              'disableCard': designation?.isOrgDesignation}" (click)="selectDesignation(i)"
+            (keydown)="$event.preventDefault()">
             <div class="custom-user-desc">
               <p [matTooltip]="designation?.designation" matTooltipPosition="above">{{designation?.designation |
                 titlecase}}</p>
@@ -65,7 +67,7 @@
 
             <div class="check-action">
               <mat-checkbox [checked]="designation?.selected" (click)="$event.preventDefault()"
-                [disabled]="designation?.isOrgDesignation"></mat-checkbox>
+                (keydown)="$event.preventDefault()" [disabled]="designation?.isOrgDesignation"></mat-checkbox>
             </div>
           </div>
         </ng-container>

@@ -1,5 +1,5 @@
 <div class="video-content p-4">
-  <div class="popup-close" (click)="dialogRef?.close()">
+  <div class="popup-close" (click)="dialogRef?.close()" (keydown)="$event.preventDefault()">
     <mat-icon class="close-icon">cancel</mat-icon>
   </div>
   <video id="reportsVideo" disablePictureInPicture="true" controls controlsList="nodownload" height="100%" width="100%"

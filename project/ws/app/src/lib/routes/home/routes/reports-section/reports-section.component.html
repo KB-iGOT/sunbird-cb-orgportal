@@ -20,7 +20,8 @@
             </ng-container>
           </div>
           <div class="reportsDemo flex justify-end section-2">
-            <div class="reportsDemoVideo flex flex-column flex-middle justify-center" (click)="openVideoPopup()">
+            <div class="reportsDemoVideo flex flex-column flex-middle justify-center"
+              (keydown)="$event.preventDefault()" (click)="openVideoPopup()">
               <mat-icon class="video_icon mb-2">play_circle</mat-icon>
               <div>
                 Watch how it works
@@ -58,11 +59,13 @@
                     <mat-form-field appearance="outline" class="margin-top-xs password-input">
                       <input [type]="showCustomReportPwd ? 'text' : 'password'" matInput [(ngModel)]="customReportPwd"
                         readonly>
-                      <mat-icon (click)="showCustomReportPwd = !showCustomReportPwd" class="eye-icon">
+                      <mat-icon (keydown)="$event.preventDefault()" (click)="showCustomReportPwd = !showCustomReportPwd"
+                        class="eye-icon">
                         {{showCustomReportPwd ? 'visibility' : 'visibility_off'}}
                       </mat-icon>
                     </mat-form-field>
-                    <mat-icon class="cust-report-icon copy-icon" (click)="copyToClipboard()">content_copy</mat-icon>
+                    <mat-icon class="cust-report-icon copy-icon" (keydown)="$event.preventDefault()"
+                      (click)="copyToClipboard()">content_copy</mat-icon>
                   </div>
 
                   <div class="flex flex-row flex-1 justify-end">
@@ -85,8 +88,8 @@
                     </mat-checkbox>
                   </th>
                   <td mat-cell *matCellDef="let row" class="row-checkbox-cell">
-                    <mat-checkbox (click)="$event.stopPropagation()" (change)="toggleSelection(row)"
-                      [checked]="selection.isSelected(row)">
+                    <mat-checkbox (keydown)="$event.preventDefault()" (click)="$event.stopPropagation()"
+                      (change)="toggleSelection(row)" [checked]="selection.isSelected(row)">
                     </mat-checkbox>
                   </td>
                 </ng-container>

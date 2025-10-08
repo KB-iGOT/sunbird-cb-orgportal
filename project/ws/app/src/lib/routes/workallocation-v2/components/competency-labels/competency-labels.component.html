@@ -163,8 +163,8 @@
                 </div>
                 <div class="flex flex-1" [formGroup]="ga">
                   <div class="flex flex-1 margin-2px">
-                    <mat-form-field appearance="outline" (click)="setSelectedFilter(gaIdx)"
-                      class="full-width no-pb square outline-color">
+                    <mat-form-field appearance="outline" (keydown)="$event.preventDefault()"
+                      (click)="setSelectedFilter(gaIdx)" class="full-width no-pb square outline-color">
                       <input [attr.id]="'compName_' + gaIdx" formControlName="compName" matInput #compName
                         placeholder="Type here" aria-label="Activity name input" class="form-input flex-1"
                         autocomplete="off" (click)="setSelectedFilter(gaIdx)"
@@ -215,7 +215,8 @@
                     </mat-form-field>
                   </div>
                   <div *ngIf="i === 0" class="flex margin-auto">
-                    <mat-icon class="cursor-pointer ws-mat-black60-text" (click)="deleteSingleCompetency(i,gaIdx)">
+                    <mat-icon class="cursor-pointer ws-mat-black60-text" (keydown)="$event.preventDefault()"
+                      (click)="deleteSingleCompetency(i,gaIdx)">
                       delete</mat-icon>
                   </div>
                 </div>

@@ -27,13 +27,14 @@
       </div>
       <div class="flex-1">
         <div class="flex flex-col gap-2 dashed-card items-center">
-          <div class="flex cursor-pointer margin-top-m" (click)="fileInput.click()"
+          <div class="flex cursor-pointer margin-top-m" (click)="fileInput.click()" (keydown)="$event.preventDefault()"
             (dblclick)="$event.preventDefault()">
             <img src="/assets/icons/csv-file.svg" alt="CSV file logo" />
           </div>
           <div *ngIf="showFileError" class="error-msg">{{bulkUploadConfig?.supportedFileTypeText2}}</div>
           <div class="flex flex-col items-center">
-            <div class="text-primary cursor-pointer" (click)="fileInput.click()" (dblclick)="$event.preventDefault()">
+            <div class="text-primary cursor-pointer" (click)="fileInput.click()" (keydown)="$event.preventDefault()"
+              (dblclick)="$event.preventDefault()">
               Browse files</div>
             <input hidden type="file" #fileInput (click)="handleFileClick($event)"
               (change)="handleOnFileChange(fileInput.files)" name="file" placeholder="Choose file"
@@ -57,7 +58,8 @@
           <div class="flex flex-row gap-1">
             <div class="font-bold">File Information</div>
           </div>
-          <div class="flex flex-row gap-2 outline-button items-center" (click)="handleDownloadFile(list)">
+          <div class="flex flex-row gap-2 outline-button items-center" (keydown)="$event.preventDefault()"
+            (click)="handleDownloadFile(list)">
             <mat-icon>download_2</mat-icon>
             {{ list?.status !== 'SUCCESSFUL' ? 'Download error log' : 'Download file' }}
           </div>

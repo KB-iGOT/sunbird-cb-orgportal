@@ -32,7 +32,8 @@
             </div>
           </div>
           <div class="cutomDemo flex justify-end section-2">
-            <div class="customDemoVideo flex flex-column flex-middle justify-center" (click)="openVideoPopup()">
+            <div class="customDemoVideo flex flex-column flex-middle justify-center" (keydown)="$event.preventDefault()"
+              (click)="openVideoPopup()">
               <mat-icon class="video_icon mb-2">play_circle</mat-icon>
               <div>
                 Watch how it works

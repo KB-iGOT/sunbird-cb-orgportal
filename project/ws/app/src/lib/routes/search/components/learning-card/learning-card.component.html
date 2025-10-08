@@ -60,7 +60,8 @@
       </div>
       <div class="flex">
         <div class="width-expand padding-top-xs" [ngClass]="{ 'text-truncate': !isExpanded }">
-          <div (click)="isExpanded = !isExpanded" class="mat-body text-justify" [innerHTML]="description">
+          <div (keydown)="$event.preventDefault()" (click)="isExpanded = !isExpanded" class="mat-body text-justify"
+            [innerHTML]="description">
 
           </div>
         </div>

@@ -191,6 +191,7 @@
                                                                             (keyup)="onSearchActivity($event)" />
                                                                         <span class="addbtn blue-color-text"
                                                                             (click)="addActivity()"
+                                                                            (keydown)="$event.preventDefault()"
                                                                             *ngIf="newAllocationForm.value.rolelist[0].childNodes">Add</span>
                                                                     </mat-form-field>
                                                                 </div>
@@ -199,9 +200,11 @@
                                                                     *ngIf="activitieslist && activitieslist.length > 0">
                                                                     <h3>Associated activities</h3>
                                                                     <p><span *ngFor="let a of activitieslist; let i = index"
-                                                                            (click)="showRemoveActivity(i)">{{a.name}}
+                                                                            (click)="showRemoveActivity(i)"
+                                                                            (keydown)="$event.preventDefault()">{{a.name}}
                                                                             <mat-icon id="showremove{{i}}"
-                                                                                (click)="removeActivity(i)">close
+                                                                                (click)="removeActivity(i)"
+                                                                                (keydown)="$event.preventDefault()">close
                                                                             </mat-icon>
                                                                         </span></p>
                                                                 </div>

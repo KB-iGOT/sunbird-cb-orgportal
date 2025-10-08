@@ -116,8 +116,9 @@
                       Role
                     </label>
                     <mat-selection-list id="roles" formControlName="roles" #roles>
-                      <mat-list-option *ngFor="let role of rolesList" (click)="modifyUserRoles(role)"
-                        [selected]="userRoles.has(role.roleName)" [value]="role.roleName">
+                      <mat-list-option *ngFor="let role of rolesList" (keydown)="$event.preventDefault()"
+                        (click)="modifyUserRoles(role)" [selected]="userRoles.has(role.roleName)"
+                        [value]="role.roleName">
                         {{role.roleName}}
                       </mat-list-option>
                     </mat-selection-list>

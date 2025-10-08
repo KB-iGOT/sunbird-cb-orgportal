@@ -5,8 +5,8 @@
 
                 <div class="flex flex-row justify-between">
                     <h2>Consultancy</h2>
-                    <a class="mat-subheading-2 hint_span margin-remove-bottom" type="button"
-                        (click)="openActivityDialog()" tabindex="0" role="button">
+                    <a (keydown)="$event.preventDefault()" class="mat-subheading-2 hint_span margin-remove-bottom"
+                        type="button" (click)="openActivityDialog()" tabindex="0" role="button">
                         <mat-icon class="mat-icon margin-right-xs notranslate material-icons mat-icon-no-color"
                             role="img" aria-hidden="true">info_outlined</mat-icon>
 
@@ -114,12 +114,13 @@
                             </div>
                             <div class="flex flex-row justify-between">
                                 <a class="cursor-pointer flex margin-right-xs">
-                                    <mat-icon class="flex  ws-mat-black60-text margin-right-xs"
+                                    <mat-icon (keydown)="$event.preventDefault()"
+                                        class="flex  ws-mat-black60-text margin-right-xs"
                                         (click)="editProject(project)">edit</mat-icon>
                                     Edit
                                 </a>
                                 <a class="cursor-pointer flex">
-                                    <mat-icon
+                                    <mat-icon (keydown)="$event.preventDefault()"
                                         class="flex cursor-pointer ws-mat-black60-text margin-left-xs margin-right-xs"
                                         (click)="deleteProject(project)">
                                         delete</mat-icon> Delete

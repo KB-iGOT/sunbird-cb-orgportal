@@ -21,12 +21,12 @@
       <div class="themes-container mt-4">
         <ng-container *ngFor="let theme of filteredThemes; let i = index">
           <div [ngClass]="{'disableChip': theme?.preSelected}" class="chip-themes {{theme.checked ? 'active' : ''}}"
-            (click)="selectTheme(i)">
+            (click)="selectTheme(i)" (keydown)="$event.preventDefault()">
             <label class="theme-name mr-2">
               {{ theme.name }}
             </label>
             <mat-checkbox [checked]="theme?.selected" (click)="$event.preventDefault()"
-              [disabled]="theme?.preSelected"></mat-checkbox>
+              (keydown)="$event.preventDefault()" [disabled]="theme?.preSelected"></mat-checkbox>
           </div>
         </ng-container>
         <a (click)="toggleThemes()" class="see-more">{{themesShowMore ? 'See Less' : 'See More'}}</a>
@@ -41,12 +41,12 @@
             <ng-container *ngFor="let subTheme of selectedTheme.associations; let i = index">
               <div [ngClass]="{'disableChip': subTheme?.preSelected}"
                 class="chip-themes {{subTheme.checked ? 'active' : ''}}"
-                (click)="selectSubTheme(subTheme, selectedTheme)">
+                (click)="selectSubTheme(subTheme, selectedTheme)" (keydown)="$event.preventDefault()">
                 <label class="theme-name">
                   {{ subTheme.name }}
                 </label>
                 <mat-checkbox [checked]="subTheme?.selected" (click)="$event.preventDefault()"
-                  [disabled]="subTheme?.preSelected"></mat-checkbox>
+                  (keydown)="$event.preventDefault()" [disabled]="subTheme?.preSelected"></mat-checkbox>
               </div>
             </ng-container>
           </div>

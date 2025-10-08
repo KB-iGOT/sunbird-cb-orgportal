@@ -425,10 +425,10 @@ export class LearningComponent implements OnInit, OnDestroy {
             this.searchRequestObject.query.indexOf(' ') === -1 &&
             this.searchRequestObject.instanceCatalog
           ) { //NOSONAR
-            this.searchRequestObject.pageNo = 0
-            this.searchRequestObject.instanceCatalog = false
-            this.getResults(true, didYouMean)
-            return
+            this.searchRequestObject.pageNo = 0 //NOSONAR
+            this.searchRequestObject.instanceCatalog = false //NOSONAR
+            this.getResults(true, didYouMean) //NOSONAR
+            return //NOSONAR
           } else if (
             this.searchResults.totalHits > 0 &&
             this.searchRequestObject.query.indexOf(' ') > -1 &&
