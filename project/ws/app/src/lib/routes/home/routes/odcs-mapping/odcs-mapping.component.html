@@ -45,7 +45,7 @@
       </mat-card>
     </div>
     <div *ngIf="environmentVal && environmentVal.frameworkName" style="height: calc(100vh - 10vh);">
-      <lib-taxonomy-view [environment]="environmentVal" [taxonomyConfig]="taxonomyConfig"></lib-taxonomy-view>
+      <lib-taxonomy-view #taxonomyElement [environment]="environmentVal" [taxonomyConfig]="taxonomyConfig"></lib-taxonomy-view>
     </div>
   </div>
 </ng-container>

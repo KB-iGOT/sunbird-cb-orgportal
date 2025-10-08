@@ -226,7 +226,7 @@ export class BatchDetailsComponent implements OnInit {
       applicationIds: [this.batchData.batchId],
       limit: 100,
       offset: 0,
-      deptName: this.userProfile.rootOrg.orgName,
+      deptName: this.userProfile.channel,
     }
     this.bpService.getRequests(request).subscribe((res: any) => {
       if (res) {

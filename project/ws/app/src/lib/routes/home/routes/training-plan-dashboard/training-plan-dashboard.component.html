@@ -13,6 +13,9 @@
           <a routerLinkActive="router-link-active" class="filter-option"
             [ngClass]="{'ws-mat-accent-border-active' : currentFilter === 'draft', 'ws-mat-accent-border font-medium':currentFilter !== 'draft'}"
             mat-button (click)="tabNavigate('draft', 'Designation'); tabTelemetry('draft', 1)" role="button">Drafts</a>
+          <a routerLinkActive="router-link-active" class="filter-option"
+            [ngClass]="{'ws-mat-accent-border-active' : currentFilter === 'retire', 'ws-mat-accent-border font-medium':currentFilter !== 'retire'}"
+            mat-button (click)="tabNavigate('retire', 'Designation'); tabTelemetry('retire', 1)" role="button">Retire</a>
         </div>
       </div>
 
@@ -106,7 +109,7 @@
 
             <!-- Paginator -->
             <mat-paginator [length]="totalTrainingPlanCount" [pageIndex]="pageIndex" [pageSize]="limit"
-              [pageSizeOptions]="[10, 20, 50, 100]" (page)="onPaginateChange($event)" showFirstLastButtons>
+              [pageSizeOptions]="[20, 50, 100]" (page)="onPaginateChange($event)" showFirstLastButtons>
             </mat-paginator>
           </div>
         </div>

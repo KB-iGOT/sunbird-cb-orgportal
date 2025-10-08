@@ -143,6 +143,7 @@ export class UserCardComponent implements OnInit, OnChanges, AfterViewChecked, A
   checked = false
   currentUserStatus = ''
   userLimitSet: any
+  defaultPaginationSize = [20, 50, 100]
   constructor(private usersSvc: UsersService, private roleservice: RolesService,
     private dialog: MatDialog, private approvalSvc: ApprovalsService,
     private route: ActivatedRoute, private snackBar: MatSnackBar,

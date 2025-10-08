@@ -141,10 +141,10 @@ export class UserBulkTransferComponent implements OnInit, AfterViewInit, OnDestr
       const file: File = fileList[0]
       this.fileName = file.name
       this.fileSelected = file
-      if (this.fileService.validateFile(this.fileName)) {
-        // this.sendOTP()
+      if (this.fileService.validateFile(this.fileName, ['xlsx'])) {
+        this.sendOTP()
         // this.verifyOTP(this.userProfile.email ? 'email' : 'phone')
-        this.uploadWithOtp() // dont use this function this is for dev purposes only
+        // this.uploadWithOtp() // dont use this function this is for dev purposes only
       } else {
         this.showFileError = true
       }

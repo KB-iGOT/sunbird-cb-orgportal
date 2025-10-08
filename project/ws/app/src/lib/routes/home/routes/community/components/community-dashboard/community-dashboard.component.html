@@ -166,7 +166,7 @@
     </table>
 
     <mat-paginator class="community-pagination" [length]="totalElements" [pageSize]="pageSize"
-      [pageSizeOptions]="[5, 10, 25, 50]" [pageIndex]="pageNumber" (page)="handlePageEvent($event)" showFirstLastButtons
+      [pageSizeOptions]="defaultPageSizeOptions" [pageIndex]="pageNumber" (page)="handlePageEvent($event)" showFirstLastButtons
       aria-label="Select page">
     </mat-paginator>
   </div>

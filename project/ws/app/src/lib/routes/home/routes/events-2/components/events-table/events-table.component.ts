@@ -33,7 +33,7 @@ export class EventsTableComponent implements OnInit, OnChanges {
   showSearchBox = true
   displayedColumns: any
   dataSource!: any
-  pageSizeOptions = [20, 30, 40]
+  pageSizeOptions = [20, 50, 100]
   columnsList: any = []
   tableColumns = []
   noDataMessage = 'No data found'
