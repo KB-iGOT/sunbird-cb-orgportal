@@ -18,7 +18,7 @@
         </div>
         <div class="reportsDemo flex justify-end section-2">
           <div class="reportsDemoVideo flex flex-column flex-middle justify-center margin-top-m"
-            (click)="openVideoPopup()">
+            (click)="openVideoPopup()" (keydown)="$event.preventDefault()">
             <mat-icon class="video_icon mb-2">play_circle</mat-icon>
             <div>
               Watch how it works
@@ -32,12 +32,14 @@
         <div class="flex flex-3 filter max-height-60">
           <a class="filter-option"
             [ngClass]="{'ws-mat-accent-border-active' : currentFilter === 'profileverification', 'ws-mat-accent-border font-medium': currentFilter !== 'profileverification'}"
-            mat-button (click)="filter('profileverification'); tabTelemetry('toapprove', 0)" role="button">Profile
+            mat-button (click)="filter('profileverification'); tabTelemetry('toapprove', 0)"
+            (keydown)="$event.preventDefault()" role="button">Profile
             Verifications ({{totalProfileVerificationRecords}})</a>
 
           <a class="filter-option"
             [ngClass]="{'ws-mat-accent-border-active' : currentFilter === 'transfers', 'ws-mat-accent-border font-medium': currentFilter !== 'transfers'}"
-            mat-button (click)="filter('transfers'); tabTelemetry('transfers', 1)" role="button">Transfers
+            mat-button (click)="filter('transfers'); tabTelemetry('transfers', 1)" (keydown)="$event.preventDefault()"
+            role="button">Transfers
             ({{totalTransfersRecords}})</a>
         </div>
         <!-- <div class="flex flex-3 flex-end" *ngIf="currentFilter === 'profileverification'">

@@ -6,7 +6,8 @@
       <span *ngIf="data?.message" class="text-white">{{data?.message}}</span>
     </div>
     <div class="close">
-      <mat-icon class="cursor-pointer" (click)="snackBarRef.dismiss()" class="text-white">close</mat-icon>
+      <mat-icon class="cursor-pointer" (click)="snackBarRef.dismiss()" (keydown)="$event.preventDefault()"
+        class="text-white">close</mat-icon>
     </div>
   </div>
 </div>

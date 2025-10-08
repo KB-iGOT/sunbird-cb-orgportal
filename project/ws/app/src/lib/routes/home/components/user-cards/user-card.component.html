@@ -6,8 +6,8 @@
   <mat-accordion [multi]="true">
     <mat-expansion-panel class="user-card" *ngFor="let user of usersData; let i = index" #panel
       (opened)="closeOtherPanels(panel)" [hideToggle]="forMentor ? true : false" [disabled]="forMentor ? true : false">
-      <mat-expansion-panel-header (click)="getUerData(user, panel, index)">
-        <div class="float-left width88 flex" (click)="$event.stopPropagation();">
+      <mat-expansion-panel-header (click)="getUerData(user, panel, index)" (keydown)="$event.preventDefault()">
+        <div class="float-left width88 flex" (click)="$event.stopPropagation();" (keydown)="$event.preventDefault()">
           <div class="initialcircle display-inline-block margin-right-m">
             <!-- <span>AB</span> -->
             <ws-widget-avatar-photo [name]="getUseravatarName(user)" [photoUrl]="user?.photo" size="l">
@@ -61,12 +61,13 @@
         </div>
         <div class="float-right flex items-center" *ngIf="(isMdoAdmin || isMdoLeader) && !forMentor">
           <!-- <ng-container *ngIf="checkForMDOAdmin(user)"> -->
-          <div class="button mat-body" (click)="onEditUser(user, panel);;"
+          <div class="button mat-body" (click)="onEditUser(user, panel);;" (keydown)="$event.preventDefault()"
             *ngIf="currentFilter !== 'notmyuser' && !user?.enableEdit">
             <mat-icon>edit</mat-icon> Edit
           </div>
           <!-- </ng-container> -->
-          <div class="button mat-body" (click)="confirmReassign(confirm, user);" *ngIf="currentFilter === 'notmyuser'">
+          <div class="button mat-body" (click)="confirmReassign(confirm, user);" *ngIf="currentFilter === 'notmyuser'"
+            (keydown)="$event.preventDefault()">
             Reassign</div>
         </div>
         <div class="float-right flex flex-col items-center" *ngIf="(isMdoAdmin || isMdoLeader) && forMentor">
@@ -124,7 +125,8 @@
                     (closed)="onDesignationDropdownClosed()">
 
                     <!-- Sticky search input container -->
-                    <div class="sticky-search-container" (click)="$event.stopPropagation()">
+                    <div class="sticky-search-container" (click)="$event.stopPropagation()"
+                      (keydown)="$event.preventDefault()">
                       <div class="search-input-wrapper">
                         <input type="text" placeholder="Search designation" formControlName="searchDesignation"
                           class="search-input" (keydown)="$event.stopPropagation()" autocomplete="off">
@@ -437,7 +439,8 @@
                 <div>
                   <mat-selection-list id="roles" formControlName="roles" #roles class="roles-list">
                     <mat-list-option *ngFor="let role of rolesList" (click)="modifyUserRoles(role.roleName)"
-                      [selected]="userRoles.has(role.roleName)" [value]="role?.roleName">
+                      (keydown)="$event.preventDefault()" [selected]="userRoles.has(role.roleName)"
+                      [value]="role?.roleName">
                       {{role.roleName}}
                     </mat-list-option>
                   </mat-selection-list>
@@ -684,8 +687,9 @@
   <mat-accordion [multi]="true" *ngIf="approvalData">
     <mat-expansion-panel class="user-card" *ngFor="let appData of approvalData | orderBy: 'firstName':'asc'" #panel
       (opened)="closeOtherPanels(panel)">
-      <mat-expansion-panel-header (click)="getApprovalUserData(appData.user, appData.userWorkflow, panel);">
-        <div class="float-left width82 flex" (click)="$event.stopPropagation();">
+      <mat-expansion-panel-header (click)="getApprovalUserData(appData.user, appData.userWorkflow, panel);"
+        (keydown)="$event.preventDefault()">
+        <div class="float-left width82 flex" (click)="$event.stopPropagation();" (keydown)="$event.preventDefault()">
           <div class="initialcircle display-inline-block margin-right-s" *ngIf="appData?.user">
             <ws-widget-avatar-photo [name]="getUseravatarName(appData?.user)" [photoUrl]="appData?.user?.photo"
               size="l">
@@ -746,12 +750,13 @@
                       <mat-radio-group aria-label="Select an option" name="approveGroup" formControlName="approveGroup"
                         class="mat-caption">
                         <mat-radio-button value="approvegroup" class="margin-right-s"
-                          (click)="onClickHandleWorkflow(field,'APPROVE')">Approve</mat-radio-button>
-                        <mat-radio-button value="rejectgroup"
-                          (click)="onClickHandleWorkflow(field,'REJECT')">Reject</mat-radio-button>
+                          (click)="onClickHandleWorkflow(field,'APPROVE')"
+                          (keydown)="$event.preventDefault()">Approve</mat-radio-button>
+                        <mat-radio-button value="rejectgroup" (click)="onClickHandleWorkflow(field,'REJECT')"
+                          (keydown)="$event.preventDefault()">Reject</mat-radio-button>
                         <mat-icon class="margin-left-m editreasonicon cursor-pointer"
                           *ngIf="field.action === 'REJECT' && comment !== '' && !htmlDetected"
-                          (click)="updateRejection(field)">chat_bubble</mat-icon>
+                          (click)="updateRejection(field)" (keydown)="$event.preventDefault()">chat_bubble</mat-icon>
                       </mat-radio-group>
                     </div>
 
@@ -772,12 +777,13 @@
                       <mat-radio-group aria-label="Select an option" name="approveDesignation"
                         formControlName="approveDesignation" class="mat-caption">
                         <mat-radio-button value="approvedesg" class="margin-right-s"
-                          (click)="onClickHandleWorkflow(field,'APPROVE')">Approve</mat-radio-button>
-                        <mat-radio-button value="rejectdesg"
-                          (click)="onClickHandleWorkflow(field,'REJECT')">Reject</mat-radio-button>
+                          (click)="onClickHandleWorkflow(field,'APPROVE')"
+                          (keydown)="$event.preventDefault()">Approve</mat-radio-button>
+                        <mat-radio-button value="rejectdesg" (click)="onClickHandleWorkflow(field,'REJECT')"
+                          (keydown)="$event.preventDefault()">Reject</mat-radio-button>
                         <mat-icon class="margin-left-m editreasonicon cursor-pointer"
                           *ngIf="field.action === 'REJECT' && comment !== '' && !htmlDetected"
-                          (click)="updateRejection(field)">chat_bubble</mat-icon>
+                          (click)="updateRejection(field)" (keydown)="$event.preventDefault()">chat_bubble</mat-icon>
                       </mat-radio-group>
                     </div>
                   </div>
@@ -980,7 +986,8 @@
 <ng-template #updaterejectDialog>
   <form class="rejectdialog">
     <p mat-dialog-title class="dialog-title">Reason for rejection
-      <mat-icon (click)="showedit()" *ngIf="!showeditText" class="float-right cursor-pointer">edit_square</mat-icon>
+      <mat-icon (click)="showedit()" (keydown)="$event.preventDefault()" *ngIf="!showeditText"
+        class="float-right cursor-pointer">edit_square</mat-icon>
     </p>
     <mat-dialog-content>
       <p class="margin-top-l margin-bottom-l" *ngIf="!showeditText">{{comment}}</p>

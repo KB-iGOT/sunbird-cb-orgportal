@@ -16,7 +16,7 @@
           <mat-select #topicName formControlName="topicName" placeholder="Select designation" panelClass="search-panel">
 
             <!-- Sticky search input container -->
-            <div class="sticky-search-container" (click)="$event.stopPropagation()">
+            <div class="sticky-search-container" (click)="$event.stopPropagation()" (keydown)="$event.preventDefault()">
               <div class="search-input-wrapper">
                 <input type="text" placeholder="Search topic" formControlName="searchTopic" class="search-input"
                   (keydown)="$event.stopPropagation()" autocomplete="off">

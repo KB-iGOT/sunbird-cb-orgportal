@@ -109,7 +109,7 @@
     </div>
     <div class="dots-container">
       <span class="dot" [ngClass]="{ active: j === currentIndex }" *ngFor="let slide of bannerTemplates; let j = index"
-        (click)="slideTo(j)"></span>
+        (click)="slideTo(j)" (keydown)="$event.preventDefault()"></span>
     </div>
     <div class="image-box__overlay"></div>
   </div>
@@ -168,7 +168,7 @@
     </div>
     <div class="dots-container">
       <span class="dot" [ngClass]="{ active: j === currentIndex }" *ngFor="let slide of bannerTemplates; let j = index"
-        (click)="slideTo(j)"></span>
+        (click)="slideTo(j)" (keydown)="$event.preventDefault()"></span>
     </div>
     <div class="image-box__overlay"></div>
   </div>

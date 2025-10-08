@@ -39,8 +39,8 @@
         <ng-container matColumnDef="{{col.key}}" *ngFor="let col of tableData!.columns">
             <mat-header-cell *matHeaderCellDef mat-sort-header> {{col.displayName}} </mat-header-cell>
             <mat-cell *matCellDef="let element">
-                <mat-radio-button #button (click)="checkState(button)" [value]="element"
-                    *ngIf="col.displayName==='Work orders'">
+                <mat-radio-button #button (click)="checkState(button)" (keydown)="$event.preventDefault()"
+                    [value]="element" *ngIf="col.displayName==='Work orders'">
                 </mat-radio-button>
                 <span *ngIf="col.isList" class="textclass" [matTooltip]="(element[col.key]).split('<br />').join(', ')">
                     <div innerHTML="{{element[col.key]}}"></div>
@@ -58,7 +58,8 @@
             </mat-cell>
         </ng-container>
         <mat-header-row *matHeaderRowDef="getFinalColumns()"></mat-header-row>
-        <mat-row *matRowDef="let row; columns: getFinalColumns();" (click)="selection.toggle(row); onRowClick(row)">
+        <mat-row *matRowDef="let row; columns: getFinalColumns();" (click)="selection.toggle(row); onRowClick(row)"
+            (keydown)="$event.preventDefault()">
         </mat-row>
     </mat-table>
     <div class="no-information-found" *ngIf="dataSource.filteredData.length===0 && isSearched">No published work

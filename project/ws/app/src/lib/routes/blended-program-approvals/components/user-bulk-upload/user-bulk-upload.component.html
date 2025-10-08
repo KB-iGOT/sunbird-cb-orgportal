@@ -50,10 +50,12 @@
   <p><b>Bulk upload learners & invite</b></p>
   <div class="flex filter-block flex-middle flex-center">
     <p class="margin-remove"><b>Filter By:</b></p>
-    <div class="tab-btn" (click)="changeFilterType('success')" [ngClass]="{'active-tab':isSeletedTab === 'success'}">
+    <div class="tab-btn" (keydown)="$event.preventDefault()" (click)="changeFilterType('success')"
+      [ngClass]="{'active-tab':isSeletedTab === 'success'}">
       Success
     </div>
-    <div class="tab-btn" (click)="changeFilterType('error')" [ngClass]="{'active-tab':isSeletedTab === 'error'}">Error
+    <div class="tab-btn" (keydown)="$event.preventDefault()" (click)="changeFilterType('error')"
+      [ngClass]="{'active-tab':isSeletedTab === 'error'}">Error
     </div>
   </div>
   <div class="margin-top-xl" *ngIf="isSuccessUserlist.length || isErrorUserlist.length">
@@ -85,7 +87,8 @@
       <!-- Checkbox Column -->
       <ng-container matColumnDef="select">
         <th mat-header-cell *matHeaderCellDef class="mat-custom-headder">
-          <mat-checkbox (change)="$event ? toggleAllRows() : null" [checked]="selection.hasValue() && isAllSelected()"
+          <mat-checkbox (keydown)="$event.preventDefault()" (change)="$event ? toggleAllRows() : null"
+            [checked]="selection.hasValue() && isAllSelected()"
             [indeterminate]="selection.hasValue() && !isAllSelected()" [aria-label]="checkboxLabel()">
           </mat-checkbox>
         </th>
@@ -138,7 +141,8 @@
       </ng-container> -->
 
       <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-      <tr mat-row *matRowDef="let row; columns: displayedColumns;" (click)="selection.toggle(row)">
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;" (click)="selection.toggle(row)"
+        (keydown)="$event.preventDefault()">
       </tr>
     </table>
     <ng-container *ngIf="dataSource.data.length === 0 || dataSource.filteredData.length === 0 ">

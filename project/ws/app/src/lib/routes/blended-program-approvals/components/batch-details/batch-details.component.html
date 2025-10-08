@@ -24,35 +24,38 @@
           <div class="flex flex-1 filter max-height-60">
             <a class="filter-option cursor-pointer" [ngClass]="{'ws-mat-accent-border-active font-bold' : currentFilter === 'pending',
                                                 'ws-mat-accent-border font-medium':currentFilter !== 'pending'}"
-              mat-button (click)="filter('pending')" role="button">New requests
+              mat-button (click)="filter('pending')" (keydown)="$event.preventDefault()" role="button">New requests
               <!-- <span *ngIf="newUsers" class="ws-mat-black60-text">({{newUsers.length}})</span> -->
             </a>
             <a class="filter-option cursor-pointer"
               [ngClass]="{'ws-mat-accent-border-active font-bold' : currentFilter === 'approved',
                                                               'ws-mat-accent-border font-medium':currentFilter !== 'approved'}" mat-button
-              (click)="filter('approved')" role="button">Learners
+              (click)="filter('approved')" (keydown)="$event.preventDefault()" role="button">Learners
               <!-- <span *ngIf="approvedUsers" class="ws-mat-black60-text">({{approvedUsers.length}})</span> -->
             </a>
             <a class="filter-option cursor-pointer"
               [ngClass]="{'ws-mat-accent-border-active font-bold' : currentFilter === 'nominate-learner',
                                                                           'ws-mat-accent-border font-medium':currentFilter !== 'nominate-learner'}"
-              mat-button (click)="filter('nominate-learner')" role="button">Nominate Learner
+              mat-button (click)="filter('nominate-learner')" (keydown)="$event.preventDefault()" role="button">Nominate
+              Learner
               <!-- <span *ngIf="approvedUsers" class="ws-mat-black60-text">({{approvedUsers.length}})</span> -->
             </a>
             <a class="filter-option cursor-pointer"
               [ngClass]="{'ws-mat-accent-border-active font-bold' : currentFilter === 'approvalStatus',
                                                                                     'ws-mat-accent-border font-medium':currentFilter !== 'approvalStatus'}"
-              mat-button (click)="filter('approvalStatus')" role="button">Enroll status
+              mat-button (click)="filter('approvalStatus')" (keydown)="$event.preventDefault()" role="button">Enroll
+              status
             </a>
             <a class="filter-option cursor-pointer" *ngIf="batchData?.batchAttributes?.sessionDetails_v2"
               [ngClass]="{'ws-mat-accent-border-active font-bold' : currentFilter === 'sessions',
-                                                                                    'ws-mat-accent-border font-medium':currentFilter !== 'sessions'}" mat-button (click)="filter('sessions')" role="button">Session
+                                                                                    'ws-mat-accent-border font-medium':currentFilter !== 'sessions'}" mat-button (click)="filter('sessions')"
+              (keydown)="$event.preventDefault()" role="button">Session
               details
               <!-- <span *ngIf="rejectedUsers" class="ws-mat-black60-text">({{rejectedUsers.length}})</span> -->
             </a>
             <a class="filter-option cursor-pointer" [ngClass]="{'ws-mat-accent-border-active font-bold' : currentFilter === 'reportStatus',
               'ws-mat-accent-border font-medium':currentFilter !== 'reportStatus'}" mat-button
-              (click)="filter('reportStatus')" role="button">Report
+              (click)="filter('reportStatus')" (keydown)="$event.preventDefault()" role="button">Report
               <!-- <span *ngIf="rejectedUsers" class="ws-mat-black60-text">({{rejectedUsers.length}})</span> -->
             </a>
           </div>
