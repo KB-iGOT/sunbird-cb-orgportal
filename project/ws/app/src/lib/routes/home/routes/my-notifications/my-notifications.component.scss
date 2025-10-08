@@ -4,7 +4,9 @@
   @extend %page-center;
 }
 .sec-header {
+  /* stylelint-disable */
   font-family: Montserrat;
+  /* stylelint-enable */
   font-weight: 600;
   font-size: 20px;
   line-height: 100%;

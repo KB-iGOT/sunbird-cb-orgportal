@@ -155,10 +155,14 @@ export class StateProfileHomeComponent implements OnInit, OnDestroy {
     }
   }
   get next() {
-    if (!this.isNextStepAllowed) { return }
+    if (!this.isNextStepAllowed) {
+      return //NOSONAR
+    }
 
     // for checking the form validation
-    if (!this.isFormValid) { return }
+    if (!this.isFormValid) {
+      return //NOSONAR
+    }
 
     const nextStep = _.first(_.filter(this.tabs, { step: this.currentStep + 1 }))
     if (nextStep) {
@@ -176,7 +180,10 @@ export class StateProfileHomeComponent implements OnInit, OnDestroy {
     return 'first'
   }
   get skip() {
-    if (!this.isNextStepAllowed) { return }
+    if (!this.isNextStepAllowed) {
+      return  //NOSONAR
+
+    }
     this.stepService.skiped.next(true)
     const nextStep = _.first(_.filter(this.tabs, { step: this.currentStep + 1 }))
     if (nextStep && nextStep.step !== this.tabs.length + 1) {

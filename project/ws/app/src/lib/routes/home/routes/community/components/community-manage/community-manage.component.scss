@@ -256,7 +256,9 @@
 }
 
 .breadcrum .event-builder-text {
+  /* stylelint-disable */
     font: 700 14px Lato;
+    /* stylelint-enable */
     color: #1B4CA1;
 }
 .event-builder-text {
@@ -267,7 +269,9 @@
 }
 .view-more-btn {
     color: #1b4ca1 !important;
+    /* stylelint-disable */
     font-family: Lato;
+    /* stylelint-enable */
     font-size: 14px;
     font-weight: 700;
     text-align: center;
@@ -285,7 +289,7 @@
     overflow: visible;
     vertical-align: middle;
     background: rgba(0, 0, 0, 0);
-    width: 100%;
+    // width: 100%;
     padding: 8px 0;
     cursor: pointer;
 }

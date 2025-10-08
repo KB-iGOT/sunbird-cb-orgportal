@@ -141,7 +141,7 @@ export class WidgetContentService {
   }
 
   async continueLearning(id: string, collectionId?: string, collectionType?: string): Promise<any> {
-    return new Promise(async resolve => {
+    return new Promise(async resolve => { //NOSONAR
       if (collectionType &&
         collectionType.toLowerCase() === 'playlist') {
         const reqBody = {

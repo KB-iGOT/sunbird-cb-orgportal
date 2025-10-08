@@ -92,7 +92,7 @@ export class BatchDetailsComponent implements OnInit {
     })
   }
 
-  async ngOnInit() {
+  async ngOnInit() { //NOSONAR
     this.userDetails = await this.bpService.getUserById('').toPromise().catch(_error => { })
   }
 

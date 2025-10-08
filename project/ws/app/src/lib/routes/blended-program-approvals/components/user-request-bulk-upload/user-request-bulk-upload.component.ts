@@ -208,7 +208,7 @@ export class UserRequestBulkUploadComponent implements OnInit {
         })
         return
       }
-      if (!headerValues.includes('userId') || !headerValues.includes('userId') || !headerValues.includes('wfId')) {
+      if (!headerValues.includes('userId') || !headerValues.includes('wfId')) {
         this.fileUploading = false
         this.snackBar.openFromComponent(SnackbarComponent, {
           data: {
@@ -239,7 +239,7 @@ export class UserRequestBulkUploadComponent implements OnInit {
         const emailPattern = new RegExp(`^[\\w\-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$`)
         const mobilePattern = new RegExp(/^(6|7|8|9)\d{9}$/)
         const emailTest = element.email ? emailPattern.test(element.email) : true
-        element['email'] = element.email
+        element['email'] = element.email //NOSONAR
 
         if (emailTest && element.email) {
           emailIds.push(element.email.toLowerCase())

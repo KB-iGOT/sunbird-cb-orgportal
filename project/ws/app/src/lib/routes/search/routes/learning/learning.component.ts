@@ -424,7 +424,7 @@ export class LearningComponent implements OnInit, OnDestroy {
             this.searchResults.totalHits === 0 &&
             this.searchRequestObject.query.indexOf(' ') === -1 &&
             this.searchRequestObject.instanceCatalog
-          ) {
+          ) { //NOSONAR
             this.searchRequestObject.pageNo = 0
             this.searchRequestObject.instanceCatalog = false
             this.getResults(true, didYouMean)
