@@ -621,7 +621,7 @@ export class UsersViewComponent implements OnInit, OnDestroy {
         //   'profileDetails',
         // ],
         limit: this.limit,
-        offset: this.getSearchText(query) ? this.pageIndex : 0,
+        offset: this.getSearchText(query) ? 0 : this.pageIndex,
         query: this.getSearchText(query),
         sort_by: this.getSortOrder(query),
       },
