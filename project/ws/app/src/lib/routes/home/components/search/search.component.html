@@ -15,13 +15,16 @@
         </button>
         <mat-menu #cardMenu="matMenu">
             <ng-template matMenuContent>
-                <div mat-menu-item class="flex items-center" (click)="sortData('alphabetical')">
-                    <span>Alphabetical</span>
+                <div mat-menu-item class="flex items-center" [ngClass]="{'activeSort': sortOrder === 'alphabetical'}"
+                    (click)="sortData('alphabetical')">
+                    <span>Alphabetical {{sortOrder}}</span>
                 </div>
-                <div mat-menu-item class="flex items-center" (click)="sortData('newest')">
+                <div mat-menu-item class="flex items-center" [ngClass]="{'activeSort': sortOrder === 'newest'}"
+                    (click)="sortData('newest')">
                     <span>Newest</span>
                 </div>
-                <div mat-menu-item class="flex items-center" (click)="sortData('oldest')">
+                <div mat-menu-item class="flex items-center" [ngClass]="{'activeSort': sortOrder === 'oldest'}"
+                    (click)="sortData('oldest')">
                     <span>Oldest</span>
                 </div>
             </ng-template>

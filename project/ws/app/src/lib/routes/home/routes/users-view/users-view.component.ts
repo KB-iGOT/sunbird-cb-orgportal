@@ -79,6 +79,7 @@ export class UsersViewComponent implements OnInit, OnDestroy {
   pendingApprovals: any = []
   totalUserLimit: any
   isMoreThanLimit = false
+  resetPagination: any = {}
   constructor(
     public dialog: MatDialog,
     private route: ActivatedRoute,
@@ -789,6 +790,8 @@ export class UsersViewComponent implements OnInit, OnDestroy {
 
   onEnterkySearch(enterValue: any) {
     this.searchQuery = enterValue
+    this.pageIndex = 0
+    this.resetPagination = { pageIndex: this.pageIndex, pageSize: this.limit, length: this.activeUsersDataCountInner }
     this.filterData(this.searchQuery)
   }
 

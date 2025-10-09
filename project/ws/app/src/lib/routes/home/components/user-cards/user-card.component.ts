@@ -3,7 +3,7 @@ import {
   AfterViewInit,
   ChangeDetectorRef,
   Component, ElementRef, EventEmitter, Input, OnChanges, OnInit, Output,
-  QueryList, TemplateRef, ViewChild, ViewChildren,
+  QueryList, SimpleChanges, TemplateRef, ViewChild, ViewChildren,
 } from '@angular/core'
 import { UntypedFormGroup, UntypedFormControl, Validators } from '@angular/forms'
 import { UsersService } from '../../../users/services/users.service'
@@ -57,6 +57,7 @@ export class UserCardComponent implements OnInit, OnChanges, AfterViewChecked, A
   @Input() forMentor = false
   @Input() pendingApprovals?: any = []
   @Input() resetPagination?: any = {}
+  @Input() sortByAsc?: boolean = true
   @Output() paginationData = new EventEmitter()
   @Output() searchByEnterKey = new EventEmitter()
   @Output() disableButton = new EventEmitter()
@@ -183,7 +184,9 @@ export class UserCardComponent implements OnInit, OnChanges, AfterViewChecked, A
     }
 
     if (this.usersData && this.usersData.length > 0) {
-      this.usersData = _.orderBy(this.usersData, item => item.firstName.toUpperCase(), ['asc'])
+      if (this.sortByAsc) {
+        this.usersData = _.orderBy(this.usersData, item => item.firstName.toUpperCase(), ['asc'])
+      }
 
       // formatting profileStatusUpdatedOn value
       this.usersData.forEach((u: any) => {
@@ -263,22 +266,30 @@ export class UserCardComponent implements OnInit, OnChanges, AfterViewChecked, A
     }
   }
 
-  ngOnChanges() {
+  ngOnChanges(changes: SimpleChanges) {
     if (this.usersData) {
-      this.usersData = _.orderBy(this.usersData, item => {
-        if (item.profileDetails && item.profileDetails.personalDetails) {
-          return item.profileDetails.personalDetails.firstname ?
-            item.profileDetails.personalDetails.firstname.toUpperCase() : item.firstName.toUpperCase()
-        }
-        // tslint:disable-next-line
-        return ''
-      }, ['asc'])
+      if (this.sortByAsc) {
+        this.usersData = _.orderBy(
+          this.usersData,
+          (item: any) => {
+            const name =
+              (item.profileDetails &&
+                item.profileDetails.personalDetails &&
+                item.profileDetails.personalDetails.firstname) ||
+              item.firstName ||
+              ''
+            return name.toUpperCase()
+          },
+          ['asc']
+        )
+      }
 
       if (this.isApprovals) {
         this.getApprovalData()
       }
     }
-    if (Object.keys(this.resetPagination).length) {
+    if (changes.resetPagination && changes.resetPagination.currentValue && Object.keys(changes.resetPagination.currentValue).length) {
+      this.resetPagination = changes.resetPagination.currentValue
       if (this.paginator) {
         this.paginator.pageIndex = 0
         // this.onChangePage(this.resetPagination)
