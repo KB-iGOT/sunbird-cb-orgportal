@@ -2,7 +2,7 @@
   class="mat-elevation-z3 custom mobile">
   <div class="fix-ww" id="root-tool-bar" title="Home" role="toolbar">
     <ng-container *ngIf="mode === 'top'">
-      <a routerLink="/app/home" class="logo-dim" role="link" title="Home">
+      <a (click)="routeToHome()" class="logo-dim" role="link" title="Home">
         <img [src]="appIcon" alt="Application Logo" class="app-logo" />
       </a> <span class="vertical-seperator"></span>
       <div class="flex flex-middle"><span>MDO portal</span></div>
