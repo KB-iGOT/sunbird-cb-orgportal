@@ -64,8 +64,58 @@ export class EventsTableComponent implements OnInit, OnChanges {
       this.dataSource.data = this.data
       setTimeout(() => {
         this.dataSource.sort = this.sort
+        this.dataSource.sortingDataAccessor = (data: any, sortHeaderId: string) => {
+          // find column definition if available
+          const col: any = this.tableColumns && this.tableColumns.find((c: any) => c.key === sortHeaderId)
+          if (col && col.cellType === 'date') {
+            const val = data[sortHeaderId]
+            const ts = this.parseDisplayDateToTimestamp(val)
+            // return numeric timestamp for correct chronological sorting; fallback to original value
+            return ts !== null ? ts : (val ?? '')
+          }
+          // default behaviour
+          const v = data[sortHeaderId]
+          // make string sorts case-insensitive
+          return typeof v === 'string' ? v.toLowerCase() : v
+        }
       }, 10)
     }
+  }
+
+  parseDisplayDateToTimestamp(dateStr: string | null | undefined): number | null {
+    if (!dateStr) {
+      return null
+    }
+    // normalize and remove commas
+    const s = dateStr.trim().replace(',', '')
+    // expected formats: "19 Jun 2025", "19 June 2025", "2025-06-19", etc.
+    const parts = s.split(/\s+/)
+    if (parts.length === 3) {
+      const day = parseInt(parts[0], 10)
+      const monthStr = parts[1].toLowerCase()
+      const year = parseInt(parts[2], 10)
+      const monthMap: Record<string, number> = {
+        jan: 0, january: 0,
+        feb: 1, february: 1,
+        mar: 2, march: 2,
+        apr: 3, april: 3,
+        may: 4,
+        jun: 5, june: 5,
+        jul: 6, july: 6,
+        aug: 7, august: 7,
+        sep: 8, sept: 8, september: 8,
+        oct: 9, october: 9,
+        nov: 10, november: 10,
+        dec: 11, december: 11,
+      }
+      const month = monthMap[monthStr]
+      if (!Number.isNaN(day) && !Number.isNaN(year) && month !== undefined) {
+        return new Date(year, month, day).getTime()
+      }
+    }
+    // fallback: try Date.parse
+    const parsed = Date.parse(dateStr)
+    return Number.isNaN(parsed) ? null : parsed
   }
 
   getFinalColumns() {

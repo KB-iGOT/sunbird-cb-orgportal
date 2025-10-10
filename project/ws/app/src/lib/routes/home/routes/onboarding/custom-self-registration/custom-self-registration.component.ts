@@ -265,12 +265,20 @@ export class CustomSelfRegistrationComponent implements OnInit {
   subscribeToAfterClosedModal() {
     this.dialogRef.afterClosed().subscribe((result: any) => {
       if (result && result.hasOwnProperty('reviewImporting') && result?.reviewImporting) {
-        this.onboardingService.setFlagToCheckRoute(true)
-        this.navigateTo('/app/home/org-designations')
+        if (!this.selectedOrgData) {
+          this.onboardingService.setFlagToCheckRoute(true)
+          this.navigateTo('/app/home/org-designations')
+        } else {
+          this.navigatToDesignations.emit(true)
+        }
       }
       else if (result && result.reviewImporting || result?.startImporting) {
-        this.onboardingService.setFlagToCheckRoute(true)
-        this.navigateTo('/app/home/org-designations')
+        if (!this.selectedOrgData) {
+          this.onboardingService.setFlagToCheckRoute(true)
+          this.navigateTo('/app/home/org-designations')
+        } else {
+          this.navigatToDesignations.emit(true)
+        }
       }
       else return
 
