@@ -232,7 +232,7 @@ export class EventsListComponent implements OnInit, OnDestroy {
       request: {
         query: this.searchKey,
         limit: _.get(this.paginationDetails, 'pageSize', 20),
-        offset: _.get(this.paginationDetails, 'pageSize', 20) * _.get(this.paginationDetails, 'pageIndex', 0),
+        offset: this.searchKey ? 0 : _.get(this.paginationDetails, 'pageSize', 20) * _.get(this.paginationDetails, 'pageIndex', 0),
         filters: {
           status: ['Live'],
           contentType: 'Event',
