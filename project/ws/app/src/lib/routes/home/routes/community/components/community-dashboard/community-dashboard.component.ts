@@ -210,7 +210,7 @@ export class CommunityDashboardComponent implements OnInit {
         "orgId": this.userProfile.rootOrgId,
       },
       "requestedFields": [],
-      "pageNumber": this.pageNumber,
+      "pageNumber": searchString ? 0 : this.pageNumber,
       "pageSize": this.pageSize,
       "facets": [],
       "orderBy": "createdOn",

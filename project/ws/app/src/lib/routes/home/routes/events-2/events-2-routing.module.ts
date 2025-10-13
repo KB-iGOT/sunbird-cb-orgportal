@@ -71,10 +71,10 @@ const routes: Routes = [
         },
       },
       {
-        path: 'canceled',
+        path: 'cancelled',
         component: EventsListComponent,
         data: {
-          pageId: 'app/home/events/canceled',
+          pageId: 'app/home/events/cancelled',
           module: 'events-2',
         },
         resolve: {

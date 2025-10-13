@@ -237,4 +237,12 @@ export class AppNavBarComponent implements OnInit, OnChanges, OnDestroy {
       this.myNotificationsSubscription.unsubscribe()
     }
   }
+
+  routeToHome() {
+    if (this.configSvc.userRoles?.has('community_moderator')) {
+      this.router.navigate(['/app/home/community'])
+    } else {
+      this.router.navigate(['/app/home'])
+    }
+  }
 }

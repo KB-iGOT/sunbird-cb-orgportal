@@ -1,4 +1,5 @@
-import { AfterViewInit, ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core'
+import { AfterViewInit, ChangeDetectorRef, Component, inject, OnInit, ViewChild } from '@angular/core'
+import { Location } from '@angular/common'
 import { EventsService } from '../../services/events.service'
 import { ActivatedRoute, Router } from '@angular/router'
 import * as _ from 'lodash'
@@ -20,6 +21,7 @@ import { ConfirmDialogComponent } from '../../../../../workallocation-v2/compone
 })
 export class CreateEventComponent implements OnInit, AfterViewInit {
   //#region (global varialbles)
+  private readonly locationService = inject(Location);
   @ViewChild(MatStepper) stepper: MatStepper | undefined
   eventId = ''
   eventIconUrl = ''
@@ -180,6 +182,7 @@ export class CreateEventComponent implements OnInit, AfterViewInit {
     }
   }
 
+
   openConforamtionPopup() {
     if (this.openMode === 'edit') {
       let dialgData = {}
@@ -241,7 +244,11 @@ export class CreateEventComponent implements OnInit, AfterViewInit {
   }
 
   navigateBack() {
-    this.router.navigate([`/app/home/events/${this.pathUrl}`])
+    if (this.pathUrl) {
+      this.router.navigate([`/app/home/events/${this.pathUrl}`])
+    } else {
+      this.locationService.back()
+    }
   }
 
   moveToNextForm() {
