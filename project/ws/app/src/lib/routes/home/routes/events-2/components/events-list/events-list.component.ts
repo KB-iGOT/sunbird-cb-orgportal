@@ -165,7 +165,7 @@ export class EventsListComponent implements OnInit, OnDestroy {
           },
         ]
         break
-      case 'canceled':
+      case 'cancelled':
         this.tableData = {
           columns: [
             { displayName: 'Event Name', key: 'name', cellType: 'textImage', imageKey: 'appIcon', cellClass: 'text-overflow-elipse' },
