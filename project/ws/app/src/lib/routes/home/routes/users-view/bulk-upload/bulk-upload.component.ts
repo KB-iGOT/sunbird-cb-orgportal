@@ -60,6 +60,10 @@ export class BulkUploadComponent implements OnInit, AfterViewInit, OnDestroy {
   ngOnInit() {
     this.rootOrgId = (this.selectedOrgData) ? (this.selectedOrgData.roleId) : _.get(this.router.snapshot.parent, 'data.configService.unMappedUser.rootOrg.rootOrgId')
     this.userProfile = _.get(this.router.snapshot.parent, 'data.configService.userProfileV2')
+    if (this.selectedOrgData) {
+      this.downloadSampleFilePath = _.get(this.router.snapshot.data.pageData.data.bulkUploadConfig, 'downloadSampleUserFilePath')
+      this.downloadAsFileName = _.get(this.router.snapshot.data.pageData.data.bulkUploadConfig, 'downloadAsUserFileName')
+    }
     this.getBulkStatusList()
   }
 
