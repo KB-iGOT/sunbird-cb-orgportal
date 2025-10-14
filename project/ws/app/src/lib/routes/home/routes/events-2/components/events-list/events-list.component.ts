@@ -264,7 +264,7 @@ export class EventsListComponent implements OnInit, OnDestroy {
           '<': this.getCurrentTimeInUTC
         }
         break
-      case 'canceled':
+      case 'cancelled':
         requestObj.request.filters.status = ['Cancelled']
         break
       case 'rejected':
