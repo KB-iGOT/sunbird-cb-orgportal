@@ -8,14 +8,14 @@
       <div class="flex flex-1 flex-column margin-fix">
         <div class="flex flex-1 filter max-height-60">
           <a routerLinkActive="router-link-active" class="filter-option"
-            [ngClass]="{'ws-mat-accent-border-active' : currentFilter === 'live', 'ws-mat-accent-border font-medium':currentFilter !== 'live'}"
-            mat-button (click)="tabNavigate('live', 'Designation'); tabTelemetry('live', 0)" role="button">Live</a>
+            [ngClass]="{'ws-mat-accent-border-active' : currentFilter === 'Live', 'ws-mat-accent-border font-medium':currentFilter !== 'Live'}"
+            mat-button (click)="tabNavigate('Live', 'Designation'); tabTelemetry('live', 0)" role="button">Live</a>
           <a routerLinkActive="router-link-active" class="filter-option"
             [ngClass]="{'ws-mat-accent-border-active' : currentFilter === 'draft', 'ws-mat-accent-border font-medium':currentFilter !== 'draft'}"
             mat-button (click)="tabNavigate('draft', 'Designation'); tabTelemetry('draft', 1)" role="button">Drafts</a>
           <a routerLinkActive="router-link-active" class="filter-option"
-            [ngClass]="{'ws-mat-accent-border-active' : currentFilter === 'retire', 'ws-mat-accent-border font-medium':currentFilter !== 'retire'}"
-            mat-button (click)="tabNavigate('retire', 'Designation'); tabTelemetry('retire', 1)" role="button">Retire</a>
+            [ngClass]="{'ws-mat-accent-border-active' : currentFilter === 'RETIRE', 'ws-mat-accent-border font-medium':currentFilter !== 'RETIRE'}"
+            mat-button (click)="tabNavigate('RETIRE', 'Designation'); tabTelemetry('retire', 1)" role="button">Retire</a>
         </div>
       </div>
 
