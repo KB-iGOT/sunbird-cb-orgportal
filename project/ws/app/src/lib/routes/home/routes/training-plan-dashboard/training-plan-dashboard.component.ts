@@ -23,7 +23,7 @@ export class TrainingPlanDashboardComponent implements OnInit, AfterViewInit {
   @ViewChild(MatPaginator, { static: false }) paginator!: MatPaginator
 
   // Component Properties
-  currentFilter = 'live'
+  currentFilter = 'Live'
   pageIndex = 0
   limit = 20
   searchQuery = ''
@@ -363,7 +363,7 @@ export class TrainingPlanDashboardComponent implements OnInit, AfterViewInit {
         if (data?.params?.status?.toLowerCase() === 'success') {
           this.snackBar.open('CBP plan published successfully.')
           this.loaderService.changeLoaderState(false)
-          this.tabNavigate('live', selectedRow.userType)
+          this.tabNavigate('Live', selectedRow.userType)
         } else {
           this.snackBar.open('Something went wrong while publishing CBP plan. Try again later')
           this.loaderService.changeLoaderState(false)
