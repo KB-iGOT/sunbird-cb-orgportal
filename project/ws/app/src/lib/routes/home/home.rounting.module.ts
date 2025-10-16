@@ -39,7 +39,7 @@ const routes: Routes = [
   {
     path: '',
     pathMatch: 'full',
-    redirectTo: 'onboarding',
+    redirectTo: 'welcome',
   },
   {
     path: '',
@@ -356,10 +356,14 @@ const routes: Routes = [
       {
         path: 'microsite',
         loadChildren: () => import('./routes/microsite/microsite.module').then(m => m.MicrositeModule),
+        data: {
+          pageKey: 'microsite-v3',
+        },
         resolve: {
           formData: FormDataResolverService,
           configService: ConfigResolveService,
         },
+
       },
       {
         path: 'reports-section',

@@ -21,33 +21,50 @@ export class FormDataResolverService {
   ): Observable<IResolveResponse<any>> {
     const pageDataKey = _route.data.pageKey
     const pageType = _route.data.pageType || 'feature'
-    const requestData: any = { "request": { "type": "MDO-channel", "subType": "microsite-v2", "action": "page-configuration", "component": "portal", "rootOrgId": "01397282245867929648" } }
+    const requestData: any = {
+      request: {
+        type: "MDO-channel",
+        subType: "microsite-v2",
+        action: "page-configuration",
+        component: "portal",
+        rootOrgId: this.configSvc?.orgReadData?.rootOrgId || ''
+      }
+    }
+    requestData.request['subType'] = 'microsite-v2-preview'
     return this.formSvc.formReadData(requestData).pipe(
       map((rData: any) => {
         const finalData = rData && rData.result.form.data
         return ({ data: finalData, error: null })
       }),
       catchError((_error: any) => {
-        const baseUrl = this.configSvc.sitePath
-        return this.http.get(`${baseUrl}/${pageType}/${pageDataKey}.json`, {
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          observe: 'response',
-        }).pipe(
-          map(response => {
-            if (response.body) {
-              return { data: response.body, error: null }
-            }
-            return { data: null, error: 'Empty response' }
+        requestData.request['subType'] = 'microsite-v2'
+        return this.formSvc.formReadData(requestData).pipe(
+          map((rData: any) => {
+            const finalData = rData && rData.result.form.data
+            return ({ data: finalData, error: null })
           }),
-          catchError(err => {
-            console.error('HTTP request failed:', err)
-            return of({ data: null, error: err })
+          catchError((_error: any) => {
+            const baseUrl = this.configSvc.sitePath
+            return this.http.get(`${baseUrl}/${pageType}/${pageDataKey}.json`, {
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              observe: 'response',
+            }).pipe(
+              map((response: any) => {
+                if (response.body) {
+                  return { data: response?.body?.data, error: null }
+                }
+                return { data: null, error: 'Empty response' }
+              }),
+              catchError(err => {
+                console.error('HTTP request failed:', err)
+                return of({ data: null, error: err })
+              }),
+            )
           }),
         )
-      }
-      ),
+      }),
     )
   }
 }
