@@ -239,7 +239,7 @@ export class AppNavBarComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   routeToHome() {
-    if (this.configSvc.userRoles?.has('community_moderator')) {
+    if (this.configSvc.userRoles?.has('community_moderator') && !this.configSvc.userRoles?.has('mdo_leader') && !this.configSvc.userRoles?.has('mdo_admin')) {
       this.router.navigate(['/app/home/community'])
     } else {
       this.router.navigate(['/app/home'])
