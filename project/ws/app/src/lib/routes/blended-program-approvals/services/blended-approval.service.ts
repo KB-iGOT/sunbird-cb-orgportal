@@ -15,13 +15,14 @@ const API_END_POINTS = {
   READ_USER: '/apis/proxies/v8/api/user/v2/read/',
   CERT_DOWNLOAD: `/apis/protected/v8/cohorts/course/batch/cert/download/`,
   SEARCH_FORM_WITH_USERID: 'apis/proxies/v8/forms/searchForms',
+  SUBMISSION_SEARCH: '/apis/proxies/v8/forms/v2/submissions/search',
   NOMINATE_LEARNERS: '/apis/proxies/v8/workflow/blendedprogram/admin/enrol',
   REMOVE_LEARNER: '/apis/proxies/v8/workflow/blendedprogram/remove/mdo',
   BLENDED_USER_COUNT: `apis/proxies/v8/workflow/blendedprogram/enrol/status/count`,
   BPREPORT_STATUS: 'apis/proxies/v8/bp/v1/bpreport/status',
   GENERATE_REPORT: `apis/proxies/v8/bp/v1/generate/report`,
   DOWNLOAD_REPORT: `apis/proxies/v8/bp/v1/bpreport/download/`,
-  GET_FORM_BY_ID: `/apis/proxies/v8/forms/getFormById`,
+  GET_FORM_BY_ID: `/apis/proxies/v8/forms/v2/getFormById`,
 }
 
 @Injectable({
@@ -72,6 +73,10 @@ export class BlendedApporvalService {
     return this.http.post<any>(`${API_END_POINTS.SEARCH_FORM_WITH_USERID}`, req)
   }
 
+  getSubmissionsByUserId(req: any) {
+    return this.http.post<any>(`${API_END_POINTS.SUBMISSION_SEARCH}`, req)
+  }
+
   nominateLearners(req: any) {
     return this.http.post<any>(`${API_END_POINTS.NOMINATE_LEARNERS}`, req)
   }
@@ -104,6 +109,6 @@ export class BlendedApporvalService {
   }
 
   getSurveyByFormId(formId: any) {
-    return this.http.get<any>(`${API_END_POINTS.GET_FORM_BY_ID}?id=${formId}`)
+    return this.http.get<any>(`${API_END_POINTS.GET_FORM_BY_ID}?formId=${formId}`)
   }
 }
