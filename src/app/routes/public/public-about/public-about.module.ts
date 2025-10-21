@@ -8,7 +8,7 @@ import { MatExpansionModule } from '@angular/material/expansion'
 import { MatIconModule } from '@angular/material/icon'
 import { MatToolbarModule } from '@angular/material/toolbar'
 import { BreadcrumbsOrgModule } from '@sunbird-cb/collection'
-import { HorizontalScrollerModule, PipeSafeSanitizerModule } from '@sunbird-cb/utils'
+import { HorizontalScrollerModule, PipeSafeSanitizerModule } from '@sunbird-cb/utils-v2'
 
 @NgModule({
   declarations: [PublicAboutComponent],

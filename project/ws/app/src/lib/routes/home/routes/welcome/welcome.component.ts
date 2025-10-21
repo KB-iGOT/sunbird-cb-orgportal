@@ -8,7 +8,7 @@ import { ProfileV2Service } from '../../services/home.servive'
 import { dashboardEmptyData } from '../../../../../../../../../src/mdo-assets/data/data'
 /* tslint:enable */
 import { Router } from '@angular/router'
-import { EventService } from '@sunbird-cb/utils'
+import { EventService } from '@sunbird-cb/utils-v2'
 import { TelemetryEvents } from '../../../../head/_services/telemetry.event.model'
 @Component({
   selector: 'ws-app-welcome',

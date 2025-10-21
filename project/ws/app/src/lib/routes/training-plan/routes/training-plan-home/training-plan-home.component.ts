@@ -28,7 +28,7 @@ export class TrainingPlanHomeComponent implements OnInit, AfterViewInit, OnDestr
     this.tpdsSvc.currentUserDepartment = (this.configSvc &&
       this.configSvc.userProfileV2 &&
       this.configSvc.userProfileV2.departmentName) ? this.configSvc.userProfileV2.departmentName : ''
-    this.subscr = this.subscr.add(this.tpdsSvc.moderatedCourseSelectStatus.subscribe(status => {
+    this.subscr.add(this.tpdsSvc.moderatedCourseSelectStatus.subscribe(status => {
       if (status) {
         this.showModeratedNotification = true
       } else {

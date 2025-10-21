@@ -7,7 +7,7 @@ import {
     LeftMenuWithoutLogoModule,
     UIORGTableModule,
 } from '@sunbird-cb/collection'
-import { WidgetResolverModule } from '@sunbird-cb/resolver'
+import { SbUiResolverModule } from '@sunbird-cb/resolver-v2'
 import { HomeModule } from '../home/home.module'
 import { RouterModule } from '@angular/router'
 import { MatBadgeModule } from '@angular/material/badge'
@@ -52,7 +52,7 @@ import { UserRequestBulkUploadComponent } from './components/user-request-bulk-u
     declarations: [BlendedHomeComponent, BatchListComponent, BatchDetailsComponent, UsersCardComponent, ProfileViewComponent,
         SessionCardComponent, NominateUsersDialogComponent, RejectReasonDialogComponent, ViewReportDialogComponent, LearnerResponsesComponent, ContentNominateLearnerComponent,
         SelectLearnersToBatchComponent, UserBulkUploadComponent, DialogConfirmComponent, SnackbarComponent, UserRequestBulkUploadComponent],
-    imports: [CommonModule, BlendedApprovalsRoutingModule, BreadcrumbsOrgModule, LeftMenuWithoutLogoModule, WidgetResolverModule,
+    imports: [CommonModule, BlendedApprovalsRoutingModule, BreadcrumbsOrgModule, LeftMenuWithoutLogoModule, SbUiResolverModule,
         MatSidenavModule, MatButtonModule, MatIconModule, HomeModule, RouterModule, UIORGTableModule,
         MatCardModule, AvatarPhotoModule, MatListModule, PipeEmailModule, PipeOrderByModule, ProfileCertificateDialogModule,
         MatBadgeModule, MatTableModule, MatCheckboxModule, MatSortModule, FormsModule, ReactiveFormsModule,

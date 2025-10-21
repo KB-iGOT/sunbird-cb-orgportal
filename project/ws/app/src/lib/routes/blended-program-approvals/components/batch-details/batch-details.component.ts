@@ -6,7 +6,7 @@ import { ActivatedRoute, Router } from '@angular/router'
 import * as _ from 'lodash'
 import { BlendedApporvalService } from '../../services/blended-approval.service'
 import { TelemetryEvents } from '../../../../head/_services/telemetry.event.model'
-import { ConfigurationsService, EventService } from '@sunbird-cb/utils'
+import { ConfigurationsService, EventService } from '@sunbird-cb/utils-v2'
 import { NominateUsersDialogComponent } from '../nominate-users-dialog/nominate-users-dialog.component'
 import moment from 'moment'
 import { NsContent } from '../../../../head/_services/widget-content.model'
@@ -227,7 +227,7 @@ export class BatchDetailsComponent implements OnInit {
       applicationIds: [this.batchData?.batchId],
       limit: 100,
       offset: 0,
-      deptName: this.userProfile.rootOrg.orgName,
+      deptName: this.userProfile.channel,
     }
     this.bpService.getRequests(request).subscribe((res: any) => {
       if (res) {

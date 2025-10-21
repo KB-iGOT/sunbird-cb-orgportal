@@ -3,7 +3,7 @@ import {
   AfterViewInit,
   ChangeDetectorRef,
   Component, ElementRef, EventEmitter, Input, OnChanges, OnInit, Output,
-  QueryList, TemplateRef, ViewChild, ViewChildren,
+  QueryList, SimpleChanges, TemplateRef, ViewChild, ViewChildren,
 } from '@angular/core'
 import { UntypedFormGroup, UntypedFormControl, Validators } from '@angular/forms'
 import { UsersService } from '../../../users/services/users.service'
@@ -22,11 +22,11 @@ import { Observable, Subscription } from 'rxjs'
 import { debounceTime, distinctUntilChanged, map, startWith } from 'rxjs/operators'
 import { environment } from '../../../../../../../../../src/environments/environment'
 // import { OtpService } from '../../../users/services/otp.service'
-// import { ConfigurationsService } from '@sunbird-cb/utils'
+// import { ConfigurationsService } from '@sunbird-cb/utils-v2'
 // import { RejectionPopupComponent } from '../rejection-popup/rejection-popup.component'
 import { APP_DATE_FORMATS, AppDateAdapter } from '../../../events/routes/format-datepicker'
 import { ApprovalsService } from '../../services/approvals.service'
-import { EventService } from '@sunbird-cb/utils'
+import { EventService } from '@sunbird-cb/utils-v2'
 import { TelemetryEvents } from '../../../../head/_services/telemetry.event.model'
 import { DatePipe } from '@angular/common'
 
@@ -57,6 +57,7 @@ export class UserCardComponent implements OnInit, OnChanges, AfterViewChecked, A
   @Input() forMentor = false
   @Input() pendingApprovals?: any = []
   @Input() resetPagination?: any = {}
+  @Input() sortByAsc?: boolean = true
   @Output() paginationData = new EventEmitter()
   @Output() searchByEnterKey = new EventEmitter()
   @Output() disableButton = new EventEmitter()
@@ -143,7 +144,8 @@ export class UserCardComponent implements OnInit, OnChanges, AfterViewChecked, A
   checked = false
   currentUserStatus = ''
   userLimitSet: any
-  constructor(public usersSvc: UsersService, private roleservice: RolesService,
+  defaultPaginationSize = [20, 50, 100]
+  constructor(private usersSvc: UsersService, private roleservice: RolesService,
     private dialog: MatDialog, private approvalSvc: ApprovalsService,
     private route: ActivatedRoute, private snackBar: MatSnackBar,
     private events: EventService,
@@ -182,7 +184,9 @@ export class UserCardComponent implements OnInit, OnChanges, AfterViewChecked, A
     }
 
     if (this.usersData && this.usersData.length > 0) {
-      this.usersData = _.orderBy(this.usersData, item => item.firstName.toUpperCase(), ['asc'])
+      if (this.sortByAsc) {
+        this.usersData = _.orderBy(this.usersData, item => item.firstName.toUpperCase(), ['asc'])
+      }
 
       // formatting profileStatusUpdatedOn value
       this.usersData.forEach((u: any) => {
@@ -262,22 +266,30 @@ export class UserCardComponent implements OnInit, OnChanges, AfterViewChecked, A
     }
   }
 
-  ngOnChanges() {
+  ngOnChanges(changes: SimpleChanges) {
     if (this.usersData) {
-      this.usersData = _.orderBy(this.usersData, item => {
-        if (item.profileDetails && item.profileDetails.personalDetails) {
-          return item.profileDetails.personalDetails.firstname ?
-            item.profileDetails.personalDetails.firstname.toUpperCase() : item.firstName.toUpperCase()
-        }
-        // tslint:disable-next-line
-        return ''
-      }, ['asc'])
+      if (this.sortByAsc) {
+        this.usersData = _.orderBy(
+          this.usersData,
+          (item: any) => {
+            const name =
+              (item.profileDetails &&
+                item.profileDetails.personalDetails &&
+                item.profileDetails.personalDetails.firstname) ||
+              item.firstName ||
+              ''
+            return name.toUpperCase()
+          },
+          ['asc']
+        )
+      }
 
       if (this.isApprovals) {
         this.getApprovalData()
       }
     }
-    if (Object.keys(this.resetPagination).length) {
+    if (changes.resetPagination && changes.resetPagination.currentValue && Object.keys(changes.resetPagination.currentValue).length) {
+      this.resetPagination = changes.resetPagination.currentValue
       if (this.paginator) {
         this.paginator.pageIndex = 0
         // this.onChangePage(this.resetPagination)
@@ -847,7 +859,7 @@ export class UserCardComponent implements OnInit, OnChanges, AfterViewChecked, A
                   roles: Array.from(this.userRoles),
                 },
               }
-              this.usersSvc.addUserToDepartment(dreq).subscribe(res => {
+              this.usersSvc.addUserToRole(dreq).subscribe(res => {
                 if (res) {
                   this.updateUserDataForm.reset({ roles: '' })
                   // this.openSnackbar('User role updated Successfully')q
@@ -1306,7 +1318,7 @@ export class UserCardComponent implements OnInit, OnChanges, AfterViewChecked, A
         roles: Array.from(this.userRoles),
       },
     }
-    this.usersSvc.addUserToDepartment(dreq).subscribe(res => {
+    this.usersSvc.addUserToRole(dreq).subscribe(res => {
       if (res) {
         if (this.activeTab === 'mentor') {
           this.usersSvc.mentorList$.next('mentor')

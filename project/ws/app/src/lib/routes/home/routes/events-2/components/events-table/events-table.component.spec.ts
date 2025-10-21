@@ -18,7 +18,8 @@ const _ = require('lodash')
 describe('EventsTableComponent', () => {
   let component: EventsTableComponent
   let fixture: ComponentFixture<EventsTableComponent>
-
+  let mockMatTableDataSource: any
+  let compAny: any
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       declarations: [EventsTableComponent],
@@ -493,6 +494,63 @@ describe('EventsTableComponent', () => {
     it('should have pageChange EventEmitter', () => {
       expect(component.pageChange).toBeDefined()
       expect(component.pageChange.emit).toBeDefined()
+    })
+  })
+
+  // === Added tests for commonly present helper methods to cover missing cases ===
+  describe('applyFilter', () => {
+    it('should set dataSource.filter normalized value', () => {
+      // Arrange
+      component.dataSource = mockMatTableDataSource
+
+      // Act
+      compAny.applyFilter('  TeSt  ')
+
+      // Assert
+      expect(component.dataSource.filter).toBe('test')
+    })
+
+    it('should handle empty or falsy filter values safely', () => {
+      component.dataSource = mockMatTableDataSource
+
+      compAny.applyFilter('')
+      expect(component.dataSource.filter).toBe('')
+
+      compAny.applyFilter(null as any)
+      expect(component.dataSource.filter).toBe('')
+    })
+  })
+
+  describe('trackBy', () => {
+    it('should return item id when present', () => {
+      const item: any = { id: 'abc' }
+      const result = compAny.trackBy(0, item)
+      expect(result).toBe('abc')
+    })
+
+    it('should return index when id not present', () => {
+      const item: any = { name: 'no-id' }
+      const result = compAny.trackBy(5, item)
+      expect(result).toBe(5)
+    })
+  })
+
+  describe('ngOnDestroy', () => {
+    it('should unsubscribe from searchSubscription if present', () => {
+      // Arrange
+      const unsub = { unsubscribe: jest.fn() }
+      compAny.searchSubscription = unsub as any
+
+      // Act
+      compAny.ngOnDestroy()
+
+      // Assert
+      expect(unsub.unsubscribe).toHaveBeenCalled()
+    })
+
+    it('should not throw if no subscription present', () => {
+      compAny.searchSubscription = undefined as any
+      expect(() => compAny.ngOnDestroy()).not.toThrow()
     })
   })
 })

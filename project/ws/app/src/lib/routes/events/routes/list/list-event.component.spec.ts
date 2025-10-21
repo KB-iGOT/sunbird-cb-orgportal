@@ -1,7 +1,7 @@
 import { ListEventComponent } from './list-event.component'
 import { Router } from '@angular/router'
 import { EventsService } from '../../services/events.service'
-import { ConfigurationsService, EventService } from '@sunbird-cb/utils'
+import { ConfigurationsService, EventService } from '@sunbird-cb/utils-v2'
 import { DatePipe } from '@angular/common'
 import { of, throwError } from 'rxjs'
 import moment from 'moment'

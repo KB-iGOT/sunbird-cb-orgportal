@@ -1,12 +1,12 @@
 import { Subject } from 'rxjs'
-import { RolesAndFunctionsComponent } from './roles-and-functions.component'
 import { OrgProfileService } from '../../services/org-profile.service'
-import { ConfigurationsService } from '@sunbird-cb/utils'
 
 // Mock lodash
 jest.mock('lodash', () => ({
     get: jest.fn()
 }))
+import { ConfigurationsService } from '@sunbird-cb/utils-v2'
+import { RolesAndFunctionsComponent } from './roles-and-functions.component'
 
 describe('RolesAndFunctionsComponent', () => {
     let component: RolesAndFunctionsComponent

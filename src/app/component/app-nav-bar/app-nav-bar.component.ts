@@ -1,8 +1,8 @@
 import { Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges } from '@angular/core'
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser'
 import { IBtnAppsConfig, CustomTourService } from '@sunbird-cb/collection'
-import { NsWidgetResolver } from '@sunbird-cb/resolver'
-import { ConfigurationsService, EventService, NsInstanceConfig, NsPage } from '@sunbird-cb/utils'
+import { NsWidgetResolver } from '@sunbird-cb/resolver-v2'
+import { ConfigurationsService, EventService, NsInstanceConfig, NsPage } from '@sunbird-cb/utils-v2'
 import { Router, NavigationStart, NavigationEnd, Event } from '@angular/router'
 import { LibNotificationsService } from '@sunbird-cb/notification'
 import { NotificationsService } from '../../services/notifications.service'
@@ -115,8 +115,8 @@ export class AppNavBarComponent implements OnInit, OnChanges, OnDestroy {
       this.getMyCount()
     }
 
-    this.myNotificationsSubscription = this.libNotificationsService._unreadCount.subscribe((res: boolean) => {
-      if (res === true) {
+    this.myNotificationsSubscription = this.libNotificationsService.unreadCount$.subscribe((res: number) => {
+      if (res > 0) {
         this.getMyCount()
       }
     })
@@ -235,6 +235,14 @@ export class AppNavBarComponent implements OnInit, OnChanges, OnDestroy {
   ngOnDestroy() {
     if (this.myNotificationsSubscription) {
       this.myNotificationsSubscription.unsubscribe()
+    }
+  }
+
+  routeToHome() {
+    if (this.configSvc.userRoles?.has('community_moderator') && !this.configSvc.userRoles?.has('mdo_leader') && !this.configSvc.userRoles?.has('mdo_admin')) {
+      this.router.navigate(['/app/home/community'])
+    } else {
+      this.router.navigate(['/app/home'])
     }
   }
 }

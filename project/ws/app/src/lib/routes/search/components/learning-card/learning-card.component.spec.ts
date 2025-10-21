@@ -1,4 +1,5 @@
 import { SimpleChanges } from '@angular/core'
+
 import { LearningCardComponent } from './learning-card.component'
 import { SafeHtml } from '@angular/platform-browser'
 import { NsContent } from '@sunbird-cb/collection'

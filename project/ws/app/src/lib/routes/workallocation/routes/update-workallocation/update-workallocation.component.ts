@@ -4,7 +4,7 @@ import { ExportAsService, ExportAsConfig } from 'ngx-export-as'
 import { ActivatedRoute, Router } from '@angular/router'
 import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar'
 import { AllocationService } from '../../services/allocation.service'
-import { ConfigurationsService, EventService } from '@sunbird-cb/utils'
+import { ConfigurationsService, EventService } from '@sunbird-cb/utils-v2'
 import { TelemetryEvents } from '../../../../head/_services/telemetry.event.model'
 import * as _ from 'lodash'
 @Component({

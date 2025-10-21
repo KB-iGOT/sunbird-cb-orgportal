@@ -6,7 +6,7 @@ import { Subject } from 'rxjs'
 import { MatLegacyChipInputEvent as MatChipInputEvent } from '@angular/material/legacy-chips'
 import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog'
 import { COMMA, ENTER } from '@angular/cdk/keycodes'
-import { ConfigurationsService } from '@sunbird-cb/utils'
+import { ConfigurationsService } from '@sunbird-cb/utils-v2'
 /* tslint:disable*/
 import * as _ from 'lodash'
 import { DialogBoxComponent } from '../../components/dialog-box/dialog-box.component'

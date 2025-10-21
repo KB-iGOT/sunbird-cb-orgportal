@@ -1,6 +1,6 @@
 import { WorkallocationService } from './workallocation.service'
 import { HttpClient } from '@angular/common/http'
-import { ConfigurationsService } from '@sunbird-cb/utils'
+import { ConfigurationsService } from '@sunbird-cb/utils-v2'
 import { of } from 'rxjs'
 
 // Mock the dependencies

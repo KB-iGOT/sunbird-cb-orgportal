@@ -1,9 +1,9 @@
 import { Component, OnInit, OnDestroy, AfterViewInit, ElementRef, HostListener, ViewChild } from '@angular/core'
 import { Router, Event, NavigationEnd, ActivatedRoute } from '@angular/router'
-import { ConfigurationsService, EventService, ValueService } from '@sunbird-cb/utils'
+import { ConfigurationsService, EventService, ValueService } from '@sunbird-cb/utils-v2'
 // import { LeftMenuService } from "@sunbird-cb/collection/lib/left-menu/left-menu.service"
 import { map } from 'rxjs/operators'
-import { NsWidgetResolver } from '@sunbird-cb/resolver'
+import { NsWidgetResolver } from '@sunbird-cb/resolver-v2'
 /* tslint:disable */
 import * as _ from 'lodash'
 import { ILeftMenu, LeftMenuService } from '@sunbird-cb/collection'

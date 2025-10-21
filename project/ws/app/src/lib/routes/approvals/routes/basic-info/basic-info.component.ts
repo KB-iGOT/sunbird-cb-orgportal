@@ -3,7 +3,7 @@ import { ActivatedRoute, Router, NavigationEnd, Event } from '@angular/router'
 /* tslint:disable */
 import * as _ from 'lodash'
 /* tslint:enable */
-// import { ConfigurationsService } from '@sunbird-cb/utils'
+// import { ConfigurationsService } from '@sunbird-cb/utils-v2'
 
 @Component({
   selector: 'ws-app-basic-info',

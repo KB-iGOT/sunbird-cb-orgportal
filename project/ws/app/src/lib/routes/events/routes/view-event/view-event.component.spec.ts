@@ -1,5 +1,6 @@
-import { ViewEventComponent } from './view-event.component'
+
 import { NavigationEnd } from '@angular/router'
+import { ViewEventComponent } from './view-event.component'
 import { ElementRef } from '@angular/core'
 import { of, Subject } from 'rxjs'
 

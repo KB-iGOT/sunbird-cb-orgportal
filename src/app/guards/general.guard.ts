@@ -4,7 +4,7 @@ import {
   // RouterStateSnapshot,
   UrlTree
 } from '@angular/router'
-import { ConfigurationsService, AuthKeycloakService } from '@sunbird-cb/utils'
+import { ConfigurationsService, AuthKeycloakService } from '@sunbird-cb/utils-v2'
 // tslint:disable-next-line
 import * as _ from 'lodash'
 @Injectable({

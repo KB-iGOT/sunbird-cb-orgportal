@@ -2,7 +2,7 @@ import { NgModule } from '@angular/core'
 import { CommonModule } from '@angular/common'
 import { OnboardingComponent } from './onboarding.component'
 import { ConfigResolveService } from '../../resolvers/config-resolve.service'
-import { PageResolve } from '@sunbird-cb/utils'
+import { PageResolve } from '@sunbird-cb/utils-v2'
 import { RouterModule, Routes } from '@angular/router'
 import { MatCardModule } from '@angular/material/card'
 import { MatIconModule } from '@angular/material/icon'
@@ -87,7 +87,7 @@ const routes: Routes = [
 ]
 
 @NgModule({
-  declarations: [OnboardingComponent, CustomSelfRegistrationComponent, LoadingPopupComponent],
+  declarations: [OnboardingComponent, LoadingPopupComponent, CustomSelfRegistrationComponent],
   imports: [
     CommonModule,
     RouterModule.forChild(routes),
@@ -104,6 +104,7 @@ const routes: Routes = [
     MatProgressSpinnerModule
 
   ],
-  providers: [MatDialogModule]
+  exports: [LoadingPopupComponent, CustomSelfRegistrationComponent],
+  providers: []
 })
 export class OnboardingModule { }

@@ -1,8 +1,9 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { Subject, BehaviorSubject } from 'rxjs'
-import { SetupLeftMenuComponent } from './left-menu.component'
+
 import { StepService } from '../../services/step.service'
-import { EventService, WsEvents } from '@sunbird-cb/utils'
+import { EventService, WsEvents } from '@sunbird-cb/utils-v2'
+import { SetupLeftMenuComponent } from './left-menu.component'
 import { NSProfileDataV3 } from '../../models/state-profile.models'
 
 // Mock services

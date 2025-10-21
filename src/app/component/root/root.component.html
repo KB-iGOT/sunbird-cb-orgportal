@@ -7,7 +7,7 @@
     isNavBarRequired && (isXSmall$ | async) === false
   " [hidden]="!showNavbar" [mode]="'top'"></ws-app-nav-bar>
 <!-- </ws-widget-sticky-header> -->
-<div class="height-adjust" [ngClass]="{
+<div class="height-adjust container-body-scroll" [ngClass]="{
     'height-on-bottom custom-scroll':
       (isXSmall$ | async) === true && showNavbar,
       'height-adjust-setup' : isSetupPage,
@@ -29,8 +29,10 @@
     </div>
   </div>
 </div>
-<ws-app-footer class="app-footer" [ngClass]="{ 'padding-bottom: 56px': !isSetupPage}" *ngIf="showNavbar">
-</ws-app-footer>
+<ng-container *ngIf="showFooter">
+  <ws-app-footer class="app-footer" [ngClass]="{ 'padding-bottom: 56px': !isSetupPage}" *ngIf="showNavbar">
+  </ws-app-footer>
+</ng-container>
 <ws-app-nav-bar class="bottom-nav-bar" [hidden]="!showNavbar" *ngIf="isNavBarRequired && (isXSmall$ | async) === true"
   [mode]="'bottom'">
 </ws-app-nav-bar>

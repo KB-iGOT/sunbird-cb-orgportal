@@ -160,7 +160,7 @@
         </div>
 
         <mat-paginator *ngIf="dataSource?.filteredData?.length > 0" [pageSize]="pageSize" [length]="this.requestCount"
-          [pageSizeOptions]="[10,20,40]" (page)="onChangePage($event)"></mat-paginator>
+          [pageSizeOptions]="defaultPageSizeOptions" (page)="onChangePage($event)"></mat-paginator>
 
 
       </div>

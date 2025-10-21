@@ -1,6 +1,6 @@
 import { ConsultancyComponent } from './consultancy.component'
 import { OrgProfileService } from '../../services/org-profile.service'
-import { ConfigurationsService } from '@sunbird-cb/utils'
+import { ConfigurationsService } from '@sunbird-cb/utils-v2'
 import { Router } from '@angular/router'
 import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog'
 import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar'
@@ -8,7 +8,7 @@ import * as _ from 'lodash'
 
 // Mock dependencies
 jest.mock('../../services/org-profile.service')
-jest.mock('@sunbird-cb/utils')
+jest.mock('@sunbird-cb/utils-v2')
 jest.mock('@angular/router')
 jest.mock('@angular/material/legacy-dialog')
 jest.mock('@angular/material/legacy-snack-bar')

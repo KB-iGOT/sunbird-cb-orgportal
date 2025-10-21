@@ -2,7 +2,7 @@ import { Injectable, SkipSelf } from '@angular/core'
 import { ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router'
 import { Observable, of } from 'rxjs'
 import { map, catchError } from 'rxjs/operators'
-import { IResolveResponse, ConfigurationsService } from '@sunbird-cb/utils'
+import { IResolveResponse, ConfigurationsService } from '@sunbird-cb/utils-v2'
 import { UsersService } from '../../users/services/users.service'
 // tslint:disable-next-line
 import * as _ from 'lodash'

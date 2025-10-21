@@ -1,6 +1,7 @@
+
+import { NavigationEnd, } from '@angular/router'
 import { HomeComponent } from './home.component'
 import { of, Subject } from 'rxjs'
-import { NavigationEnd } from '@angular/router'
 import moment from 'moment'
 
 // Mock dependencies

@@ -1,8 +1,8 @@
 import { of, throwError } from 'rxjs'
 import { TncAppResolverService } from './tnc-app-resolver.service'
 import { HttpClient } from '@angular/common/http'
-import { ConfigurationsService } from '@sunbird-cb/utils'
 import { NsTnc } from '../models/tnc.model'
+import { ConfigurationsService } from '@sunbird-cb/utils-v2'
 
 describe('TncAppResolverService', () => {
     let service: TncAppResolverService

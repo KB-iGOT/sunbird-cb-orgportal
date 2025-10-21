@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http'
 import { Injectable } from '@angular/core'
-import { ConfigurationsService } from '@sunbird-cb/utils'
+import { ConfigurationsService } from '@sunbird-cb/utils-v2'
 import { Observable, of } from 'rxjs'
 import { catchError, retry, map } from 'rxjs/operators'
 //import { NsContentStripMultiple } from '../content-strip-multiple/content-strip-multiple.model'
@@ -10,6 +10,7 @@ import { NsContentStripMultiple } from '@sunbird-cb/collection'
 
 // TODO: move this in some common place
 const PROTECTED_SLAG_V8 = '/apis/protected/v8'
+const LOGO_UPDATE_V8 = '/apis/proxies/v8/customselfregistration/upload/logo/gcpcontainer'
 
 const API_END_POINTS = {
   CONTENT: `${PROTECTED_SLAG_V8}/content`,
@@ -33,6 +34,8 @@ const API_END_POINTS = {
   REGISTRATION_STATUS: `${PROTECTED_SLAG_V8}/admin/userRegistration/checkUserRegistrationContent`,
   MARK_AS_COMPLETE_META: (contentId: string) => `${PROTECTED_SLAG_V8}/user/progress/${contentId}`,
   ENROLL_BATCH: `/apis/proxies/v8/learner/course/v1/enrol`,
+  UPDATE_URL_LOGO: '/apis/proxies/v8/org/v1/update',
+  ORG_READ: '/apis/proxies/v8/org/v1/read',
 }
 
 @Injectable({
@@ -43,6 +46,27 @@ export class WidgetContentService {
     private http: HttpClient,
     private configSvc: ConfigurationsService
   ) { }
+
+
+  uploadOrgLogo(req: any): Observable<any> {
+    return this.http.post<any>(
+      LOGO_UPDATE_V8, req
+    )
+  }
+  updateUrlLogo(req: any): Observable<any> {
+    const request = {
+      request: req,
+    }
+    return this.http.patch<any>(`${API_END_POINTS.UPDATE_URL_LOGO}`, request)
+  }
+  getOrgReadData(organisationId: string): Observable<any> {
+    const request = {
+      request: {
+        organisationId,
+      },
+    }
+    return this.http.post<any>(API_END_POINTS.ORG_READ, request)
+  }
 
   isResource(primaryCategory: string) {
     if (primaryCategory) {

@@ -1,9 +1,10 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing'
-import { Router, NavigationEnd, ActivatedRoute } from '@angular/router'
 import { ElementRef } from '@angular/core'
 import { Subject } from 'rxjs'
+
+import { Router, ActivatedRoute, NavigationEnd } from '@angular/router'
+import { ConfigurationsService, ValueService } from '@sunbird-cb/utils-v2'
 import { EventsHomeComponent } from './events-home.component'
-import { ConfigurationsService, ValueService } from '@sunbird-cb/utils'
 
 // Mock dependencies
 const mockValueService = {

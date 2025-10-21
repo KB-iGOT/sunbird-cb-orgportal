@@ -1,7 +1,8 @@
+import '@angular/compiler'
+import { Router, ActivatedRoute, NavigationEnd } from '@angular/router'
+import { ConfigurationsService, EventService, ValueService } from '@sunbird-cb/utils-v2'
 import { HomeComponent } from './home.component'
 import { Subject } from 'rxjs'
-import { NavigationEnd, Router, ActivatedRoute } from '@angular/router'
-import { ConfigurationsService, EventService, ValueService } from '@sunbird-cb/utils'
 import { LeftMenuService } from '@sunbird-cb/collection'
 import * as _ from 'lodash'
 

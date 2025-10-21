@@ -1,7 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core'
+
+import { ConfigurationsService } from '@sunbird-cb/utils-v2'
 import { TncRendererComponent } from './tnc-renderer.component'
-import { ConfigurationsService } from '@sunbird-cb/utils'
 import { NsTnc } from '../../models/tnc.model'
 
 // Mock the ConfigurationsService

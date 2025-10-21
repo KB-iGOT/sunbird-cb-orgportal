@@ -3,7 +3,7 @@ import { UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms
 import { debounceTime, switchMap, takeUntil } from 'rxjs/operators'
 import { OrgProfileService } from '../../services/org-profile.service'
 import { Subject } from 'rxjs'
-import { ConfigurationsService } from '@sunbird-cb/utils'
+import { ConfigurationsService } from '@sunbird-cb/utils-v2'
 /* tslint:disable*/
 import * as _ from 'lodash'
 

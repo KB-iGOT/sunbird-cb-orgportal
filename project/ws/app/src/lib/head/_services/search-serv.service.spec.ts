@@ -1,6 +1,6 @@
+import { of } from 'rxjs'
 import { SearchServService } from './search-serv.service'
 import { WsEvents } from '@sunbird-cb/utils'
-import { of } from 'rxjs'
 
 // Mock dependencies
 const mockHttpClient = {

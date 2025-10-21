@@ -25,6 +25,7 @@ export class StandardCardComponent implements OnInit, AfterViewChecked {
   pageSize = 20
   defaultPosterImage: SafeUrl | null = '/assets/instances/eagle/app_logos/default.png'
   defaultThumbnail: SafeUrl | null = 'assets/instances/eagle/app_logos/KarmayogiBharat_Logo.svg'
+  multilingualCourses = 'Multilingual Course'
   constructor(
     private tpdsSvc: TrainingPlanDataSharingService,
     private changeDetectorRef: ChangeDetectorRef
@@ -47,23 +48,33 @@ export class StandardCardComponent implements OnInit, AfterViewChecked {
     this.startIndex = (pe.pageIndex) * pe.pageSize
     this.lastIndex = pe.pageSize
     this.tpdsSvc.handleContentPageChange.next({ pageIndex: this.startIndex, pageSize: pe.pageSize })
-    // this.startIndex = this.pageIndex
   }
 
   selectContentItem(event: any, item: any) {
-    if (event.checked) {
-      // this.selectedContent.push(item);
-      this.tpdsSvc.trainingPlanContentData.data.content.map((sitem: any, index: any) => {
-        if (sitem.identifier === item.identifier) {
-          sitem['selected'] = true
-          this.tpdsSvc.trainingPlanContentData.data.content.splice(index, 1)
-          this.tpdsSvc.trainingPlanContentData.data.content.unshift(sitem)
-        }
-      })
+    if (!this.tpdsSvc.trainingPlanContentData) {
+      this.tpdsSvc.trainingPlanContentData = { data: { content: [] } }
+    }
+    if (!this.tpdsSvc.trainingPlanStepperData['contentList']) {
+      this.tpdsSvc.trainingPlanStepperData['contentList'] = []
+    }
 
-      if (this.tpdsSvc.trainingPlanStepperData['contentList']) {
+    if (event.checked) {
+      const contentItem = this.contentData.find(sitem => sitem.identifier === item.identifier)
+      if (contentItem) {
+        contentItem['selected'] = true
+      }
+
+      const serviceIndex = this.tpdsSvc.trainingPlanContentData.data.content
+        .findIndex((sitem: any) => sitem.identifier === item.identifier)
+
+      if (serviceIndex !== -1) {
+        const sitem = this.tpdsSvc.trainingPlanContentData.data.content[serviceIndex]
+        sitem['selected'] = true
+        this.tpdsSvc.trainingPlanContentData.data.content.splice(serviceIndex, 1)
+        this.tpdsSvc.trainingPlanContentData.data.content.unshift(sitem)
         this.tpdsSvc.trainingPlanStepperData['contentList'].push(item.identifier)
       }
+
     } else {
       // this.selectedContent = this.selectedContent.filter( sitem  => sitem.identifier !== item.identifier)
       this.tpdsSvc.trainingPlanContentData.data.content.map((sitem: any) => {

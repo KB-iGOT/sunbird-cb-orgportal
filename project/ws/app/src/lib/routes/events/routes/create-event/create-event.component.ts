@@ -9,8 +9,8 @@ import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog'
 import { ParticipantsComponent } from '../../components/participants/participants.component'
 import { SuccessComponent } from '../../components/success/success.component'
 import { Router, ActivatedRoute } from '@angular/router'
-import { ConfigurationsService, EventService } from '@sunbird-cb/utils'
-import moment from 'moment'
+import { ConfigurationsService, EventService } from '@sunbird-cb/utils-v2'
+import * as moment from 'moment'
 /* tslint:disable */
 import * as _ from 'lodash'
 import { TelemetryEvents } from '../../../../head/_services/telemetry.event.model'
@@ -418,7 +418,7 @@ export class CreateEventComponent implements OnInit {
     // tslint:disable-next-line:radix
     const totalMinutes = startMinutes + endMinutes + parseInt(this.createEventForm.controls['eventDurationMinutes'].value)
     // tslint:disable-next-line:prefer-template
-    const hours = (Math.floor(totalMinutes / 60) < 10) ? '0' + Math.floor(totalMinutes / 60) : Math.floor(totalMinutes / 60)
+    const hours: any = (Math.floor(totalMinutes / 60) < 10) ? '0' + Math.floor(totalMinutes / 60) : Math.floor(totalMinutes / 60)
     const minutes = totalMinutes % 60
     let finalTime
     let newendDate

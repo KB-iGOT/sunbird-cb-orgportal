@@ -84,7 +84,7 @@ export class CreateRequestFormComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.compentencyKey = this.initService.configSvc.competency[environment.compentencyVersionKey]
+    this.compentencyKey = this.initService.configSvc.compentency[environment.compentencyVersionKey]
 
     this.initFromGroup()
     this.getRequestTypeList()

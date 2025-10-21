@@ -5,10 +5,11 @@ import 'videojs-hls-quality-selector'
 import 'videojs-vr'
 
 import { Subscription, interval, fromEvent } from 'rxjs'
-import { WsEvents } from '@sunbird-cb/utils'
-import { ROOT_WIDGET_CONFIG, IWidgetsPlayerMediaData } from '@sunbird-cb/collection'
 // import { IWidgetsPlayerMediaData } from '../_models/player-media.model'
+import { WsEvents } from '@sunbird-cb/utils-v2'
+
 import { NsContent } from './widget-content.model'
+import { IWidgetsPlayerMediaData, ROOT_WIDGET_CONFIG } from '@sunbird-cb/collection'
 
 export const videojsEventNames = {
   disposing: 'disposing',
@@ -70,7 +71,8 @@ function eventDispatchHelper(
   playerState: string,
   mimeT: string,
 ) {
-  if (state === WsEvents.EnumTelemetrySubType.Loaded || WsEvents.EnumTelemetrySubType.Unloaded) {
+  //|| WsEvents.EnumTelemetrySubType.Unloaded
+  if (state === WsEvents.EnumTelemetrySubType.Loaded) {
     const event = {
       eventType: WsEvents.WsEventType.Telemetry,
       eventLogLevel: WsEvents.WsEventLogLevel.Info,

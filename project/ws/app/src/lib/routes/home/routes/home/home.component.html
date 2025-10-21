@@ -2,7 +2,7 @@
 </ws-widget-breadcrumbs-org> -->
 
 <!-- <div *ngIf="currentRoute === 'home'" class="container-balanced-banner margin-top-s">
-  <ng-container [wsResolverWidget]="banner"></ng-container>
+  <ng-container [sbUiResolverWidget]="banner"></ng-container>
 </div> -->
 <ws-survey-form></ws-survey-form>
 
@@ -10,7 +10,7 @@
   [ngClass]="{'custom-odcs':containerCustomCls}">
   <mat-sidenav [mode]="mode$ | async" [(opened)]="sideNavBarOpened" class="left-nav border-0">
     <div class="container2" *ngIf="widgetData">
-      <!-- <ng-container [wsResolverWidget]="widgetData"></ng-container> -->
+      <!-- <ng-container [sbUiResolverWidget]="widgetData"></ng-container> -->
       <ws-widget-left-menu [myRoles]="myRoles" [widgetData]="widgetData"></ws-widget-left-menu>
     </div>
   </mat-sidenav>

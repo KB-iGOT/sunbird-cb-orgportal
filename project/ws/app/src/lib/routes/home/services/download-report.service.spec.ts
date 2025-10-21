@@ -1,6 +1,7 @@
-import { DownloadReportService } from './download-report.service'
+
 import { HttpClient, HttpResponse, HttpErrorResponse } from '@angular/common/http'
-import { ConfigurationsService } from '@sunbird-cb/utils'
+import { ConfigurationsService } from '@sunbird-cb/utils-v2'
+import { DownloadReportService } from './download-report.service'
 import { of, throwError } from 'rxjs'
 
 // Mock HttpClient

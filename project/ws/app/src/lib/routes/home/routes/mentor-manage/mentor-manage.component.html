@@ -55,14 +55,14 @@
             mat-button (click)="filter('allusers'); tabTelemetry('allusers', 0)" role="button">All users
             ({{activeUsersDataCount}})</a> -->
 
-          <a routerLink="/app/home/mentor-manage/verified" routerLinkActive="router-link-active" class="filter-option"
+          <a class="filter-option"
             [ngClass]="{'ws-mat-accent-border-active' : currentFilter === 'verified','ws-mat-accent-border font-medium':currentFilter !== 'verified'}"
             mat-button (click)="filter('verified'); tabTelemetry('verified', 0)" role="button"
             (keydown)="$event.preventDefault()">All Verified <span
               *ngIf="verifiedUsersDataCount === 1 || verifiedUsersDataCount === 0">User</span> <span
               *ngIf="verifiedUsersDataCount > 1">Users</span>
             ({{verifiedUsersDataCount}})</a>
-          <a routerLink="/app/home/mentor-manage/mentor" routerLinkActive="router-link-active" class="filter-option"
+          <a class="filter-option"
             [ngClass]="{'ws-mat-accent-border-active' : currentFilter === 'mentor','ws-mat-accent-border font-medium':currentFilter !== 'verified'}"
             mat-button (click)="filter('mentor'); tabTelemetry('mentor', 0)" role="button"
             (keydown)="$event.preventDefault()">Assigned <span

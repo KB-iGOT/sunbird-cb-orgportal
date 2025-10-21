@@ -1,4 +1,4 @@
-import { ConfigurationsService } from '@sunbird-cb/utils'
+import { ConfigurationsService } from '@sunbird-cb/utils-v2'
 import { DomSanitizer } from '@angular/platform-browser'
 import { NavigationEnd, Router } from '@angular/router'
 import { HomeComponent } from './home.component'

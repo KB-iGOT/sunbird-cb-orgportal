@@ -38,7 +38,7 @@ export class CompetencySummaryComponent implements OnInit, OnChanges {
   constructor(private initService: InitService) { }
 
   ngOnInit() {
-    this.compentencyKey = this.initService.configSvc.competency[environment.compentencyVersionKey]
+    this.compentencyKey = this.initService.configSvc.compentency[environment.compentencyVersionKey]
   }
 
   ngOnChanges() {

@@ -1,6 +1,6 @@
 
 import { HttpClient } from '@angular/common/http'
-import { ConfigurationsService } from '@sunbird-cb/utils'
+import { ConfigurationsService } from '@sunbird-cb/utils-v2'
 import { ApprovalsService } from './approvals.service'
 
 describe('ApprovalsService', () => {

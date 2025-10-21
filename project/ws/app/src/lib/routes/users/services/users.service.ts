@@ -14,7 +14,7 @@ const API_END_POINTS = {
   PROFILE_REGISTRY_V1: '/apis/proxies/v8/api/user/v2/read/',
   PROFILE_REGISTRY_V2: '/apis/proxies/v8/api/user/v2/read',
   CREATE_PROFILE_REGISTRY: '/apis/protected/v8/user/profileRegistry/createUserRegistryV2',
-  ADD_USER_TO_DEPARTMENT: '/apis/proxies/v8/user/private/v1/assign/role',
+  ADD_USER_ROLE: '/apis/proxies/v8/user/private/v1/assign/role',
   WF_HISTORY_BY_APPID: 'apis/protected/v8/workflowhandler/historyByApplicationId/',
   SEARCH_USER: 'apis/protected/v8/user/autocomplete/department',
   USER_BDD: '/apis/protected/v8/portal/mdo/deptAction/userrole',
@@ -79,8 +79,8 @@ export class UsersService {
   }
 
   /** new API add roles */
-  addUserToDepartment(req: any): Observable<any> {
-    return this.http.post<any>(`${API_END_POINTS.ADD_USER_TO_DEPARTMENT}`, req)
+  addUserToRole(req: any): Observable<any> {
+    return this.http.post<any>(`${API_END_POINTS.ADD_USER_ROLE}`, req)
   }
 
   // addUserRoleToDepartment(req: any): Observable<any> {
@@ -222,6 +222,11 @@ export class UsersService {
       map(
         (data: any) => ({ role, count: _.get(data, 'result.response.count') })))
   }
+
+  getRolesCountsApi(reqBody: any): Observable<any> {
+    return this.http.post<any>(`${API_END_POINTS.GET_ALL_USERS}`, reqBody)
+  }
+
   getTotalRoleUsers(depId: string, role: string): Observable<any> {
     const reqBody = {
       request: {

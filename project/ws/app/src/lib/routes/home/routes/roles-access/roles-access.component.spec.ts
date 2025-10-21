@@ -1,10 +1,10 @@
 import { RolesAccessComponent } from './roles-access.component'
 import { Router, ActivatedRoute } from '@angular/router'
+import { EventService } from '@sunbird-cb/utils-v2'
 import { RolesService } from '../../../users/services/roles.service'
 import { UsersService } from '../../../users/services/users.service'
 import { TelemetryEvents } from '../../../../head/_services/telemetry.event.model'
 import { of } from 'rxjs'
-import { EventService } from '@sunbird-cb/utils/lib/services/event.service'
 
 // Mock lodash
 jest.mock('lodash', () => ({

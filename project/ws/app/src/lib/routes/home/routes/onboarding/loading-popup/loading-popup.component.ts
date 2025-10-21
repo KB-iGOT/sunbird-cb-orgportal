@@ -11,6 +11,7 @@ export class LoadingPopupComponent implements OnInit {
   constructor(public dialogRef: MatDialogRef<LoadingPopupComponent>, @Inject(MAT_DIALOG_DATA) public data: any) { }
 
   ngOnInit(): void {
+
   }
 
 

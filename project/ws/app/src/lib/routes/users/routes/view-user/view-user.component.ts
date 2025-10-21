@@ -7,7 +7,7 @@ import { MatLegacyChipInputEvent as MatChipInputEvent } from '@angular/material/
 import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar'
 // tslint:disable-next-line
 import * as _ from 'lodash'
-import { EventService } from '@sunbird-cb/utils'
+import { EventService } from '@sunbird-cb/utils-v2'
 import { Subscription } from 'rxjs'
 import { TelemetryEvents } from '../../../../head/_services/telemetry.event.model'
 import { COMMA, ENTER } from '@angular/cdk/keycodes'
@@ -488,7 +488,7 @@ export class ViewUserComponent implements OnInit, AfterViewInit {
           },
         }
 
-        this.usersSvc.addUserToDepartment(dreq).subscribe(dres => {
+        this.usersSvc.addUserToRole(dreq).subscribe(dres => {
           if (dres) {
             this.updateUserRoleForm.reset({ roles: '' })
             this.openSnackbar('User role updated Successfully')

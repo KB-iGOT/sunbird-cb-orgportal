@@ -2,7 +2,7 @@ import { Component, OnInit, SimpleChanges } from '@angular/core'
 import { MatLegacyDialog as MatDialog, MatLegacyDialogConfig as MatDialogConfig } from '@angular/material/legacy-dialog'
 import { MatLegacyPaginator as MatPaginator } from '@angular/material/legacy-paginator'
 import { Router, ActivatedRoute } from '@angular/router'
-import { EventService } from '@sunbird-cb/utils'
+import { EventService } from '@sunbird-cb/utils-v2'
 /* tslint:disable */
 import * as _ from 'lodash'
 import { PublishPopupComponent } from '../../components/publish-popup/publish-popup.component'

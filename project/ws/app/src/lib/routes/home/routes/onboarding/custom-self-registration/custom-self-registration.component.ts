@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core'
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core'
 import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog'
 import { ActivatedRoute, Router } from '@angular/router'
 import { ICustomRegistrationQRCodeResponse, IOnBoardingConfig, IRegisteredLinksList } from '../interface/onboarding.interface'
@@ -9,7 +9,7 @@ import { LoadingPopupComponent } from '../loading-popup/loading-popup.component'
 import { OnboardingService } from '../../../services/onboarding.service'
 import { DesignationsService } from '../../designation/services/designations.service'
 import * as _ from 'lodash'
-import { EventService } from '@sunbird-cb/utils'
+import { EventService } from '@sunbird-cb/utils-v2'
 
 @Component({
   selector: 'ws-app-custom-self-registration',
@@ -17,6 +17,10 @@ import { EventService } from '@sunbird-cb/utils'
   styleUrls: ['./custom-self-registration.component.scss'],
 })
 export class CustomSelfRegistrationComponent implements OnInit {
+
+  @Input() selectedOrgData: any
+  @Output() navigatToDesignations = new EventEmitter<boolean>()
+
   configSvc: any
   onboardingConfig: IOnBoardingConfig | undefined
   selfRegistrationForm!: FormGroup
@@ -44,13 +48,14 @@ export class CustomSelfRegistrationComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.configSvc = this.activatedRoute?.parent && this.activatedRoute?.parent?.snapshot?.data?.configService
-    this.onboardingConfig = this.activatedRoute?.parent && this.activatedRoute?.parent?.snapshot?.data?.pageData?.data
-    this.rootOrdId = this.configSvc?.userProfile?.rootOrgId
-    this.framewordId = this.configSvc?.orgReadData?.frameworkid
+    this.configSvc = (this.selectedOrgData) ? _.get(this.activatedRoute, 'snapshot.data.configService') || {} :
+      _.get(this.activatedRoute, 'parent.snapshot.data.configService') || {}
+    this.onboardingConfig = this.activatedRoute.parent && this.activatedRoute.parent.snapshot.data.pageData.data
+    this.rootOrdId = (this.selectedOrgData) ? this.selectedOrgData.rootOrgId : this.configSvc.userProfile.rootOrgId
+    this.framewordId = (this.selectedOrgData) ? this.selectedOrgData.frameworkid : this.configSvc.orgReadData.frameworkid
     this.initializeForm()
 
-    if (this.framewordId && this.configSvc.orgReadData) {
+    if (this.framewordId && (this.configSvc.orgReadData || this.selectedOrgData)) {
       this.getFrameworkInfo(this.framewordId)
     }
   }
@@ -69,7 +74,7 @@ export class CustomSelfRegistrationComponent implements OnInit {
             qrRegistrationLogoPath: this.getQRCodePath(this.latestRegisteredData),
           }
           this.numberOfUsersOnboarded = this.latestRegisteredData?.numberOfUsersOnboarded
-        } else {  
+        } else {
           this.customRegistrationLinks = undefined
         }
         this.isLoading = false
@@ -141,11 +146,11 @@ export class CustomSelfRegistrationComponent implements OnInit {
     const dialogRef = this.dialog.open(LoadingPopupComponent, {
       autoFocus: false,
       width: '365px',
-      height: '201px',
       maxWidth: '80vw',
       maxHeight: '90vh',
       disableClose: true,
-      data: { type: 'generate-link-loader' }
+      data: { type: 'generate-link-loader' },
+      panelClass: 'loading-popup-dialog-container',
     })
 
     const payload = {
@@ -234,21 +239,23 @@ export class CustomSelfRegistrationComponent implements OnInit {
       this.dialogRef = this.dialog.open(LoadingPopupComponent, {
         autoFocus: false,
         width: '504px',
-        height: '275px',
         maxWidth: '80vw',
         maxHeight: '90vh',
         data: { type: 'import-igot-master-review' },
-        disableClose: true
+        disableClose: true,
+        panelClass: 'loading-popup-dialog-container',
+
       })
     } else {
       this.dialogRef = this.dialog.open(LoadingPopupComponent, {
         autoFocus: false,
         width: '504px',
-        height: '275px',
         maxWidth: '80vw',
         maxHeight: '90vh',
         data: { type: 'import-igot-master-create' },
-        disableClose: true
+        disableClose: true,
+        panelClass: 'loading-popup-dialog-container',
+
       })
     }
     this.subscribeToAfterClosedModal()
@@ -258,12 +265,20 @@ export class CustomSelfRegistrationComponent implements OnInit {
   subscribeToAfterClosedModal() {
     this.dialogRef.afterClosed().subscribe((result: any) => {
       if (result && result.hasOwnProperty('reviewImporting') && result?.reviewImporting) {
-        this.onboardingService.setFlagToCheckRoute(true)
-        this.navigateTo('/app/home/org-designations')
+        if (!this.selectedOrgData) {
+          this.onboardingService.setFlagToCheckRoute(true)
+          this.navigateTo('/app/home/org-designations')
+        } else {
+          this.navigatToDesignations.emit(true)
+        }
       }
       else if (result && result.reviewImporting || result?.startImporting) {
-        this.onboardingService.setFlagToCheckRoute(true)
-        this.navigateTo('/app/home/org-designations')
+        if (!this.selectedOrgData) {
+          this.onboardingService.setFlagToCheckRoute(true)
+          this.navigateTo('/app/home/org-designations')
+        } else {
+          this.navigatToDesignations.emit(true)
+        }
       }
       else return
 
@@ -286,24 +301,24 @@ export class CustomSelfRegistrationComponent implements OnInit {
     this.dialogRef = this.dialog.open(LoadingPopupComponent, {
       autoFocus: false,
       width: '504px',
-      height: '275px',
       maxWidth: '80vw',
       maxHeight: '90vh',
       data: { type: 'import-igot-master-review' },
       disableClose: true,
+      panelClass: 'loading-popup-dialog-container',
     })
 
     this.dialogRef.afterClosed().subscribe((result: any) => {
-      if (result && result.hasOwnProperty('reviewImporting') && result?.reviewImporting) {
-        this.onboardingService.setFlagToCheckRoute(true)
-        this.navigateTo('/app/home/org-designations')
+      if (result?.reviewImporting) {
+        if (!this.selectedOrgData) {
+          this.onboardingService.setFlagToCheckRoute(true)
+          this.navigateTo('/app/home/org-designations')
+        } else {
+          this.navigatToDesignations.emit(true)
+        }
+      } else {
+        this.generateRegistrationLink()
       }
-      else if (result && result.reviewImporting || result?.startImporting) {
-        this.onboardingService.setFlagToCheckRoute(true)
-        this.navigateTo('/app/home/org-designations')
-      }
-      else this.generateRegistrationLink()
-
     })
   }
 

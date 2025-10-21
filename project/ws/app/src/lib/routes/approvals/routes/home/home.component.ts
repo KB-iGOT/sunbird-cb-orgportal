@@ -1,11 +1,11 @@
 import { AfterViewInit, Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core'
 import { ActivatedRoute, Router, Event, NavigationEnd } from '@angular/router'
 import moment from 'moment'
-// import { ConfigurationsService } from '@sunbird-cb/utils'
+// import { ConfigurationsService } from '@sunbird-cb/utils-v2'
 // import { NeedApprovalsService } from '../../services/need-approvals.service'
 // tslint:disable
 import * as _ from 'lodash'
-import { EventService } from '@sunbird-cb/utils'
+import { EventService } from '@sunbird-cb/utils-v2'
 import { TelemetryEvents } from '../../../../head/_services/telemetry.event.model'
 // tslint:enable
 @Component({

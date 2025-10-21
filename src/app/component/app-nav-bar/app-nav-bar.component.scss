@@ -140,17 +140,15 @@
 
 .my-search {
   display: flex;
-  margin-left: 0;
-  /* margin-right: 0; */
+  margin-left: 16px;
   text-align: center;
-  // <<<<<<< HEAD flex: 3;
-  // max-width: 500px;
-  flex: 10;
-  max-width: 690px;
-  margin-right: 4.88rem;
-  // >>>>>>>hubs
+  flex: 4;
+    max-width: 650px;
 }
 
+.search-container {
+  min-width: 650px !important;
+}
 .mobile {
   @include breakpoint-xs {
     padding: $size-xs;

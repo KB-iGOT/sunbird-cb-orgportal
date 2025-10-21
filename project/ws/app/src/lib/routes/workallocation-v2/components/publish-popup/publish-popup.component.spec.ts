@@ -1,4 +1,5 @@
 import { of, throwError } from 'rxjs'
+
 import { PublishPopupComponent } from './publish-popup.component'
 
 // Mock dependencies

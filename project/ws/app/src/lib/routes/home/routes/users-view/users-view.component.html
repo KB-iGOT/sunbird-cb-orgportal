@@ -88,8 +88,8 @@
         </div>
         <ws-widget-user-card [userId]="currentUser" [currentFilter]="currentFilter" [usersData]="activeUsersData"
           [totalRecords]="activeUsersDataCountInner" [tabChangeIndex]="pageIndex" [isApprovals]="false"
-          (paginationData)="onPaginateChange($event)" (updateList)="getAllUsers('')"
-          [isUserLimitCrossed]="isMoreThanLimit"></ws-widget-user-card>
+          [resetPagination]="resetPagination" [sortByAsc]="false" (paginationData)="onPaginateChange($event)"
+          (updateList)="getAllUsers('')" [isUserLimitCrossed]="isMoreThanLimit"></ws-widget-user-card>
       </ng-container>
 
       <ng-container *ngIf="currentFilter === 'verified'">
@@ -99,8 +99,8 @@
         </div>
 
         <ws-widget-user-card [userId]="currentUser" [currentFilter]="currentFilter" [usersData]="verifiedUsersData"
-          [totalRecords]="verifiedUsersDataCountInner" [tabChangeIndex]="pageIndex"
-          (paginationData)="onPaginateChange($event)" (updateList)="getVUsers('')"
+          [totalRecords]="verifiedUsersDataCountInner" [tabChangeIndex]="pageIndex" [sortByAsc]="false"
+          [resetPagination]="resetPagination" (paginationData)="onPaginateChange($event)" (updateList)="getVUsers('')"
           [isUserLimitCrossed]="isMoreThanLimit"></ws-widget-user-card>
       </ng-container>
 
@@ -110,8 +110,8 @@
             [currentFilter]="currentFilter" [filterFacetsData]="filterFacets"></ws-app-searchuser>
         </div>
         <ws-widget-user-card [userId]="currentUser" [currentFilter]="currentFilter" [usersData]="nonverifiedUsersData"
-          [totalRecords]="nonverifiedUsersDataCountInner" [tabChangeIndex]="pageIndex"
-          (paginationData)="onPaginateChange($event)" (updateList)="getNVUsers('')"
+          [totalRecords]="nonverifiedUsersDataCountInner" [tabChangeIndex]="pageIndex" [sortByAsc]="false"
+          [resetPagination]="resetPagination" (paginationData)="onPaginateChange($event)" (updateList)="getNVUsers('')"
           [pendingApprovals]="pendingApprovals" [isUserLimitCrossed]="isMoreThanLimit"></ws-widget-user-card>
       </ng-container>
 
@@ -121,8 +121,8 @@
             [currentFilter]="currentFilter" [filterFacetsData]="filterFacets"></ws-app-searchuser>
         </div>
         <ws-widget-user-card [userId]="currentUser" [currentFilter]="currentFilter" [usersData]="notmyuserUsersData"
-          [totalRecords]="notmyuserUsersDataCountInner" [tabChangeIndex]="pageIndex"
-          (paginationData)="onPaginateChange($event)" (updateList)="getNMUsers('')"
+          [totalRecords]="notmyuserUsersDataCountInner" [tabChangeIndex]="pageIndex" [sortByAsc]="false"
+          [resetPagination]="resetPagination" (paginationData)="onPaginateChange($event)" (updateList)="getNMUsers('')"
           [isUserLimitCrossed]="isMoreThanLimit"></ws-widget-user-card>
       </ng-container>
     </mat-card-content>
