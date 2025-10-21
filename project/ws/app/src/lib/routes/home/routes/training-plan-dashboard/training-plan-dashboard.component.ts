@@ -243,7 +243,7 @@ export class TrainingPlanDashboardComponent implements OnInit, AfterViewInit {
           break
         case 'editContent':
         case 'deleteContent':
-          hasAccess = _v.isMdoLeader ? true : isOwner
+          hasAccess = _v.isMdoLeader && element?.status !== 'RETIRE' ? true : isOwner && element?.status !== 'RETIRE' ? true : false
           break
         case 'publishContent':
           hasAccess = isDraft ? _v.isMdoLeader ? true : isOwner : false
