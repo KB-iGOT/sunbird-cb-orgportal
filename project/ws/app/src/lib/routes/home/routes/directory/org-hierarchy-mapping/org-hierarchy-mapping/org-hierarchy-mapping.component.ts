@@ -455,9 +455,9 @@ export class OrgHierarchyMappingComponent implements OnInit, AfterViewInit {
       },
       error: (err: any) => {
         console.error('Error in API chain:', err)
-        if (err?.error?.params?.errMsg) {
-          this.snackbar.open(`${err.error.params.errMsg}`)
-        }
+        // if (err?.error?.params?.errmsg) {
+        //   this.snackbar.open(`${err.error.params.errmsg}`)
+        // }
       }
     })
   }

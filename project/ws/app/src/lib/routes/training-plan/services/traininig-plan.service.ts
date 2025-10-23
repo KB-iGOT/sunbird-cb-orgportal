@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core'
 import { HttpClient, HttpHeaders } from '@angular/common/http'
 import { Observable } from 'rxjs'
-import { map, retry } from 'rxjs/operators'
+import { map } from 'rxjs/operators'
 // tslint:disable
 import _ from 'lodash'
 // tslint:enable
@@ -61,7 +61,7 @@ export class TrainingPlanService {
   }
 
   getAllContent(filter: object): Observable<any> {
-    return this.http.post<any>(`${API_END_POINTS.GET_ALL_CONTENT}`, filter).pipe(map(res => _.get(res, 'result')), retry(1))
+    return this.http.post<any>(`${API_END_POINTS.GET_ALL_CONTENT}`, filter).pipe(map(res => _.get(res, 'result')))
   }
 
   getCustomUsers(filter: object): Observable<any> {
