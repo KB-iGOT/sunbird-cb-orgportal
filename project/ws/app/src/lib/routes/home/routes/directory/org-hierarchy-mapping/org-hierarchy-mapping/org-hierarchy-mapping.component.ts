@@ -373,12 +373,14 @@ export class OrgHierarchyMappingComponent implements OnInit, AfterViewInit {
 
   checkIfMdoL0() {
     const userRoles = this.orgHieService.getUserRoles()
-    return (this.orgReadData?.sbOrgType?.toLowerCase() === 'ministry' && userRoles.has('mdo_leader'))
+    return ((this.parentOrgReadData?.sbOrgType?.toLowerCase() === 'ministry' ||
+      this.parentOrgReadData?.sbOrgType?.toLowerCase() === 'state') && userRoles.has('mdo_leader'))
   }
 
   checkIfMdoL0Admin() {
     const userRoles = this.orgHieService.getUserRoles()
-    return (this.orgReadData?.sbOrgType?.toLowerCase() === 'ministry' && userRoles.has('mdo_admin'))
+    return ((this.parentOrgReadData?.sbOrgType?.toLowerCase() === 'ministry' ||
+      this.parentOrgReadData?.sbOrgType?.toLowerCase() === 'state') && userRoles.has('mdo_admin'))
   }
 
   checkIfParentIsMdoL0() {
@@ -397,8 +399,7 @@ export class OrgHierarchyMappingComponent implements OnInit, AfterViewInit {
       switchMap((res: any) => {
         if (res && res.params && res.params.status.toLowerCase() === 'success') {
           this.orgReadData = res.result?.response || null
-          if (res.result?.response && (res.result?.response?.ministryOrStateType?.toLowerCase() === 'ministry' ||
-            res.result?.response?.ministryOrStateType?.toLowerCase() === 'state')) {
+          if (res.result?.response && res.result?.response?.ministryOrStateType?.toLowerCase() === 'ministry') {
             const reqBody = {
               request: {
                 organisationId: res.result?.response?.ministryOrStateId || '',
@@ -456,9 +457,9 @@ export class OrgHierarchyMappingComponent implements OnInit, AfterViewInit {
       },
       error: (err: any) => {
         console.error('Error in API chain:', err)
-        // if (err?.error?.params?.errmsg) {
-        //   this.snackbar.open(`${err.error.params.errmsg}`)
-        // }
+        if (err?.error?.params?.errMsg) {
+          this.snackbar.open(`${err.error.params.errMsg}`)
+        }
       }
     })
   }
