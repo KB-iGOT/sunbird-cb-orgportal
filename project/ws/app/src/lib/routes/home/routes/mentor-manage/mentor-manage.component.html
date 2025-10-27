@@ -99,8 +99,8 @@
 
         <ws-widget-user-card [userId]="currentUser" [currentFilter]="currentFilter" [usersData]="verifiedUsersData"
           [totalRecords]="verifiedUsersDataCount" [tabChangeIndex]="pageIndex" [forMentor]="true"
-          (paginationData)="onPaginateChange($event)" (updateList)="getAllVerifiedUsers('')"
-          [activeTab]="currentFilter"></ws-widget-user-card>
+          (paginationData)="onPaginateChange($event)" (updateList)="getAllVerifiedUsers('')" [activeTab]="currentFilter"
+          [resetPagination]="resetPagination"></ws-widget-user-card>
       </ng-container>
       <ng-container *ngIf="currentFilter === 'mentor'">
         <div class="searchfilter" *ngIf="mentorUsersData">
@@ -110,8 +110,8 @@
 
         <ws-widget-user-card [userId]="currentUser" [currentFilter]="currentFilter" [usersData]="mentorUsersData"
           [totalRecords]="mentorUsersDataCount" [tabChangeIndex]="pageIndex" [forMentor]="true"
-          (paginationData)="onPaginateChange($event)" (updateList)="getMentorUsers('')"
-          [activeTab]="currentFilter"></ws-widget-user-card>
+          (paginationData)="onPaginateChange($event)" (updateList)="getMentorUsers('')" [activeTab]="currentFilter"
+          [resetPagination]="resetPagination"></ws-widget-user-card>
       </ng-container>
       <!-- <ng-container *ngIf="currentFilter === 'non-mentor'">
         <div class="searchfilter" *ngIf="verifiedUsersData">

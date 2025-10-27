@@ -169,7 +169,6 @@ export class BreadcrumbComponent implements OnInit {
     // let hasMultipleCriteriaValues = false
     // let hasRootOrgId = false
     let userRootOrgId = this.configSvc?.userProfile?.rootOrgId || this.configSvc?.unMappedUser?.rootOrgId || ''
-    let orgIdList = [userRootOrgId]
     let isCCA = this.configSvc?.orgReadData?.isCCA || false
     for (const group of userGroups) {
       const criteriaList = group.userGroupCriteriaList || []
@@ -182,32 +181,6 @@ export class BreadcrumbComponent implements OnInit {
           criteriaKey: "rootOrgId",
           criteriaValue: [userRootOrgId]
         })
-        // hasRootOrgId = true
-      } else {
-        // If rootOrgId criteria exists, check if user's orgId is present
-        if (rootOrgIdCriteria.criteriaValue && rootOrgIdCriteria.criteriaValue.length > 0) {
-
-          if (!rootOrgIdCriteria.criteriaValue.includes(userRootOrgId)) {
-            // Add user's orgId if not present
-            rootOrgIdCriteria.criteriaValue.push(userRootOrgId)
-          }
-          rootOrgIdCriteria.criteriaValue.forEach((item: any) => {
-            if (!orgIdList.includes(item)) {
-              orgIdList.push(item)
-            }
-          })
-        } else {
-          // If criteriaValue is empty or undefined, initialize it with user's orgId
-          rootOrgIdCriteria.criteriaValue = [userRootOrgId]
-        }
-        // hasRootOrgId = true
-      }
-
-      // Check for multiple criteria values
-      for (const criteria of criteriaList) {
-        if (criteria.criteriaValue && criteria.criteriaValue.length > 1) {
-          // hasMultipleCriteriaValues = true
-        }
       }
 
       // Check for multiple criteria values
@@ -227,7 +200,7 @@ export class BreadcrumbComponent implements OnInit {
     if (type === 'create') {
       return {
         request: {
-          orgIdList: orgIdList,
+          orgIdList: [userRootOrgId],
           comment: trainingPlanStepperData?.comment ?? 'cbPlanId1 is created',
           contentList: trainingPlanStepperData?.contentList || [],
           contentType: trainingPlanStepperData?.contentType || "Course",

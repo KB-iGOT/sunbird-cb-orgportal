@@ -29,7 +29,7 @@ export class PreviewPlanComponent implements OnInit {
       this.navUrl = {
         url: ['app', 'home', 'training-plan-dashboard'],
         queryParams: {
-          type: contentData.status.toLowerCase(),
+          type: contentData.status,
           tabSelected: contentData.assignmentType,
         },
       }
