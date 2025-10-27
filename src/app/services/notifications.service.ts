@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core'
 import { HttpClient } from '@angular/common/http'
 import { Observable, Subject } from 'rxjs'
 import * as _ from 'lodash'
-import { map, retry } from 'rxjs/operators'
+import { map } from 'rxjs/operators'
 import { Router } from '@angular/router'
 import { ConfigurationsService } from '@sunbird-cb/utils-v2'
 const API_END_POINTS = {
@@ -41,8 +41,7 @@ export class NotificationsService {
     return this.http.get<any>(`${API_END_POINTS.CONTENT_READ(contentId)}`).pipe(
       map((data: any) => {
         return data.result.content
-      }),
-      retry(1))
+      }))
   }
 
   searchWorkflowSearch(req: any): Observable<any> {
@@ -53,8 +52,7 @@ export class NotificationsService {
     return this.http.get<any>(`${API_END_POINTS.CONNECTION_REQUEST(0, 100)}`).pipe(
       map((data: any) => {
         return data.result.data
-      }),
-      retry(1))
+      }))
   }
 
   resetNotificationsCount(): Observable<any> {
