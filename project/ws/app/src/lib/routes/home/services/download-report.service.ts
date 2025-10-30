@@ -15,7 +15,8 @@ const API_END_POINTS = {
   GET_ORGS_OF_DEPT: '/apis/public/v8/org/v2/list',
   DOWNLOAD_OPS_REPORTS: '/apis/proxies/v8/operationalreports/v2/download',
   GET_DEPARTMENT_TYPE: 'apis/proxies/v8/data/v1/system/settings/get/orgTypeConfig',
-  SEARCH_ORG_BY_HIERARCHY: '/apis/proxies/v8/org/level/hierarchy'
+  SEARCH_ORG_BY_HIERARCHY: '/apis/proxies/v8/org/level/hierarchy',
+  FORM_READ: '/apis/v1/form/read'
 }
 @Injectable({
   providedIn: 'root',
@@ -102,6 +103,27 @@ export class DownloadReportService {
       },
     }
     return this.http.post(API_END_POINTS.SEARCH_ORG_BY_HIERARCHY, req)
+  }
+
+  getFormReadForOrgSearch(payload: any) {
+    return this.formReadData(payload).pipe(
+      map((rData: any) => {
+        const finalData = rData && rData.result.form.data
+        return (finalData)
+      }),
+      catchError((_error: any) => {
+        const baseUrl = this.configSvc.sitePath
+        return this.http.get(`${baseUrl}/org-hierarchy.json`).pipe(
+          map(data => (data)),
+          catchError(err => of({ data: null, error: err })),
+        )
+      }
+      ),
+    )
+  }
+
+  formReadData(request: any): Observable<any> {
+    return this.http.post<any>(API_END_POINTS.FORM_READ, request)
   }
 
 }
