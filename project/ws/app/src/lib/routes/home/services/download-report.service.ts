@@ -15,6 +15,7 @@ const API_END_POINTS = {
   GET_ORGS_OF_DEPT: '/apis/public/v8/org/v2/list',
   DOWNLOAD_OPS_REPORTS: '/apis/proxies/v8/operationalreports/v2/download',
   GET_DEPARTMENT_TYPE: 'apis/proxies/v8/data/v1/system/settings/get/orgTypeConfig',
+  SEARCH_ORG_BY_HIERARCHY: '/apis/proxies/v8/org/level/hierarchy'
 }
 @Injectable({
   providedIn: 'root',
@@ -91,6 +92,16 @@ export class DownloadReportService {
 
   getDepartmentType(): Observable<any> {
     return this.http.get<any>(`${API_END_POINTS.GET_DEPARTMENT_TYPE}`)
+  }
+
+  searchOrgByHierarchy(filterReq: any) {
+    const req = {
+      request: {
+        filters: filterReq,
+        limit: 2000,
+      },
+    }
+    return this.http.post(API_END_POINTS.SEARCH_ORG_BY_HIERARCHY, req)
   }
 
 }
