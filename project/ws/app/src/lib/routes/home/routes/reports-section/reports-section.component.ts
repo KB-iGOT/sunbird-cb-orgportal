@@ -419,20 +419,49 @@ export class ReportsSectionComponent implements OnInit {
       identifier: [user.rootOrgId],
       parentType: this.departmentType,
     }
-    return this.downloadService.searchOrgs(req).subscribe((response: any) => {
+    // return this.downloadService.searchOrgs(req).subscribe((response: any) => {
+    //   if (response && response.result && response.result.response && response.result.response.length > 0) {
+    //     this.orgListData = response.result.response
+
+    //     this.downloadService.getOrgsOfDepartment(this.orgListData[0].mapId).subscribe(res => {
+    //       if (res && res.result && res.result.response) {
+    //         const l1orgListData = res.result.response.content
+    //         this.l1orgListData = l1orgListData.filter((item: any) => item.sbOrgId !== null && item.sbOrgId !== '')
+    //       } else {
+    //         this.l1orgListData = []
+    //       }
+    //       this.updateDataSource()
+    //       this.changeDetector.detectChanges()
+    //     })
+    //   } else {
+    //     this.orgListData.push({
+    //       orgName: user.departmentName,
+    //       sbOrgId: user.rootOrgId,
+    //     })
+    //     this.updateDataSource()
+    //     this.changeDetector.detectChanges()
+    //   }
+    // }, (err: any) => {
+    //   if (err.error && err.error.params && err.error.params.errmsg) {
+    //     this.openSnackbar(err.error.params.errmsg)
+    //   } else {
+    //     this.openSnackbar('Something went wrong. Please try after sometime.')
+    //   }
+    // })
+    return this.downloadService.searchOrgByHierarchy(req).subscribe((response: any) => {
       if (response && response.result && response.result.response && response.result.response.length > 0) {
         this.orgListData = response.result.response
 
-        this.downloadService.getOrgsOfDepartment(this.orgListData[0].mapId).subscribe(res => {
-          if (res && res.result && res.result.response) {
-            const l1orgListData = res.result.response.content
-            this.l1orgListData = l1orgListData.filter((item: any) => item.sbOrgId !== null && item.sbOrgId !== '')
-          } else {
-            this.l1orgListData = []
-          }
-          this.updateDataSource()
-          this.changeDetector.detectChanges()
-        })
+        console.log('response--', response)
+        if (response && response.result && response.result.response) {
+          const l1orgListData = response.result.response
+          this.l1orgListData = l1orgListData.filter((item: any) => item.sbOrgId !== null && item.sbOrgId !== '')
+        } else {
+          this.l1orgListData = []
+        }
+        this.updateDataSource()
+        this.changeDetector.detectChanges()
+
       } else {
         this.orgListData.push({
           orgName: user.departmentName,
