@@ -599,7 +599,6 @@ export class ReportsSectionComponent implements OnInit {
       }
     }
     this.downloadService.getFormReadForOrgSearch(payload).toPromise().then((publicConfig) => {
-      console.log('publicConfig', publicConfig)
       if (publicConfig && publicConfig && publicConfig.mdoOrgHierarchyLevelEnabled && publicConfig.mdoOrgHierarchyLevelEnabled.all) {
         this.hierarchySearchEnableForOrg = true
         this.filterOrgsSearch()
