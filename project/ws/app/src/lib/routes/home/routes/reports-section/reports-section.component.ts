@@ -453,26 +453,19 @@ export class ReportsSectionComponent implements OnInit {
         }
       })
     } else {
-      return this.downloadService.searchOrgByHierarchy(req).subscribe((response: any) => {
-        if (response && response.result && response.result.response && response.result.response.length > 0) {
-          this.orgListData = []
-          if (response && response.result && response.result.response) {
-            const l1orgListData = response.result.response
-            this.l1orgListData = l1orgListData.filter((item: any) => item.sbOrgId !== null && item.sbOrgId !== '')
-          } else {
-            this.l1orgListData = []
-          }
-          this.updateDataSource()
-          this.changeDetector.detectChanges()
-
+      this.orgListData.push({
+        orgName: user.departmentName,
+        sbOrgId: user.rootOrgId,
+      })
+      return this.downloadService.searchOrgByHierarchy(req).subscribe((res: any) => {
+        if (res && res.result && res.result.response) {
+          const l1orgListData = res.result.response
+          this.l1orgListData = l1orgListData.filter((item: any) => item.sbOrgId !== null && item.sbOrgId !== '')
         } else {
-          this.orgListData.push({
-            orgName: user.departmentName,
-            sbOrgId: user.rootOrgId,
-          })
-          this.updateDataSource()
-          this.changeDetector.detectChanges()
+          this.l1orgListData = []
         }
+        this.updateDataSource()
+        this.changeDetector.detectChanges()
       }, (err: any) => {
         if (err.error && err.error.params && err.error.params.errmsg) {
           this.openSnackbar(err.error.params.errmsg)
@@ -480,6 +473,7 @@ export class ReportsSectionComponent implements OnInit {
           this.openSnackbar('Something went wrong. Please try after sometime.')
         }
       })
+
     }
 
 
