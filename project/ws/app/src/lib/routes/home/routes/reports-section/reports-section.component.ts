@@ -460,7 +460,7 @@ export class ReportsSectionComponent implements OnInit {
       return this.downloadService.searchOrgByHierarchy(req).subscribe((res: any) => {
         if (res && res.result && res.result.response) {
           const l1orgListData = res.result.response
-          this.l1orgListData = l1orgListData.filter((item: any) => item.sbOrgId !== null && item.sbOrgId !== '')
+          this.l1orgListData = l1orgListData?.filter((item: any) => item.sbOrgId !== null && item.sbOrgId !== '')
         } else {
           this.l1orgListData = []
         }
