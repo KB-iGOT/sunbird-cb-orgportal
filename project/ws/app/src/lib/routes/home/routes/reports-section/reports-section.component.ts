@@ -561,6 +561,7 @@ export class ReportsSectionComponent implements OnInit {
               // Clean up blob URL
               window.URL.revokeObjectURL(blobUrl)
               selectedItem.status = ''
+              this.snackBar.open('Download Successfully')
             }
           } else {
             selectedItem.status = 'Failed'
