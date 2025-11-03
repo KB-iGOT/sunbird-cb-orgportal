@@ -34,14 +34,14 @@ export class FormDataResolverService {
     return this.formSvc.formReadData(requestData).pipe(
       map((rData: any) => {
         const finalData = rData && rData.result.form.data
-        return ({ data: finalData, error: null })
+        return ({ data: finalData, error: null, default: false })
       }),
       catchError((_error: any) => {
         requestData.request['subType'] = 'microsite-v2'
         return this.formSvc.formReadData(requestData).pipe(
           map((rData: any) => {
             const finalData = rData && rData.result.form.data
-            return ({ data: finalData, error: null })
+            return ({ data: finalData, error: null, default: false })
           }),
           catchError((_error: any) => {
             const baseUrl = this.configSvc.sitePath
@@ -53,7 +53,7 @@ export class FormDataResolverService {
             }).pipe(
               map((response: any) => {
                 if (response.body) {
-                  return { data: response?.body?.data, error: null }
+                  return { data: response?.body?.data, error: null, default: true }
                 }
                 return { data: null, error: 'Empty response' }
               }),
