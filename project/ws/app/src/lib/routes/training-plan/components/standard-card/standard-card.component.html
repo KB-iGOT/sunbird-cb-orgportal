@@ -6,7 +6,8 @@
                     <div style="position: relative; z-index: 1;">
                         <ng-container>
                             <div class="card-select-box" *ngIf="checkboxVisibility">
-                                <mat-checkbox class="card-select-check" [checked]="item?.selected" [disabled]="item?.courseCategory === multilingualCourses"
+                                <mat-checkbox class="card-select-check" [checked]="item?.selected"
+                                    [disabled]="item?.courseCategory === multilingualCourses"
                                     (change)="selectContentItem($event, item)"></mat-checkbox>
                             </div>
                             <div class="card-cross-icon" *ngIf="showDeleteFlag">

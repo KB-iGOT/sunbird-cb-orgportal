@@ -32,13 +32,14 @@ import { MentorManageComponent } from './routes/mentor-manage/mentor-manage.comp
 import { BulkUploadOdcsComponent } from './routes/odcs-mapping/bulk-upload-odcs/bulk-upload-odcs.component'
 import { GroupsGradeComponent } from './components/groups-grade/groups-grade.component'
 import { MyNotificationsComponent } from './routes/my-notifications/my-notifications.component'
+import { FormDataResolverService } from './resolvers/form-data-resolver.service'
 import { DirectoryComponent } from './routes/directory/directory.component'
 import { OrganisationUsersComponent } from './routes/directory/organisation-users/organisation-users.component'
 const routes: Routes = [
   {
     path: '',
     pathMatch: 'full',
-    redirectTo: 'onboarding',
+    redirectTo: 'welcome',
   },
   {
     path: '',
@@ -350,6 +351,19 @@ const routes: Routes = [
         resolve: {
           configService: ConfigResolveService,
         },
+      },
+
+      {
+        path: 'microsite',
+        loadChildren: () => import('./routes/microsite/microsite.module').then(m => m.MicrositeModule),
+        data: {
+          pageKey: 'microsite-v3',
+        },
+        resolve: {
+          formData: FormDataResolverService,
+          configService: ConfigResolveService,
+        },
+
       },
       {
         path: 'reports-section',
