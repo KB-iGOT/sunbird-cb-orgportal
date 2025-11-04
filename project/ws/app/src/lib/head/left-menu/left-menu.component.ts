@@ -58,7 +58,7 @@ export class LeftMenuComponent implements OnInit, OnDestroy {
       this.rootOrgId = orgdata?.rootOrgId
       this.channelName = orgdata?.channel
     }
-    if (orgdata?.sbOrgType?.toLowerCase() !== 'ministry' || orgdata?.sbOrgType?.toLowerCase() !== 'state' || orgdata?.ministryOrStateType?.toLowerCase() !== 'spv') {
+    if (orgdata?.sbOrgType?.toLowerCase() !== 'ministry' && orgdata?.sbOrgType?.toLowerCase() !== 'state' && orgdata?.ministryOrStateType?.toLowerCase() !== 'spv') {
       this.menulist.forEach((ele: any) => {
         if (ele.menuCategory === 'Organization Setting') {
           ele.subMenu.forEach((subEle: any) => {
