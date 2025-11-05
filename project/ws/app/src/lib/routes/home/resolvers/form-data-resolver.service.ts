@@ -30,14 +30,14 @@ export class FormDataResolverService {
         rootOrgId: this.configSvc?.orgReadData?.rootOrgId || ''
       }
     }
-    requestData.request['subType'] = 'microsite-v2-preview'
+    requestData.request['subType'] = 'microsite-v3-preview'
     return this.formSvc.formReadData(requestData).pipe(
       map((rData: any) => {
         const finalData = rData && rData.result.form.data
         return ({ data: finalData, error: null, default: false })
       }),
       catchError((_error: any) => {
-        requestData.request['subType'] = 'microsite-v2'
+        requestData.request['subType'] = 'microsite-v3'
         return this.formSvc.formReadData(requestData).pipe(
           map((rData: any) => {
             const finalData = rData && rData.result.form.data

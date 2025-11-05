@@ -13,6 +13,7 @@ export class MicrositeV1Component {
   channelName = '';
   orgId = '';
   isDefault = false;
+  userRedirData: any = {}
   constructor(private route: ActivatedRoute, private configSvc: ConfigurationsService) {
     console.log('MicrositeV1Component initialized', this.configSvc)
     if (this.configSvc && this.configSvc.unMappedUser && this.configSvc.unMappedUser.channel) {
@@ -31,6 +32,12 @@ export class MicrositeV1Component {
       && this.route.snapshot.data.formData.data.stateLearningWeekConfig
     ) {
       this.slwConfig = this.route.snapshot.data.formData.data.stateLearningWeekConfig
+    }
+    if (this.route.snapshot.data && this.route.snapshot.data.formData
+      && this.route.snapshot.data.formData.data
+      && this.route.snapshot.data.formData.data.userRedirectionData
+    ) {
+      this.userRedirData = this.route.snapshot.data.formData.data.userRedirectionData
     }
   }
 }
