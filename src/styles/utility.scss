@@ -597,6 +597,11 @@
   align-items: center !important;
 }
 
+.btn-disable {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 :root {
   --mat-select-panel-background-color: #ffffff;
   --mat-select-panel-text-color: rgba(0, 0, 0, 0.87);
