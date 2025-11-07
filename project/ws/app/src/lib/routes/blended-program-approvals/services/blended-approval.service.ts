@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core'
-import { HttpClient } from '@angular/common/http'
+import { HttpClient, HttpHeaders } from '@angular/common/http'
 import { Observable } from 'rxjs'
 import { map } from 'rxjs/operators'
 // tslint:disable-next-line:import-name
@@ -17,7 +17,7 @@ const API_END_POINTS = {
   SEARCH_FORM_WITH_USERID: 'apis/proxies/v8/forms/searchForms',
   SUBMISSION_SEARCH: '/apis/proxies/v8/forms/v2/submissions/search',
   NOMINATE_LEARNERS: '/apis/proxies/v8/workflow/blendedprogram/admin/enrol',
-  REMOVE_LEARNER: '/apis/proxies/v8/workflow/blendedprogram/remove/mdo',
+  REMOVE_LEARNER: '/apis/proxies/v8/workflow/blendedprogram/remove/approved/user',
   BLENDED_USER_COUNT: `apis/proxies/v8/workflow/blendedprogram/enrol/status/count`,
   BPREPORT_STATUS: 'apis/proxies/v8/bp/v1/bpreport/status',
   GENERATE_REPORT: `apis/proxies/v8/bp/v1/generate/report`,
@@ -82,7 +82,10 @@ export class BlendedApporvalService {
   }
 
   removeLearner(req: any) {
-    return this.http.post<any>(`${API_END_POINTS.REMOVE_LEARNER}`, req)
+    const headers = new HttpHeaders({
+      "isPc": "false"
+    })
+    return this.http.post<any>(`${API_END_POINTS.REMOVE_LEARNER}`, req, { headers: headers })
   }
 
   fetchBlendedUserCount(req: any) {
