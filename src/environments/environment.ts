@@ -25,6 +25,7 @@ export const environment: IEnvironment = {
   portalsForNotifications: (((window as { [key: string]: any })['env']['portalsForNotifications'] || {})) || {},
   debug: (window as { [key: string]: any })['env']['debug'] || false,  // Add this missing property,
   googleStorageUrl: (window as { [key: string]: any })['env']['googleStorageUrl'] || '',
+  mdoChannelsBookmarkId: (window as { [key: string]: any })['env']['mdoChannelsBookmarkId'] || ''
 }
 interface IEnvironment {
   name: null | string
@@ -48,7 +49,8 @@ interface IEnvironment {
   dicussV2Bucket: string
   portalsForNotifications: any
   debug?: boolean  // Add this missing property
-  googleStorageUrl: string
+  googleStorageUrl: string,
+  mdoChannelsBookmarkId: string
 }
 
 /*
