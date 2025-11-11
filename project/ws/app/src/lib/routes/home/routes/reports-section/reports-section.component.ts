@@ -55,7 +55,7 @@ export class ReportsSectionComponent implements OnInit {
   displayedColumns: string[] = ['select', 'orgName', 'status', 'action']
   dataSource = new MatTableDataSource<any>()
   selection = new SelectionModel<string>(true, [])
-
+  hierarchySearchEnableForOrg = false
   @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator | null = null
 
   @ViewChild(MatPaginator, { static: false }) set matPaginator(paginator: MatPaginator) {
@@ -94,7 +94,8 @@ export class ReportsSectionComponent implements OnInit {
     this.getReportInfo()
     this.setTableHeaders()
     this.getAdminTableData(getNoteDetails)
-    this.filterOrgsSearch()
+    this.getFormReadForOrgSearch()
+
   }
 
   sanitizeHtml(html: string): SafeHtml {
@@ -419,35 +420,63 @@ export class ReportsSectionComponent implements OnInit {
       identifier: [user.rootOrgId],
       parentType: this.departmentType,
     }
-    return this.downloadService.searchOrgs(req).subscribe((response: any) => {
-      if (response && response.result && response.result.response && response.result.response.length > 0) {
-        this.orgListData = response.result.response
+    //not org
 
-        this.downloadService.getOrgsOfDepartment(this.orgListData[0].mapId).subscribe(res => {
-          if (res && res.result && res.result.response) {
-            const l1orgListData = res.result.response.content
-            this.l1orgListData = l1orgListData.filter((item: any) => item.sbOrgId !== null && item.sbOrgId !== '')
-          } else {
-            this.l1orgListData = []
-          }
+    if (!this.hierarchySearchEnableForOrg) {
+      return this.downloadService.searchOrgs(req).subscribe((response: any) => {
+        if (response && response.result && response.result.response && response.result.response.length > 0) {
+          this.orgListData = response.result.response
+
+          this.downloadService.getOrgsOfDepartment(this.orgListData[0].mapId).subscribe(res => {
+            if (res && res.result && res.result.response) {
+              const l1orgListData = res.result.response.content
+              this.l1orgListData = l1orgListData.filter((item: any) => item.sbOrgId !== null && item.sbOrgId !== '')
+            } else {
+              this.l1orgListData = []
+            }
+            this.updateDataSource()
+            this.changeDetector.detectChanges()
+          })
+        } else {
+          this.orgListData.push({
+            orgName: user.departmentName,
+            sbOrgId: user.rootOrgId,
+          })
           this.updateDataSource()
           this.changeDetector.detectChanges()
-        })
-      } else {
-        this.orgListData.push({
-          orgName: user.departmentName,
-          sbOrgId: user.rootOrgId,
-        })
+        }
+      }, (err: any) => {
+        if (err.error && err.error.params && err.error.params.errmsg) {
+          this.openSnackbar(err.error.params.errmsg)
+        } else {
+          this.openSnackbar('Something went wrong. Please try after sometime.')
+        }
+      })
+    } else {
+      this.orgListData.push({
+        orgName: user.departmentName,
+        sbOrgId: user.rootOrgId,
+      })
+      return this.downloadService.searchOrgByHierarchy(req).subscribe((res: any) => {
+        if (res && res.result && res.result.response) {
+          const l1orgListData = res.result.response
+          this.l1orgListData = l1orgListData?.filter((item: any) => item.sbOrgId !== null && item.sbOrgId !== '')
+        } else {
+          this.l1orgListData = []
+        }
         this.updateDataSource()
         this.changeDetector.detectChanges()
-      }
-    }, (err: any) => {
-      if (err.error && err.error.params && err.error.params.errmsg) {
-        this.openSnackbar(err.error.params.errmsg)
-      } else {
-        this.openSnackbar('Something went wrong. Please try after sometime.')
-      }
-    })
+      }, (err: any) => {
+        if (err.error && err.error.params && err.error.params.errmsg) {
+          this.openSnackbar(err.error.params.errmsg)
+        } else {
+          this.openSnackbar('Something went wrong. Please try after sometime.')
+        }
+      })
+
+    }
+
+
   }
 
   isAllSelected() {
@@ -531,7 +560,9 @@ export class ReportsSectionComponent implements OnInit {
               document.body.removeChild(a)
               // Clean up blob URL
               window.URL.revokeObjectURL(blobUrl)
-              selectedItem.status = ''
+              selectedItem.status = 'Success'
+              this.snackBar.open('Download Successfully')
+              failedItems.push(selectedItem)
             }
           } else {
             selectedItem.status = 'Failed'
@@ -551,5 +582,45 @@ export class ReportsSectionComponent implements OnInit {
     item.status = 'Pending'
     const retryItem = [item]
     this.downloadReportsForEach(event, retryItem)
+  }
+
+  getFormReadForOrgSearch() {
+    let payload = {
+      "request": {
+        "type": "page",
+        "subType": "mdoOrgHierarchy",
+        "action": "page-configuration",
+        "component": "portal",
+        "rootOrgId": this.configSvc.unMappedUser.rootOrgId
+      }
+    }
+    this.downloadService.getFormReadForOrgSearch(payload).toPromise().then((publicConfig) => {
+      if (publicConfig && publicConfig && publicConfig.mdoOrgHierarchyLevelEnabled && publicConfig.mdoOrgHierarchyLevelEnabled.all) {
+        this.hierarchySearchEnableForOrg = true
+        this.filterOrgsSearch()
+        //  console.log('this.configSvc', this.configSvc)
+      } else if (publicConfig && publicConfig && publicConfig.mdoOrgHierarchyLevelEnabled && publicConfig.mdoOrgHierarchyLevelEnabled.forOrg &&
+        publicConfig.mdoOrgHierarchyLevelEnabled.forOrg.length && publicConfig.mdoOrgHierarchyLevelEnabled.forOrg.includes(this.configSvc?.userProfile?.rootOrgId)
+      ) {
+        this.hierarchySearchEnableForOrg = true
+        this.filterOrgsSearch()
+        //  console.log('this.configSvc', this.configSvc)
+      } else {
+        this.hierarchySearchEnableForOrg = false
+        this.filterOrgsSearch()
+      }
+
+      // this.configSvc.iGOTAIConfig = {
+      //   "aiTutor": true,
+      //   "iGOTAI": true,
+      //   "subTitles": true,
+      //   "transcription": true
+      // }
+      if (publicConfig && publicConfig.error && publicConfig.error.status === 404) {
+        this.hierarchySearchEnableForOrg = false
+        this.filterOrgsSearch()
+      }
+    })
+
   }
 }
