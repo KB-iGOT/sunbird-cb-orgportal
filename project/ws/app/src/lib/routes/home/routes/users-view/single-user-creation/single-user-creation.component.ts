@@ -64,9 +64,17 @@ export class SingleUserCreationComponent implements OnInit, AfterViewInit, OnDes
   designationDefaultLoadCount = 50
   isLoadingMoreDesignations = false;
   desigantionFilterEnable = false
+  designationOffset = 0
+  designationTotalCount = 0
+  designationsTotalCount = 0
+  // Guard to avoid continuous legacy API calls when there is no more data
+  noMoreLegacyDesignations = false
 
   displayLoader = false
   isMdoLeader = false
+  orgHasDesignations = false
+  designationSearchText = ''
+
   filteredRoles: string[] = []
   // emailRegix = `^[\\w\-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$`
   userCreationForm = this.formBuilder.group({
@@ -107,11 +115,16 @@ export class SingleUserCreationComponent implements OnInit, AfterViewInit, OnDes
           startWith(''),
         )
         .subscribe(res => {
-          if (res && res.length) {
+          const txt = (res || '').toString().trim()
+          if (txt && txt.length) {
             this.desigantionFilterEnable = true
-            if (this.masterData && this.masterData.designation) {
+            // If org has IGOT designations, call the IGOT API; otherwise filter from local backup
+            if (this.orgHasDesignations) {
+              this.isLoadingMoreDesignations = true
+              this.getIgotDesignations(txt)
+            } else if (this.masterData && this.masterData.designationBackup) {
               this.masterData.designation = this.masterData.designationBackup.filter((item: any) =>
-                item.name.toLowerCase().includes(res && res.toLowerCase()))
+                item.name.toLowerCase().includes(txt.toLowerCase()))
             }
           } else {
             if (this.masterData && this.masterData.designationBackup) {
@@ -147,7 +160,7 @@ export class SingleUserCreationComponent implements OnInit, AfterViewInit, OnDes
         this.assignData()
       }
     }
-    this.getDesignation()
+    this.checkOrgHasDesignations()
     this.getMasterLanguages()
     this.getGroups()
     this.getOrgRolesList()
@@ -198,6 +211,153 @@ export class SingleUserCreationComponent implements OnInit, AfterViewInit, OnDes
       }
     })
   }
+  designationSearch(evt: any) {
+    const searchText = evt?.target?.value
+    const txt = (searchText || '').toString().trim()
+    this.designationSearchText = txt
+    if (txt && txt.length) {
+      this.desigantionFilterEnable = true
+      this.isLoadingMoreDesignations = true
+      if (this.orgHasDesignations) {
+        this.getIgotDesignations(txt, 0)
+      } else {
+        this.getDesignation(txt, 0)
+      }
+    } else if (this.masterData && this.masterData?.designationBackup) {
+      this.masterData.designation = this.masterData?.designationBackup.slice(0, this.designationDefaultLoadCount)
+      this.desigantionFilterEnable = false
+      this.checkCurrentDesignationPresent()
+    }
+  }
+
+  checkOrgHasDesignations(): void {
+    const igotDesignationBody: any = {
+      request: {
+        filters: {
+          status: 'Live',
+          category: 'designation',
+          categories: [
+            _.get(this.fullProfile?.unMappedUser, 'rootOrgId', '') + '_odcs_designation'
+          ],
+          objectType: 'Term',
+        },
+        fields: ['name'],
+        offset: 0,
+        limit: 1,
+        sort_by: {
+          lastUpdatedOn: 'desc',
+          objectType: 'Term',
+        },
+        facets: [],
+      },
+    }
+    this.usersService.searchIgotDesignation(igotDesignationBody).subscribe({
+      next: (res: any) => {
+        const count = _.get(res, 'result.count', 0)
+        this.orgHasDesignations = count > 0
+        // reset pagination counters before fetching
+        this.designationOffset = 0
+        this.designationListLoadCount = this.designationDefaultLoadCount
+        this.getdesignationsMeta()
+      },
+      error: () => {
+        this.orgHasDesignations = false
+        this.designationOffset = 0
+        this.designationListLoadCount = this.designationDefaultLoadCount
+        this.getdesignationsMeta()
+      }
+    })
+  }
+  getdesignationsMeta() {
+    this.isLoadingMoreDesignations = true
+    // Reset pagination counters before fetching
+    this.designationOffset = 0
+    this.designationListLoadCount = this.designationDefaultLoadCount
+    // reset legacy no-more-data guard
+    this.noMoreLegacyDesignations = false
+    if (this.orgHasDesignations) {
+      // For orgs using IGOT taxonomy, fetch first page from IGOT
+      this.getIgotDesignations(undefined, 0)
+    } else {
+      this.getDesignation(undefined, 0)
+    }
+  }
+  getIgotDesignations(searchText?: string, offset?: number) {
+    // Compute the requested offset (number of items) and ensure we don't request beyond known total
+    const reqOffset = (typeof offset === 'number') ? offset : this.designationOffset || 0
+    // If we already know the total count and requested offset is beyond it, do nothing
+    if (this.designationTotalCount && reqOffset >= this.designationTotalCount) {
+      this.isLoadingMoreDesignations = false
+      return
+    }
+
+    const igotDesignationBody: any = {
+      request: {
+        filters: {
+          status: 'Live',
+          category: 'designation',
+          categories: [
+            _.get(this.fullProfile?.unMappedUser, 'rootOrgId', '') + '_odcs_designation'
+          ],
+          objectType: 'Term',
+        },
+        fields: ['name'],
+        offset: reqOffset,
+        // keep server page size as default load count (50)
+        limit: this.designationDefaultLoadCount,
+        sort_by: {
+          lastUpdatedOn: 'desc',
+          objectType: 'Term',
+        },
+        facets: [],
+      },
+    }
+    if (searchText && searchText.length) {
+      igotDesignationBody.request.query = searchText
+      // when searching, always start from first page
+      igotDesignationBody.request.offset = 0
+      // use the current display count as limit for search (to show more results if previously loaded)
+      igotDesignationBody.request.limit = this.designationListLoadCount
+    }
+
+
+    // this.masterData['designation'] = _res.responseData.slice(0, this.designationDefaultLoadCount)
+    // this.masterData['designationBackup'] = _res.responseData
+
+    this.usersService.searchIgotDesignation(igotDesignationBody).subscribe({
+      next: (res: any) => {
+        // IGOT returns terms under result.Term with { name, ... } structure
+        const igotData = _.get(res, 'result.Term', [])
+        const total = _.get(res, 'result.count', 0)
+        // update total count for pagination control when not a search
+        if (!searchText || !searchText.length) {
+          this.designationTotalCount = total
+        }
+        // If this is a search call, don't overwrite the full backup; only replace the visible list
+        if (searchText && searchText.length) {
+          this.masterData['designation'] = igotData.slice(0, this.designationDefaultLoadCount)
+        } else {
+          // Append or set the backup depending on offset (server pagination)
+          if (!this.masterData['designationBackup'] || (offset === 0 || offset === undefined)) {
+            this.masterData['designationBackup'] = igotData
+          } else {
+            // append and dedupe by name (case-insensitive)
+            const combined = (this.masterData['designationBackup'] || []).concat(igotData)
+            this.masterData['designationBackup'] = _.uniqBy(combined, (it: any) => (it?.name || '').toLowerCase())
+          }
+          // Ensure visible list matches the requested display count
+          this.masterData['designation'] = this.masterData['designationBackup'].slice(0, this.designationListLoadCount)
+        }
+        this.isLoadingMoreDesignations = false
+        // Ensure currently selected designation (if any) is present in the list
+        this.checkCurrentDesignationPresent()
+      },
+      error: () => {
+        this.isLoadingMoreDesignations = false
+        // this.openSnackbar('Something went wrong. Please refresh or try again later.')
+      },
+    })
+  }
 
   setDefaultValue(): void {
     if (!this.userCreationForm.get('roles')?.value || this.userCreationForm.get('roles')?.value.length === 0) {
@@ -209,18 +369,79 @@ export class SingleUserCreationComponent implements OnInit, AfterViewInit, OnDes
     })
   }
 
-  getDesignation(): void {
-    this.usersService.getDesignations()
-      .pipe(takeUntil(this.destroySubject$))
-      .subscribe((_res: any) => {
-        this.masterData['designation'] = _res.responseData.slice(0, this.designationDefaultLoadCount)
-        this.masterData['designationBackup'] = _res.responseData
-        // tslint:disable-next-line
-      }, (_err: HttpErrorResponse) => {
-        if (!_err.ok) {
-          this.matSnackBar.open('Unable to fetch designation details, please try again later!')
+  getDesignation(searchText?: string, offset?: number): void {
+    // if starting fresh or searching, clear the no-more-data guard
+    if (!searchText || searchText.length === 0) {
+      // keep previous flag unless explicitly starting from first page
+    }
+    const reqOffset = (typeof offset === 'number') ? offset : this.designationOffset
+    const reqLimit = this.designationDefaultLoadCount
+    const pageIndex = reqLimit > 0 ? Math.floor(reqOffset / reqLimit) : 0
+    // if we're requesting from first page, clear the no-more-data guard
+    if (pageIndex === 0) {
+      this.noMoreLegacyDesignations = false
+    }
+    const requestBody: any = {
+      filterCriteriaMap: {
+        status: 'Active'
+      },
+      requestedFields: [],
+      pageNumber: pageIndex,
+      pageSize: reqLimit,
+    }
+    if (searchText && searchText.length) {
+      requestBody['searchString'] = searchText
+      // when searching, start from first page
+      requestBody.pageNumber = 0
+      // allow larger page for search if needed
+      requestBody.pageSize = this.designationListLoadCount
+      // reset guard when performing a fresh search
+      this.noMoreLegacyDesignations = false
+    }
+
+    this.usersService.searchDesignation(requestBody).subscribe({
+      next: (res: any) => {
+        const content = _.get(res, 'result.result.data', [])
+        const mapped = content.map((item: any) => ({
+          name: item.designation || '',
+          status: item.status || 'Active',
+        }))
+
+        // total count may be present in different keys depending on API version.
+        // Prefer 'result.result.totalcount' (legacy lower-case) then data.totalCount, then totalCount
+        const total = _.get(res, 'result.result.totalcount', _.get(res, 'result.result.data.totalCount', _.get(res, 'result.result.totalCount', 0)))
+        this.designationsTotalCount = total
+
+        // If offset is zero (first page) replace backup, otherwise append + dedupe
+        if (!this.masterData['designationBackup'] || reqOffset === 0) {
+          this.masterData['designationBackup'] = mapped
+        } else {
+          const combined = (this.masterData['designationBackup'] || []).concat(mapped)
+          this.masterData['designationBackup'] = _.uniqBy(combined, (it: any) => (it?.name || '').toLowerCase())
         }
-      })
+
+        // If server returned no new items, mark as no-more-data to stop further scroll requests
+        if (!mapped || mapped.length === 0) {
+          this.noMoreLegacyDesignations = true
+        }
+
+        // If we've loaded at least the total count, mark no-more-data
+        if (this.designationsTotalCount && (this.masterData['designationBackup'] || []).length >= this.designationsTotalCount) {
+          this.noMoreLegacyDesignations = true
+        }
+
+        // Ensure visible list matches the requested display count
+        this.masterData['designation'] = (this.masterData['designationBackup'] || []).slice(0, this.designationListLoadCount)
+        this.isLoadingMoreDesignations = false
+        this.checkCurrentDesignationPresent()
+      },
+      error: () => {
+        // Stop further automatic calls on repeated errors to avoid tight loops
+        this.isLoadingMoreDesignations = false
+        this.noMoreLegacyDesignations = true
+        this.matSnackBar.open('Unable to fetch designation details, please try again later!')
+      }
+    })
   }
 
   getMasterLanguages(): void {
@@ -470,8 +691,17 @@ export class SingleUserCreationComponent implements OnInit, AfterViewInit, OnDes
     if (opened) {
       this.desigantionFilterEnable = false
       this.designationListLoadCount = this.designationDefaultLoadCount // Reset the load count
-      this.masterData.designation = this.masterData.designationBackup.slice(0, this.designationListLoadCount)
-      this.checkCurrentDesignationPresent()
+      // Reset offset pagination
+      this.designationOffset = 0
+      if (this.orgHasDesignations) {
+        // For IGOT taxonomy, refresh first page from API
+        this.isLoadingMoreDesignations = true
+        this.getIgotDesignations(undefined, 0)
+      } else {
+        this.getDesignation(undefined, 0)
+        this.masterData.designation = this.masterData.designationBackup.slice(0, this.designationListLoadCount)
+        this.checkCurrentDesignationPresent()
+      }
       if (this.userCreationForm.get('searchDesignation')) {
         this.userCreationForm.get('searchDesignation')!.setValue('')
       }
@@ -499,18 +729,42 @@ export class SingleUserCreationComponent implements OnInit, AfterViewInit, OnDes
       // Check if user has scrolled to the bottom (with a small threshold)
       if (element.scrollTop + element.clientHeight >= element.scrollHeight - 5) {
         // Only load more if not already loading and if there are potentially more items
-        if (!this.isLoadingMoreDesignations && this.masterData.designationBackup.length > this.masterData.designation.length) {
-          this.isLoadingMoreDesignations = true
-
-          // Increase the load count by designationDefaultLoadCount
-          this.designationListLoadCount += this.designationDefaultLoadCount
-
-          // Update the filtered list with more items
-          setTimeout(() => {
-            this.masterData.designation = this.masterData.designationBackup.slice(0, this.designationListLoadCount)
-            this.checkCurrentDesignationPresent()
-            this.isLoadingMoreDesignations = false
-          }, 500) // Small timeout to simulate loading and prevent multiple triggers
+        if (!this.isLoadingMoreDesignations) {
+          // If org uses IGOT designation taxonomy, request more from the API by increasing the limit
+          if (this.orgHasDesignations) {
+            this.isLoadingMoreDesignations = true
+            // If we've already loaded everything, don't call the API again
+            const loaded = (this.masterData?.designationBackup || []).length
+            if (this.designationTotalCount && loaded >= this.designationTotalCount) {
+              this.isLoadingMoreDesignations = false
+              return
+            }
+            // Increase the offset by designationDefaultLoadCount and fetch the next page
+            this.designationOffset = (this.designationOffset || 0) + this.designationDefaultLoadCount
+            // Ensure the display size is increased to include newly fetched items
+            this.designationListLoadCount += this.designationDefaultLoadCount
+            this.getIgotDesignations(undefined, this.designationOffset)
+          } else if (this.masterData?.designationBackup.length > this.masterData?.designation.length) {
+            // Local pagination: expand the sliced list
+            this.isLoadingMoreDesignations = true
+            this.designationListLoadCount += this.designationDefaultLoadCount
+            // Update the filtered list with more items
+            setTimeout(() => {
+              this.masterData.designation = this.masterData.designationBackup.slice(0, this.designationListLoadCount)
+              this.checkCurrentDesignationPresent()
+              this.isLoadingMoreDesignations = false
+            }, 500) // Small timeout to simulate loading and prevent multiple triggers
+          } else {
+            // Legacy (server) pagination: request next page if total not reached
+            const loadedLegacy = (this.masterData?.designationBackup || []).length
+            if (!this.noMoreLegacyDesignations && this.designationsTotalCount && loadedLegacy < this.designationsTotalCount) {
+              this.isLoadingMoreDesignations = true
+              this.designationOffset = (this.designationOffset || 0) + this.designationDefaultLoadCount
+              // increase display count to include newly fetched items
+              this.designationListLoadCount += this.designationDefaultLoadCount
+              this.getDesignation(undefined, this.designationOffset)
+            }
+          }
         }
       }
     }
