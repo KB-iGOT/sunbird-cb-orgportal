@@ -36,6 +36,8 @@ const API_END_POINTS = {
   getApprovalPendingFields: '/apis/proxies/v8/workflow/v2/userWFApplicationFieldsSearch',
   getPendingRequests: '/apis/proxies/v8/workflow/admin/pending/request',
   GET_ALL_USERS_V3: '/apis/proxies/v8/user/v3/search',
+  GET_SUNBIRD_IGOT_SEARCH: '/apis/proxies/v8/sunbirdigot/v4/search',
+  GET_SEARCH_DESIGNATIONS: '/apis/proxies/v8/designation/search',
 }
 
 @Injectable()
@@ -265,6 +267,13 @@ export class UsersService {
 
   getDesignations(_req?: any) {
     return this.http.get<any>(API_END_POINTS.getDesignation)
+  }
+
+  searchIgotDesignation(_req: any): Observable<any> {
+    return this.http.post<any>(API_END_POINTS.GET_SUNBIRD_IGOT_SEARCH, _req)
+  }
+  searchDesignation(_req: any): Observable<any> {
+    return this.http.post<any>(API_END_POINTS.GET_SEARCH_DESIGNATIONS, _req)
   }
 
   updateUserDetails(reqBody: any) {
