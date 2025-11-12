@@ -65,8 +65,8 @@ export class SingleUserCreationComponent implements OnInit, AfterViewInit, OnDes
   isLoadingMoreDesignations = false;
   desigantionFilterEnable = false
   designationOffset = 0
-  designationTotalCount = 0
-  designationsTotalCount = 0
+  odcsDesignationCount = 0
+  defaultSearchDesignationCount = 0
   // Guard to avoid continuous legacy API calls when there is no more data
   noMoreLegacyDesignations = false
 
@@ -115,8 +115,8 @@ export class SingleUserCreationComponent implements OnInit, AfterViewInit, OnDes
           startWith(''),
         )
         .subscribe(res => {
-          const txt = (res || '').toString().trim()
-          if (txt && txt.length) {
+          const txt = res?.toString()?.trim() ?? ''
+          if (txt?.length) {
             this.desigantionFilterEnable = true
             // If org has IGOT designations, call the IGOT API; otherwise filter from local backup
             if (this.orgHasDesignations) {
@@ -215,7 +215,7 @@ export class SingleUserCreationComponent implements OnInit, AfterViewInit, OnDes
     const searchText = evt?.target?.value
     const txt = (searchText || '').toString().trim()
     this.designationSearchText = txt
-    if (txt && txt.length) {
+    if (txt?.length) {
       this.desigantionFilterEnable = true
       this.isLoadingMoreDesignations = true
       if (this.orgHasDesignations) {
@@ -286,7 +286,7 @@ export class SingleUserCreationComponent implements OnInit, AfterViewInit, OnDes
     // Compute the requested offset (number of items) and ensure we don't request beyond known total
     const reqOffset = (typeof offset === 'number') ? offset : this.designationOffset || 0
     // If we already know the total count and requested offset is beyond it, do nothing
-    if (this.designationTotalCount && reqOffset >= this.designationTotalCount) {
+    if (this.odcsDesignationCount && reqOffset >= this.odcsDesignationCount) {
       this.isLoadingMoreDesignations = false
       return
     }
@@ -312,7 +312,7 @@ export class SingleUserCreationComponent implements OnInit, AfterViewInit, OnDes
         facets: [],
       },
     }
-    if (searchText && searchText.length) {
+    if (searchText?.length) {
       igotDesignationBody.request.query = searchText
       // when searching, always start from first page
       igotDesignationBody.request.offset = 0
@@ -331,10 +331,10 @@ export class SingleUserCreationComponent implements OnInit, AfterViewInit, OnDes
         const total = _.get(res, 'result.count', 0)
         // update total count for pagination control when not a search
         if (!searchText || !searchText.length) {
-          this.designationTotalCount = total
+          this.odcsDesignationCount = total
         }
         // If this is a search call, don't overwrite the full backup; only replace the visible list
-        if (searchText && searchText.length) {
+        if (searchText?.length) {
           this.masterData['designation'] = igotData.slice(0, this.designationDefaultLoadCount)
         } else {
           // Append or set the backup depending on offset (server pagination)
@@ -389,7 +389,7 @@ export class SingleUserCreationComponent implements OnInit, AfterViewInit, OnDes
       pageNumber: pageIndex,
       pageSize: reqLimit,
     }
-    if (searchText && searchText.length) {
+    if (searchText?.length) {
       requestBody['searchString'] = searchText
       // when searching, start from first page
       requestBody.pageNumber = 0
@@ -410,7 +410,7 @@ export class SingleUserCreationComponent implements OnInit, AfterViewInit, OnDes
         // total count may be present in different keys depending on API version.
         // Prefer 'result.result.totalcount' (legacy lower-case) then data.totalCount, then totalCount
         const total = _.get(res, 'result.result.totalcount', _.get(res, 'result.result.data.totalCount', _.get(res, 'result.result.totalCount', 0)))
-        this.designationsTotalCount = total
+        this.defaultSearchDesignationCount = total
 
         // If offset is zero (first page) replace backup, otherwise append + dedupe
         if (!this.masterData['designationBackup'] || reqOffset === 0) {
@@ -426,7 +426,7 @@ export class SingleUserCreationComponent implements OnInit, AfterViewInit, OnDes
         }
 
         // If we've loaded at least the total count, mark no-more-data
-        if (this.designationsTotalCount && (this.masterData['designationBackup'] || []).length >= this.designationsTotalCount) {
+        if (this.defaultSearchDesignationCount && (this.masterData['designationBackup'] || []).length >= this.defaultSearchDesignationCount) {
           this.noMoreLegacyDesignations = true
         }
 
@@ -735,7 +735,7 @@ export class SingleUserCreationComponent implements OnInit, AfterViewInit, OnDes
             this.isLoadingMoreDesignations = true
             // If we've already loaded everything, don't call the API again
             const loaded = (this.masterData?.designationBackup || []).length
-            if (this.designationTotalCount && loaded >= this.designationTotalCount) {
+            if (this.odcsDesignationCount && loaded >= this.odcsDesignationCount) {
               this.isLoadingMoreDesignations = false
               return
             }
@@ -757,7 +757,7 @@ export class SingleUserCreationComponent implements OnInit, AfterViewInit, OnDes
           } else {
             // Legacy (server) pagination: request next page if total not reached
             const loadedLegacy = (this.masterData?.designationBackup || []).length
-            if (!this.noMoreLegacyDesignations && this.designationsTotalCount && loadedLegacy < this.designationsTotalCount) {
+            if (!this.noMoreLegacyDesignations && this.defaultSearchDesignationCount && loadedLegacy < this.defaultSearchDesignationCount) {
               this.isLoadingMoreDesignations = true
               this.designationOffset = (this.designationOffset || 0) + this.designationDefaultLoadCount
               // increase display count to include newly fetched items
