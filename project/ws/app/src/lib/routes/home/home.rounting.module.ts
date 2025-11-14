@@ -35,6 +35,7 @@ import { MyNotificationsComponent } from './routes/my-notifications/my-notificat
 import { FormDataResolverService } from './resolvers/form-data-resolver.service'
 import { DirectoryComponent } from './routes/directory/directory.component'
 import { OrganisationUsersComponent } from './routes/directory/organisation-users/organisation-users.component'
+// import { CbpPlanAiModule } from '@sunbird-cb/cbp-plan-ai'
 const routes: Routes = [
   {
     path: '',
@@ -534,6 +535,15 @@ const routes: Routes = [
       configService: ConfigResolveService,
     },
   },
+  {
+    path: 'cbp-plan-ai',
+    loadChildren: () =>
+      import('@sunbird-cb/cbp-plan-ai').then(m => m.CbpPlanAiModule),
+    resolve: {
+      pageData: PageResolve,
+      configService: ConfigResolveService,
+    },
+  }
 
 ]
 
