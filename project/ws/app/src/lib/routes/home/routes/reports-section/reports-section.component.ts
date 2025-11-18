@@ -56,6 +56,7 @@ export class ReportsSectionComponent implements OnInit {
   dataSource = new MatTableDataSource<any>()
   selection = new SelectionModel<string>(true, [])
   hierarchySearchEnableForOrg = false
+  searchTerm: string = '';
   @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator | null = null
 
   @ViewChild(MatPaginator, { static: false }) set matPaginator(paginator: MatPaginator) {
@@ -508,6 +509,11 @@ export class ReportsSectionComponent implements OnInit {
       this.dataSource.data.push(...this.l1orgListData)
     }
 
+    this.dataSource.filterPredicate = (data: any, filter: string) => {
+      // Convert both data.orgName and filter to lowercase and check if orgName contains the filter
+      return data.orgName.toLowerCase().includes(filter)
+    }
+
     if (failedItems && failedItems.length > 0) {
       failedItems.forEach((failedItem: any) => {
         const index = this.dataSource.data.findIndex((existingItem: any) =>
@@ -622,5 +628,15 @@ export class ReportsSectionComponent implements OnInit {
       }
     })
 
+  }
+
+  applyFilter() {
+    const filterValue = this.searchTerm.toLowerCase()
+    this.dataSource.filter = filterValue  // This triggers the filterPredicate
+
+    // Reset the paginator to the first page after each filter
+    if (this.dataSource.paginator) {
+      this.dataSource.paginator.firstPage()
+    }
   }
 }
