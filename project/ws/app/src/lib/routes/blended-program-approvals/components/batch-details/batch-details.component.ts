@@ -348,21 +348,11 @@ export class BatchDetailsComponent implements OnInit {
   }
 
   removeUser(event: any) {
-    const actionType = event.action.toUpperCase()
     const request = {
-      rootOrgId: this.userProfile.rootOrgId,
       userId: event.userData.user_id,
-      actorUserId: this.userProfile.userId,
-      state: 'APPROVED',
-      action: actionType,
       applicationId: this.batchID,
-      serviceName: 'blendedprogram',
       courseId: this.programID,
-      deptName: event.userData.department,
       comment: event.comment,
-      updateFieldValues: [{
-        toValue: { name: event.userData.first_name },
-      }],
     }
     this.bpService.removeLearner(request).subscribe((_res: any) => {
       this.openSnackbar('Learner is removed successfully!')

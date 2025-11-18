@@ -18,5 +18,7 @@ export const environment = {
   compentencyVersionKey: (window as { [key: string]: any })['env']['compentencyVersionKey'] || '',
   doptOrg: (window as { [key: string]: any })['env']['doptOrg'] || '',
   dicussV2Bucket: (window as { [key: string]: any })['env']['dicussV2Bucket'] || '',
-  portalsForNotifications: (((window as { [key: string]: any })['env']['portalsForNotifications'] || {})) || {}
+  portalsForNotifications: (((window as { [key: string]: any })['env']['portalsForNotifications'] || {})) || {},
+  googleStorageUrl: (window as { [key: string]: any })['env']['googleStorageUrl'] || '',
+  mdoChannelsBookmarkId: (window as { [key: string]: any })['env']['mdoChannelsBookmarkId'] || ''
 }
