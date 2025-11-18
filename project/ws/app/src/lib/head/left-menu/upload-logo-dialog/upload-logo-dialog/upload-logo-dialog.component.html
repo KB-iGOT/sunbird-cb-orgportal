@@ -15,7 +15,7 @@
       <image-cropper [imageChangedEvent]="imageChangedEvent" [aspectRatio]="1" [resizeToWidth]="300"
         [maintainAspectRatio]="true" [roundCropper]="false" [transform]="transform" format="jpeg"
         (imageCropped)="onImageCropped($event)" (imageLoaded)="imageLoaded()" (cropperReady)="cropperReady()"
-        (loadImageFailed)="loadImageFailed($event)" class="custom-cropper">
+        (loadImageFailed)="loadImageFailed()" class="custom-cropper">
       </image-cropper>
     </div>
     <!-- Zoom Controls: Minus Button + Slider + Plus Button -->

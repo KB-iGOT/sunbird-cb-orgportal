@@ -418,7 +418,7 @@ export class CreateEventComponent implements OnInit {
     // tslint:disable-next-line:radix
     const totalMinutes = startMinutes + endMinutes + parseInt(this.createEventForm.controls['eventDurationMinutes'].value)
     // tslint:disable-next-line:prefer-template
-    const hours = (Math.floor(totalMinutes / 60) < 10) ? '0' + Math.floor(totalMinutes / 60) : Math.floor(totalMinutes / 60)
+    const hours: any = (Math.floor(totalMinutes / 60) < 10) ? '0' + Math.floor(totalMinutes / 60) : Math.floor(totalMinutes / 60)
     const minutes = totalMinutes % 60
     let finalTime
     let newendDate

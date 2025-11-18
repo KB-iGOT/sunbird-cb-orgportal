@@ -255,21 +255,21 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
             "port": 3000,
-            "browserTarget": "mdo:build"
+            "buildTarget": "mdo:build"
           },
           "configurations": {
             "production": {
-              "browserTarget": "mdo:build:production"
+              "buildTarget": "mdo:build:production"
             },
             "de": {
-              "browserTarget": "mdo:build:de"
+              "buildTarget": "mdo:build:de"
             }
           }
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "mdo:build"
+            "buildTarget": "mdo:build"
           }
         },
         "test": {

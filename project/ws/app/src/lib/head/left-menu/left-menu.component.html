@@ -2,7 +2,7 @@
   <div class="margin-top-xs flex flex-column max-width width-1-1">
     <a href="javascript:void(0)" role="link" class="flex flex-column padding-right-m padding-left-m">
       <div class="dept-logo-block flex flex-middle flex-center position-relative">
-        <img [src]="orgData" [alt]="widgetData.name" class="img-logo" (error)="changeToDefaultImg($event)" />
+        <img [src]="orgData" [alt]="widgetData.name" class="img-logo" />
         <!-- Pencil Icon -->
         <button mat-icon-button class="pencil-icon" (click)="onEditLogoClick()" aria-label="Edit Logo">
           <!-- <mat-icon class="custom-font">cloud_upload</mat-icon> -->
