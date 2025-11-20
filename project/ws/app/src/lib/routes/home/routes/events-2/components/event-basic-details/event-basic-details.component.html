@@ -29,6 +29,26 @@
     </div>
   </ng-template>
 
+  <div class="flex flex-row gap-4" [ngClass]="{'disableForm': openTab === 'past'}">
+    <div class="flex flex-column gap-2 event-form w-full">
+      <div class="form-lable required">
+        Event Category
+      </div>
+      <mat-form-field appearance="outline" class="disable-round">
+        <mat-select placeholder="select Event Category" formControlName="eventCategory">
+          <ng-container *ngFor="let category of evntCategorysList">
+            <mat-option [value]="category">
+              {{category}}
+            </mat-option>
+          </ng-container>
+        </mat-select>
+        <mat-error *ngIf="showValidationMsg('eventCategory','required')">
+          Event category is mandatory
+        </mat-error>
+      </mat-form-field>
+    </div>
+  </div>
+
   <div class="flex flex-column gap-2 event-form" [ngClass]="{'disableForm': eventStatus === 'live'}">
     <div class="form-lable required">
       Event Name
@@ -67,97 +87,70 @@
       class="description-count flex justify-end">{{eventDetails?.controls['description']?.value?.length}}/2000</span>
   </div>
 
-  <div [ngClass]="{'disableForm': eventStatus === 'live'}">
-    <div class="label flex items-center mt-2">
-      <div class="form-lable required">
-        Event Type
-      </div>
+  <div class="flex flex-column gap-2" [ngClass]="{'disableForm': eventStatus === 'live'}">
+    <div class="form-lable required">
+      Maximum participants allowed
     </div>
-    <mat-radio-group aria-label="Select an option" class="flex" formControlName="typeofEvent">
-      <!-- <mat-radio-button class="mr-5 p-4" value="live">
-              Live Event
-            </mat-radio-button> -->
-      <mat-radio-button class="mr-5 p-4" value="record">
-        Recorded Event
-      </mat-radio-button>
-    </mat-radio-group>
+    <ng-container *ngIf="eventDetails?.controls?.maxEnrolments; else maxFallback">
+      <mat-form-field appearance="outline" class="">
+        <input matInput type="number" placeholder="Enter number only" formControlName="maxEnrolments" min="1" step="1"
+          inputmode="numeric" pattern="[0-9]*" (keypress)="allowNumbers($event)" (paste)="onPasteNumber($event)">
+        <mat-error *ngIf="showValidationMsg('maxEnrolments','required')">
+          Maximum participants is mandatory
+        </mat-error>
+      </mat-form-field>
+    </ng-container>
+    <ng-template #maxFallback>
+      <mat-form-field appearance="outline" class="">
+        <input matInput type="number" placeholder="Enter max participants" [disabled]="true">
+      </mat-form-field>
+    </ng-template>
   </div>
 
-  <ng-container *ngIf="uploadedVideoName; else uploadVideo">
-    <div class="appIconCard flex justify-between px-2 items-center">
-      <div class="flex gap-2 items-center">
-        <img src="/assets/icons/image.svg" alt="app icon">
-        <span class="iconName">{{uploadedVideoName}}</span>
+  <ng-container *ngIf="!checkIfLiveEvent()">
+    <ng-container *ngIf="uploadedVideoName; else uploadVideo">
+      <div class="appIconCard flex justify-between px-2 items-center">
+        <div class="flex gap-2 items-center">
+          <img src="/assets/icons/image.svg" alt="app icon">
+          <span class="iconName">{{uploadedVideoName}}</span>
+        </div>
+        <ng-container *ngIf="openMode === 'edit'">
+          <mat-icon class="remove-app-icon" (click)="removeFile('uploadedVideo')">close</mat-icon>
+        </ng-container>
       </div>
-      <ng-container *ngIf="openMode === 'edit'">
-        <mat-icon class="remove-app-icon" (click)="removeFile('uploadedVideo')">close</mat-icon>
-      </ng-container>
-    </div>
-  </ng-container>
-  <ng-template #uploadVideo>
-    <div class="upload flex justify-center items-center cursor-pointer dashed-border"
-      [ngClass]="{'disable': (openMode === 'view' || disableUpload) }" cdkDropList [cdkDropListData]="videoData"
-      (cdkDropListDropped)="onVideoSelected($event)" (dragover)="preventDefaultCDK($event)"
-      (dragenter)="preventDefaultCDK($event, 'enter')" (dragleave)="preventDefaultCDK($event, 'leave')"
-      (drop)="onDrop($event)" onclick="document.getElementById('upload-video').click();">
-      <input #file type="file" name="upload-video" id="upload-video" class="hidden"
-        accept="video/mp4, video/mov, video/avi" (change)="onVideoSelected(file.files);">
-      <div class="flex flex-column items-center gap-2">
-        <img src="/assets/icons/upload-upward-arrow.svg" alt="icon">
-        <span class="text-sm font-bold text-blue">Select video to upload <strong class="text-red-700">*</strong></span>
-        <span class="text-xs font-normal">or drag and drop here</span>
-        <span class="text-xs font-normal">Max Size - 1GB</span>
+    </ng-container>
+    <ng-template #uploadVideo>
+      <div class="upload flex justify-center items-center cursor-pointer dashed-border"
+        [ngClass]="{'disable': (openMode === 'view' || disableUpload) }" cdkDropList [cdkDropListData]="videoData"
+        (cdkDropListDropped)="onVideoSelected($event)" (dragover)="preventDefaultCDK($event)"
+        (dragenter)="preventDefaultCDK($event, 'enter')" (dragleave)="preventDefaultCDK($event, 'leave')"
+        (drop)="onDrop($event)" onclick="document.getElementById('upload-video').click();">
+        <input #file type="file" name="upload-video" id="upload-video" class="hidden"
+          accept="video/mp4, video/mov, video/avi" (change)="onVideoSelected(file.files);">
+        <div class="flex flex-column items-center gap-2">
+          <img src="/assets/icons/upload-upward-arrow.svg" alt="icon">
+          <span class="text-sm font-bold text-blue">Select video to upload <strong
+              class="text-red-700">*</strong></span>
+          <span class="text-xs font-normal">or drag and drop here</span>
+          <span class="text-xs font-normal">Max Size - 1GB</span>
+        </div>
       </div>
-    </div>
-  </ng-template>
-  <div class="flex flex-column gap-2 event-form w-full " [ngClass]="{'disableForm': disableUrl}">
-    <div class="form-url-lable required">
-      or Upload from URL
-    </div>
-    <mat-form-field appearance="outline" class="disable-round">
-      <input matInput placeholder="Enter url" formControlName="registrationLink">
-      <mat-error *ngIf="showValidationMsg('registrationLink','required')">
-        Resource is mandatory
-      </mat-error>
-      <mat-error *ngIf="showValidationMsg('registrationLink','pattern')">
-        Please give valid URL
-      </mat-error>
-    </mat-form-field>
-  </div>
-
-  <div class="flex flex-row gap-4" [ngClass]="{'disableForm': openTab === 'past'}">
-    <div class="flex flex-column gap-2 event-form w-full">
-      <div class="form-lable required">
-        Event Category
+    </ng-template>
+    <div class="flex flex-column gap-2 event-form w-full " [ngClass]="{'disableForm': disableUrl}">
+      <div class="form-url-lable" [ngClass]="{'required': expression}">
+        or Upload from URL
       </div>
       <mat-form-field appearance="outline" class="disable-round">
-        <mat-select placeholder="select Event Category" formControlName="eventCategory">
-          <ng-container *ngFor="let category of evntCategorysList">
-            <mat-option [value]="category">
-              {{category}}
-            </mat-option>
-          </ng-container>
-        </mat-select>
-        <mat-error *ngIf="showValidationMsg('eventCategory','required')">
-          Event category is mandatory
+        <input matInput placeholder="Enter url" formControlName="registrationLink">
+        <mat-error *ngIf="showValidationMsg('registrationLink','required')">
+          Resource is mandatory
+        </mat-error>
+        <mat-error *ngIf="showValidationMsg('registrationLink','pattern')">
+          Please give valid URL
         </mat-error>
       </mat-form-field>
     </div>
-    <!-- <div class="flex flex-column gap-2 event-form w-full disable-round">
-      <div class="form-lable required">
-        Stream Type
-      </div>
-      <mat-form-field appearance="outline" class="">
-        <mat-select placeholder="select Event Category" formControlName="streamType">
-          <mat-option>
-          </mat-option>
-        </mat-select>
-        <mat-error *ngIf="showValidationMsg('streamType','required')">
-          stream type is mandatory
-        </mat-error>
-      </mat-form-field>
-    </div> -->
-  </div>
+  </ng-container>
 
   <div class="flex flex-row gap-4" [ngClass]="{'disableForm': openTab === 'past'}">
     <div class="flex flex-column gap-2 event-form w-full eventTimpicker">
@@ -204,6 +197,23 @@
       </mat-form-field>
     </div>
   </div>
+
+  <div [ngClass]="{'disableForm': eventStatus === 'live'}">
+    <div class="label flex items-center mt-2">
+      <div class="form-lable required">
+        Event Type
+      </div>
+    </div>
+    <mat-radio-group aria-label="Select an option" class="flex" formControlName="typeofEvent">
+      <mat-radio-button class="mr-5 p-4" value="live" *ngIf="checkIfLiveEvent()">
+        Live Event
+      </mat-radio-button>
+      <mat-radio-button class="mr-5 p-4" value="record" *ngIf="edf?.typeofEvent?.value?.toLowerCase() === 'record'">
+        Recorded Event
+      </mat-radio-button>
+    </mat-radio-group>
+  </div>
+
   <div class="flex flex-row gap-2">
     <div class="text-sm">Note: This event will be visible to the learners 5 minutes after the SPV Publisher has
       published

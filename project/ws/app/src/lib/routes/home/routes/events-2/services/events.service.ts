@@ -15,6 +15,7 @@ const API_END_POINTS = {
   UPDATE_EVENT: (eventId: string) => `apis/proxies/v8/event/v4/update/${eventId}`,
   PUBLISH_EVENT: (eventId: string) => `apis/proxies/v8/event/v4/publish/${eventId}`,
   SEARCH_USERS: '/apis/proxies/v8/user/v1/search',
+  CONTENT_SEARCH: `apis/proxies/v8/sunbirdigot/v4/search`
 }
 
 @Injectable({
@@ -173,6 +174,10 @@ export class EventsService {
     }
 
     return this.http.post<any>(`${API_END_POINTS.SEARCH_USERS}`, reqBody)
+  }
+
+  getContentSearch(request: any): Observable<any> {
+    return this.http.post<any>(`${API_END_POINTS.CONTENT_SEARCH}`, request)
   }
 
 }

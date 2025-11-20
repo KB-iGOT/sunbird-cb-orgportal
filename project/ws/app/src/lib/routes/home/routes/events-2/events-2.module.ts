@@ -46,7 +46,8 @@ import { RejectionReasonComponent } from './dialogs/rejection-reason/rejection-r
 import { CarouselModule } from 'ngx-owl-carousel-o'
 import { DragDropModule } from '@angular/cdk/drag-drop'
 import { MatSortModule } from '@angular/material/sort'
-import { ComponentSharedModule } from '../../../workallocation-v2/components/component-shared.module'
+import { ComponentSharedModule } from '../../../workallocation-v2/components/component-shared.module';
+import { CourseListingComponent } from './components/course-listing/course-listing.component'
 
 
 @NgModule({
@@ -66,7 +67,8 @@ import { ComponentSharedModule } from '../../../workallocation-v2/components/com
     EventsPreviewComponent,
     YoutubePlayerComponent,
     CardCompetencyComponent,
-    RejectionReasonComponent
+    RejectionReasonComponent,
+    CourseListingComponent
   ],
   imports: [
     CommonModule,

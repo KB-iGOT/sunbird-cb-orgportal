@@ -30,8 +30,8 @@
   </div>
 
   <mat-stepper labelPosition="bottom" [selectedIndex]="currentStepperIndex"
-    (selectionChange)="onSelectionChange($event)" class="mx-10" #stepper>
-    <mat-step label="Basic Details">
+    (selectionChange)="onSelectionChange($event)" class="mx-10" #stepper [linear]="true"><!-- add [linear]="true" -->
+    <mat-step label="Basic Details" [stepControl]="eventDetailsForm">
       <ng-template matStepLabel>Basic Details</ng-template>
       <ws-app-event-basic-details [eventStatus]="eventStatus" [eventDetails]="eventDetailsForm" [openMode]="openMode"
         [userProfile]="userProfile" [openTab]="pathUrl"></ws-app-event-basic-details>
@@ -42,12 +42,21 @@
       <ws-app-speakers [speakersList]="speakersList" [openMode]="openMode"
         [userProfile]="userProfile"></ws-app-speakers>
     </mat-step> -->
+    <ng-container *ngIf="edf?.typeofEvent?.value?.toLowerCase() === 'live'">
+      <mat-step label="Course linking" [stepControl]="courseSelectionForm">
+        <ng-template matStepLabel>Course linking</ng-template>
+        <ws-app-course-listing [materialsList]="materialsList" [openMode]="openMode" [openTab]="pathUrl"
+          (courseSelected)="onCourseSelected($event)"></ws-app-course-listing>
+      </mat-step>
+    </ng-container>
 
-    <mat-step label="Add Material">
-      <ng-template matStepLabel>Add Material</ng-template>
-      <ws-app-event-materials [materialsList]="materialsList" [openMode]="openMode"
-        [openTab]="pathUrl"></ws-app-event-materials>
-    </mat-step>
+    <ng-container *ngIf="edf?.typeofEvent?.value?.toLowerCase() === 'record'">
+      <mat-step label="Add Material">
+        <ng-template matStepLabel>Add Material</ng-template>
+        <ws-app-event-materials [materialsList]="materialsList" [openMode]="openMode"
+          [openTab]="pathUrl"></ws-app-event-materials>
+      </mat-step>
+    </ng-container>
 
     <mat-step label="Add Competency">
       <ng-template matStepLabel>Add Competency</ng-template>

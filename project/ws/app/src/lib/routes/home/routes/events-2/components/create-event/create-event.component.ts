@@ -13,6 +13,7 @@ import { DatePipe } from '@angular/common'
 import { LoaderService } from '../../../../../../../../../../../src/app/services/loader.service'
 import { MatLegacyDialog } from '@angular/material/legacy-dialog'
 import { ConfirmDialogComponent } from '../../../../../workallocation-v2/components/confirm-dialog/confirm-dialog.component'
+import { CourseListingComponent } from '../course-listing/course-listing.component'
 
 @Component({
   selector: 'ws-app-create-event',
@@ -23,11 +24,13 @@ export class CreateEventComponent implements OnInit, AfterViewInit {
   //#region (global varialbles)
   private readonly locationService = inject(Location);
   @ViewChild(MatStepper) stepper: MatStepper | undefined
+  @ViewChild(CourseListingComponent) courseListingComponent: CourseListingComponent | undefined
   eventId = ''
   eventIconUrl = ''
   eventDetails: any
   updatedEventDetails: any
   eventDetailsForm!: FormGroup
+  courseSelectionForm!: FormGroup
   speakersList: speaker[] = []
   materialsList: material[] = []
   competencies: any = []
@@ -72,8 +75,15 @@ export class CreateEventComponent implements OnInit, AfterViewInit {
       recoredEventUrl: new FormControl(''),
       appIcon: new FormControl('', [Validators.required]),
       typeofEvent: new FormControl('', [Validators.required]),
+      maxEnrolments: new FormControl('', [Validators.min(1)]),
+    })
+
+    this.courseSelectionForm = this.formBuilder.group({
+      selectedCourse: new FormControl(null, [Validators.required])
     })
   }
+
+  get edf() { return this.eventDetailsForm.controls }
 
   getEventDetailsFromResolver() {
     this.activatedRoute.queryParams.subscribe((params: any) => {
@@ -171,15 +181,55 @@ export class CreateEventComponent implements OnInit, AfterViewInit {
 
   //#region (ui interactions)
   onSelectionChange(event: StepperSelectionEvent) {
+    const selectedStep = this.stepper?.steps.toArray()[event.selectedIndex]
+    const selectedLabel = selectedStep?.label
+    const previousStep = this.stepper?.steps.toArray()[event.previouslySelectedIndex]
+    const previousLabel = previousStep?.label
+
+    // Check if user is trying to navigate FORWARD from Course Linking step without selecting a course
+    if (previousLabel === 'Course linking' &&
+      this.edf?.typeofEvent?.value?.toLowerCase() === 'live' &&
+      event.selectedIndex > event.previouslySelectedIndex) {
+      if (!this.courseListingComponent?.selectedCourse) {
+        this.matSnackBar.open('Please select a course before proceeding', 'Close', {
+          duration: 3000,
+        })
+        // Prevent navigation by using setTimeout to reset after Angular's change detection
+        setTimeout(() => {
+          if (this.stepper) {
+            this.stepper.selectedIndex = event.previouslySelectedIndex
+            this.currentStepperIndex = event.previouslySelectedIndex
+            this.cdr.detectChanges()
+          }
+        }, 0)
+        return
+      } else {
+        // Update the form control when a course is selected
+        this.courseSelectionForm.patchValue({
+          selectedCourse: this.courseListingComponent.selectedCourse
+        })
+      }
+    }
+
     this.currentStepperIndex = event.selectedIndex
     if (this.stepper) {
-      const selectedStep = this.stepper.steps.toArray()[this.currentStepperIndex]
-      this.selectedStepperLable = selectedStep.label
+      this.selectedStepperLable = selectedLabel || ''
       this.cdr.detectChanges()
     }
     if (this.selectedStepperLable === 'Preview') {
       this.updatedEventDetails = this.getFormBodyOfEvent(this.eventDetails['status'])
     }
+  }
+
+  onCourseSelected(course: any) {
+    // Update the form control immediately when a course is selected
+    this.courseSelectionForm.patchValue({
+      selectedCourse: course
+    })
+    // Mark the form as touched and update validity
+    this.courseSelectionForm.markAllAsTouched()
+    this.courseSelectionForm.updateValueAndValidity()
+    this.cdr.detectChanges()
   }
 
 
