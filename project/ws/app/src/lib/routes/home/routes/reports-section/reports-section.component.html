@@ -76,6 +76,18 @@
           </mat-card>
           <ng-container class="margin-top-l">
             <div class="table-container">
+              <div class="flex flex-row flex-1 password">
+                <mat-form-field appearance="outline" class="margin-top-xs password-input">
+                  <mat-icon class="search">
+                    search
+                  </mat-icon>
+                  <input [type]="text" placeholder="Search Organisation" [(ngModel)]="searchTerm"
+                    (keyup)="applyFilter()" matInput>
+
+                </mat-form-field>
+
+              </div>
+
               <table matSort mat-table [dataSource]="dataSource" [matSortActive]="orgName" [matSortDirection]="asc"
                 class="mat-elevation-z8 full-width-table" aria-label="Example table"><!-- //NOSONAR -->
                 <ng-container matColumnDef="select">
