@@ -40,7 +40,7 @@
       (click)="onCourseSelect(course)">
       <div class="card-image-container">
         <img [src]="course?.posterImage || '/assets/images/parliament.jpg'" [alt]="course.name" class="card-image">
-        <div class="radio-btn-container" (click)="$event.stopPropagation()">
+        <div class="radio-btn-container">
           <mat-radio-button [checked]="selectedCourse?.identifier === course?.identifier"
             class="flex flex-center"></mat-radio-button>
         </div>
