@@ -47,7 +47,8 @@ import { CarouselModule } from 'ngx-owl-carousel-o'
 import { DragDropModule } from '@angular/cdk/drag-drop'
 import { MatSortModule } from '@angular/material/sort'
 import { ComponentSharedModule } from '../../../workallocation-v2/components/component-shared.module';
-import { CourseListingComponent } from './components/course-listing/course-listing.component'
+import { CourseListingComponent } from './components/course-listing/course-listing.component';
+import { EventDetailsComponent } from './components/event-details/event-details.component'
 
 
 @NgModule({
@@ -68,7 +69,8 @@ import { CourseListingComponent } from './components/course-listing/course-listi
     YoutubePlayerComponent,
     CardCompetencyComponent,
     RejectionReasonComponent,
-    CourseListingComponent
+    CourseListingComponent,
+    EventDetailsComponent
   ],
   imports: [
     CommonModule,

@@ -30,7 +30,7 @@
   </div>
 
   <mat-stepper labelPosition="bottom" [selectedIndex]="currentStepperIndex"
-    (selectionChange)="onSelectionChange($event)" class="mx-10" #stepper [linear]="true"><!-- add [linear]="true" -->
+    (selectionChange)="onSelectionChange($event)" class="mx-10" #stepper><!-- add [linear]="true" -->
     <mat-step label="Basic Details" [stepControl]="eventDetailsForm">
       <ng-template matStepLabel>Basic Details</ng-template>
       <ws-app-event-basic-details [eventStatus]="eventStatus" [eventDetails]="eventDetailsForm" [openMode]="openMode"
@@ -50,6 +50,14 @@
       </mat-step>
     </ng-container>
 
+    <ng-container *ngIf="edf?.typeofEvent?.value?.toLowerCase() === 'live'">
+      <mat-step label="Event Setup">
+        <ng-template matStepLabel>Event Setup</ng-template>
+        <ws-app-event-details [materialsList]="materialsList" [openMode]="openMode"
+          [openTab]="pathUrl"></ws-app-event-details>
+      </mat-step>
+    </ng-container>
+
     <ng-container *ngIf="edf?.typeofEvent?.value?.toLowerCase() === 'record'">
       <mat-step label="Add Material">
         <ng-template matStepLabel>Add Material</ng-template>
@@ -58,7 +66,7 @@
       </mat-step>
     </ng-container>
 
-    <mat-step label="Add Competency">
+    <mat-step label="Add Competency" *ngIf="edf?.typeofEvent?.value?.toLowerCase() === 'record'">
       <ng-template matStepLabel>Add Competency</ng-template>
       <ws-app-event-competencies [competenciesList]="competencies" [openMode]="openMode" [openTab]="pathUrl"
         (addCompetencies)="addCompetencies($event)"></ws-app-event-competencies>
