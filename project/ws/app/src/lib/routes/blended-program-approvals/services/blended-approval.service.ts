@@ -23,6 +23,7 @@ const API_END_POINTS = {
   GENERATE_REPORT: `apis/proxies/v8/bp/v1/generate/report`,
   DOWNLOAD_REPORT: `apis/proxies/v8/bp/v1/bpreport/download/`,
   GET_FORM_BY_ID: `/apis/proxies/v8/forms/v2/getFormById`,
+  INVITE_USERS: 'apis/proxies/v8/workflow/blendedprogram/nominate',
 }
 
 @Injectable({
@@ -113,5 +114,10 @@ export class BlendedApporvalService {
 
   getSurveyByFormId(formId: any) {
     return this.http.get<any>(`${API_END_POINTS.GET_FORM_BY_ID}?formId=${formId}`)
+  }
+
+
+  inviteUserToBatch(data: any): Observable<any> {
+    return this.http.post<any>(API_END_POINTS.INVITE_USERS, data)
   }
 }
