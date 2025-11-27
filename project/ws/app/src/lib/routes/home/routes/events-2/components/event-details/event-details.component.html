@@ -133,12 +133,14 @@
         <label class="field-label required">Upload session recording</label>
 
         <!-- Upload Container - Show when no video uploaded -->
-        <div class="upload-container" *ngIf="!showUploadedVideo" [class.disabled]="isDraft">
+        <div class="upload-container" *ngIf="!showUploadedVideo"
+          [class.disabled]="isDraft && isDateTimePassed(eventDetailsData?.endDateTime)">
           <mat-icon class="upload-icon">cloud_upload</mat-icon>
           <p class="upload-text">Select video to upload</p>
           <p class="upload-subtext">or drag and drop here</p>
           <p class="upload-limit">Max Size - 500 MB</p>
-          <input type="file" class="file-input" (change)="onVideoUpload($event)" accept=".mp4" [disabled]="isDraft">
+          <input type="file" class="file-input" (change)="onVideoUpload($event)" accept=".mp4"
+            [disabled]="isDraft && isDateTimePassed(eventDetailsData?.endDateTime)">
         </div>
 
         <!-- Uploaded Video Display - Show after successful upload -->
@@ -169,13 +171,14 @@
         <label class="field-label">Summary Document</label>
 
         <!-- Upload Container - Show when no document uploaded -->
-        <div class="upload-container" *ngIf="!showUploadedSummaryDoc" [class.disabled]="isDraft">
+        <div class="upload-container" *ngIf="!showUploadedSummaryDoc"
+          [class.disabled]="isDraft && isDateTimePassed(eventDetailsData?.endDateTime)">
           <mat-icon class="upload-icon">cloud_upload</mat-icon>
           <p class="upload-text">Select document to upload</p>
           <p class="upload-subtext">or drag and drop here</p>
           <p class="upload-limit">Max Size - 10MB</p>
           <input type="file" class="file-input" (change)="onSummaryDocUpload($event)" accept=".pdf"
-            [disabled]="isDraft">
+            [disabled]="isDraft && isDateTimePassed(eventDetailsData?.endDateTime)">
         </div>
 
         <!-- Uploaded Document Display - Show after successful upload -->
