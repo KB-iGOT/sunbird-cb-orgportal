@@ -1,0 +1,89 @@
+<div class="course-listing-details p-6">
+  <div class="flex flex-middle gap-1 required">
+    <div class="course-listing-header">
+      Course Linking
+    </div>
+    <mat-icon class="cursor-pointer info-icon"
+      matTooltip="You need to add a course to create this event.">info_outline</mat-icon>
+  </div>
+
+  <!-- Selected Course Chip -->
+  <div class="selected-items-container mt-4" *ngIf="selectedCourse">
+    <span class="selected-label">Selected items -</span>
+    <div class="selected-chip">
+      <span class="chip-text">{{selectedCourse.name}}</span>
+      <ng-container *ngIf="isDraft">
+        <mat-icon class="chip-close" (click)="removeCourse()">close</mat-icon>
+      </ng-container>
+    </div>
+  </div>
+
+  <div class="flex justify-between items-center mt-4 action-bar">
+    <div class="flex items-center gap-3 w-full">
+      <div class="search-container">
+        <mat-icon class="search-icon">search</mat-icon>
+        <input type="text" placeholder="Search" class="search-input" (keyup.enter)="onSearch($event)"
+          [disabled]="!isDraft">
+      </div>
+      <button mat-button class="sort-button flex items-center gap-2" [matMenuTriggerFor]="sortMenu"
+        [disabled]="!isDraft">
+        Sort by
+        <mat-icon>tune</mat-icon>
+      </button>
+      <mat-menu #sortMenu="matMenu" class="sort-menu">
+        <button mat-menu-item class="sort-az" (click)="onSort('asc')">
+          <mat-icon>arrow_upward</mat-icon>
+          <span>Sort A-Z</span>
+        </button>
+        <button mat-menu-item class="sort-za" (click)="onSort('desc')">
+          <mat-icon>arrow_downward</mat-icon>
+          <span>Sort Z-A</span>
+        </button>
+      </mat-menu>
+      <div class="ml-auto">
+        <button mat-button class="add-button">
+          Add
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="course-grid mt-5">
+    <div class="course-card" [ngClass]="{'disable-card': !isDraft}"
+      *ngFor="let course of contentList; trackBy: trackByCourse" (click)="(isDraft) ? onCourseSelect(course) : null">
+      <div class="card-image-container">
+        <img [src]="getCorrectUrl(course?.posterImage) || '/assets/images/parliament.jpg'" [alt]="course.name"
+          class="card-image">
+        <div class="radio-btn-container">
+          <mat-radio-button [checked]="selectedCourse?.identifier === course?.identifier" class="flex flex-center"
+            [disabled]="!isDraft"></mat-radio-button>
+        </div>
+      </div>
+      <div class="card-content">
+        <span class="course-badge">{{course.courseCategory || 'Course'}}</span>
+        <h3 class="course-title">{{course.name}}</h3>
+        <p class="course-publish-date">Published on: {{course.lastPublishedOn | date:'d/MMM/yy'}}</p>
+      </div>
+    </div>
+
+    <div class="no-data-container" *ngIf="!contentList || contentList.length === 0">
+      <img src="/assets/images/no-content-data-search.svg" alt="No data" class="no-data-image">
+      <h3 class="no-data-title">No Content Found</h3>
+      <p class="no-data-message">There are no content available for the selected filter.</p>
+    </div>
+  </div>
+
+  <div class="pagination-container" *ngIf="contentList && contentList.length > 0">
+    <div class="pagination-info">
+      <span>Content per page</span>
+      <mat-form-field appearance="outline" class="per-page-select">
+        <mat-select [value]="pageSize" (selectionChange)="onPageSizeChange($event.value)">
+          <mat-option *ngFor="let size of pageSizeOptions" [value]="size">{{size}}</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+    <mat-paginator [length]="totalCount" [pageSize]="pageSize" [pageIndex]="pageIndex"
+      [pageSizeOptions]="pageSizeOptions" (page)="onPageChange($event)" showFirstLastButtons>
+    </mat-paginator>
+  </div>
+</div>

@@ -6,15 +6,18 @@ import { DatePipe } from '@angular/common'
 import { Observable } from 'rxjs'
 
 const API_END_POINTS = {
-  GET_EVENTS: '/apis/proxies/v8/sunbirdigot/search',
+  GET_EVENTS: 'apis/proxies/v8/sunbirdigot/search',
   CREATE_CONTENT: 'apis/proxies/v8/action/content/v3/create',
   UPLOAD_CONTENT: 'apis/proxies/v8/upload/action/content/v3/upload',
-  CREATE_EVENT: '/apis/proxies/v8/event/v4/create',
+  CREATE_EVENT: 'apis/proxies/v8/event/v4/create',
   EVENT_READ: (eventId: string) => `apis/proxies/v8/event/v4/read/${eventId}`,
   EDIT_EVENT_READ: (eventId: string) => `apis/proxies/v8/event/v4/read/${eventId}?mode=edit`,
   UPDATE_EVENT: (eventId: string) => `apis/proxies/v8/event/v4/update/${eventId}`,
   PUBLISH_EVENT: (eventId: string) => `apis/proxies/v8/event/v4/publish/${eventId}`,
-  SEARCH_USERS: '/apis/proxies/v8/user/v1/search',
+  SEARCH_USERS: 'apis/proxies/v8/user/v1/search',
+  CONTENT_SEARCH: `apis/proxies/v8/sunbirdigot/v4/search`,
+  CONTENT_READ: (contentId: string) => `apis/proxies/v8/action/content/v3/read/${contentId}`,
+  AUTOCOMPLETE: (query: string) => `apis/proxies/v8/user/v1/autocomplete/${query}`,
 }
 
 @Injectable({
@@ -173,6 +176,18 @@ export class EventsService {
     }
 
     return this.http.post<any>(`${API_END_POINTS.SEARCH_USERS}`, reqBody)
+  }
+
+  getContentSearch(request: any): Observable<any> {
+    return this.http.post<any>(`${API_END_POINTS.CONTENT_SEARCH}`, request)
+  }
+
+  getContentRead(contentId: string): Observable<any> {
+    return this.http.get<any>(`${API_END_POINTS.CONTENT_READ(contentId)}`)
+  }
+
+  getUserSearchList(userText: string) {
+    return this.http.get(API_END_POINTS.AUTOCOMPLETE(userText)).pipe(map(res => _.get(res, 'result.response')))
   }
 
 }

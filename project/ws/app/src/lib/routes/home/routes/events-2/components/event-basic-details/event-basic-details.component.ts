@@ -123,7 +123,17 @@ export class EventBasicDetailsComponent implements OnInit, OnChanges {
           }
         })
       }
+      if (this.edf?.typeofEvent?.value?.toLowerCase() === 'live') {
+        this.edf.maxEnrolments?.setValidators([Validators.required, Validators.min(10), Validators.max(10000)])
+        this.edf.maxEnrolments?.updateValueAndValidity()
+        this.edf.registrationLink?.setValidators([])
+        this.edf.registrationLink?.updateValueAndValidity()
+      }
     }
+  }
+
+  get edf() {
+    return this.eventDetails?.controls
   }
 
   checkMinTimeToStart(selectedDate: any) {
@@ -433,6 +443,28 @@ export class EventBasicDetailsComponent implements OnInit, OnChanges {
 
   private openSnackBar(message: string) {
     this.matSnackBar.open(message)
+  }
+
+  allowNumbers(event: KeyboardEvent): void {
+    const allowedKeys = ['Backspace', 'ArrowLeft', 'ArrowRight', 'Tab', 'Delete']
+    if (allowedKeys.indexOf(event.key) !== -1) {
+      return
+    }
+    // Allow only single digit keys 0-9
+    if (!/^[0-9]$/.test(event.key)) {
+      event.preventDefault()
+    }
+  }
+
+  onPasteNumber(event: ClipboardEvent): void {
+    const paste = event.clipboardData ? event.clipboardData.getData('text') : ''
+    if (!/^[0-9]+$/.test(paste)) {
+      event.preventDefault()
+    }
+  }
+
+  checkIfLiveEvent(): boolean {
+    return this.edf?.typeofEvent?.value?.toLowerCase() === 'live'
   }
 
 }
