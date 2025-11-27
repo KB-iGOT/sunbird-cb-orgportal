@@ -245,6 +245,7 @@ export class CreateEventComponent implements OnInit, AfterViewInit {
         this.courseSelectionForm.patchValue({
           selectedCourse: this.courseListingComponent.selectedCourse
         })
+        this.competencies = this.getLatestCompetencies(this.courseListingComponent.selectedCourse)
       }
     }
 
