@@ -36,6 +36,7 @@ import { EventResolverService } from './services/event-resolver'
 import { AddCompetencyComponent } from './dialogs/add-competency/add-competency.component'
 import { MatLegacyCheckboxModule } from '@angular/material/legacy-checkbox'
 import { MatLegacyAutocompleteModule } from '@angular/material/legacy-autocomplete'
+import { MatLegacyChipsModule } from '@angular/material/legacy-chips'
 import { EventsPreviewComponent } from './components/events-preview/events-preview.component'
 import { YoutubePlayerComponent } from './dialogs/youtube-player/youtube-player.component'
 import { MatLegacyTabsModule } from '@angular/material/legacy-tabs'
@@ -46,8 +47,8 @@ import { RejectionReasonComponent } from './dialogs/rejection-reason/rejection-r
 import { CarouselModule } from 'ngx-owl-carousel-o'
 import { DragDropModule } from '@angular/cdk/drag-drop'
 import { MatSortModule } from '@angular/material/sort'
-import { ComponentSharedModule } from '../../../workallocation-v2/components/component-shared.module';
-import { CourseListingComponent } from './components/course-listing/course-listing.component';
+import { ComponentSharedModule } from '../../../workallocation-v2/components/component-shared.module'
+import { CourseListingComponent } from './components/course-listing/course-listing.component'
 import { EventDetailsComponent } from './components/event-details/event-details.component'
 
 
@@ -96,6 +97,7 @@ import { EventDetailsComponent } from './components/event-details/event-details.
     MatFormFieldModule,
     MatDatepickerModule,
     MatLegacyAutocompleteModule,
+    MatLegacyChipsModule,
     MatLegacyTabsModule,
     SbUiResolverModule,
     NgxMaterialTimepickerModule,

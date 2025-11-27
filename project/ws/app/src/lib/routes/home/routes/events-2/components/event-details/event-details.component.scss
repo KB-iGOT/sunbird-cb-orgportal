@@ -65,6 +65,12 @@
       position: relative;
       cursor: pointer;
 
+      &.disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        pointer-events: none;
+      }
+
       .upload-icon {
         width: 48px;
         height: 48px;
@@ -99,6 +105,63 @@
         height: 100%;
         opacity: 0;
         cursor: pointer;
+      }
+    }
+
+    .uploaded-doc-container {
+      margin-top: 8px;
+
+      .uploaded-doc-card {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 16px;
+        border: 1px solid #E0E0E0;
+        border-radius: 8px;
+        background: #FAFAFA;
+
+        .doc-icon {
+          width: 40px;
+          height: 40px;
+          object-fit: contain;
+        }
+
+        .video-icon {
+          width: 40px;
+          height: 40px;
+          font-size: 40px;
+          color: #1B4CA1;
+        }
+
+        .doc-info {
+          flex: 1;
+
+          .doc-name {
+            font: 500 14px/20px Lato;
+            color: #333;
+            margin: 0 0 4px 0;
+          }
+
+          .doc-type {
+            font: 400 12px/16px Lato;
+            color: #666;
+            margin: 0;
+          }
+        }
+
+        .remove-btn {
+          color: #D32F2F;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+
+          mat-icon {
+            font-size: 20px;
+            width: 20px;
+            height: 20px;
+            line-height: 20px;
+          }
+        }
       }
     }
 

@@ -7,13 +7,26 @@
       matTooltip="You need to add a course to create this event.">info_outline</mat-icon>
   </div>
 
+  <!-- Selected Course Chip -->
+  <div class="selected-items-container mt-4" *ngIf="selectedCourse">
+    <span class="selected-label">Selected items -</span>
+    <div class="selected-chip">
+      <span class="chip-text">{{selectedCourse.name}}</span>
+      <ng-container *ngIf="isDraft">
+        <mat-icon class="chip-close" (click)="removeCourse()">close</mat-icon>
+      </ng-container>
+    </div>
+  </div>
+
   <div class="flex justify-between items-center mt-4 action-bar">
     <div class="flex items-center gap-3 w-full">
       <div class="search-container">
         <mat-icon class="search-icon">search</mat-icon>
-        <input type="text" placeholder="Search" class="search-input" (keyup.enter)="onSearch($event)">
+        <input type="text" placeholder="Search" class="search-input" (keyup.enter)="onSearch($event)"
+          [disabled]="!isDraft">
       </div>
-      <button mat-button class="sort-button flex items-center gap-2" [matMenuTriggerFor]="sortMenu">
+      <button mat-button class="sort-button flex items-center gap-2" [matMenuTriggerFor]="sortMenu"
+        [disabled]="!isDraft">
         Sort by
         <mat-icon>tune</mat-icon>
       </button>
@@ -36,13 +49,14 @@
   </div>
 
   <div class="course-grid mt-5">
-    <div class="course-card" *ngFor="let course of contentList; trackBy: trackByCourse"
-      (click)="onCourseSelect(course)">
+    <div class="course-card" [ngClass]="{'disable-card': !isDraft}"
+      *ngFor="let course of contentList; trackBy: trackByCourse" (click)="(isDraft) ? onCourseSelect(course) : null">
       <div class="card-image-container">
-        <img [src]="course?.posterImage || '/assets/images/parliament.jpg'" [alt]="course.name" class="card-image">
+        <img [src]="getCorrectUrl(course?.posterImage) || '/assets/images/parliament.jpg'" [alt]="course.name"
+          class="card-image">
         <div class="radio-btn-container">
-          <mat-radio-button [checked]="selectedCourse?.identifier === course?.identifier"
-            class="flex flex-center"></mat-radio-button>
+          <mat-radio-button [checked]="selectedCourse?.identifier === course?.identifier" class="flex flex-center"
+            [disabled]="!isDraft"></mat-radio-button>
         </div>
       </div>
       <div class="card-content">

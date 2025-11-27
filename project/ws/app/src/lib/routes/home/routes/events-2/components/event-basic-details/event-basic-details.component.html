@@ -93,10 +93,17 @@
     </div>
     <ng-container *ngIf="eventDetails?.controls?.maxEnrolments; else maxFallback">
       <mat-form-field appearance="outline" class="">
-        <input matInput type="number" placeholder="Enter number only" formControlName="maxEnrolments" min="1" step="1"
-          inputmode="numeric" pattern="[0-9]*" (keypress)="allowNumbers($event)" (paste)="onPasteNumber($event)">
+        <input matInput type="number" placeholder="Enter number only" formControlName="maxEnrolments" min="10"
+          max="10000" step="1" inputmode="numeric" pattern="[0-9]*" (keypress)="allowNumbers($event)"
+          (paste)="onPasteNumber($event)">
         <mat-error *ngIf="showValidationMsg('maxEnrolments','required')">
           Maximum participants is mandatory
+        </mat-error>
+        <mat-error *ngIf="showValidationMsg('maxEnrolments','min')">
+          Minimum 10 participants required
+        </mat-error>
+        <mat-error *ngIf="showValidationMsg('maxEnrolments','max')">
+          Maximum 10000 participants allowed
         </mat-error>
       </mat-form-field>
     </ng-container>

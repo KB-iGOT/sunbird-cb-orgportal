@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core'
-import { material } from '../../models/events.model'
 import { EventsService } from '../../services/events.service'
 import { PageEvent } from '@angular/material/paginator'
+import { environment } from '../../../../../../../../../../../src/environments/environment'
 
 @Component({
   selector: 'ws-app-course-listing',
@@ -10,7 +10,8 @@ import { PageEvent } from '@angular/material/paginator'
 })
 export class CourseListingComponent implements OnInit {
 
-  @Input() materialsList: material[] = []
+  @Input() courseDetails: any
+  @Input() eventDetailsData: any
   @Input() openMode = 'edit'
   @Input() openTab = 'draft'
   @Output() courseSelected = new EventEmitter<any>()
@@ -26,6 +27,7 @@ export class CourseListingComponent implements OnInit {
   // Search and sort
   searchQuery = ''
   sortOrder: 'asc' | 'desc' = 'asc'
+  isDraft: boolean = false
 
   constructor(
     public eventsService: EventsService
@@ -33,6 +35,7 @@ export class CourseListingComponent implements OnInit {
 
   ngOnInit() {
     this.fetchCourseDetails()
+    this.isDraft = this.eventDetailsData?.status?.toLowerCase() !== 'live'
   }
 
   fetchCourseDetails() {
@@ -54,6 +57,9 @@ export class CourseListingComponent implements OnInit {
     this.eventsService.getContentSearch(reqBody).subscribe((response: any) => {
       this.contentList = response.result.content || []
       this.totalCount = response.result.count || 0
+      if (this.courseDetails?.identifier) {
+        this.selectedCourse = this.courseDetails
+      }
     })
   }
 
@@ -86,6 +92,11 @@ export class CourseListingComponent implements OnInit {
     this.courseSelected.emit(course)
   }
 
+  removeCourse() {
+    this.selectedCourse = null
+    this.courseSelected.emit(null)
+  }
+
   isSelected(course: any): boolean {
     return this.selectedCourse?.identifier === course?.identifier
   }
@@ -94,4 +105,10 @@ export class CourseListingComponent implements OnInit {
     return course?.identifier || index
   }
 
+  getCorrectUrl(url: string): string {
+    if (url && url.includes('nic.in')) {
+      return url.replace(/https?:\/\/[^\/]+\.nic\.in/, environment.domainName || '')
+    }
+    return url ? url : '/assets/images/default.png'
+  }
 }
