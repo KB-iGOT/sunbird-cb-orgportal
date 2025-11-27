@@ -145,7 +145,7 @@ export class EventDetailsComponent implements OnInit {
 
   patchFormValues() {
     this.preEventForm.patchValue({
-      preEventReads: this.eventDetailsData.preEventReads?.[0] || [],
+      preEventReads: this.eventDetailsData.preEventReads?.[0] || '',
       meetingLink: this.eventDetailsData.registrationLink || '',
       agenda: this.eventDetailsData.meetingAgenda || '',
       selectedSpeaker: (_.isString(this.eventDetailsData.speakerDetails)) ? JSON.parse(this.eventDetailsData.speakerDetails) :
