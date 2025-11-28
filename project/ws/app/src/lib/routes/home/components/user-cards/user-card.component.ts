@@ -231,6 +231,7 @@ export class UserCardComponent implements OnInit, OnChanges, AfterViewChecked, A
     } else {
       this.init()
     }
+    this.loadDesignations()
     this.userLimitSet = this.usersSvc.TOTAL_USERS_LIMIT
 
 
@@ -238,7 +239,6 @@ export class UserCardComponent implements OnInit, OnChanges, AfterViewChecked, A
       .pipe(
         debounceTime(250),
         distinctUntilChanged(),
-        startWith(''),
       )
       .subscribe(searchText => {
         this.loadDesignations(searchText)
@@ -386,7 +386,6 @@ export class UserCardComponent implements OnInit, OnChanges, AfterViewChecked, A
   }
 
   async init() {
-    await this.loadDesignations()
     await this.loadGroups()
     await this.loadLangauages()
     // await this.loadCountryCodes()
@@ -1424,7 +1423,9 @@ export class UserCardComponent implements OnInit, OnChanges, AfterViewChecked, A
       this.designationListLoadCount = this.designationDefaultLoadCount // Reset the load count
       this.designationOffset = 0
       this.noMoreLegacyDesignations = false
-      this.loadDesignations()
+      if (!this.designationsMeta || this.designationsMeta.length === 0) {
+        this.loadDesignations()
+      }
       if (this.updateUserDataForm.get('searchDesignation')) {
         this.updateUserDataForm.get('searchDesignation')!.setValue('')
       }
