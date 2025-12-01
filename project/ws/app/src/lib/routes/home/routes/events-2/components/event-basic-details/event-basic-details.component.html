@@ -36,7 +36,7 @@
       </div>
       <mat-form-field appearance="outline" class="disable-round">
         <mat-select placeholder="select Event Category" formControlName="eventCategory">
-          <ng-container *ngFor="let category of evntCategorysList">
+          <ng-container *ngFor="let category of eventCategoriesList">
             <mat-option [value]="category">
               {{category}}
             </mat-option>
