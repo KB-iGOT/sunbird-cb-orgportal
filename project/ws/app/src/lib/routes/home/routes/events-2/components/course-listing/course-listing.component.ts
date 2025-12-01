@@ -47,7 +47,7 @@ export class CourseListingComponent implements OnInit {
         sort_by: { lastSubmittedOn: this.sortOrder === 'asc' ? 'asc' : 'desc' },
         filters: {
           must: {
-            courseCategory: ['Course', 'Moderated Course']
+            courseCategory: ['Course']
           },
           status: ['Live']
         }

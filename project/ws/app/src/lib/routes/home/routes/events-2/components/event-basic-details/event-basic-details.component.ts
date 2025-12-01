@@ -24,7 +24,7 @@ export class EventBasicDetailsComponent implements OnInit, OnChanges {
   @Input() userProfile: any
   @Input() openTab = 'draft'
 
-  evntCategorysList = ['Webinar', 'Karmayogi Talks', 'Karmayogi Saptah']
+  eventCategoriesList = ['Webinar', 'Karmayogi Talks', 'Karmayogi Saptah']
   minDate = new Date()
 
   maxTimeToStart = '11:44 pm'
@@ -128,6 +128,7 @@ export class EventBasicDetailsComponent implements OnInit, OnChanges {
         this.edf.maxEnrolments?.updateValueAndValidity()
         this.edf.registrationLink?.setValidators([])
         this.edf.registrationLink?.updateValueAndValidity()
+        this.eventCategoriesList = ['Samuhik Charcha']
       }
     }
   }
