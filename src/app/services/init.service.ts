@@ -160,6 +160,10 @@ export class InitService {
       'radio-on',
       domSanitizer.bypassSecurityTrustResourceUrl('assets/icons/radio-on.svg'),
     )
+    iconRegistry.addSvgIcon(
+      'single-color-upload-file',
+      domSanitizer.bypassSecurityTrustResourceUrl('assets/icons/upload-upward-arrow.svg'),
+    )
   }
 
   async init() {

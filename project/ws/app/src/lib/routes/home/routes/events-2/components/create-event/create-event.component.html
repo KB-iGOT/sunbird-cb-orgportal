@@ -11,7 +11,8 @@
         <button mat-raised-button class="flex justify-center items-center save-and-exit" (click)="saveAndExit()">
           Save Draft & Exit</button>
       </ng-container>
-      <ng-container *ngIf="openMode === 'edit' && pathUrl === 'past'">
+      <ng-container
+        *ngIf="openMode === 'edit' && pathUrl === 'past' && edf?.typeofEvent?.value?.toLowerCase() !== 'live'">
         <button mat-raised-button class="flex justify-center items-center save-and-exit" (click)="saveAndPublish()">Save
         </button>
       </ng-container>
@@ -31,6 +32,11 @@
         *ngIf="(selectedStepperLable === 'Event Setup' ||selectedStepperLable === 'Preview' || selectedStepperLable === 'Add Competency') && openMode === 'edit' && pathUrl !== 'past'">
         <button mat-raised-button class="flex items-center publish-btn" (click)="publish()">Send to Publisher</button>
       </ng-container>
+      <ng-container
+        *ngIf="pathUrl === 'past' && edf?.typeofEvent?.value?.toLowerCase() === 'live' && selectedStepperLable === 'Event Setup'">
+        <button mat-raised-button class="flex items-center publish-btn" (click)="updatePostEvent()">
+          Update Post Event </button>
+      </ng-container>
     </div>
   </div>
 
@@ -48,8 +54,8 @@
         [userProfile]="userProfile"></ws-app-speakers>
     </mat-step> -->
     <ng-container *ngIf="edf?.typeofEvent?.value?.toLowerCase() === 'live' && contentLoaded">
-      <mat-step label="Course linking" [stepControl]="courseSelectionForm">
-        <ng-template matStepLabel>Course linking</ng-template>
+      <mat-step label="Course Linking" [stepControl]="courseSelectionForm">
+        <ng-template matStepLabel>Course Linking</ng-template>
         <ws-app-course-listing [courseDetails]="courseSelectionForm?.value?.selectedCourse"
           [eventDetailsData]="eventDetails" [openMode]="openMode" [openTab]="pathUrl"
           (courseSelected)="onCourseSelected($event)"></ws-app-course-listing>

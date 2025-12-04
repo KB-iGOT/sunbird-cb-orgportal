@@ -220,34 +220,47 @@ export class CreateEventComponent implements OnInit, AfterViewInit {
   onSelectionChange(event: StepperSelectionEvent) {
     const selectedStep = this.stepper?.steps.toArray()[event.selectedIndex]
     const selectedLabel = selectedStep?.label
-    const previousStep = this.stepper?.steps.toArray()[event.previouslySelectedIndex]
-    const previousLabel = previousStep?.label
+    // const previousStep = this.stepper?.steps.toArray()[event.previouslySelectedIndex]
+    // const previousLabel = previousStep?.label
 
     // Check if user is trying to navigate FORWARD from Course Linking step without selecting a course
-    if (previousLabel === 'Course linking' &&
-      this.edf?.typeofEvent?.value?.toLowerCase() === 'live' &&
-      event.selectedIndex > event.previouslySelectedIndex) {
-      if (!this.courseListingComponent?.selectedCourse) {
-        this.matSnackBar.open('Please select a course before proceeding', 'Close', {
-          duration: 3000,
-        })
-        // Prevent navigation by using setTimeout to reset after Angular's change detection
-        setTimeout(() => {
-          if (this.stepper) {
-            this.stepper.selectedIndex = event.previouslySelectedIndex
-            this.currentStepperIndex = event.previouslySelectedIndex
-            this.cdr.detectChanges()
-          }
-        }, 0)
-        return
-      } else {
-        // Update the form control when a course is selected
-        this.courseSelectionForm.patchValue({
-          selectedCourse: this.courseListingComponent.selectedCourse
-        })
-        this.competencies = this.getLatestCompetencies(this.courseListingComponent.selectedCourse)
-      }
-    }
+    // if (previousLabel === 'Course Linking' &&
+    //   this.edf?.typeofEvent?.value?.toLowerCase() === 'live' &&
+    //   event.selectedIndex > event.previouslySelectedIndex) {
+    //   if (!this.courseListingComponent?.selectedCourse) {
+    //     this.matSnackBar.open('Please select a course before proceeding', 'X', {
+    //       duration: 3000,
+    //     })
+    //     // Prevent navigation by using setTimeout to reset after Angular's change detection
+    //     setTimeout(() => {
+    //       if (this.stepper) {
+    //         this.stepper.selectedIndex = event.previouslySelectedIndex
+    //         this.currentStepperIndex = event.previouslySelectedIndex
+    //         this.cdr.detectChanges()
+    //       }
+    //     }, 0)
+    //     return
+    //   } else {
+    //     // Update the form control when a course is selected
+    //     this.courseSelectionForm.patchValue({
+    //       selectedCourse: this.courseListingComponent.selectedCourse
+    //     })
+    //     this.competencies = this.getLatestCompetencies(this.courseListingComponent.selectedCourse)
+    //   }
+    // }
+
+    // if (event.selectedIndex > event.previouslySelectedIndex && previousLabel === 'Basic Details') {
+    //   if (this.eventDetailsForm.invalid) {
+    //     this.matSnackBar.open('Please fill mandatory fields')
+    //     setTimeout(() => {
+    //       if (this.stepper) {
+    //         this.stepper.selectedIndex = event.previouslySelectedIndex
+    //         this.currentStepperIndex = event.previouslySelectedIndex
+    //         this.cdr.detectChanges()
+    //       }
+    //     }, 0)
+    //   }
+    // }
 
     this.currentStepperIndex = event.selectedIndex
     if (this.stepper) {
@@ -350,8 +363,14 @@ export class CreateEventComponent implements OnInit, AfterViewInit {
   }
 
   moveToNextForm() {
+    // const currentStep = this.stepper?.steps.toArray()[this.currentStepperIndex]
+    // const currentStepLabel = currentStep?.label || ''
     this.eventDetailsForm.markAllAsTouched()
     this.eventDetailsForm.updateValueAndValidity()
+    // if (currentStepLabel === 'Basic Details' && this.eventDetailsForm.invalid) {
+    //   this.matSnackBar.open('Please fill mandatory fields')
+    //   return
+    // }
     if (this.stepper && this.currentStepperIndex < this.stepper.steps.length - 1) {
       this.currentStepperIndex = this.currentStepperIndex + 1
     }
@@ -453,7 +472,7 @@ export class CreateEventComponent implements OnInit, AfterViewInit {
           return false
         }
         if (this.courseSelectionForm?.invalid) {
-          this.openSnackBar('Please select one course in course linking')
+          this.openSnackBar('Please select one course in course Linking')
           return false
         }
       }
@@ -521,7 +540,9 @@ export class CreateEventComponent implements OnInit, AfterViewInit {
     this.eventSvc.updateEvent(formBody, this.eventId).subscribe({
       next: res => {
         if (res) {
-          const successMessage = status === 'Draft' ? 'Event details saved successfully' : 'Event details sent for approval successfully'
+          const successMessage = status === 'Draft' ? 'Event details saved successfully' :
+            status === 'updatePostEvent' ? 'Post event details updated successfully' :
+              'Event details sent for approval successfully'
           this.openSnackBar(successMessage)
           setTimeout(() => {
             this.navigateBack()
@@ -661,7 +682,7 @@ export class CreateEventComponent implements OnInit, AfterViewInit {
       eventDetails['endDateTime'] = endDateTime
     }
 
-    eventDetails['status'] = status
+    eventDetails['status'] = (status === 'updatePostEvent') ? this.eventDetails['status'] : status
 
     if (eventBaseDetails?.typeofEvent?.toLowerCase() === 'live') {
       eventDetails['maxEnrolments'] = eventBaseDetails?.maxEnrolments || 0
@@ -673,6 +694,10 @@ export class CreateEventComponent implements OnInit, AfterViewInit {
       eventDetails['preEventReads'] = [this.preEventForm.controls['preEventReads'].value || '']
       eventDetails['speakerDetails'] = JSON.stringify(this.preEventForm.controls['selectedSpeaker'].value) || []
       this.competencies = this.getLatestCompetencies(this.courseSelectionForm?.value?.selectedCourse)
+      eventDetails['noOfAttendes'] = this.postEventForm?.controls['noOfAttendes'].value || 0
+      eventDetails['eventDuration'] = this.convertDurationToMinutes(this.postEventForm?.controls['eventDuration'].value) || 0
+      eventDetails['meetingSummary'] = this.postEventForm?.controls['meetingSummary'].value || ''
+      eventDetails['postEventSummary'] = [this.postEventForm?.controls['postEventSummary'].value || '']
     }
 
     return eventDetails
@@ -735,6 +760,43 @@ export class CreateEventComponent implements OnInit, AfterViewInit {
 
   private openSnackBar(message: string) {
     this.matSnackBar.open(message)
+  }
+
+  updatePostEvent() {
+    if (this.postEventForm.invalid) {
+      this.openSnackBar('Please fill mandatory fields in Post Event Setup')
+      return
+    } else {
+      this.saveAndExit('updatePostEvent')
+    }
+  }
+
+  convertDurationToMinutes(duration: string): number {
+    if (!duration) {
+      return 0
+    }
+
+    let totalMinutes = 0
+
+    // Extract hours
+    const hoursMatch = duration.match(/(\d+)h/)
+    if (hoursMatch) {
+      totalMinutes += parseInt(hoursMatch[1], 10) * 60
+    }
+
+    // Extract minutes
+    const minutesMatch = duration.match(/(\d+)m/)
+    if (minutesMatch) {
+      totalMinutes += parseInt(minutesMatch[1], 10)
+    }
+
+    // Extract seconds and convert to minutes (rounded)
+    const secondsMatch = duration.match(/(\d+)s/)
+    if (secondsMatch) {
+      totalMinutes += Math.round(parseInt(secondsMatch[1], 10) / 60)
+    }
+
+    return totalMinutes
   }
 
 }

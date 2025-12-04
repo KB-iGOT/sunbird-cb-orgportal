@@ -38,7 +38,7 @@
     .field-label {
       display: flex;
       align-items: center;
-      font: 500 14px/20px Lato;
+      font: 700 14px/20px Lato;
       color: #333;
       margin-bottom: 8px;
 
@@ -61,7 +61,7 @@
       border-radius: 8px;
       padding: 32px;
       text-align: center;
-      background: #FAFAFA;
+      background: #EDF7FF;
       position: relative;
       cursor: pointer;
 
@@ -76,12 +76,12 @@
         height: 48px;
         font-size: 48px;
         color: #1B4CA1;
-        margin: 0 auto 16px;
+        margin: 0 auto 0;
       }
 
       .upload-text {
-        font: 500 14px/20px Lato;
-        color: #333;
+        font: 700 14px/20px Lato;
+        color: #1B4CA1;
         margin: 0 0 4px 0;
       }
 
@@ -118,7 +118,7 @@
         padding: 12px 16px;
         border: 1px solid #E0E0E0;
         border-radius: 8px;
-        background: #FAFAFA;
+        background: #EDF7FF;
 
         .doc-icon {
           width: 40px;
@@ -230,5 +230,20 @@
 
   ::ng-deep .mat-select {
     font: 400 14px/20px Lato;
+  }
+}
+
+:host ::ng-deep .event-form {
+  .mat-form-field-appearance-outline .mat-form-field-infix {
+    padding: 5px 0px 10px;
+  }
+
+  .mat-form-field-appearance-outline .mat-form-field-outline-end {
+    border-left-style: solid !important;
+    border-radius: 25px !important;
+  }
+
+  .mat-form-field-appearance-outline .mat-form-field-outline-start {
+    display: none;
   }
 }

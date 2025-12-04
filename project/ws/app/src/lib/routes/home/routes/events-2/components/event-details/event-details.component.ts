@@ -19,6 +19,9 @@ import { ConfirmDialogComponent } from '../../../../../workallocation-v2/compone
 })
 export class EventDetailsComponent implements OnInit {
 
+  private URL_PATTERN = /^https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)$/
+  private DURATION_PATTERN = /^(\d+h\s*)?(\d+m\s*)?(\d+s)?$/
+
   @Input() eventDetailsData: any
   @Input() openMode = 'edit'
   @Input() openTab = 'draft'
@@ -111,29 +114,23 @@ export class EventDetailsComponent implements OnInit {
 
   applyFormRulesBasedOnStatus() {
     const status = _.get(this.eventDetailsData, 'status', '').toLowerCase()
-    this.isDraft = status?.toLowerCase() !== 'live'
+    this.isDraft = status?.toLowerCase() === 'draft'
 
     if (this.isDraft) {
-      // Pre Event Setup - meetingLink and agenda are mandatory
-      this.preEventForm.get('meetingLink')?.setValidators([Validators.required])
-      this.preEventForm.get('agenda')?.setValidators([Validators.required, Validators.minLength(150), Validators.maxLength(3000)])
+      this.preEventForm.get('meetingLink')?.setValidators([Validators.required, Validators.pattern(this.URL_PATTERN)])
+      this.preEventForm.get('agenda')?.setValidators([Validators.required, Validators.minLength(100), Validators.maxLength(1000)])
       this.preEventForm.get('meetingLink')?.updateValueAndValidity()
       this.preEventForm.get('agenda')?.updateValueAndValidity()
       this.preEventForm.enable()
-
-      // Post Event Setup - nothing is mandatory and should be disabled
       this.postEventForm.disable()
     } else if (this.isDateTimePassed(this.eventDetailsData.endDateTime)) {
-      // Pre Event Setup - should be disabled
       this.preEventForm.disable()
-
-      // Post Event Setup - recordedMediaLink, noOfAttendes and eventDuration are mandatory
       this.postEventForm.enable()
-      this.postEventForm.get('recordedMediaLink')?.setValidators([Validators.required])
+      this.postEventForm.get('postEventSummary')?.setValidators([Validators.required])
       this.postEventForm.get('noOfAttendes')?.setValidators([Validators.required, Validators.min(0)])
-      this.postEventForm.get('eventDuration')?.setValidators([Validators.required])
+      this.postEventForm.get('eventDuration')?.setValidators([Validators.required, Validators.pattern(this.DURATION_PATTERN)])
       this.postEventForm.get('meetingSummary')?.setValidators([Validators.minLength(150), Validators.maxLength(3000)])
-      this.postEventForm.get('recordedMediaLink')?.updateValueAndValidity()
+      this.postEventForm.get('postEventSummary')?.updateValueAndValidity()
       this.postEventForm.get('noOfAttendes')?.updateValueAndValidity()
       this.postEventForm.get('eventDuration')?.updateValueAndValidity()
       this.postEventForm.get('meetingSummary')?.updateValueAndValidity()
@@ -151,9 +148,19 @@ export class EventDetailsComponent implements OnInit {
       selectedSpeaker: (_.isString(this.eventDetailsData.speakerDetails)) ? JSON.parse(this.eventDetailsData.speakerDetails) :
         this.eventDetailsData.speakerDetails || []
     })
+    this.postEventForm.patchValue({
+      noOfAttendes: this.eventDetailsData.noOfAttendes || null,
+      eventDuration: this.convertMinutesToDuration(this.eventDetailsData.eventDuration) || '',
+      meetingSummary: this.eventDetailsData.meetingSummary || '',
+      postEventSummary: this.eventDetailsData.postEventSummary?.[0] || ''
+    })
     if (this.preEventControls['preEventReads'].value) {
       this.generateUploadedDocTypeImg(this.preEventControls['preEventReads'].value)
       this.showUploadedDoc = true
+    }
+    if (this.postEventControls['postEventSummary'].value) {
+      this.generateUploadedDocTypeImg(this.postEventControls['postEventSummary'].value)
+      this.showUploadedSummaryDoc = true
     }
   }
 
@@ -334,18 +341,25 @@ export class EventDetailsComponent implements OnInit {
     if (files.length === 0) {
       return
     }
-    const mimeType = files[0].type
+    const file = files[0]
+    const mimeType = file.type
     if (mimeType !== 'application/pdf') {
       this.matSnackBar.open('Invalid file type. Please upload only PDF files.')
       return
     }
-    this.preReadDocument = files[0]
+    // Check file size (10MB = 10 * 1024 * 1024 bytes)
+    const maxSize = 10 * 1024 * 1024
+    if (file.size > maxSize) {
+      this.matSnackBar.open('File size exceeds 10MB. Please upload a smaller file.')
+      return
+    }
+    this.preReadDocument = file
     const reader = new FileReader()
-    reader.readAsDataURL(files[0])
+    reader.readAsDataURL(file)
     this.loaderService.changeLoaderState(true)
     reader.onload = _event => {
       this.loaderService.changeLoaderState(false)
-      this.saveFile(files[0], 'pre-read')
+      this.saveFile(file, 'pre-read')
     }
   }
 
@@ -552,6 +566,29 @@ export class EventDetailsComponent implements OnInit {
         this.matSnackBar.open('Document removed successfully', 'Close', { duration: 3000 })
       }
     })
+  }
+
+  convertMinutesToDuration(totalMinutes: number): string {
+    if (!totalMinutes || totalMinutes < 0) {
+      return ''
+    }
+
+    const hours = Math.floor(totalMinutes / 60)
+    const minutes = Math.floor(totalMinutes % 60)
+    const seconds = Math.round((totalMinutes % 1) * 60)
+
+    let duration = ''
+    if (hours > 0) {
+      duration += `${hours}h `
+    }
+    if (minutes > 0) {
+      duration += `${minutes}m `
+    }
+    if (seconds > 0) {
+      duration += `${seconds}s`
+    }
+
+    return duration.trim()
   }
 
 }
