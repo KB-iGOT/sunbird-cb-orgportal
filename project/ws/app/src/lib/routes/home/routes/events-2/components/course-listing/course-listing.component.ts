@@ -26,8 +26,9 @@ export class CourseListingComponent implements OnInit {
 
   // Search and sort
   searchQuery = ''
-  sortOrder: 'asc' | 'desc' = 'asc'
+  sortOrder: 'asc' | 'desc' = 'desc'
   isDraft: boolean = false
+  sortType: string = ''
 
   constructor(
     public eventsService: EventsService
@@ -35,7 +36,7 @@ export class CourseListingComponent implements OnInit {
 
   ngOnInit() {
     this.fetchCourseDetails()
-    this.isDraft = this.eventDetailsData?.status?.toLowerCase() !== 'live'
+    this.isDraft = this.eventDetailsData?.status?.toLowerCase() === 'draft'
   }
 
   fetchCourseDetails() {
@@ -44,7 +45,7 @@ export class CourseListingComponent implements OnInit {
         limit: this.pageSize,
         offset: this.pageIndex * this.pageSize,
         query: this.searchQuery,
-        sort_by: { lastSubmittedOn: this.sortOrder === 'asc' ? 'asc' : 'desc' },
+        sort_by: { lastSubmittedOn: this.sortOrder === 'asc' ? 'asc' : 'desc' } as any,
         filters: {
           must: {
             courseCategory: ['Course']
@@ -52,6 +53,10 @@ export class CourseListingComponent implements OnInit {
           status: ['Live']
         }
       }
+    }
+
+    if (this.sortType === 'name') {
+      reqBody.request.sort_by = { name: this.sortOrder === 'asc' ? 'asc' : 'desc' }
     }
 
     this.eventsService.getContentSearch(reqBody).subscribe((response: any) => {
@@ -69,8 +74,9 @@ export class CourseListingComponent implements OnInit {
     this.fetchCourseDetails()
   }
 
-  onSort(order: 'asc' | 'desc') {
+  onSort(order: 'asc' | 'desc', type: string) {
     this.sortOrder = order
+    this.sortType = type
     this.pageIndex = 0
     this.fetchCourseDetails()
   }

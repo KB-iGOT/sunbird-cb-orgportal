@@ -10,7 +10,7 @@
         <img src="/assets/icons/image.svg" alt="app icon">
         <span class="iconName">{{appIconName}}</span>
       </div>
-      <ng-container *ngIf="openMode === 'edit' && openTab !== 'past'">
+      <ng-container *ngIf="isDraft">
         <mat-icon class="remove-app-icon" (click)="removeFile('appIcon')">close</mat-icon>
       </ng-container>
     </div>
@@ -29,7 +29,7 @@
     </div>
   </ng-template>
 
-  <div class="flex flex-row gap-4" [ngClass]="{'disableForm': openTab === 'past'}">
+  <div class="flex flex-row gap-4" [ngClass]="{'disableForm': eventStatus !== 'draft'}">
     <div class="flex flex-column gap-2 event-form w-full">
       <div class="form-lable required">
         Event Category
@@ -87,14 +87,16 @@
       class="description-count flex justify-end">{{eventDetails?.controls['description']?.value?.length}}/2000</span>
   </div>
 
-  <div class="flex flex-column gap-2" [ngClass]="{'disableForm': eventStatus === 'live'}">
-    <div class="form-lable required">
+  <div class="flex flex-column gap-2 event-form" [ngClass]="{'disableForm': eventStatus === 'live'}">
+    <div class="form-lable required flex flex-middle gap-1">
       Maximum participants allowed
+      <mat-icon class="cursor-pointer info-icon"
+        matTooltip="Maximum Participant : 10k, Minimum Participant : 10.">info_outline</mat-icon>
     </div>
     <ng-container *ngIf="eventDetails?.controls?.maxEnrolments; else maxFallback">
       <mat-form-field appearance="outline" class="">
-        <input matInput type="number" placeholder="Enter number only" formControlName="maxEnrolments" min="10"
-          max="10000" step="1" inputmode="numeric" pattern="[0-9]*" (keypress)="allowNumbers($event)"
+        <input matInput type="number" placeholder="Enter number only" formControlName="maxEnrolments" min="10" max="200"
+          step="1" inputmode="numeric" pattern="[0-9]*" (keypress)="allowNumbers($event)"
           (paste)="onPasteNumber($event)">
         <mat-error *ngIf="showValidationMsg('maxEnrolments','required')">
           Maximum participants is mandatory
@@ -103,7 +105,7 @@
           Minimum 10 participants required
         </mat-error>
         <mat-error *ngIf="showValidationMsg('maxEnrolments','max')">
-          Maximum 10000 participants allowed
+          Maximum 200 participants allowed
         </mat-error>
       </mat-form-field>
     </ng-container>
@@ -167,7 +169,7 @@
       <mat-form-field appearance="outline" class="disable-round">
         <input matInput [matDatepicker]="startDate" [min]="minDate" placeholder="Enter Start Date"
           formControlName="startDate" readonly>
-        <mat-datepicker-toggle matSuffix [for]="startDate"></mat-datepicker-toggle>
+        <mat-datepicker-toggle matSuffix [for]="startDate" [disabled]="!isDraft"></mat-datepicker-toggle>
         <mat-datepicker #startDate></mat-datepicker>
         <mat-error *ngIf="showValidationMsg('startDate','required')">
           Date is mandatory
@@ -181,7 +183,8 @@
       <mat-form-field appearance="outline" class="disable-round">
         <input matInput placeholder="Enter Start Time" formControlName="startTime" [ngxTimepicker]="startTimepicker"
           [max]="maxTimeToStart" [min]="minTimeToStart" readonly>
-        <ngx-material-timepicker-toggle [for]="startTimepicker" matSuffix></ngx-material-timepicker-toggle>
+        <ngx-material-timepicker-toggle [for]="startTimepicker" matSuffix
+          [disabled]="!isDraft"></ngx-material-timepicker-toggle>
         <ngx-material-timepicker #startTimepicker class="eventTimpicker"></ngx-material-timepicker>
         <mat-error *ngIf="showValidationMsg('startTime','required')">
           Start time is mandatory
@@ -196,7 +199,8 @@
       <mat-form-field appearance="outline" class="disable-round">
         <input matInput placeholder="Enter End Time" formControlName="endTime" [ngxTimepicker]="endTimepicker"
           [min]="minTimeToEnd" readonly>
-        <ngx-material-timepicker-toggle [for]="endTimepicker" matSuffix></ngx-material-timepicker-toggle>
+        <ngx-material-timepicker-toggle [for]="endTimepicker" matSuffix
+          [disabled]="!isDraft"></ngx-material-timepicker-toggle>
         <ngx-material-timepicker #endTimepicker (change)="onEndTimeChange($event)"></ngx-material-timepicker>
         <mat-error *ngIf="showValidationMsg('endTime','required')">
           End time is mandatory

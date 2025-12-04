@@ -28,23 +28,18 @@
       <button mat-button class="sort-button flex items-center gap-2" [matMenuTriggerFor]="sortMenu"
         [disabled]="!isDraft">
         Sort by
-        <mat-icon>tune</mat-icon>
+        <mat-icon>sort</mat-icon>
       </button>
       <mat-menu #sortMenu="matMenu" class="sort-menu">
-        <button mat-menu-item class="sort-az" (click)="onSort('asc')">
+        <button mat-menu-item class="sort-az" (click)="onSort('asc', 'name')">
           <mat-icon>arrow_upward</mat-icon>
           <span>Sort A-Z</span>
         </button>
-        <button mat-menu-item class="sort-za" (click)="onSort('desc')">
+        <button mat-menu-item class="sort-za" (click)="onSort('desc', 'name')">
           <mat-icon>arrow_downward</mat-icon>
           <span>Sort Z-A</span>
         </button>
       </mat-menu>
-      <div class="ml-auto">
-        <button mat-button class="add-button">
-          Add
-        </button>
-      </div>
     </div>
   </div>
 
@@ -61,7 +56,7 @@
       </div>
       <div class="card-content">
         <span class="course-badge">{{course.courseCategory || 'Course'}}</span>
-        <h3 class="course-title">{{course.name}}</h3>
+        <h3 class="course-title" [matTooltip]="course.name">{{course.name}}</h3>
         <p class="course-publish-date">Published on: {{course.lastPublishedOn | date:'d/MMM/yy'}}</p>
       </div>
     </div>
