@@ -220,47 +220,47 @@ export class CreateEventComponent implements OnInit, AfterViewInit {
   onSelectionChange(event: StepperSelectionEvent) {
     const selectedStep = this.stepper?.steps.toArray()[event.selectedIndex]
     const selectedLabel = selectedStep?.label
-    const previousStep = this.stepper?.steps.toArray()[event.previouslySelectedIndex]
-    const previousLabel = previousStep?.label
+    // const previousStep = this.stepper?.steps.toArray()[event.previouslySelectedIndex]
+    // const previousLabel = previousStep?.label
 
     // Check if user is trying to navigate FORWARD from Course Linking step without selecting a course
-    if (previousLabel === 'Course Linking' &&
-      this.edf?.typeofEvent?.value?.toLowerCase() === 'live' &&
-      event.selectedIndex > event.previouslySelectedIndex) {
-      if (!this.courseListingComponent?.selectedCourse) {
-        this.matSnackBar.open('Please select a course before proceeding', 'X', {
-          duration: 3000,
-        })
-        // Prevent navigation by using setTimeout to reset after Angular's change detection
-        setTimeout(() => {
-          if (this.stepper) {
-            this.stepper.selectedIndex = event.previouslySelectedIndex
-            this.currentStepperIndex = event.previouslySelectedIndex
-            this.cdr.detectChanges()
-          }
-        }, 0)
-        return
-      } else {
-        // Update the form control when a course is selected
-        this.courseSelectionForm.patchValue({
-          selectedCourse: this.courseListingComponent.selectedCourse
-        })
-        this.competencies = this.getLatestCompetencies(this.courseListingComponent.selectedCourse)
-      }
-    }
+    // if (previousLabel === 'Course Linking' &&
+    //   this.edf?.typeofEvent?.value?.toLowerCase() === 'live' &&
+    //   event.selectedIndex > event.previouslySelectedIndex) {
+    //   if (!this.courseListingComponent?.selectedCourse) {
+    //     this.matSnackBar.open('Please select a course before proceeding', 'X', {
+    //       duration: 3000,
+    //     })
+    //     // Prevent navigation by using setTimeout to reset after Angular's change detection
+    //     setTimeout(() => {
+    //       if (this.stepper) {
+    //         this.stepper.selectedIndex = event.previouslySelectedIndex
+    //         this.currentStepperIndex = event.previouslySelectedIndex
+    //         this.cdr.detectChanges()
+    //       }
+    //     }, 0)
+    //     return
+    //   } else {
+    //     // Update the form control when a course is selected
+    //     this.courseSelectionForm.patchValue({
+    //       selectedCourse: this.courseListingComponent.selectedCourse
+    //     })
+    //     this.competencies = this.getLatestCompetencies(this.courseListingComponent.selectedCourse)
+    //   }
+    // }
 
-    if (event.selectedIndex > event.previouslySelectedIndex && previousLabel === 'Basic Details') {
-      if (this.eventDetailsForm.invalid) {
-        this.matSnackBar.open('Please fill mandatory fields', 'Close', { duration: 3000 })
-        setTimeout(() => {
-          if (this.stepper) {
-            this.stepper.selectedIndex = event.previouslySelectedIndex
-            this.currentStepperIndex = event.previouslySelectedIndex
-            this.cdr.detectChanges()
-          }
-        }, 0)
-      }
-    }
+    // if (event.selectedIndex > event.previouslySelectedIndex && previousLabel === 'Basic Details') {
+    //   if (this.eventDetailsForm.invalid) {
+    //     this.matSnackBar.open('Please fill mandatory fields')
+    //     setTimeout(() => {
+    //       if (this.stepper) {
+    //         this.stepper.selectedIndex = event.previouslySelectedIndex
+    //         this.currentStepperIndex = event.previouslySelectedIndex
+    //         this.cdr.detectChanges()
+    //       }
+    //     }, 0)
+    //   }
+    // }
 
     this.currentStepperIndex = event.selectedIndex
     if (this.stepper) {
@@ -363,14 +363,14 @@ export class CreateEventComponent implements OnInit, AfterViewInit {
   }
 
   moveToNextForm() {
-    const currentStep = this.stepper?.steps.toArray()[this.currentStepperIndex]
-    const currentStepLabel = currentStep?.label || ''
+    // const currentStep = this.stepper?.steps.toArray()[this.currentStepperIndex]
+    // const currentStepLabel = currentStep?.label || ''
     this.eventDetailsForm.markAllAsTouched()
     this.eventDetailsForm.updateValueAndValidity()
-    if (currentStepLabel === 'Basic Details' && this.eventDetailsForm.invalid) {
-      this.matSnackBar.open('Please fill mandatory fields', 'X', { duration: 3000 })
-      return
-    }
+    // if (currentStepLabel === 'Basic Details' && this.eventDetailsForm.invalid) {
+    //   this.matSnackBar.open('Please fill mandatory fields')
+    //   return
+    // }
     if (this.stepper && this.currentStepperIndex < this.stepper.steps.length - 1) {
       this.currentStepperIndex = this.currentStepperIndex + 1
     }
