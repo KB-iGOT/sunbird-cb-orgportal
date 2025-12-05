@@ -404,6 +404,11 @@ export class CreateEventComponent implements OnInit, AfterViewInit {
   }
 
   publish() {
+    if (this.eventDetails?.typeofEvent?.toLowerCase() === 'live' && !(this.competencies && this.competencies.length)) {
+      if (this.courseSelectionForm?.valid) {
+        this.competencies = this.getLatestCompetencies(this.courseSelectionForm?.value?.selectedCourse)
+      }
+    }
     if (this.canPublish) {
       this.saveAndExit('SentToPublish')
     }
