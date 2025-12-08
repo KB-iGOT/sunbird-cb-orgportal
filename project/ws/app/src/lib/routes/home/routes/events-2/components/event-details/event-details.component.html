@@ -20,7 +20,8 @@
         <!-- Upload Container - Show when no document uploaded -->
         <div class="upload-container" *ngIf="!showUploadedDoc" (drop)="onDrop($event)"
           (dragover)="preventDefaultCDK($event)" (dragenter)="preventDefaultCDK($event, 'enter')"
-          (dragleave)="preventDefaultCDK($event, 'leave')">
+          (dragleave)="preventDefaultCDK($event, 'leave')"
+          [class.disabled]="eventDetailsData?.status?.toLowerCase() !== 'draft'">
           <mat-icon class="upload-icon" svgIcon="single-color-upload-file"></mat-icon>
           <p class="upload-text">Select document to upload</p>
           <p class="upload-subtext">or drag and drop here</p>
@@ -174,7 +175,7 @@
 
         <!-- Upload Container - Show when no document uploaded -->
         <div class="upload-container" *ngIf="!showUploadedSummaryDoc"
-          [class.disabled]="!isDateTimePassed(eventDetailsData?.endDateTime)">
+          [class.disabled]="!isDateTimePassed(eventDetailsData?.endDateTime) || eventDetailsData.status.toLowerCase() !== 'live'">
           <mat-icon class="upload-icon" svgIcon="single-color-upload-file"></mat-icon>
           <p class="upload-text">Select document to upload</p>
           <p class="upload-subtext">or drag and drop here</p>
@@ -191,7 +192,8 @@
               <p class="doc-name">Summary Document</p>
               <p class="doc-type">PDF document</p>
             </div>
-            <button mat-icon-button class="remove-btn" (click)="removeUploadedSummaryDoc()" type="button">
+            <button mat-icon-button class="remove-btn" (click)="removeUploadedSummaryDoc()" type="button"
+              *ngIf="!isSavedPostEvent">
               <mat-icon>close</mat-icon>
             </button>
           </div>
