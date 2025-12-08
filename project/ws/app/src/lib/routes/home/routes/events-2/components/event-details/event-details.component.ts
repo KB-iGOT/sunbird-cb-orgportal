@@ -62,6 +62,7 @@ export class EventDetailsComponent implements OnInit {
   selectable = true
   removable = true
   showSpeakerInvalidMsg = false
+  isSavedPostEvent: boolean = false
 
   constructor(
     private formBuilder: FormBuilder,
@@ -123,7 +124,7 @@ export class EventDetailsComponent implements OnInit {
       this.preEventForm.get('agenda')?.updateValueAndValidity()
       this.preEventForm.enable()
       this.postEventForm.disable()
-    } else if (this.isDateTimePassed(this.eventDetailsData.endDateTime)) {
+    } else if (this.isDateTimePassed(this.eventDetailsData.endDateTime) && this.eventDetailsData.status.toLowerCase() === 'live') {
       this.preEventForm.disable()
       this.postEventForm.enable()
       this.postEventForm.get('postEventSummary')?.setValidators([Validators.required])
@@ -161,6 +162,8 @@ export class EventDetailsComponent implements OnInit {
     if (this.postEventControls['postEventSummary'].value) {
       this.generateUploadedDocTypeImg(this.postEventControls['postEventSummary'].value)
       this.showUploadedSummaryDoc = true
+      this.isSavedPostEvent = true
+      this.postEventForm.disable()
     }
   }
 
@@ -414,17 +417,17 @@ export class EventDetailsComponent implements OnInit {
                 this.preEventForm.patchValue({ preEventReads: fileUrl })
                 this.generateUploadedDocTypeImg(fileUrl)
                 this.showUploadedDoc = true
-                this.matSnackBar.open('Document uploaded successfully', 'Close', { duration: 3000 })
+                this.matSnackBar.open('Document uploaded successfully')
                 break
               case 'post-event-video':
                 this.postEventForm.patchValue({ recordedMediaLink: fileUrl })
                 this.showUploadedVideo = true
-                this.matSnackBar.open('Video uploaded successfully', 'Close', { duration: 3000 })
+                this.matSnackBar.open('Video uploaded successfully')
                 break
               case 'post-event-summary':
                 this.postEventForm.patchValue({ postEventSummary: fileUrl })
                 this.showUploadedSummaryDoc = true
-                this.matSnackBar.open('Summary document uploaded successfully', 'Close', { duration: 3000 })
+                this.matSnackBar.open('Summary document uploaded successfully')
                 break
             }
           }
@@ -483,7 +486,7 @@ export class EventDetailsComponent implements OnInit {
         this.showUploadedDoc = false
         this.uploadedDocTypeImg = ''
         this.materialType = ''
-        this.matSnackBar.open('Document removed successfully', 'Close', { duration: 3000 })
+        this.matSnackBar.open('Document removed successfully')
       }
     })
   }
@@ -523,7 +526,7 @@ export class EventDetailsComponent implements OnInit {
         this.videoFile = null
         this.showUploadedVideo = false
         this.postEventForm.patchValue({ recordedMediaLink: null })
-        this.matSnackBar.open('Video removed successfully', 'Close', { duration: 3000 })
+        this.matSnackBar.open('Video removed successfully')
       }
     })
   }
@@ -563,7 +566,7 @@ export class EventDetailsComponent implements OnInit {
         this.summaryDocument = null
         this.postEventForm.patchValue({ postEventSummary: null })
         this.showUploadedSummaryDoc = false
-        this.matSnackBar.open('Document removed successfully', 'Close', { duration: 3000 })
+        this.matSnackBar.open('Document removed successfully')
       }
     })
   }
