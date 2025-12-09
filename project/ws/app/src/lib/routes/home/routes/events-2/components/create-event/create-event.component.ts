@@ -159,6 +159,7 @@ export class CreateEventComponent implements OnInit, AfterViewInit {
       if (this.eventDetails?.courseLinked) {
         const contentData: any = await this.eventSvc.getContentRead(this.eventDetails?.courseLinked).toPromise().catch(_err => { })
         if (contentData?.result) {
+          this.eventSvc.setCourseDetails(contentData?.result?.content || {})
           this.courseSelectionForm.controls.selectedCourse.setValue(contentData?.result?.content || {})
           this.competencies = this.getLatestCompetencies(contentData?.result?.content)
           this.contentLoaded = true
@@ -277,6 +278,7 @@ export class CreateEventComponent implements OnInit, AfterViewInit {
     this.courseSelectionForm.patchValue({
       selectedCourse: course
     })
+    this.eventSvc.setCourseDetails(course)
     // Mark the form as touched and update validity
     this.courseSelectionForm.markAllAsTouched()
     this.courseSelectionForm.updateValueAndValidity()

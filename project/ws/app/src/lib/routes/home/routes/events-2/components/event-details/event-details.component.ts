@@ -63,6 +63,7 @@ export class EventDetailsComponent implements OnInit {
   removable = true
   showSpeakerInvalidMsg = false
   isSavedPostEvent: boolean = false
+  isSpeakerDisabled: boolean = true
 
   constructor(
     private formBuilder: FormBuilder,
@@ -100,7 +101,8 @@ export class EventDetailsComponent implements OnInit {
       preEventReads: new FormControl(null),
       meetingLink: new FormControl(''),
       agenda: new FormControl(''),
-      selectedSpeaker: new FormControl([])
+      selectedSpeaker: new FormControl([]),
+      speakerType: new FormControl('')
     })
 
     // Post Event Setup Form
@@ -147,7 +149,8 @@ export class EventDetailsComponent implements OnInit {
       meetingLink: this.eventDetailsData.registrationLink || '',
       agenda: this.eventDetailsData.meetingAgenda || '',
       selectedSpeaker: (_.isString(this.eventDetailsData.speakerDetails)) ? JSON.parse(this.eventDetailsData.speakerDetails) :
-        this.eventDetailsData.speakerDetails || []
+        this.eventDetailsData.speakerDetails || [],
+      speakerType: this.eventDetailsData.speakerType || ''
     })
     this.postEventForm.patchValue({
       noOfAttendes: this.eventDetailsData.noOfAttendes || null,
@@ -274,6 +277,42 @@ export class EventDetailsComponent implements OnInit {
           selectedSpeaker: [...currentSpeakers, { name: value, email: '', id: '' }]
         })
       }
+    }
+  }
+
+  onSpeakerTypeChange(event: any) {
+    const speakerType = event.value
+    this.preEventForm.patchValue({ selectedSpeaker: [] })
+    if (speakerType === 'courseCreator') {
+      this.isSpeakerDisabled = true
+      const courseDetails = this.eventSvc.getCourseDetails()
+      if (courseDetails && Object.keys(courseDetails)?.length) {
+        this.preEventForm.patchValue({ selectedSpeaker: _.isString(courseDetails.creatorContacts) ? JSON.parse(courseDetails.creatorContacts) : [] })
+        this.preEventControls['selectedSpeaker'].updateValueAndValidity()
+      } else {
+        this.preEventControls['speakerType'].setValue('')
+        this.matSnackBar.open('Please select a course to fetch course creators')
+      }
+    } else if (speakerType === 'others') {
+      this.isSpeakerDisabled = false
+      // Allow manual entry
+    }
+  }
+
+  addSpeakerFromInput(event: any): void {
+    const value = (event.value || '').trim()
+
+    // Add speaker name
+    if (value) {
+      const currentSpeakers = this.preEventForm.get('selectedSpeaker')?.value || []
+      this.preEventForm.patchValue({
+        selectedSpeaker: [...currentSpeakers, { name: value, email: '', id: '' }]
+      })
+    }
+
+    // Clear the input value
+    if (event.chipInput) {
+      event.chipInput.clear()
     }
   }
 

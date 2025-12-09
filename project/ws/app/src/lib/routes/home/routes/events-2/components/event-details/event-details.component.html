@@ -81,8 +81,8 @@
         </mat-form-field>
       </div>
 
-      <!-- Add Speaker -->
-      <div class="form-field mt-4 event-form">
+      <!-- Add Speaker - Old Implementation (Commented Out) -->
+      <!-- <div class="form-field mt-4 event-form">
         <label class="field-label flex items-center gap-1">
           Add Speaker
           <mat-icon class="info-icon" matTooltip="Add speaker information">info_outline</mat-icon>
@@ -112,15 +112,43 @@
             </mat-option>
           </mat-autocomplete>
         </mat-form-field>
-      </div>
-
-      <!-- Speaker Name
-      <div class="form-field mt-4" *ngIf="false">
-        <label class="field-label">Speaker Name</label>
-        <mat-form-field appearance="outline" class="full-width">
-          <input matInput placeholder="Enter speaker name" formControlName="speakerName">
-        </mat-form-field>
       </div> -->
+
+      <!-- Add Speaker - New Implementation -->
+      <div class="flex gap-5">
+        <div class="form-field mt-4 event-form w-full">
+          <label class="field-label flex items-center gap-1">
+            Add Speaker
+            <mat-icon class="info-icon" matTooltip="Add speaker information">info_outline</mat-icon>
+          </label>
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-select placeholder="Select Speaker Type" formControlName="speakerType"
+              (selectionChange)="onSpeakerTypeChange($event)">
+              <mat-option value="courseCreator">Course Creator</mat-option>
+              <mat-option value="others">Others</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <!-- Speaker Name -->
+        <div class="form-field mt-4 event-form w-full">
+          <label class="field-label">Speaker Name {{isSpeakerDisabled}}</label>
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-chip-list #speakerChipList aria-label="Speaker selection">
+              <mat-chip *ngFor="let speaker of preEventForm.controls['selectedSpeaker'].value" [selectable]="selectable"
+                [removable]="removable" (removed)="removeSpeaker(speaker)">
+                {{ speaker?.name }}
+                <ng-container *ngIf="!isSpeakerDisabled && isDraft">
+                  <mat-icon matChipRemove *ngIf="removable">cancel</mat-icon>
+                </ng-container>
+              </mat-chip>
+              <input placeholder="Enter speaker name" #speakerInput [matChipInputFor]="speakerChipList"
+                [matChipInputSeparatorKeyCodes]="separatorKeysCodes" [matChipInputAddOnBlur]="true"
+                (matChipInputTokenEnd)="addSpeakerFromInput($event)" [disabled]="isSpeakerDisabled || !isDraft" />
+            </mat-chip-list>
+          </mat-form-field>
+        </div>
+      </div>
     </div>
   </div>
 
