@@ -93,10 +93,15 @@ export class UserCardComponent implements OnInit, OnChanges, AfterViewChecked, A
   approveUserDataForm: UntypedFormGroup
   designationsMeta: any = []
   filterDesignationsMeta: any = []
+  designationBackup: any = []
   designationListLoadCount = 50
   designationDefaultLoadCount = 50
   isLoadingMoreDesignations = false;
   desigantionFilterEnable = false
+  designationSearchText = ''
+  designationOffset = 0
+  noMoreLegacyDesignations = false
+  defaultSearchDesignationCount = 0
   groupsList: any = []
   selectedtags: any[] = []
   reqbody: any
@@ -226,6 +231,7 @@ export class UserCardComponent implements OnInit, OnChanges, AfterViewChecked, A
     } else {
       this.init()
     }
+    this.loadDesignations()
     this.userLimitSet = this.usersSvc.TOTAL_USERS_LIMIT
 
 
@@ -233,20 +239,9 @@ export class UserCardComponent implements OnInit, OnChanges, AfterViewChecked, A
       .pipe(
         debounceTime(250),
         distinctUntilChanged(),
-        startWith(''),
       )
       .subscribe(searchText => {
-        if (searchText) {
-          this.desigantionFilterEnable = true
-          this.filterDesignationsMeta = this.designationsMeta.filter((val: any) =>
-            val && val.name.trim().toLowerCase().includes(searchText && searchText.toLowerCase())
-          )
-        } else {
-          this.filterDesignationsMeta = this.designationsMeta.slice(0, this.designationDefaultLoadCount)
-          this.desigantionFilterEnable = false
-
-          this.checkCurrentDesignationPresent()
-        }
+        this.loadDesignations(searchText)
       })
   }
 
@@ -391,23 +386,83 @@ export class UserCardComponent implements OnInit, OnChanges, AfterViewChecked, A
   }
 
   async init() {
-    await this.loadDesignations()
     await this.loadGroups()
     await this.loadLangauages()
     // await this.loadCountryCodes()
     await this.loadRoles()
   }
 
-  async loadDesignations() {
-    await this.usersSvc.getDesignations({}).subscribe(
+  designationSearch(evt: any) {
+    const searchText = evt?.target?.value
+    const txt = (searchText || '').toString().trim()
+    this.designationSearchText = txt
+    if (txt?.length) {
+      this.desigantionFilterEnable = true
+      this.isLoadingMoreDesignations = true
+      this.loadDesignations(txt)
+    } else {
+      this.loadDesignations()
+      this.desigantionFilterEnable = false
+      this.checkCurrentDesignationPresent()
+    }
+  }
+
+  async loadDesignations(searchText?: string, offset?: number) {
+    this.isLoadingMoreDesignations = true
+    const requestBody: any = {
+      filterCriteriaMap: {
+        status: 'Active'
+      },
+      requestedFields: [],
+      pageNumber: 0,
+      pageSize: this.designationDefaultLoadCount,
+    }
+    if (searchText?.length) {
+      requestBody['searchString'] = searchText
+      requestBody.pageSize = this.designationListLoadCount
+    } else {
+      const reqOffset = offset || 0
+      const pageIndex = this.designationDefaultLoadCount > 0 ? Math.floor(reqOffset / this.designationDefaultLoadCount) : 0
+      requestBody.pageNumber = pageIndex
+      requestBody.pageSize = this.designationDefaultLoadCount
+    }
+    await this.usersSvc.searchDesignation(requestBody).subscribe(
       (data: any) => {
-        this.designationsMeta = data.responseData || []
+        const content = data?.result?.result?.data || []
+        const mapped = content.map((item: any) => ({
+          name: item.designation || '',
+          status: item.status || 'Active',
+        }))
+
+        const total = _.get(data, 'result.result.totalcount', _.get(data, 'result.result.data.totalCount', _.get(data, 'result.result.totalCount', 0)))
+        this.defaultSearchDesignationCount = total
+
+        if (searchText?.length) {
+          this.designationsMeta = mapped
+          this.filterDesignationsMeta = mapped.slice(0, this.designationListLoadCount)
+        } else {
+          if (!this.designationBackup || requestBody.pageNumber === 0) {
+            this.designationBackup = mapped
+          } else {
+            const combined = (this.designationBackup || []).concat(mapped)
+            this.designationBackup = _.uniqBy(combined, (it: any) => (it?.name || '').toLowerCase())
+          }
+          this.designationsMeta = this.designationBackup
+          this.filterDesignationsMeta = this.designationBackup.slice(0, this.designationListLoadCount)
+
+          if (!mapped || mapped.length === 0) {
+            this.noMoreLegacyDesignations = true
+          }
+
+          if (this.defaultSearchDesignationCount && this.designationBackup.length >= this.defaultSearchDesignationCount) {
+            this.noMoreLegacyDesignations = true
+          }
+        }
+
         // Add "Others" option if not already present
         if (!this.designationsMeta.some((d: any) => d.name === 'Others')) {
           this.designationsMeta.push({ name: 'Others', id: 0, description: 'Others' })
         }
-        // Initialize the filtered list
-        this.filterDesignationsMeta = this.designationsMeta.slice(0, this.designationDefaultLoadCount)
 
         // If we have a user with a designation that's not in the list, add it
         if (this.usersData && this.usersData.length > 0) {
@@ -432,9 +487,11 @@ export class UserCardComponent implements OnInit, OnChanges, AfterViewChecked, A
             }
           })
         }
+        this.isLoadingMoreDesignations = false
       },
       (_err: any) => {
         console.error('Error loading designations:', _err)
+        this.isLoadingMoreDesignations = false
       })
   }
 
@@ -530,7 +587,7 @@ export class UserCardComponent implements OnInit, OnChanges, AfterViewChecked, A
             if (this.isMdoLeader) {
               u.enableEdit = true
               userval.enableEdit = true
-            } else if (this.isMdoAdmin && userval.roles.includes('MDO_ADMIN')) {
+            } else if (this.isMdoAdmin && userval?.roles?.includes('MDO_ADMIN')) {
               u.enableEdit = false
               userval.enableEdit = false
               this.snackBar.open('Only MDO Leader Can Update Profile')
@@ -1364,8 +1421,11 @@ export class UserCardComponent implements OnInit, OnChanges, AfterViewChecked, A
     if (opened) {
       this.desigantionFilterEnable = false
       this.designationListLoadCount = this.designationDefaultLoadCount // Reset the load count
-      this.filterDesignationsMeta = this.designationsMeta.slice(0, this.designationListLoadCount)
-      this.checkCurrentDesignationPresent()
+      this.designationOffset = 0
+      this.noMoreLegacyDesignations = false
+      if (!this.designationsMeta || this.designationsMeta.length === 0) {
+        this.loadDesignations()
+      }
       if (this.updateUserDataForm.get('searchDesignation')) {
         this.updateUserDataForm.get('searchDesignation')!.setValue('')
       }
@@ -1393,18 +1453,14 @@ export class UserCardComponent implements OnInit, OnChanges, AfterViewChecked, A
       // Check if user has scrolled to the bottom (with a small threshold)
       if (element.scrollTop + element.clientHeight >= element.scrollHeight - 5) {
         // Only load more if not already loading and if there are potentially more items
-        if (!this.isLoadingMoreDesignations && this.designationsMeta.length > this.filterDesignationsMeta.length) {
-          this.isLoadingMoreDesignations = true
-
-          // Increase the load count by designationDefaultLoadCount
-          this.designationListLoadCount += this.designationDefaultLoadCount
-
-          // Update the filtered list with more items
-          setTimeout(() => {
-            this.filterDesignationsMeta = this.designationsMeta.slice(0, this.designationListLoadCount)
-            this.checkCurrentDesignationPresent()
-            this.isLoadingMoreDesignations = false
-          }, 500) // Small timeout to simulate loading and prevent multiple triggers
+        if (!this.isLoadingMoreDesignations) {
+          const loadedLegacy = (this.designationBackup || []).length
+          if (!this.noMoreLegacyDesignations && this.defaultSearchDesignationCount && loadedLegacy < this.defaultSearchDesignationCount) {
+            this.isLoadingMoreDesignations = true
+            this.designationOffset = (this.designationOffset || 0) + this.designationDefaultLoadCount
+            this.designationListLoadCount += this.designationDefaultLoadCount
+            this.loadDesignations(undefined, this.designationOffset)
+          }
         }
       }
     }
@@ -1440,10 +1496,12 @@ export class UserCardComponent implements OnInit, OnChanges, AfterViewChecked, A
     }
   }
   onDesignationDropdownClosed(): void {
-
     this.desigantionFilterEnable = false
     this.designationListLoadCount = this.designationDefaultLoadCount // Reset the load count
     this.filterDesignationsMeta = this.designationsMeta.slice(0, this.designationListLoadCount)
     this.checkCurrentDesignationPresent()
+    if (this.updateUserDataForm.get('searchDesignation')) {
+      this.updateUserDataForm.get('searchDesignation')!.setValue('')
+    }
   }
 }
