@@ -507,7 +507,6 @@ export class ReportsSectionComponent implements OnInit {
 
   updateDataSource(failedItems?: any[]) {
     this.dataSource.data = [...this.orgListData]
-    console.log('this.orgListData--', this.orgListData)
     if (this.l1orgListData && this.l1orgListData.length > 0) {
       this.dataSource.data.push(...this.l1orgListData)
     }
