@@ -462,6 +462,9 @@ export class ReportsSectionComponent implements OnInit {
         if (res && res.result && res.result.response && res.result.response.content && res.result.response.content.length) {
           const l1orgListData = res.result.response.content
           this.l1orgListData = l1orgListData && l1orgListData?.filter((item: any) => item.sbOrgId !== null && item.sbOrgId !== '')
+        } else if (res && res.result && res.result.response && res.result.response?.length) {
+          const l1orgListData = res.result.response
+          this.l1orgListData = l1orgListData && l1orgListData?.filter((item: any) => item.sbOrgId !== null && item.sbOrgId !== '')
         } else {
           this.l1orgListData = []
         }
