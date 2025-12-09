@@ -20,7 +20,44 @@ import { ConfirmDialogComponent } from '../../../../../workallocation-v2/compone
 export class EventDetailsComponent implements OnInit {
 
   private URL_PATTERN = /^https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)$/
-  private DURATION_PATTERN = /^(\d+h\s*)?(\d+m\s*)?(\d+s)?$/
+
+  // Custom validator for event duration
+  private durationValidator(control: FormControl): { [key: string]: any } | null {
+    const value = control.value?.trim()
+    if (!value) {
+      return null
+    }
+
+    const pattern = /^((\d+)h\s*)?((\d+)m\s*)?((\d+)s)?$/
+    if (!pattern.test(value)) {
+      return { pattern: true }
+    }
+
+    const hoursMatch = value.match(/(\d+)h/)
+    const minutesMatch = value.match(/(\d+)m/)
+    const secondsMatch = value.match(/(\d+)s/)
+
+    const hours = hoursMatch ? parseInt(hoursMatch[1], 10) : 0
+    const minutes = minutesMatch ? parseInt(minutesMatch[1], 10) : 0
+    const seconds = secondsMatch ? parseInt(secondsMatch[1], 10) : 0
+
+    // Check if all values are zero
+    if (hours === 0 && minutes === 0 && seconds === 0) {
+      return { zeroDuration: true }
+    }
+
+    // Validate minutes (0-59)
+    if (minutes > 59) {
+      return { invalidMinutes: true }
+    }
+
+    // Validate seconds (0-59)
+    if (seconds > 59) {
+      return { invalidSeconds: true }
+    }
+
+    return null
+  }
 
   @Input() eventDetailsData: any
   @Input() openMode = 'edit'
@@ -117,7 +154,9 @@ export class EventDetailsComponent implements OnInit {
 
   applyFormRulesBasedOnStatus() {
     const status = _.get(this.eventDetailsData, 'status', '').toLowerCase()
-    this.isDraft = status?.toLowerCase() === 'draft'
+    this.isDraft = status?.toLowerCase() === 'draft' ||
+      (this.eventDetailsData?.status?.toLowerCase() === 'rejected' && (!this.eventDetailsData?.prevStatus ||
+        this.eventDetailsData?.prevStatus?.toLowerCase() === 'sentToPublish'))
 
     if (this.isDraft) {
       this.preEventForm.get('meetingLink')?.setValidators([Validators.required, Validators.pattern(this.URL_PATTERN)])
@@ -130,9 +169,9 @@ export class EventDetailsComponent implements OnInit {
       this.preEventForm.disable()
       this.postEventForm.enable()
       this.postEventForm.get('postEventSummary')?.setValidators([Validators.required])
-      this.postEventForm.get('noOfAttendes')?.setValidators([Validators.required, Validators.min(0)])
-      this.postEventForm.get('eventDuration')?.setValidators([Validators.required, Validators.pattern(this.DURATION_PATTERN)])
-      this.postEventForm.get('meetingSummary')?.setValidators([Validators.minLength(150), Validators.maxLength(3000)])
+      this.postEventForm.get('noOfAttendes')?.setValidators([Validators.required, Validators.min(1), Validators.max(this.eventDetailsData.maxEnrolments || 200)])
+      this.postEventForm.get('eventDuration')?.setValidators([Validators.required, this.durationValidator.bind(this)])
+      this.postEventForm.get('meetingSummary')?.setValidators([Validators.minLength(100), Validators.maxLength(1000)])
       this.postEventForm.get('postEventSummary')?.updateValueAndValidity()
       this.postEventForm.get('noOfAttendes')?.updateValueAndValidity()
       this.postEventForm.get('eventDuration')?.updateValueAndValidity()
@@ -341,6 +380,12 @@ export class EventDetailsComponent implements OnInit {
       const mimeType = file.type
       if (mimeType !== 'application/pdf') {
         this.matSnackBar.open('Invalid file type. Please upload only PDF files.')
+        return
+      }
+      // Check file size (10MB = 10 * 1024 * 1024 bytes)
+      const maxSize = 10 * 1024 * 1024
+      if (file.size > maxSize) {
+        this.matSnackBar.open('File size exceeds 10MB. Please upload a smaller file.')
         return
       }
       this.summaryDocument = file
@@ -631,6 +676,49 @@ export class EventDetailsComponent implements OnInit {
     }
 
     return duration.trim()
+  }
+
+  onNumberKeyPress(event: KeyboardEvent): boolean {
+    const charCode = event.which ? event.which : event.keyCode
+    // Allow: backspace, delete, tab, escape, enter
+    if ([46, 8, 9, 27, 13].indexOf(charCode) !== -1 ||
+      // Allow: Ctrl+A, Ctrl+C, Ctrl+V, Ctrl+X
+      (charCode === 65 && event.ctrlKey === true) ||
+      (charCode === 67 && event.ctrlKey === true) ||
+      (charCode === 86 && event.ctrlKey === true) ||
+      (charCode === 88 && event.ctrlKey === true)) {
+      return true
+    }
+    // Prevent decimal point (190, 110) and minus sign (189, 109)
+    if ([190, 110, 189, 109].indexOf(charCode) !== -1) {
+      return false
+    }
+    // Ensure that it is a number and stop the keypress if not
+    if ((charCode < 48 || charCode > 57)) {
+      return false
+    }
+    return true
+  }
+
+  onAttendeesInput(event: any): void {
+    const value = event.target.value
+    // Remove any decimal values
+    if (value && value.includes('.')) {
+      const intValue = Math.floor(parseFloat(value))
+      this.postEventForm.patchValue({ noOfAttendes: intValue >= 0 ? intValue : null })
+    }
+  }
+
+  onAttendeesPaste(event: ClipboardEvent): void {
+    event.preventDefault()
+    const pastedText = event.clipboardData?.getData('text')
+    if (pastedText) {
+      const numValue = parseFloat(pastedText)
+      if (!isNaN(numValue)) {
+        const intValue = Math.floor(numValue)
+        this.postEventForm.patchValue({ noOfAttendes: intValue >= 0 ? intValue : null })
+      }
+    }
   }
 
 }

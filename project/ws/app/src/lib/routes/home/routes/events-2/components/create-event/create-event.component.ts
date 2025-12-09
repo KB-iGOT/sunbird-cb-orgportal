@@ -163,6 +163,21 @@ export class CreateEventComponent implements OnInit, AfterViewInit {
           this.courseSelectionForm.controls.selectedCourse.setValue(contentData?.result?.content || {})
           this.competencies = this.getLatestCompetencies(contentData?.result?.content)
           this.contentLoaded = true
+          setTimeout(() => {
+            // Check if event is live and endDateTime has passed
+            if (this.eventDetails?.status?.toLowerCase() === 'live' && this.eventDetails?.endDateTime) {
+              const endDateTime = new Date(this.eventDetails.endDateTime)
+              const currentDateTime = new Date()
+              if (endDateTime < currentDateTime && this.stepper) {
+                const stepersList = this.stepper.steps.toArray()
+                const eventSetupIndex = stepersList.findIndex((step) => step.label === 'Event Setup')
+                if (eventSetupIndex !== -1) {
+                  this.currentStepperIndex = eventSetupIndex
+                  this.selectedStepperLable = 'Event Setup'
+                }
+              }
+            }
+          }, 300)
         }
       } else {
         this.courseSelectionForm.controls.selectedCourse.setValue({})
@@ -193,6 +208,7 @@ export class CreateEventComponent implements OnInit, AfterViewInit {
     if (this.competencies.length === 0) {
       this.competencies = _.get(this.eventDetails, 'competencies_v6', [])
     }
+
   }
 
   ngAfterViewInit() {
@@ -220,49 +236,13 @@ export class CreateEventComponent implements OnInit, AfterViewInit {
   //#region (ui interactions)
   onSelectionChange(event: StepperSelectionEvent) {
     const selectedStep = this.stepper?.steps.toArray()[event.selectedIndex]
+    const previousStep = this.stepper?.steps.toArray()[event.previouslySelectedIndex]
     const selectedLabel = selectedStep?.label
-    // const previousStep = this.stepper?.steps.toArray()[event.previouslySelectedIndex]
-    // const previousLabel = previousStep?.label
-
-    // Check if user is trying to navigate FORWARD from Course Linking step without selecting a course
-    // if (previousLabel === 'Course Linking' &&
-    //   this.edf?.typeofEvent?.value?.toLowerCase() === 'live' &&
-    //   event.selectedIndex > event.previouslySelectedIndex) {
-    //   if (!this.courseListingComponent?.selectedCourse) {
-    //     this.matSnackBar.open('Please select a course before proceeding', 'X', {
-    //       duration: 3000,
-    //     })
-    //     // Prevent navigation by using setTimeout to reset after Angular's change detection
-    //     setTimeout(() => {
-    //       if (this.stepper) {
-    //         this.stepper.selectedIndex = event.previouslySelectedIndex
-    //         this.currentStepperIndex = event.previouslySelectedIndex
-    //         this.cdr.detectChanges()
-    //       }
-    //     }, 0)
-    //     return
-    //   } else {
-    //     // Update the form control when a course is selected
-    //     this.courseSelectionForm.patchValue({
-    //       selectedCourse: this.courseListingComponent.selectedCourse
-    //     })
-    //     this.competencies = this.getLatestCompetencies(this.courseListingComponent.selectedCourse)
-    //   }
-    // }
-
-    // if (event.selectedIndex > event.previouslySelectedIndex && previousLabel === 'Basic Details') {
-    //   if (this.eventDetailsForm.invalid) {
-    //     this.matSnackBar.open('Please fill mandatory fields')
-    //     setTimeout(() => {
-    //       if (this.stepper) {
-    //         this.stepper.selectedIndex = event.previouslySelectedIndex
-    //         this.currentStepperIndex = event.previouslySelectedIndex
-    //         this.cdr.detectChanges()
-    //       }
-    //     }, 0)
-    //   }
-    // }
-
+    const previousLabel = previousStep?.label
+    if (previousLabel === 'Basic Details') {
+      this.eventDetailsForm.markAllAsTouched()
+      this.eventDetailsForm.updateValueAndValidity()
+    }
     this.currentStepperIndex = event.selectedIndex
     if (this.stepper) {
       this.selectedStepperLable = selectedLabel || ''
@@ -475,6 +455,8 @@ export class CreateEventComponent implements OnInit, AfterViewInit {
 
       if (this.eventDetails?.status?.toLowerCase() === 'draft' && this.eventDetails?.typeofEvent?.toLowerCase() === 'live') {
         if (this.preEventForm?.invalid) {
+          this.preEventForm.markAllAsTouched()
+          this.preEventForm.updateValueAndValidity()
           this.openSnackBar('Please fill mandatory fields in Event Setup > Pre Event Setup')
           return false
         }
@@ -598,7 +580,7 @@ export class CreateEventComponent implements OnInit, AfterViewInit {
                 setTimeout(() => {
                   this.navigateBack()
                   this.loaderService.changeLoaderState(false)
-                }, 1000)
+                }, 2000)
               } else {
                 this.loaderService.changeLoaderState(false)
               }
@@ -771,10 +753,12 @@ export class CreateEventComponent implements OnInit, AfterViewInit {
 
   updatePostEvent() {
     if (this.postEventForm.invalid) {
+      this.postEventForm.markAllAsTouched()
+      this.postEventForm.updateValueAndValidity()
       this.openSnackBar('Please fill mandatory fields in Post Event Setup')
       return
     } else {
-      this.saveAndExit('updatePostEvent')
+      this.saveAndPublish()
     }
   }
 
