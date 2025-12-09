@@ -459,9 +459,9 @@ export class ReportsSectionComponent implements OnInit {
         sbOrgId: user.rootOrgId,
       })
       return this.downloadService.searchOrgByHierarchy(req).subscribe((res: any) => {
-        if (res && res.result && res.result.response) {
-          const l1orgListData = res.result.response
-          this.l1orgListData = l1orgListData?.filter((item: any) => item.sbOrgId !== null && item.sbOrgId !== '')
+        if (res && res.result && res.result.response && res.result.response.content && res.result.response.content.length) {
+          const l1orgListData = res.result.response.content
+          this.l1orgListData = l1orgListData && l1orgListData?.filter((item: any) => item.sbOrgId !== null && item.sbOrgId !== '')
         } else {
           this.l1orgListData = []
         }
@@ -504,7 +504,7 @@ export class ReportsSectionComponent implements OnInit {
 
   updateDataSource(failedItems?: any[]) {
     this.dataSource.data = [...this.orgListData]
-
+    console.log('this.orgListData--', this.orgListData)
     if (this.l1orgListData && this.l1orgListData.length > 0) {
       this.dataSource.data.push(...this.l1orgListData)
     }
