@@ -24,6 +24,7 @@ const API_END_POINTS = {
   providedIn: 'root'
 })
 export class EventsService {
+  courseDetails: any = {}
 
   constructor(
     private http: HttpClient,
@@ -188,6 +189,14 @@ export class EventsService {
 
   getUserSearchList(userText: string) {
     return this.http.get(API_END_POINTS.AUTOCOMPLETE(userText)).pipe(map(res => _.get(res, 'result.response')))
+  }
+
+  getCourseDetails() {
+    return this.courseDetails
+  }
+
+  setCourseDetails(content: any) {
+    this.courseDetails = content
   }
 
 }
