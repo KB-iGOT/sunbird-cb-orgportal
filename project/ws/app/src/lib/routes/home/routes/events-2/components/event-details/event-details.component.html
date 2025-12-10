@@ -21,7 +21,7 @@
         <div class="upload-container" *ngIf="!showUploadedDoc" (drop)="onDrop($event)"
           (dragover)="preventDefaultCDK($event)" (dragenter)="preventDefaultCDK($event, 'enter')"
           (dragleave)="preventDefaultCDK($event, 'leave')"
-          [class.disabled]="eventDetailsData?.status?.toLowerCase() !== 'draft'">
+          [class.disabled]="eventDetailsData?.status?.toLowerCase() !== 'draft' && eventDetailsData?.status?.toLowerCase() !== 'rejected'">
           <mat-icon class="upload-icon" svgIcon="single-color-upload-file"></mat-icon>
           <p class="upload-text">Select document to upload</p>
           <p class="upload-subtext">or drag and drop here</p>
@@ -260,6 +260,12 @@
           <mat-error *ngIf="postEventControls['eventDuration'].hasError('zeroDuration')">
             Duration cannot be 0h 0m 0s. Please enter a valid duration
           </mat-error>
+          <mat-error *ngIf="postEventControls['eventDuration'].hasError('minDuration')">
+            Event duration must be at least 30 minutes
+          </mat-error>
+          <mat-error *ngIf="postEventControls['eventDuration'].hasError('maxDuration')">
+            Event duration cannot exceed 24 hours
+          </mat-error>
           <mat-error *ngIf="postEventControls['eventDuration'].hasError('invalidMinutes')">
             Minutes must be between 0 and 59
           </mat-error>
@@ -275,9 +281,10 @@
         <mat-form-field appearance="outline" class="full-width">
           <textarea matInput placeholder="Add your description" formControlName="meetingSummary" rows="4"
             maxlength="1000"></textarea>
-          <mat-hint align="end">{{postEventControls['meetingSummary'].value?.length || 0}}/1000 (Minimum 100
-            characters
-            required)</mat-hint>
+          <mat-hint align="end">{{postEventControls['meetingSummary'].value?.length || 0}}/1000</mat-hint>
+          <mat-error *ngIf="postEventControls['meetingSummary'].hasError('minlength')">
+            Key takeaways must be at least {{ 100 - postEventControls['meetingSummary'].value?.length }} characters
+          </mat-error>
         </mat-form-field>
       </div>
     </div>

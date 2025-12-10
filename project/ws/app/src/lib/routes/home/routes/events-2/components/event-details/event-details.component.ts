@@ -56,6 +56,19 @@ export class EventDetailsComponent implements OnInit {
       return { invalidSeconds: true }
     }
 
+    // Calculate total duration in minutes
+    const totalMinutes = (hours * 60) + minutes + (seconds / 60)
+
+    // Check minimum duration of 30 minutes
+    if (totalMinutes < 30) {
+      return { minDuration: true }
+    }
+
+    // Check maximum duration of 23 hours 59 minutes 59 seconds (1439.98 minutes)
+    if (totalMinutes >= 1440) {
+      return { maxDuration: true }
+    }
+
     return null
   }
 
@@ -113,6 +126,10 @@ export class EventDetailsComponent implements OnInit {
 
   ngOnInit() {
     this.userProfile = _.get(this.activatedRoute, 'snapshot.data.configService.userProfile')
+    const queryParams = this.activatedRoute.snapshot.queryParams
+    if (queryParams && queryParams['pathUrl'] === 'past') {
+      this.isPreEventExpanded = false
+    }
     this.initializeForms()
     this.applyFormRulesBasedOnStatus()
     this.patchFormValues()
@@ -127,9 +144,36 @@ export class EventDetailsComponent implements OnInit {
       }
     })
 
+    // Scroll and focus on Summary Document if conditions are met
+    this.scrollToSummaryDocument()
+
     // Emit forms to parent component
     this.preEventFormReady.emit(this.preEventForm)
     this.postEventFormReady.emit(this.postEventForm)
+  }
+
+  scrollToSummaryDocument() {
+    // Check if event is live and endDateTime has passed
+    if (this.eventDetailsData?.status?.toLowerCase() === 'live' &&
+      this.eventDetailsData?.endDateTime &&
+      this.isDateTimePassed(this.eventDetailsData.endDateTime)) {
+
+      // Expand Post Event Setup section
+      this.isPostEventExpanded = true
+
+      // Use setTimeout to ensure DOM is updated after expansion
+      setTimeout(() => {
+        const summaryDocElements = Array.from(document.querySelectorAll('.field-label.required'))
+          .filter((el: any) => el.textContent?.trim().includes('Summary Document'))
+
+        if (summaryDocElements.length > 0) {
+          const element = summaryDocElements[0] as HTMLElement
+          element.scrollIntoView({ behavior: 'smooth', block: 'center' })
+          // Focus on the parent container for better visibility
+          element.parentElement?.focus()
+        }
+      }, 300)
+    }
   }
 
   initializeForms() {
@@ -680,32 +724,43 @@ export class EventDetailsComponent implements OnInit {
 
   onNumberKeyPress(event: KeyboardEvent): boolean {
     const charCode = event.which ? event.which : event.keyCode
-    // Allow: backspace, delete, tab, escape, enter
-    if ([46, 8, 9, 27, 13].indexOf(charCode) !== -1 ||
+    const key = event.key
+
+    // Block decimal point/period in all forms
+    if (key === '.' || charCode === 46 || charCode === 190 || charCode === 110) {
+      event.preventDefault()
+      return false
+    }
+
+    // Block minus sign
+    if (key === '-' || charCode === 189 || charCode === 109) {
+      event.preventDefault()
+      return false
+    }
+
+    // Allow: backspace, delete, tab, escape, enter, arrows
+    if ([8, 9, 27, 13, 37, 38, 39, 40].indexOf(charCode) !== -1 ||
       // Allow: Ctrl+A, Ctrl+C, Ctrl+V, Ctrl+X
-      (charCode === 65 && event.ctrlKey === true) ||
-      (charCode === 67 && event.ctrlKey === true) ||
-      (charCode === 86 && event.ctrlKey === true) ||
-      (charCode === 88 && event.ctrlKey === true)) {
+      (event.ctrlKey && [65, 67, 86, 88].indexOf(charCode) !== -1)) {
       return true
     }
-    // Prevent decimal point (190, 110) and minus sign (189, 109)
-    if ([190, 110, 189, 109].indexOf(charCode) !== -1) {
-      return false
+
+    // Ensure that it is a number (0-9)
+    if (key && (key >= '0' && key <= '9')) {
+      return true
     }
-    // Ensure that it is a number and stop the keypress if not
-    if ((charCode < 48 || charCode > 57)) {
-      return false
-    }
-    return true
+
+    // Block everything else
+    event.preventDefault()
+    return false
   }
 
   onAttendeesInput(event: any): void {
+    // This is kept for paste handling via keyboard
     const value = event.target.value
-    // Remove any decimal values
     if (value && value.includes('.')) {
       const intValue = Math.floor(parseFloat(value))
-      this.postEventForm.patchValue({ noOfAttendes: intValue >= 0 ? intValue : null })
+      this.postEventForm.patchValue({ noOfAttendes: intValue >= 0 ? intValue : null }, { emitEvent: false })
     }
   }
 
