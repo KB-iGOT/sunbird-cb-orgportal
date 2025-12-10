@@ -444,7 +444,7 @@ export class CreateEventComponent implements OnInit, AfterViewInit {
         return false
       }
       if (!(this.competencies && this.competencies.length)) {
-        this.openSnackBar('Please add atleast one competency in Add Competency')
+        this.openSnackBar(this.eventDetails.typeofEvent === 'live' ? 'Select course from course linking' : 'Please add atleast one competency in Add Competency')
         return false
       }
 
