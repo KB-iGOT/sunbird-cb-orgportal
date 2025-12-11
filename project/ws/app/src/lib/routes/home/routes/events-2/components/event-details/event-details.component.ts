@@ -113,7 +113,7 @@ export class EventDetailsComponent implements OnInit {
   removable = true
   showSpeakerInvalidMsg = false
   isSavedPostEvent: boolean = false
-  isSpeakerDisabled: boolean = true
+  isSpeakerDisabled: boolean = false
 
   constructor(
     private formBuilder: FormBuilder,
@@ -163,14 +163,9 @@ export class EventDetailsComponent implements OnInit {
 
       // Use setTimeout to ensure DOM is updated after expansion
       setTimeout(() => {
-        const summaryDocElements = Array.from(document.querySelectorAll('.field-label.required'))
-          .filter((el: any) => el.textContent?.trim().includes('Summary Document'))
-
-        if (summaryDocElements.length > 0) {
-          const element = summaryDocElements[0] as HTMLElement
-          element.scrollIntoView({ behavior: 'smooth', block: 'center' })
-          // Focus on the parent container for better visibility
-          element.parentElement?.focus()
+        const summaryDocElement = document.getElementById('summaryDocumentSection')
+        if (summaryDocElement) {
+          summaryDocElement.scrollIntoView({ behavior: 'smooth', block: 'center' })
         }
       }, 300)
     }
@@ -220,6 +215,12 @@ export class EventDetailsComponent implements OnInit {
       this.postEventForm.get('noOfAttendes')?.updateValueAndValidity()
       this.postEventForm.get('eventDuration')?.updateValueAndValidity()
       this.postEventForm.get('meetingSummary')?.updateValueAndValidity()
+    } else if (this.isDateUpcoming(this.eventDetailsData.startDateTime) && this.eventDetailsData.status.toLowerCase() === 'live') {
+      this.preEventForm.disable()
+      this.postEventForm.disable()
+      this.preEventForm.get('meetingLink')?.setValidators([Validators.required, Validators.pattern(this.URL_PATTERN)])
+      this.preEventForm.get('meetingLink')?.enable()
+      this.preEventForm.get('meetingLink')?.updateValueAndValidity()
     } else {
       this.preEventForm.disable()
       this.postEventForm.disable()
@@ -233,7 +234,7 @@ export class EventDetailsComponent implements OnInit {
       agenda: this.eventDetailsData.meetingAgenda || '',
       selectedSpeaker: (_.isString(this.eventDetailsData.speakerDetails)) ? JSON.parse(this.eventDetailsData.speakerDetails) :
         this.eventDetailsData.speakerDetails || [],
-      speakerType: this.eventDetailsData.speakerType || ''
+      speakerType: ''
     })
     this.postEventForm.patchValue({
       noOfAttendes: this.eventDetailsData.noOfAttendes || null,
@@ -241,6 +242,7 @@ export class EventDetailsComponent implements OnInit {
       meetingSummary: this.eventDetailsData.meetingSummary || '',
       postEventSummary: this.eventDetailsData.postEventSummary?.[0] || ''
     })
+    this.getSpeakerType()
     if (this.preEventControls['preEventReads'].value) {
       this.generateUploadedDocTypeImg(this.preEventControls['preEventReads'].value)
       this.showUploadedDoc = true
@@ -251,6 +253,30 @@ export class EventDetailsComponent implements OnInit {
       this.isSavedPostEvent = true
       this.postEventForm.disable()
     }
+  }
+
+  getSpeakerType() {
+    const speakerData = (_.isString(this.eventDetailsData.speakerDetails)) ? JSON.parse(this.eventDetailsData.speakerDetails) :
+      this.eventDetailsData.speakerDetails || []
+    if (speakerData.length > 1) {
+      this.preEventControls['speakerType'].setValue('others')
+    } else if (speakerData.length === 1) {
+      if (speakerData[0].id !== '') {
+        if (this.eventDetailsData.courseLinked === '') {
+          this.preEventControls['selectedSpeaker'].setValue('')
+          this.preEventControls['speakerType'].setValue('')
+        } else {
+          this.preEventControls['speakerType'].setValue('courseCreator')
+        }
+      } else {
+        this.preEventControls['speakerType'].setValue('others')
+      }
+    } else {
+      this.preEventControls['selectedSpeaker'].setValue('')
+      this.preEventControls['speakerType'].setValue('')
+    }
+    this.preEventForm.get('speakerType')?.updateValueAndValidity()
+    this.preEventForm.get('selectedSpeaker')?.updateValueAndValidity()
   }
 
   get preEventControls() {
@@ -277,6 +303,19 @@ export class EventDetailsComponent implements OnInit {
       const inputDate = new Date(dateTimeString)
       const currentDate = new Date()
       return inputDate < currentDate
+    } catch (error) {
+      return false
+    }
+  }
+
+  isDateUpcoming(dateTimeString: string): boolean {
+    if (!dateTimeString) {
+      return false
+    }
+    try {
+      const inputDate = new Date(dateTimeString)
+      const currentDate = new Date()
+      return inputDate > currentDate
     } catch (error) {
       return false
     }

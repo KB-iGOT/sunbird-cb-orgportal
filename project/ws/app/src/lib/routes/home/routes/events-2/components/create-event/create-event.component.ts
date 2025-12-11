@@ -262,6 +262,15 @@ export class CreateEventComponent implements OnInit, AfterViewInit {
     // Mark the form as touched and update validity
     this.courseSelectionForm.markAllAsTouched()
     this.courseSelectionForm.updateValueAndValidity()
+
+    // Reset speaker type and speaker names when course changes
+    if (this.preEventForm && this.preEventForm.get('speakerType')?.value === 'courseCreator') {
+      this.preEventForm.patchValue({
+        speakerType: '',
+        selectedSpeaker: []
+      })
+    }
+
     this.cdr.detectChanges()
   }
 
@@ -462,6 +471,15 @@ export class CreateEventComponent implements OnInit, AfterViewInit {
         }
         if (this.courseSelectionForm?.invalid) {
           this.openSnackBar('Please select one course in course Linking')
+          return false
+        }
+      }
+
+      if (this.eventDetails?.status?.toLowerCase() === 'live' && this.eventDetails?.typeofEvent?.toLowerCase() === 'live') {
+        if (this.preEventForm?.invalid) {
+          this.preEventForm.markAllAsTouched()
+          this.preEventForm.updateValueAndValidity()
+          this.openSnackBar('Please fill mandatory fields in Event Setup > Pre Event Setup')
           return false
         }
       }

@@ -61,6 +61,10 @@ export class CourseListingComponent implements OnInit {
       reqBody.request.sort_by = { name: this.sortOrder === 'asc' ? 'asc' : 'desc' }
     }
 
+    if (this.sortType === 'latest') {
+      reqBody.request.sort_by = { lastPublishedOn: this.sortOrder === 'asc' ? 'asc' : 'desc' }
+    }
+
     this.eventsService.getContentSearch(reqBody).subscribe((response: any) => {
       this.contentList = response.result.content || []
       this.totalCount = response.result.count || 0
