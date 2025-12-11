@@ -130,6 +130,10 @@ export class EventBasicDetailsComponent implements OnInit, OnChanges {
         this.edf.registrationLink?.updateValueAndValidity()
         this.eventCategoriesList = ['Samuhik Charcha']
       }
+    } else if (this.openMode === 'view') {
+      if (this.edf?.typeofEvent?.value?.toLowerCase() === 'live') {
+        this.eventCategoriesList = ['Samuhik Charcha']
+      }
     }
   }
 

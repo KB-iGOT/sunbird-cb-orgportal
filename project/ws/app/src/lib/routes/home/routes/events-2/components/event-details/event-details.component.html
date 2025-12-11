@@ -15,7 +15,7 @@
     <div class="section-content" *ngIf="isPreEventExpanded" [formGroup]="preEventForm">
       <!-- Upload Pre-read Document -->
       <div class="form-field mt-4">
-        <label class="field-label">Upload Pre-read Document</label>
+        <label class="field-label">Upload Pre-read Document {{eventDetailsData?.status}}</label>
 
         <!-- Upload Container - Show when no document uploaded -->
         <div class="upload-container" *ngIf="!showUploadedDoc" (drop)="onDrop($event)"
@@ -132,21 +132,23 @@
 
         <!-- Speaker Name -->
         <div class="form-field mt-4 event-form w-full">
-          <label class="field-label">Speaker Name {{isSpeakerDisabled}}</label>
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-chip-list #speakerChipList aria-label="Speaker selection">
-              <mat-chip *ngFor="let speaker of preEventForm.controls['selectedSpeaker'].value" [selectable]="selectable"
-                [removable]="removable" (removed)="removeSpeaker(speaker)">
-                {{ speaker?.name }}
-                <ng-container *ngIf="!isSpeakerDisabled && isDraft">
-                  <mat-icon matChipRemove *ngIf="removable">cancel</mat-icon>
-                </ng-container>
-              </mat-chip>
-              <input placeholder="Enter speaker name" #speakerInput [matChipInputFor]="speakerChipList"
-                [matChipInputSeparatorKeyCodes]="separatorKeysCodes" [matChipInputAddOnBlur]="true"
-                (matChipInputTokenEnd)="addSpeakerFromInput($event)" [disabled]="isSpeakerDisabled || !isDraft" />
-            </mat-chip-list>
-          </mat-form-field>
+          <ng-container *ngIf="preEventControls['speakerType'].value">
+            <label class="field-label">Speaker Name</label>
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-chip-list #speakerChipList aria-label="Speaker selection">
+                <mat-chip *ngFor="let speaker of preEventForm.controls['selectedSpeaker'].value"
+                  [selectable]="selectable" [removable]="removable" (removed)="removeSpeaker(speaker)">
+                  {{ speaker?.name }}
+                  <ng-container *ngIf="!isSpeakerDisabled && isDraft">
+                    <mat-icon matChipRemove *ngIf="removable">cancel</mat-icon>
+                  </ng-container>
+                </mat-chip>
+                <input placeholder="Enter speaker name" #speakerInput [matChipInputFor]="speakerChipList"
+                  [matChipInputSeparatorKeyCodes]="separatorKeysCodes" [matChipInputAddOnBlur]="true"
+                  (matChipInputTokenEnd)="addSpeakerFromInput($event)" [disabled]="isSpeakerDisabled || !isDraft" />
+              </mat-chip-list>
+            </mat-form-field>
+          </ng-container>
         </div>
       </div>
     </div>
@@ -198,7 +200,7 @@
       </div> -->
 
       <!-- Summary Document -->
-      <div class="form-field mt-4">
+      <div id="summaryDocumentSection" class="form-field mt-4">
         <label class="field-label required">Summary Document </label>
 
         <!-- Upload Container - Show when no document uploaded -->
@@ -238,7 +240,7 @@
             Number of attendees is required
           </mat-error>
           <mat-error *ngIf="postEventControls['noOfAttendes'].hasError('min')">
-            Number of attendees cannot be less than 0
+            Number of attendees cannot be less than 1
           </mat-error>
           <mat-error *ngIf="postEventControls['noOfAttendes'].hasError('max')">
             Number of attendees cannot exceed {{ eventDetailsData.maxEnrolments || 200 }}
@@ -264,7 +266,7 @@
             Event duration must be at least 30 minutes
           </mat-error>
           <mat-error *ngIf="postEventControls['eventDuration'].hasError('maxDuration')">
-            Event duration cannot exceed 24 hours
+            Event duration should be less than 24H
           </mat-error>
           <mat-error *ngIf="postEventControls['eventDuration'].hasError('invalidMinutes')">
             Minutes must be between 0 and 59
