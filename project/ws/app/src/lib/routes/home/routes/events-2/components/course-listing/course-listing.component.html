@@ -52,6 +52,11 @@
           <mat-icon *ngIf="sortOrder === 'desc' && sortType === 'latest'" class="select-radio margin-remove margin-left-s
                     ">radio_button_checked</mat-icon>
         </button>
+        <button mat-menu-item class="sort-za flex flex-middle" (click)="onSort('desc', 'latest')"
+          [ngClass]="{'sort-selected': sortOrder === 'desc' && sortType === 'latest'}">
+          <mat-icon>today</mat-icon>
+          <span>Newest</span>
+        </button>
       </mat-menu>
     </div>
   </div>

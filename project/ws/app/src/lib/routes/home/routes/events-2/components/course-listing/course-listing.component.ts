@@ -39,6 +39,9 @@ export class CourseListingComponent implements OnInit {
     this.isDraft = this.eventDetailsData?.status?.toLowerCase() === 'draft' ||
       (this.eventDetailsData?.status?.toLowerCase() === 'rejected' && (!this.eventDetailsData?.prevStatus ||
         this.eventDetailsData?.prevStatus?.toLowerCase() === 'sentToPublish'))
+    if (this.openMode === 'view') {
+      this.isDraft = false
+    }
   }
 
   fetchCourseDetails() {
