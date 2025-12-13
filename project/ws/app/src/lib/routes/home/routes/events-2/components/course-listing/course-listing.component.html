@@ -35,22 +35,16 @@
           [ngClass]="{'sort-selected': sortOrder === 'asc' && sortType === 'name'}">
           <mat-icon>arrow_upward</mat-icon>
           <span>Sort A-Z</span>
-          <mat-icon *ngIf="sortOrder === 'asc' && sortType === 'name'" class="select-radio margin-remove margin-left-s
-            ">radio_button_checked</mat-icon>
         </button>
         <button mat-menu-item class="sort-za flex flex-middle" (click)="onSort('desc', 'name')"
           [ngClass]="{'sort-selected': sortOrder === 'desc' && sortType === 'name'}">
           <mat-icon>arrow_downward</mat-icon>
           <span>Sort Z-A</span>
-          <mat-icon *ngIf="sortOrder === 'desc' && sortType === 'name'" class="select-radio margin-remove margin-left-s
-            ">radio_button_checked</mat-icon>
         </button>
         <button mat-menu-item class="sort-za flex flex-middle" (click)="onSort('desc', 'latest')"
           [ngClass]="{'sort-selected': sortOrder === 'desc' && sortType === 'latest'}">
           <mat-icon>today</mat-icon>
           <span>Newest</span>
-          <mat-icon *ngIf="sortOrder === 'desc' && sortType === 'latest'" class="select-radio margin-remove margin-left-s
-                    ">radio_button_checked</mat-icon>
         </button>
       </mat-menu>
     </div>

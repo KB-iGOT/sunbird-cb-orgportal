@@ -164,7 +164,7 @@
     </div>
   </ng-container>
 
-  <div class="flex flex-row gap-4" [ngClass]="{'disableForm': openTab === 'past'}">
+  <div class="flex flex-row gap-4" [ngClass]="{'disableForm': openTab === 'past' || openTab === 'upcoming'}">
     <div class="flex flex-column gap-2 event-form w-full eventTimpicker">
       <div class="form-lable required">
         Date
@@ -173,7 +173,8 @@
         <input matInput [matDatepicker]="startDate" [min]="minDate" placeholder="Enter Start Date"
           formControlName="startDate" readonly>
         <mat-datepicker-toggle matSuffix [for]="startDate"></mat-datepicker-toggle>
-        <mat-datepicker #startDate></mat-datepicker>
+        <mat-datepicker #startDate
+          [disabled]="openTab === 'upcoming' || openTab === 'past' || openMode === 'view'"></mat-datepicker>
         <mat-error *ngIf="showValidationMsg('startDate','required')">
           Date is mandatory
         </mat-error>

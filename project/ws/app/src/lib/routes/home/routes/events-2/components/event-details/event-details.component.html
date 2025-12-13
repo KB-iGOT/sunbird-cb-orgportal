@@ -34,7 +34,7 @@
           <div class="uploaded-doc-card">
             <img [src]="uploadedDocTypeImg" alt="document" class="doc-icon">
             <div class="doc-info">
-              <p class="doc-name">Pre-read Document</p>
+              <p class="doc-name">{{uploadedFileName(preEventControls['preEventReads'].value)}}</p>
               <p class="doc-type">{{materialType}}</p>
             </div>
             <ng-container *ngIf="isDraft">
@@ -219,7 +219,7 @@
           <div class="uploaded-doc-card">
             <img src="/assets/icons/pdf.svg" alt="document" class="doc-icon">
             <div class="doc-info">
-              <p class="doc-name">Summary Document</p>
+              <p class="doc-name">{{uploadedFileName(postEventControls['postEventSummary'].value)}}</p>
               <p class="doc-type">PDF document</p>
             </div>
             <button mat-icon-button class="remove-btn" (click)="removeUploadedSummaryDoc()" type="button"

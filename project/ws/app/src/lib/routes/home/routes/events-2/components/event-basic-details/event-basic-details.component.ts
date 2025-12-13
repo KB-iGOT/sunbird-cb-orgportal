@@ -96,6 +96,11 @@ export class EventBasicDetailsComponent implements OnInit, OnChanges {
   }
 
   ngOnInit(): void {
+    if (this.eventDetails) {
+      if (this.edf?.typeofEvent?.value?.toLowerCase() === 'live') {
+        this.eventCategoriesList = ['Samuhik Charcha']
+      }
+    }
     if (this.eventDetails && this.eventDetails.controls && this.openMode === 'edit' && this.openTab !== 'past') {
       if (this.eventDetails.controls.startDate) {
         this.eventDetails.controls.startDate.valueChanges.subscribe((date) => {
@@ -128,10 +133,6 @@ export class EventBasicDetailsComponent implements OnInit, OnChanges {
         this.edf.maxEnrolments?.updateValueAndValidity()
         this.edf.registrationLink?.setValidators([])
         this.edf.registrationLink?.updateValueAndValidity()
-        this.eventCategoriesList = ['Samuhik Charcha']
-      }
-    } else if (this.openMode === 'view') {
-      if (this.edf?.typeofEvent?.value?.toLowerCase() === 'live') {
         this.eventCategoriesList = ['Samuhik Charcha']
       }
     }

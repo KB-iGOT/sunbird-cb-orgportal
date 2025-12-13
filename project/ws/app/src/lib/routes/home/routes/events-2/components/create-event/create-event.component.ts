@@ -165,7 +165,7 @@ export class CreateEventComponent implements OnInit, AfterViewInit {
           this.contentLoaded = true
           setTimeout(() => {
             // Check if event is live and endDateTime has passed
-            if (this.eventDetails?.status?.toLowerCase() === 'live' && this.eventDetails?.endDateTime) {
+            if (this.eventDetails?.status?.toLowerCase() === 'live' && this.eventDetails?.endDateTime && this.openMode === 'edit') {
               const endDateTime = new Date(this.eventDetails.endDateTime)
               const currentDateTime = new Date()
               if (endDateTime < currentDateTime && this.stepper) {

@@ -144,31 +144,9 @@ export class EventDetailsComponent implements OnInit {
       }
     })
 
-    // Scroll and focus on Summary Document if conditions are met
-    this.scrollToSummaryDocument()
-
     // Emit forms to parent component
     this.preEventFormReady.emit(this.preEventForm)
     this.postEventFormReady.emit(this.postEventForm)
-  }
-
-  scrollToSummaryDocument() {
-    // Check if event is live and endDateTime has passed
-    if (this.eventDetailsData?.status?.toLowerCase() === 'live' &&
-      this.eventDetailsData?.endDateTime &&
-      this.isDateTimePassed(this.eventDetailsData.endDateTime)) {
-
-      // Expand Post Event Setup section
-      this.isPostEventExpanded = true
-
-      // Use setTimeout to ensure DOM is updated after expansion
-      setTimeout(() => {
-        const summaryDocElement = document.getElementById('summaryDocumentSection')
-        if (summaryDocElement) {
-          summaryDocElement.scrollIntoView({ behavior: 'smooth', block: 'center' })
-        }
-      }, 300)
-    }
   }
 
   initializeForms() {
@@ -196,7 +174,9 @@ export class EventDetailsComponent implements OnInit {
     this.isDraft = status?.toLowerCase() === 'draft' ||
       (this.eventDetailsData?.status?.toLowerCase() === 'rejected' && (!this.eventDetailsData?.prevStatus ||
         this.eventDetailsData?.prevStatus?.toLowerCase() === 'sentToPublish'))
-
+    if (this.openMode === 'view') {
+      this.isDraft = false
+    }
     if (this.isDraft) {
       this.preEventForm.get('meetingLink')?.setValidators([Validators.required, Validators.pattern(this.URL_PATTERN)])
       this.preEventForm.get('agenda')?.setValidators([Validators.required, Validators.minLength(100), Validators.maxLength(1000)])
@@ -228,12 +208,21 @@ export class EventDetailsComponent implements OnInit {
   }
 
   patchFormValues() {
+    let speakerDetails = []
+    try {
+      speakerDetails = (_.isString(this.eventDetailsData.speakerDetails) && this.eventDetailsData.speakerDetails.trim() !== '')
+        ? JSON.parse(this.eventDetailsData.speakerDetails)
+        : this.eventDetailsData.speakerDetails || []
+    } catch (error) {
+      console.error('Error parsing speaker details:', error)
+      speakerDetails = []
+    }
+
     this.preEventForm.patchValue({
       preEventReads: this.eventDetailsData.preEventReads?.[0] || '',
       meetingLink: this.eventDetailsData.registrationLink || '',
       agenda: this.eventDetailsData.meetingAgenda || '',
-      selectedSpeaker: (_.isString(this.eventDetailsData.speakerDetails)) ? JSON.parse(this.eventDetailsData.speakerDetails) :
-        this.eventDetailsData.speakerDetails || [],
+      selectedSpeaker: speakerDetails,
       speakerType: ''
     })
     this.postEventForm.patchValue({
@@ -256,8 +245,15 @@ export class EventDetailsComponent implements OnInit {
   }
 
   getSpeakerType() {
-    const speakerData = (_.isString(this.eventDetailsData.speakerDetails)) ? JSON.parse(this.eventDetailsData.speakerDetails) :
-      this.eventDetailsData.speakerDetails || []
+    let speakerData = []
+    try {
+      speakerData = (_.isString(this.eventDetailsData.speakerDetails) && this.eventDetailsData.speakerDetails.trim() !== '')
+        ? JSON.parse(this.eventDetailsData.speakerDetails)
+        : this.eventDetailsData.speakerDetails || []
+    } catch (error) {
+      console.error('Error parsing speaker details in getSpeakerType:', error)
+      speakerData = []
+    }
     if (speakerData.length > 1) {
       this.preEventControls['speakerType'].setValue('others')
     } else if (speakerData.length === 1) {
@@ -267,6 +263,7 @@ export class EventDetailsComponent implements OnInit {
           this.preEventControls['speakerType'].setValue('')
         } else {
           this.preEventControls['speakerType'].setValue('courseCreator')
+          this.isSpeakerDisabled = true
         }
       } else {
         this.preEventControls['speakerType'].setValue('others')
@@ -812,6 +809,25 @@ export class EventDetailsComponent implements OnInit {
         const intValue = Math.floor(numValue)
         this.postEventForm.patchValue({ noOfAttendes: intValue >= 0 ? intValue : null })
       }
+    }
+  }
+
+  uploadedFileName(url: string): string {
+    if (!url) {
+      return ''
+    }
+    try {
+      // Remove quotes if present
+      const cleanUrl = url.replace(/['"]/g, '')
+      // Split by '/' and get the last part
+      const parts = cleanUrl.split('/')
+      const lastPart = parts[parts.length - 1]
+      // Extract filename after the last underscore (removing timestamp)
+      const filenameParts = lastPart.split('_')
+      return filenameParts[filenameParts.length - 1] || lastPart
+    } catch (error) {
+      console.error('Error extracting filename:', error)
+      return url
     }
   }
 
