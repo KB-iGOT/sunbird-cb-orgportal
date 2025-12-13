@@ -376,6 +376,20 @@
     &:hover {
       background-color: #F5F5F5;
     }
+
+    &.sort-selected {
+      background-color: #E3F2FD !important;
+      color: #1B4CA1 !important;
+      font-weight: 500;
+
+      mat-icon {
+        color: #1B4CA1;
+      }
+
+      span {
+        color: #1B4CA1;
+      }
+    }
   }
 }
 
