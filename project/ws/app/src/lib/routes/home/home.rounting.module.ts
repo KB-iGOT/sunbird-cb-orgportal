@@ -26,7 +26,7 @@ import { UsersListResolve } from './resolvers/users-list-resolve.service'
 import { UserCreationComponent } from './routes/users-view/user-creation/user-creation.component'
 import { BulkUploadApprovalComponent } from './routes/approvals/bulk-upload/bulk-upload.component'
 import { RequestListComponent } from './components/request-list/request-list.component'
-import { CreateRequestFormComponent } from './components/request-list/create-request-form/create-request-form.component'
+// import { CreateRequestFormComponent } from './components/request-list/create-request-form/create-request-form.component'
 import { OdcsMappingComponent } from './routes/odcs-mapping/odcs-mapping.component'
 import { MentorManageComponent } from './routes/mentor-manage/mentor-manage.component'
 import { BulkUploadOdcsComponent } from './routes/odcs-mapping/bulk-upload-odcs/bulk-upload-odcs.component'
@@ -35,6 +35,7 @@ import { MyNotificationsComponent } from './routes/my-notifications/my-notificat
 import { FormDataResolverService } from './resolvers/form-data-resolver.service'
 import { DirectoryComponent } from './routes/directory/directory.component'
 import { OrganisationUsersComponent } from './routes/directory/organisation-users/organisation-users.component'
+import { CreateRequestFormV2Component } from './components/create-request-form-v2/create-request-form-v2.component'
 const routes: Routes = [
   {
     path: '',
@@ -401,7 +402,7 @@ const routes: Routes = [
       },
       {
         path: 'create-request-form',
-        component: CreateRequestFormComponent,
+        component: CreateRequestFormV2Component,
         data: {
           pageId: 'create-request-form',
           pageType: 'feature',

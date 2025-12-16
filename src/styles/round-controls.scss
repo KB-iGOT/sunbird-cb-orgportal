@@ -1,0 +1,73 @@
+.round-control-label {
+  color: #212529;
+  /*stylelint-disable-next-line*/
+  font: 700 14px Lato;
+}
+
+:host ::ng-deep .round-control {
+  .mat-form-field-appearance-outline .mat-form-field-flex {
+    height: 50px;
+  }
+
+  .mat-form-field-appearance-outline .mat-form-field-infix {
+    padding: 15px 0px 0px !important;
+  }
+
+  .mat-form-field-infix {
+    border-top: 0.7em !important;
+  }
+
+  .mat-form-field-appearance-outline .mat-form-field-suffix {
+    top: 0px !important;
+  }
+
+  .mat-mdc-icon-button svg {
+    width: 16px !important;
+    height: 16px !important;
+  }
+
+  .mat-form-field-appearance-outline .mat-form-field-outline-end {
+    border-radius: 25px !important;
+    border-left-style: solid !important;
+  }
+
+  .mat-form-field-appearance-outline .mat-form-field-outline-start {
+    display: none !important;
+  }
+
+  .mat-form-field-wrapper {
+    padding-bottom: 0px !important;
+  }
+
+  .mat-form-field-appearance-outline .mat-form-field-subscript-wrapper {
+    padding: 4px !important;
+    margin-top: 25px;
+  }
+
+  .add-subscript-wrapper { // give this class to mat-form-field if you have mat-hint or mat-error
+    margin-bottom: 20px;
+  }
+
+  mat-checkbox,
+  mat-radio-button {
+    display: flex;
+    align-items: center;
+    justify-items: center;
+    height: 50px;
+    border-radius: 25px;
+    border: 1px solid rgba(0, 0, 0, 0.16);
+    padding: 0 15px;
+  }
+
+  .mat-checkbox-inner-container {
+    margin-left: 0px !important;
+  }
+
+  .mat-checkbox-layout .mat-checkbox-label,
+  .mat-radio-label-content {
+    width: 100%;
+    display: flex;
+    align-items: center;
+  }
+
+}

@@ -1,0 +1,44 @@
+.c-r-form {
+  .arrow-btn {
+    width: 30px;
+    font-size: 30px;
+    cursor: pointer;
+  }
+
+  .title-request {
+    /* stylelint-disable-next-line */
+    font: 600 20px Montserrat;
+  }
+
+  mat-card-title {
+    margin: 0px !important;
+  }
+
+  .preview-btn {
+    width: 106px;
+    height: 40px;
+    border-radius: 20px;
+    border: 1px solid #1B4CA1 !important;
+    color: #1B4CA1 !important;
+
+    /* stylelint-disable-next-line */
+    font: normal normal 700 14px/16px Lato;
+  }
+
+  .submit-btn {
+    width: 106px;
+    height: 40px;
+    border-radius: 20px;
+    color: #1B4CA1 !important;
+    background-color: #1B4CA1 !important;
+    color: #ffffff !important;
+
+    /* stylelint-disable-next-line */
+    font: normal normal 700 14px/16px Lato;
+  }
+
+  .disabled-preview-btn {
+    opacity: 0.6;
+    pointer-events: none;
+  }
+}

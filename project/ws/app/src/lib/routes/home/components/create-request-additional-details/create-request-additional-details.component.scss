@@ -1,0 +1,8 @@
+@import 'src/styles/round-controls';
+
+
+:host ::ng-deep .user-type-checkboxes {
+  .mat-radio-label {
+    min-width: 150px;
+  }
+}

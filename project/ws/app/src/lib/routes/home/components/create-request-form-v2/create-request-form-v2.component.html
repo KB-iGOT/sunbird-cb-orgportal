@@ -1,0 +1,33 @@
+<div class="w-full h-full c-r-form">
+  <mat-card class="card-section">
+    <span class="flex gap-2 items-center mt-4">
+      <mat-icon class="arrow-btn" (click)="navigateBack()">arrow_back</mat-icon>
+      <mat-card-title class="title-request">
+        {{isHideData ? 'Go Back':'Request Content'}}
+      </mat-card-title>
+    </span>
+    <mat-card-content>
+      <sb-uic-horizontal-dynamic-stepper [labels]="steppersList" [selectedIndex]="currentStepperIndex"
+        (stepChange)="onStepChanged($event)">
+        <ng-template>
+          <ws-app-create-request-content-details
+            [contentDetailsForm]="contentDetailsForm"></ws-app-create-request-content-details>
+        </ng-template>
+        <ng-template>
+          <ws-app-create-request-additional-details
+            [additionalDetailsForm]="additionalDetailsForm"></ws-app-create-request-additional-details>
+        </ng-template>
+      </sb-uic-horizontal-dynamic-stepper>
+      <div class="flex w-full justify-between items-center mt-6 mb-4">
+        <button mat-raised-button [ngClass]="{'disabled-preview-btn': currentStepperIndex === 0}" class="preview-btn"
+          (click)="onPrevious()">
+          Previous
+        </button>
+        <button mat-raised-button color="primary" class="submit-btn" (click)="onNext()"
+          [ngClass]="{'disabled-preview-btn': currentStepperIndex === steppersList.length - 1 && (contentDetailsForm.invalid || additionalDetailsForm.invalid)}">
+          {{ currentStepperIndex === steppersList.length - 1 ? 'Submit' : 'Next' }}
+        </button>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>
