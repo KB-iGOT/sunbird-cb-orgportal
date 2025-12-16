@@ -205,6 +205,10 @@ export class EventDetailsComponent implements OnInit {
       this.preEventForm.disable()
       this.postEventForm.disable()
     }
+    if (this.openMode === 'view') {
+      this.preEventForm.disable()
+      this.postEventForm.disable()
+    }
   }
 
   patchFormValues() {
