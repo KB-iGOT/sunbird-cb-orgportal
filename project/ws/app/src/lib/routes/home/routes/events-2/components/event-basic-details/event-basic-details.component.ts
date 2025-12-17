@@ -236,6 +236,14 @@ export class EventBasicDetailsComponent implements OnInit, OnChanges {
     return name
   }
 
+  get disableSchedule(): boolean {
+    if (this.openTab === 'past' || this.openTab === 'upcoming' ||
+      (this.eventStatus === 'live' && (this.openTab === 'draft' || this.openTab === 'rejected'))) {
+      return true
+    }
+    return false
+  }
+
   removeFile(item = 'appIcon') {
     if (item === 'appIcon' && this.eventDetails.controls.appIcon) {
       this.eventDetails.controls.appIcon.patchValue('')
