@@ -18,6 +18,7 @@ const API_END_POINTS = {
   CONTENT_SEARCH: `apis/proxies/v8/sunbirdigot/v4/search`,
   CONTENT_READ: (contentId: string) => `apis/proxies/v8/action/content/v3/read/${contentId}`,
   AUTOCOMPLETE: (query: string) => `apis/proxies/v8/user/v1/autocomplete/${query}`,
+  CANCEL_EVENT: (eventId: string) => `apis/proxies/v8/event/v1/cancel/${eventId}`,
 }
 
 @Injectable({
@@ -84,6 +85,10 @@ export class EventsService {
 
   publishEvent(eventId: string, formBody: any) {
     return this.http.post<any>(API_END_POINTS.PUBLISH_EVENT(eventId), formBody)
+  }
+
+  cancelEvent(eventId: string, formBody: any) {
+    return this.http.patch<any>(API_END_POINTS.CANCEL_EVENT(eventId), formBody)
   }
 
   convertToTreeView(competencies: any) {

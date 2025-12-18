@@ -10,7 +10,8 @@
         <img src="/assets/icons/image.svg" alt="app icon">
         <span class="iconName">{{appIconName}}</span>
       </div>
-      <ng-container *ngIf="eventStatus === 'draft' || eventStatus?.toLowerCase() === 'rejected'">
+      <ng-container
+        *ngIf="(eventStatus === 'draft' || eventStatus?.toLowerCase() === 'rejected' || (openTab === 'draft' && eventStatus?.toLowerCase() === 'live')) && openMode !== 'view'">
         <mat-icon class="remove-app-icon" (click)="removeFile('appIcon')">close</mat-icon>
       </ng-container>
     </div>
@@ -29,7 +30,8 @@
     </div>
   </ng-template>
 
-  <div class="flex flex-row gap-4" [ngClass]="{'disableForm': eventStatus !== 'draft'}">
+  <div class="flex flex-row gap-4"
+    [ngClass]="{'disableForm': eventStatus !== 'draft' && eventStatus?.toLowerCase() !== 'rejected' && openTab !== 'draft' && openTab !== 'rejected'}">
     <div class="flex flex-column gap-2 event-form w-full">
       <div class="form-lable required">
         Event Category
@@ -88,7 +90,8 @@
   </div>
 
   <ng-container *ngIf="checkIfLiveEvent()">
-    <div class="flex flex-column gap-2 event-form" [ngClass]="{'disableForm': eventStatus === 'live'}">
+    <div class="flex flex-column gap-2 event-form"
+      [ngClass]="{'disableForm': eventStatus === 'live' && openTab !== 'upcoming' && openTab !== 'draft' && openTab !== 'rejected'}">
       <div class="form-lable required flex flex-middle gap-1">
         Maximum participants allowed
         <mat-icon class="cursor-pointer info-icon"
@@ -164,7 +167,7 @@
     </div>
   </ng-container>
 
-  <div class="flex flex-row gap-4" [ngClass]="{'disableForm': openTab === 'past' || openTab === 'upcoming'}">
+  <div class="flex flex-row gap-4" [ngClass]="{'disableForm': disableSchedule}">
     <div class="flex flex-column gap-2 event-form w-full eventTimpicker">
       <div class="form-lable required">
         Date

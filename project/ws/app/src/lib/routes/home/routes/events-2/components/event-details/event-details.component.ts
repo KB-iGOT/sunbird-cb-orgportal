@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output, ViewChild, ElementRef } from '@angular/core'
+import { Component, EventEmitter, Input, OnInit, Output, ViewChild, ElementRef, OnChanges, SimpleChanges } from '@angular/core'
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms'
 import { MatLegacySnackBar } from '@angular/material/legacy-snack-bar'
 import { MatLegacyDialog } from '@angular/material/legacy-dialog'
@@ -17,7 +17,7 @@ import { ConfirmDialogComponent } from '../../../../../workallocation-v2/compone
   templateUrl: './event-details.component.html',
   styleUrls: ['./event-details.component.scss']
 })
-export class EventDetailsComponent implements OnInit {
+export class EventDetailsComponent implements OnInit, OnChanges {
 
   private URL_PATTERN = /^https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)$/
 
@@ -75,6 +75,7 @@ export class EventDetailsComponent implements OnInit {
   @Input() eventDetailsData: any
   @Input() openMode = 'edit'
   @Input() openTab = 'draft'
+  @Input() eventStatus = ''
   @Output() preEventFormReady = new EventEmitter<FormGroup>()
   @Output() postEventFormReady = new EventEmitter<FormGroup>()
   @ViewChild('speakerAuto') speakerAutocomplete!: MatLegacyAutocomplete
@@ -123,6 +124,26 @@ export class EventDetailsComponent implements OnInit {
     private activatedRoute: ActivatedRoute,
     private dialog: MatLegacyDialog
   ) { }
+
+  ngOnChanges(data: SimpleChanges) {
+    if (data['eventStatus'] && !data['eventStatus'].firstChange) {
+      if (data['eventStatus'].currentValue === 'live') {
+        this.disableLiveEventEditing()
+      }
+    }
+  }
+
+  disableLiveEventEditing() {
+    if (this.preEventForm) {
+      this.preEventForm.get('agenda')?.disable()
+      this.preEventForm.get('selectedSpeaker')?.disable()
+      this.preEventForm.get('speakerType')?.disable()
+      this.preEventForm.get('agenda')?.updateValueAndValidity()
+      this.preEventForm.get('selectedSpeaker')?.updateValueAndValidity()
+      this.preEventForm.get('speakerType')?.updateValueAndValidity()
+    }
+  }
+
 
   ngOnInit() {
     this.userProfile = _.get(this.activatedRoute, 'snapshot.data.configService.userProfile')
@@ -204,6 +225,13 @@ export class EventDetailsComponent implements OnInit {
     } else {
       this.preEventForm.disable()
       this.postEventForm.disable()
+    }
+    if (this.openMode === 'view') {
+      this.preEventForm.disable()
+      this.postEventForm.disable()
+    }
+    if (this.eventStatus === 'live') {
+      this.disableLiveEventEditing()
     }
   }
 

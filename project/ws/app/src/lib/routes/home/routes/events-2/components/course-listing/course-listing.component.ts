@@ -14,6 +14,7 @@ export class CourseListingComponent implements OnInit {
   @Input() eventDetailsData: any
   @Input() openMode = 'edit'
   @Input() openTab = 'draft'
+  @Input() eventStatus = ''
   @Output() courseSelected = new EventEmitter<any>()
   contentList: any[] = []
   selectedCourse: any = null
@@ -39,7 +40,7 @@ export class CourseListingComponent implements OnInit {
     this.isDraft = this.eventDetailsData?.status?.toLowerCase() === 'draft' ||
       (this.eventDetailsData?.status?.toLowerCase() === 'rejected' && (!this.eventDetailsData?.prevStatus ||
         this.eventDetailsData?.prevStatus?.toLowerCase() === 'sentToPublish'))
-    if (this.openMode === 'view') {
+    if (this.openMode === 'view' || this.eventStatus === 'live') {
       this.isDraft = false
     }
   }

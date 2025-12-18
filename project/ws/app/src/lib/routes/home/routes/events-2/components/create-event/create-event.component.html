@@ -57,7 +57,7 @@
       <mat-step label="Course Linking" [stepControl]="courseSelectionForm">
         <ng-template matStepLabel>Course Linking</ng-template>
         <ws-app-course-listing [courseDetails]="courseSelectionForm?.value?.selectedCourse"
-          [eventDetailsData]="eventDetails" [openMode]="openMode" [openTab]="pathUrl"
+          [eventDetailsData]="eventDetails" [openMode]="openMode" [openTab]="pathUrl" [eventStatus]="eventStatus"
           (courseSelected)="onCourseSelected($event)"></ws-app-course-listing>
       </mat-step>
     </ng-container>
@@ -66,7 +66,7 @@
       <mat-step label="Event Setup">
         <ng-template matStepLabel>Event Setup</ng-template>
         <ws-app-event-details [eventDetailsData]="eventDetails" [openMode]="openMode" [openTab]="pathUrl"
-          (preEventFormReady)="onPreEventFormReady($event)"
+          [eventStatus]="eventStatus" (preEventFormReady)="onPreEventFormReady($event)"
           (postEventFormReady)="onPostEventFormReady($event)"></ws-app-event-details>
       </mat-step>
     </ng-container>
