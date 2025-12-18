@@ -267,6 +267,8 @@ export class CreateEventComponent implements OnInit, AfterViewInit {
     this.courseSelectionForm.markAllAsTouched()
     this.courseSelectionForm.updateValueAndValidity()
 
+    this.competencies = this.getLatestCompetencies(course)
+
     // Reset speaker type and speaker names when course changes
     if (this.preEventForm && this.preEventForm.get('speakerType')?.value === 'courseCreator') {
       this.preEventForm.patchValue({

@@ -216,6 +216,10 @@
           <input type="file" class="file-input" (change)="onSummaryDocUpload($event)" accept=".pdf"
             [disabled]="!isDateTimePassed(eventDetailsData?.endDateTime)">
         </div>
+        <mat-error class="font-75-pre"
+          *ngIf="postEventControls['postEventSummary'].hasError('required') && postEventControls['postEventSummary'].touched">
+          Summary document is required
+        </mat-error>
 
         <!-- Uploaded Document Display - Show after successful upload -->
         <div class="uploaded-doc-container" *ngIf="showUploadedSummaryDoc">
