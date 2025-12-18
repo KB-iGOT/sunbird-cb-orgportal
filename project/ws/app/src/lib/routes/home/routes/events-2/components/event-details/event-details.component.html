@@ -74,7 +74,7 @@
             Agenda is required
           </mat-error>
           <mat-error *ngIf="preEventControls['agenda'].hasError('minlength')">
-            Agenda must be at least 100 characters
+            Minimum characters needed for valid agenda {{100 - (preEventControls['agenda'].value?.length || 0)}}
           </mat-error>
         </mat-form-field>
         <span class="description-count flex justify-end">{{preEventControls['agenda'].value?.length || 0}}/1000</span>

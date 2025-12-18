@@ -142,6 +142,7 @@ export class EventBasicDetailsComponent implements OnInit, OnChanges {
         this.eventCategoriesList = ['Samuhik Charcha']
       }
     }
+
   }
 
   get edf() {
@@ -483,8 +484,15 @@ export class EventBasicDetailsComponent implements OnInit, OnChanges {
     }
   }
 
-  checkIfLiveEvent(): boolean {
+  checkIfSCEvent(): boolean {
     return this.edf?.typeofEvent?.value?.toLowerCase() === 'live'
+  }
+
+  get checkIfLiveEvent() {
+    if ((this.openTab === 'draft' || this.openTab?.toLowerCase() === 'rejected' || this.openTab?.toLowerCase() === 'upcoming') && this.eventStatus?.toLowerCase() === 'live') {
+      return true
+    }
+    return false
   }
 
 }

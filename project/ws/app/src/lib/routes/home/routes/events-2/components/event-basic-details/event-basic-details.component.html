@@ -31,7 +31,7 @@
   </ng-template>
 
   <div class="flex flex-row gap-4"
-    [ngClass]="{'disableForm': eventStatus !== 'draft' && eventStatus?.toLowerCase() !== 'rejected' && openTab !== 'draft' && openTab !== 'rejected'}">
+    [ngClass]="{'disableForm': (((openTab === 'draft' || openTab?.toLowerCase() === 'rejected' || openTab?.toLowerCase() === 'upcoming') && eventStatus?.toLowerCase() === 'live')) && openMode !== 'view'}">
     <div class="flex flex-column gap-2 event-form w-full">
       <div class="form-lable required">
         Event Category
@@ -89,7 +89,7 @@
       class="description-count flex justify-end">{{eventDetails?.controls['description']?.value?.length}}/2000</span>
   </div>
 
-  <ng-container *ngIf="checkIfLiveEvent()">
+  <ng-container *ngIf="checkIfSCEvent()">
     <div class="flex flex-column gap-2 event-form"
       [ngClass]="{'disableForm': eventStatus === 'live' && openTab !== 'upcoming' && openTab !== 'draft' && openTab !== 'rejected'}">
       <div class="form-lable required flex flex-middle gap-1">
@@ -122,7 +122,7 @@
     </div>
   </ng-container>
 
-  <ng-container *ngIf="!checkIfLiveEvent()">
+  <ng-container *ngIf="!checkIfSCEvent()">
     <ng-container *ngIf="uploadedVideoName; else uploadVideo">
       <div class="appIconCard flex justify-between px-2 items-center">
         <div class="flex gap-2 items-center">
@@ -221,7 +221,7 @@
       </div>
     </div>
     <mat-radio-group aria-label="Select an option" class="flex" formControlName="typeofEvent">
-      <mat-radio-button class="mr-5 p-4" value="live" *ngIf="checkIfLiveEvent()">
+      <mat-radio-button class="mr-5 p-4" value="live" *ngIf="checkIfSCEvent()">
         Live Event
       </mat-radio-button>
       <mat-radio-button class="mr-5 p-4" value="record" *ngIf="edf?.typeofEvent?.value?.toLowerCase() === 'record'">
