@@ -11,7 +11,7 @@
         <span class="iconName">{{appIconName}}</span>
       </div>
       <ng-container
-        *ngIf="(eventStatus === 'draft' || eventStatus?.toLowerCase() === 'rejected' || ((openTab === 'draft' || openTab?.toLowerCase() === 'rejected' ) && eventStatus?.toLowerCase() === 'live')) && openMode !== 'view'">
+        *ngIf="(eventStatus === 'draft' || eventStatus?.toLowerCase() === 'rejected' || ((openTab === 'draft' || openTab?.toLowerCase() === 'rejected' || openTab?.toLowerCase() === 'upcoming') && eventStatus?.toLowerCase() === 'live')) && openMode !== 'view'">
         <mat-icon class="remove-app-icon" (click)="removeFile('appIcon')">close</mat-icon>
       </ng-container>
     </div>
