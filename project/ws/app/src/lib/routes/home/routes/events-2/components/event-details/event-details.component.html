@@ -70,8 +70,6 @@
         <mat-form-field appearance="outline" class="full-width">
           <textarea matInput placeholder="Add your description" formControlName="agenda" rows="4"
             maxlength="1000"></textarea>
-          <mat-hint align="end">{{preEventControls['agenda'].value?.length || 0}}/1000 (Minimum 100 characters
-            required)</mat-hint>
           <mat-error *ngIf="preEventControls['agenda'].hasError('required')">
             Agenda is required
           </mat-error>
@@ -79,6 +77,7 @@
             Agenda must be at least 100 characters
           </mat-error>
         </mat-form-field>
+        <span class="description-count flex justify-end">{{preEventControls['agenda'].value?.length || 0}}/1000</span>
       </div>
 
       <!-- Add Speaker - Old Implementation (Commented Out) -->
