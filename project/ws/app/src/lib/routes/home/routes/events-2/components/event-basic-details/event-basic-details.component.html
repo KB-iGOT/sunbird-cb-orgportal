@@ -10,7 +10,8 @@
         <img src="/assets/icons/image.svg" alt="app icon">
         <span class="iconName">{{appIconName}}</span>
       </div>
-      <ng-container *ngIf="eventStatus === 'draft' || eventStatus?.toLowerCase() === 'rejected'">
+      <ng-container
+        *ngIf="(eventStatus === 'draft' || eventStatus?.toLowerCase() === 'rejected' || (openTab === 'draft' && eventStatus?.toLowerCase() === 'live')) && openMode !== 'view'">
         <mat-icon class="remove-app-icon" (click)="removeFile('appIcon')">close</mat-icon>
       </ng-container>
     </div>
