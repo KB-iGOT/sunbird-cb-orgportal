@@ -177,7 +177,7 @@
           formControlName="startDate" readonly>
         <mat-datepicker-toggle matSuffix [for]="startDate"></mat-datepicker-toggle>
         <mat-datepicker #startDate
-          [disabled]="openTab === 'upcoming' || openTab === 'past' || openMode === 'view'"></mat-datepicker>
+          [disabled]="openTab === 'upcoming' || openTab === 'past' || openMode === 'view' || eventStatus === 'live'"></mat-datepicker>
         <mat-error *ngIf="showValidationMsg('startDate','required')">
           Date is mandatory
         </mat-error>
