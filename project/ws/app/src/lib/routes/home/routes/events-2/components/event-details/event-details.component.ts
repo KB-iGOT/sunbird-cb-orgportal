@@ -141,9 +141,19 @@ export class EventDetailsComponent implements OnInit, OnChanges {
       this.preEventForm.get('agenda')?.updateValueAndValidity()
       this.preEventForm.get('selectedSpeaker')?.updateValueAndValidity()
       this.preEventForm.get('speakerType')?.updateValueAndValidity()
+      if (this.checkIfLiveEvent) {
+        this.preEventForm.get('meetingLink')?.enable()
+        this.preEventForm.get('meetingLink')?.updateValueAndValidity()
+      }
     }
   }
 
+  get checkIfLiveEvent() {
+    if ((this.openTab === 'draft' || this.openTab?.toLowerCase() === 'rejected') && this.eventStatus?.toLowerCase() === 'live') {
+      return true
+    }
+    return false
+  }
 
   ngOnInit() {
     this.userProfile = _.get(this.activatedRoute, 'snapshot.data.configService.userProfile')

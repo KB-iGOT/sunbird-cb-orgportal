@@ -37,7 +37,7 @@
               <p class="doc-name">{{uploadedFileName(preEventControls['preEventReads'].value)}}</p>
               <p class="doc-type">{{materialType}}</p>
             </div>
-            <ng-container *ngIf="isDraft">
+            <ng-container *ngIf="isDraft || checkIfLiveEvent">
               <button mat-icon-button class="remove-btn" (click)="removeUploadedDoc()" type="button">
                 <mat-icon>close</mat-icon>
               </button>
