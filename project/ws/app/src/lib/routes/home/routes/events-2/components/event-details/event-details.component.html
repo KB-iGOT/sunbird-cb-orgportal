@@ -15,13 +15,13 @@
     <div class="section-content" *ngIf="isPreEventExpanded" [formGroup]="preEventForm">
       <!-- Upload Pre-read Document -->
       <div class="form-field mt-4">
-        <label class="field-label">Upload Pre-read Document</label>
+        <label class="field-label">Upload Pre-read Document {{eventDetailsData?.status}}</label>
 
         <!-- Upload Container - Show when no document uploaded -->
         <div class="upload-container" *ngIf="!showUploadedDoc" (drop)="onDrop($event)"
           (dragover)="preventDefaultCDK($event)" (dragenter)="preventDefaultCDK($event, 'enter')"
           (dragleave)="preventDefaultCDK($event, 'leave')"
-          [class.disabled]="(eventDetailsData?.status?.toLowerCase() !== 'draft' && eventDetailsData?.status?.toLowerCase() !== 'rejected') || openMode === 'view'">
+          [class.disabled]="(eventDetailsData?.status?.toLowerCase() !== 'draft' && eventDetailsData?.status?.toLowerCase() !== 'rejected') && !checkIfLiveEvent || openMode === 'view'">
           <mat-icon class="upload-icon" svgIcon="single-color-upload-file"></mat-icon>
           <p class="upload-text">Select document to upload</p>
           <p class="upload-subtext">or drag and drop here</p>

@@ -149,7 +149,7 @@ export class EventDetailsComponent implements OnInit, OnChanges {
   }
 
   get checkIfLiveEvent() {
-    if ((this.openTab === 'draft' || this.openTab?.toLowerCase() === 'rejected') && this.eventStatus?.toLowerCase() === 'live') {
+    if ((this.openTab === 'draft' || this.openTab?.toLowerCase() === 'rejected' || this.openTab?.toLowerCase() === 'upcoming') && this.eventStatus?.toLowerCase() === 'live') {
       return true
     }
     return false

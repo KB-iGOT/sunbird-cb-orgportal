@@ -100,6 +100,7 @@ export class EventBasicDetailsComponent implements OnInit, OnChanges {
       if (this.edf?.typeofEvent?.value?.toLowerCase() === 'live') {
         this.eventCategoriesList = ['Samuhik Charcha']
         this.timeGap = 30
+        this.maxTimeToStart = '11:29 pm'
       }
     }
     if (this.eventDetails && this.eventDetails.controls && this.openMode === 'edit' && this.openTab !== 'past') {
