@@ -15,7 +15,7 @@
     <div class="section-content" *ngIf="isPreEventExpanded" [formGroup]="preEventForm">
       <!-- Upload Pre-read Document -->
       <div class="form-field mt-4">
-        <label class="field-label">Upload Pre-read Document {{eventDetailsData?.status}}</label>
+        <label class="field-label">Upload Pre-read Document</label>
 
         <!-- Upload Container - Show when no document uploaded -->
         <div class="upload-container" *ngIf="!showUploadedDoc" (drop)="onDrop($event)"
