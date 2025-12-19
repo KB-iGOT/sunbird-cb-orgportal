@@ -149,6 +149,9 @@ export class EventDetailsComponent implements OnInit, OnChanges {
   }
 
   get checkIfLiveEvent() {
+    if (this.openMode === 'view') {
+      return false
+    }
     if ((this.openTab === 'draft' || this.openTab?.toLowerCase() === 'rejected' || this.openTab?.toLowerCase() === 'upcoming') && this.eventStatus?.toLowerCase() === 'live') {
       return true
     }
