@@ -195,7 +195,8 @@
         <mat-error *ngIf="showValidationMsg('startTime','required')">
           Start time is mandatory
         </mat-error>
-        <mat-hint>Minimum time duration for events is 15 minutes</mat-hint>
+        <mat-hint>Minimum time duration for events is {{edf?.typeofEvent?.value?.toLowerCase() === 'live' ? 30 : 15}}
+          minutes</mat-hint>
       </mat-form-field>
     </div>
     <div class="flex flex-column gap-2 event-form w-full" [ngClass]="{'disableForm': uploadedVideoDuration > 0}">
