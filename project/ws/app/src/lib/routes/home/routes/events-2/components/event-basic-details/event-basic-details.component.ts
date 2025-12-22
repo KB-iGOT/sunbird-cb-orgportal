@@ -99,6 +99,8 @@ export class EventBasicDetailsComponent implements OnInit, OnChanges {
     if (this.eventDetails) {
       if (this.edf?.typeofEvent?.value?.toLowerCase() === 'live') {
         this.eventCategoriesList = ['Samuhik Charcha']
+        this.timeGap = 30
+        this.maxTimeToStart = '11:29 pm'
       }
     }
     if (this.eventDetails && this.eventDetails.controls && this.openMode === 'edit' && this.openTab !== 'past') {
@@ -140,6 +142,7 @@ export class EventBasicDetailsComponent implements OnInit, OnChanges {
         this.eventCategoriesList = ['Samuhik Charcha']
       }
     }
+
   }
 
   get edf() {
@@ -234,6 +237,14 @@ export class EventBasicDetailsComponent implements OnInit, OnChanges {
       }
     }
     return name
+  }
+
+  get disableSchedule(): boolean {
+    if (this.openTab === 'past' || this.openTab === 'upcoming' ||
+      (this.eventStatus === 'live' && (this.openTab === 'draft' || this.openTab === 'rejected'))) {
+      return true
+    }
+    return false
   }
 
   removeFile(item = 'appIcon') {
@@ -473,8 +484,15 @@ export class EventBasicDetailsComponent implements OnInit, OnChanges {
     }
   }
 
-  checkIfLiveEvent(): boolean {
+  checkIfSCEvent(): boolean {
     return this.edf?.typeofEvent?.value?.toLowerCase() === 'live'
+  }
+
+  get checkIfLiveEvent() {
+    if ((this.openTab === 'draft' || this.openTab?.toLowerCase() === 'rejected' || this.openTab?.toLowerCase() === 'upcoming') && this.eventStatus?.toLowerCase() === 'live') {
+      return true
+    }
+    return false
   }
 
 }

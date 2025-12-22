@@ -155,7 +155,6 @@ export class CreateEventComponent implements OnInit, AfterViewInit {
 
     if (this.eventDetails?.typeofEvent?.toLowerCase() === 'live') {
       this.courseSelectionForm.controls.selectedCourse.setValidators([Validators.required])
-      console.log(this.eventDetails?.courseLinked)
       if (this.eventDetails?.courseLinked) {
         const contentData: any = await this.eventSvc.getContentRead(this.eventDetails?.courseLinked).toPromise().catch(_err => { })
         if (contentData?.result) {
@@ -198,6 +197,11 @@ export class CreateEventComponent implements OnInit, AfterViewInit {
       this.eventDetailsForm.controls.description.disable()
       this.eventDetailsForm.controls.typeofEvent.disable()
       this.eventDetailsForm.controls.streamType.disable()
+      if (_.get(this.edf, 'typeofEvent.value', '').toString().toLowerCase() === 'live') {
+        this.eventDetailsForm.controls.startDate.disable()
+        this.eventDetailsForm.controls.startTime.disable()
+        this.eventDetailsForm.controls.endTime.disable()
+      }
       this.eventStatus = 'live' // this is to handle the case when user is trying to edit duplicate record of the event which is already live
     }
 
@@ -262,6 +266,8 @@ export class CreateEventComponent implements OnInit, AfterViewInit {
     // Mark the form as touched and update validity
     this.courseSelectionForm.markAllAsTouched()
     this.courseSelectionForm.updateValueAndValidity()
+
+    this.competencies = this.getLatestCompetencies(course)
 
     // Reset speaker type and speaker names when course changes
     if (this.preEventForm && this.preEventForm.get('speakerType')?.value === 'courseCreator') {

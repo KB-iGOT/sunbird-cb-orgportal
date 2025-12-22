@@ -15,13 +15,13 @@
     <div class="section-content" *ngIf="isPreEventExpanded" [formGroup]="preEventForm">
       <!-- Upload Pre-read Document -->
       <div class="form-field mt-4">
-        <label class="field-label">Upload Pre-read Document {{eventDetailsData?.status}}</label>
+        <label class="field-label">Upload Pre-read Document</label>
 
         <!-- Upload Container - Show when no document uploaded -->
         <div class="upload-container" *ngIf="!showUploadedDoc" (drop)="onDrop($event)"
           (dragover)="preventDefaultCDK($event)" (dragenter)="preventDefaultCDK($event, 'enter')"
           (dragleave)="preventDefaultCDK($event, 'leave')"
-          [class.disabled]="eventDetailsData?.status?.toLowerCase() !== 'draft' && eventDetailsData?.status?.toLowerCase() !== 'rejected'">
+          [class.disabled]="(eventDetailsData?.status?.toLowerCase() !== 'draft' && eventDetailsData?.status?.toLowerCase() !== 'rejected') && !checkIfLiveEvent || openMode === 'view'">
           <mat-icon class="upload-icon" svgIcon="single-color-upload-file"></mat-icon>
           <p class="upload-text">Select document to upload</p>
           <p class="upload-subtext">or drag and drop here</p>
@@ -37,7 +37,7 @@
               <p class="doc-name">{{uploadedFileName(preEventControls['preEventReads'].value)}}</p>
               <p class="doc-type">{{materialType}}</p>
             </div>
-            <ng-container *ngIf="isDraft">
+            <ng-container *ngIf="isDraft || checkIfLiveEvent">
               <button mat-icon-button class="remove-btn" (click)="removeUploadedDoc()" type="button">
                 <mat-icon>close</mat-icon>
               </button>
@@ -70,15 +70,14 @@
         <mat-form-field appearance="outline" class="full-width">
           <textarea matInput placeholder="Add your description" formControlName="agenda" rows="4"
             maxlength="1000"></textarea>
-          <mat-hint align="end">{{preEventControls['agenda'].value?.length || 0}}/1000 (Minimum 100 characters
-            required)</mat-hint>
           <mat-error *ngIf="preEventControls['agenda'].hasError('required')">
             Agenda is required
           </mat-error>
           <mat-error *ngIf="preEventControls['agenda'].hasError('minlength')">
-            Agenda must be at least 100 characters
+            Minimum characters needed for valid agenda {{100 - (preEventControls['agenda'].value?.length || 0)}}
           </mat-error>
         </mat-form-field>
+        <span class="description-count flex justify-end">{{preEventControls['agenda'].value?.length || 0}}/1000</span>
       </div>
 
       <!-- Add Speaker - Old Implementation (Commented Out) -->
@@ -139,13 +138,16 @@
                 <mat-chip *ngFor="let speaker of preEventForm.controls['selectedSpeaker'].value"
                   [selectable]="selectable" [removable]="removable" (removed)="removeSpeaker(speaker)">
                   {{ speaker?.name }}
-                  <ng-container *ngIf="!isSpeakerDisabled && isDraft">
+                  <ng-container *ngIf="!isSpeakerDisabled && isDraft && eventStatus !== 'live'">
                     <mat-icon matChipRemove *ngIf="removable">cancel</mat-icon>
                   </ng-container>
                 </mat-chip>
-                <input placeholder="Enter speaker name" #speakerInput [matChipInputFor]="speakerChipList"
-                  [matChipInputSeparatorKeyCodes]="separatorKeysCodes" [matChipInputAddOnBlur]="true"
-                  (matChipInputTokenEnd)="addSpeakerFromInput($event)" [disabled]="isSpeakerDisabled || !isDraft" />
+                <ng-container *ngIf="preEventForm?.controls['speakerType'].value !== 'courseCreator'">
+                  <input placeholder="Enter speaker name" #speakerInput [matChipInputFor]="speakerChipList"
+                    [matChipInputSeparatorKeyCodes]="separatorKeysCodes" [matChipInputAddOnBlur]="true"
+                    (matChipInputTokenEnd)="addSpeakerFromInput($event)"
+                    [disabled]="isSpeakerDisabled || !isDraft || eventStatus === 'live'" />
+                </ng-container>
               </mat-chip-list>
             </mat-form-field>
           </ng-container>
@@ -205,7 +207,7 @@
 
         <!-- Upload Container - Show when no document uploaded -->
         <div class="upload-container" *ngIf="!showUploadedSummaryDoc"
-          [class.disabled]="!isDateTimePassed(eventDetailsData?.endDateTime) || eventDetailsData.status.toLowerCase() !== 'live'">
+          [class.disabled]="!isDateTimePassed(eventDetailsData?.endDateTime) || eventDetailsData.status.toLowerCase() !== 'live' || openMode === 'view'">
           <mat-icon class="upload-icon" svgIcon="single-color-upload-file"></mat-icon>
           <p class="upload-text">Select document to upload</p>
           <p class="upload-subtext">or drag and drop here</p>
@@ -213,6 +215,10 @@
           <input type="file" class="file-input" (change)="onSummaryDocUpload($event)" accept=".pdf"
             [disabled]="!isDateTimePassed(eventDetailsData?.endDateTime)">
         </div>
+        <mat-error class="font-75-pre"
+          *ngIf="postEventControls['postEventSummary'].hasError('required') && postEventControls['postEventSummary'].touched">
+          Summary document is required
+        </mat-error>
 
         <!-- Uploaded Document Display - Show after successful upload -->
         <div class="uploaded-doc-container" *ngIf="showUploadedSummaryDoc">

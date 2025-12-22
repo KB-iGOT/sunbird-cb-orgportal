@@ -10,7 +10,8 @@
         <img src="/assets/icons/image.svg" alt="app icon">
         <span class="iconName">{{appIconName}}</span>
       </div>
-      <ng-container *ngIf="eventStatus === 'draft' || eventStatus?.toLowerCase() === 'rejected'">
+      <ng-container
+        *ngIf="(eventStatus === 'draft' || eventStatus?.toLowerCase() === 'rejected' || ((openTab === 'draft' || openTab?.toLowerCase() === 'rejected' || openTab?.toLowerCase() === 'upcoming') && eventStatus?.toLowerCase() === 'live')) && openMode !== 'view'">
         <mat-icon class="remove-app-icon" (click)="removeFile('appIcon')">close</mat-icon>
       </ng-container>
     </div>
@@ -29,7 +30,8 @@
     </div>
   </ng-template>
 
-  <div class="flex flex-row gap-4" [ngClass]="{'disableForm': eventStatus !== 'draft'}">
+  <div class="flex flex-row gap-4"
+    [ngClass]="{'disableForm': (((openTab === 'draft' || openTab?.toLowerCase() === 'rejected' || openTab?.toLowerCase() === 'upcoming') && eventStatus?.toLowerCase() === 'live')) && openMode !== 'view'}">
     <div class="flex flex-column gap-2 event-form w-full">
       <div class="form-lable required">
         Event Category
@@ -87,8 +89,9 @@
       class="description-count flex justify-end">{{eventDetails?.controls['description']?.value?.length}}/2000</span>
   </div>
 
-  <ng-container *ngIf="checkIfLiveEvent()">
-    <div class="flex flex-column gap-2 event-form" [ngClass]="{'disableForm': eventStatus === 'live'}">
+  <ng-container *ngIf="checkIfSCEvent()">
+    <div class="flex flex-column gap-2 event-form"
+      [ngClass]="{'disableForm': eventStatus === 'live' && openTab !== 'upcoming' && openTab !== 'draft' && openTab !== 'rejected'}">
       <div class="form-lable required flex flex-middle gap-1">
         Maximum participants allowed
         <mat-icon class="cursor-pointer info-icon"
@@ -119,7 +122,7 @@
     </div>
   </ng-container>
 
-  <ng-container *ngIf="!checkIfLiveEvent()">
+  <ng-container *ngIf="!checkIfSCEvent()">
     <ng-container *ngIf="uploadedVideoName; else uploadVideo">
       <div class="appIconCard flex justify-between px-2 items-center">
         <div class="flex gap-2 items-center">
@@ -164,7 +167,7 @@
     </div>
   </ng-container>
 
-  <div class="flex flex-row gap-4" [ngClass]="{'disableForm': openTab === 'past' || openTab === 'upcoming'}">
+  <div class="flex flex-row gap-4" [ngClass]="{'disableForm': disableSchedule}">
     <div class="flex flex-column gap-2 event-form w-full eventTimpicker">
       <div class="form-lable required">
         Date
@@ -174,7 +177,7 @@
           formControlName="startDate" readonly>
         <mat-datepicker-toggle matSuffix [for]="startDate"></mat-datepicker-toggle>
         <mat-datepicker #startDate
-          [disabled]="openTab === 'upcoming' || openTab === 'past' || openMode === 'view'"></mat-datepicker>
+          [disabled]="openTab === 'upcoming' || openTab === 'past' || openMode === 'view' || eventStatus === 'live'"></mat-datepicker>
         <mat-error *ngIf="showValidationMsg('startDate','required')">
           Date is mandatory
         </mat-error>
@@ -192,7 +195,8 @@
         <mat-error *ngIf="showValidationMsg('startTime','required')">
           Start time is mandatory
         </mat-error>
-        <mat-hint>Minimum time duration for events is 15 minutes</mat-hint>
+        <mat-hint>Minimum time duration for events is {{edf?.typeofEvent?.value?.toLowerCase() === 'live' ? 30 : 15}}
+          minutes</mat-hint>
       </mat-form-field>
     </div>
     <div class="flex flex-column gap-2 event-form w-full" [ngClass]="{'disableForm': uploadedVideoDuration > 0}">
@@ -218,7 +222,7 @@
       </div>
     </div>
     <mat-radio-group aria-label="Select an option" class="flex" formControlName="typeofEvent">
-      <mat-radio-button class="mr-5 p-4" value="live" *ngIf="checkIfLiveEvent()">
+      <mat-radio-button class="mr-5 p-4" value="live" *ngIf="checkIfSCEvent()">
         Live Event
       </mat-radio-button>
       <mat-radio-button class="mr-5 p-4" value="record" *ngIf="edf?.typeofEvent?.value?.toLowerCase() === 'record'">

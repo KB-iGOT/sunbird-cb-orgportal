@@ -395,7 +395,7 @@ export class EventsListComponent implements OnInit, OnDestroy {
       }
     }
 
-    this.eventSvc.updateEvent(requestBody, rowData.identifier).subscribe({
+    this.eventSvc.cancelEvent(rowData.identifier, requestBody).subscribe({
       next: res => {
         if (res) {
           this.openSnackBar('event is cancelled successfully')
