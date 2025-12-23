@@ -21,6 +21,7 @@ import { RouterModule } from '@angular/router'
 import { HorizontalDynamicStepperModule } from '@sunbird-cb/consumption'
 import { MatLegacyCardModule } from '@angular/material/legacy-card'
 import { MatLegacyRadioModule } from '@angular/material/legacy-radio'
+import { MatLegacyTooltipModule } from '@angular/material/legacy-tooltip'
 
 
 @NgModule({
@@ -47,6 +48,7 @@ import { MatLegacyRadioModule } from '@angular/material/legacy-radio'
     MatLegacyDialogModule,
     MatLegacyCardModule,
     MatLegacyRadioModule,
+    MatLegacyTooltipModule,
     HttpClientModule,
     HorizontalDynamicStepperModule,
   ]

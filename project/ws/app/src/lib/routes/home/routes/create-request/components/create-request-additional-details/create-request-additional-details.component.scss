@@ -9,10 +9,11 @@
 
 .cra-add-button {
   display: flex;
-  padding: 12px 16px;
+  height: 32px;
+  padding: 0px 16px;
   justify-content: center;
   align-items: center;
-  border-radius: 15px;
+  border-radius: 17px;
   background: #1B4CA1 !important;
   color: #FFF !important;
   text-align: center;
@@ -20,6 +21,41 @@
   /* stylelint-disable-next-line */
   font: 700 14px/21px Lato;
 }
+
+.search-icon {
+  margin-top: 10px !important;
+}
+
+.search-close-btn {
+  height: 24px !important;
+  margin-top: 15px;
+}
+
+.authers-header-row {
+  border-bottom: 2px solid rgba(0, 0, 0, 0.16);
+  color: #212529;
+  /* stylelint-disable-next-line */
+  font: 700 14px Lato;
+  height: 17px;
+  padding: 8px 8px 9px;
+}
+
+.authers-data-row {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.16);
+  height: 17px;
+  padding: 8px 8px 9px;
+  color: #212529;
+  /* stylelint-disable-next-line */
+  font: 400 14px Lato;
+
+  .author-delete-icon {
+    color: rgba(0, 0, 0, 0.60);
+    font-size: 17px;
+    height: 17px;
+    width: 17px;
+  }
+}
+
 
 :host ::ng-deep .user-type-checkboxes {
   .mat-radio-label {
