@@ -123,9 +123,6 @@ import { UserOnboardingComponent } from './routes/directory/user-onbarding/user-
 import { UserBulkTransferComponent } from './routes/directory/user-bulk-transfer/user-bulk-transfer.component'
 import { HorizontalDynamicStepperModule, UserUpdateModule } from '@sunbird-cb/consumption'
 import { OnboardingModule } from './routes/onboarding/onboarding.module'
-import { CreateRequestFormV2Component } from './components/create-request-form-v2/create-request-form-v2.component'
-import { CreateRequestContentDetailsComponent } from './components/create-request-content-details/create-request-content-details.component'
-import { CreateRequestAdditionalDetailsComponent } from './components/create-request-additional-details/create-request-additional-details.component'
 
 @NgModule({
   declarations: [
@@ -191,10 +188,7 @@ import { CreateRequestAdditionalDetailsComponent } from './components/create-req
     BulkUploadOrgComponent,
     UsersComponent,
     UserOnboardingComponent,
-    UserBulkTransferComponent,
-    CreateRequestFormV2Component,
-    CreateRequestContentDetailsComponent,
-    CreateRequestAdditionalDetailsComponent
+    UserBulkTransferComponent
   ],
   imports: [
     CommonModule,

@@ -1,19 +1,42 @@
 <div class="w-full">
   <form [formGroup]="additionalDetailsForm" class="w-full flex flex-column gap-6">
-    <div class="flex flex-col gap-1 round-control">
+    <div class="flex flex-col gap-1 round-control cra-languages-dropdown">
       <span class="round-control-label required">Course Language</span>
       <mat-form-field appearance="outline" class="w-full">
-        <mat-select formControlName="courseLanguage">
-          <mat-option *ngFor="let language of languagesList" [value]="language.value">
-            {{ language.displayName }}
-          </mat-option>
+        <mat-select class="placeholder-text" placeholder="Choose language" (openedChange)="onDropdownToggle($event)"
+          formControlName="courseLanguage" multiple>
+          <mat-optgroup>
+            <mat-form-field floatLabel="never">
+              <input #search autocomplete="off" placeholder="Search" (keydown.space)="$event.stopPropagation()"
+                formControlName="searchLanguage" matInput (input)="onSearchChange($event)">
+              <button [disableRipple]="true" *ngIf="search.value" matSuffix mat-icon-button aria-label="Clear"
+                (click)="clearSearch($event,'searchLanguage')"><mat-icon>close</mat-icon></button>
+            </mat-form-field>
+          </mat-optgroup>
+          <mat-optgroup *ngIf="filteredLanguages.length === 0">
+            <div>No results found!</div>
+          </mat-optgroup>
+          <ng-container *ngFor="let option of filteredLanguages">
+            <mat-option [value]="option">{{ option.displayName }}</mat-option>
+          </ng-container>
         </mat-select>
+        <mat-error *ngIf="controlValidationStatus('courseLanguage', 'required')">
+          Course Language selection is required
+        </mat-error>
       </mat-form-field>
+      <mat-chip-list>
+        <mat-chip *ngFor="let item of additionalDetailsForm?.get('courseLanguage')?.value || []" [removable]="true"
+          (removed)="onLanguageRemoved(item)">
+          {{ item.displayName }}
+          <mat-icon matChipRemove>cancel</mat-icon>
+        </mat-chip>
+      </mat-chip-list>
     </div>
 
     <div class="flex flex-col gap-1 round-control user-type-checkboxes">
       <span class="round-control-label required">Sectoral Subject Matter Expert Available with MDO</span>
-      <mat-radio-group formControlName="availableWithMDO" class="flex gap-3 flex-wrap">
+      <mat-radio-group formControlName="availableWithMDO" (change)="onAvailableWithMDOChange($event)"
+        class="flex gap-3 flex-wrap">
         <mat-radio-button class="rounded-outline-radio" [value]="true">
           Yes
         </mat-radio-button>
@@ -25,6 +48,17 @@
         Sectoral Subject Matter Expert selection is required
       </mat-error>
     </div>
+
+    <ng-container *ngIf="additionalDetailsForm.get('availableWithMDO')?.value">
+      <div class="flex flex-col gap-1">
+        <div class="flex justify-between">
+          <span class="authors required">Authors</span>
+          <button mat-button class="cra-add-button" (click)="addAuthor()" type="button">
+            Add
+          </button>
+        </div>
+      </div>
+    </ng-container>
 
     <div class="flex flex-col gap-1 round-control user-type-checkboxes">
       <span class="round-control-label required">Course Digitisation Agency Required From Karmayogi Bharat</span>

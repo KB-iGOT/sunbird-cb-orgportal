@@ -35,7 +35,6 @@ import { MyNotificationsComponent } from './routes/my-notifications/my-notificat
 import { FormDataResolverService } from './resolvers/form-data-resolver.service'
 import { DirectoryComponent } from './routes/directory/directory.component'
 import { OrganisationUsersComponent } from './routes/directory/organisation-users/organisation-users.component'
-import { CreateRequestFormV2Component } from './components/create-request-form-v2/create-request-form-v2.component'
 const routes: Routes = [
   {
     path: '',
@@ -400,18 +399,22 @@ const routes: Routes = [
           pageData: PageResolve,
         },
       },
+      // {
+      //   path: 'create-request-form',
+      //   component: CreateRequestFormV2Component,
+      //   data: {
+      //     pageId: 'create-request-form',
+      //     pageType: 'feature',
+      //     pageKey: 'create-request-form',
+      //   },
+      //   resolve: {
+      //     configService: ConfigResolveService,
+      //     pageData: PageResolve,
+      //   },
+      // },
       {
         path: 'create-request-form',
-        component: CreateRequestFormV2Component,
-        data: {
-          pageId: 'create-request-form',
-          pageType: 'feature',
-          pageKey: 'create-request-form',
-        },
-        resolve: {
-          configService: ConfigResolveService,
-          pageData: PageResolve,
-        },
+        loadChildren: () => import('./routes/create-request/create-request.module').then(m => m.CreateRequestModule),
       },
       {
         path: 'org-designations',
