@@ -1,6 +1,6 @@
 <div class="flex flex-col">
   <div class="auther-header mb-6">
-    Authers
+    Authors
   </div>
   <form [formGroup]="authersForm" class="flex flex-col gap-1">
     <div class="flex flex-col gap-1 round-control">
@@ -32,8 +32,8 @@
     <div class="flex flex-col gap-1 round-control">
       <span class="round-control-label required">Mobile Number</span>
       <mat-form-field appearance="outline" class="w-full add-subscript-wrapper">
-        <input matInput formControlName="number" placeholder="Type here" maxlength="10" (keypress)="numericOnly($event)"
-          (paste)="numericOnly($event)" />
+        <input matInput type="text" inputmode="numeric" formControlName="number" placeholder="Type here" maxlength="10"
+          (keypress)="numericOnly($event)" (paste)="numericOnly($event)" />
         <mat-error *ngIf="controlValidationStatus('number', 'required')">
           Please enter Authers mobile number
         </mat-error>

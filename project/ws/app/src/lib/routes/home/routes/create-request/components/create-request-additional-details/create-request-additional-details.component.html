@@ -2,10 +2,13 @@
   <form [formGroup]="additionalDetailsForm" class="w-full flex flex-column gap-6">
     <!-- Language -->
     <div class="flex flex-col gap-1 round-control cra-languages-dropdown">
-      <span class="round-control-label required">Course Language</span>
+      <span class="round-control-label">Course Language</span>
       <mat-form-field appearance="outline" class="w-full">
-        <mat-select class="placeholder-text" placeholder="Choose language" (openedChange)="onDropdownToggle($event)"
-          formControlName="courseLanguage" multiple>
+        <mat-select class="placeholder-text" placeholder="Select Language" (openedChange)="onDropdownToggle($event)"
+          formControlName="courseLanguage" multiple [compareWith]="compareByValue">
+          <mat-select-trigger>
+            <span class="placeholder-text">Select Language</span>
+          </mat-select-trigger>
           <mat-optgroup class="round-control">
             <mat-form-field floatLabel="never" appearance="outline" class="w-full">
               <button [disableRipple]="true" matPrefix mat-icon-button aria-label="Clear">
@@ -21,8 +24,8 @@
           <mat-optgroup *ngIf="filteredLanguages.length === 0">
             <div>No results found!</div>
           </mat-optgroup>
-          <ng-container *ngFor="let option of filteredLanguages">
-            <mat-option [value]="option">{{ option.displayName }}</mat-option>
+          <ng-container *ngFor="let option of getFilteredLanguagesWithSelected()">
+            <mat-option [value]="option">{{ option.name }}</mat-option>
           </ng-container>
         </mat-select>
         <mat-error *ngIf="controlValidationStatus('courseLanguage', 'required')">
@@ -31,9 +34,9 @@
       </mat-form-field>
       <mat-chip-list>
         <mat-chip *ngFor="let item of additionalDetailsForm?.get('courseLanguage')?.value || []" [removable]="true"
-          (removed)="onLanguageRemoved(item)">
-          {{ item.displayName }}
-          <mat-icon matChipRemove>cancel</mat-icon>
+          (removed)="onLanguageRemoved(item)" class="cra-chips">
+          {{ item.name }}
+          <mat-icon *ngIf="viewMode.toLowerCase() !== 'view'" matChipRemove>cancel</mat-icon>
         </mat-chip>
       </mat-chip-list>
     </div>
@@ -59,7 +62,8 @@
       <div class="flex flex-col gap-1">
         <div class="flex justify-between">
           <span class="authors required">Authors</span>
-          <button mat-button class="cra-add-button" (click)="openAddAuthorDialog()" type="button">
+          <button *ngIf="viewMode.toLowerCase() !== 'view'" mat-button class="cra-add-button"
+            (click)="openAddAuthorDialog()" type="button">
             Add
           </button>
         </div>
@@ -91,13 +95,18 @@
 
             <!-- Delete button (fixed width) -->
             <div class="w-12 flex justify-center">
-              <button type="button" (click)="removeAuthor(i)" *ngIf="addedAuthersList?.length > 1">
-                <mat-icon class="author-delete-icon">delete</mat-icon>
-              </button>
+              <ng-container *ngIf="addedAuthersList.length > 1">
+                <mat-icon tabindex="0" role="button" (click)="removeAuthor(i)" (keydown.enter)="removeAuthor(i)"
+                  (keydown.space)="$event.preventDefault(); removeAuthor(i)"
+                  class="author-delete-icon">delete</mat-icon>
+              </ng-container>
             </div>
           </div>
 
         </div>
+        <mat-error class="authors-error" *ngIf="controlValidationStatus('authors', 'required')">
+          Please add at least one Author
+        </mat-error>
 
       </div>
     </ng-container>
@@ -126,7 +135,7 @@
         <mat-radio-group formControlName="requestType" class="flex gap-3 flex-wrap">
           <ng-container *ngFor="let type of requestTypeList">
             <mat-radio-button class="rounded-outline-radio" [value]="type" (change)="selectRequestType(type)">
-              {{ type }}
+              {{ type }}<mat-icon class="info-icon">info_outline</mat-icon>
             </mat-radio-button>
           </ng-container>
         </mat-radio-group>
@@ -156,11 +165,9 @@
 
       <ng-container *ngIf="additionalDetailsForm.get('requestType')?.value === 'Broadcast'">
         <div class="round-control user-type-checkboxes">
-          <div class="round-control-label">Preffered Providers <span class="required"></span>
-            <span class="tooltip-span">
-              <mat-icon class="info-icon cursor-pointer" [matTooltip]="'You can select upto 5 preferred provider'"
-                matTooltipClass="tooltip-sec">info</mat-icon>
-            </span>
+          <div class="round-control-label flex items-center gap-1 required">Preffered Providers
+            <mat-icon class="label-info-icon cursor-pointer" [matTooltip]="'You can select upto 5 preferred provider'"
+              matTooltipClass="tooltip-sec">info_outline</mat-icon>
           </div>
           <div class="">
             <mat-form-field appearance="outline" class="w-full field-height" fxFlex="40">
@@ -171,7 +178,7 @@
                     <mat-chip *ngFor="let item of additionalDetailsForm.get('providers').value" [removable]="true"
                       (removed)="onProviderRemoved(item)">
                       {{ item.orgName }}
-                      <mat-icon matChipRemove>cancel</mat-icon>
+                      <mat-icon *ngIf="viewMode.toLowerCase() !== 'view'" matChipRemove>cancel</mat-icon>
                     </mat-chip>
                   </mat-chip-list>
                 </mat-select-trigger>
@@ -202,7 +209,7 @@
     </ng-container>
 
     <div class="flex flex-col gap-1 round-control">
-      <span class="round-control-label required">Reference Link</span>
+      <span class="round-control-label">Reference Link</span>
       <mat-form-field appearance="outline" class="w-full add-subscript-wrapper">
         <input matInput formControlName="referenceLink" placeholder="Provide reference link" />
 

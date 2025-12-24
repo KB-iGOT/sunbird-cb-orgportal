@@ -1,10 +1,11 @@
 import { Component, OnInit } from '@angular/core'
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms'
-import { Router } from '@angular/router'
+import { ActivatedRoute, Router } from '@angular/router'
 import { CreateRequestService } from '../../services/create-request.service'
 import { ConfirmationBoxComponent } from '../../../../../training-plan/components/confirmation-box/confirmation.box.component'
 import { MatLegacyDialog } from '@angular/material/legacy-dialog'
 import { MatLegacySnackBar } from '@angular/material/legacy-snack-bar'
+import { ProfileV2Service } from '../../../../services/home.servive'
 
 @Component({
   selector: 'ws-app-create-request-form-v2',
@@ -19,6 +20,10 @@ export class CreateRequestFormV2Component implements OnInit {
   contentDetailsForm!: UntypedFormGroup
   additionalDetailsForm!: UntypedFormGroup
   dialogRefs: any
+  demandId: string | null = null
+  viewMode: string = 'Create'
+  requestObjData: any
+  formLoading: boolean = false
 
   //#endregion
 
@@ -28,6 +33,8 @@ export class CreateRequestFormV2Component implements OnInit {
     private createRequestSvc: CreateRequestService,
     public dialog: MatLegacyDialog,
     private snackBar: MatLegacySnackBar,
+    private activatedRoute: ActivatedRoute,
+    private homeService: ProfileV2Service,
   ) { }
 
   ngOnInit(): void {
@@ -39,13 +46,13 @@ export class CreateRequestFormV2Component implements OnInit {
       courseTitle: ['', [
         Validators.required,
         Validators.maxLength(70),
-        Validators.minLength(5),
+        Validators.minLength(10),
         Validators.pattern(/^[A-Za-z0-9.\-_' ,\$\/:\[\] !]+$/)
       ]],
-      courseDescription: ['', [Validators.maxLength(500), Validators.pattern(/^[A-Za-z0-9.\-_' ,\$\/:\[\] !]+$/)]],
+      courseDescription: ['', [Validators.maxLength(500), Validators.pattern(/^[A-Za-z0-9.\-_' ,\$\/:\[\] !\r\n]+$/)]],
       userType: ['', [Validators.required]],
       proficiencyLevel: ['', [Validators.required]],
-      hours: [0, [Validators.max(99)]],
+      hours: [1, [Validators.max(99)]],
       minutes: [0, [Validators.max(59), Validators.min(0)]],
       seconds: [0, [Validators.max(59), Validators.min(0)]]
     })
@@ -54,6 +61,7 @@ export class CreateRequestFormV2Component implements OnInit {
       availableWithMDO: ['', [Validators.required]],
       requiredFromKB: ['', [Validators.required]],
       referenceLink: ['', [Validators.pattern(/^(https?|http):\/\/[^\s/$.?#].[^\s]*$/)]],
+      authors: [''],
       requestType: [''],
       assignee: [''],
       assigneeText: [''],
@@ -61,6 +69,90 @@ export class CreateRequestFormV2Component implements OnInit {
       preferredProvider: [''],
       providerText: ['']
     })
+
+    this.routeSubscription()
+  }
+
+  routeSubscription() {
+    this.activatedRoute.queryParams.subscribe(params => {
+      if (params['id']) {
+        this.demandId = params.id
+        this.viewMode = params.name
+        if (this.viewMode.toLocaleLowerCase() === 'view') {
+          this.additionalDetailsForm.disable()
+          this.contentDetailsForm.disable()
+        }
+        this.getRequestDataById()
+      }
+    })
+  }
+
+  getRequestDataById() {
+    this.formLoading = true
+    this.homeService.getRequestDataById(this.demandId).subscribe((data: any) => {
+      if (data) {
+        this.requestObjData = data
+        this.setRequestData()
+      }
+    }
+    )
+  }
+
+  setRequestData() {
+    if (!this.requestObjData) {
+      return
+    }
+    const estimatedDuration = this.requestObjData.estimatedDuration ? this.requestObjData.estimatedDuration.split(':') : []
+    this.contentDetailsForm.setValue({
+      courseTitle: this.requestObjData.title,
+      courseDescription: this.requestObjData.objective,
+      userType: this.requestObjData.typeOfUser || [],
+      proficiencyLevel: this.requestObjData.proficiencyLevel || '',
+      hours: estimatedDuration.length > 0 ? parseInt(estimatedDuration[0], 10) : 0,
+      minutes: estimatedDuration.length > 1 ? parseInt(estimatedDuration[1], 10) : 0,
+      seconds: estimatedDuration.length > 2 ? parseInt(estimatedDuration[2], 10) : 0,
+    })
+    this.additionalDetailsForm.setValue({
+      courseLanguage: this.requestObjData.courseLanguage ? this.requestObjData.courseLanguage : [],
+      availableWithMDO: this.requestObjData.sectoralSubjectMatterExpertAvailable,
+      requiredFromKB: this.requestObjData.courseDigitisationAgencyRequired,
+      referenceLink: this.requestObjData.referenceLink ? this.requestObjData.referenceLink : '',
+      requestType: this.requestObjData.requestType || '',
+      assignee: this.requestObjData.assignedProvider || [],
+      assigneeText: '',
+      providers: this.requestObjData.preferredProvider || [],
+      preferredProvider: '',
+      providerText: '',
+      authors: this.requestObjData.sectoralSubjectMatterExpertDetails || []
+    })
+    if (this.requestObjData.courseDigitisationAgencyRequired === false) {
+      const requestTypeControl = this.additionalDetailsForm.get('requestType')
+      if (requestTypeControl) {
+        requestTypeControl.setValidators([Validators.required])
+        requestTypeControl.updateValueAndValidity()
+      }
+    }
+
+    if (this.requestObjData.requestType === 'Broadcast') {
+      const providersControl = this.additionalDetailsForm.get('providers')
+      if (providersControl) {
+        providersControl.setValidators([Validators.required])
+      }
+    } else if (this.requestObjData.requestType === 'Single') {
+      const assigneeControl = this.additionalDetailsForm.get('assignee')
+      if (assigneeControl) {
+        assigneeControl.setValidators([Validators.required])
+        assigneeControl.updateValueAndValidity()
+      }
+    }
+    if (this.requestObjData.sectoralSubjectMatterExpertAvailable === true) {
+      const authorsControl = this.additionalDetailsForm.get('authors')
+      if (authorsControl) {
+        authorsControl.setValidators([Validators.required])
+        authorsControl.updateValueAndValidity()
+      }
+    }
+    this.formLoading = false
   }
   //#endregion (initialization)
 
@@ -110,7 +202,10 @@ export class CreateRequestFormV2Component implements OnInit {
         }
       },
       error: (error: any) => {
-        console.error('Error creating request form:', error)
+        if (error) {
+          this.dialogRefs.close()
+          this.snackBar.open('Something went wrong, please try again.')
+        }
       }
     })
   }
@@ -170,8 +265,7 @@ export class CreateRequestFormV2Component implements OnInit {
       estimatedDuration: this.getEstimatedDuration,
       courseLanguage: this.getCourseLanguage,
       sectoralSubjectMatterExpertAvailable: this.additionalDetailsForm.get('availableWithMDO')?.value,
-      sectoralSubjectMatterExpertDetails: [
-      ],
+      sectoralSubjectMatterExpertDetails: this.additionalDetailsForm.get('authors')?.value || [],
       courseDigitisationAgencyRequired: this.additionalDetailsForm.get('requiredFromKB')?.value,
     }
   }
@@ -179,21 +273,25 @@ export class CreateRequestFormV2Component implements OnInit {
   get providerValue(): any {
     if (this.additionalDetailsForm && this.additionalDetailsForm.get('providers')) {
       const providerValue = this.additionalDetailsForm.get('providers')?.value
-      if (providerValue) {
-        return {
-          providerId: providerValue.id,
-          providerName: providerValue.orgName
-        }
+      if (providerValue && providerValue.length > 0) {
+        const formattedProvider = providerValue.map((provider: any) => {
+          return {
+            providerId: provider.id,
+            providerName: provider.orgName
+          }
+        })
+        return formattedProvider
       }
     }
     return undefined
   }
 
   get assignedProviderValue(): any {
-    if (this.additionalDetailsForm && this.additionalDetailsForm.get('assignee')) {
+    const assigneeControl = this.additionalDetailsForm.get('assignee')
+    if (assigneeControl && assigneeControl.value) {
       const assignee = {
-        providerId: this.additionalDetailsForm.get('assignee')?.value.id,
-        providerName: this.additionalDetailsForm.get('assignee')?.value.orgName
+        providerId: assigneeControl.value.id,
+        providerName: assigneeControl.value.orgName
       }
       return assignee
     }

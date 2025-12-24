@@ -11,19 +11,20 @@ import * as _ from 'lodash'
 })
 export class CreateRequestContentDetailsComponent implements OnInit {
   @Input() contentDetailsForm!: FormGroup
+  @Input() viewMode: string = ''
 
   userTypeOptions = [
-    { displayName: 'Initiator', value: 'INITIATOR', isChecked: false },
-    { displayName: 'Reviewer', value: 'REVIEWER', isChecked: false },
-    { displayName: 'Decision Maker', value: 'DECISION_MAKER', isChecked: false },
-    { displayName: 'Strategic', value: 'STRATEGIC', isChecked: false },
-    { displayName: 'Policy Maker', value: 'POLICY_MAKER', isChecked: false }
+    { displayName: 'Initiator', value: 'Initiator', isChecked: false },
+    { displayName: 'Reviewer', value: 'Reviewer', isChecked: false },
+    { displayName: 'Decision Maker', value: 'Decision Maker', isChecked: false },
+    { displayName: 'Strategic', value: 'Strategic', isChecked: false },
+    { displayName: 'Policy Maker', value: 'Policy Maker', isChecked: false }
   ];
 
   proficiencyLevels = [
-    { displayName: 'Beginner', value: 'BEGINNER' },
-    { displayName: 'Intermediate', value: 'INTERMEDIATE' },
-    { displayName: 'Advanced', value: 'ADVANCED' }
+    { displayName: 'Beginner', value: 'Beginner' },
+    { displayName: 'Intermediate', value: 'Intermediate' },
+    { displayName: 'Advanced', value: 'Advanced' }
   ];
 
   selectedUserTypes: string[] = [];
@@ -31,6 +32,19 @@ export class CreateRequestContentDetailsComponent implements OnInit {
   constructor() { }
 
   ngOnInit(): void {
+    this.initialization()
+  }
+
+  initialization() {
+    const userTypeControl = this.getControl('userType')
+    if (userTypeControl && userTypeControl.value && Array.isArray(userTypeControl.value)) {
+      const selectedUserTypeValues = [...userTypeControl.value]
+      this.userTypeOptions.forEach(opt => {
+        opt.isChecked = selectedUserTypeValues.includes(opt.value)
+      })
+      this.selectedUserTypes = selectedUserTypeValues
+      userTypeControl.updateValueAndValidity()
+    }
   }
 
   //#region (UI interaction)

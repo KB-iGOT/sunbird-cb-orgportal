@@ -7,6 +7,13 @@
   width: 20px;
 }
 
+.label-info-icon {
+  font-size: 14px !important;
+  color: rgba(0, 0, 0, 0.6);
+  height: 14px;
+  width: 14px;
+}
+
 .hoursLabel {
   color: rgba(0, 0, 0, 0.42);
   font-weight: 400px !important;
@@ -22,6 +29,17 @@
   .mat-radio-label-content {
     justify-content: space-between;
   }
+}
+
+::ng-deep .theme-igot.day-mode .crc_disable_radio_btn .mat-radio-button .mat-radio-container .mat-radio-outer-circle {
+  border-color: rgba(0, 0, 0, 0.38) !important;
+}
+
+.duration-placeholder {
+  height: 50px;
+  color: rgba(0, 0, 0, 0.60);
+  /* stylelint-disable-next-line */
+  font: 400 14px Lato;
 }
 
 :host ::ng-deep .duration-controls {

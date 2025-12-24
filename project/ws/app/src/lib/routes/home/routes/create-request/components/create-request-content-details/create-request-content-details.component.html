@@ -1,7 +1,7 @@
 <div class="w-full">
   <form [formGroup]="contentDetailsForm" class="w-full flex flex-column gap-6">
     <div class="flex flex-col gap-1 round-control">
-      <span class="round-control-label required">Content Name</span>
+      <span class="round-control-label required">Course Title</span>
       <mat-form-field appearance="outline" class="w-full add-subscript-wrapper">
         <input matInput formControlName="courseTitle" placeholder="Type here" maxlength="70" />
         <mat-hint align="start">
@@ -15,7 +15,7 @@
           Content Name is required
         </mat-error>
         <mat-error *ngIf="controlValidationStatus('courseTitle', 'minlength')">
-          Content Name cannot be less than 5 characters
+          Minimum characters left to create {{10 - getControl('courseTitle')?.value?.length || 0}}
         </mat-error>
         <mat-error *ngIf="controlValidationStatus('courseTitle', 'pattern')">
           Content Name can only contain ( a-z/A-Z , 0-9 . - _ $ / : [ ]' ' !) characters
@@ -24,7 +24,7 @@
     </div>
 
     <div class="flex flex-col gap-1">
-      <span class="round-control-label required">Description</span>
+      <span class="round-control-label">Description</span>
       <mat-form-field appearance="outline" class="w-full">
         <textarea matInput formControlName="courseDescription" placeholder="Type here" maxlength="500"
           rows="5"></textarea>
@@ -42,10 +42,12 @@
 
     <!-- Type of user / Target Audience -->
     <div class="flex flex-col gap-1 round-control">
-      <span class="round-control-label required">Type of user/Target Audience</span>
+      <span class="round-control-label flex items-center gap-1 required">Type of user/Target Audience
+        <mat-icon class="label-info-icon">info_outline</mat-icon></span>
       <div class="flex flex-wrap gap-3 rounded-outline-checkbox user-type-checkboxes">
         <ng-container *ngFor="let opt of userTypeOptions; let i = index">
-          <mat-checkbox (change)="onUserTypeSelectionChange($event, opt)">
+          <mat-checkbox [disabled]="viewMode.toLowerCase() === 'view'" (change)="onUserTypeSelectionChange($event, opt)"
+            [checked]="opt.isChecked">
             {{ opt.displayName }}
             <mat-icon class="info-icon">info_outline</mat-icon>
           </mat-checkbox>
@@ -57,11 +59,14 @@
     </div>
 
     <!-- Proficiency Level -->
-    <div class="flex flex-col gap-1 round-control user-type-checkboxes">
+    <div class="flex flex-col gap-1 round-control user-type-checkboxes"
+      [ngClass]="{'crc_disable_radio_btn': viewMode.toLowerCase() === 'view'}">
       <span class="round-control-label required">Proficiency Level</span>
-      <mat-radio-group formControlName="proficiencyLevel" class="flex gap-3 flex-wrap">
+      <mat-radio-group formControlName="proficiencyLevel" class="flex gap-3 flex-wrap"
+        [disabled]="viewMode.toLowerCase() === 'view'">
         <ng-container *ngFor="let p of proficiencyLevels">
-          <mat-radio-button class="rounded-outline-radio" [value]="p.value">
+          <mat-radio-button [disabled]="viewMode.toLowerCase() === 'view'" class="rounded-outline-radio"
+            [value]="p.value">
             {{ p.displayName }}
             <mat-icon class="info-icon">info_outline</mat-icon>
           </mat-radio-button>
@@ -75,25 +80,29 @@
     <!-- Estimated Duration hh:mm:ss -->
     <div class="flex flex-col gap-1 duration-controls">
       <span class="round-control-label">Estimated Duration <span class="hoursLabel">(hh:mm:ss)</span></span>
-      <div class="flex items-center gap-2">
+      <div class="flex items-center gap-1">
         <mat-form-field appearance="outline" class="duration-field">
           <input matInput formControlName="hours" maxlength="2" inputmode="numeric"
             (input)="numbersOnly($event, 'hours')" />
         </mat-form-field>
 
-        <div class="duration-separator">:</div>
+        <div class="flex items-end duration-placeholder">hh</div>
+
+        <div class="duration-separator px-1">:</div>
 
         <mat-form-field appearance="outline" class="duration-field">
           <input matInput formControlName="minutes" maxlength="2" inputmode="numeric"
             (input)="numbersOnly($event, 'minutes')" />
         </mat-form-field>
+        <div class="flex items-end duration-placeholder">mm</div>
 
-        <div class="duration-separator">:</div>
+        <div class="duration-separator px-1">:</div>
 
         <mat-form-field appearance="outline" class="duration-field">
           <input matInput formControlName="seconds" maxlength="2" inputmode="numeric"
             (input)="numbersOnly($event, 'seconds')" />
         </mat-form-field>
+        <div class="flex items-end duration-placeholder">ss</div>
       </div>
 
       <div class="px-4">

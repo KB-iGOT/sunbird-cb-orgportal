@@ -100,7 +100,7 @@ export class AddUserPopupComponent implements OnInit {
         this.authersTotalCount = _.get(response, 'result.response.count', 0)
         const authers: Auther[] = _.get(response, 'result.response.content', []).map((auther: any) => ({
           name: auther.firstName,
-          number: _.get(auther, 'profileDetails.personalDetails.mobile', ''),
+          number: _.get(auther, 'profileDetails.personalDetails.mobile', '').toString(),
           email: _.get(auther, 'profileDetails.personalDetails.primaryEmail', '')
         }))
         if (this.authersOffset === 0) {

@@ -4,6 +4,8 @@ import { MatLegacyDialog } from '@angular/material/legacy-dialog'
 import { AddUserPopupComponent } from '../../dialogs/add-user-popup/add-user-popup.component'
 import { debounceTime, distinctUntilChanged, startWith } from 'rxjs/operators'
 import { ProfileV2Service } from '../../../../services/home.servive'
+import { CreateRequestService } from '../../services/create-request.service'
+import * as _ from 'lodash'
 
 type Auther = {
   name: string,
@@ -19,6 +21,8 @@ type Auther = {
 export class CreateRequestAdditionalDetailsComponent implements OnInit {
   //#region (global variable declaration)
   @Input() additionalDetailsForm!: UntypedFormGroup
+  @Input() viewMode: string = ''
+  @Input() demandId: string | null = null
 
   languagesList: any[] = []
   filteredLanguages: any[] = []
@@ -32,14 +36,13 @@ export class CreateRequestAdditionalDetailsComponent implements OnInit {
   filteredAssigneeType: any[] = []
   filteredRequestType: any[] = []
   requestTypeData: any[] = []
-  demandId: any
-  actionBtnName: string = ''
   requestObjData: any
   //#endregion (global variable declaration)
 
   constructor(
     private dialog: MatLegacyDialog,
-    private homeService: ProfileV2Service
+    private homeService: ProfileV2Service,
+    private createRequestSvc: CreateRequestService
   ) { }
 
   ngOnInit(): void {
@@ -48,8 +51,36 @@ export class CreateRequestAdditionalDetailsComponent implements OnInit {
 
   initialization() {
     this.additionalDetailsForm.addControl('searchLanguage', new FormControl(''))
-    this.getLainguagesList()
+    this.getLanguagesList()
     this.getRequestTypeList()
+    const autherControl = this.getControl('authors')
+    if (autherControl && autherControl.value && autherControl.value.length > 0) {
+      this.addedAuthersList = autherControl.value
+    }
+  }
+
+  getLanguagesList(): void {
+    const req = {
+      request: {
+        type: "cbp-portal",
+        subType: "cbp-v1",
+        action: "cbp-configuration",
+        component: "cbp",
+        rootOrgId: "*"
+      }
+    }
+    this.createRequestSvc.getLanguages(req).subscribe((res: any) => {
+      this.languagesList = _.get(res, 'result.form.data.languages', [])
+      this.filteredLanguages = [...this.languagesList]
+      if (this.demandId) {
+        const courseLanguageControl = this.getControl('courseLanguage')
+        if (courseLanguageControl && courseLanguageControl.value && courseLanguageControl.value.length > 0) {
+          const selectedLanguages = this.languagesList.filter((lang: any) => courseLanguageControl.value.some((cl: any) => cl === lang.value))
+          courseLanguageControl.setValue(selectedLanguages)
+          courseLanguageControl.updateValueAndValidity()
+        }
+      }
+    })
   }
 
   getRequestTypeList() {
@@ -66,82 +97,26 @@ export class CreateRequestAdditionalDetailsComponent implements OnInit {
       this.filteredRequestType = [...this.requestTypeData]
       this.filteredAssigneeType = [...this.requestTypeData]
       if (this.demandId) {
-        // this.getRequestDataById()
-        if (this.actionBtnName === 'view') {
-          this.additionalDetailsForm.disable()
-        } else if (this.actionBtnName === 'reassign') {
-          this.additionalDetailsForm.disable()
-          this.additionalDetailsForm.controls['assigneeText'].enable()
-          this.additionalDetailsForm.controls['assignee'].enable()
+        const providersControl = this.getControl('providers')
+        const assigneeControl = this.getControl('assignee')
+        if (providersControl && providersControl.value && providersControl.value.length > 0) {
+          const selcetdProvidersList = this.requestTypeData.filter((provider: any) => providersControl.value.some((p: any) => p.providerId === provider.id))
+          providersControl.setValue(selcetdProvidersList)
+          providersControl.updateValueAndValidity()
         }
+        if (assigneeControl && assigneeControl.value && assigneeControl.value.providerId) {
+          const selcetdAssignee = this.requestTypeData.filter((assignee: any) => assigneeControl.value.providerId === assignee.id)
+          assigneeControl.setValue(selcetdAssignee ? selcetdAssignee[0] : null)
+          assigneeControl.updateValueAndValidity()
+        }
+        // if (this.viewMode.toLocaleLowerCase() === 'reassign') {
+        //   this.additionalDetailsForm.controls['assigneeText'].enable()
+        //   this.additionalDetailsForm.controls['assignee'].enable()
+        // }
       }
 
     })
   }
-
-  // getRequestDataById() {
-  //   this.homeService.getRequestDataById(this.demandId).subscribe((data: any) => {
-  //     if (data) {
-  //       this.requestObjData = data
-  //       this.setRequestData()
-  //     }
-  //   })
-  // }
-
-  // setRequestData() {
-  //   this.requestForm.setValue({
-  //     TitleName: this.requestObjData.title,
-  //     Objective: this.requestObjData.objective,
-  //     userType: this.requestObjData.typeOfUser ? this.requestObjData.typeOfUser : '',
-  //     learningMode: this.requestObjData.learningMode ? this.requestObjData.learningMode : '',
-  //     [this.compentencyKey.vKey]: [],
-  //     referenceLink: this.requestObjData.referenceLink ? this.requestObjData.referenceLink : '',
-  //     providers: [],
-  //     assignee: {},
-  //     requestType: this.requestObjData.requestType,
-  //     compArea: '',
-  //     providerText: '',
-  //     queryThemeControl: '',
-  //     querySubThemeControl: '',
-  //     assigneeText: '',
-  //   })
-  //   const value = this.requestForm.controls[this.compentencyKey.vKey].value || []
-  //   this.requestObjData.competencies.map((comp: any) => {
-  //     const obj = {
-  //       competencyArea: comp.area || comp.select_area,
-  //       competencyTheme: comp.theme || comp.select_theme,
-  //       competencySubTheme: comp.sub_theme || comp.select_sub_theme,
-  //     }
-  //     value.push(obj)
-  //   })
-
-  //   this.requestForm.controls[this.compentencyKey.vKey].setValue(value)
-
-  //   this.selectRequestType(this.requestObjData.requestType)
-  //   if (this.filteredRequestType) {
-  //     if (this.requestObjData.preferredProvider && this.requestObjData.preferredProvider.length) {
-  //       const prefferedData = this.filteredRequestType.filter(option =>
-  //         this.requestObjData.preferredProvider.some((res: any) =>
-  //           res.providerId === option.id
-  //         )
-  //       )
-  //       if (prefferedData && prefferedData.length) {
-  //         this.requestForm.controls['providers'].setValue(prefferedData)
-  //       }
-  //     }
-  //   }
-
-  //   if (this.filteredAssigneeType) {
-  //     if (this.requestObjData.assignedProvider) {
-  //       const assignData = this.filteredAssigneeType.find(option =>
-  //         this.requestObjData.assignedProvider.providerId === option.id
-  //       )
-  //       if (assignData) {
-  //         this.requestForm.controls['assignee'].setValue(assignData)
-  //       }
-  //     }
-  //   }
-  // }
 
   valueChangeFunctions() {
     const assigneeTextControl = this.getControl('assigneeText')
@@ -161,22 +136,6 @@ export class CreateRequestAdditionalDetailsComponent implements OnInit {
       value.orgName.toLowerCase().includes(searchValue.toLowerCase()))
   }
 
-  getLainguagesList(): void {
-    this.languagesList = [
-      { displayName: 'English', value: 'English' },
-      { displayName: 'Hindi', value: 'Hindi' },
-      { displayName: 'Marathi', value: 'Marathi' },
-      { displayName: 'Tamil', value: 'Tamil' },
-      { displayName: 'Telugu', value: 'Telugu' },
-      { displayName: 'Kannada', value: 'Kannada' },
-      { displayName: 'Malayalam', value: 'Malayalam' },
-      { displayName: 'Bengali', value: 'Bengali' },
-      { displayName: 'Gujarati', value: 'Gujarati' },
-      { displayName: 'Punjabi', value: 'Punjabi' }
-    ]
-    this.filteredLanguages = [...this.languagesList]
-  }
-
   clearSearch() {
     this.getControl('searchLanguage')?.setValue('')
     this.filteredLanguages = [...this.languagesList]
@@ -186,7 +145,31 @@ export class CreateRequestAdditionalDetailsComponent implements OnInit {
     this.searchText = (event.target as HTMLInputElement).value
     const searchValue = (event.target as HTMLInputElement).value.toLowerCase()
     this.filteredLanguages = this.languagesList.filter(lang =>
-      lang.displayName.toLowerCase().includes(searchValue)
+      lang.name.toLowerCase().includes(searchValue)
+    )
+  }
+
+  getFilteredLanguagesWithSelected(): any[] {
+    const selectedLanguages = this.getControl('courseLanguage')?.value || []
+
+    // Create a unique list combining filtered languages and selected languages
+    const uniqueLanguages = new Map()
+
+    // Add filtered languages
+    this.filteredLanguages.forEach(lang => {
+      uniqueLanguages.set(lang.value || lang.name, lang)
+    })
+
+    // Add selected languages (even if they don't match the current filter)
+    selectedLanguages.forEach((selectedLang: any) => {
+      if (selectedLang && (selectedLang.value || selectedLang.name)) {
+        uniqueLanguages.set(selectedLang.value || selectedLang.name, selectedLang)
+      }
+    })
+
+    // Convert back to array and sort by name
+    return Array.from(uniqueLanguages.values()).sort((a, b) =>
+      (a.name || '').localeCompare(b.name || '')
     )
   }
 
@@ -218,8 +201,14 @@ export class CreateRequestAdditionalDetailsComponent implements OnInit {
     const selectedValue = event.value
     if (selectedValue === true) {
       this.openAddAuthorDialog()
+      const authorsControl = this.getControl('authors')
+      if (authorsControl) {
+        authorsControl.setValidators([Validators.required])
+        authorsControl.updateValueAndValidity()
+      }
     } else {
       this.addedAuthersList = []
+      this.resetControlAndClearValidators('authors')
     }
   }
 
@@ -232,16 +221,27 @@ export class CreateRequestAdditionalDetailsComponent implements OnInit {
     })
 
     dialogRef.afterClosed().subscribe((result: Auther | undefined) => {
+      const authorsControl = this.getControl('authors')
       if (result) {
         this.addedAuthersList.push(result)
-        console.log('Added Authers List:', this.addedAuthersList)
+        if (authorsControl) {
+          authorsControl.setValue(this.addedAuthersList)
+          authorsControl.updateValueAndValidity()
+        }
       }
+      authorsControl?.markAsDirty()
+      authorsControl?.markAsTouched()
     })
   }
 
   removeAuthor(index: number): void {
     if (this.addedAuthersList && this.addedAuthersList.length > 1) {
       this.addedAuthersList.splice(index, 1)
+      const authorsControl = this.getControl('authors')
+      if (authorsControl) {
+        authorsControl.setValue(this.addedAuthersList)
+        authorsControl.updateValueAndValidity()
+      }
     }
   }
 
