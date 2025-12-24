@@ -121,7 +121,7 @@ import { OrgHierarchyMappingComponent } from './routes/directory/org-hierarchy-m
 import { UsersComponent } from '../access/routes/users/users.component'
 import { UserOnboardingComponent } from './routes/directory/user-onbarding/user-onboarding.component'
 import { UserBulkTransferComponent } from './routes/directory/user-bulk-transfer/user-bulk-transfer.component'
-import { UserUpdateModule } from '@sunbird-cb/consumption'
+import { HorizontalDynamicStepperModule, UserUpdateModule } from '@sunbird-cb/consumption'
 import { OnboardingModule } from './routes/onboarding/onboarding.module'
 
 @NgModule({
@@ -251,7 +251,8 @@ import { OnboardingModule } from './routes/onboarding/onboarding.module'
     TranslateModule.forChild(),
     TreeHierarchyModule,
     UserUpdateModule,
-    OnboardingModule
+    OnboardingModule,
+    HorizontalDynamicStepperModule
   ],
   providers: [
     { provide: 'environment', useValue: environment },

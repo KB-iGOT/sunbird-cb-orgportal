@@ -1,0 +1,69 @@
+<div class="flex flex-col">
+  <div class="auther-header mb-6">
+    Authors
+  </div>
+  <form [formGroup]="authersForm" class="flex flex-col gap-1">
+    <div class="flex flex-col gap-1 round-control">
+      <span class="round-control-label required">Name</span>
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-select formControlName="name" placeholder="Type here" (openedChange)="setupScrollListener($event)"
+          (closed)="onAutherDropdownClosed()">
+          <div class="sticky-search-container" (click)="$event.stopPropagation()">
+            <div class="search-input-wrapper round-control">
+              <input type="text" placeholder="Search Authers" formControlName="searchUser" class="search-input"
+                (keydown)="$event.stopPropagation()" (click)="$event.stopPropagation()" autocomplete="off">
+            </div>
+          </div>
+          <mat-option *ngFor="let option of auhtersListMeta" [value]="option?.name" (click)="setMobileAndEmail(option)">
+            {{ option?.name }}
+          </mat-option>
+          <div *ngIf="authersLoading" class="loading-indicator">
+            Loading more...
+          </div>
+          <mat-option *ngIf="(auhtersListMeta )?.length === 0" disabled>
+            No matches found
+          </mat-option>
+          <mat-error *ngIf="controlValidationStatus('name', 'required')">
+            Authers Name is required
+          </mat-error>
+        </mat-select>
+      </mat-form-field>
+    </div>
+    <div class="flex flex-col gap-1 round-control">
+      <span class="round-control-label required">Mobile Number</span>
+      <mat-form-field appearance="outline" class="w-full add-subscript-wrapper">
+        <input matInput type="text" inputmode="numeric" formControlName="number" placeholder="Type here" maxlength="10"
+          (keypress)="numericOnly($event)" (paste)="numericOnly($event)" />
+        <mat-error *ngIf="controlValidationStatus('number', 'required')">
+          Please enter Authers mobile number
+        </mat-error>
+        <mat-error *ngIf="controlValidationStatus('number', 'pattern')">
+          Please enter a valid 10 digit mobile number
+        </mat-error>
+      </mat-form-field>
+    </div>
+    <div class="flex flex-col gap-1 round-control">
+      <span class="round-control-label required">Email</span>
+      <mat-form-field appearance="outline" class="w-full add-subscript-wrapper">
+        <input matInput formControlName="email" placeholder="Type here" maxlength="320" />
+        <mat-error *ngIf="controlValidationStatus('email', 'required')">
+          Please enter Authers email
+        </mat-error>
+        <mat-error *ngIf="controlValidationStatus('email', 'pattern') || controlValidationStatus('email', 'email')">
+          Please enter a valid email address
+        </mat-error>
+      </mat-form-field>
+    </div>
+
+    <div class="flex justify-center gap-6 mt-2">
+      <button mat-button class="cra-cancel-button flex items-center" (click)="closeDialog()" type="button">
+        Cancel
+      </button>
+      <button mat-button class="cra-submit-button flex items-center" [class.disabled-button]="authersForm?.invalid"
+        [disabled]="authersForm?.invalid" (click)="submitAuthers()" type="button">
+        Add
+      </button>
+    </div>
+  </form>
+
+</div>

@@ -42,7 +42,7 @@
 
   <mat-stepper labelPosition="bottom" [selectedIndex]="currentStepperIndex"
     (selectionChange)="onSelectionChange($event)" class="mx-10" #stepper><!-- add [linear]="true" -->
-    <mat-step label="Basic Details" [stepControl]="eventDetailsForm">
+    <mat-step label="Basic Details">
       <ng-template matStepLabel>Basic Details</ng-template>
       <ws-app-event-basic-details [eventStatus]="eventStatus" [eventDetails]="eventDetailsForm" [openMode]="openMode"
         [userProfile]="userProfile" [openTab]="pathUrl"></ws-app-event-basic-details>
