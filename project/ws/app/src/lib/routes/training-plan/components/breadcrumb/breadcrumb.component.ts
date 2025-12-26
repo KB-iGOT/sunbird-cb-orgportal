@@ -354,7 +354,7 @@ export class BreadcrumbComponent implements OnInit {
           this.tpdsSvc.trainingPlanTitle = ''
           this.router.navigate(['app', 'home', 'training-plan-dashboard'], {
             queryParams: {
-              type: this.tpdsSvc.trainingPlanStepperData.status.toLowerCase(),
+              type: this.tpdsSvc.trainingPlanStepperData.status,
               tabSelected: this.tpdsSvc.trainingPlanStepperData.assignmentType,
             },
           })
