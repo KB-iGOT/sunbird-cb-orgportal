@@ -84,7 +84,7 @@ export class AddModeratorComponent {
         "filters": {
           "rootOrgId": this.userProfile && this.userProfile.rootOrgId || "",
           "profileDetails.profileStatus": [
-            "VERIFIED"
+            "VERIFIED","NOT-VERIFIED"
           ],
           "roles.role": "COMMUNITY_MODERATOR"
         },
