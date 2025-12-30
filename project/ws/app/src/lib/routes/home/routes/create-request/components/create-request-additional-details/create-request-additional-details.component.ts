@@ -293,7 +293,13 @@ export class CreateRequestAdditionalDetailsComponent implements OnInit {
         requestTypeControl.setValidators([Validators.required])
         requestTypeControl.updateValueAndValidity()
       }
-    } else { }
+    } else {
+      const requestTypeControl = this.getControl('requestType')
+      if (requestTypeControl) {
+        requestTypeControl.setValue('Single')
+        requestTypeControl.updateValueAndValidity()
+      }
+    }
 
   }
 
