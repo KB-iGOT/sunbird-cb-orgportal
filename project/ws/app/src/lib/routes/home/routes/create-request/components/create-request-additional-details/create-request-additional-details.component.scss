@@ -83,6 +83,10 @@
   color: rgba(98, 98, 98, 1)
 }
 
+.hideOptions {
+  display: none;
+}
+
 
 :host ::ng-deep .user-type-checkboxes {
   .mat-checkbox-layout,

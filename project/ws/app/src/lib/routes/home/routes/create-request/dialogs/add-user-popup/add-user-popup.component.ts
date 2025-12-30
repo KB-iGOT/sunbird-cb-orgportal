@@ -29,6 +29,7 @@ export class AddUserPopupComponent implements OnInit {
   authersOffset: number = 0
   authersLimit: number = 50
   authersLoading: boolean = false
+  isAutherSelected: boolean = false
 
   userProfile: any
 
@@ -55,6 +56,7 @@ export class AddUserPopupComponent implements OnInit {
 
     let settingValueChange = true
     const searchUserControl = this.authersForm.get('searchUser')
+    const nameControl = this.authersForm.get('name')
     if (searchUserControl) {
       searchUserControl.valueChanges
         .pipe(
@@ -63,6 +65,7 @@ export class AddUserPopupComponent implements OnInit {
           startWith(''),
         ).subscribe((searchText: string) => {
           this.authersOffset = 0
+          this.isAutherSelected = false
           if (searchText && searchText.length > 1) {
             this.authersSearchText = searchText
             this.getAuthersMeta()
@@ -75,6 +78,11 @@ export class AddUserPopupComponent implements OnInit {
           }
           settingValueChange = false
         })
+    }
+    if (nameControl) {
+      nameControl.valueChanges.subscribe(() => {
+        this.isAutherSelected = true
+      })
     }
   }
 
@@ -148,7 +156,6 @@ export class AddUserPopupComponent implements OnInit {
   }
 
   checkCurrentAutherPresent() {
-
     const searchAutherControl = this.authersForm.get('name')
     const currentAuther = searchAutherControl ? searchAutherControl.value : ''
     if (currentAuther) {
@@ -170,7 +177,7 @@ export class AddUserPopupComponent implements OnInit {
     const searchAutherControl = this.authersForm.get('searchUser')
     const nameControl = this.authersForm.get('name')
     if (searchAutherControl) {
-      if (searchAutherControl.value && nameControl && (!nameControl.value || nameControl.value !== searchAutherControl.value)) {
+      if (searchAutherControl.value && nameControl && (!nameControl.value || this.isAutherSelected === false)) {
         this.setName()
       }
       searchAutherControl.setValue('')

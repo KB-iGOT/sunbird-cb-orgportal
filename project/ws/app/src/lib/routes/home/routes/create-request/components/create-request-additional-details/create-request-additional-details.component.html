@@ -147,16 +147,25 @@
       <ng-container *ngIf="additionalDetailsForm.get('requestType')?.value === 'Single'">
         <div class="round-control user-type-checkboxes">
           <div class="round-control-label required">Assignee </div>
-          <div class="">
+          <div class="round-control">
             <mat-form-field appearance="outline" class="w-full">
               <mat-select class=" placeholder-text" placeholder="Choose the Assignee" formControlName="assignee">
-                <input #search autocomplete="off" placeholder="Search" class="assigneeSearch"
-                  (keydown.space)="$event.stopPropagation()" formControlName="assigneeText" matInput>
+                <mat-optgroup class="round-control">
+                  <mat-form-field floatLabel="never" class="w-full">
+                    <input #search autocomplete="off" placeholder="Search" class="assigneeSearch"
+                      (keydown.space)="$event.stopPropagation()" formControlName="assigneeText" matInput>
+                  </mat-form-field>
+                </mat-optgroup>
+
+                <mat-optgroup *ngIf="filteredAssigneeType.length === 0">
+                  <div>No results found!</div>
+                </mat-optgroup>
+
                 <mat-option *ngFor="let option of filteredAssigneeType" [value]="option">{{option.orgName}}</mat-option>
 
               </mat-select>
               <mat-error *ngIf="controlValidationStatus('assignee', 'required')">
-                Please select a provider/assignee for the request.
+                Please select a assignee for the request.
               </mat-error>
             </mat-form-field>
           </div>
@@ -169,7 +178,7 @@
             <mat-icon class="label-info-icon cursor-pointer" [matTooltip]="'You can select upto 5 preferred provider'"
               matTooltipClass="tooltip-sec">info_outline</mat-icon>
           </div>
-          <div class="">
+          <div class="round-control">
             <mat-form-field appearance="outline" class="w-full field-height" fxFlex="40">
               <mat-select class=" placeholder-text" placeholder="Choose the provider"
                 (openedChange)="providersOpenedChange($event,'providerText')" formControlName="providers" multiple>
@@ -190,7 +199,7 @@
                       (click)="clearProviderSearch($event,'providerText')"><mat-icon>close</mat-icon></button>
                   </mat-form-field>
                 </mat-optgroup>
-                <mat-optgroup *ngIf="filteredRequestType.length === 0">
+                <mat-optgroup *ngIf="countOfVisibleProviders === 0">
                   <div>No results found!</div>
                 </mat-optgroup>
                 <ng-container *ngFor="let option of filteredRequestType">

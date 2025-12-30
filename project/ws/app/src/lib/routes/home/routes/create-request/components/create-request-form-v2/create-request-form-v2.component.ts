@@ -103,7 +103,7 @@ export class CreateRequestFormV2Component implements OnInit {
       return
     }
     const estimatedDuration = this.requestObjData.estimatedDuration ? this.requestObjData.estimatedDuration.split(':') : []
-    this.contentDetailsForm.setValue({
+    this.contentDetailsForm.patchValue({
       courseTitle: this.requestObjData.title,
       courseDescription: this.requestObjData.objective,
       userType: this.requestObjData.typeOfUser || [],
@@ -112,17 +112,14 @@ export class CreateRequestFormV2Component implements OnInit {
       minutes: estimatedDuration.length > 1 ? parseInt(estimatedDuration[1], 10) : 0,
       seconds: estimatedDuration.length > 2 ? parseInt(estimatedDuration[2], 10) : 0,
     })
-    this.additionalDetailsForm.setValue({
+    this.additionalDetailsForm.patchValue({
       courseLanguage: this.requestObjData.courseLanguage ? this.requestObjData.courseLanguage : [],
       availableWithMDO: this.requestObjData.sectoralSubjectMatterExpertAvailable,
       requiredFromKB: this.requestObjData.courseDigitisationAgencyRequired,
       referenceLink: this.requestObjData.referenceLink ? this.requestObjData.referenceLink : '',
       requestType: this.requestObjData.requestType || '',
       assignee: this.requestObjData.assignedProvider || [],
-      assigneeText: '',
       providers: this.requestObjData.preferredProvider || [],
-      preferredProvider: '',
-      providerText: '',
       authors: this.requestObjData.sectoralSubjectMatterExpertDetails || []
     })
     if (this.requestObjData.courseDigitisationAgencyRequired === false) {
