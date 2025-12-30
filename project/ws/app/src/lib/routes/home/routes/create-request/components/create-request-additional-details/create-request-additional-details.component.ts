@@ -35,6 +35,7 @@ export class CreateRequestAdditionalDetailsComponent implements OnInit {
   ]
   filteredAssigneeType: any[] = []
   filteredRequestType: any[] = []
+  countOfVisibleProviders: number = 0
   requestTypeData: any[] = []
   requestObjData: any
   //#endregion (global variable declaration)
@@ -53,6 +54,7 @@ export class CreateRequestAdditionalDetailsComponent implements OnInit {
     this.additionalDetailsForm.addControl('searchLanguage', new FormControl(''))
     this.getLanguagesList()
     this.getRequestTypeList()
+    this.valueChangeFunctions()
     const autherControl = this.getControl('authors')
     if (autherControl && autherControl.value && autherControl.value.length > 0) {
       this.addedAuthersList = autherControl.value
@@ -96,6 +98,7 @@ export class CreateRequestAdditionalDetailsComponent implements OnInit {
       this.requestTypeData = data
       this.filteredRequestType = [...this.requestTypeData]
       this.filteredAssigneeType = [...this.requestTypeData]
+      this.countOfVisibleProviders = this.filteredRequestType.length
       if (this.demandId) {
         const providersControl = this.getControl('providers')
         const assigneeControl = this.getControl('assignee')
@@ -120,6 +123,7 @@ export class CreateRequestAdditionalDetailsComponent implements OnInit {
 
   valueChangeFunctions() {
     const assigneeTextControl = this.getControl('assigneeText')
+    const providerTextControl = this.getControl('providerText')
     if (assigneeTextControl) {
       assigneeTextControl.valueChanges.pipe(
         debounceTime(100),
@@ -129,11 +133,37 @@ export class CreateRequestAdditionalDetailsComponent implements OnInit {
         this.filteredAssigneeType = this.filterOrgValues(newValue, this.requestTypeData)
       })
     }
+
+    if (providerTextControl) {
+      providerTextControl.valueChanges.pipe(
+        debounceTime(100),
+        distinctUntilChanged(),
+        startWith(''),
+      ).subscribe((newValue: any) => {
+        this.filteredRequestType = this.getHiddenOptions(newValue, this.requestTypeData)
+      })
+    }
   }
 
   filterOrgValues(searchValue: string, array: any) {
     return array.filter((value: any) =>
       value.orgName.toLowerCase().includes(searchValue.toLowerCase()))
+  }
+
+  getHiddenOptions(searchValue: string, array: any) {
+    const hiddenOptions: any = []
+    let countOfVisibleProviders = 0
+    array.forEach((element: any) => {
+      if (element.orgName.toLowerCase().includes(searchValue.toLowerCase())) {
+        element['hideOption'] = 'show'
+        countOfVisibleProviders += 1
+      } else {
+        element['hideOption'] = 'hide'
+      }
+      hiddenOptions.push(element)
+    })
+    this.countOfVisibleProviders = countOfVisibleProviders
+    return hiddenOptions
   }
 
   clearSearch() {
