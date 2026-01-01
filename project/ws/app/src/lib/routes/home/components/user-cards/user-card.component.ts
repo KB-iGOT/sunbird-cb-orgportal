@@ -407,92 +407,126 @@ export class UserCardComponent implements OnInit, OnChanges, AfterViewChecked, A
     }
   }
 
-  async loadDesignations(searchText?: string, offset?: number) {
-    this.isLoadingMoreDesignations = true
-    const requestBody: any = {
-      filterCriteriaMap: {
-        status: 'Active'
-      },
-      requestedFields: [],
-      pageNumber: 0,
-      pageSize: this.designationDefaultLoadCount,
-    }
-    if (searchText?.length) {
-      requestBody['searchString'] = searchText
-      requestBody.pageSize = this.designationListLoadCount
-    } else {
-      const reqOffset = offset || 0
-      const pageIndex = this.designationDefaultLoadCount > 0 ? Math.floor(reqOffset / this.designationDefaultLoadCount) : 0
-      requestBody.pageNumber = pageIndex
-      requestBody.pageSize = this.designationDefaultLoadCount
-    }
-    await this.usersSvc.searchDesignation(requestBody).subscribe(
-      (data: any) => {
-        const content = data?.result?.result?.data || []
-        const mapped = content.map((item: any) => ({
-          name: item.designation || '',
-          status: item.status || 'Active',
-        }))
+  async loadDesignations(searchText?: string, offset?: number): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this.isLoadingMoreDesignations = true
+      const requestBody: any = {
+        filterCriteriaMap: {
+          status: 'Active'
+        },
+        requestedFields: [],
+        pageNumber: 0,
+        pageSize: this.designationDefaultLoadCount,
+      }
+      if (searchText?.length) {
+        requestBody['searchString'] = searchText
+        requestBody.pageSize = this.designationListLoadCount
+      } else {
+        const reqOffset = offset || 0
+        const pageIndex = this.designationDefaultLoadCount > 0 ? Math?.floor(reqOffset / this.designationDefaultLoadCount) : 0
+        requestBody.pageNumber = pageIndex
+        requestBody.pageSize = this.designationDefaultLoadCount
+      }
+      this.usersSvc.searchDesignation(requestBody).subscribe(
+        (data: any) => {
+          const content = data?.result?.result?.data || []
+          const mapped = content.map((item: any) => ({
+            name: item.designation || '',
+            status: item.status || 'Active',
+          }))
 
-        const total = _.get(data, 'result.result.totalcount', _.get(data, 'result.result.data.totalCount', _.get(data, 'result.result.totalCount', 0)))
-        this.defaultSearchDesignationCount = total
+          const total = _.get(data, 'result.result.totalcount', _.get(data, 'result.result.data.totalCount', _.get(data, 'result.result.totalCount', 0)))
+          this.defaultSearchDesignationCount = total
 
-        if (searchText?.length) {
-          this.designationsMeta = mapped
-          this.filterDesignationsMeta = mapped.slice(0, this.designationListLoadCount)
-        } else {
-          if (!this.designationBackup || requestBody.pageNumber === 0) {
-            this.designationBackup = mapped
+          if (searchText?.length) {
+            this.designationsMeta = mapped
+            this.filterDesignationsMeta = mapped.slice(0, this.designationListLoadCount)
           } else {
-            const combined = (this.designationBackup || []).concat(mapped)
-            this.designationBackup = _.uniqBy(combined, (it: any) => (it?.name || '').toLowerCase())
+            if (!this.designationBackup || requestBody.pageNumber === 0) {
+              this.designationBackup = mapped
+            } else {
+              const combined = (this.designationBackup || []).concat(mapped)
+              this.designationBackup = _.uniqBy(combined, (it: any) => (it?.name || '').toLowerCase())
+            }
+            this.designationsMeta = this.designationBackup
+            this.filterDesignationsMeta = this.designationBackup.slice(0, this.designationListLoadCount)
+
+            if (!mapped || mapped.length === 0) {
+              this.noMoreLegacyDesignations = true
+            }
+
+            if (this.defaultSearchDesignationCount && this.designationBackup.length >= this.defaultSearchDesignationCount) {
+              this.noMoreLegacyDesignations = true
+            }
           }
-          this.designationsMeta = this.designationBackup
-          this.filterDesignationsMeta = this.designationBackup.slice(0, this.designationListLoadCount)
 
-          if (!mapped || mapped.length === 0) {
-            this.noMoreLegacyDesignations = true
+          // Add "Others" option if not already present
+          if (!this.designationsMeta.some((d: any) => d.name === 'Others')) {
+            this.designationsMeta.push({ name: 'Others', id: 0, description: 'Others' })
           }
 
-          if (this.defaultSearchDesignationCount && this.designationBackup.length >= this.defaultSearchDesignationCount) {
-            this.noMoreLegacyDesignations = true
+          // If we have a user with a designation that's not in the list, add it
+          if (this.usersData && this.usersData.length > 0) {
+            this.usersData.forEach((user: any) => {
+              if (user.profileDetails &&
+                user.profileDetails.professionalDetails &&
+                user.profileDetails.professionalDetails[0] &&
+                user.profileDetails.professionalDetails[0].designation) {
+
+                const userDesignation = user.profileDetails.professionalDetails[0].designation
+                const designationExists = this.designationsMeta.some(
+                  (d: any) => d.name && d.name.toLowerCase() === userDesignation.toLowerCase()
+                )
+
+                if (!designationExists && userDesignation) {
+                  this.designationsMeta.push({
+                    name: userDesignation,
+                    id: 'custom-' + Date.now(),
+                    description: userDesignation
+                  })
+                }
+              }
+            })
           }
-        }
+          this.isLoadingMoreDesignations = false
+          // Ensure the currently selected designation (if any) is present
+          try {
+            const currentDesignation = this.updateUserDataForm && this.updateUserDataForm.get('designation')
+              ? this.updateUserDataForm.get('designation')!.value : null
+            if (currentDesignation) {
+              const currentLower = (currentDesignation || '')?.toString()?.toLowerCase()
+              const existsInAll = this.designationsMeta.some((d: any) => (d?.name || '')?.toLowerCase() === currentLower)
+              if (!existsInAll) {
+                const newDesignation = { name: currentDesignation, id: 'custom-' + Date.now(), description: currentDesignation }
+                // add to the master list so future resets won't lose it
+                this.designationsMeta.unshift(newDesignation)
+              }
 
-        // Add "Others" option if not already present
-        if (!this.designationsMeta.some((d: any) => d.name === 'Others')) {
-          this.designationsMeta.push({ name: 'Others', id: 0, description: 'Others' })
-        }
-
-        // If we have a user with a designation that's not in the list, add it
-        if (this.usersData && this.usersData.length > 0) {
-          this.usersData.forEach((user: any) => {
-            if (user.profileDetails &&
-              user.profileDetails.professionalDetails &&
-              user.profileDetails.professionalDetails[0] &&
-              user.profileDetails.professionalDetails[0].designation) {
-
-              const userDesignation = user.profileDetails.professionalDetails[0].designation
-              const designationExists = this.designationsMeta.some(
-                (d: any) => d.name && d.name.toLowerCase() === userDesignation.toLowerCase()
-              )
-
-              if (!designationExists && userDesignation) {
-                this.designationsMeta.push({
-                  name: userDesignation,
-                  id: 'custom-' + Date.now(),
-                  description: userDesignation
-                })
+              const existsInFilter = this.filterDesignationsMeta.some((d: any) => (d?.name || '')?.toLowerCase() === currentLower)
+              if (!existsInFilter) {
+                // put it at the top of filtered list so selected value remains visible
+                const found = this.designationsMeta?.find((d: any) => (d?.name || '')?.toLowerCase() === currentLower)
+                if (found) {
+                  // if filtered list is at max length, drop last to keep count stable
+                  if (this.filterDesignationsMeta?.length >= this.designationListLoadCount) {
+                    this.filterDesignationsMeta?.pop()
+                  }
+                  this.filterDesignationsMeta?.unshift(found)
+                }
               }
             }
-          })
-        }
-        this.isLoadingMoreDesignations = false
-      },
-      (_err: any) => {
-        console.error('Error loading designations:', _err)
-        this.isLoadingMoreDesignations = false
-      })
+          } catch (e) {
+            // swallow any errors here so we don't break UI on unexpected form state
+            // console.warn('Error preserving current designation', e)
+          }
+          resolve()
+        },
+        (_err: any) => {
+          console.error('Error loading designations:', _err)
+          this.isLoadingMoreDesignations = false
+          reject(_err)
+        })
+    })
   }
 
   async loadGroups() {
@@ -600,13 +634,23 @@ export class UserCardComponent implements OnInit, OnChanges, AfterViewChecked, A
           }
         })
 
-        // Wrap in setTimeout to avoid ExpressionChangedAfterItHasBeenCheckedError
-        setTimeout(() => {
-          pnael.open()
-        }, 200)
-
-        this.setUserDetails(userval)
-        this.cdr.detectChanges()
+        // Ensure designations are loaded before setting user details
+        if (!this.designationsMeta || this.designationsMeta?.length === 0) {
+          this.loadDesignations().then(() => {
+            this.setUserDetails(userval)
+            setTimeout(() => {
+              pnael.open()
+            }, 200)
+            this.cdr.detectChanges()
+          })
+        } else {
+          this.setUserDetails(userval)
+          // Wrap in setTimeout to avoid ExpressionChangedAfterItHasBeenCheckedError
+          setTimeout(() => {
+            pnael.open()
+          }, 200)
+          this.cdr?.detectChanges()
+        }
       }
     })
   }
@@ -685,12 +729,35 @@ export class UserCardComponent implements OnInit, OnChanges, AfterViewChecked, A
     } else {
       this.loadRoles()
       this.mapRoles(user)
+      // Ensure the current designation is present in the filtered list so the select shows it.
+      // Use a slightly larger delay so the template (mat-select) has time to initialize
+      setTimeout(() => {
+        try {
+          // guard: ensure filtered list exists
+          if (!this.filterDesignationsMeta) {
+            this.filterDesignationsMeta = []
+          }
+          this.checkCurrentDesignationPresent()
+        } catch (e) {
+          // ignore
+        }
+        // Trigger change detection after we modify the arrays
+        try {
+          this.cdr?.detectChanges()
+        } catch (_e) {
+          // ignore
+        }
+      }, 150)
     }
   }
 
   setUserDetails(user: any) {
     if (user && user.profileDetails) {
       this.updateUserDataForm.reset()
+
+      // Store the designation value to ensure it's preserved
+      let userDesignation = ''
+
       if (user.profileDetails.additionalProperties) {
         if (user.profileDetails.additionalProperties.externalSystemId) {
           this.updateUserDataForm.controls['ehrmsID'].setValue(user.profileDetails.additionalProperties.externalSystemId)
@@ -698,7 +765,10 @@ export class UserCardComponent implements OnInit, OnChanges, AfterViewChecked, A
       }
       if (user.profileDetails.professionalDetails) {
         if (user.profileDetails.professionalDetails[0].designation) {
-          this.updateUserDataForm.controls['designation'].setValue(user.profileDetails.professionalDetails[0].designation)
+          userDesignation = user?.profileDetails?.professionalDetails[0]?.designation
+          // Ensure designation is in dropdown before setting the value
+          this.ensureDesignationInDropdown(userDesignation)
+          this.updateUserDataForm.controls['designation'].setValue(userDesignation)
         }
         if (user.profileDetails.professionalDetails[0].group) {
           this.updateUserDataForm.controls['group'].setValue(user.profileDetails.professionalDetails[0].group)
@@ -747,7 +817,19 @@ export class UserCardComponent implements OnInit, OnChanges, AfterViewChecked, A
           this.updateUserDataForm.controls['employeeID'].setValue(user.profileDetails.employmentDetails.employeeCode)
         }
       }
+
+      // Ensure designation is preserved in the dropdown after roles are mapped
       this.mapRoles(user)
+
+      // After mapping roles, ensure the current designation is visible in the dropdown
+      if (userDesignation) {
+        setTimeout(() => {
+          this.ensureDesignationInDropdown(userDesignation)
+          // Re-set the designation value to ensure it's properly bound
+          this.updateUserDataForm?.controls['designation']?.setValue(userDesignation)
+          this.cdr?.detectChanges()
+        }, 150)
+      }
     }
   }
 
@@ -1423,18 +1505,28 @@ export class UserCardComponent implements OnInit, OnChanges, AfterViewChecked, A
       this.designationListLoadCount = this.designationDefaultLoadCount // Reset the load count
       this.designationOffset = 0
       this.noMoreLegacyDesignations = false
+      // Load designations if not already loaded
       if (!this.designationsMeta || this.designationsMeta.length === 0) {
         this.loadDesignations()
+      } else {
+        // Ensure current designation is visible when opening
+        const currentDesignation = this.updateUserDataForm.get('designation')?.value
+        if (currentDesignation) {
+          this.ensureDesignationInDropdown(currentDesignation)
+        }
       }
+
       if (this.updateUserDataForm.get('searchDesignation')) {
         this.updateUserDataForm.get('searchDesignation')!.setValue('')
       }
+
       setTimeout(() => {
         const searchInput = document.querySelector('.search-input') as HTMLInputElement
         if (searchInput) {
           searchInput.focus()
         }
       }, 100)
+
       // Wait for the panel to be rendered in the DOM
       setTimeout(() => {
         // Find the panel element
@@ -1472,34 +1564,77 @@ export class UserCardComponent implements OnInit, OnChanges, AfterViewChecked, A
     const currentDesignation = this.updateUserDataForm.get('designation')!.value
     // Check if current designation exists in the list
     if (currentDesignation) {
-      const designationExists = this.filterDesignationsMeta.some(
-        (designation: any) => designation.name.toLowerCase() === currentDesignation.toLowerCase()
+      this.ensureDesignationInDropdown(currentDesignation)
+    }
+  }
+
+  ensureDesignationInDropdown(designation: string) {
+    if (!designation) return
+
+    const designationLower = designation?.toLowerCase()
+
+    // Initialize arrays if they don't exist
+    if (!this.designationsMeta) {
+      this.designationsMeta = []
+    }
+    if (!this.filterDesignationsMeta) {
+      this.filterDesignationsMeta = []
+    }
+
+    // Check if designation exists in the main list
+    const existsInMain = this.designationsMeta.some(
+      (d: any) => d?.name && d?.name?.toLowerCase() === designationLower
+    )
+
+    // If not in main list, add it
+    if (!existsInMain) {
+      const newDesignation = {
+        name: designation,
+        id: 'custom-' + Date.now(),
+        description: designation
+      }
+      this.designationsMeta?.unshift(newDesignation)
+    }
+
+    // Check if designation exists in the filtered list
+    const existsInFiltered = this.filterDesignationsMeta.some(
+      (d: any) => d?.name && d?.name?.toLowerCase() === designationLower
+    )
+
+    // If not in filtered list, add it at the top
+    if (!existsInFiltered) {
+      const foundDesignation = this.designationsMeta.find(
+        (d: any) => d?.name && d?.name?.toLowerCase() === designationLower
       )
 
-      // If designation doesn't exist in the list, add it
-      if (!designationExists) {
-        // Create a new designation object to match the structure of other items
-        const newDesignation = {
-          name: currentDesignation,
-          // Add any other required properties matching your data structure
-          id: 'custom-' + Date.now(),
-          description: currentDesignation
-        }
-        // Make sure the custom designation appears in the filtered list
+      if (foundDesignation) {
+        // Remove from current position if exists and add to top
+        this.filterDesignationsMeta = this.filterDesignationsMeta.filter(
+          (d: any) => d?.name && d?.name?.toLowerCase() !== designationLower
+        )
+
+        // If at max capacity, remove last item
         if (this.filterDesignationsMeta.length >= this.designationListLoadCount) {
-          // Replace the last item with the new one to maintain the same number of items
           this.filterDesignationsMeta.pop()
         }
-        this.filterDesignationsMeta.unshift(newDesignation)
-        this.isLoadingMoreDesignations = false
+
+        this.filterDesignationsMeta.unshift(foundDesignation)
       }
     }
+
+    this.isLoadingMoreDesignations = false
   }
   onDesignationDropdownClosed(): void {
     this.desigantionFilterEnable = false
     this.designationListLoadCount = this.designationDefaultLoadCount // Reset the load count
     this.filterDesignationsMeta = this.designationsMeta.slice(0, this.designationListLoadCount)
-    this.checkCurrentDesignationPresent()
+
+    // Ensure current designation remains visible after closing
+    const currentDesignation = this.updateUserDataForm.get('designation')?.value
+    if (currentDesignation) {
+      this.ensureDesignationInDropdown(currentDesignation)
+    }
+
     if (this.updateUserDataForm.get('searchDesignation')) {
       this.updateUserDataForm.get('searchDesignation')!.setValue('')
     }
