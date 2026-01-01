@@ -7,32 +7,11 @@
       </mat-card-title>
     </span>
     <mat-card-content>
-      <sb-uic-horizontal-dynamic-stepper [labels]="steppersList" [selectedIndex]="currentStepperIndex"
-        (stepChange)="onStepChanged($event)">
-        <ng-template>
-          <ng-container *ngIf="!formLoading">
-            <ws-app-create-request-content-details [viewMode]="viewMode"
-              [contentDetailsForm]="contentDetailsForm"></ws-app-create-request-content-details>
-          </ng-container>
-        </ng-template>
-        <ng-template>
-          <ng-container *ngIf="!formLoading">
-            <ws-app-create-request-additional-details [viewMode]="viewMode" [demandId]="demandId"
-              [additionalDetailsForm]="additionalDetailsForm"></ws-app-create-request-additional-details>
-          </ng-container>
-        </ng-template>
-      </sb-uic-horizontal-dynamic-stepper>
-      <div class="flex justify-between items-center mt-6 mx-4">
-        <button mat-raised-button [ngClass]="{'disabled-preview-btn': currentStepperIndex === 0}" class="preview-btn"
-          (click)="onPrevious()">
-          Previous
-        </button>
-        <button mat-raised-button color="primary" class="submit-btn" (click)="onNext()"
-          [ngClass]="{'disabled-preview-btn':
-            currentStepperIndex === steppersList.length - 1 && (contentDetailsForm.invalid || additionalDetailsForm.invalid || viewMode.toLowerCase() === 'view')}">
-          {{ currentStepperIndex === steppersList.length - 1 ? 'Submit' : 'Next' }}
-        </button>
-      </div>
+      <sb-uic-create-request-form (popupStatus)="showDialogBox($event)"></sb-uic-create-request-form>
     </mat-card-content>
   </mat-card>
 </div>
+
+<!-- <div>
+  <sb-uic-create-request-form (popuStatus)="showDialogBox($event)"></sb-uic-create-request-form>
+</div> -->
