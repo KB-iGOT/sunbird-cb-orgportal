@@ -7,11 +7,7 @@
       </mat-card-title>
     </span>
     <mat-card-content>
-      <sb-uic-create-request-form (popupStatus)="showDialogBox($event)"></sb-uic-create-request-form>
+      <sb-uic-create-request-form (requestDetails)="onSubmit($event)"></sb-uic-create-request-form>
     </mat-card-content>
   </mat-card>
 </div>
-
-<!-- <div>
-  <sb-uic-create-request-form (popuStatus)="showDialogBox($event)"></sb-uic-create-request-form>
-</div> -->

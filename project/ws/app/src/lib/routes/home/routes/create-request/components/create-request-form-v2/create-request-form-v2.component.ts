@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
 import { ConfirmationBoxComponent } from '../../../../../training-plan/components/confirmation-box/confirmation.box.component'
 import { MatLegacyDialog } from '@angular/material/legacy-dialog'
+import { MatLegacySnackBar } from '@angular/material/legacy-snack-bar'
+import { CreateRequestService } from '../../services/create-request.service'
 
 @Component({
   selector: 'ws-app-create-request-form-v2',
@@ -17,12 +19,15 @@ export class CreateRequestFormV2Component implements OnInit {
   constructor(
     private router: Router,
     public dialog: MatLegacyDialog,
-    private activatedRoute: ActivatedRoute
+    private activatedRoute: ActivatedRoute,
+    private snackBar: MatLegacySnackBar,
+    private createRequestSvc: CreateRequestService,
   ) { }
 
   ngOnInit(): void {
     this.routeSubscription()
   }
+
   routeSubscription() {
     this.activatedRoute.queryParams.subscribe(params => {
       if (params['id']) {
@@ -34,6 +39,27 @@ export class CreateRequestFormV2Component implements OnInit {
   //#region (interactions)
   navigateBack() {
     this.router.navigateByUrl('/app/home/request-list')
+  }
+
+  onSubmit(requestBody: any) {
+    this.showDialogBox('progress')
+    this.createRequestSvc.createRequestForm(requestBody).subscribe({
+      next: (response: any) => {
+        if (response) {
+          this.showDialogBox('progress-completed')
+          setTimeout(() => {
+            this.dialogRefs.close()
+            this.router.navigateByUrl('/app/home/request-list')
+            this.snackBar.open('Request submitted successfully ')
+          }, 1000)
+        }
+      },
+      error: (error: any) => {
+        if (error) {
+          this.snackBar.open('Something went wrong, please try again.')
+        }
+      }
+    })
   }
 
   showDialogBox(event: any) {
