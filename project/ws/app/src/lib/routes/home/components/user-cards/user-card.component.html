@@ -138,6 +138,7 @@
                     <mat-option [value]="designation?.name" *ngFor="let designation of filterDesignationsMeta">
                       {{designation?.name}}
                     </mat-option>
+                    <mat-option *ngIf="updateUserDataForm.get('designation')?.value" [value]="updateUserDataForm.get('designation')?.value" disabled >{{updateUserDataForm.get('designation')?.value}}</mat-option>
                     <!-- No results message -->
                     <mat-option *ngIf="(filterDesignationsMeta )?.length === 0" disabled>
                       No matches found
