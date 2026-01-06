@@ -56,6 +56,7 @@ export class CreateRequestFormV2Component implements OnInit {
       },
       error: (error: any) => {
         if (error) {
+          this.dialogRefs.close()
           this.snackBar.open('Something went wrong, please try again.')
         }
       }
