@@ -20,5 +20,6 @@ export const environment = {
   dicussV2Bucket: (window as { [key: string]: any })['env']['dicussV2Bucket'] || '',
   portalsForNotifications: (((window as { [key: string]: any })['env']['portalsForNotifications'] || {})) || {},
   googleStorageUrl: (window as { [key: string]: any })['env']['googleStorageUrl'] || '',
-  mdoChannelsBookmarkId: (window as { [key: string]: any })['env']['mdoChannelsBookmarkId'] || ''
+  mdoChannelsBookmarkId: (window as { [key: string]: any })['env']['mdoChannelsBookmarkId'] || '',
+  spvorgID: (window as { [key: string]: any })['env']['spvorgID'] || ''
 }
