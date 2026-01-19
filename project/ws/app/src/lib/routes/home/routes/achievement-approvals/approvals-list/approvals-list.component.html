@@ -1,0 +1,149 @@
+<div class="achievement-approvals-container">
+  <!-- Header -->
+  <div class="header-section">
+    <h1 class="title">Achievement Approvals</h1>
+    <p class="subtitle">Manage and review all student achievement submissions.</p>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="stats-container">
+    <div class="stat-card">
+      <div class="stat-icon pending-icon">
+        <mat-icon>event_available</mat-icon>
+      </div>
+      <div class="stat-label">TOTAL PENDING</div>
+      <div class="stat-value">{{ stats.totalPending }}</div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon reviewed-icon">
+        <mat-icon>calendar_today</mat-icon>
+      </div>
+      <div class="stat-label">REVIEWED TODAY</div>
+      <div class="stat-value">{{ stats.reviewedToday }}</div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon approved-icon">
+        <mat-icon>check_circle</mat-icon>
+      </div>
+      <div class="stat-label">TOTAL APPROVED</div>
+      <div class="stat-value">{{ stats.totalApproved | number }}</div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon rejected-icon">
+        <mat-icon>cancel</mat-icon>
+      </div>
+      <div class="stat-label">TOTAL REJECTED</div>
+      <div class="stat-value">{{ stats.totalRejected }}</div>
+    </div>
+  </div>
+
+  <!-- Tabs and Actions -->
+  <div class="tabs-actions-container">
+    <mat-tab-group [(selectedIndex)]="selectedTabIndex" class="custom-tabs">
+      <mat-tab label="Pending Approval"></mat-tab>
+      <mat-tab label="Approved / Rejected"></mat-tab>
+    </mat-tab-group>
+
+    <div class="action-buttons">
+      <button mat-stroked-button class="filter-btn">
+        <mat-icon>filter_list</mat-icon>
+        Filter
+      </button>
+      <button mat-raised-button color="primary" class="bulk-approve-btn" [disabled]="selection.selected.length === 0"
+        (click)="bulkApprove()">
+        <mat-icon>check</mat-icon>
+        Bulk Approve
+      </button>
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div class="table-container">
+    <table mat-table [dataSource]="dataSource" class="approvals-table">
+      <!-- Checkbox Column -->
+      <ng-container matColumnDef="select">
+        <th mat-header-cell *matHeaderCellDef>
+          <mat-checkbox (change)="$event ? toggleAllRows() : null" [checked]="selection.hasValue() && isAllSelected()"
+            [indeterminate]="selection.hasValue() && !isAllSelected()">
+          </mat-checkbox>
+        </th>
+        <td mat-cell *matCellDef="let row">
+          <mat-checkbox (click)="$event.stopPropagation()" (change)="$event ? selection.toggle(row) : null"
+            [checked]="selection.isSelected(row)" (keydown.space)="selection.toggle(row)"
+            (keydown.enter)="selection.toggle(row)">
+          </mat-checkbox>
+        </td>
+      </ng-container>
+
+      <!-- Student Column -->
+      <ng-container matColumnDef="student">
+        <th mat-header-cell *matHeaderCellDef class="student-header">STUDENT</th>
+        <td mat-cell *matCellDef="let element" class="student-cell">
+          <div class="student-info">
+            <div class="avatar" [style.background-color]="element.avatarColor">
+              {{ element.studentInitials }}
+            </div>
+            <div class="student-details">
+              <div class="student-name">{{ element.studentName }}</div>
+              <div class="student-email">{{ element.studentEmail }}</div>
+            </div>
+          </div>
+        </td>
+      </ng-container>
+
+      <!-- Achievement Title Column -->
+      <ng-container matColumnDef="achievementTitle">
+        <th mat-header-cell *matHeaderCellDef class="achievement-header">ACHIEVEMENT TITLE</th>
+        <td mat-cell *matCellDef="let element" class="achievement-cell">
+          <div class="achievement-title">{{ element.achievementTitle }}</div>
+          <div class="evidence-link">
+            <mat-icon>link</mat-icon>
+            <span>Evidence Submitted</span>
+          </div>
+        </td>
+      </ng-container>
+
+      <!-- Date Submitted Column -->
+      <ng-container matColumnDef="dateSubmitted">
+        <th mat-header-cell *matHeaderCellDef class="date-header">DATE SUBMITTED</th>
+        <td mat-cell *matCellDef="let element" class="date-cell">
+          {{ element.dateSubmitted | date: 'MMM dd, yyyy' }}
+        </td>
+      </ng-container>
+
+      <!-- Actions Column -->
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef class="actions-header">ACTIONS</th>
+        <td mat-cell *matCellDef="let element" class="actions-cell">
+          <button mat-raised-button color="primary" class="approve-btn" (click)="approve(element)">
+            <mat-icon>check</mat-icon>
+            Approve
+          </button>
+          <button mat-button class="reject-btn" (click)="reject(element)">
+            <mat-icon>close</mat-icon>
+            Reject
+          </button>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
+  </div>
+
+  <!-- Pagination -->
+  <div class="pagination-container">
+    <div class="pagination-info">
+      PAGINATION<br>
+      <span class="pagination-text">
+        Showing {{ getStartIndex() }} to {{ getEndIndex() }} of {{ totalResults }} results
+      </span>
+    </div>
+    <mat-paginator [length]="totalResults" [pageSize]="pageSize" [pageSizeOptions]="[5, 10, 25, 50]"
+      (page)="onPageChange($event)" showFirstLastButtons>
+    </mat-paginator>
+  </div>
+</div>
