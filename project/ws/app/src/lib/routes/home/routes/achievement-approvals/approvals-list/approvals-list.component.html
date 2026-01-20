@@ -41,24 +41,27 @@
   </div>
 
   <!-- Tabs and Actions -->
-  <div class="tabs-actions-container">
-    <mat-tab-group [(selectedIndex)]="selectedTabIndex" class="custom-tabs">
-      <mat-tab label="Pending Approval"></mat-tab>
-      <mat-tab label="Approved / Rejected"></mat-tab>
-    </mat-tab-group>
 
-    <div class="action-buttons">
-      <button mat-stroked-button class="filter-btn">
+  <div class="flex item-center justify-content pb-8 justify-between">
+    <div>
+      <mat-tab-group [selectedIndex]="selectedTabIndex" (selectedIndexChange)="onTabChange($event)" class="custom-tabs">
+        <mat-tab label="Pending Approval"></mat-tab>
+        <mat-tab label="Approved / Rejected"></mat-tab>
+      </mat-tab-group>
+    </div>
+    <div *ngIf="selectedTabIndex === 0" class="action-btns">
+      <button mat-stroked-button class="filter-btn margin-right-l">
         <mat-icon>filter_list</mat-icon>
         Filter
       </button>
-      <button mat-raised-button color="primary" class="bulk-approve-btn" [disabled]="selection.selected.length === 0"
+      <button mat-raised-button class="bulk-approve-btn pl-4" [disabled]="selection.selected.length === 0"
         (click)="bulkApprove()">
         <mat-icon>check</mat-icon>
         Bulk Approve
       </button>
     </div>
   </div>
+
 
   <!-- Table -->
   <div class="table-container">
@@ -79,16 +82,16 @@
       </ng-container>
 
       <!-- Student Column -->
-      <ng-container matColumnDef="student">
-        <th mat-header-cell *matHeaderCellDef class="student-header">STUDENT</th>
-        <td mat-cell *matCellDef="let element" class="student-cell">
-          <div class="student-info">
+      <ng-container matColumnDef="user">
+        <th mat-header-cell *matHeaderCellDef class="user-header">USER</th>
+        <td mat-cell *matCellDef="let element" class="user-cell">
+          <div class="user-info">
             <div class="avatar" [style.background-color]="element.avatarColor">
               {{ element.studentInitials }}
             </div>
-            <div class="student-details">
-              <div class="student-name">{{ element.studentName }}</div>
-              <div class="student-email">{{ element.studentEmail }}</div>
+            <div class="user-details">
+              <div class="user-name">{{ element.userName }}</div>
+              <div class="user-email">{{ element.userEmail }}</div>
             </div>
           </div>
         </td>
@@ -118,7 +121,7 @@
       <ng-container matColumnDef="actions">
         <th mat-header-cell *matHeaderCellDef class="actions-header">ACTIONS</th>
         <td mat-cell *matCellDef="let element" class="actions-cell">
-          <button mat-raised-button color="primary" class="approve-btn" (click)="approve(element)">
+          <button mat-raised-button class="approve-btn" (click)="approve(element)">
             <mat-icon>check</mat-icon>
             Approve
           </button>

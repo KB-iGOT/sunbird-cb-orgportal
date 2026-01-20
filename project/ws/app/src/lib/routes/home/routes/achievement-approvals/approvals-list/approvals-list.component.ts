@@ -5,8 +5,8 @@ import { PageEvent } from '@angular/material/paginator'
 
 export interface AchievementApproval {
   id: string
-  studentName: string
-  studentEmail: string
+  userName: string
+  userEmail: string
   studentInitials: string
   avatarColor: string
   achievementTitle: string
@@ -20,7 +20,10 @@ export interface AchievementApproval {
   styleUrls: ['./approvals-list.component.scss']
 })
 export class ApprovalsListComponent implements OnInit {
-  displayedColumns: string[] = ['select', 'student', 'achievementTitle', 'dateSubmitted', 'actions'];
+  displayedColumns: string[] = ['select', 'user', 'achievementTitle', 'dateSubmitted', 'actions'];
+  readonly pendingColumns: string[] = ['select', 'user', 'achievementTitle', 'dateSubmitted', 'actions']
+  readonly reviewedColumns: string[] = ['user', 'achievementTitle', 'dateSubmitted']
+
   dataSource: MatTableDataSource<AchievementApproval>
   selection = new SelectionModel<AchievementApproval>(true, []);
   selectedTabIndex = 0;
@@ -36,12 +39,12 @@ export class ApprovalsListComponent implements OnInit {
   totalResults = 24;
   currentPage = 0;
 
-  // Sample data
-  private readonly sampleData: AchievementApproval[] = [
+  // Sample data for Pending tab
+  private readonly pendingData: AchievementApproval[] = [
     {
       id: '1',
-      studentName: 'Sarah Jenkins',
-      studentEmail: 's.jenkins@university.edu',
+      userName: 'Sarah Jenkins',
+      userEmail: 's.jenkins@university.edu',
       studentInitials: 'SJ',
       avatarColor: '#C8B88A',
       achievementTitle: 'Top Performer Q3',
@@ -49,8 +52,8 @@ export class ApprovalsListComponent implements OnInit {
     },
     {
       id: '2',
-      studentName: 'Michael Chen',
-      studentEmail: 'm.chen@tech.org',
+      userName: 'Michael Chen',
+      userEmail: 'm.chen@tech.org',
       studentInitials: 'MC',
       avatarColor: '#7BC5C5',
       achievementTitle: 'Product Innovation Award',
@@ -58,17 +61,60 @@ export class ApprovalsListComponent implements OnInit {
     }
   ];
 
+  // Sample data for Approved / Rejected tab
+  private readonly reviewedData: AchievementApproval[] = [
+    {
+      id: '3',
+      userName: 'Alex Rivera',
+      userEmail: 'a.rivera@college.edu',
+      studentInitials: 'AR',
+      avatarColor: '#A1C4FD',
+      achievementTitle: 'Leadership Excellence',
+      dateSubmitted: new Date('2023-09-21')
+    },
+    {
+      id: '4',
+      userName: 'Priya Singh',
+      userEmail: 'p.singh@university.edu',
+      studentInitials: 'PS',
+      avatarColor: '#FBC2EB',
+      achievementTitle: 'Community Impact Award',
+      dateSubmitted: new Date('2023-09-18')
+    }
+  ];
+
   constructor() {
-    this.dataSource = new MatTableDataSource(this.sampleData)
+    this.dataSource = new MatTableDataSource()
   }
 
   ngOnInit(): void {
     // Load initial data
+    this.setTabData(0)
     this.loadApprovals()
   }
 
   loadApprovals(): void {
     // API call will be implemented when backend is ready
+  }
+
+  onTabChange(index: number): void {
+    this.selectedTabIndex = index
+    this.setTabData(index)
+  }
+
+  private setTabData(index: number): void {
+    this.currentPage = 0
+
+    if (index === 0) {
+      this.displayedColumns = this.pendingColumns
+      this.dataSource.data = this.pendingData
+    } else {
+      this.displayedColumns = this.reviewedColumns
+      this.selection.clear()
+      this.dataSource.data = this.reviewedData
+    }
+
+    this.totalResults = this.dataSource.data.length
   }
 
   /** Whether the number of selected elements matches the total number of rows. */
