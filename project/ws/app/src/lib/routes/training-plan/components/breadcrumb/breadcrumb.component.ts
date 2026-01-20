@@ -267,8 +267,8 @@ export class BreadcrumbComponent implements OnInit {
     }
     const obj: any = { request: { ...this.tpdsSvc.trainingPlanStepperData, id: this.activeRoute.snapshot.data['contentData'].id } }
     if (obj.request.status && obj.request.status.toLowerCase() === 'live') {
-      delete obj.request.contentList
-      delete obj.request.contentType
+      //delete obj.request.contentList
+      //delete obj.request.contentType
       delete obj.request.assignmentType
     }
     delete obj.request.status
@@ -305,10 +305,10 @@ export class BreadcrumbComponent implements OnInit {
     }
     const obj = this.generateRequestPayload(this.tpdsSvc.trainingPlanStepperData, 'update')
     if (obj.request.status && obj.request.status.toLowerCase() === 'live') {
-      delete obj.request.contentList
-      delete obj.request.contentType
+      //delete obj.request.contentList
+      //delete obj.request.contentType
       delete obj.request.assignmentType
-      delete obj.request.orgIdList
+      //delete obj.request.orgIdList
     }
     delete obj.request.status
     this.showDialogBox('progress')

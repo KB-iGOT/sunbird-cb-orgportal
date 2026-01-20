@@ -15,7 +15,8 @@
             mat-button (click)="tabNavigate('draft', 'Designation'); tabTelemetry('draft', 1)" role="button">Drafts</a>
           <a routerLinkActive="router-link-active" class="filter-option"
             [ngClass]="{'ws-mat-accent-border-active' : currentFilter === 'RETIRE', 'ws-mat-accent-border font-medium':currentFilter !== 'RETIRE'}"
-            mat-button (click)="tabNavigate('RETIRE', 'Designation'); tabTelemetry('retire', 1)" role="button">Retire</a>
+            mat-button (click)="tabNavigate('RETIRE', 'Designation'); tabTelemetry('retire', 1)"
+            role="button">Retire</a>
         </div>
       </div>
 
