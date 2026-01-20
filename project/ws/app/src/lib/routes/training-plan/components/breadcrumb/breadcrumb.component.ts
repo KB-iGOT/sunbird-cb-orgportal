@@ -415,7 +415,7 @@ export class BreadcrumbComponent implements OnInit {
           data: {
             type: 'conformation',
             icon: 'radio_on',
-            title: 'Are you sure you want to update and publish the plan?',
+            title: "Editing the course list may impact learners who have already accessed this training plan. Removing or modifying a course could change their learning experience. Please confirm before proceeding. Are you sure you want to update and publish the plan?",
             // subTitle: 'You wont be able to revert this',
             primaryAction: 'Confirm',
             secondaryAction: 'Cancel',
