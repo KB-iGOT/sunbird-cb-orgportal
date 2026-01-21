@@ -48,7 +48,9 @@ export class BreadcrumbComponent implements OnInit {
 
   cancel() {
     this.tpdsSvc.trainingPlanTitle = ''
-    this.router.navigateByUrl('app/home/training-plan-dashboard')
+    setTimeout(() => {
+      this.router.navigateByUrl('app/home/training-plan-dashboard')
+    }, 500)
   }
 
   nextStep() {
