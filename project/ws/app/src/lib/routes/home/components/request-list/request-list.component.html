@@ -77,8 +77,7 @@
             <ng-container matColumnDef="interests">
               <th mat-header-cell *matHeaderCellDef class="row-heading">Interests</th>
               <td mat-cell class="title-class" *matCellDef="let element">
-                <a class="action-btn-view" *ngIf="element?.interestCount!== 0" href="javascript:void(0)"
-                  [ngStyle]="getPointerEventsStyle(element)">
+                <a class="action-btn-view" *ngIf="element?.interestCount!== 0" href="javascript:void(0)" [ngStyle]="getPointerEventsStyle(element)">
                   <span (click)="handleClick(element)">
                     {{element?.interestCount}}
                   </span></a>
@@ -111,9 +110,8 @@
                     <button mat-menu-item (click)="onClickMenu(element,'viewContent')">
                       <span>View</span>
                     </button>
-                    <button
-                      *ngIf="element?.status === statusKey.Unassigned && element?.status!== statusKey.Inprogress &&  element?.status!== statusKey.invalid "
-                      mat-menu-item (click)="onClickMenu(element,'invalidContent')">
+                    <button *ngIf="element?.status === statusKey.Unassigned && element?.status!== statusKey.Inprogress &&  element?.status!== statusKey.invalid " mat-menu-item
+                      (click)="onClickMenu(element,'invalidContent')">
                       <span>Mark as invalid</span>
                     </button>
                     <button mat-menu-item
@@ -121,8 +119,7 @@
                       (click)="onClickMenu(element,'assignContent')">
                       <span>Assign</span>
                     </button>
-                    <button
-                      *ngIf="element?.status === statusKey.Assigned && element?.status!== statusKey.Inprogress &&  element?.status!== statusKey.invalid && element?.status!==statusKey.fullfill "
+                    <button *ngIf="element?.status === statusKey.Assigned && element?.status!== statusKey.Inprogress &&  element?.status!== statusKey.invalid && element?.status!==statusKey.fullfill "
                       mat-menu-item (click)="onClickMenu(element,'reAssignContent')">
                       <span> Re-Assign</span>
                     </button>
@@ -152,14 +149,13 @@
                   [routerLink]="['/app/home/create-request-form']">Request Content</button>
               </div> -->
           <div class=" margin-top-m no-content-create">
-            <button mat-button type="button" class="search-btns"
-              [routerLink]="['/app/home/create-request-form']">Request Content</button>
+            <button mat-button type="button" class="search-btns" [routerLink]="['/app/home/create-request-form']">Request Content</button>
           </div>
 
         </div>
 
-        <mat-paginator *ngIf="dataSource?.filteredData?.length > 0" [pageSize]="pageSize" [length]="this.requestCount"
-          [pageSizeOptions]="defaultPageSizeOptions" (page)="onChangePage($event)"></mat-paginator>
+        <mat-paginator *ngIf="dataSource?.filteredData?.length > 0" [pageSize]="pageSize" [length]="this.requestCount" [pageSizeOptions]="defaultPageSizeOptions"
+          (page)="onChangePage($event)"></mat-paginator>
 
 
       </div>

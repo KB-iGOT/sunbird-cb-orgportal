@@ -11,6 +11,8 @@ export interface AchievementApproval {
   avatarColor: string
   achievementTitle: string
   dateSubmitted: Date
+  status?: 'Approved' | 'Rejected'
+  decisionDate?: Date
   evidenceUrl?: string
 }
 
@@ -22,15 +24,15 @@ export interface AchievementApproval {
 export class ApprovalsListComponent implements OnInit {
   displayedColumns: string[] = ['select', 'user', 'achievementTitle', 'dateSubmitted', 'actions'];
   readonly pendingColumns: string[] = ['select', 'user', 'achievementTitle', 'dateSubmitted', 'actions']
-  readonly reviewedColumns: string[] = ['user', 'achievementTitle', 'dateSubmitted']
+  readonly reviewedColumns: string[] = ['user', 'achievementTitle', 'dateSubmitted', 'status', 'decisionDate']
 
   dataSource: MatTableDataSource<AchievementApproval>
   selection = new SelectionModel<AchievementApproval>(true, []);
   selectedTabIndex = 0;
+  filterStatus: 'All' | 'Approved' | 'Rejected' = 'All'
 
   stats = {
     totalPending: 24,
-    reviewedToday: 142,
     totalApproved: 1240,
     totalRejected: 45
   };
@@ -70,7 +72,9 @@ export class ApprovalsListComponent implements OnInit {
       studentInitials: 'AR',
       avatarColor: '#A1C4FD',
       achievementTitle: 'Leadership Excellence',
-      dateSubmitted: new Date('2023-09-21')
+      dateSubmitted: new Date('2023-09-21'),
+      status: 'Approved',
+      decisionDate: new Date('2023-09-25')
     },
     {
       id: '4',
@@ -79,7 +83,9 @@ export class ApprovalsListComponent implements OnInit {
       studentInitials: 'PS',
       avatarColor: '#FBC2EB',
       achievementTitle: 'Community Impact Award',
-      dateSubmitted: new Date('2023-09-18')
+      dateSubmitted: new Date('2023-09-18'),
+      status: 'Rejected',
+      decisionDate: new Date('2023-09-22')
     }
   ];
 
@@ -111,7 +117,8 @@ export class ApprovalsListComponent implements OnInit {
     } else {
       this.displayedColumns = this.reviewedColumns
       this.selection.clear()
-      this.dataSource.data = this.reviewedData
+      this.filterStatus = 'All'
+      this.dataSource.data = this.getFilteredReviewedData()
     }
 
     this.totalResults = this.dataSource.data.length
@@ -148,17 +155,29 @@ export class ApprovalsListComponent implements OnInit {
     // Implement bulk approve logic
   }
 
+  onFilterChange(status: 'All' | 'Approved' | 'Rejected'): void {
+    this.filterStatus = status
+
+    if (this.selectedTabIndex === 1) {
+      this.dataSource.data = this.getFilteredReviewedData()
+      this.totalResults = this.dataSource.data.length
+    }
+  }
+
+  private getFilteredReviewedData(): AchievementApproval[] {
+    if (this.filterStatus === 'Approved') {
+      return this.reviewedData.filter(item => item.status === 'Approved')
+    }
+
+    if (this.filterStatus === 'Rejected') {
+      return this.reviewedData.filter(item => item.status === 'Rejected')
+    }
+
+    return this.reviewedData
+  }
+
   onPageChange(event: PageEvent): void {
     this.pageSize = event.pageSize
     this.currentPage = event.pageIndex
-  }
-
-  getStartIndex(): number {
-    return this.currentPage * this.pageSize + 1
-  }
-
-  getEndIndex(): number {
-    const end = (this.currentPage + 1) * this.pageSize
-    return Math.min(end, this.totalResults)
   }
 }
