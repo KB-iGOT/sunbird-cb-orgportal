@@ -2,6 +2,9 @@ import { Component, OnInit } from '@angular/core'
 import { MatTableDataSource } from '@angular/material/table'
 import { SelectionModel } from '@angular/cdk/collections'
 import { PageEvent } from '@angular/material/paginator'
+import { MatLegacyDialog } from '@angular/material/legacy-dialog'
+import { ConfirmationBoxComponent } from '../../../../training-plan/components/confirmation-box/confirmation.box.component'
+import { RejectReasonDialogComponent } from '../reject-reason-dialog/reject-reason-dialog.component'
 
 export interface AchievementApproval {
   id: string
@@ -24,7 +27,7 @@ export interface AchievementApproval {
 export class ApprovalsListComponent implements OnInit {
   displayedColumns: string[] = ['select', 'user', 'achievementTitle', 'dateSubmitted', 'actions'];
   readonly pendingColumns: string[] = ['select', 'user', 'achievementTitle', 'dateSubmitted', 'actions']
-  readonly reviewedColumns: string[] = ['user', 'achievementTitle', 'dateSubmitted', 'status', 'decisionDate']
+  readonly reviewedColumns: string[] = ['user', 'achievementTitle', 'dateSubmitted', 'decisionDate', 'status']
 
   dataSource: MatTableDataSource<AchievementApproval>
   selection = new SelectionModel<AchievementApproval>(true, []);
@@ -89,7 +92,7 @@ export class ApprovalsListComponent implements OnInit {
     }
   ];
 
-  constructor() {
+  constructor(private readonly dialog: MatLegacyDialog) {
     this.dataSource = new MatTableDataSource()
   }
 
@@ -142,17 +145,76 @@ export class ApprovalsListComponent implements OnInit {
 
   approve(element: AchievementApproval): void {
     console.log('Approving:', element)
-    // Implement approve logic
+    this.action('approve')
   }
 
   reject(element: AchievementApproval): void {
     console.log('Rejecting:', element)
-    // Implement reject logic
+    this.action('reject')
+  }
+
+  action(type: 'approve' | 'reject'): void {
+    if (type === 'reject') {
+      const dialogRef = this.dialog.open(RejectReasonDialogComponent, {
+        disableClose: true,
+        data: {
+          title: 'Please specify the reason for rejection',
+          maxLength: 500,
+        },
+        autoFocus: false,
+        width: '1000px',
+      })
+
+      dialogRef.afterClosed().subscribe((reason: string | undefined) => {
+        if (reason) {
+          console.log('User provided rejection reason:', reason)
+          // Integrate API call here to reject the achievement with this reason
+        }
+      })
+      return
+    }
+
+    const dialogRef = this.dialog.open(ConfirmationBoxComponent, {
+      disableClose: true,
+      data: {
+        type: 'conformation',
+        icon: 'radio_on',
+        title: `Are you sure you want to ${type} this?`,
+        primaryAction: 'Confirm',
+        secondaryAction: 'Cancel',
+      },
+      autoFocus: false,
+    })
+
+    console.log('Dialog opened for', type)
+
+    dialogRef.afterClosed().subscribe((btnAction: any) => {
+      if (btnAction) {
+        console.log('User confirmed approve action for:', this.selection.selected)
+      }
+    })
   }
 
   bulkApprove(): void {
     console.log('Bulk approving:', this.selection.selected)
     // Implement bulk approve logic
+    const dialogRef = this.dialog.open(ConfirmationBoxComponent, {
+      disableClose: true,
+      data: {
+        type: 'conformation',
+        icon: 'radio_on',
+        title: 'Are you sure you want to approve all?',
+        primaryAction: 'Confirm',
+        secondaryAction: 'Cancel',
+      },
+      autoFocus: false,
+    })
+
+    dialogRef.afterClosed().subscribe((btnAction: any) => {
+      if (btnAction) {
+        console.log('User confirmed approve action for:', this.selection.selected)
+      }
+    })
   }
 
   onFilterChange(status: 'All' | 'Approved' | 'Rejected'): void {

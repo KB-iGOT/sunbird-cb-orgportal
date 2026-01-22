@@ -24,10 +24,12 @@ import { MatExpansionModule } from '@angular/material/expansion'
 import { MatDialogModule } from '@angular/material/dialog'
 import { ApprovalsListComponent } from './approvals-list/approvals-list.component'
 import { AchievementApprovalsRoutingModule } from './achievement-approvals-routing.module'
+import { RejectReasonDialogComponent } from './reject-reason-dialog/reject-reason-dialog.component'
 @NgModule({
   declarations: [
     BaseComponent,
     ApprovalsListComponent,
+    RejectReasonDialogComponent,
   ],
   imports: [
     CommonModule,

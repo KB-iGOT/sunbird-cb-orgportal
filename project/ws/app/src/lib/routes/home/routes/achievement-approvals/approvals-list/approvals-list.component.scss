@@ -103,9 +103,7 @@
       color: #64748b;
       min-width: 160px;
 
-      &.mat-tab-label-active {
-        color: #135bec;
-      }
+
     }
 
     .mat-ink-bar {
@@ -160,6 +158,7 @@
     opacity: 0.6;
   }
 }
+
 .action-btns {
   display: flex;
   align-items: flex-end;
@@ -260,25 +259,6 @@ table .table-row-data {
   gap: 12px;
   align-items: center;
   min-height: 100px;
-}
-
-.approve-btn {
-  background-color: #00c284 !important;
-  color: white !important;
-  font-weight: 700;
-  font-size: 12px;
-  min-height: 36px;
-  border-radius: 8px;
-}
-
-.reject-btn {
-  background-color: white !important;
-  border: 1px solid #cecece;
-  color: #475569;
-  font-weight: 700;
-  font-size: 12px;
-  min-height: 36px;
-  border-radius: 8px;
 }
 
 .nav-container {
