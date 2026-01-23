@@ -13,7 +13,7 @@ export class AICBPConfigResolver implements Resolve<any> {
     console.log('environment--', environment)
     return of({
       configDetails: environment,
-      baseUrl: "https://portal.dev.karmayogibharat.net/"
+      baseUrl: environment.mdoPath
     })
   }
 }
