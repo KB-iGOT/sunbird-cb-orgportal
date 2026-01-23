@@ -123,6 +123,8 @@ import { UserOnboardingComponent } from './routes/directory/user-onbarding/user-
 import { UserBulkTransferComponent } from './routes/directory/user-bulk-transfer/user-bulk-transfer.component'
 import { HorizontalDynamicStepperModule, UserUpdateModule } from '@sunbird-cb/consumption'
 import { OnboardingModule } from './routes/onboarding/onboarding.module'
+import { AICBPRequestModule } from './ai-cbp-request/ai-cbp-request.module'
+
 
 @NgModule({
   declarations: [
@@ -252,7 +254,8 @@ import { OnboardingModule } from './routes/onboarding/onboarding.module'
     TreeHierarchyModule,
     UserUpdateModule,
     OnboardingModule,
-    HorizontalDynamicStepperModule
+    HorizontalDynamicStepperModule,
+    AICBPRequestModule
   ],
   providers: [
     { provide: 'environment', useValue: environment },

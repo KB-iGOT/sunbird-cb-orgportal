@@ -476,6 +476,11 @@ const routes: Routes = [
           configService: ConfigResolveService,
         }
       },
+      {
+        path: 'ai-cbp-requests',
+        loadChildren: () => import('./ai-cbp-request/ai-cbp-request.module').then(m => m.AICBPRequestModule),
+
+      },
     ],
   },
   {
@@ -537,7 +542,8 @@ const routes: Routes = [
       pageData: PageResolve,
       configService: ConfigResolveService,
     },
-  },
+  }
+
 
 ]
 
