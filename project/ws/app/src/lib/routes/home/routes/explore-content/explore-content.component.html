@@ -20,7 +20,7 @@
 
   <!-- Content table -->
   <div class="table-card mat-elevation-z1" *ngIf="dataSource?.data?.length > 0">
-    <table mat-table [dataSource]="dataSource" class="full-width">
+    <table mat-table [dataSource]="dataSource" class="full-width" multiTemplateDataRows>
       <ng-container matColumnDef="expand">
         <th mat-header-cell *matHeaderCellDef [style.width.px]="40"></th>
         <td mat-cell *matCellDef="let row" [style.width.px]="40">
@@ -36,7 +36,79 @@
           </a>
         </td>
       </ng-container>
+      <ng-container matColumnDef="expandedDetail">
+        <td mat-cell *matCellDef="let row" [attr.colspan]="displayedColumns.length">
+          <div class="element-detail" *ngIf="row === expandedElement">
+            <table class="table-container w-full mt-4 sub-table">
+              <ng-container *ngFor="let course of multilingualCourses">
+                <tr class="mb-1 subtable-row-item">
+                  <td class="mat-subheading-2" [style.width.px]="30"></td>
+                  <td class="mat-subheading-2" [style.width.px]="600">
+                    <div class="content-cell pt-2 gap-4">
+                      <div class="thumb-wrapper py-2">
+                        <img class="thumb-img" [src]="course.posterImage" [alt]="course.name" />
+                        <span class="duration-chip"></span>
+                      </div>
+                      <div class="content-meta pt-2">
+                        <div class="title line-clamp-2 ">{{ course.name }}</div>
+                        <div class="tag-chip mt-2">{{course?.courseCategory ? course?.courseCategory : course?.resourceCategory}}</div>
+                      </div>
+                    </div>
+                  </td>
 
+                  <td class="table-cell-spacing padding-10" [style.width.px]="150" style="white-space: normal; word-wrap: break-word;">
+                    <div class="status-badge">
+                      <span class="{{ course?.status?.toLowerCase() }}">
+                        <mat-icon class="status-icon"
+                          *ngIf="course?.status !== 'Live' && course?.status !== 'Retired' && course?.status !== 'Failed'">
+                          schedule
+                        </mat-icon>
+                        <mat-icon class="status-icon" *ngIf="course?.status === 'Failed'">close</mat-icon>
+
+                        <span *ngIf="course?.status === 'Live'; else otherStatus">Live</span>
+                        <ng-template #otherStatus>
+                          <span *ngIf="course?.status === 'Retired'">Inactive</span>
+                          <span *ngIf="course?.status === 'Review' && course?.reviewStatus === 'InReview'">
+                            Under Review
+                          </span>
+                          <span *ngIf="course?.status === 'Review' && course?.reviewStatus === 'Reviewed'">
+                            Under Publish
+                          </span>
+                          <span *ngIf="course?.status === 'Draft'">Draft</span>
+                        </ng-template>
+                      </span>
+                    </div>
+                  </td>
+                  <ng-container>
+                    <td class="table-cell-spacing" [style.width.px]="250" style="white-space: normal; word-wrap: break-word;">
+                      {{ course?.creator }}
+                    </td>
+                    <td class="table-cell-spacing" [style.width.px]="150" style="white-space: normal; word-wrap: break-word;">
+                      <ng-container *ngFor="let language of course?.language; let last = last">
+                        {{ language }}<span *ngIf="course?.language?.length > 1 && !last">,</span>
+                      </ng-container>
+                    </td>
+                  </ng-container>
+
+                  <td class="table-cell-spacing" [style.width.px]="200" style="white-space: normal; word-wrap: break-word;">
+                    {{ course?.createdOn | date: 'MMM dd, yyyy' }}
+                  </td>
+                  <td class="table-cell-spacing" [style.width.px]="200" style="white-space: normal; word-wrap: break-word;">
+                    {{ course?.lastUpdatedOn | date: 'MMM dd, yyyy' }}
+                  </td>
+                  <ng-container>
+                    <td class="table-cell-spacing">
+                      <ng-container *ngIf="course?.status !== 'Retired'">
+                        <mat-icon class="cursor-pointer">visibility</mat-icon>
+                      </ng-container>
+                    </td>
+                  </ng-container>
+                </tr>
+              </ng-container>
+            </table>
+          </div>
+        </td>
+      </ng-container>
 
       <!-- Content Name column -->
       <ng-container matColumnDef="contentName">
@@ -70,14 +142,14 @@
 
       <!-- Created By column -->
       <ng-container matColumnDef="createdBy">
-        <th mat-header-cell *matHeaderCellDef [style.width.px]="300">Created By</th>
-        <td mat-cell *matCellDef="let row" [style.width.px]="300">{{ row.createdBy }}</td>
+        <th mat-header-cell *matHeaderCellDef [style.width.px]="250">Created By</th>
+        <td mat-cell *matCellDef="let row" [style.width.px]="250">{{ row.createdBy }}</td>
       </ng-container>
 
       <!-- Language column -->
       <ng-container matColumnDef="language">
-        <th mat-header-cell *matHeaderCellDef [style.width.px]="250">Language</th>
-        <td mat-cell *matCellDef="let row" [style.width.px]="200">
+        <th mat-header-cell *matHeaderCellDef [style.width.px]="150">Language</th>
+        <td mat-cell *matCellDef="let row" [style.width.px]="150">
           <ng-container *ngFor="let language of row?.language; let last = last">
             {{language}} <span *ngIf="row?.language?.length > 1 && !last">,</span>
           </ng-container>
@@ -90,13 +162,13 @@
 
       <!-- Created On column -->
       <ng-container matColumnDef="createdOn">
-        <th mat-header-cell *matHeaderCellDef>Created On</th>
+        <th mat-header-cell *matHeaderCellDef [style.width.px]="200">Created On</th>
         <td mat-cell *matCellDef="let row">{{ row.createdOn | date:'MMM dd, yyyy' }}</td>
       </ng-container>
 
       <!-- Last Submitted On column -->
       <ng-container matColumnDef="lastSubmittedOn">
-        <th mat-header-cell *matHeaderCellDef>Last Submitted On</th>
+        <th mat-header-cell *matHeaderCellDef [style.width.px]="200">Last Submitted On</th>
         <td mat-cell *matCellDef="let row">{{ row.lastSubmittedOn | date:'MMM dd, yyyy' }}</td>
       </ng-container>
 
@@ -111,9 +183,13 @@
       </ng-container>
 
       <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-      <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="element-row new-row" [ngClass]="{'':expandedElement === row}"
+        (click)="expandedElement = expandedElement === element ? null : element"
+        (keyup)="expandedElement = expandedElement === element ? null : element">
+      </tr>
+      <tr mat-row *matRowDef="let row; columns: ['expandedDetail']" class="detail-row" [ngClass]="{'subtable-row':expandedElement === row}"
+        [@detailExpand]="expandedElement == expandedElement ? 'expanded' : 'collapsed'"></tr>
     </table>
-
     <mat-paginator [length]="length" [pageSize]="pageSize" [pageIndex]="pageIndex" [pageSizeOptions]="pageSizeOptions" (page)="onPageChange($event)"
       showFirstLastButtons>
     </mat-paginator>

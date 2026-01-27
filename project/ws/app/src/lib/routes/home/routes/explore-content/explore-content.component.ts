@@ -3,11 +3,20 @@ import { MatTableDataSource } from '@angular/material/table'
 import { MatLegacyPaginator as MatPaginator } from '@angular/material/legacy-paginator'
 import { PageEvent } from '@angular/material/paginator'
 import { ExploreContentService } from '../../services/explore-content.service'
+import { animate, state, style, transition, trigger } from '@angular/animations'
 
 @Component({
   selector: 'ws-app-explore-content',
   templateUrl: './explore-content.component.html',
   styleUrls: ['./explore-content.component.scss'],
+  animations: [
+    trigger('detailExpand', [
+      state('collapsed, void', style({ height: '0px', minHeight: '0' })), // Removed display: 'none'
+      state('expanded', style({ height: '*' })),
+      transition('expanded <=> collapsed', animate('225ms cubic-bezier(0.4, 0.0, 0.2, 1)')),
+      transition('expanded <=> void', animate('225ms cubic-bezier(0.4, 0.0, 0.2, 1)')),
+    ]),
+  ],
 })
 export class ExploreContentComponent implements OnInit {
   displayedColumns: string[] = [
@@ -31,6 +40,7 @@ export class ExploreContentComponent implements OnInit {
   pageSizeOptions: number[] = [10, 25, 50]
   expandedElement: any = null
   multilingualCourses: any[] = []
+  currentTab: 'live' | 'draft' | 'retired' = 'live'
 
   @ViewChild(MatPaginator, { static: true }) paginator!: MatPaginator
 
@@ -168,30 +178,31 @@ export class ExploreContentComponent implements OnInit {
     return ''
   }
 
+  takeAction(action: 'overview' | 'edit', course: any): void {
+    // Placeholder for navigation; wire to router when ready
+    console.log('Take action', action, 'for course', course)
+  }
+
+  changeToDefaultImg(event: Event): void {
+    const target = event.target as HTMLImageElement
+    target.src = '/assets/common/mdo-assets/images/content-thumbnail-placeholder.svg'
+  }
+
+  getPendingStatus(element: any): string {
+    return element?.contentRetiredStatus || ''
+  }
+
   getMultiLanguageCourses(element: any): void {
     const searchData = {
       locale: ['en'],
       request: {
-        limit: this.pageSize,
-        offset: this.pageIndex * this.pageSize,
-        query: this.searchQuery || '',
+        limit: 10,
+        offset: 0,
+        query: '',
         facets: ['courseCategory', 'resourceCategory'],
         filters: {
           identifier: this.getLanguageIds(element.languageMapV1 || {}),
-          must: {
-            courseCategory: [
-              'Course',
-              'Program',
-              'Standalone Assessment',
-              'Curated Program',
-              'Blended Program',
-              'invite-only program',
-              'invite-only assessment',
-              'Case Study',
-              'Comprehensive Assessment Program',
-            ],
-          },
-          status: ['Live'],
+          status: ["Live"],
         },
         sort_by: {
           lastUpdatedOn: 'desc',
