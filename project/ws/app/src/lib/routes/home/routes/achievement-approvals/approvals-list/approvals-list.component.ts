@@ -144,13 +144,15 @@ export class ApprovalsListComponent implements OnInit {
   }
 
   approve(element: AchievementApproval): void {
-    console.log('Approving:', element)
-    this.action('approve')
+    if (element) {
+      this.action('approve')
+    }
   }
 
   reject(element: AchievementApproval): void {
-    console.log('Rejecting:', element)
-    this.action('reject')
+    if (element) {
+      this.action('reject')
+    }
   }
 
   action(type: 'approve' | 'reject'): void {
@@ -167,7 +169,6 @@ export class ApprovalsListComponent implements OnInit {
 
       dialogRef.afterClosed().subscribe((reason: string | undefined) => {
         if (reason) {
-          console.log('User provided rejection reason:', reason)
           // Integrate API call here to reject the achievement with this reason
         }
       })
@@ -185,19 +186,14 @@ export class ApprovalsListComponent implements OnInit {
       },
       autoFocus: false,
     })
-
-    console.log('Dialog opened for', type)
-
     dialogRef.afterClosed().subscribe((btnAction: any) => {
       if (btnAction) {
-        console.log('User confirmed approve action for:', this.selection.selected)
+        // Integrate API call here to approve the achievement
       }
     })
   }
 
   bulkApprove(): void {
-    console.log('Bulk approving:', this.selection.selected)
-    // Implement bulk approve logic
     const dialogRef = this.dialog.open(ConfirmationBoxComponent, {
       disableClose: true,
       data: {
@@ -212,7 +208,7 @@ export class ApprovalsListComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((btnAction: any) => {
       if (btnAction) {
-        console.log('User confirmed approve action for:', this.selection.selected)
+        // Integrate API call here to approve the achievement
       }
     })
   }
