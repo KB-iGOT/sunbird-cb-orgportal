@@ -1,4 +1,4 @@
-<div class="request-container">
+<div class="request-container mt-5">
   <h2>Content Request</h2>
   <mat-card class="mb-8">
     <mat-card-content class="flex gap-10">
@@ -24,7 +24,9 @@
       </div> -->
     </mat-card-content>
   </mat-card>
-  <div class="create-action">
+  <div class="create-action gap-4">
+    <button mat-button type="button" class="search-btn" [routerLink]="['/app/home/explore-content']">Explore Content
+    </button>
     <button mat-button type="button" class="search-btn" [routerLink]="['/app/home/create-request-form']">Request
       Content</button>
   </div>
@@ -110,8 +112,9 @@
                     <button mat-menu-item (click)="onClickMenu(element,'viewContent')">
                       <span>View</span>
                     </button>
-                    <button *ngIf="element?.status === statusKey.Unassigned && element?.status!== statusKey.Inprogress &&  element?.status!== statusKey.invalid " mat-menu-item
-                      (click)="onClickMenu(element,'invalidContent')">
+                    <button
+                      *ngIf="element?.status === statusKey.Unassigned && element?.status!== statusKey.Inprogress &&  element?.status!== statusKey.invalid "
+                      mat-menu-item (click)="onClickMenu(element,'invalidContent')">
                       <span>Mark as invalid</span>
                     </button>
                     <button mat-menu-item
@@ -119,7 +122,8 @@
                       (click)="onClickMenu(element,'assignContent')">
                       <span>Assign</span>
                     </button>
-                    <button *ngIf="element?.status === statusKey.Assigned && element?.status!== statusKey.Inprogress &&  element?.status!== statusKey.invalid && element?.status!==statusKey.fullfill "
+                    <button
+                      *ngIf="element?.status === statusKey.Assigned && element?.status!== statusKey.Inprogress &&  element?.status!== statusKey.invalid && element?.status!==statusKey.fullfill "
                       mat-menu-item (click)="onClickMenu(element,'reAssignContent')">
                       <span> Re-Assign</span>
                     </button>
@@ -154,8 +158,8 @@
 
         </div>
 
-        <mat-paginator *ngIf="dataSource?.filteredData?.length > 0" [pageSize]="pageSize" [length]="this.requestCount" [pageSizeOptions]="defaultPageSizeOptions"
-          (page)="onChangePage($event)"></mat-paginator>
+        <mat-paginator *ngIf="dataSource?.filteredData?.length > 0" [pageSize]="pageSize" [length]="this.requestCount"
+          [pageSizeOptions]="defaultPageSizeOptions" (page)="onChangePage($event)"></mat-paginator>
 
 
       </div>
