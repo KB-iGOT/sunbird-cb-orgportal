@@ -123,6 +123,10 @@ import { UserOnboardingComponent } from './routes/directory/user-onbarding/user-
 import { UserBulkTransferComponent } from './routes/directory/user-bulk-transfer/user-bulk-transfer.component'
 import { HorizontalDynamicStepperModule, UserUpdateModule } from '@sunbird-cb/consumption'
 import { OnboardingModule } from './routes/onboarding/onboarding.module'
+import { ExploreContentComponent } from './routes/explore-content/explore-content.component'
+import { ExploreContentService } from './services/explore-content.service'
+import { WsCustomTooltipDirective } from './directives/ws-auth-ws-custom-tooltip.directive'
+import { LangToolTipComponent } from './routes/lang-tool-tip/lang-tool-tip.component'
 
 @NgModule({
   declarations: [
@@ -188,7 +192,10 @@ import { OnboardingModule } from './routes/onboarding/onboarding.module'
     BulkUploadOrgComponent,
     UsersComponent,
     UserOnboardingComponent,
-    UserBulkTransferComponent
+    UserBulkTransferComponent,
+    ExploreContentComponent,
+    WsCustomTooltipDirective,
+    LangToolTipComponent,
   ],
   imports: [
     CommonModule,
@@ -262,6 +269,7 @@ import { OnboardingModule } from './routes/onboarding/onboarding.module'
     UploadService,
     TrainingPlanDashboardService,
     UsersService,
+    ExploreContentService,
     { provide: MAT_DATE_LOCALE, useValue: 'en-GB' },
     OrgHierarchyService
   ],

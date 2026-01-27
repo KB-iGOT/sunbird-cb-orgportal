@@ -1,0 +1,121 @@
+<div class="explore-container">
+  <div class="flex my-5 font-weight-600 text-24">
+    <span class="h-600-s-20-m color-87">All content</span>
+  </div>
+  <!-- Header search and filter -->
+  <div class="explore-toolbar">
+    <div class="search-wrapper">
+      <mat-icon class="search-icon">search</mat-icon>
+      <input class="search-input" type="text" placeholder="Type here to search..." [(ngModel)]="searchQuery" (input)="applySearch(searchQuery)" />
+      <button *ngIf="searchQuery" mat-icon-button class="clear-btn" (click)="clearSearch()" aria-label="Clear search">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+
+    <button mat-stroked-button color="primary" class="filter-btn">
+      <mat-icon>filter_list</mat-icon>
+      Filter
+    </button>
+  </div>
+
+  <!-- Content table -->
+  <div class="table-card mat-elevation-z1" *ngIf="dataSource?.data?.length > 0">
+    <table mat-table [dataSource]="dataSource" class="full-width">
+      <ng-container matColumnDef="expand">
+        <th mat-header-cell *matHeaderCellDef [style.width.px]="40"></th>
+        <td mat-cell *matCellDef="let row" [style.width.px]="40">
+          <a mat-icon-button class="cursor-pointer explore_link" *ngIf="getLanguageCount(row?.languageMapV1) > 0"
+            (click)="(expandedElement = expandedElement === row ? null : row); $event.stopPropagation(); getMultiLanguageCourses(row)">
+            <span *ngIf="expandedElement !== row"> <mat-icon class=" mat-icon1 mat-icon notranslate material-icons mat-icon-no-color v-middle">
+                keyboard_arrow_down</mat-icon>
+            </span>
+            <span *ngIf="expandedElement === row"> <mat-icon
+                class="mat-icon1 mat-icon notranslate material-icons mat-icon-no-color v-middle">keyboard_arrow_up
+              </mat-icon>
+            </span>
+          </a>
+        </td>
+      </ng-container>
+
+
+      <!-- Content Name column -->
+      <ng-container matColumnDef="contentName">
+        <th mat-header-cell *matHeaderCellDef [style.width.px]="600">Content Name</th>
+        <td mat-cell *matCellDef="let row" [style.width.px]="600">
+          <div class="content-cell pt-2 gap-4">
+            <div class="thumb-wrapper py-2">
+              <img class="thumb-img" [src]="row.thumbnail" [alt]="row.title" />
+              <span class="duration-chip">{{ row.duration }}</span>
+            </div>
+            <div class="content-meta pt-2">
+              <div class="title line-clamp-2 ">{{ row.title }}</div>
+              <div class="tag-chip mt-2">{{ row.tag }}</div>
+            </div>
+          </div>
+        </td>
+      </ng-container>
+
+      <!-- Status column -->
+      <ng-container matColumnDef="status">
+        <th mat-header-cell *matHeaderCellDef [style.width.px]="150">Status</th>
+        <td mat-cell *matCellDef="let row" [style.width.px]="150">
+          <div class="status-badge">
+            <span [ngClass]="{ 'live': row.status === 'Live'}">
+              {{ row.status }}
+            </span>
+          </div>
+
+        </td>
+      </ng-container>
+
+      <!-- Created By column -->
+      <ng-container matColumnDef="createdBy">
+        <th mat-header-cell *matHeaderCellDef [style.width.px]="300">Created By</th>
+        <td mat-cell *matCellDef="let row" [style.width.px]="300">{{ row.createdBy }}</td>
+      </ng-container>
+
+      <!-- Language column -->
+      <ng-container matColumnDef="language">
+        <th mat-header-cell *matHeaderCellDef [style.width.px]="250">Language</th>
+        <td mat-cell *matCellDef="let row" [style.width.px]="200">
+          <ng-container *ngFor="let language of row?.language; let last = last">
+            {{language}} <span *ngIf="row?.language?.length > 1 && !last">,</span>
+          </ng-container>
+          <ng-container *ngIf="getLanguageCount(row?.languageMapV1) > 0 && row?.courseCategory !== 'Multilingual Course'">
+            <span class="ml-1 language-count mat-body-2 cursor-pointer" [wsAuthWsCustomTooltip]="getFormattedLanguageNames(row?.languageMapV1)">
+              +{{getLanguageCount(row?.languageMapV1)}}</span>
+          </ng-container>
+        </td>
+      </ng-container>
+
+      <!-- Created On column -->
+      <ng-container matColumnDef="createdOn">
+        <th mat-header-cell *matHeaderCellDef>Created On</th>
+        <td mat-cell *matCellDef="let row">{{ row.createdOn | date:'MMM dd, yyyy' }}</td>
+      </ng-container>
+
+      <!-- Last Submitted On column -->
+      <ng-container matColumnDef="lastSubmittedOn">
+        <th mat-header-cell *matHeaderCellDef>Last Submitted On</th>
+        <td mat-cell *matCellDef="let row">{{ row.lastSubmittedOn | date:'MMM dd, yyyy' }}</td>
+      </ng-container>
+
+      <!-- Actions column with visibility icon -->
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef class="actions-header">Actions</th>
+        <td mat-cell *matCellDef="let row" class="actions-cell">
+          <button mat-icon-button color="primary" aria-label="View content" (click)="viewContent(row)">
+            <mat-icon>visibility</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+    </table>
+
+    <mat-paginator [length]="length" [pageSize]="pageSize" [pageIndex]="pageIndex" [pageSizeOptions]="pageSizeOptions" (page)="onPageChange($event)"
+      showFirstLastButtons>
+    </mat-paginator>
+  </div>
+</div>
