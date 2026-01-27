@@ -48,7 +48,9 @@ export class BreadcrumbComponent implements OnInit {
 
   cancel() {
     this.tpdsSvc.trainingPlanTitle = ''
-    this.router.navigateByUrl('app/home/training-plan-dashboard')
+    setTimeout(() => {
+      this.router.navigateByUrl('app/home/training-plan-dashboard')
+    }, 500)
   }
 
   nextStep() {
@@ -267,8 +269,8 @@ export class BreadcrumbComponent implements OnInit {
     }
     const obj: any = { request: { ...this.tpdsSvc.trainingPlanStepperData, id: this.activeRoute.snapshot.data['contentData'].id } }
     if (obj.request.status && obj.request.status.toLowerCase() === 'live') {
-      delete obj.request.contentList
-      delete obj.request.contentType
+      //delete obj.request.contentList
+      //delete obj.request.contentType
       delete obj.request.assignmentType
     }
     delete obj.request.status
@@ -305,10 +307,10 @@ export class BreadcrumbComponent implements OnInit {
     }
     const obj = this.generateRequestPayload(this.tpdsSvc.trainingPlanStepperData, 'update')
     if (obj.request.status && obj.request.status.toLowerCase() === 'live') {
-      delete obj.request.contentList
-      delete obj.request.contentType
+      //delete obj.request.contentList
+      //delete obj.request.contentType
       delete obj.request.assignmentType
-      delete obj.request.orgIdList
+      //delete obj.request.orgIdList
     }
     delete obj.request.status
     this.showDialogBox('progress')
@@ -415,7 +417,7 @@ export class BreadcrumbComponent implements OnInit {
           data: {
             type: 'conformation',
             icon: 'radio_on',
-            title: 'Are you sure you want to update and publish the plan?',
+            title: "Editing the course list may impact learners who have already accessed this training plan. Removing or modifying a course could change their learning experience. Please confirm before proceeding. Are you sure you want to update and publish the plan?",
             // subTitle: 'You wont be able to revert this',
             primaryAction: 'Confirm',
             secondaryAction: 'Cancel',
