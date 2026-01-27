@@ -60,6 +60,22 @@ table {
    tr.detail-row {
     height: 0;
   }
+  .element-row td {
+    border-bottom-width: 0;
+    /* stylelint-disable */
+    font: normal 14px Lato !important;
+    /* stylelint-enable */
+    font-weight: 400 !important;
+  }
+
+  .new-row {
+    height: 58px !important;
+  }
+
+  .element-detail {
+    overflow: hidden;
+    // display: flex;
+  }
 }
 
 th.mat-header-cell {
