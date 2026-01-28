@@ -4,6 +4,7 @@ import { MatLegacyPaginator as MatPaginator } from '@angular/material/legacy-pag
 import { PageEvent } from '@angular/material/paginator'
 import { ExploreContentService } from '../../services/explore-content.service'
 import { animate, state, style, transition, trigger } from '@angular/animations'
+import { Router } from '@angular/router'
 
 @Component({
   selector: 'ws-app-explore-content',
@@ -44,7 +45,9 @@ export class ExploreContentComponent implements OnInit {
 
   @ViewChild(MatPaginator, { static: true }) paginator!: MatPaginator
 
-  constructor(readonly exploreContentService: ExploreContentService,
+  constructor(
+    readonly exploreContentService: ExploreContentService,
+    private router: Router,
   ) {
   }
 
@@ -64,9 +67,17 @@ export class ExploreContentComponent implements OnInit {
   }
 
   viewContent(row: any): void {
-    // Placeholder for navigation / preview action
-    // Implement routing to content detail when backend is ready
-    console.log('View content clicked', row)
+    if (!row || !row.identifier) {
+      console.warn('Cannot navigate to preview: missing identifier on row', row)
+      return
+    }
+    this.router.navigate([
+      'app',
+      'home',
+      'explore-content',
+      row.identifier,
+      'preview',
+    ])
   }
 
   onPageChange(event: PageEvent): void {
@@ -112,7 +123,7 @@ export class ExploreContentComponent implements OnInit {
         const contents = result.content || []
         this.length = typeof result.count === 'number' ? result.count : contents.length
         if (contents.length) {
-          this.processContentResponse(contents)
+          this.dataSource.data = contents
         } else {
           this.dataSource.data = []
         }
@@ -123,25 +134,6 @@ export class ExploreContentComponent implements OnInit {
         this.length = 0
       }
     )
-  }
-
-  processContentResponse(contents: any[]): void {
-    const contentRows: any[] = contents.map(content => {
-      return {
-        thumbnail: content.posterImage,
-        title: content.name,
-        tag: content.courseCategory || 'N/A',
-        duration: content.duration ? this.formatDuration(content.duration) : 'N/A',
-        createdBy: content.creator || 'Unknown',
-        language: content.language || [],
-        createdOn: content.createdOn ? new Date(content.createdOn).toLocaleDateString() : 'N/A',
-        status: content.status || 'N/A',
-        languageMapV1: content.languageMapV1 || {},
-        courseCategory: content.courseCategory || '',
-        lastSubmittedOn: content.lastSubmittedOn ? new Date(content.lastSubmittedOn).toLocaleDateString() : 'N/A',
-      }
-    })
-    this.dataSource.data = contentRows
   }
 
   formatDuration(durationInSeconds: number): string {

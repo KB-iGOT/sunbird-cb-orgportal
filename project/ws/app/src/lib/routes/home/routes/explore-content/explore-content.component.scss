@@ -150,6 +150,10 @@ td.mat-cell {
   text-underline-position: from-font;
   text-decoration-skip-ink: none;
 }
+
+.title {
+  font-weight: 700;
+}
  .line-clamp-2 {
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -313,21 +317,23 @@ tr.detail-row {
       border: 1px solid #00000014;
     }
 
-    .time-badge {
-      position: absolute;
-      bottom: 12px;
-      right: 4px;
-      background: #000000DE;
-      color: white;
-      font-size: 12px;
-      border-radius: 4px;
 
-      mat-icon {
-        font-size: 12px;
-        color: #fff;
-        width: 13.33px;
-        height: 13.33px;
-      }
+  }
+
+  .time-badge {
+    position: absolute;
+    bottom: 12px;
+    right: 4px;
+    background: #000000DE;
+    color: white;
+    font-size: 12px;
+    border-radius: 4px;
+
+    mat-icon {
+      font-size: 13px;
+      color: #fff;
+      width: 13.33px;
+      height: 11.33px;
     }
   }
 

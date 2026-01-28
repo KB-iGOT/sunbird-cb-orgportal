@@ -127,6 +127,7 @@ import { ExploreContentComponent } from './routes/explore-content/explore-conten
 import { ExploreContentService } from './services/explore-content.service'
 import { WsCustomTooltipDirective } from './directives/ws-auth-ws-custom-tooltip.directive'
 import { LangToolTipComponent } from './routes/lang-tool-tip/lang-tool-tip.component'
+import { PreviewComponent } from './routes/explore-content/preview/preview.component'
 
 @NgModule({
   declarations: [
@@ -196,6 +197,7 @@ import { LangToolTipComponent } from './routes/lang-tool-tip/lang-tool-tip.compo
     ExploreContentComponent,
     WsCustomTooltipDirective,
     LangToolTipComponent,
+    PreviewComponent,
   ],
   imports: [
     CommonModule,
