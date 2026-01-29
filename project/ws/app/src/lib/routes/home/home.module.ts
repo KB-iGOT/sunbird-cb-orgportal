@@ -91,7 +91,7 @@ import { CreateRequestFormComponent } from './components/request-list/create-req
 import { CompetencyViewComponent } from './components/request-list/competency-view/competency-view.component'
 import { AssignListPopupComponent } from './components/request-list/assign-list-popup/assign-list-popup.component'
 import { SingleAssignPopupComponent } from './components/request-list/single-assign-popup/single-assign-popup.component'
-import { HttpClientModule } from '@angular/common/http'
+import { HttpClient, HttpClientModule } from '@angular/common/http'
 import { DesignationModule } from './routes/designation/designation.module'
 import { OdcsMappingComponent } from './routes/odcs-mapping/odcs-mapping.component'
 import { environment } from '../../../../../../../src/environments/environment'
@@ -104,7 +104,7 @@ import { GroupsGradeComponent } from './components/groups-grade/groups-grade.com
 import { MAT_DATE_LOCALE } from '@angular/material/core'
 import { MyNotificationsComponent } from './routes/my-notifications/my-notifications.component'
 import { AllNotificationsModule } from '@sunbird-cb/notification'
-import { TranslateModule } from '@ngx-translate/core'
+import { TranslateLoader, TranslateModule } from '@ngx-translate/core'
 import { CreateUserComponent } from './routes/directory/create-user/create-user.component'
 import { DirectoryComponent } from './routes/directory/directory.component'
 import { DirectoryTableComponent } from './components/directory-table/directory-table.component'
@@ -128,7 +128,11 @@ import { ExploreContentService } from './services/explore-content.service'
 import { WsCustomTooltipDirective } from './directives/ws-auth-ws-custom-tooltip.directive'
 import { LangToolTipComponent } from './routes/lang-tool-tip/lang-tool-tip.component'
 import { PreviewComponent } from './routes/explore-content/preview/preview.component'
-
+import { AppTocLibModule } from '@sunbird-cb/toc'
+import { TranslateHttpLoader } from '@ngx-translate/http-loader'
+export function HttpLoaderFactory(http: HttpClient) {
+  return new TranslateHttpLoader(http)
+}
 @NgModule({
   declarations: [
     HomeComponent,
@@ -261,7 +265,15 @@ import { PreviewComponent } from './routes/explore-content/preview/preview.compo
     TreeHierarchyModule,
     UserUpdateModule,
     OnboardingModule,
-    HorizontalDynamicStepperModule
+    HorizontalDynamicStepperModule,
+    AppTocLibModule,
+    TranslateModule.forRoot({
+      loader: {
+        provide: TranslateLoader,
+        useFactory: HttpLoaderFactory,
+        deps: [HttpClient],
+      },
+    }),
   ],
   providers: [
     { provide: 'environment', useValue: environment },

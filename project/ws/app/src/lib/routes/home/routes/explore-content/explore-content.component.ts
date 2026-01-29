@@ -5,6 +5,7 @@ import { PageEvent } from '@angular/material/paginator'
 import { ExploreContentService } from '../../services/explore-content.service'
 import { animate, state, style, transition, trigger } from '@angular/animations'
 import { Router } from '@angular/router'
+import { LoaderService } from '../../../../../../../../../src/app/services/loader.service'
 
 @Component({
   selector: 'ws-app-explore-content',
@@ -48,6 +49,7 @@ export class ExploreContentComponent implements OnInit {
   constructor(
     readonly exploreContentService: ExploreContentService,
     private router: Router,
+    private loaderService: LoaderService,
   ) {
   }
 
@@ -87,6 +89,7 @@ export class ExploreContentComponent implements OnInit {
   }
 
   private loadContent(): void {
+    this.loaderService.changeLoaderState(true)
     const requestBody = {
       locale: ['en'],
       request: {
@@ -124,14 +127,17 @@ export class ExploreContentComponent implements OnInit {
         this.length = typeof result.count === 'number' ? result.count : contents.length
         if (contents.length) {
           this.dataSource.data = contents
+          this.loaderService.changeLoaderState(false)
         } else {
           this.dataSource.data = []
+          this.loaderService.changeLoaderState(false)
         }
       },
       error => {
         console.error('Error fetching explore content', error)
         this.dataSource.data = []
         this.length = 0
+        this.loaderService.changeLoaderState(false)
       }
     )
   }
@@ -201,6 +207,7 @@ export class ExploreContentComponent implements OnInit {
         },
       },
     }
+    this.loaderService.changeLoaderState(true)
     const observable = this.exploreContentService.getAllContent(searchData)
     observable.subscribe(
       async data => {
@@ -209,6 +216,7 @@ export class ExploreContentComponent implements OnInit {
         } else {
           this.multilingualCourses = []
         }
+        this.loaderService.changeLoaderState(false)
       })
   }
 

@@ -45,7 +45,7 @@
                   <td class="mat-subheading-2" [style.width.px]="30"></td>
                   <td class="mat-subheading-2" [style.width.px]="600">
                     <div class="content-cell pt-2 gap-4">
-                      <div class="thumb-wrapper relative py-2">
+                      <div class="thumb-wrapper relative py-2 cursor-pointer" (click)="viewContent(course)" (keyup)="viewContent(course)">
                         <img class="thumb-img" [src]="course.posterImage" [alt]="course.name" />
                         <span class="time-badge flex flex-middle px-1"
                           *ngIf="course.primaryCategory !== 'Blended Program' && course.duration  && course?.duration !== '0'">
@@ -126,7 +126,7 @@
         <th mat-header-cell *matHeaderCellDef [style.width.px]="600">Content Name</th>
         <td mat-cell *matCellDef="let row" [style.width.px]="600">
           <div class="content-cell pt-2 gap-4">
-            <div class="thumb-wrapper relative py-2">
+            <div class="thumb-wrapper relative py-2 cursor-pointer" (click)="viewContent(row)" (keyup)="viewContent(row)">
               <img class="thumb-img" [src]="row.posterImage" [alt]="row.name" />
               <span class="time-badge flex flex-middle px-1"
                 *ngIf="row.primaryCategory !== 'Blended Program' && row.duration  && row?.duration !== '0'">
