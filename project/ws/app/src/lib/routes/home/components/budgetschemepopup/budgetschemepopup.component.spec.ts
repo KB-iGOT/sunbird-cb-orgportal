@@ -1,7 +1,7 @@
 import { BudgetschemepopupComponent } from './budgetschemepopup.component'
-import { MatLegacyDialogRef as MatDialogRef } from '@angular/material/legacy-dialog'
-jest.mock('@angular/material/legacy-dialog', () => ({
-  MatLegacyDialogRef: jest.fn().mockImplementation(() => ({
+import { MatDialogRef } from '@angular/material/dialog'
+jest.mock('@angular/material/dialog', () => ({
+  MatDialogRef: jest.fn().mockImplementation(() => ({
     close: jest.fn(),
   })),
 }))

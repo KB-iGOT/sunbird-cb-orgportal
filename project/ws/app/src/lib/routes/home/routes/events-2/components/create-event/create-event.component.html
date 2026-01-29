@@ -40,7 +40,7 @@
     </div>
   </div>
 
-  <mat-stepper labelPosition="bottom" [selectedIndex]="currentStepperIndex"
+  <mat-stepper [displayDefaultIndicatorType]="false" labelPosition="bottom" [selectedIndex]="currentStepperIndex"
     (selectionChange)="onSelectionChange($event)" class="mx-10" #stepper><!-- add [linear]="true" -->
     <mat-step label="Basic Details">
       <ng-template matStepLabel>Basic Details</ng-template>

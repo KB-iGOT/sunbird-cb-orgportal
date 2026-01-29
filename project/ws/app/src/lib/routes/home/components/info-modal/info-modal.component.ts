@@ -1,15 +1,16 @@
 import { Component, Inject } from '@angular/core'
-import { MAT_LEGACY_DIALOG_DATA, MatLegacyDialogRef } from '@angular/material/legacy-dialog'
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog'
 
 @Component({
-  selector: 'ws-app-info-modal',
-  templateUrl: './info-modal.component.html',
-  styleUrls: ['./info-modal.component.scss']
+    selector: 'ws-app-info-modal',
+    templateUrl: './info-modal.component.html',
+    styleUrls: ['./info-modal.component.scss'],
+    standalone: false
 })
 export class InfoModalComponent {
   constructor(
-    public dialogRef: MatLegacyDialogRef<InfoModalComponent>,
-    @Inject(MAT_LEGACY_DIALOG_DATA) public data: any) { }
+    public dialogRef: MatDialogRef<InfoModalComponent>,
+    @Inject(MAT_DIALOG_DATA) public data: any) { }
 
 
   confirmed() {

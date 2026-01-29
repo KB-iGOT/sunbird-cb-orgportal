@@ -1,9 +1,9 @@
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, SimpleChanges } from '@angular/core'
 import { FormControl } from '@angular/forms'
-import { MatLegacyDialog } from '@angular/material/legacy-dialog'
+import { MatDialog } from '@angular/material/dialog'
 import { forkJoin, of, Subscription } from 'rxjs'
 import { LoaderService } from '../../../../../../../../../../src/app/services/loader.service'
-import { MatLegacySnackBar } from '@angular/material/legacy-snack-bar'
+import { MatSnackBar } from '@angular/material/snack-bar'
 import { DatePipe } from '@angular/common'
 import { ActivatedRoute, Router } from '@angular/router'
 import { DirectoryService } from '../../../services/directory.service'
@@ -16,9 +16,10 @@ import { ConformationPopupComponent } from '../../designation/dialog-boxes/confo
 import { ConfigurationsService } from '@sunbird-cb/utils-v2'
 
 @Component({
-  selector: 'ws-app-import-designation',
-  templateUrl: './import-designation.component.html',
-  styleUrls: ['./import-designation.component.scss']
+    selector: 'ws-app-import-designation',
+    templateUrl: './import-designation.component.html',
+    styleUrls: ['./import-designation.component.scss'],
+    standalone: false
 })
 export class ImportDesignationComponent implements OnInit, OnDestroy {
   @Output() closeComponent: EventEmitter<boolean> = new EventEmitter<boolean>();
@@ -47,9 +48,9 @@ export class ImportDesignationComponent implements OnInit, OnDestroy {
 
   constructor(
     private directoryService: DirectoryService,
-    private dialog: MatLegacyDialog,
+    private dialog: MatDialog,
     private loaderService: LoaderService,
-    private snackBar: MatLegacySnackBar,
+    private snackBar: MatSnackBar,
     private datePipe: DatePipe,
     private activateRoute: ActivatedRoute,
     private router: Router,

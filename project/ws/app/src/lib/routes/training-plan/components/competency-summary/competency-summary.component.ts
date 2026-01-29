@@ -4,9 +4,10 @@ import { environment } from '../../../../../../../../../src/environments/environ
 import { InitService } from '../../../../../../../../../src/app/services/init.service'
 
 @Component({
-  selector: 'ws-app-competency-summary',
-  templateUrl: './competency-summary.component.html',
-  styleUrls: ['./competency-summary.component.scss'],
+    selector: 'ws-app-competency-summary',
+    templateUrl: './competency-summary.component.html',
+    styleUrls: ['./competency-summary.component.scss'],
+    standalone: false
 })
 export class CompetencySummaryComponent implements OnInit, OnChanges {
   @Input() contentData: any

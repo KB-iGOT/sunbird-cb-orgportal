@@ -4,9 +4,10 @@ import { ActivatedRoute } from '@angular/router'
 import { TrainingPlanDataSharingService } from '../../services/training-plan-data-share.service'
 import { NsAccessControlConfig } from '@sunbird-cb/access-settings'
 @Component({
-  selector: 'ws-app-stepper',
-  templateUrl: './stepper.component.html',
-  styleUrls: ['./stepper.component.scss'],
+    selector: 'ws-app-stepper',
+    templateUrl: './stepper.component.html',
+    styleUrls: ['./stepper.component.scss'],
+    standalone: false
 })
 export class StepperComponent implements OnInit, OnChanges, AfterViewInit {
 

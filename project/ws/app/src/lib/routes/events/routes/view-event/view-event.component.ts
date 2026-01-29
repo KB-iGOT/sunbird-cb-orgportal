@@ -6,9 +6,10 @@ import moment from 'moment'
 import { TelemetryEvents } from '../../../../head/_services/telemetry.event.model'
 
 @Component({
-  selector: 'ws-app-view-event',
-  templateUrl: './view-event.component.html',
-  styleUrls: ['./view-event.component.scss'],
+    selector: 'ws-app-view-event',
+    templateUrl: './view-event.component.html',
+    styleUrls: ['./view-event.component.scss'],
+    standalone: false
 })
 export class ViewEventComponent implements OnInit, AfterViewInit {
   tabsData!: any[]

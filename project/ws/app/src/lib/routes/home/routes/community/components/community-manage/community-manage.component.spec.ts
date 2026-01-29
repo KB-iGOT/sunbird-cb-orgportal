@@ -1,15 +1,15 @@
 import { CommunityManageComponent } from './community-manage.component'
-import { MatLegacyDialog } from '@angular/material/legacy-dialog'
+import { MatDialog } from '@angular/material/dialog'
 import { CommunityService } from '../../services/community.service'
 // import { ActivatedRoute } from '@angular/router'
-import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar'
+import { MatSnackBar } from '@angular/material/snack-bar'
 import { of, throwError } from 'rxjs'
 import { ReportIssueComponent } from '../report-issue/report-issue.component'
 import { DialogConfirmComponent } from '../../../../../../../../../../../src/app/component/dialog-confirm/dialog-confirm.component'
 
 describe('CommunityManageComponent', () => {
   let component: CommunityManageComponent
-  let mockMatDialog: jest.Mocked<MatLegacyDialog>
+  let mockMatDialog: jest.Mocked<MatDialog>
   let mockCommunityService: jest.Mocked<CommunityService>
   let mockActivatedRoute: any
   let mockSnackBar: jest.Mocked<MatSnackBar>
@@ -43,7 +43,7 @@ describe('CommunityManageComponent', () => {
       open: jest.fn().mockReturnValue({
         afterClosed: jest.fn().mockReturnValue(of(true))
       })
-    } as unknown as jest.Mocked<MatLegacyDialog>
+    } as unknown as jest.Mocked<MatDialog>
 
     mockCommunityService = {
       getAllReportedDiscussion: jest.fn().mockReturnValue(of(mockReportedDiscussionResponse)),

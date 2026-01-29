@@ -13,9 +13,10 @@ interface TabDetails {
 }
 
 @Component({
-  selector: 'ws-app-organisation-users',
-  templateUrl: './organisation-users.component.html',
-  styleUrls: ['./organisation-users.component.scss']
+    selector: 'ws-app-organisation-users',
+    templateUrl: './organisation-users.component.html',
+    styleUrls: ['./organisation-users.component.scss'],
+    standalone: false
 })
 export class OrganisationUsersComponent implements OnInit {
   selectedTabIndex = 0;

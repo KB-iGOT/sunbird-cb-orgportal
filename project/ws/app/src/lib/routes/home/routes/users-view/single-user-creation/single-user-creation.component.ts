@@ -2,10 +2,10 @@ import { AfterViewInit, Component, ElementRef, EventEmitter, Input, OnDestroy, O
 import { UntypedFormBuilder, UntypedFormControl, Validators } from '@angular/forms'
 import { MomentDateAdapter } from '@angular/material-moment-adapter'
 import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE } from '@angular/material/core'
-import { MatLegacyCheckboxChange as MatCheckboxChange } from '@angular/material/legacy-checkbox'
-import { MatLegacyChipInputEvent as MatChipInputEvent } from '@angular/material/legacy-chips'
-import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar'
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog'
+import { MatCheckboxChange } from '@angular/material/checkbox'
+import { MatChipInputEvent } from '@angular/material/chips'
+import { MatSnackBar } from '@angular/material/snack-bar'
+import { MatDialog } from '@angular/material/dialog'
 import { HttpErrorResponse } from '@angular/common/http'
 import { COMMA, ENTER } from '@angular/cdk/keycodes'
 import { Subject } from 'rxjs'
@@ -36,13 +36,14 @@ const MOBILE_PATTERN = /^[0]?[6789]\d{9}$/
 const PIN_CODE_PATTERN = /^[1-9][0-9]{5}$/
 
 @Component({
-  selector: 'ws-single-user-creation',
-  templateUrl: './single-user-creation.component.html',
-  styleUrls: ['./single-user-creation.component.scss'],
-  providers: [
-    { provide: DateAdapter, useClass: MomentDateAdapter, deps: [MAT_DATE_LOCALE] },
-    { provide: MAT_DATE_FORMATS, useValue: MY_FORMATS },
-  ],
+    selector: 'ws-single-user-creation',
+    templateUrl: './single-user-creation.component.html',
+    styleUrls: ['./single-user-creation.component.scss'],
+    providers: [
+        { provide: DateAdapter, useClass: MomentDateAdapter, deps: [MAT_DATE_LOCALE] },
+        { provide: MAT_DATE_FORMATS, useValue: MY_FORMATS },
+    ],
+    standalone: false
 })
 export class SingleUserCreationComponent implements OnInit, AfterViewInit, OnDestroy {
 

@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit, SimpleChanges } from '@angular/core'
-import { ITableData } from '@sunbird-cb/collection/lib/ui-org-table/interface/interfaces'
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog'
-import { MatLegacyPaginator as MatPaginator } from '@angular/material/legacy-paginator'
+import { ITableData } from '@sunbird-cb/collection'
+import { MatDialog } from '@angular/material/dialog'
+import { MatPaginator } from '@angular/material/paginator'
 import { Router, ActivatedRoute } from '@angular/router'
 import { ExportAsService, ExportAsConfig } from 'ngx-export-as'
 /* tslint:disable */
@@ -16,6 +16,7 @@ import { TelemetryEvents } from '../../../../head/_services/telemetry.event.mode
   selector: 'ws-app-workallocation',
   templateUrl: './workallocation.component.html',
   styleUrls: ['./workallocation.component.scss'],
+  standalone: false
 })
 export class WorkallocationComponent implements OnInit, OnDestroy {
   currentFilter = 'Draft'

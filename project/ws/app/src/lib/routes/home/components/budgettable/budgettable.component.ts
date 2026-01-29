@@ -1,23 +1,24 @@
 import { Component, OnInit, OnChanges, Input, Output, ViewChild, SimpleChanges, EventEmitter } from '@angular/core'
 import { SelectionModel } from '@angular/cdk/collections'
-import { MatLegacyTableDataSource as MatTableDataSource } from '@angular/material/legacy-table'
-import { MatLegacyPaginator as MatPaginator } from '@angular/material/legacy-paginator'
+import { MatTableDataSource } from '@angular/material/table'
+import { MatPaginator } from '@angular/material/paginator'
 import { MatSort } from '@angular/material/sort'
 import { IColums } from '../../interface/interfaces'
 import * as _ from 'lodash'
 
 @Component({
-  selector: 'ws-app-budgettable',
-  templateUrl: './budgettable.component.html',
-  styleUrls: ['./budgettable.component.scss'],
+    selector: 'ws-app-budgettable',
+    templateUrl: './budgettable.component.html',
+    styleUrls: ['./budgettable.component.scss'],
+    standalone: false
 })
 export class BudgettableComponent implements OnInit, OnChanges {
   @Input() type: any
   @Input() data!: {
-    srnumber: number;
-    filename: string;
-    filesize: string;
-    uploadedon: string;
+    srnumber: number
+    filename: string
+    filesize: string
+    uploadedon: string
   }[]
   @Input() tableData: any = []
   // tslint:disable-next-line:no-output-on-prefix

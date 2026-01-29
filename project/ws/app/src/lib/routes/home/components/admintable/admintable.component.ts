@@ -1,9 +1,9 @@
 import { Component, OnInit, OnChanges, ViewChild, SimpleChanges, Input } from '@angular/core'
 import { SelectionModel } from '@angular/cdk/collections'
-import { MatLegacyTableDataSource as MatTableDataSource } from '@angular/material/legacy-table'
-import { MatLegacyDialogConfig as MatDialogConfig, MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog'
-import { MatLegacyPaginator as MatPaginator } from '@angular/material/legacy-paginator'
-import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar'
+import { MatTableDataSource } from '@angular/material/table'
+import { MatDialogConfig as MatDialogConfig, MatDialog } from '@angular/material/dialog'
+import { MatPaginator } from '@angular/material/paginator'
+import { MatSnackBar } from '@angular/material/snack-bar'
 import { MatSort } from '@angular/material/sort'
 import { IColums, ITableData } from '../../interface/interfaces'
 import * as _ from 'lodash'
@@ -14,9 +14,10 @@ import { Router } from '@angular/router'
 import { ProfileV2UtillService } from '../../services/home-utill.service'
 
 @Component({
-  selector: 'ws-app-admintable',
-  templateUrl: './admintable.component.html',
-  styleUrls: ['./admintable.component.scss'],
+    selector: 'ws-app-admintable',
+    templateUrl: './admintable.component.html',
+    styleUrls: ['./admintable.component.scss'],
+    standalone: false
 })
 export class AdmintableComponent implements OnInit, OnChanges {
   tableData: ITableData = {
@@ -53,8 +54,8 @@ export class AdmintableComponent implements OnInit, OnChanges {
   }
 
   constructor(public dialog: MatDialog, private snackBar: MatSnackBar,
-              private mdoinfoSrvc: MdoInfoService, private router: Router,
-              private profileUtilSvc: ProfileV2UtillService) {
+    private mdoinfoSrvc: MdoInfoService, private router: Router,
+    private profileUtilSvc: ProfileV2UtillService) {
     this.dataSource = new MatTableDataSource<any>()
     this.dataSource.paginator = this.paginator
 

@@ -6,10 +6,11 @@ import { UntypedFormControl } from '@angular/forms'
 import { TrainingPlanService } from '../../../training-plan/services/traininig-plan.service'
 import { UsersService } from '../../../users/services/users.service'
 @Component({
-  selector: 'ws-app-filter',
-  templateUrl: './filter.component.html',
-  styleUrls: ['./filter.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'ws-app-filter',
+    templateUrl: './filter.component.html',
+    styleUrls: ['./filter.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class FilterComponent implements OnInit, AfterContentChecked {
   @Output() toggleFilter = new EventEmitter()

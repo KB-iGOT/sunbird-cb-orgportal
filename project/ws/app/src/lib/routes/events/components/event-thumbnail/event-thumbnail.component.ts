@@ -1,10 +1,11 @@
 import { Component, Inject, OnInit } from '@angular/core'
-import { MatLegacyDialogRef as MatDialogRef, MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA } from '@angular/material/legacy-dialog'
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog'
 
 @Component({
-  selector: 'ws-event-thumbnail',
-  templateUrl: './event-thumbnail.component.html',
-  styleUrls: ['./event-thumbnail.component.scss'],
+    selector: 'ws-event-thumbnail',
+    templateUrl: './event-thumbnail.component.html',
+    styleUrls: ['./event-thumbnail.component.scss'],
+    standalone: false
 })
 export class EventThumbnailComponent implements OnInit {
 

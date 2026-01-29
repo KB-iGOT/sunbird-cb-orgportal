@@ -3,7 +3,7 @@ import { BehaviorSubject, Subject, Observable } from 'rxjs'
 import { finalize } from 'rxjs/operators'
 import { HttpClient, HttpResponse } from '@angular/common/http'
 import * as fileSaver from 'file-saver'
-import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar'
+import { MatSnackBar } from '@angular/material/snack-bar'
 
 const API_ENDPOINTS = {
   // bulkUpload: `/apis/proxies/v8/user/v1/bulkupload`,

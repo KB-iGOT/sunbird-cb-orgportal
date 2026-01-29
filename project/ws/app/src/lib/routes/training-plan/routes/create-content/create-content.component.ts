@@ -1,13 +1,14 @@
 import { Component, EventEmitter, OnInit, Output, Input, OnChanges, SimpleChanges } from '@angular/core'
 import { TrainingPlanDataSharingService } from './../../services/training-plan-data-share.service'
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog'
+import { MatDialog } from '@angular/material/dialog'
 // import { AddContentDialogComponent } from '../../components/add-content-dialog/add-content-dialog.component'
 import { Router } from '@angular/router'
 import { ConfirmationBoxComponent } from '../../components/confirmation-box/confirmation.box.component'
 @Component({
-  selector: 'ws-app-create-content',
-  templateUrl: './create-content.component.html',
-  styleUrls: ['./create-content.component.scss'],
+    selector: 'ws-app-create-content',
+    templateUrl: './create-content.component.html',
+    styleUrls: ['./create-content.component.scss'],
+    standalone: false
 })
 export class CreateContentComponent implements OnInit, OnChanges {
   @Output() addContentInvalid = new EventEmitter<any>()

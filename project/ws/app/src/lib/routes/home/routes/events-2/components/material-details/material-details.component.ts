@@ -4,15 +4,16 @@ import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms'
 import * as _ from 'lodash'
 import { environment } from '../../../../../../../../../../../src/environments/environment'
 import { HttpErrorResponse } from '@angular/common/http'
-import { MatLegacySnackBar } from '@angular/material/legacy-snack-bar'
+import { MatSnackBar } from '@angular/material/snack-bar'
 import { map, mergeMap } from 'rxjs/operators'
 import { LoaderService } from '../../../../../../../../../../../src/app/services/loader.service'
 import { EventsService } from '../../services/events.service'
 
 @Component({
-  selector: 'ws-app-material-details',
-  templateUrl: './material-details.component.html',
-  styleUrls: ['./material-details.component.scss']
+    selector: 'ws-app-material-details',
+    templateUrl: './material-details.component.html',
+    styleUrls: ['./material-details.component.scss'],
+    standalone: false
 })
 export class MaterialDetailsComponent implements OnChanges {
   @Input() materialDetails: material | undefined
@@ -35,7 +36,7 @@ export class MaterialDetailsComponent implements OnChanges {
 
   constructor(
     private formBuilder: FormBuilder,
-    private matSnackBar: MatLegacySnackBar,
+    private matSnackBar: MatSnackBar,
     private eventSvc: EventsService,
     private loaderService: LoaderService
   ) { }

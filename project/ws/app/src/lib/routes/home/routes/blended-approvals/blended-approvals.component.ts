@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
-import { ITableData } from '@sunbird-cb/collection/lib/ui-org-table/interface/interfaces'
 import moment from 'moment'
 import { BlendedService } from '../../services/blended.service'
 
@@ -8,6 +7,7 @@ import { BlendedService } from '../../services/blended.service'
   selector: 'ws-app-blended-approvals',
   templateUrl: './blended-approvals.component.html',
   styleUrls: ['./blended-approvals.component.scss'],
+  standalone: false
 })
 export class BlendedApprovalsComponent implements OnInit {
   data: any[] = []
@@ -15,7 +15,7 @@ export class BlendedApprovalsComponent implements OnInit {
   discussionList!: any
   discussProfileData!: any
   departName = ''
-  tabledata: ITableData = {
+  tabledata: any = {
     actions: [],
     columns: [
       { displayName: 'CBP name', key: 'name', imageUrl: true },

@@ -1,5 +1,5 @@
 import { Component, ElementRef, HostListener, Input, OnChanges, OnInit, SimpleChanges, ViewChild } from '@angular/core'
-import { MatLegacyDialog } from '@angular/material/legacy-dialog'
+import { MatDialog } from '@angular/material/dialog'
 import { NsWidgetResolver } from '@sunbird-cb/resolver-v2'
 import { environment } from '../../../../../../../../../../../src/environments/environment'
 import { OwlOptions } from 'ngx-owl-carousel-o'
@@ -8,9 +8,10 @@ import { YoutubePlayerComponent } from '../../dialogs/youtube-player/youtube-pla
 import * as _ from 'lodash'
 
 @Component({
-  selector: 'ws-app-events-preview',
-  templateUrl: './events-preview.component.html',
-  styleUrls: ['./events-preview.component.scss']
+    selector: 'ws-app-events-preview',
+    templateUrl: './events-preview.component.html',
+    styleUrls: ['./events-preview.component.scss'],
+    standalone: false
 })
 export class EventsPreviewComponent implements OnInit, OnChanges {
   @Input() event: any
@@ -109,7 +110,7 @@ export class EventsPreviewComponent implements OnInit, OnChanges {
 
   constructor(
     private eventsService: EventsService,
-    private dialog: MatLegacyDialog
+    private dialog: MatDialog
   ) { }
 
   ngOnInit(): void {

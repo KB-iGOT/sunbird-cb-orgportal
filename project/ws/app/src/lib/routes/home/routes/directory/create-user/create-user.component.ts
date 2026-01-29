@@ -16,9 +16,10 @@ interface UserData {
 }
 
 @Component({
-  selector: 'ws-app-create-user',
-  templateUrl: './create-user.component.html',
-  styleUrls: ['./create-user.component.scss']
+    selector: 'ws-app-create-user',
+    templateUrl: './create-user.component.html',
+    styleUrls: ['./create-user.component.scss'],
+    standalone: false
 })
 export class CreateUserComponent implements OnInit {
   displayedColumns: string[] = ['fullName', 'email', 'roles', 'actions'];

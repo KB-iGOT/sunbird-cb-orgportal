@@ -4,9 +4,10 @@ import { PageEvent } from '@angular/material/paginator'
 import { environment } from '../../../../../../../../../../../src/environments/environment'
 
 @Component({
-  selector: 'ws-app-course-listing',
-  templateUrl: './course-listing.component.html',
-  styleUrls: ['./course-listing.component.scss']
+    selector: 'ws-app-course-listing',
+    templateUrl: './course-listing.component.html',
+    styleUrls: ['./course-listing.component.scss'],
+    standalone: false
 })
 export class CourseListingComponent implements OnInit {
 

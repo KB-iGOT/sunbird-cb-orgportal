@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core'
 import { CommonModule } from '@angular/common'
-import { MatLegacyButtonModule as MatButtonModule } from '@angular/material/legacy-button'
+import { MatButtonModule } from '@angular/material/button'
 import { MatRippleModule } from '@angular/material/core'
 import { MatDividerModule } from '@angular/material/divider'
 import { MatIconModule } from '@angular/material/icon'
@@ -28,4 +28,4 @@ import { NotificationEventComponent } from './components/notification-event/noti
   ],
   providers: [NotificationApiService, NotificationService],
 })
-export class NotificationV2Module {}
+export class NotificationV2Module { }

@@ -6,9 +6,10 @@ import { OrgHierarchyService } from '../../services/org-hierarchy.service'
 //#endregion (imports)
 
 @Component({
-  selector: 'ws-app-directory',
-  templateUrl: './directory.component.html',
-  styleUrls: ['./directory.component.scss']
+    selector: 'ws-app-directory',
+    templateUrl: './directory.component.html',
+    styleUrls: ['./directory.component.scss'],
+    standalone: false
 })
 
 export class DirectoryComponent implements OnInit, AfterViewInit {

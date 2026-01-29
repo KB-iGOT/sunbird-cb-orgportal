@@ -3,10 +3,11 @@ import { fromEvent, Observable } from 'rxjs'
 import { mapTo } from 'rxjs/operators'
 
 @Component({
-  selector: 'ws-app-option',
-  templateUrl: './option.component.html',
-  styleUrls: ['./option.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'ws-app-option',
+    templateUrl: './option.component.html',
+    styleUrls: ['./option.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class OptionComponent implements OnInit {
 

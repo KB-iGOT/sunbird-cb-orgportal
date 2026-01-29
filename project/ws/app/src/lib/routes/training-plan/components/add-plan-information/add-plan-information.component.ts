@@ -5,9 +5,10 @@ import { TrainingPlanDataSharingService } from '../../services/training-plan-dat
 import { Subscription } from 'rxjs'
 
 @Component({
-  selector: 'ws-app-add-plan-information',
-  templateUrl: './add-plan-information.component.html',
-  styleUrls: ['./add-plan-information.component.scss'],
+    selector: 'ws-app-add-plan-information',
+    templateUrl: './add-plan-information.component.html',
+    styleUrls: ['./add-plan-information.component.scss'],
+    standalone: false
 })
 export class AddPlanInformationComponent implements OnInit, OnDestroy {
 

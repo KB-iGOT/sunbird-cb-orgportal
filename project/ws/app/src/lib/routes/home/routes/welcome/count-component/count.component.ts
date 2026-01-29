@@ -7,12 +7,10 @@ import { IPrintCount } from './count.model'
 /* tslint:enable */
 
 @Component({
-  selector: 'ws-app-count',
-  templateUrl: './count.component.html',
-  styleUrls: ['./count.component.scss'],
-  /* tslint:disable */
-  // host: { class: 'flex margin-xs' },
-  /* tslint:enable */
+    selector: 'ws-app-count',
+    templateUrl: './count.component.html',
+    styleUrls: ['./count.component.scss'],
+    standalone: false
 })
 
 export class CountComponent extends WidgetBaseComponent implements OnInit, NsWidgetResolver.IWidgetData<IPrintCount> {

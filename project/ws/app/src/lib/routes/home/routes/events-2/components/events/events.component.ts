@@ -1,6 +1,6 @@
 //#region (imports)
 import { Component, OnDestroy, OnInit } from '@angular/core'
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog'
+import { MatDialog } from '@angular/material/dialog'
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router'
 import { Subscription } from 'rxjs'
 import { BasicInfoComponent } from '../../dialogs/basic-info/basic-info.component'
@@ -9,9 +9,10 @@ import * as _ from 'lodash'
 //#endregion
 
 @Component({
-  selector: 'ws-app-events',
-  templateUrl: './events.component.html',
-  styleUrls: ['./events.component.scss']
+    selector: 'ws-app-events',
+    templateUrl: './events.component.html',
+    styleUrls: ['./events.component.scss'],
+    standalone: false
 })
 export class EventsComponent implements OnInit, OnDestroy {
 

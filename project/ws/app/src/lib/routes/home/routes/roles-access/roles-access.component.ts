@@ -1,6 +1,5 @@
 import { AfterViewInit, Component, OnInit, OnDestroy, Input } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
-import { ITableData } from '@sunbird-cb/collection/lib/ui-org-table/interface/interfaces'
 import { EventService } from '@sunbird-cb/utils-v2'
 // tslint:disable-next-line
 import _ from 'lodash'
@@ -12,9 +11,10 @@ import { map } from 'rxjs/operators'
   selector: 'ws-app-roles-access',
   templateUrl: './roles-access.component.html',
   styleUrls: ['./roles-access.component.scss'],
+  standalone: false
 })
 export class RolesAccessComponent implements OnInit, AfterViewInit, OnDestroy {
-  tabledata!: ITableData
+  tabledata!: any
   data: any = []
   roleCountSpinner = true
   parseRoledata: any = []

@@ -1,9 +1,9 @@
 import { Component, OnInit, OnChanges, ViewChild, SimpleChanges } from '@angular/core'
 import { SelectionModel } from '@angular/cdk/collections'
-import { MatLegacyTableDataSource as MatTableDataSource } from '@angular/material/legacy-table'
-import { MatLegacyDialogConfig as MatDialogConfig, MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog'
-import { MatLegacyPaginator as MatPaginator } from '@angular/material/legacy-paginator'
-import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar'
+import { MatTableDataSource } from '@angular/material/table'
+import { MatDialogConfig as MatDialogConfig, MatDialog } from '@angular/material/dialog'
+import { MatPaginator } from '@angular/material/paginator'
+import { MatSnackBar } from '@angular/material/snack-bar'
 import { MatSort } from '@angular/material/sort'
 import { IColums, ITableData } from '../../interface/interfaces'
 import * as _ from 'lodash'
@@ -14,9 +14,10 @@ import { ActivatedRoute, Router } from '@angular/router'
 import { ProfileV2UtillService } from '../../services/home-utill.service'
 
 @Component({
-  selector: 'ws-app-leadershiptable',
-  templateUrl: './leadershiptable.component.html',
-  styleUrls: ['./leadershiptable.component.scss'],
+    selector: 'ws-app-leadershiptable',
+    templateUrl: './leadershiptable.component.html',
+    styleUrls: ['./leadershiptable.component.scss'],
+    standalone: false
 })
 export class LeadershiptableComponent implements OnInit, OnChanges {
   tableData: ITableData = {
@@ -56,7 +57,7 @@ export class LeadershiptableComponent implements OnInit, OnChanges {
   constructor(public dialog: MatDialog, private activeRoute: ActivatedRoute, private snackBar: MatSnackBar,
     // tslint:disable-next-line:align
     private mdoinfoSrvc: MdoInfoService, private configSvc: ConfigurationsService, private router: Router,
-              private profileUtilSvc: ProfileV2UtillService) {
+    private profileUtilSvc: ProfileV2UtillService) {
     this.dataSource = new MatTableDataSource<any>()
     this.dataSource.paginator = this.paginator
   }

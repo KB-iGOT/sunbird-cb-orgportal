@@ -16,9 +16,10 @@ const endpoint = {
   lookerProDashboard: 'apis/proxies/v8/looker/dashboard',
 }
 @Component({
-  selector: 'ws-app-training-plan-dashboardview',
-  templateUrl: './training-plan-dashboardview.component.html',
-  styleUrls: ['./training-plan-dashboardview.component.scss']
+    selector: 'ws-app-training-plan-dashboardview',
+    templateUrl: './training-plan-dashboardview.component.html',
+    styleUrls: ['./training-plan-dashboardview.component.scss'],
+    standalone: false
 })
 export class TrainingPlanDashboardviewComponent {
 

@@ -1,7 +1,7 @@
 import { CreateEventComponent } from './create-event.component'
 import { EventsService } from '../../services/events.service'
-import { MatLegacySnackBar } from '@angular/material/legacy-snack-bar'
-import { MatLegacyDialog } from '@angular/material/legacy-dialog'
+import { MatSnackBar } from '@angular/material/snack-bar'
+import { MatDialog } from '@angular/material/dialog'
 import { Router, ActivatedRoute } from '@angular/router'
 import { ConfigurationsService, EventService } from '@sunbird-cb/utils-v2'
 import { ChangeDetectorRef } from '@angular/core'
@@ -13,8 +13,8 @@ import { SuccessComponent } from '../../components/success/success.component'
 describe('CreateEventComponent', () => {
 	let component: CreateEventComponent
 	let mockEventsService: jest.Mocked<EventsService>
-	let mockSnackBar: jest.Mocked<MatLegacySnackBar>
-	let mockMatDialog: jest.Mocked<MatLegacyDialog>
+	let mockSnackBar: jest.Mocked<MatSnackBar>
+	let mockMatDialog: jest.Mocked<MatDialog>
 	let mockRouter: jest.Mocked<Router>
 	let mockConfigService: jest.Mocked<ConfigurationsService>
 	let mockChangeDetectorRef: jest.Mocked<ChangeDetectorRef>
@@ -35,13 +35,13 @@ describe('CreateEventComponent', () => {
 
 		mockSnackBar = {
 			open: jest.fn()
-		} as unknown as jest.Mocked<MatLegacySnackBar>
+		} as unknown as jest.Mocked<MatSnackBar>
 
 		mockMatDialog = {
 			open: jest.fn().mockReturnValue({
 				afterClosed: jest.fn().mockReturnValue(of(null))
 			})
-		} as unknown as jest.Mocked<MatLegacyDialog>
+		} as unknown as jest.Mocked<MatDialog>
 
 		mockRouter = {
 			navigate: jest.fn()

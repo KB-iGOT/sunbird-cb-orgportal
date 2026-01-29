@@ -3,9 +3,10 @@ import { ConfigurationsService, NsPage, ValueService } from '@sunbird-cb/utils-v
 import { Subscription } from 'rxjs'
 
 @Component({
-  selector: 'ws-app-meetup',
-  templateUrl: './meetup.component.html',
-  styleUrls: ['./meetup.component.scss'],
+    selector: 'ws-app-meetup',
+    templateUrl: './meetup.component.html',
+    styleUrls: ['./meetup.component.scss'],
+    standalone: false
 })
 export class MeetupComponent implements OnInit {
 

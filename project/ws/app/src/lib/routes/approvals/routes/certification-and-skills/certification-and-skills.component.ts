@@ -2,9 +2,10 @@ import { Component, OnInit } from '@angular/core'
 import { ActivatedRoute, Router, NavigationEnd, Event } from '@angular/router'
 
 @Component({
-  selector: 'ws-app-certification-and-skills',
-  templateUrl: './certification-and-skills.component.html',
-  styleUrls: ['./certification-and-skills.component.scss'],
+    selector: 'ws-app-certification-and-skills',
+    templateUrl: './certification-and-skills.component.html',
+    styleUrls: ['./certification-and-skills.component.scss'],
+    standalone: false
 })
 export class CertificationAndSkillsComponent implements OnInit {
 

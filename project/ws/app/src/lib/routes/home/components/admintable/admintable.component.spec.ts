@@ -1,6 +1,6 @@
 import { AdmintableComponent } from './admintable.component'
-import { MatLegacyTableDataSource as MatTableDataSource } from '@angular/material/legacy-table'
-import { MatLegacyPaginator as MatPaginator } from '@angular/material/legacy-paginator'
+import { MatTableDataSource } from '@angular/material/table'
+import { MatPaginator } from '@angular/material/paginator'
 import { of, throwError } from 'rxjs'
 
 describe('AdmintableComponent', () => {

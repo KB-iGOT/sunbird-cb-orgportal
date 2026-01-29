@@ -3,16 +3,15 @@ import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } 
 import { FileService } from '../../services/upload.service'
 import { Observable, Subscription, interval } from 'rxjs'
 import { startWith, map, pairwise } from 'rxjs/operators'
-import { MatLegacyRadioChange as MatRadioChange } from '@angular/material/legacy-radio'
-import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar'
+import { MatRadioChange } from '@angular/material/radio'
+import { MatSnackBar } from '@angular/material/snack-bar'
 import { MatSort } from '@angular/material/sort'
-import { MatLegacyPaginator as MatPaginator } from '@angular/material/legacy-paginator'
-import { MatLegacyTableDataSource as MatTableDataSource } from '@angular/material/legacy-table'
+import { MatPaginator } from '@angular/material/paginator'
+import { MatTableDataSource } from '@angular/material/table'
 import { environment } from 'src/environments/environment'
 import { ActivatedRoute } from '@angular/router'
 // tslint:disable-next-line
 import * as _ from 'lodash'
-import { ITableData } from '@sunbird-cb/collection/lib/ui-org-table/interface/interfaces'
 import { DatePipe } from '@angular/common'
 import { UsersService } from '../../services/users.service'
 
@@ -20,6 +19,7 @@ import { UsersService } from '../../services/users.service'
   selector: 'ws-app-users-upload',
   templateUrl: './users-upload.component.html',
   styleUrls: ['./users-upload.component.scss'],
+  standalone: false
 })
 export class UsersUploadComponent implements OnInit, AfterViewInit, OnDestroy {
   tableList!: any[]
@@ -38,7 +38,7 @@ export class UsersUploadComponent implements OnInit, AfterViewInit, OnDestroy {
   dataSource: MatTableDataSource<any>
   // tslint:disable-next-line:max-line-length
   displayedColumns: string[] = ['fileName', 'status', 'failedRecordsCount', 'successfulRecordsCount', 'totalRecords', 'dateCreatedOn', 'dateUpdatedOn']
-  tabledata!: ITableData
+  tabledata!: any
   departments: string[] = []
   contactUsUrl = ''
   fileSelected!: any

@@ -1,6 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core'
 import { material } from '../../models/events.model'
-import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar'
+import { MatSnackBar } from '@angular/material/snack-bar'
 import { EventsService } from '../../services/events.service'
 import { map, mergeMap } from 'rxjs/operators'
 import * as _ from 'lodash'
@@ -11,9 +11,10 @@ import { LoaderService } from '../../../../../../../../../../../src/app/services
 
 
 @Component({
-  selector: 'ws-app-event-materials',
-  templateUrl: './event-materials.component.html',
-  styleUrls: ['./event-materials.component.scss']
+    selector: 'ws-app-event-materials',
+    templateUrl: './event-materials.component.html',
+    styleUrls: ['./event-materials.component.scss'],
+    standalone: false
 })
 export class EventMaterialsComponent implements OnInit {
 

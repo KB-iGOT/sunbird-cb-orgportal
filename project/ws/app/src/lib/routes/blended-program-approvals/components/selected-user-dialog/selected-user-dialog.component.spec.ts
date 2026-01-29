@@ -1,5 +1,5 @@
 
-import { MatLegacyDialogRef as MatDialogRef } from '@angular/material/legacy-dialog'
+import { MatDialogRef } from '@angular/material/dialog'
 import { SelectedUserDialogComponent } from './selected-user-dialog.component'
 
 describe('SelectedUserDialogComponent', () => {

@@ -1,11 +1,12 @@
 import { Component, Inject, OnInit } from '@angular/core'
 import { UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms'
-import { MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA, MatLegacyDialogRef as MatDialogRef } from '@angular/material/legacy-dialog'
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog'
 import { TrainingPlanService } from '../../services/traininig-plan.service'
 @Component({
-  selector: 'ws-app-add-content-dialog',
-  templateUrl: './add-content-dialog.component.html',
-  styleUrls: ['./add-content-dialog.component.scss'],
+    selector: 'ws-app-add-content-dialog',
+    templateUrl: './add-content-dialog.component.html',
+    styleUrls: ['./add-content-dialog.component.scss'],
+    standalone: false
 })
 export class AddContentDialogComponent implements OnInit {
   contentForm!: UntypedFormGroup

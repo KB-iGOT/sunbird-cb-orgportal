@@ -5,34 +5,33 @@ import { MatGridListModule } from '@angular/material/grid-list'
 import { MatExpansionModule } from '@angular/material/expansion'
 import { MatDividerModule } from '@angular/material/divider'
 import { SbUiResolverModule } from '@sunbird-cb/resolver-v2'
-import { MatLegacyAutocompleteModule as MatAutocompleteModule } from '@angular/material/legacy-autocomplete'
-import { MatLegacyButtonModule as MatButtonModule } from '@angular/material/legacy-button'
-import { MatLegacyCheckboxModule as MatCheckboxModule } from '@angular/material/legacy-checkbox'
-import { MatLegacyChipsModule as MatChipsModule } from '@angular/material/legacy-chips'
+import { MatAutocompleteModule } from '@angular/material/autocomplete'
+import { MatButtonModule } from '@angular/material/button'
+import { MatCheckboxModule } from '@angular/material/checkbox'
+import { MatChipsModule } from '@angular/material/chips'
 import { MatDatepickerModule } from '@angular/material/datepicker'
-import { MatLegacyDialogModule as MatDialogModule, MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA } from '@angular/material/legacy-dialog'
-import { MatLegacyFormFieldModule as MatFormFieldModule } from '@angular/material/legacy-form-field'
+import { MatDialogModule, MAT_DIALOG_DATA } from '@angular/material/dialog'
+import { MatFormFieldModule } from '@angular/material/form-field'
 import { MatIconModule } from '@angular/material/icon'
-import { MatLegacyInputModule as MatInputModule } from '@angular/material/legacy-input'
-import { MatLegacyListModule as MatListModule } from '@angular/material/legacy-list'
-import { MatLegacyProgressBarModule as MatProgressBarModule } from '@angular/material/legacy-progress-bar'
-import { MatLegacyProgressSpinnerModule as MatProgressSpinnerModule } from '@angular/material/legacy-progress-spinner'
-import { MatLegacyRadioModule as MatRadioModule } from '@angular/material/legacy-radio'
-import { MatLegacySelectModule as MatSelectModule } from '@angular/material/legacy-select'
+import { MatInputModule } from '@angular/material/input'
+import { MatListModule } from '@angular/material/list'
+import { MatProgressBarModule } from '@angular/material/progress-bar'
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner'
+import { MatRadioModule } from '@angular/material/radio'
+import { MatSelectModule } from '@angular/material/select'
 import { MatSidenavModule } from '@angular/material/sidenav'
-import { MatLegacySlideToggleModule as MatSlideToggleModule } from '@angular/material/legacy-slide-toggle'
-import { MatLegacyTabsModule as MatTabsModule } from '@angular/material/legacy-tabs'
-import { MatLegacyMenuModule as MatMenuModule } from '@angular/material/legacy-menu'
-import { MatLegacyPaginatorModule as MatPaginatorModule } from '@angular/material/legacy-paginator'
-import { MatLegacyCardModule as MatCardModule } from '@angular/material/legacy-card'
-import { MatLegacyTableModule as MatTableModule } from '@angular/material/legacy-table'
-import { MatLegacyTooltipModule as MatTooltipModule } from '@angular/material/legacy-tooltip'
+import { MatSlideToggleModule } from '@angular/material/slide-toggle'
+import { MatTabsModule } from '@angular/material/tabs'
+import { MatMenuModule } from '@angular/material/menu'
+import { MatPaginatorModule } from '@angular/material/paginator'
+import { MatCardModule } from '@angular/material/card'
+import { MatTableModule } from '@angular/material/table'
+import { MatTooltipModule } from '@angular/material/tooltip'
 import { MatSortModule } from '@angular/material/sort'
 import { ReactiveFormsModule, FormsModule } from '@angular/forms'
 import { RouterModule } from '@angular/router'
 // import { Ng2SearchPipeModule } from 'ng2-search-filter'
 import { NgxPaginationModule } from 'ngx-pagination'
-import { RainDashboardsModule } from '@sunbird-cb/rain-dashboards'
 
 import { ExportAsModule } from 'ngx-export-as'
 import { HomeRoutingModule } from './home.rounting.module'
@@ -91,7 +90,7 @@ import { CreateRequestFormComponent } from './components/request-list/create-req
 import { CompetencyViewComponent } from './components/request-list/competency-view/competency-view.component'
 import { AssignListPopupComponent } from './components/request-list/assign-list-popup/assign-list-popup.component'
 import { SingleAssignPopupComponent } from './components/request-list/single-assign-popup/single-assign-popup.component'
-import { HttpClientModule } from '@angular/common/http'
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { DesignationModule } from './routes/designation/designation.module'
 import { OdcsMappingComponent } from './routes/odcs-mapping/odcs-mapping.component'
 import { environment } from '../../../../../../../src/environments/environment'
@@ -190,8 +189,8 @@ import { OnboardingModule } from './routes/onboarding/onboarding.module'
     UserOnboardingComponent,
     UserBulkTransferComponent
   ],
-  imports: [
-    CommonModule,
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
+  exports: [LeftMenuComponent], imports: [CommonModule,
     // Ng2SearchPipeModule,
     UIORGTableModule,
     ReactiveFormsModule,
@@ -231,7 +230,6 @@ import { OnboardingModule } from './routes/onboarding/onboarding.module'
     WorkallocationModule,
     NgxPaginationModule,
     UIAdminTableModule,
-    RainDashboardsModule,
     MatTabsModule,
     MatTableModule,
     MatTooltipModule,
@@ -243,7 +241,6 @@ import { OnboardingModule } from './routes/onboarding/onboarding.module'
     FilterSearchPipeModule,
     MatAutocompleteModule,
     MatSlideToggleModule,
-    HttpClientModule,
     DesignationModule,
     TaxonomyEditorModule,
     ImageResponsiveModule,
@@ -252,22 +249,18 @@ import { OnboardingModule } from './routes/onboarding/onboarding.module'
     TreeHierarchyModule,
     UserUpdateModule,
     OnboardingModule,
-    HorizontalDynamicStepperModule
-  ],
-  providers: [
-    { provide: 'environment', useValue: environment },
-    { provide: MAT_DIALOG_DATA, useValue: {} },
-    InitResolver,
-    MdoInfoService,
-    UploadService,
-    TrainingPlanDashboardService,
-    UsersService,
-    { provide: MAT_DATE_LOCALE, useValue: 'en-GB' },
-    OrgHierarchyService
-  ],
-  schemas: [CUSTOM_ELEMENTS_SCHEMA],
-  exports: [LeftMenuComponent]
-
+    HorizontalDynamicStepperModule], providers: [
+      { provide: 'environment', useValue: environment },
+      { provide: MAT_DIALOG_DATA, useValue: {} },
+      InitResolver,
+      MdoInfoService,
+      UploadService,
+      TrainingPlanDashboardService,
+      UsersService,
+      { provide: MAT_DATE_LOCALE, useValue: 'en-GB' },
+      OrgHierarchyService,
+      provideHttpClient(withInterceptorsFromDi())
+    ]
 })
 export class HomeModule {
 

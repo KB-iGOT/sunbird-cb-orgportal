@@ -3,8 +3,8 @@ import { ActivatedRoute, Router, Event, NavigationEnd } from '@angular/router'
 import moment from 'moment'
 import { UntypedFormGroup, UntypedFormControl, Validators } from '@angular/forms'
 import { UsersService } from '../../services/users.service'
-import { MatLegacyChipInputEvent as MatChipInputEvent } from '@angular/material/legacy-chips'
-import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar'
+import { MatChipInputEvent } from '@angular/material/chips'
+import { MatSnackBar } from '@angular/material/snack-bar'
 // tslint:disable-next-line
 import _ from 'lodash'
 import { EventService } from '@sunbird-cb/utils-v2'
@@ -13,9 +13,10 @@ import { TelemetryEvents } from '../../../../head/_services/telemetry.event.mode
 import { COMMA, ENTER } from '@angular/cdk/keycodes'
 
 @Component({
-  selector: 'ws-app-view-user',
-  templateUrl: './view-user.component.html',
-  styleUrls: ['./view-user.component.scss'],
+    selector: 'ws-app-view-user',
+    templateUrl: './view-user.component.html',
+    styleUrls: ['./view-user.component.scss'],
+    standalone: false
 })
 export class ViewUserComponent implements OnInit, AfterViewInit {
   tabsData!: any[]

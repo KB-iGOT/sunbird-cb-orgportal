@@ -1,7 +1,7 @@
 import { Subject, of, throwError } from 'rxjs'
 import { SingleUserCreationComponent } from './single-user-creation.component'
 import { UntypedFormBuilder } from '@angular/forms'
-import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar'
+import { MatSnackBar } from '@angular/material/snack-bar'
 import { UsersService } from '../../../../users/services/users.service'
 import { RolesService } from '../../../../users/services/roles.service'
 import { ActivatedRoute } from '@angular/router'

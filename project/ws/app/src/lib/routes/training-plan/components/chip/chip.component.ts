@@ -1,11 +1,12 @@
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output } from '@angular/core'
 import { TrainingPlanDataSharingService } from '../../services/training-plan-data-share.service'
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog'
+import { MatDialog } from '@angular/material/dialog'
 import { PreviewDialogBoxComponent } from '../preview-dialog-box/preview-dialog-box.component'
 @Component({
-  selector: 'ws-app-chip',
-  templateUrl: './chip.component.html',
-  styleUrls: ['./chip.component.scss'],
+    selector: 'ws-app-chip',
+    templateUrl: './chip.component.html',
+    styleUrls: ['./chip.component.scss'],
+    standalone: false
 })
 export class ChipComponent implements OnInit, OnChanges {
   @Input() selectedContentChips: any[] = []

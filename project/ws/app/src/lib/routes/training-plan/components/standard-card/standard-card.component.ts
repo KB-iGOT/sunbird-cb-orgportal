@@ -1,12 +1,13 @@
 import { Component, EventEmitter, Input, Output, OnInit, ChangeDetectorRef, ViewChild, AfterViewChecked } from '@angular/core'
-import { MatLegacyPaginator as MatPaginator, LegacyPageEvent as PageEvent } from '@angular/material/legacy-paginator'
+import { MatPaginator, PageEvent } from '@angular/material/paginator'
 import { TrainingPlanDataSharingService } from '../../services/training-plan-data-share.service'
 import { SafeUrl } from '@angular/platform-browser'
 
 @Component({
-  selector: 'ws-app-standard-card',
-  templateUrl: './standard-card.component.html',
-  styleUrls: ['./standard-card.component.scss'],
+    selector: 'ws-app-standard-card',
+    templateUrl: './standard-card.component.html',
+    styleUrls: ['./standard-card.component.scss'],
+    standalone: false
 })
 export class StandardCardComponent implements OnInit, AfterViewChecked {
   @Input() cardSize: any

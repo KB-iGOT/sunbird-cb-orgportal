@@ -6,13 +6,14 @@ import { ContentBatchService } from '../../services/content-batch.service'
 import { NSContent } from '../../interface/content'
 import { LocalDataService } from '../../services/local-data.service'
 import * as _ from 'lodash'
-import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar'
+import { MatSnackBar } from '@angular/material/snack-bar'
 import { ConfigurationsService } from '@sunbird-cb/utils-v2'
 
 @Component({
-  selector: 'ws-app-content-nominate-learner',
-  templateUrl: './content-nominate-learner.component.html',
-  styleUrls: ['./content-nominate-learner.component.scss']
+    selector: 'ws-app-content-nominate-learner',
+    templateUrl: './content-nominate-learner.component.html',
+    styleUrls: ['./content-nominate-learner.component.scss'],
+    standalone: false
 })
 export class ContentNominateLearnerComponent implements OnInit {
   contentForm!: FormGroup

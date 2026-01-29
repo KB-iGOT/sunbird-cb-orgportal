@@ -1,6 +1,6 @@
 
-import { DOCUMENT } from '@angular/common'
-import { AfterViewInit, Component, Inject, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core'
+
+import { AfterViewInit, Component, Inject, OnDestroy, OnInit, ViewEncapsulation, DOCUMENT } from '@angular/core'
 /* tslint:disable */
 import _ from 'lodash'
 import { environment } from '../../../../../../../../../src/environments/environment'
@@ -11,14 +11,14 @@ import { Router } from '@angular/router'
 import { EventService } from '@sunbird-cb/utils-v2'
 import { TelemetryEvents } from '../../../../head/_services/telemetry.event.model'
 @Component({
-  selector: 'ws-app-welcome',
-  templateUrl: './welcome.component.html',
-  styleUrls: ['./welcome.component.scss', './bootstrap-rain.scss'],
-  /* tslint:disable-next-line */
-  encapsulation: ViewEncapsulation.None,
-  /* tslint:disable */
-  host: { class: 'flex flex-1' },
-  /* tslint:enable */
+    selector: 'ws-app-welcome',
+    templateUrl: './welcome.component.html',
+    styleUrls: ['./welcome.component.scss', './bootstrap-rain.scss'],
+    /* tslint:disable-next-line */
+    encapsulation: ViewEncapsulation.None,
+    /* tslint:disable */
+    host: { class: 'flex flex-1' },
+    standalone: false
 })
 
 export class WelcomeComponent implements OnInit, AfterViewInit, OnDestroy {

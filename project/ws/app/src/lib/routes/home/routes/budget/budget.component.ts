@@ -1,10 +1,10 @@
 import { Component, OnInit, ViewChild, SimpleChanges, OnChanges } from '@angular/core'
 import { SelectionModel } from '@angular/cdk/collections'
-import { MatLegacyTableDataSource as MatTableDataSource } from '@angular/material/legacy-table'
-import { MatLegacyDialogConfig as MatDialogConfig, MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog'
-import { MatLegacyPaginator as MatPaginator } from '@angular/material/legacy-paginator'
-import { MatLegacySelectChange as MatSelectChange } from '@angular/material/legacy-select'
-import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar'
+import { MatTableDataSource } from '@angular/material/table'
+import { MatDialogConfig as MatDialogConfig, MatDialog } from '@angular/material/dialog'
+import { MatPaginator } from '@angular/material/paginator'
+import { MatSelectChange } from '@angular/material/select'
+import { MatSnackBar } from '@angular/material/snack-bar'
 import { MatSort } from '@angular/material/sort'
 import { ITableData, IColums } from '../../interface/interfaces'
 import * as _ from 'lodash'
@@ -17,9 +17,10 @@ import { ActivatedRoute } from '@angular/router'
 import { preventHtmlAndJs } from '../../../validators/prevent-html-and-js.validator'
 
 @Component({
-  selector: 'ws-app-budget',
-  templateUrl: './budget.component.html',
-  styleUrls: ['./budget.component.scss'],
+    selector: 'ws-app-budget',
+    templateUrl: './budget.component.html',
+    styleUrls: ['./budget.component.scss'],
+    standalone: false
 })
 export class BudgetComponent implements OnInit, OnChanges {
   budgetdata: UntypedFormGroup

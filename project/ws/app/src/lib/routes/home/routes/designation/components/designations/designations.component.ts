@@ -1,11 +1,10 @@
 import { Component, OnInit } from '@angular/core'
 import * as _ from 'lodash'
-import { ITableData } from '@sunbird-cb/collection/lib/ui-org-table/interface/interfaces'
 import { DesignationsService } from '../../services/designations.service'
 import { UntypedFormControl } from '@angular/forms'
 import { delay } from 'rxjs/operators'
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog'
-import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar'
+import { MatDialog } from '@angular/material/dialog'
+import { MatSnackBar } from '@angular/material/snack-bar'
 import { ConformationPopupComponent } from '../../dialog-boxes/conformation-popup/conformation-popup.component'
 import { ActivatedRoute } from '@angular/router'
 import { environment } from '../../../../../../../../../../../src/environments/environment'
@@ -15,6 +14,7 @@ import { ReportsVideoComponent } from '../../../reports-video/reports-video.comp
   selector: 'ws-app-designations',
   templateUrl: './designations.component.html',
   styleUrls: ['./designations.component.scss'],
+  standalone: false
 })
 export class DesignationsComponent implements OnInit {
 
@@ -29,7 +29,7 @@ export class DesignationsComponent implements OnInit {
   selectedOrganisation = ''
   designationsList: any = []
   filteredDesignationsList: any = []
-  tableData!: ITableData
+  tableData!: any
   showLoader = false
   actionMenuItem: {
     name: string,

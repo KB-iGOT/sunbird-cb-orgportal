@@ -3,9 +3,10 @@ import { ActivatedRoute } from '@angular/router'
 import { ConfigurationsService } from '@sunbird-cb/utils-v2'
 
 @Component({
-  selector: 'ws-app-microsite-v1',
-  templateUrl: './microsite-v1.component.html',
-  styleUrls: ['./microsite-v1.component.scss']
+    selector: 'ws-app-microsite-v1',
+    templateUrl: './microsite-v1.component.html',
+    styleUrls: ['./microsite-v1.component.scss'],
+    standalone: false
 })
 export class MicrositeV1Component {
   slwConfig = {}

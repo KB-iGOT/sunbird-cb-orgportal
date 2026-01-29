@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core'
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog'
-import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar'
+import { MatDialog } from '@angular/material/dialog'
+import { MatSnackBar } from '@angular/material/snack-bar'
 import { ActivatedRoute, Router } from '@angular/router'
 // tslint:disable-next-line:import-name
 import _ from 'lodash'
@@ -11,13 +11,14 @@ import { NominateUsersDialogComponent } from '../nominate-users-dialog/nominate-
 import moment from 'moment'
 import { NsContent } from '../../../../head/_services/widget-content.model'
 import { DialogConfirmComponent } from '../../../../../../../../../src/app/component/dialog-confirm/dialog-confirm.component'
-import { ITableData } from '@sunbird-cb/collection/lib/ui-org-table/interface/interfaces'
+import { ITableData } from '@sunbird-cb/collection'
 import { IRequestLearnerType } from '../../enums/enrolment-type'
 import { FormControl, FormGroup, Validators } from '@angular/forms'
 @Component({
   selector: 'ws-app-batch-details',
   templateUrl: './batch-details.component.html',
   styleUrls: ['./batch-details.component.scss'],
+  standalone: false
 })
 export class BatchDetailsComponent implements OnInit {
   currentFilter = 'pending'

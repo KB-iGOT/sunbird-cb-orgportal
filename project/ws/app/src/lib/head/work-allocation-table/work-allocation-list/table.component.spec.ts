@@ -1,7 +1,7 @@
 
 import { WorkAllocationTableComponent } from './table.component'
 import { SelectionModel } from '@angular/cdk/collections'
-import { MatLegacyTableDataSource as MatTableDataSource } from '@angular/material/legacy-table'
+import { MatTableDataSource } from '@angular/material/table'
 
 import { UserPopupComponent } from '../user-popup/user-popup'
 import { of, Subject } from 'rxjs'

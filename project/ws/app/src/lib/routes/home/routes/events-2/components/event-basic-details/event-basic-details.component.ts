@@ -1,6 +1,6 @@
 import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core'
 import { FormGroup, Validators } from '@angular/forms'
-import { MatLegacySnackBar } from '@angular/material/legacy-snack-bar'
+import { MatSnackBar } from '@angular/material/snack-bar'
 import * as _ from 'lodash'
 import { URL_PATRON, events } from '../../models/events.model'
 import { EventsService } from '../../services/events.service'
@@ -11,9 +11,10 @@ import { LoaderService } from '../../../../../../../../../../../src/app/services
 import { DatePipe } from '@angular/common'
 
 @Component({
-  selector: 'ws-app-event-basic-details',
-  templateUrl: './event-basic-details.component.html',
-  styleUrls: ['./event-basic-details.component.scss']
+    selector: 'ws-app-event-basic-details',
+    templateUrl: './event-basic-details.component.html',
+    styleUrls: ['./event-basic-details.component.scss'],
+    standalone: false
 })
 export class EventBasicDetailsComponent implements OnInit, OnChanges {
 
@@ -38,7 +39,7 @@ export class EventBasicDetailsComponent implements OnInit, OnChanges {
   //#endregion
 
   constructor(
-    private matSnackBar: MatLegacySnackBar,
+    private matSnackBar: MatSnackBar,
     private eventSvc: EventsService,
     private loaderService: LoaderService,
     private datePipe: DatePipe,

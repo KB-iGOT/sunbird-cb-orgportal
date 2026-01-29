@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core'
 import { MatTableDataSource } from '@angular/material/table'
 import { SelectionModel } from '@angular/cdk/collections'
 import { PageEvent } from '@angular/material/paginator'
-import { MatLegacyDialog } from '@angular/material/legacy-dialog'
+import { MatDialog } from '@angular/material/dialog'
 import { ConfirmationBoxComponent } from '../../../../training-plan/components/confirmation-box/confirmation.box.component'
 import { RejectReasonDialogComponent } from '../reject-reason-dialog/reject-reason-dialog.component'
 
@@ -20,9 +20,10 @@ export interface AchievementApproval {
 }
 
 @Component({
-  selector: 'ws-app-approvals-list',
-  templateUrl: './approvals-list.component.html',
-  styleUrls: ['./approvals-list.component.scss']
+    selector: 'ws-app-approvals-list',
+    templateUrl: './approvals-list.component.html',
+    styleUrls: ['./approvals-list.component.scss'],
+    standalone: false
 })
 export class ApprovalsListComponent implements OnInit {
   displayedColumns: string[] = ['select', 'user', 'achievementTitle', 'dateSubmitted', 'actions'];
@@ -92,7 +93,7 @@ export class ApprovalsListComponent implements OnInit {
     }
   ];
 
-  constructor(private readonly dialog: MatLegacyDialog) {
+  constructor(private readonly dialog: MatDialog) {
     this.dataSource = new MatTableDataSource()
   }
 

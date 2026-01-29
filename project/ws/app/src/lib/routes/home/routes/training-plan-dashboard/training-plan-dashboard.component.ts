@@ -1,12 +1,12 @@
 import { Component, OnInit, AfterViewInit, ViewChild } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
-import { ITableData } from '@sunbird-cb/collection/lib/ui-org-table/interface/interfaces'
+import { ITableData } from '@sunbird-cb/collection'
 import { TrainingPlanDashboardService } from '../../services/training-plan-dashboard.service'
 import moment from 'moment'
 import { LoaderService } from '../../../../../../../../../src/app/services/loader.service'
 import { TrainingPlanService } from '../../../training-plan/services/traininig-plan.service'
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog'
-import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar'
+import { MatDialog } from '@angular/material/dialog'
+import { MatSnackBar } from '@angular/material/snack-bar'
 import { ConfirmationBoxComponent } from '../../../training-plan/components/confirmation-box/confirmation.box.component'
 import { MatTableDataSource } from '@angular/material/table'
 import { MatSort } from '@angular/material/sort'
@@ -17,6 +17,7 @@ import _ from 'lodash'
   selector: 'ws-app-training-plan-dashboard',
   templateUrl: './training-plan-dashboard.component.html',
   styleUrls: ['./training-plan-dashboard.component.scss'],
+  standalone: false
 })
 export class TrainingPlanDashboardComponent implements OnInit, AfterViewInit {
   @ViewChild(MatSort, { static: false }) sort!: MatSort

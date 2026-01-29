@@ -15,7 +15,7 @@ import _ from 'lodash'
     styleUrls: ['./roles-and-functions.component.scss'],
     /* tslint:disable */
     host: { class: 'w-full role-card flex flex-1' },
-    /* tslint:enable */
+    standalone: false
 })
 export class RolesAndFunctionsComponent implements OnInit {
     roleActivityForm!: UntypedFormGroup

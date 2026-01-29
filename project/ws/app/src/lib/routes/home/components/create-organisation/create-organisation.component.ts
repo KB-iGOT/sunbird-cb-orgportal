@@ -10,9 +10,10 @@ import { debounceTime, distinctUntilChanged, takeUntil } from 'rxjs/operators'
 import { ConfigurationsService } from '@sunbird-cb/utils-v2'
 
 @Component({
-  selector: 'ws-app-create-organisation',
-  templateUrl: './create-organisation.component.html',
-  styleUrls: ['./create-organisation.component.scss']
+    selector: 'ws-app-create-organisation',
+    templateUrl: './create-organisation.component.html',
+    styleUrls: ['./create-organisation.component.scss'],
+    standalone: false
 })
 export class CreateOrganisationComponent implements OnInit, OnDestroy {
 

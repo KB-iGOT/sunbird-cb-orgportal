@@ -1,9 +1,10 @@
 import { Component, Input, OnInit } from '@angular/core'
 
 @Component({
-  selector: 'ws-app-initial-avatar',
-  templateUrl: './initial-avatar.component.html',
-  styleUrls: ['./initial-avatar.component.scss'],
+    selector: 'ws-app-initial-avatar',
+    templateUrl: './initial-avatar.component.html',
+    styleUrls: ['./initial-avatar.component.scss'],
+    standalone: false
 })
 export class InitialAvatarComponent implements OnInit {
   @Input() name!: string

@@ -1,19 +1,19 @@
 import { SimpleChanges } from '@angular/core'
-import { MatLegacyDialog } from '@angular/material/legacy-dialog'
-import { MatLegacySnackBar } from '@angular/material/legacy-snack-bar'
+import { MatDialog } from '@angular/material/dialog'
+import { MatSnackBar } from '@angular/material/snack-bar'
 import { EventsService } from '../../../events-2/services/events.service'
 import { CompetencyAddComponent } from '../../../../../../common/competency-add/competency-add.component'
 import { CommunityCompetencyComponent } from './community-competency.component'
 
 // Mocks
-jest.mock('@angular/material/legacy-dialog')
-jest.mock('@angular/material/legacy-snack-bar')
+jest.mock('@angular/material/dialog')
+jest.mock('@angular/material/snack-bar')
 jest.mock('../../../events-2/services/events.service')
 
 describe('CommunityCompetencyComponent', () => {
   let component: CommunityCompetencyComponent
-  let mockMatSnackBar: jest.Mocked<MatLegacySnackBar>
-  let mockDialog: jest.Mocked<MatLegacyDialog>
+  let mockMatSnackBar: jest.Mocked<MatSnackBar>
+  let mockDialog: jest.Mocked<MatDialog>
   let mockEventsService: jest.Mocked<EventsService>
 
   // Sample test data
@@ -72,11 +72,11 @@ describe('CommunityCompetencyComponent', () => {
     // Create mocks
     mockMatSnackBar = {
       open: jest.fn(),
-    } as unknown as jest.Mocked<MatLegacySnackBar>
+    } as unknown as jest.Mocked<MatSnackBar>
 
     mockDialog = {
       open: jest.fn().mockReturnValue(mockDialogRef)
-    } as unknown as jest.Mocked<MatLegacyDialog>
+    } as unknown as jest.Mocked<MatDialog>
 
     mockEventsService = {
       convertToTreeView: jest.fn().mockReturnValue(mockTreeViewData),

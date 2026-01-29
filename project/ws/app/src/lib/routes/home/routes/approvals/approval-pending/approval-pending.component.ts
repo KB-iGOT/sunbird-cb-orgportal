@@ -1,9 +1,9 @@
 import { Component, OnDestroy, OnInit } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser'
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog'
-import { LegacyPageEvent as PageEvent } from '@angular/material/legacy-paginator'
-import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar'
+import { MatDialog } from '@angular/material/dialog'
+import { PageEvent } from '@angular/material/paginator'
+import { MatSnackBar } from '@angular/material/snack-bar'
 import { EventService } from '@sunbird-cb/utils-v2'
 
 /* tslint:disable */
@@ -16,9 +16,10 @@ import { LoaderService } from '../../../../../../../../../../src/app/services/lo
 import { environment } from 'src/environments/environment'
 
 @Component({
-  selector: 'ws-approval-pending',
-  templateUrl: './approval-pending.component.html',
-  styleUrls: ['./approval-pending.component.scss'],
+    selector: 'ws-approval-pending',
+    templateUrl: './approval-pending.component.html',
+    styleUrls: ['./approval-pending.component.scss'],
+    standalone: false
 })
 
 export class ApprovalPendingComponent implements OnInit, OnDestroy {

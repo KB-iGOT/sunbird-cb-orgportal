@@ -2,8 +2,8 @@ import { AfterViewInit, Component, EventEmitter, OnDestroy, OnInit, Output } fro
 import { IBulkUploadDesignationList } from '../../designation/interface/interface'
 import { Subject } from 'rxjs'
 import { FileService } from '../../../../users/services/upload.service'
-import { MatLegacySnackBar } from '@angular/material/legacy-snack-bar'
-import { MatLegacyDialog } from '@angular/material/legacy-dialog'
+import { MatSnackBar } from '@angular/material/snack-bar'
+import { MatDialog } from '@angular/material/dialog'
 import { ActivatedRoute } from '@angular/router'
 import { DirectoryService } from '../../../services/directory.service'
 import * as _ from 'lodash'
@@ -16,9 +16,10 @@ import { UsersService } from '../../../../users/services/users.service'
 import { ConfigurationsService } from '@sunbird-cb/utils-v2'
 
 @Component({
-  selector: 'ws-app-designations-builk-upload',
-  templateUrl: './designations-builk-upload.component.html',
-  styleUrls: ['./designations-builk-upload.component.scss']
+    selector: 'ws-app-designations-builk-upload',
+    templateUrl: './designations-builk-upload.component.html',
+    styleUrls: ['./designations-builk-upload.component.scss'],
+    standalone: false
 })
 export class DesignationsBuilkUploadComponent implements OnInit, OnDestroy, AfterViewInit {
   @Output() closeComponent: EventEmitter<boolean> = new EventEmitter<boolean>();
@@ -50,8 +51,8 @@ export class DesignationsBuilkUploadComponent implements OnInit, OnDestroy, Afte
 
   constructor(
     private fileService: FileService,
-    private matSnackBar: MatLegacySnackBar,
-    public dialog: MatLegacyDialog,
+    private matSnackBar: MatSnackBar,
+    public dialog: MatDialog,
     private usersService: UsersService,
     private activateRoute: ActivatedRoute,
     private directoryService: DirectoryService,

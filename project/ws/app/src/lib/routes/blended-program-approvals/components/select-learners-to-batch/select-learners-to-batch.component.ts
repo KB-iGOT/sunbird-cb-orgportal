@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core'
-import { MatLegacyTableDataSource as MatTableDataSource } from '@angular/material/legacy-table'
+import { MatTableDataSource } from '@angular/material/table'
 import { SelectionModel } from '@angular/cdk/collections'
 import { OrgUserService } from '../../services/org-user.service'
 import { ContentBatchService } from '../../services/content-batch.service'
@@ -8,13 +8,14 @@ import { UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms
 import { SPACE, ENTER } from '@angular/cdk/keycodes'
 import { SelectedUserDialogComponent } from '../selected-user-dialog/selected-user-dialog.component'
 import * as _ from 'lodash'
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog'
-import { MatLegacyPaginator as MatPaginator } from '@angular/material/legacy-paginator'
+import { MatDialog } from '@angular/material/dialog'
+import { MatPaginator } from '@angular/material/paginator'
 
 @Component({
-  selector: 'ws-app-select-learners-to-batch',
-  templateUrl: './select-learners-to-batch.component.html',
-  styleUrls: ['./select-learners-to-batch.component.scss']
+    selector: 'ws-app-select-learners-to-batch',
+    templateUrl: './select-learners-to-batch.component.html',
+    styleUrls: ['./select-learners-to-batch.component.scss'],
+    standalone: false
 })
 export class SelectLearnersToBatchComponent implements OnInit {
   filterForm!: UntypedFormGroup

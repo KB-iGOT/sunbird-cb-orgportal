@@ -1,7 +1,7 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core'
 import { UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms'
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog'
-import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar'
+import { MatDialog } from '@angular/material/dialog'
+import { MatSnackBar } from '@angular/material/snack-bar'
 import { ActivatedRoute, Router } from '@angular/router'
 import { ConfigurationsService } from '@sunbird-cb/utils-v2'
 /* tslint:disable*/
@@ -18,7 +18,7 @@ import { OrgProfileService } from '../../services/org-profile.service'
     styleUrls: ['./institute-profile.component.scss'],
     /* tslint:disable */
     host: { class: 'w-full role-card flex flex-1' },
-    /* tslint:enable */
+    standalone: false
 })
 export class InstituteProfileComponent implements OnInit {
     instituteProfileForm!: UntypedFormGroup

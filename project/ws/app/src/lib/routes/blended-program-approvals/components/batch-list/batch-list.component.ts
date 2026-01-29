@@ -5,9 +5,10 @@ import moment from 'moment'
 import { BlendedApporvalService } from '../../services/blended-approval.service'
 
 @Component({
-  selector: 'ws-app-batch-list',
-  templateUrl: './batch-list.component.html',
-  styleUrls: ['./batch-list.component.scss'],
+    selector: 'ws-app-batch-list',
+    templateUrl: './batch-list.component.html',
+    styleUrls: ['./batch-list.component.scss'],
+    standalone: false
 })
 export class BatchListComponent implements OnInit {
   programData: any

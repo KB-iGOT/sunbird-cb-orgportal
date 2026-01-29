@@ -6,7 +6,7 @@ import { Subject } from 'rxjs'
 import { ConfigurationsService } from '@sunbird-cb/utils-v2'
 /* tslint:disable*/
 import * as _ from 'lodash'
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog'
+import { MatDialog } from '@angular/material/dialog'
 import { DialogBoxComponent } from '../../components/dialog-box/dialog-box.component'
 
 
@@ -16,7 +16,7 @@ import { DialogBoxComponent } from '../../components/dialog-box/dialog-box.compo
     styleUrls: ['./faculty.component.scss'],
     /* tslint:disable */
     host: { class: 'w-full role-card flex flex-1' },
-    /* tslint:enable */
+    standalone: false
 })
 export class FacultyComponent implements OnInit {
     facultyForm!: UntypedFormGroup

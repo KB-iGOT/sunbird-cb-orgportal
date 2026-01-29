@@ -1,11 +1,11 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core'
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog'
+import { MatDialog } from '@angular/material/dialog'
 import { ActivatedRoute, Router } from '@angular/router'
 /* tslint:disable */
 import _ from 'lodash'
 /* tslint:enable */
 // import { environment } from 'src/environments/environment'
-import { LegacyPageEvent as PageEvent } from '@angular/material/legacy-paginator'
+import { PageEvent } from '@angular/material/paginator'
 import { EventService } from '@sunbird-cb/utils-v2'
 import { NsContent } from '@sunbird-cb/collection'
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser'
@@ -16,12 +16,12 @@ import { TelemetryEvents } from '../../../../head/_services/telemetry.event.mode
 import { ReportsVideoComponent } from '../reports-video/reports-video.component'
 
 @Component({
-  selector: 'ws-app-mentor-manage',
-  templateUrl: './mentor-manage.component.html',
-  styleUrls: ['./mentor-manage.component.scss'],
-  /* tslint:disable */
-  host: { class: 'flex flex-col' },
-  /* tslint:enable */
+    selector: 'ws-app-mentor-manage',
+    templateUrl: './mentor-manage.component.html',
+    styleUrls: ['./mentor-manage.component.scss'],
+    /* tslint:disable */
+    host: { class: 'flex flex-col' },
+    standalone: false
 })
 export class MentorManageComponent implements OnInit, OnDestroy {
 

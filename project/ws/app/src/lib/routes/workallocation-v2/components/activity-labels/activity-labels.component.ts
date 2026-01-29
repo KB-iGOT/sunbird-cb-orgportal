@@ -8,8 +8,8 @@ import { AllocationService } from '../../../workallocation/services/allocation.s
 import { debounceTime, map, switchMap, takeUntil } from 'rxjs/operators'
 import { Observable, Subject } from 'rxjs'
 import { WatStoreService } from '../../services/wat.store.service'
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog'
-import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar'
+import { MatDialog } from '@angular/material/dialog'
+import { MatSnackBar } from '@angular/material/snack-bar'
 import { animate, keyframes, state, style, transition, trigger } from '@angular/animations'
 import { WatRolePopupComponent } from './wat-role-popup/wat-role-popup.component'
 import { DialogConfirmComponent } from '../../../../../../../../../src/app/component/dialog-confirm/dialog-confirm.component'
@@ -18,34 +18,29 @@ import * as _ from 'lodash'
 // tslint:enable
 
 @Component({
-  selector: 'ws-app-activity-labels',
-  templateUrl: './activity-labels.component.html',
-  styleUrls: ['./activity-labels.component.scss'],
-  animations: [
-    trigger('fadeInGrow', [
-      state('in', style({ transform: 'translateY(0)' })),
-      transition('void => *', [
-        animate(
-          500,
-          keyframes([
-            style({ opacity: 0, transform: 'translateY(-100%)', offset: 0 }),
-            style({ opacity: 1, transform: 'translateY(15px)', offset: 0.3 }),
-            style({ opacity: 1, transform: 'translateY(0)', offset: 1.0 }),
-          ])
-        ),
-      ]),
-      transition('* => void', [
-        animate(
-          500000,
-          keyframes([
-            style({ opacity: 1, transform: 'translateY(0)', offset: 0 }),
-            style({ opacity: 1, transform: 'translateY(-15px)', offset: 0.7 }),
-            style({ opacity: 0, transform: 'translateY(100%)', offset: 1.0 }),
-          ])
-        ),
-      ]),
-    ]),
-  ],
+    selector: 'ws-app-activity-labels',
+    templateUrl: './activity-labels.component.html',
+    styleUrls: ['./activity-labels.component.scss'],
+    animations: [
+        trigger('fadeInGrow', [
+            state('in', style({ transform: 'translateY(0)' })),
+            transition('void => *', [
+                animate(500, keyframes([
+                    style({ opacity: 0, transform: 'translateY(-100%)', offset: 0 }),
+                    style({ opacity: 1, transform: 'translateY(15px)', offset: 0.3 }),
+                    style({ opacity: 1, transform: 'translateY(0)', offset: 1.0 }),
+                ])),
+            ]),
+            transition('* => void', [
+                animate(500000, keyframes([
+                    style({ opacity: 1, transform: 'translateY(0)', offset: 0 }),
+                    style({ opacity: 1, transform: 'translateY(-15px)', offset: 0.7 }),
+                    style({ opacity: 0, transform: 'translateY(100%)', offset: 1.0 }),
+                ])),
+            ]),
+        ]),
+    ],
+    standalone: false
 })
 export class ActivityLabelsComponent implements OnInit, OnDestroy, AfterViewInit {
   private unsubscribe = new Subject<void>()

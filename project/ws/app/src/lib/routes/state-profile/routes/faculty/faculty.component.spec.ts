@@ -3,7 +3,7 @@ import { UntypedFormGroup } from '@angular/forms'
 import { Subject, of } from 'rxjs'
 import { OrgProfileService } from '../../services/org-profile.service'
 import { ConfigurationsService } from '@sunbird-cb/utils-v2'
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog'
+import { MatDialog } from '@angular/material/dialog'
 import { DialogBoxComponent } from '../../components/dialog-box/dialog-box.component'
 
 // Mock services

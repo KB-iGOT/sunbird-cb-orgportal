@@ -1,10 +1,11 @@
 import { Component, Inject, OnInit } from '@angular/core'
-import { MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA, MatLegacyDialogRef as MatDialogRef } from '@angular/material/legacy-dialog'
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog'
 
 @Component({
-  selector: 'ws-app-selected-designation-popup',
-  templateUrl: './selected-designation-popup.component.html',
-  styleUrls: ['./selected-designation-popup.component.scss'],
+    selector: 'ws-app-selected-designation-popup',
+    templateUrl: './selected-designation-popup.component.html',
+    styleUrls: ['./selected-designation-popup.component.scss'],
+    standalone: false
 })
 export class SelectedDesignationPopupComponent implements OnInit {
 

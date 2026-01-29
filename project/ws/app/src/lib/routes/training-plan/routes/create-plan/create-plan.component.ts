@@ -6,9 +6,10 @@ import { TrainingPlanDataSharingService } from '../../services/training-plan-dat
 import _ from 'lodash'
 /* tslint:enable */
 @Component({
-  selector: 'ws-app-create-plan',
-  templateUrl: './create-plan.component.html',
-  styleUrls: ['./create-plan.component.scss'],
+    selector: 'ws-app-create-plan',
+    templateUrl: './create-plan.component.html',
+    styleUrls: ['./create-plan.component.scss'],
+    standalone: false
 })
 
 export class CreatePlanComponent implements OnInit, OnDestroy {

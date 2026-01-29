@@ -3,17 +3,18 @@ import { UntypedFormGroup, Validators, UntypedFormBuilder, UntypedFormArray, Unt
 import { AllocationService } from '../../services/allocation.service'
 import { Router } from '@angular/router'
 import { ExportAsService, ExportAsConfig } from 'ngx-export-as'
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog'
-import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar'
+import { MatDialog } from '@angular/material/dialog'
+import { MatSnackBar } from '@angular/material/snack-bar'
 import { AllocationActionsComponent } from '../../components/allocation-actions/allocation-actions.component'
 import { ConfigurationsService, EventService } from '@sunbird-cb/utils-v2'
 import { TelemetryEvents } from '../../../../head/_services/telemetry.event.model'
 import * as _ from 'lodash'
 import { DialogConfirmComponent } from '../../../../../../../../../src/app/component/dialog-confirm/dialog-confirm.component'
 @Component({
-  selector: 'ws-app-create-workallocation',
-  templateUrl: './create-workallocation.component.html',
-  styleUrls: ['./create-workallocation.component.scss'],
+    selector: 'ws-app-create-workallocation',
+    templateUrl: './create-workallocation.component.html',
+    styleUrls: ['./create-workallocation.component.scss'],
+    standalone: false
 })
 export class CreateWorkallocationComponent implements OnInit {
   @ViewChild('childNodes')

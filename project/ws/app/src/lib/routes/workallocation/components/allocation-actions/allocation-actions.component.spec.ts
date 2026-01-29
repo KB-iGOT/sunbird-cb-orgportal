@@ -1,6 +1,6 @@
 import { AllocationActionsComponent } from './allocation-actions.component'
 import { AllocationService } from '../../services/allocation.service'
-import { MatLegacyDialogRef as MatDialogRef } from '@angular/material/legacy-dialog'
+import { MatDialogRef } from '@angular/material/dialog'
 import { UntypedFormBuilder } from '@angular/forms'
 import { of } from 'rxjs'
 

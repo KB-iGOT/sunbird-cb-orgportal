@@ -1,8 +1,8 @@
 import { Component, EventEmitter, Input, OnInit, Output, ViewChild, ElementRef, OnChanges, SimpleChanges } from '@angular/core'
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms'
-import { MatLegacySnackBar } from '@angular/material/legacy-snack-bar'
-import { MatLegacyDialog } from '@angular/material/legacy-dialog'
-import { MatLegacyAutocomplete } from '@angular/material/legacy-autocomplete'
+import { MatSnackBar } from '@angular/material/snack-bar'
+import { MatDialog } from '@angular/material/dialog'
+import { MatAutocomplete } from '@angular/material/autocomplete'
 import { LoaderService } from '../../../../../../../../../../../src/app/services/loader.service'
 import { EventsService } from '../../services/events.service'
 import { map, mergeMap, debounceTime, distinctUntilChanged } from 'rxjs/operators'
@@ -13,9 +13,10 @@ import { ActivatedRoute } from '@angular/router'
 import { ConfirmDialogComponent } from '../../../../../workallocation-v2/components/confirm-dialog/confirm-dialog.component'
 
 @Component({
-  selector: 'ws-app-event-details',
-  templateUrl: './event-details.component.html',
-  styleUrls: ['./event-details.component.scss']
+    selector: 'ws-app-event-details',
+    templateUrl: './event-details.component.html',
+    styleUrls: ['./event-details.component.scss'],
+    standalone: false
 })
 export class EventDetailsComponent implements OnInit, OnChanges {
 
@@ -78,7 +79,7 @@ export class EventDetailsComponent implements OnInit, OnChanges {
   @Input() eventStatus = ''
   @Output() preEventFormReady = new EventEmitter<FormGroup>()
   @Output() postEventFormReady = new EventEmitter<FormGroup>()
-  @ViewChild('speakerAuto') speakerAutocomplete!: MatLegacyAutocomplete
+  @ViewChild('speakerAuto') speakerAutocomplete!: MatAutocomplete
   @ViewChild('speakerInput') speakerInput!: ElementRef<HTMLInputElement>
 
   // Toggle states
@@ -118,11 +119,11 @@ export class EventDetailsComponent implements OnInit, OnChanges {
 
   constructor(
     private formBuilder: FormBuilder,
-    private matSnackBar: MatLegacySnackBar,
+    private matSnackBar: MatSnackBar,
     private loaderService: LoaderService,
     private eventSvc: EventsService,
     private activatedRoute: ActivatedRoute,
-    private dialog: MatLegacyDialog
+    private dialog: MatDialog
   ) { }
 
   ngOnChanges(data: SimpleChanges) {

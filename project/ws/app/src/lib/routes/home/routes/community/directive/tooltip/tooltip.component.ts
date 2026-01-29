@@ -2,9 +2,10 @@ import { Component, Input, ElementRef, ChangeDetectorRef, HostBinding } from '@a
 
 
 @Component({
-  selector: 'app-tooltip',
-  templateUrl: './tooltip.component.html',
-  styleUrls: ['./tooltip.component.scss'],
+    selector: 'app-tooltip',
+    templateUrl: './tooltip.component.html',
+    styleUrls: ['./tooltip.component.scss'],
+    standalone: false
 })
 export class TooltipComponent {
   @Input() content: string = '';

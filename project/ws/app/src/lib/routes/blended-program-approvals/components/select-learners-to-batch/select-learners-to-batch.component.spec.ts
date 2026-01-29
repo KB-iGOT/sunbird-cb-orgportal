@@ -1,7 +1,7 @@
 
 import { OrgUserService } from '../../services/org-user.service'
 import { MyContentService } from '../../services/content-detail.service'
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog'
+import { MatDialog } from '@angular/material/dialog'
 import { SelectLearnersToBatchComponent } from './select-learners-to-batch.component'
 
 describe('SelectLearnersToBatchComponent', () => {

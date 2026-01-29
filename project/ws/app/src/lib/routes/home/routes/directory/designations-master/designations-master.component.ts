@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core'
 import { FormControl } from '@angular/forms'
-import { MatLegacySnackBar } from '@angular/material/legacy-snack-bar'
+import { MatSnackBar } from '@angular/material/snack-bar'
 import { ActivatedRoute } from '@angular/router'
 import { DirectoryService } from '../../../services/directory.service'
 import * as _ from 'lodash'
@@ -9,12 +9,13 @@ import { environment } from '../../../../../../../../../../src/environments/envi
 import { delay } from 'rxjs/operators'
 import { ReportsVideoComponent } from '../../reports-video/reports-video.component'
 import { ConformationPopupComponent } from '../../designation/dialog-boxes/conformation-popup/conformation-popup.component'
-import { MatLegacyDialog } from '@angular/material/legacy-dialog'
+import { MatDialog } from '@angular/material/dialog'
 
 @Component({
-  selector: 'ws-app-designations-master',
-  templateUrl: './designations-master.component.html',
-  styleUrls: ['./designations-master.component.scss']
+    selector: 'ws-app-designations-master',
+    templateUrl: './designations-master.component.html',
+    styleUrls: ['./designations-master.component.scss'],
+    standalone: false
 })
 export class DesignationsMasterComponent {
   @Input() goToImportMaster: boolean = false
@@ -43,9 +44,9 @@ export class DesignationsMasterComponent {
   designationMaster = 'desigantion master'
   constructor(
     private directoryService: DirectoryService,
-    private dialog: MatLegacyDialog,
+    private dialog: MatDialog,
     private activateRoute: ActivatedRoute,
-    private snackBar: MatLegacySnackBar,
+    private snackBar: MatSnackBar,
     private configSvc: ConfigurationsService
   ) { }
 

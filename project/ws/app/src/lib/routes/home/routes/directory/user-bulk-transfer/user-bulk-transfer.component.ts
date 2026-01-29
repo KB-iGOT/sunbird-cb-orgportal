@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy, AfterViewInit, Input } from '@angular/core'
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog'
-import { LegacyPageEvent as PageEvent } from '@angular/material/legacy-paginator'
-import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar'
+import { MatDialog } from '@angular/material/dialog'
+import { PageEvent } from '@angular/material/paginator'
+import { MatSnackBar } from '@angular/material/snack-bar'
 import { HttpErrorResponse } from '@angular/common/http'
 import { ActivatedRoute } from '@angular/router'
 // tslint:disable-next-line
@@ -15,9 +15,10 @@ import { FileProgressComponent } from '../../users-view/file-progress/file-progr
 import { VerifyOtpComponent } from '../../users-view/verify-otp/verify-otp.component'
 import { OrgHierarchyService } from '../../../services/org-hierarchy.service'
 @Component({
-  selector: 'ws-app-user-bulk-transfer',
-  templateUrl: './user-bulk-transfer.component.html',
-  styleUrls: ['./user-bulk-transfer.component.scss']
+    selector: 'ws-app-user-bulk-transfer',
+    templateUrl: './user-bulk-transfer.component.html',
+    styleUrls: ['./user-bulk-transfer.component.scss'],
+    standalone: false
 })
 export class UserBulkTransferComponent implements OnInit, AfterViewInit, OnDestroy {
 

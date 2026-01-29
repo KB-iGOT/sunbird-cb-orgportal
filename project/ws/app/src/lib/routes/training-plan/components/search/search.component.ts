@@ -10,9 +10,10 @@ import { InitService } from '../../../../../../../../../src/app/services/init.se
 import { ICompentencyKeys } from '../../../home/interface/interfaces'
 import { environment } from '../../../../../../../../../src/environments/environment'
 @Component({
-  selector: 'ws-app-search',
-  templateUrl: './search.component.html',
-  styleUrls: ['./search.component.scss'],
+    selector: 'ws-app-search',
+    templateUrl: './search.component.html',
+    styleUrls: ['./search.component.scss'],
+    standalone: false
 })
 export class SearchComponent implements OnInit {
   @Input() categoryData: any = []

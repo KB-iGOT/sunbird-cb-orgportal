@@ -2,9 +2,10 @@ import { Component, Input } from '@angular/core'
 import { Subscription, interval } from 'rxjs'
 
 @Component({
-  selector: 'ws-app-image-sliders',
-  templateUrl: './image-sliders.component.html',
-  styleUrls: ['./image-sliders.component.scss']
+    selector: 'ws-app-image-sliders',
+    templateUrl: './image-sliders.component.html',
+    styleUrls: ['./image-sliders.component.scss'],
+    standalone: false
 })
 export class ImageSlidersComponent {
   @Input() imageUrls: any[] = []

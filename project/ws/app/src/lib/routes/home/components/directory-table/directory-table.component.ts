@@ -7,13 +7,14 @@ import { MatTableDataSource } from '@angular/material/table'
 import { MatPaginator } from '@angular/material/paginator'
 import { MatSort } from '@angular/material/sort'
 import { InfoModalComponent } from '../info-modal/info-modal.component'
-import { MatLegacyDialog } from '@angular/material/legacy-dialog'
+import { MatDialog } from '@angular/material/dialog'
 import { ActivatedRoute, Router } from '@angular/router'
 
 @Component({
-  selector: 'ws-app-directory-table',
-  templateUrl: './directory-table.component.html',
-  styleUrls: ['./directory-table.component.scss']
+    selector: 'ws-app-directory-table',
+    templateUrl: './directory-table.component.html',
+    styleUrls: ['./directory-table.component.scss'],
+    standalone: false
 })
 export class DirectoryTableComponent implements OnInit {
 
@@ -59,7 +60,7 @@ export class DirectoryTableComponent implements OnInit {
   constructor(
     private directoryService: DirectoryService,
     private datePipe: DatePipe,
-    private dialog: MatLegacyDialog,
+    private dialog: MatDialog,
     private router: Router,
     private activatedRoute: ActivatedRoute
   ) {

@@ -1,18 +1,19 @@
 import { Component, Inject, OnInit } from '@angular/core'
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms'
-import { MatLegacyDialogRef, MAT_LEGACY_DIALOG_DATA } from '@angular/material/legacy-dialog'
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog'
 import * as _ from 'lodash'
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators'
 import { EventsService } from '../../services/events.service'
 import { speaker } from '../../models/events.model'
-import { MatLegacySnackBar } from '@angular/material/legacy-snack-bar'
+import { MatSnackBar } from '@angular/material/snack-bar'
 
 const EMAIL_PATTERN = /^[a-zA-Z0-9*]+([a-zA-Z0-9._-]*[a-zA-Z0-9*]+)*@[a-zA-Z0-9]+([-a-zA-Z0-9]*[a-zA-Z0-9]+)?(\.[a-zA-Z0-9-]+)*\.[a-zA-Z]{2,10}$/
 
 @Component({
-  selector: 'ws-app-add-speakers',
-  templateUrl: './add-speakers.component.html',
-  styleUrls: ['./add-speakers.component.scss']
+    selector: 'ws-app-add-speakers',
+    templateUrl: './add-speakers.component.html',
+    styleUrls: ['./add-speakers.component.scss'],
+    standalone: false
 })
 export class AddSpeakersComponent implements OnInit {
 
@@ -25,11 +26,11 @@ export class AddSpeakersComponent implements OnInit {
   speakerIndex = -1
 
   constructor(
-    private dialogRef: MatLegacyDialogRef<AddSpeakersComponent>,
-    @Inject(MAT_LEGACY_DIALOG_DATA) data: any,
+    private dialogRef: MatDialogRef<AddSpeakersComponent>,
+    @Inject(MAT_DIALOG_DATA) data: any,
     private formBuilder: FormBuilder,
     private eventsService: EventsService,
-    private matSnackBar: MatLegacySnackBar,
+    private matSnackBar: MatSnackBar,
   ) {
     this.speakersList = data.speakersList ? data.speakersList : []
     this.speakerIndex = data.speakerIndex
