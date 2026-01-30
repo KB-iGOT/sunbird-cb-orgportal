@@ -24,18 +24,15 @@ export class ExploreContentComponent implements OnInit {
   displayedColumns: string[] = [
     'expand',
     'contentName',
-    'status',
     'createdBy',
     'language',
     'createdOn',
-    'lastSubmittedOn',
+    'publishedOn',
     'actions',
   ]
-
   dataSource = new MatTableDataSource<any>([])
 
   searchQuery = ''
-
   length = 0
   pageSize = 10
   pageIndex = 0
@@ -43,9 +40,25 @@ export class ExploreContentComponent implements OnInit {
   expandedElement: any = null
   multilingualCourses: any[] = []
   currentTab: 'live' | 'draft' | 'retired' = 'live'
-
+  sideNavBarOpened = false
   @ViewChild(MatPaginator, { static: true }) paginator!: MatPaginator
-
+  searchBody: any
+  allFacets: any
+  defaultFacets: any = ["courseCategory", "avgRating", "language", "organisation",
+    "competencies_v6.competencyAreaName", "competencies_v6.competencyThemeName",
+    "competencies_v6.competencySubThemeName"]
+  defaultCategories: string[] = [
+    'Course',
+    'Program',
+    'Standalone Assessment',
+    'Curated Program',
+    'Blended Program',
+    'invite-only program',
+    'invite-only assessment',
+    'Case Study',
+    'Comprehensive Assessment Program',
+    'multilingual course'
+  ]
   constructor(
     readonly exploreContentService: ExploreContentService,
     private router: Router,
@@ -54,6 +67,23 @@ export class ExploreContentComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.searchBody = {
+      locale: ['en'],
+      request: {
+        limit: this.pageSize,
+        offset: this.pageIndex * this.pageSize,
+        query: this.searchQuery || '',
+        facets: this.defaultFacets,
+        filters: {
+          contentType: ["Course"],
+          courseCategory: this.defaultCategories,
+          status: ['Live'],
+        },
+        sort_by: {
+          lastUpdatedOn: 'desc',
+        },
+      },
+    }
     this.loadContent()
   }
 
@@ -90,43 +120,15 @@ export class ExploreContentComponent implements OnInit {
 
   private loadContent(): void {
     this.loaderService.changeLoaderState(true)
-    const requestBody = {
-      locale: ['en'],
-      request: {
-        limit: this.pageSize,
-        offset: this.pageIndex * this.pageSize,
-        query: this.searchQuery || '',
-        facets: ['courseCategory'],
-        filters: {
-          createdFor: ["0140788863598264326"],
-          must: {
-            courseCategory: [
-              'Course',
-              'Program',
-              'Standalone Assessment',
-              'Curated Program',
-              'Blended Program',
-              'invite-only program',
-              'invite-only assessment',
-              'Case Study',
-              'Comprehensive Assessment Program',
-            ],
-          },
-          status: ['Live'],
-        },
-        sort_by: {
-          lastUpdatedOn: 'desc',
-        },
-      },
-    }
 
-    this.exploreContentService.getAllContent(requestBody).subscribe(
+    this.exploreContentService.getAllContent(this.searchBody).subscribe(
       response => {
         const result = response?.result || {}
         const contents = result.content || []
         this.length = typeof result.count === 'number' ? result.count : contents.length
         if (contents.length) {
           this.dataSource.data = contents
+          this.allFacets = result.facets || []
           this.loaderService.changeLoaderState(false)
         } else {
           this.dataSource.data = []
@@ -225,5 +227,62 @@ export class ExploreContentComponent implements OnInit {
       return Object.values(languageMap).filter((lang: any) => !lang.isBaseLang && lang.status?.toLowerCase() === 'live').map(lang => lang.id)
     }
     return []
+  }
+
+  handleCloseSidenav(): void {
+    this.sideNavBarOpened = false
+  }
+
+  handleFiltersChanges(selectedFilters: any): void {
+    console.log('Selected filters received:', selectedFilters)
+    this.pageIndex = 0
+
+    // Update filters in searchBody
+    this.searchBody.request.filters = this.processSelectedFilters(selectedFilters)
+    console.log('Updated searchBody with filters:', this.searchBody)
+    this.loadContent()
+  }
+
+  processSelectedFilters(selectedFilters: any): any {
+    const filters: any = {
+      contentType: ['Course'],
+      status: ['Live'],
+      courseCategory: this.defaultCategories,
+      query: this.searchQuery || '',
+    }
+
+    // override default courseCategory if user selected categories
+    if (selectedFilters && Array.isArray(selectedFilters.categoryType) && selectedFilters.categoryType.length > 0) {
+      filters.courseCategory = selectedFilters.categoryType
+    }
+
+    // helper to add array filters only when non-empty
+    const addIfNonEmpty = (key: string, arr?: any[]) => {
+      if (Array.isArray(arr) && arr.length > 0) {
+        filters[key] = arr
+      }
+    }
+
+    // ratings -> avgRating (parse leading numeric value)
+    if (selectedFilters && Array.isArray(selectedFilters.ratings) && selectedFilters.ratings.length > 0) {
+      const re = /^\d+(?:\.\d+)?/
+      const parsed: number[] = []
+      for (const r of selectedFilters.ratings) {
+        const m = re.exec(String(r))
+        if (m?.[0]) {
+          parsed.push(Number.parseFloat(m[0]))
+        }
+      }
+      if (parsed.length) {
+        // choose the smallest threshold so the filter is inclusive
+        const threshold = Math.min(...parsed)
+        filters.avgRating = { '>=': String(threshold) }
+      }
+    }
+    addIfNonEmpty('organisation', selectedFilters.organisations)
+    addIfNonEmpty('competencies_v6.competencyAreaName', selectedFilters.competencyArea)
+    addIfNonEmpty('competencies_v6.competencyThemeName', selectedFilters.competencyTheme)
+    addIfNonEmpty('competencies_v6.competencySubThemeName', selectedFilters.competencySubTheme)
+    return filters
   }
 }

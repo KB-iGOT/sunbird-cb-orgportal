@@ -130,6 +130,7 @@ import { LangToolTipComponent } from './routes/lang-tool-tip/lang-tool-tip.compo
 import { PreviewComponent } from './routes/explore-content/preview/preview.component'
 import { AppTocLibModule } from '@sunbird-cb/toc'
 import { TranslateHttpLoader } from '@ngx-translate/http-loader'
+import { FiltersComponent } from './routes/explore-content/filters/filters.component'
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http)
 }
@@ -202,6 +203,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     WsCustomTooltipDirective,
     LangToolTipComponent,
     PreviewComponent,
+    FiltersComponent,
   ],
   imports: [
     CommonModule,

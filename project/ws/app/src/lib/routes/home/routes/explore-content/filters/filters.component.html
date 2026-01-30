@@ -1,0 +1,157 @@
+<div class="filter-overlay-12">
+  <div class="filter-12">
+    <div class="filter-header">
+      <h4 class="font-weight-bold margin-remove">
+        <div class="flex flex-between flex-baseline">
+          <span class="mat-h2 font-weight-500 margin-remove" i18n>Filter By</span>
+          <button mat-icon-button color="primary" class="text-middle close-button margin-remove" (click)="onClose()">
+            <mat-icon class="">clear</mat-icon>
+          </button>
+        </div>
+      </h4>
+    </div>
+    <div class="filter-content mt-4">
+
+      <!-- Category Type Section -->
+      <div class="filter-section">
+        <h3 class="filter-section-title">Category Type</h3>
+        <div class="filter-item">
+          <mat-checkbox [checked]="isAllContentsSelected()" (change)="onAllContentsChange($event)">
+            All Contents
+          </mat-checkbox>
+          <button mat-icon-button class="expand-btn" (click)="toggleCategoryExpand()">
+            <mat-icon>{{ categoryExpanded ? 'expand_less' : 'expand_more' }}</mat-icon>
+          </button>
+        </div>
+
+        <div *ngIf="categoryExpanded" class="filter-options">
+          <div *ngFor="let item of getDisplayedCategories()" class="filter-item">
+            <mat-checkbox [checked]="isFilterSelected('categoryType', item.name)"
+              (change)="onFilterChange('categoryType', item.name, $event.checked)">
+              {{ item.name }}({{ item.count }})
+            </mat-checkbox>
+          </div>
+          <a *ngIf="categories.length > 5" class="see-more-link" (click)="toggleCategoryShowAll()">
+            {{ showAllCategories ? 'See Less' : 'See More' }}
+          </a>
+        </div>
+      </div>
+
+      <!-- Ratings Section -->
+      <div class="filter-section" *ngIf="ratings?.length">
+        <h3 class="filter-section-title">Ratings</h3>
+        <div class="filter-options">
+          <div *ngFor="let item of ratings" class="filter-item">
+            <mat-checkbox [checked]="isFilterSelected('ratings', item.name)" (change)="onFilterChange('ratings', item.name, $event.checked)">
+              {{ item.name }}({{ item.count }})
+            </mat-checkbox>
+          </div>
+        </div>
+      </div>
+
+      <!-- Languages Section -->
+      <div class="filter-section">
+        <h3 class="filter-section-title">Languages</h3>
+        <mat-form-field appearance="outline" class="search-field">
+          <mat-icon matPrefix>search</mat-icon>
+          <input matInput placeholder="Search" [(ngModel)]="languageSearch" (input)="filterLanguages()">
+        </mat-form-field>
+        <div class="filter-options">
+          <div *ngFor="let item of getDisplayedLanguages()" class="filter-item">
+            <mat-checkbox [checked]="isFilterSelected('languages', item.name)" (change)="onFilterChange('languages', item.name, $event.checked)">
+              {{ item.name }}({{ item.count }})
+            </mat-checkbox>
+          </div>
+          <a *ngIf="filteredLanguages.length > 4" class="see-more-link" (click)="toggleLanguageShowAll()">
+            {{ showAllLanguages ? 'See Less' : 'See More' }}
+          </a>
+        </div>
+      </div>
+
+      <!-- Organisation Section -->
+      <div class="filter-section">
+        <h3 class="filter-section-title">Organisation</h3>
+        <mat-form-field appearance="outline" class="search-field">
+          <mat-icon matPrefix>search</mat-icon>
+          <input matInput placeholder="Search" [(ngModel)]="organisationSearch" (input)="filterOrganisations()">
+        </mat-form-field>
+        <div class="filter-options">
+          <div *ngFor="let item of getDisplayedOrganisations()" class="filter-item">
+            <mat-checkbox [checked]="isFilterSelected('organisations', item.name)"
+              (change)="onFilterChange('organisations', item.name, $event.checked)">
+              {{ item.name }}({{ item.count }})
+            </mat-checkbox>
+          </div>
+          <a *ngIf="filteredOrganisations.length > 4" class="see-more-link" (click)="toggleOrganisationShowAll()">
+            {{ showAllOrganisations ? 'See Less' : 'See More' }}
+          </a>
+        </div>
+      </div>
+
+      <!-- Competency Area Section -->
+      <div class="filter-section">
+        <h3 class="filter-section-title">Competency Area</h3>
+        <div class="filter-options">
+          <div *ngFor="let item of getDisplayedCompetencies()" class="filter-item">
+            <mat-checkbox [checked]="isFilterSelected('competencyArea', item.name)"
+              (change)="onFilterChange('competencyArea', item.name, $event.checked)">
+              {{ item.name }}({{ item.count }})
+            </mat-checkbox>
+          </div>
+          <a *ngIf="competencies.length > 4" class="see-more-link" (click)="toggleCompetencyShowAll()">
+            {{ showAllCompetencies ? 'See Less' : 'See More' }}
+          </a>
+        </div>
+      </div>
+
+      <!-- Competency Theme Section -->
+      <div class="filter-section">
+        <h3 class="filter-section-title">Competency Theme</h3>
+        <mat-form-field appearance="outline" class="search-field">
+          <mat-icon matPrefix>search</mat-icon>
+          <input matInput placeholder="Search" [(ngModel)]="competencyThemeSearch" (input)="filterCompetencyTheme()">
+        </mat-form-field>
+        <div class="filter-options">
+          <div *ngFor="let item of getDisplayedCompetencyTheme()" class="filter-item">
+            <mat-checkbox [checked]="isFilterSelected('competencyTheme', item.name)"
+              (change)="onFilterChange('competencyTheme', item.name, $event.checked)">
+              {{ item.name }}({{ item.count }})
+            </mat-checkbox>
+          </div>
+          <a *ngIf="filteredCompetencyTheme.length > 4" class="see-more-link" (click)="toggleCompetencyThemeShowAll()">
+            {{ showAllCompetencyTheme ? 'See Less' : 'See More' }}
+          </a>
+        </div>
+      </div>
+
+      <!-- Competency Sub-Theme Section -->
+      <div class="filter-section">
+        <h3 class="filter-section-title">Competency Sub-Theme</h3>
+        <mat-form-field appearance="outline" class="search-field">
+          <mat-icon matPrefix>search</mat-icon>
+          <input matInput placeholder="Search" [(ngModel)]="competencySubThemeSearch" (input)="filterCompetencySubTheme()">
+        </mat-form-field>
+        <div class="filter-options">
+          <div *ngFor="let item of getDisplayedCompetencySubTheme()" class="filter-item">
+            <mat-checkbox [checked]="isFilterSelected('competencySubTheme', item.name)"
+              (change)="onFilterChange('competencySubTheme', item.name, $event.checked)">
+              {{ item.name }}({{ item.count }})
+            </mat-checkbox>
+          </div>
+          <a *ngIf="filteredCompetencySubTheme.length > 4" class="see-more-link" (click)="toggleCompetencySubThemeShowAll()">
+            {{ showAllCompetencySubTheme ? 'See Less' : 'See More' }}
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="filter-footer flex flex-center gap-6">
+      <button mat-button type="button" class="clear-all-btn" (click)="onClearAll()">
+        Clear All
+      </button>
+      <button mat-button type="button" class="apply-filter-btn" (click)="onApplyFilter()">
+        Apply Filter
+      </button>
+    </div>
+  </div>
+</div>

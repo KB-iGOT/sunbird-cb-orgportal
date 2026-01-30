@@ -45,8 +45,22 @@
 	width: 32px;
 }
 
+.visibility {
+  color: #1B4CA1!important;
+}
+
 .filter-btn {
 	text-transform: none;
+  background: transparent !important;
+  border: none !important;
+  color: #1B4CA1!important;
+  mat-icon {
+    color: #1B4CA1!important;
+  }
+  span {
+    padding-left: 5px;
+    color: #1B4CA1!important;
+  }
 }
 
 .table-card {
@@ -103,6 +117,7 @@ td.mat-cell {
   object-fit: scale-down;
   border-radius: 4px;
   border: 1px solid rgba(0, 0, 0, .0784313725);
+  min-height: 76px;
 }
 
 .duration-chip {
@@ -117,7 +132,7 @@ td.mat-cell {
 }
 
 .content-meta {
-  width: 235px;
+  width: 275px;
 }
 
 .language-count {
@@ -160,6 +175,7 @@ td.mat-cell {
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
+  line-height: 22px;
  }
 
 .tag-chip {
@@ -347,5 +363,12 @@ tr.detail-row {
 	.search-wrapper {
 		width: 100%;
 	}
+}
+
+.opened {
+  display: block;
+}
+.closed {
+  display: none;
 }
 

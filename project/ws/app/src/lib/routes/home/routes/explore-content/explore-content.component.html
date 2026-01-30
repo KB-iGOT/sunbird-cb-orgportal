@@ -12,9 +12,9 @@
       </button>
     </div>
 
-    <button mat-stroked-button color="primary" class="filter-btn">
+    <button mat-stroked-button color="primary" class="filter-btn" (click)="sideNavBarOpened = true">
       <mat-icon>filter_list</mat-icon>
-      Filter
+      <span>Filter</span>
     </button>
   </div>
 
@@ -66,51 +66,27 @@
                       </div>
                     </div>
                   </td>
-
-                  <td class="table-cell-spacing padding-10" [style.width.px]="150" style="white-space: normal; word-wrap: break-word;">
-                    <div class="status-badge">
-                      <span class="{{ course?.status?.toLowerCase() }}">
-                        <mat-icon class="status-icon"
-                          *ngIf="course?.status !== 'Live' && course?.status !== 'Retired' && course?.status !== 'Failed'">
-                          schedule
-                        </mat-icon>
-                        <mat-icon class="status-icon" *ngIf="course?.status === 'Failed'">close</mat-icon>
-
-                        <span *ngIf="course?.status === 'Live'; else otherStatus">Live</span>
-                        <ng-template #otherStatus>
-                          <span *ngIf="course?.status === 'Retired'">Inactive</span>
-                          <span *ngIf="course?.status === 'Review' && course?.reviewStatus === 'InReview'">
-                            Under Review
-                          </span>
-                          <span *ngIf="course?.status === 'Review' && course?.reviewStatus === 'Reviewed'">
-                            Under Publish
-                          </span>
-                          <span *ngIf="course?.status === 'Draft'">Draft</span>
-                        </ng-template>
-                      </span>
-                    </div>
-                  </td>
                   <ng-container>
                     <td class="table-cell-spacing" [style.width.px]="250" style="white-space: normal; word-wrap: break-word;">
-                      {{ course?.creator }}
+                      {{ course?.source }}
                     </td>
-                    <td class="table-cell-spacing" [style.width.px]="150" style="white-space: normal; word-wrap: break-word;">
+                    <td class="table-cell-spacing" [style.width.px]="250" style="white-space: normal; word-wrap: break-word;">
                       <ng-container *ngFor="let language of course?.language; let last = last">
                         {{ language }}<span *ngIf="course?.language?.length > 1 && !last">,</span>
                       </ng-container>
                     </td>
                   </ng-container>
 
-                  <td class="table-cell-spacing" [style.width.px]="200" style="white-space: normal; word-wrap: break-word;">
+                  <td class="table-cell-spacing" [style.width.px]="250" style="white-space: normal; word-wrap: break-word;">
                     {{ course?.createdOn | date: 'MMM dd, yyyy' }}
                   </td>
-                  <td class="table-cell-spacing" [style.width.px]="250" style="white-space: normal; word-wrap: break-word;">
+                  <td class="table-cell-spacing" [style.width.px]="275" style="white-space: normal; word-wrap: break-word;">
                     {{ course?.lastUpdatedOn | date: 'MMM dd, yyyy' }}
                   </td>
                   <ng-container>
                     <td class="table-cell-spacing">
                       <ng-container *ngIf="course?.status !== 'Retired'">
-                        <mat-icon class="cursor-pointer" (click)="viewContent(course)" (keyup)="viewContent(course)">visibility</mat-icon>
+                        <mat-icon class="cursor-pointer visibility" (click)="viewContent(course)" (keyup)="viewContent(course)">visibility</mat-icon>
                       </ng-container>
                     </td>
                   </ng-container>
@@ -148,29 +124,16 @@
         </td>
       </ng-container>
 
-      <!-- Status column -->
-      <ng-container matColumnDef="status">
-        <th mat-header-cell *matHeaderCellDef [style.width.px]="150">Status</th>
-        <td mat-cell *matCellDef="let row" [style.width.px]="150">
-          <div class="status-badge">
-            <span [ngClass]="{ 'live': row.status === 'Live'}">
-              {{ row.status }}
-            </span>
-          </div>
-
-        </td>
-      </ng-container>
-
       <!-- Created By column -->
       <ng-container matColumnDef="createdBy">
         <th mat-header-cell *matHeaderCellDef [style.width.px]="250">Created By</th>
-        <td mat-cell *matCellDef="let row" [style.width.px]="250">{{ row.creator }}</td>
+        <td mat-cell *matCellDef="let row" [style.width.px]="250">{{ row.source }}</td>
       </ng-container>
 
       <!-- Language column -->
       <ng-container matColumnDef="language">
-        <th mat-header-cell *matHeaderCellDef [style.width.px]="150">Language</th>
-        <td mat-cell *matCellDef="let row" [style.width.px]="150">
+        <th mat-header-cell *matHeaderCellDef [style.width.px]="250">Language</th>
+        <td mat-cell *matCellDef="let row" [style.width.px]="250">
           <ng-container *ngFor="let language of row?.language; let last = last">
             {{language}} <span *ngIf="row?.language?.length > 1 && !last">,</span>
           </ng-container>
@@ -183,14 +146,14 @@
 
       <!-- Created On column -->
       <ng-container matColumnDef="createdOn">
-        <th mat-header-cell *matHeaderCellDef [style.width.px]="200">Created On</th>
-        <td mat-cell *matCellDef="let row">{{ row.createdOn | date:'MMM dd, yyyy' }}</td>
+        <th mat-header-cell *matHeaderCellDef [style.width.px]="250">Created On</th>
+        <td mat-cell *matCellDef="let row" [style.width.px]="250">{{ row.createdOn | date:'MMM dd, yyyy' }}</td>
       </ng-container>
 
       <!-- Last Submitted On column -->
-      <ng-container matColumnDef="lastSubmittedOn">
-        <th mat-header-cell *matHeaderCellDef [style.width.px]="200">Last Submitted On</th>
-        <td mat-cell *matCellDef="let row">{{ row.lastSubmittedOn | date:'MMM dd, yyyy' }}</td>
+      <ng-container matColumnDef="publishedOn">
+        <th mat-header-cell *matHeaderCellDef [style.width.px]="250">Published On</th>
+        <td mat-cell *matCellDef="let row" [style.width.px]="250">{{ row.lastPublishedOn | date:'MMM dd, yyyy' }}</td>
       </ng-container>
 
       <!-- Actions column with visibility icon -->
@@ -198,7 +161,7 @@
         <th mat-header-cell *matHeaderCellDef class="actions-header">Actions</th>
         <td mat-cell *matCellDef="let row" class="actions-cell">
           <button mat-icon-button color="primary" aria-label="View content" (click)="viewContent(row)">
-            <mat-icon>visibility</mat-icon>
+            <mat-icon class="visibility">visibility</mat-icon>
           </button>
         </td>
       </ng-container>
@@ -216,3 +179,6 @@
     </mat-paginator>
   </div>
 </div>
+<div [ngClass]="{'opened': sideNavBarOpened, 'closed': !sideNavBarOpened }" class="filter-sidenav-container">
+  <ws-app-filters [allFacets]="allFacets" (closeSidenav)="handleCloseSidenav()" (filtersChanged)="handleFiltersChanges($event)"></ws-app-filters>
+</div>handleSelectedFilters
