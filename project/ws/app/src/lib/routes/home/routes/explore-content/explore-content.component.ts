@@ -89,6 +89,7 @@ export class ExploreContentComponent implements OnInit {
 
   applySearch(value: string): void {
     this.searchQuery = (value || '').trim()
+    this.searchBody.request.query = this.searchQuery
     this.pageIndex = 0
     this.loadContent()
   }
@@ -248,7 +249,6 @@ export class ExploreContentComponent implements OnInit {
       contentType: ['Course'],
       status: ['Live'],
       courseCategory: this.defaultCategories,
-      query: this.searchQuery || '',
     }
 
     // override default courseCategory if user selected categories

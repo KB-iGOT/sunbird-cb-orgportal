@@ -36,7 +36,7 @@ export class ApprovalsListComponent implements OnInit {
 
   stats = {
     totalPending: 24,
-    totalApproved: 1240,
+    totalApproved: 5240,
     totalRejected: 45
   };
 
@@ -160,7 +160,7 @@ export class ApprovalsListComponent implements OnInit {
       const dialogRef = this.dialog.open(RejectReasonDialogComponent, {
         disableClose: true,
         data: {
-          title: 'Please specify the reason for rejection',
+          title: 'Remarks',
           maxLength: 500,
         },
         autoFocus: false,
