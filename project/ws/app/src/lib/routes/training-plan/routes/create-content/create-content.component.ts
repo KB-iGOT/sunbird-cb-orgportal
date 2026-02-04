@@ -133,7 +133,6 @@ export class CreateContentComponent implements OnInit, OnChanges {
   itemsRemovedFromChip() {
     this.handleSelectedChips(true)
     if (this.tpdsSvc.trainingPlanStepperData.status === 'Live') {
-      console.log('Content changed in live training plan')
       this.tpdsSvc.isContentChanged = true
     }
   }

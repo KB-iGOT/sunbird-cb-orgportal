@@ -55,7 +55,6 @@ export class StandardCardComponent implements OnInit, AfterViewChecked {
       this.tpdsSvc.trainingPlanStepperData['contentList'] = []
     }
     if (this.tpdsSvc.trainingPlanStepperData.status === 'Live') {
-      console.log('Content changed in live training plan')
       this.tpdsSvc.isContentChanged = true
     }
     if (event.checked) {
@@ -98,7 +97,6 @@ export class StandardCardComponent implements OnInit, AfterViewChecked {
       }
     })
     if (this.tpdsSvc.trainingPlanStepperData.status === 'Live') {
-      console.log('Content changed in live training plan')
       this.tpdsSvc.isContentChanged = true
     }
     this.contentData.filter((sitem: any, index: any) => { //NOSONAR
