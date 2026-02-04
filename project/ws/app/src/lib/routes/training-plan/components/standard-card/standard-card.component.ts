@@ -54,7 +54,9 @@ export class StandardCardComponent implements OnInit, AfterViewChecked {
     if (!this.tpdsSvc.trainingPlanStepperData['contentList']) {
       this.tpdsSvc.trainingPlanStepperData['contentList'] = []
     }
-
+    if (this.tpdsSvc.trainingPlanStepperData.status === 'Live') {
+      this.tpdsSvc.isContentChanged = true
+    }
     if (event.checked) {
       const contentItem = this.contentData.find(sitem => sitem.identifier === item.identifier)
       if (contentItem) {
@@ -94,6 +96,9 @@ export class StandardCardComponent implements OnInit, AfterViewChecked {
         sitem['selected'] = false
       }
     })
+    if (this.tpdsSvc.trainingPlanStepperData.status === 'Live') {
+      this.tpdsSvc.isContentChanged = true
+    }
     this.contentData.filter((sitem: any, index: any) => { //NOSONAR
       if (sitem.identifier === item.identifier) {
         this.contentData.splice(index, 1)
