@@ -18,6 +18,7 @@ export class FiltersComponent implements OnInit, OnChanges {
   // Category data - will be populated from allFacets
   categories: FilterItem[] = []
   ratings: FilterItem[] = []
+  filteredRatings: FilterItem[] = []
   languages: FilterItem[] = []
   organisations: FilterItem[] = []
   competencies: FilterItem[] = []
@@ -59,54 +60,43 @@ export class FiltersComponent implements OnInit, OnChanges {
   constructor() { }
 
   ngOnInit(): void {
-    console.log('ngOnInit - allFacets:', this.allFacets)
     this.initializeFiltersFromFacets()
   }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['allFacets'] && !changes['allFacets'].firstChange) {
-      console.log('ngOnChanges - allFacets updated:', this.allFacets)
       this.initializeFiltersFromFacets()
     }
   }
 
   private initializeFiltersFromFacets(): void {
-    console.log('Initializing filters from facets:', this.allFacets)
     if (!this.allFacets || this.allFacets.length === 0) {
       console.warn('No facets available')
       return
     }
 
     this.allFacets.forEach((facet: any) => {
-      console.log('Processing facet:', facet.name, 'with', facet.values?.length, 'values')
       switch (facet.name) {
         case 'courseCategory':
           this.categories = this.mapFacetValues(facet.values)
-          console.log('Categories mapped:', this.categories)
           break
         case 'avgRating':
           this.ratings = this.formatRatings(facet.values)
-          console.log('Ratings mapped:', this.ratings)
           break
         case 'language':
           this.languages = this.mapFacetValues(facet.values)
-          console.log('Languages mapped:', this.languages)
           break
         case 'organisation':
           this.organisations = this.mapFacetValues(facet.values)
-          console.log('Organisations mapped:', this.organisations)
           break
         case 'competencies_v6.competencyAreaName':
           this.competencies = this.mapFacetValues(facet.values)
-          console.log('Competencies mapped:', this.competencies)
           break
         case 'competencies_v6.competencyThemeName':
           this.competencyTheme = this.mapFacetValues(facet.values)
-          console.log('Competency Theme mapped:', this.competencyTheme)
           break
         case 'competencies_v6.competencySubThemeName':
           this.competencySubTheme = this.mapFacetValues(facet.values)
-          console.log('Competency Sub-Theme mapped:', this.competencySubTheme)
           break
       }
     })
@@ -127,7 +117,29 @@ export class FiltersComponent implements OnInit, OnChanges {
 
   private formatRatings(values: any[]): FilterItem[] {
     if (!values) return []
-    // Sort ratings in descending order
+    // Build a simple map from rating string to count
+    const valuesMap: Record<string, number> = {}
+    values.forEach((v: any) => {
+      const key = String(v.name)
+      valuesMap[key] = (valuesMap[key] || 0) + (v.count || 0)
+    })
+
+    // Create aggregated rating ranges like 4.5, 4.0, 3.5, 3.0
+    const ratingRanges = [4.5, 4, 3.5, 3]
+    const formatted = ratingRanges
+      .map((rating) => {
+        const count = Object.entries(valuesMap)
+          .filter(([rate]) => Number.parseFloat(rate) >= rating)
+          .reduce((sum, [, cnt]) => sum + Number(cnt), 0)
+        return count > 0 ? { name: `${rating.toFixed(1)}`, count } : null
+      })
+      .filter(Boolean) as FilterItem[]
+
+    // Keep original ratings array (sorted) for compatibility, but also store the aggregated filteredRatings
+    this.filteredRatings = formatted.map(v => ({
+      name: `${v.name} & Above`,
+      count: v.count
+    }))
     const sortedValues = [...values].sort((a, b) => Number.parseFloat(b.name) - Number.parseFloat(a.name))
     return sortedValues.map(v => ({
       name: `${v.name} & Above`,
@@ -252,7 +264,6 @@ export class FiltersComponent implements OnInit, OnChanges {
 
   emitFilterChanges(): void {
     this.filtersChanged.emit(this.selectedFilters)
-    console.log('Selected filters:', this.selectedFilters)
   }
 
   onClose(): void {

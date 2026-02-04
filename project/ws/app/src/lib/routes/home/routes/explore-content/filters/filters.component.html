@@ -38,12 +38,12 @@
       </div>
 
       <!-- Ratings Section -->
-      <div class="filter-section" *ngIf="ratings?.length">
+      <div class="filter-section" *ngIf="filteredRatings?.length">
         <h3 class="filter-section-title">Ratings</h3>
         <div class="filter-options">
-          <div *ngFor="let item of ratings" class="filter-item">
+          <div *ngFor="let item of filteredRatings" class="filter-item">
             <mat-checkbox [checked]="isFilterSelected('ratings', item.name)" (change)="onFilterChange('ratings', item.name, $event.checked)">
-              {{ item.name }}({{ item.count }})
+              {{ item.name }} ({{ item.count }})
             </mat-checkbox>
           </div>
         </div>
