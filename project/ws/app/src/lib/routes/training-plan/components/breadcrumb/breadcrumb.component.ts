@@ -411,13 +411,17 @@ export class BreadcrumbComponent implements OnInit {
           autoFocus: false,
         })
         break
-      case 'updateAndPublish':
+      case 'updateAndPublish': {
+        let title: any = "Are you sure you want to update and publish the plan?"
+        if (this.tpdsSvc.isContentChanged) {
+          title = "Editing the course list may impact learners who have already accessed this training plan. Removing or modifying a course could change their learning experience. Please confirm before proceeding. Are you sure you want to update and publish the plan?"
+        }
         this.dialogRef = this.dialog.open(ConfirmationBoxComponent, {
           disableClose: true,
           data: {
             type: 'conformation',
             icon: 'radio_on',
-            title: "Editing the course list may impact learners who have already accessed this training plan. Removing or modifying a course could change their learning experience. Please confirm before proceeding. Are you sure you want to update and publish the plan?",
+            title: title,
             // subTitle: 'You wont be able to revert this',
             primaryAction: 'Confirm',
             secondaryAction: 'Cancel',
@@ -425,6 +429,7 @@ export class BreadcrumbComponent implements OnInit {
           autoFocus: false,
         })
         break
+      }
     }
     this.dialogRef.afterClosed().subscribe((_res: any) => {
       if (_res === 'confirmed') {
