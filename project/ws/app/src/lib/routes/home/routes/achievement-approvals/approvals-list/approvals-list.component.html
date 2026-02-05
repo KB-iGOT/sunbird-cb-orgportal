@@ -109,10 +109,6 @@
               </th>
               <td mat-cell *matCellDef="let element" class="achievement-cell">
                 <div class="achievement-title">{{ element.achievementTitle }}</div>
-                <div class="evidence-link cursor-pointer flex item-center gap-2">
-                  <mat-icon>link</mat-icon>
-                  <span>Evidence Submitted</span>
-                </div>
               </td>
             </ng-container>
 
@@ -144,7 +140,7 @@
               </td>
             </ng-container>
 
-            <ng-container matColumnDef="actions">
+            <ng-container matColumnDef="actions" *ngIf="selectedTabIndex === 0">
               <th mat-header-cell *matHeaderCellDef class="actions-header">Actions</th>
               <td mat-cell *matCellDef="let element" class="actions-cell">
                 <button type="button" mat-icon-button="" aria-label="action items" [matMenuTriggerFor]="cardMenu"
@@ -154,6 +150,13 @@
                       data-mat-icon-type="font">more_horiz</mat-icon></span><span matripple=""
                     class="mat-ripple mat-button-ripple mat-button-ripple-round" ng-reflect-disabled="false" ng-reflect-centered="true"></span><span
                     class="mat-button-focus-overlay"></span></button>
+              </td>
+
+            </ng-container>
+            <ng-container matColumnDef="actions" *ngIf="selectedTabIndex === 1">
+              <th mat-header-cell *matHeaderCellDef class="actions-header">Actions</th>
+              <td mat-cell *matCellDef="let element" class="actions-cell">
+                <mat-icon class="visibility-icon cursor-pointer" (click)="view(element)" (keyup)="view(element)">visibility</mat-icon>
               </td>
             </ng-container>
             <tr mat-header-row *matHeaderRowDef="displayedColumns" class="table-row-data"></tr>
@@ -177,6 +180,9 @@
 
 <mat-menu #cardMenu="matMenu">
   <ng-template matMenuContent let-rowData="data">
+    <button (click)="view(rowData)" mat-menu-item name="channel-analytics-button" aria-label="Analytics">
+      <mat-icon class="margin-right-xs">visibility</mat-icon><span>View</span>
+    </button>
     <button (click)="approve(rowData)" mat-menu-item name="channel-analytics-button" aria-label="Analytics">
       <mat-icon class="margin-right-xs">check</mat-icon><span>Approve</span>
     </button>
@@ -185,3 +191,7 @@
     </button>
   </ng-template>
 </mat-menu>
+
+<div [ngClass]="{'opened': sideNavBarOpened, 'closed': !sideNavBarOpened }" class="filter-sidenav-container">
+  <ws-app-view-achievement (closeSidenav)="handleCloseSidenav()"></ws-app-view-achievement>
+</div>

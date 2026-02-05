@@ -27,12 +27,13 @@ export interface AchievementApproval {
 export class ApprovalsListComponent implements OnInit {
   displayedColumns: string[] = ['select', 'user', 'achievementTitle', 'dateSubmitted', 'actions'];
   readonly pendingColumns: string[] = ['select', 'user', 'achievementTitle', 'dateSubmitted', 'actions']
-  readonly reviewedColumns: string[] = ['user', 'achievementTitle', 'dateSubmitted', 'decisionDate', 'status']
+  readonly reviewedColumns: string[] = ['user', 'achievementTitle', 'dateSubmitted', 'decisionDate', 'status', 'actions']
 
   dataSource: MatTableDataSource<AchievementApproval>
   selection = new SelectionModel<AchievementApproval>(true, []);
   selectedTabIndex = 0;
   filterStatus: 'All' | 'Approved' | 'Rejected' = 'All'
+  sideNavBarOpened: boolean = false
 
   stats = {
     totalPending: 24,
@@ -237,5 +238,14 @@ export class ApprovalsListComponent implements OnInit {
   onPageChange(event: PageEvent): void {
     this.pageSize = event.pageSize
     this.currentPage = event.pageIndex
+  }
+
+  handleCloseSidenav(): void {
+    this.sideNavBarOpened = false
+  }
+
+  view(rowData: AchievementApproval): void {
+    this.sideNavBarOpened = true
+    console.log('Viewing achievement details for:', rowData)
   }
 }
