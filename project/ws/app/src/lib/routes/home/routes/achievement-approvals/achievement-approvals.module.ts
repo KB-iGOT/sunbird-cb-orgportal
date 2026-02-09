@@ -26,6 +26,7 @@ import { ApprovalsListComponent } from './approvals-list/approvals-list.componen
 import { AchievementApprovalsRoutingModule } from './achievement-approvals-routing.module'
 import { RejectReasonDialogComponent } from './reject-reason-dialog/reject-reason-dialog.component'
 import { ViewAchievementComponent } from './view-achievement/view-achievement.component'
+import { AchievementsService } from '../../services/achievements.service'
 @NgModule({
   declarations: [
     BaseComponent,
@@ -70,5 +71,8 @@ import { ViewAchievementComponent } from './view-achievement/view-achievement.co
     MatProgressSpinnerModule,
     MatExpansionModule,
   ],
+  providers: [
+    AchievementsService
+  ]
 })
 export class AchievementApprovalsModule { }
