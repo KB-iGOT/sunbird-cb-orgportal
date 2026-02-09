@@ -87,7 +87,7 @@ export class BreadcrumbComponent implements OnInit {
       if (this.editState) {
         this.router.navigate(['app', 'home', 'training-plan-dashboard'], {
           queryParams: {
-            type: this.tpdsSvc.trainingPlanStepperData.status.toLowerCase(),
+            type: this.tpdsSvc.trainingPlanStepperData.status === 'Live' ? this.tpdsSvc.trainingPlanStepperData.status : this.tpdsSvc.trainingPlanStepperData.status.toLowerCase(),
             tabSelected: this.tpdsSvc.trainingPlanStepperData.assignmentType,
           },
         })
