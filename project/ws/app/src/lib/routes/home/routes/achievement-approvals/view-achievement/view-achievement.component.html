@@ -15,24 +15,24 @@
         <div class="details">
           <div class="detail-row py-2">
             <div class="detail-label font-bold">Title</div>
-            <div class="detail-value">{{ achievement?.title || 'N/A'}}</div>
+            <div class="detail-value">{{ achievement?.contextData?.title || 'N/A'}}</div>
           </div>
 
           <div class="detail-row py-2">
             <div class="detail-label font-bold">Issuing Organization</div>
-            <div class="detail-value">{{ achievement?.issuedBy || 'N/A'}}</div>
+            <div class="detail-value">{{ achievement?.contextData?.issuedOrganisation || 'N/A'}}</div>
           </div>
 
           <div class="detail-row py-2">
             <div class="detail-label font-bold">Delivery Mode</div>
-            <div class="detail-value">{{ achievement?.deliveryMode || 'N/A' }}</div>
+            <div class="detail-value">{{ achievement?.contextData?.deliveryMode || 'N/A' }}</div>
           </div>
 
           <div class="detail-row py-2">
             <div class="detail-label font-bold">Learning Objective</div>
             <div class="detail-value text-justify">
-              <ng-container *ngIf="achievement?.description; else noDescription">
-                <div #descriptionRef [class.line-clamp]="!showFullDescription">{{ achievement.description }}</div>
+              <ng-container *ngIf="achievement?.contextData?.description; else noDescription">
+                <div #descriptionRef [class.line-clamp]="!showFullDescription">{{ achievement.contextData.description }}</div>
                 <a *ngIf="isLongDescription" class="view-toggle cursor-pointer text-primary" (click)="toggleDescription()">
                   {{ showFullDescription ? 'View less' : 'View more' }}
                 </a>
@@ -43,38 +43,40 @@
 
           <div class="detail-row py-2">
             <div class="detail-label font-bold">Start Date</div>
-            <div class="detail-value">{{ achievement?.startDate ? (achievement.startDate | date:'mediumDate') : 'N/A' }}</div>
+            <div class="detail-value">{{ achievement?.contextData?.startDate ? (achievement.contextData.startDate | date:'mediumDate') : 'N/A' }}
+            </div>
           </div>
 
           <div class="detail-row py-2">
             <div class="detail-label font-bold">End Date</div>
-            <div class="detail-value">{{ achievement?.endDate ? (achievement.endDate | date:'mediumDate') : 'N/A' }}</div>
+            <div class="detail-value">{{ achievement?.contextData?.endDate ? (achievement.contextData.endDate | date:'mediumDate') : 'N/A' }}</div>
           </div>
 
           <div class="detail-row py-2">
             <div class="detail-label font-bold">Issue Date</div>
-            <div class="detail-value">{{ achievement?.issueDate ? (achievement.issueDate | date:'mediumDate') : 'N/A' }}</div>
+            <div class="detail-value">{{ achievement?.contextData?.issuedDate ? (achievement.contextData.issuedDate | date:'mediumDate') : 'N/A' }}
+            </div>
           </div>
 
           <div class="detail-row py-2">
             <div class="detail-label font-bold">Learning Hours</div>
-            <div class="detail-value">{{ achievement?.learningHours ?? 'N/A' }}</div>
+            <div class="detail-value">{{ achievement?.contextData?.learningHours ? achievement?.contextData?.learningHours :'N/A' }}</div>
           </div>
 
           <div class="detail-row py-2">
             <div class=" detail-label font-bold">Training Type</div>
-            <div class="detail-value">{{ achievement?.trainingType || 'N/A' }}</div>
+            <div class="detail-value">{{ achievement?.contextData?.trainingType || 'N/A' }}</div>
           </div>
 
-          <div class="detail-row py-2" *ngIf="achievement?.uploadedDocumentUrl">
+          <div class="detail-row py-2" *ngIf="achievement?.contextData?.uploadedDocumentUrl">
             <div class="detail-label font-bold pb-2">Evidence</div>
-            <img [src]="achievement?.uploadedDocumentUrl" alt="Evidence Document" class="evidence-image" />
+            <img [src]="achievement?.contextData?.uploadedDocumentUrl" alt="Evidence Document" class="evidence-image" />
           </div>
 
-          <div class="detail-row py-2" *ngIf="achievement?.url">
+          <div class="detail-row py-2" *ngIf="achievement?.contextData?.url">
             <div class="detail-label font-bold">URL</div>
             <div class="detail-value">
-              <a href="{{ achievement?.url }}" target="_blank">{{ achievement?.url || 'N/A'}}</a>
+              <a href="{{ achievement?.contextData?.url }}" target="_blank">{{ achievement?.contextData?.url || 'N/A'}}</a>
             </div>
           </div>
         </div>

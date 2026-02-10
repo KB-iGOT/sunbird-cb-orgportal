@@ -1,12 +1,13 @@
-import { Component, OnInit } from '@angular/core'
+import { Component, OnInit, ViewChild } from '@angular/core'
 import { MatTableDataSource } from '@angular/material/table'
 import { SelectionModel } from '@angular/cdk/collections'
-import { PageEvent } from '@angular/material/paginator'
+import { PageEvent, MatPaginator } from '@angular/material/paginator'
 import { MatLegacyDialog } from '@angular/material/legacy-dialog'
 import { ConfirmationBoxComponent } from '../../../../training-plan/components/confirmation-box/confirmation.box.component'
 import { RejectReasonDialogComponent } from '../reject-reason-dialog/reject-reason-dialog.component'
 import { AchievementsService } from '../../../services/achievements.service'
 import { MatSnackBar } from '@angular/material/snack-bar'
+import { LoaderService } from '../../../../../../../../../../src/app/services/loader.service'
 
 
 
@@ -16,35 +17,37 @@ import { MatSnackBar } from '@angular/material/snack-bar'
   styleUrls: ['./approvals-list.component.scss']
 })
 export class ApprovalsListComponent implements OnInit {
-  displayedColumns: string[] = ['select', 'user', 'achievementTitle', 'dateSubmitted', 'actions'];
+  @ViewChild(MatPaginator) paginator!: MatPaginator
+
+  displayedColumns: string[] = ['select', 'user', 'achievementTitle', 'dateSubmitted', 'actions']
   readonly pendingColumns: string[] = ['select', 'user', 'achievementTitle', 'dateSubmitted', 'actions']
   readonly reviewedColumns: string[] = ['user', 'achievementTitle', 'dateSubmitted', 'decisionDate', 'status', 'actions']
 
   dataSource: MatTableDataSource<any>
   userDetails: { [key: string]: string } = {}
-  selection = new SelectionModel<any>(true, []);
-  selectedTabIndex = 0;
+  selection = new SelectionModel<any>(true, [])
+  selectedTabIndex = 0
   filterStatus: 'ALL' | 'APPROVED' | 'REJECTED' = 'ALL'
   sideNavBarOpened: boolean = false
-
+  selectedAchievement: any = null
   stats = {
     totalPending: 0,
     totalApproved: 0,
     totalRejected: 0
   }
-  pageSize = 10;
-  totalResults = 24;
-  currentPage = 0;
+  pageSize = 10
+  totalResults = 0
+  currentPage = 0
 
   constructor(private readonly dialog: MatLegacyDialog,
     private achievementsService: AchievementsService,
-    private matSnackBar: MatSnackBar
+    private matSnackBar: MatSnackBar,
+    private loaderService: LoaderService,
   ) {
     this.dataSource = new MatTableDataSource()
   }
 
   ngOnInit(): void {
-    // Load initial data
     this.setTabData(0)
     this.loadData()
   }
@@ -64,7 +67,7 @@ export class ApprovalsListComponent implements OnInit {
   }
 
   loadData(): void {
-
+    this.loaderService.changeLoad.next(true)
     const requestBody = {
       filterCriteriaMap: {
         status: this.findFilters()
@@ -92,7 +95,6 @@ export class ApprovalsListComponent implements OnInit {
             color: it.avatarColor,
           }
         })
-        console.log('Fetched approvals list:', items)
         this.dataSource.data = items
         this.totalResults = res.result.search_results.totalCount || 0
       }
@@ -105,10 +107,11 @@ export class ApprovalsListComponent implements OnInit {
         if (approvedFacet) { this.stats.totalApproved = approvedFacet.count }
         if (rejectedFacet) { this.stats.totalRejected = rejectedFacet.count }
       }
-
+      this.loaderService.changeLoad.next(false)
     }, () => {
       this.dataSource.data = []
       this.totalResults = 0
+      this.loaderService.changeLoad.next(false)
     })
   }
 
@@ -124,11 +127,15 @@ export class ApprovalsListComponent implements OnInit {
 
   onTabChange(index: number): void {
     this.selectedTabIndex = index
+    this.currentPage = 0
     this.setTabData(index)
   }
 
   private setTabData(index: number): void {
     this.currentPage = 0
+    if (this.paginator) {
+      this.paginator.pageIndex = 0
+    }
 
     if (index === 0) {
       this.displayedColumns = this.pendingColumns
@@ -255,6 +262,10 @@ export class ApprovalsListComponent implements OnInit {
 
   onFilterChange(status: 'ALL' | 'APPROVED' | 'REJECTED'): void {
     this.filterStatus = status
+    this.currentPage = 0
+    if (this.paginator) {
+      this.paginator.pageIndex = 0
+    }
     if (this.selectedTabIndex === 1) {
       this.getFilteredReviewedData()
     }
@@ -281,11 +292,12 @@ export class ApprovalsListComponent implements OnInit {
 
   handleCloseSidenav(): void {
     this.sideNavBarOpened = false
+    this.selectedAchievement = null
   }
 
   view(rowData: any): void {
     this.sideNavBarOpened = true
-    console.log('Viewing achievement details for:', rowData)
+    this.selectedAchievement = rowData
   }
 
   getRandomColor() {
