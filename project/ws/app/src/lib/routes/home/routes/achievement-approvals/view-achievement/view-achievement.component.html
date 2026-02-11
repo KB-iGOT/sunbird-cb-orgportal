@@ -70,13 +70,17 @@
 
           <div class="detail-row py-2" *ngIf="achievement?.contextData?.uploadedDocumentUrl">
             <div class="detail-label font-bold pb-2">Evidence</div>
-            <img [src]="achievement?.contextData?.uploadedDocumentUrl" alt="Evidence Document" class="evidence-image" />
+            <img src="/assets/images/17258.jpg" class="evidence-image" />
+            <!-- <img [src]="achievement?.contextData?.uploadedDocumentUrl" alt="Evidence Document" class="evidence-image" /> -->
           </div>
 
           <div class="detail-row py-2" *ngIf="achievement?.contextData?.url">
             <div class="detail-label font-bold">URL</div>
             <div class="detail-value">
-              <a href="{{ achievement?.contextData?.url }}" target="_blank">{{ achievement?.contextData?.url || 'N/A'}}</a>
+              <!-- <a href="{{ achievement?.contextData?.url }}" target="_blank">{{ achievement?.contextData?.url || 'N/A'}}</a> -->
+              <a href="https://www.freepik.com/free-vector/certificate-template-design_1080532.htm#fromView=keyword&page=1&position=19&uuid=70750b10-f239-489e-a44c-a0b71760b9af&query=Certificate"
+                target="_blank">{{ achievement?.contextData?.url || 'N/A'}}</a>
+
             </div>
           </div>
         </div>

@@ -74,7 +74,7 @@ export class ApprovalsListComponent implements OnInit {
       },
       pageNumber: this.currentPage,
       pageSize: this.pageSize,
-      orderBy: 'createdOn',
+      orderBy: 'updatedOn',
       orderDirection: 'desc',
       facets: ['status']
     }
