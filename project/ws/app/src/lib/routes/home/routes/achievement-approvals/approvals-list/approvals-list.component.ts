@@ -49,7 +49,6 @@ export class ApprovalsListComponent implements OnInit {
 
   ngOnInit(): void {
     this.setTabData(0)
-    this.loadData()
   }
 
   findFilters() {
@@ -74,7 +73,7 @@ export class ApprovalsListComponent implements OnInit {
       },
       pageNumber: this.currentPage,
       pageSize: this.pageSize,
-      orderBy: 'updatedOn',
+      orderBy: 'createdOn',
       orderDirection: 'desc',
       facets: ['status']
     }
