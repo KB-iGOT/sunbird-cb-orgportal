@@ -1,0 +1,10 @@
+<ng-container *ngIf="contentLoaded">
+  <div class="back-btn">
+    <button mat-icon-button class="back-button" (click)="goBack()">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+  </div>
+  <div class="preview-container">
+    <ws-app-app-toc-home-v2 [forPreview]="true" [inputContent]="contentData"></ws-app-app-toc-home-v2>
+  </div>
+</ng-container>

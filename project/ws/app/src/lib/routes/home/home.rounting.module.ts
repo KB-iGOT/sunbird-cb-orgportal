@@ -35,6 +35,8 @@ import { MyNotificationsComponent } from './routes/my-notifications/my-notificat
 import { FormDataResolverService } from './resolvers/form-data-resolver.service'
 import { DirectoryComponent } from './routes/directory/directory.component'
 import { OrganisationUsersComponent } from './routes/directory/organisation-users/organisation-users.component'
+import { ExploreContentComponent } from './routes/explore-content/explore-content.component'
+import { PreviewComponent } from './routes/explore-content/preview/preview.component'
 const routes: Routes = [
   {
     path: '',
@@ -424,6 +426,33 @@ const routes: Routes = [
       {
         path: 'org-designations',
         loadChildren: () => import('./routes/designation/designation.module').then(m => m.DesignationModule),
+      },
+      {
+        path: 'explore-content',
+        component: ExploreContentComponent,
+        data: {
+          pageId: 'home/explore-content',
+          module: 'explore-content',
+          pageType: 'feature',
+          pageKey: 'explore-content',
+        },
+        resolve: {
+          configService: ConfigResolveService,
+          pageData: PageResolve,
+        },
+      },
+      {
+        path: 'explore-content/:identifier/preview',
+        component: PreviewComponent,
+        data: {
+          pageId: 'home/explore-content/:identifier/preview',
+          module: 'explore-content',
+          pageType: 'feature',
+          pageKey: 'explore-content-preview',
+        },
+        resolve: {
+          configService: ConfigResolveService,
+        },
       },
       {
         path: 'odcs-mapping',

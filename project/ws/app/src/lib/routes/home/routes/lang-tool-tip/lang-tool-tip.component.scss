@@ -1,0 +1,56 @@
+.custom-tooltip-container {
+  background-color: white;
+  color: black;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 8px;
+  min-width: 150px;
+  max-width: 300px;
+}
+
+.tooltip-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.lang-name {
+  margin-right: 8px;
+}
+
+.status-pill {
+  padding: 2px 8px;
+  border-radius: 15px;
+  font-size: 12px;
+}
+
+.live {
+  background-color: #1d892329;
+  color: #00a650;
+  border: 1px solid #00a650;
+}
+
+.under-review {
+  border: 1px solid #F3962F;
+  background-color: #F3962F14;
+  color: #000;
+}
+
+.draft {
+  background-color: #f5f5f5;
+  color: #000;
+}
+
+.status-icon {
+  margin: 0 !important;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  background: #00a650;
+  border-radius: 50%;
+  margin-right: 4px;
+}

@@ -1,23 +1,15 @@
-import { Component, OnInit } from '@angular/core'
+import { Component, OnInit, ViewChild } from '@angular/core'
 import { MatTableDataSource } from '@angular/material/table'
 import { SelectionModel } from '@angular/cdk/collections'
-import { PageEvent } from '@angular/material/paginator'
+import { PageEvent, MatPaginator } from '@angular/material/paginator'
 import { MatLegacyDialog } from '@angular/material/legacy-dialog'
 import { ConfirmationBoxComponent } from '../../../../training-plan/components/confirmation-box/confirmation.box.component'
 import { RejectReasonDialogComponent } from '../reject-reason-dialog/reject-reason-dialog.component'
+import { AchievementsService } from '../../../services/achievements.service'
+import { MatSnackBar } from '@angular/material/snack-bar'
+import { LoaderService } from '../../../../../../../../../../src/app/services/loader.service'
 
-export interface AchievementApproval {
-  id: string
-  userName: string
-  userEmail: string
-  studentInitials: string
-  avatarColor: string
-  achievementTitle: string
-  dateSubmitted: Date
-  status?: 'Approved' | 'Rejected'
-  decisionDate?: Date
-  evidenceUrl?: string
-}
+
 
 @Component({
   selector: 'ws-app-approvals-list',
@@ -25,103 +17,134 @@ export interface AchievementApproval {
   styleUrls: ['./approvals-list.component.scss']
 })
 export class ApprovalsListComponent implements OnInit {
-  displayedColumns: string[] = ['select', 'user', 'achievementTitle', 'dateSubmitted', 'actions'];
+  @ViewChild(MatPaginator) paginator!: MatPaginator
+
+  displayedColumns: string[] = ['select', 'user', 'achievementTitle', 'dateSubmitted', 'actions']
   readonly pendingColumns: string[] = ['select', 'user', 'achievementTitle', 'dateSubmitted', 'actions']
-  readonly reviewedColumns: string[] = ['user', 'achievementTitle', 'dateSubmitted', 'decisionDate', 'status']
+  readonly reviewedColumns: string[] = ['user', 'achievementTitle', 'dateSubmitted', 'decisionDate', 'status', 'actions']
 
-  dataSource: MatTableDataSource<AchievementApproval>
-  selection = new SelectionModel<AchievementApproval>(true, []);
-  selectedTabIndex = 0;
-  filterStatus: 'All' | 'Approved' | 'Rejected' = 'All'
-
+  dataSource: MatTableDataSource<any>
+  userDetails: { [key: string]: string } = {}
+  selection = new SelectionModel<any>(true, [])
+  selectedTabIndex = 0
+  filterStatus: 'ALL' | 'APPROVED' | 'REJECTED' = 'ALL'
+  sideNavBarOpened: boolean = false
+  selectedAchievement: any = null
   stats = {
-    totalPending: 24,
-    totalApproved: 1240,
-    totalRejected: 45
-  };
+    totalPending: 0,
+    totalApproved: 0,
+    totalRejected: 0
+  }
+  pageSize = 10
+  totalResults = 0
+  currentPage = 0
 
-  pageSize = 10;
-  totalResults = 24;
-  currentPage = 0;
-
-  // Sample data for Pending tab
-  private readonly pendingData: AchievementApproval[] = [
-    {
-      id: '1',
-      userName: 'Sarah Jenkins',
-      userEmail: 's.jenkins@university.edu',
-      studentInitials: 'SJ',
-      avatarColor: '#C8B88A',
-      achievementTitle: 'Top Performer Q3',
-      dateSubmitted: new Date('2023-10-12')
-    },
-    {
-      id: '2',
-      userName: 'Michael Chen',
-      userEmail: 'm.chen@tech.org',
-      studentInitials: 'MC',
-      avatarColor: '#7BC5C5',
-      achievementTitle: 'Product Innovation Award',
-      dateSubmitted: new Date('2023-10-11')
-    }
-  ];
-
-  // Sample data for Approved / Rejected tab
-  private readonly reviewedData: AchievementApproval[] = [
-    {
-      id: '3',
-      userName: 'Alex Rivera',
-      userEmail: 'a.rivera@college.edu',
-      studentInitials: 'AR',
-      avatarColor: '#A1C4FD',
-      achievementTitle: 'Leadership Excellence',
-      dateSubmitted: new Date('2023-09-21'),
-      status: 'Approved',
-      decisionDate: new Date('2023-09-25')
-    },
-    {
-      id: '4',
-      userName: 'Priya Singh',
-      userEmail: 'p.singh@university.edu',
-      studentInitials: 'PS',
-      avatarColor: '#FBC2EB',
-      achievementTitle: 'Community Impact Award',
-      dateSubmitted: new Date('2023-09-18'),
-      status: 'Rejected',
-      decisionDate: new Date('2023-09-22')
-    }
-  ];
-
-  constructor(private readonly dialog: MatLegacyDialog) {
+  constructor(private readonly dialog: MatLegacyDialog,
+    private achievementsService: AchievementsService,
+    private matSnackBar: MatSnackBar,
+    private loaderService: LoaderService,
+  ) {
     this.dataSource = new MatTableDataSource()
   }
 
   ngOnInit(): void {
-    // Load initial data
     this.setTabData(0)
-    this.loadApprovals()
+    this.loadData()
   }
 
-  loadApprovals(): void {
-    // API call will be implemented when backend is ready
+  findFilters() {
+    if (this.selectedTabIndex === 1) {
+      if (this.filterStatus === 'APPROVED') {
+        return ['APPROVED']
+      }
+      if (this.filterStatus === 'REJECTED') {
+        return ['REJECTED']
+      }
+      return ['APPROVED', 'REJECTED']
+    } else {
+      return ['PENDING']
+    }
+  }
+
+  loadData(): void {
+    this.loaderService.changeLoad.next(true)
+    const requestBody = {
+      filterCriteriaMap: {
+        status: this.findFilters()
+      },
+      pageNumber: this.currentPage,
+      pageSize: this.pageSize,
+      orderBy: 'updatedOn',
+      orderDirection: 'desc',
+      facets: ['status']
+    }
+
+    this.achievementsService.getApprovalsList(requestBody).subscribe((res: any) => {
+      if (res && res.result && res.result.search_results && res.result.search_results.userDetails) {
+        this.userDetails = res.result.search_results.userDetails
+      }
+      if (res && res.result && res.result.search_results && res.result.search_results.data) {
+        const items = res.result.search_results.data
+        // add avatar object and stable avatarColor per item
+        items.forEach((it: any) => {
+          if (!it.avatarColor) {
+            it.avatarColor = this.getRandomColor()
+          }
+          it.avatar = {
+            initials: this.getInitials(it.userId),
+            color: it.avatarColor,
+          }
+        })
+        this.dataSource.data = items
+        this.totalResults = res.result.search_results.totalCount || 0
+      }
+      if (res && res.result && res.result.search_results && res.result.search_results.facets && res.result.search_results.facets.status) {
+        let statusFacets = res.result.search_results.facets.status
+        const pendingFacet = statusFacets.find((f: any) => f.value === 'PENDING')
+        const approvedFacet = statusFacets.find((f: any) => f.value === 'APPROVED')
+        const rejectedFacet = statusFacets.find((f: any) => f.value === 'REJECTED')
+        if (pendingFacet) { this.stats.totalPending = pendingFacet.count }
+        if (approvedFacet) { this.stats.totalApproved = approvedFacet.count }
+        if (rejectedFacet) { this.stats.totalRejected = rejectedFacet.count }
+      }
+      this.loaderService.changeLoad.next(false)
+    }, () => {
+      this.dataSource.data = []
+      this.totalResults = 0
+      this.loaderService.changeLoad.next(false)
+    })
+  }
+
+  getUserName(userId: string): string {
+    return (this.userDetails && this.userDetails[userId]) ? this.userDetails[userId] : '--'
+  }
+
+  getInitials(userId: string): string {
+    const name = this.getUserName(userId)
+    if (!name || name === '--') { return '' }
+    return name.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase()
   }
 
   onTabChange(index: number): void {
     this.selectedTabIndex = index
+    this.currentPage = 0
     this.setTabData(index)
   }
 
   private setTabData(index: number): void {
     this.currentPage = 0
+    if (this.paginator) {
+      this.paginator.pageIndex = 0
+    }
 
     if (index === 0) {
       this.displayedColumns = this.pendingColumns
-      this.dataSource.data = this.pendingData
+      this.loadData()
     } else {
       this.displayedColumns = this.reviewedColumns
       this.selection.clear()
-      this.filterStatus = 'All'
-      this.dataSource.data = this.getFilteredReviewedData()
+      this.filterStatus = 'ALL'
+      this.loadData()
     }
 
     this.totalResults = this.dataSource.data.length
@@ -143,24 +166,24 @@ export class ApprovalsListComponent implements OnInit {
     this.selection.select(...this.dataSource.data)
   }
 
-  approve(element: AchievementApproval): void {
+  approve(element: any): void {
     if (element) {
-      this.action('approve')
+      this.action('approve', element)
     }
   }
 
-  reject(element: AchievementApproval): void {
+  reject(element: any): void {
     if (element) {
-      this.action('reject')
+      this.action('reject', element)
     }
   }
 
-  action(type: 'approve' | 'reject'): void {
+  action(type: 'approve' | 'reject', element: any): void {
     if (type === 'reject') {
       const dialogRef = this.dialog.open(RejectReasonDialogComponent, {
         disableClose: true,
         data: {
-          title: 'Please specify the reason for rejection',
+          title: 'Remarks',
           maxLength: 500,
         },
         autoFocus: false,
@@ -169,12 +192,11 @@ export class ApprovalsListComponent implements OnInit {
 
       dialogRef.afterClosed().subscribe((reason: string | undefined) => {
         if (reason) {
-          // Integrate API call here to reject the achievement with this reason
+          this.triggerAPICall(element, reason, 'REJECTED')
         }
       })
       return
     }
-
     const dialogRef = this.dialog.open(ConfirmationBoxComponent, {
       disableClose: true,
       data: {
@@ -188,8 +210,33 @@ export class ApprovalsListComponent implements OnInit {
     })
     dialogRef.afterClosed().subscribe((btnAction: any) => {
       if (btnAction) {
-        // Integrate API call here to approve the achievement
+        this.triggerAPICall(element, 'this is approved via API', 'APPROVED')
       }
+    })
+  }
+
+  triggerAPICall(element: any, reason: string, status: string): void {
+    const requestBody = {
+      request: {
+        learnerId: element.userId,
+        id: element.id,
+        status: status,
+        reason: reason,
+        contextType: "achievements",
+      }
+    }
+    this.achievementsService.updateApprovalStatus(requestBody).subscribe((resp) => {
+      if (resp && resp.responseCode === 'OK') {
+        this.matSnackBar.open(`Achievement ${status === 'REJECTED' ? 'rejected' : 'approved'} successfully`)
+        this.currentPage = 0
+        setTimeout(() => { this.loadData() }, 500)
+      }
+    }, (error) => {
+      if (error && error.error.params.errMsg && error.error.params && error.error.params.errMsg) {
+        this.matSnackBar.open(error.error.params.errMsg)
+        return
+      }
+      this.matSnackBar.open(`Something went wrong while ${status === 'REJECTED' ? 'rejecting' : 'approving'} achievement`)
     })
   }
 
@@ -213,29 +260,55 @@ export class ApprovalsListComponent implements OnInit {
     })
   }
 
-  onFilterChange(status: 'All' | 'Approved' | 'Rejected'): void {
+  onFilterChange(status: 'ALL' | 'APPROVED' | 'REJECTED'): void {
     this.filterStatus = status
-
+    this.currentPage = 0
+    if (this.paginator) {
+      this.paginator.pageIndex = 0
+    }
     if (this.selectedTabIndex === 1) {
-      this.dataSource.data = this.getFilteredReviewedData()
-      this.totalResults = this.dataSource.data.length
+      this.getFilteredReviewedData()
     }
   }
 
-  private getFilteredReviewedData(): AchievementApproval[] {
-    if (this.filterStatus === 'Approved') {
-      return this.reviewedData.filter(item => item.status === 'Approved')
+  private getFilteredReviewedData() {
+    if (this.filterStatus === 'APPROVED') {
+      this.loadData()
     }
 
-    if (this.filterStatus === 'Rejected') {
-      return this.reviewedData.filter(item => item.status === 'Rejected')
+    if (this.filterStatus === 'REJECTED') {
+      this.loadData()
     }
-
-    return this.reviewedData
+    if (this.filterStatus === 'ALL') {
+      this.loadData()
+    }
   }
 
   onPageChange(event: PageEvent): void {
     this.pageSize = event.pageSize
     this.currentPage = event.pageIndex
+    this.loadData()
+  }
+
+  handleCloseSidenav(): void {
+    this.sideNavBarOpened = false
+    this.selectedAchievement = null
+  }
+
+  view(rowData: any): void {
+    this.sideNavBarOpened = true
+    this.selectedAchievement = rowData
+  }
+
+  getRandomColor() {
+    const randomcolors = [
+      '#EB7181',
+      '#006400',
+      '#000000',
+      '#3670B2',
+      '#4E9E87',
+      '#7E4C8D',
+    ]
+    return randomcolors[Math.floor(Math.random() * randomcolors.length)]
   }
 }

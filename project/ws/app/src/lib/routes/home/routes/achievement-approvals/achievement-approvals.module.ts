@@ -25,11 +25,14 @@ import { MatDialogModule } from '@angular/material/dialog'
 import { ApprovalsListComponent } from './approvals-list/approvals-list.component'
 import { AchievementApprovalsRoutingModule } from './achievement-approvals-routing.module'
 import { RejectReasonDialogComponent } from './reject-reason-dialog/reject-reason-dialog.component'
+import { ViewAchievementComponent } from './view-achievement/view-achievement.component'
+import { AchievementsService } from '../../services/achievements.service'
 @NgModule({
   declarations: [
     BaseComponent,
     ApprovalsListComponent,
     RejectReasonDialogComponent,
+    ViewAchievementComponent,
   ],
   imports: [
     CommonModule,
@@ -68,5 +71,8 @@ import { RejectReasonDialogComponent } from './reject-reason-dialog/reject-reaso
     MatProgressSpinnerModule,
     MatExpansionModule,
   ],
+  providers: [
+    AchievementsService
+  ]
 })
 export class AchievementApprovalsModule { }
