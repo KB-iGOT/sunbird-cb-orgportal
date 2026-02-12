@@ -481,6 +481,17 @@ const routes: Routes = [
           configService: ConfigResolveService,
         }
       },
+      {
+        path: 'peer-validation',
+        loadChildren: () => import('./routes/peer-validation/peer-validation.module').then(m => m.PeerValidationModule),
+        data: {
+          pageKey: 'peer-validation',
+        },
+        resolve: {
+          configService: ConfigResolveService,
+        },
+
+      },
     ],
   },
   {
