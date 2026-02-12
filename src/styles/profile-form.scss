@@ -66,7 +66,7 @@
       }
     }
 
-    ::ng-deep .mat-form-field-wrapper{
+    ::ng-deep .mat-mdc-form-field-wrapper{
       width: 100%!important;
 
     }
@@ -156,12 +156,12 @@
       color: #e44;
     }
 
-    ::ng-deep .mat-form-field-outline {
+    ::ng-deep .mat-mdc-form-field-outline {
       min-height: 40px;
       background: #fff;
       border-radius: 4px;
 
-      .mat-form-field-outline-start {
+      .mat-mdc-form-field-outline-start {
         border: 1px solid #70707069;
         border-radius: 4px 0 0 4px;
         border-right-style: none;
@@ -169,33 +169,33 @@
         //border-right-style: none;
       }
 
-      .mat-form-field-outline-gap {
+      .mat-mdc-form-field-outline-gap {
         border: 1px solid currentColor;
         border-radius: 82px;
         border-left-style: none;
         border-right-style: none;
       }
 
-      .mat-form-field-outline-end {
+      .mat-mdc-form-field-outline-end {
         border: 1px solid #70707069;
         border-left-style: none;
         border-radius: 0 4px 4px 0;
       }
     }
 
-    ::ng-deep .mat-form-field-outline.mat-form-field-outline-thick {
+    ::ng-deep .mat-mdc-form-field-outline.mat-mdc-form-field-outline-thick {
       min-height: 40px;
       background: #fff;
       border-radius: 4px;
 
-      .mat-form-field-outline-start {
+      .mat-mdc-form-field-outline-start {
         border-radius: 4px 0 0 4px;
         min-width: 4px;
         border: 1px solid currentColor;
         border-right-style: none;
       }
 
-      .mat-form-field-outline-gap {
+      .mat-mdc-form-field-outline-gap {
         border-width: 1px;
         border: 1px solid currentColor;
         border-radius: 4px;
@@ -203,7 +203,7 @@
         border-right-style: none;
       }
 
-      .mat-form-field-outline-end {
+      .mat-mdc-form-field-outline-end {
         border-width: 1px;
         border-radius: 0 4px 4px 0;
         border: 1px solid currentColor;
@@ -211,7 +211,7 @@
       }
     }
 
-    ::ng-deep .mat-form-field-infix {
+    ::ng-deep .mat-mdc-form-field-infix {
       padding: 0!important;
       margin: 8px 0 0!important;
       border: none;
@@ -243,7 +243,7 @@
     border-color:#0174b6!important;
 }
 
-.mat-form-field-wrapper {
+.mat-mdc-form-field-wrapper {
     padding-bottom: 0!important;
 }
 

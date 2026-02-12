@@ -264,12 +264,12 @@ label {
       transform: translateY(0%) !important;
   }
 
-  .mat-form-field-appearance-outline .mat-form-field-infix {
+  .mat-mdc-form-field-appearance-outline .mat-mdc-form-field-infix {
       padding: 0 0 0.5em 0 !important;
       width: 15em !important;
   }
 
-  .mat-form-field-disabled {
+  .mat-mdc-form-field-disabled {
     cursor: not-allowed !important;
     pointer-events: none !important;
     opacity: 0.8 !important;
@@ -286,7 +286,7 @@ label {
     /* stylelint-enable */
   }
 
-  .mat-form-field-disabled .mat-form-field-outline {
+  .mat-mdc-form-field-disabled .mat-mdc-form-field-outline {
     background-color: #ededed;
   }
 
@@ -300,10 +300,10 @@ label {
 
   .customdob {
     width: 16.5em !important;
-    .mat-form-field-flex {
+    .mat-mdc-form-field-flex {
       height: 45px !important;
     }
-    .mat-form-field-infix {
+    .mat-mdc-form-field-infix {
       line-height: 0 !important;
     }
   }
@@ -435,19 +435,19 @@ label {
   // Fixed height select styling
   .fixed-height-select {
     // Make the form field exactly 45px high
-    ::ng-deep .mat-form-field-flex {
+    ::ng-deep .mat-mdc-form-field-flex {
       height: 48px !important;
       min-height: 45px !important;
       align-items: center;
     }
-    ::ng-deep .mat-form-field-infix {
+    ::ng-deep .mat-mdc-form-field-infix {
       padding: 0 !important;
       border-top: 0 !important;
       height: 45px !important;
       display: flex;
       align-items: center;
     }
-    ::ng-deep .mat-form-field-wrapper {
+    ::ng-deep .mat-mdc-form-field-wrapper {
       padding-bottom: 0 !important;
     }
     // Fix arrow alignment
@@ -455,7 +455,7 @@ label {
       transform: translateY(0) !important;
     }
     // Fix label positioning
-    ::ng-deep .mat-form-field-label-wrapper {
+    ::ng-deep .mat-mdc-form-field-label-wrapper {
       top: -1.1em;
     }
   }
@@ -521,15 +521,15 @@ label {
   }
 
   // MDC-specific overrides (Angular Material 15+)
-  ::ng-deep .mat-mdc-form-field.fixed-height-select {
+  ::ng-deep .mat-mdc-form-field-.fixed-height-select {
     .mat-mdc-text-field-wrapper {
       height: 45px !important;
     }
-    .mat-mdc-form-field-flex {
+    .mat-mdc-form-field--flex {
       min-height: 45px !important;
       height: 45px !important;
     }
-    .mat-mdc-form-field-infix {
+    .mat-mdc-form-field--infix {
       min-height: 45px !important;
       height: 45px !important;
       padding-top: 0 !important;

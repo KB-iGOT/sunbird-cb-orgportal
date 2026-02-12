@@ -5,19 +5,19 @@
 }
 
 ::ng-deep .round-control {
-  .mat-form-field-appearance-outline .mat-form-field-flex {
+  .mat-mdc-form-field-appearance-outline .mat-mdc-form-field-flex {
     height: 50px;
   }
 
-  .mat-form-field-appearance-outline .mat-form-field-infix {
+  .mat-mdc-form-field-appearance-outline .mat-mdc-form-field-infix {
     padding: 15px 0px 0px !important;
   }
 
-  .mat-form-field-infix {
+  .mat-mdc-form-field-infix {
     border-top: 0.7em !important;
   }
 
-  .mat-form-field-appearance-outline .mat-form-field-suffix {
+  .mat-mdc-form-field-appearance-outline .mat-mdc-form-field-suffix {
     top: 0px !important;
   }
 
@@ -26,20 +26,20 @@
     height: 16px !important;
   }
 
-  .mat-form-field-appearance-outline .mat-form-field-outline-end {
+  .mat-mdc-form-field-appearance-outline .mat-mdc-form-field-outline-end {
     border-radius: 25px !important;
     border-left-style: solid !important;
   }
 
-  .mat-form-field-appearance-outline .mat-form-field-outline-start {
+  .mat-mdc-form-field-appearance-outline .mat-mdc-form-field-outline-start {
     display: none !important;
   }
 
-  .mat-form-field-wrapper {
+  .mat-mdc-form-field-wrapper {
     padding-bottom: 0px !important;
   }
 
-  .mat-form-field-appearance-outline .mat-form-field-subscript-wrapper {
+  .mat-mdc-form-field-appearance-outline .mat-mdc-form-field-subscript-wrapper {
     padding: 4px !important;
     margin-top: 25px;
   }

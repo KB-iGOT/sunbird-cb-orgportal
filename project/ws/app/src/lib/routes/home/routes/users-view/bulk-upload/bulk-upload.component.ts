@@ -61,6 +61,9 @@ export class BulkUploadComponent implements OnInit, AfterViewInit, OnDestroy {
   ngOnInit() {
     this.rootOrgId = (this.selectedOrgData) ? (this.selectedOrgData.roleId) : _.get(this.router.snapshot.parent, 'data.configService.unMappedUser.rootOrg.rootOrgId')
     this.userProfile = _.get(this.router.snapshot.parent, 'data.configService.userProfileV2')
+    if (!this.userProfile) {
+      this.userProfile = _.get(this.router.snapshot, 'data.configService.userProfileV2')
+    }
     if (this.selectedOrgData) {
       this.downloadSampleFilePath = _.get(this.router.snapshot.data.pageData.data.bulkUploadConfig, 'downloadSampleUserFilePath')
       this.downloadAsFileName = _.get(this.router.snapshot.data.pageData.data.bulkUploadConfig, 'downloadAsUserFileName')
@@ -144,9 +147,9 @@ export class BulkUploadComponent implements OnInit, AfterViewInit, OnDestroy {
       this.fileName = file.name
       this.fileSelected = file
       if (this.fileService.validateFile(this.fileName)) {
-        // this.sendOTP()
+        this.sendOTP()
         // this.verifyOTP(this.userProfile.email ? 'email' : 'phone')
-        this.uploadWithOtp() // dont use this function this is for dev purposes only
+        // this.uploadWithOtp() // dont use this function this is for dev purposes only
       } else {
         this.showFileError = true
       }

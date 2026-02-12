@@ -314,11 +314,11 @@ table tr .row-heading {
 }
 
 :host ::ng-deep .search {
-  .mat-form-field-wrapper {
+  .mat-mdc-form-field-wrapper {
     padding-bottom: 0px !important;
   }
 
-  .mat-form-field-infix {
+  .mat-mdc-form-field-infix {
     border-top-width: 2px !important;
     margin: auto;
   }

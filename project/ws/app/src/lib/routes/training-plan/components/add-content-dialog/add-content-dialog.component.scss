@@ -45,7 +45,7 @@
     font-size: 14px;
   }
 
-  .mat-form-field-appearance-outline .mat-form-field-flex, .mat-form-field-flex {
+  .mat-mdc-form-field-appearance-outline .mat-mdc-form-field-flex, .mat-mdc-form-field-flex {
     width: 100% !important;
   }
 }
@@ -84,7 +84,7 @@
   width: 100%;
 }
 
-::ng-deep.select-container .mat-form-field-infix {
+::ng-deep.select-container .mat-mdc-form-field-infix {
     padding: 0.4375em 0;
     border-top: 1px solid transparent;
     border-bottom: 1px solid rgba(0, 0, 0, 0.16) !important;

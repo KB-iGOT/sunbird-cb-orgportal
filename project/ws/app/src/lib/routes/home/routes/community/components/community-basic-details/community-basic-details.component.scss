@@ -20,24 +20,24 @@
 }
 
 :host ::ng-deep .community-form {
-  .mat-form-field-appearance-outline .mat-form-field-infix {
+  .mat-mdc-form-field-appearance-outline .mat-mdc-form-field-infix {
     padding: 5px 0px 10px;
   }
 
-  .mat-form-field-appearance-outline .mat-form-field-outline-end {
+  .mat-mdc-form-field-appearance-outline .mat-mdc-form-field-outline-end {
     border-left-style: solid !important;
     border-radius: 25px !important;
   }
 
-  .mat-form-field-appearance-outline .mat-form-field-outline-start {
+  .mat-mdc-form-field-appearance-outline .mat-mdc-form-field-outline-start {
     display: none;
   }
-  .mat-form-field-appearance-outline.mat-form-field-invalid.mat-form-field-invalid .mat-form-field-outline-thick {
+  .mat-mdc-form-field-appearance-outline.mat-mdc-form-field-invalid.mat-mdc-form-field-invalid .mat-mdc-form-field-outline-thick {
     color: #e0e0e0 !important;
   }
 }
 :host ::ng-deep .community-form-textarea {
-  .mat-form-field-appearance-outline.mat-form-field-invalid.mat-form-field-invalid .mat-form-field-outline-thick {
+  .mat-mdc-form-field-appearance-outline.mat-mdc-form-field-invalid.mat-mdc-form-field-invalid .mat-mdc-form-field-outline-thick {
     color: #e0e0e0 !important;
   }
 }
@@ -110,19 +110,19 @@
   // Fixed height select styling
   .fixed-height-select {
     // Make the form field exactly 45px high
-    ::ng-deep .mat-form-field-flex {
+    ::ng-deep .mat-mdc-form-field-flex {
       height: 48px !important;
       min-height: 45px !important;
       align-items: center;
     }
-    ::ng-deep .mat-form-field-infix {
+    ::ng-deep .mat-mdc-form-field-infix {
       padding: 0 !important;
       border-top: 0 !important;
       height: 45px !important;
       display: flex;
       align-items: center;
     }
-    ::ng-deep .mat-form-field-wrapper {
+    ::ng-deep .mat-mdc-form-field-wrapper {
       padding-bottom: 0 !important;
     }
     // Fix arrow alignment
@@ -130,7 +130,7 @@
       transform: translateY(0) !important;
     }
     // Fix label positioning
-    ::ng-deep .mat-form-field-label-wrapper {
+    ::ng-deep .mat-mdc-form-field-label-wrapper {
       top: -1.1em;
     }
   }
@@ -196,15 +196,15 @@
   }
 
   // MDC-specific overrides (Angular Material 15+)
-  ::ng-deep .mat-mdc-form-field.fixed-height-select {
+  ::ng-deep .mat-mdc-form-field-.fixed-height-select {
     .mat-mdc-text-field-wrapper {
       height: 45px !important;
     }
-    .mat-mdc-form-field-flex {
+    .mat-mdc-form-field--flex {
       min-height: 45px !important;
       height: 45px !important;
     }
-    .mat-mdc-form-field-infix {
+    .mat-mdc-form-field--infix {
       min-height: 45px !important;
       height: 45px !important;
       padding-top: 0 !important;

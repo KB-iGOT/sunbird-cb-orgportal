@@ -7,7 +7,7 @@
     padding: 24px 0;
   }
 
-  .mat-form-field-outline {
+  .mat-mdc-form-field-outline {
     border-radius: 30px;
   }
 
@@ -116,21 +116,21 @@
   min-width: 100px;
 }
 
-::ng-deep .filedTextbox .mat-form-field-wrapper {
+::ng-deep .filedTextbox .mat-mdc-form-field-wrapper {
   padding-bottom: 0.5rem!important;
 }
-::ng-deep .filedTextbox .mat-form-field-appearance-outline .mat-form-field-infix {
+::ng-deep .filedTextbox .mat-mdc-form-field-appearance-outline .mat-mdc-form-field-infix {
   padding: 0rem!important;
 }
 
 ::ng-deep .profile-form-field {
-  .mat-form-field-suffix {
+  .mat-mdc-form-field-suffix {
     position: relative;
     left: -16px;
   }
 }
 
-::ng-deep .required-select .mat-form-field-subscript-wrapper {
+::ng-deep .required-select .mat-mdc-form-field-subscript-wrapper {
   margin-top: 20px;
 }
 .profile-form-field .mat-select {

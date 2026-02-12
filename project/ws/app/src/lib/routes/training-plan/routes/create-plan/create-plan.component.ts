@@ -26,7 +26,7 @@ export class CreatePlanComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-
+    this.tpdsSvc.isContentChanged = false
   }
 
   ngOnInit() {

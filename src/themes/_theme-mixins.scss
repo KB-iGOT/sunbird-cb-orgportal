@@ -117,7 +117,7 @@
 
     // .mat-tab-group
     .mat-tab-nav-bar,
-    .mat-form-field-outline-thick .mat-ink-bar {
+    .mat-mdc-form-field-outline-thick .mat-ink-bar {
       background-color: $colorAccentLight !important;
     }
 
@@ -175,7 +175,7 @@
     }
 
     .mat-tab-nav-bar,
-    .mat-form-field-outline-thick .mat-ink-bar {
+    .mat-mdc-form-field-outline-thick .mat-ink-bar {
       background-color: $colorPrimaryDark !important;
     }
 
@@ -183,7 +183,7 @@
       background: inherit;
     }
 
-    // .mat-form-field-outline {
+    // .mat-mdc-form-field-outline {
     //   background: $colorPrimary;
     // }
     .mat-chip.mat-standard-chip {
@@ -307,15 +307,15 @@
       color: rgba(255, 255, 255, 0.7) !important;
     }
 
-    .mat-form-field.mat-focused .mat-form-field-label {
+    .mat-form-field.mat-focused .mat-mdc-form-field-label {
       color: $colorPrimaryDark !important;
     }
 
-    .mat-form-field-outline-thick {
+    .mat-mdc-form-field-outline-thick {
       color: $colorAccent !important;
     }
 
-    .mat-form-field-appearance-outline.mat-form-field-invalid.mat-form-field-invalid .mat-form-field-outline-thick {
+    .mat-mdc-form-field-appearance-outline.mat-mdc-form-field-invalid.mat-mdc-form-field-invalid .mat-mdc-form-field-outline-thick {
       color: $colorRed !important;
     }
 
@@ -357,7 +357,7 @@
       border-color: $colorAccentDark;
     }
 
-    .mat-form-field-outline {
+    .mat-mdc-form-field-outline {
       background: $colorPrimary;
     }
 

@@ -49,7 +49,7 @@
   // width: 150px;
   height: 48px;
 
-  .mat-form-field-infix {
+  .mat-mdc-form-field-infix {
     border-top: 0.2em solid transparent !important;
   }
 
@@ -82,12 +82,12 @@
     top: 10px;
   }
 
-  .mat-form-field-infix {
+  .mat-mdc-form-field-infix {
     border-top: 0.2em solid transparent !important;
     padding: 12px 0 12px 24px !important;
   }
 
-  .mat-form-field-wrapper {
+  .mat-mdc-form-field-wrapper {
     padding-bottom: 0
   }
 
@@ -104,7 +104,7 @@
 ::ng-deep .search-input-block {
   width: 460px;
 
-  .mat-form-field-infix {
+  .mat-mdc-form-field-infix {
     border-top: 0.2em solid transparent !important;
     padding: 12px 0 12px 24px !important;
   }
