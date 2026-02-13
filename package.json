@@ -65,7 +65,7 @@
     "ngx-infinite-scroll": "^16.0.0",
     "@polyflix/vtt-parser": "^1.4.0",
     "@ctrl/ngx-emoji-mart": "^7.1.0",
-    "@sunbird-cb/toc": "0.0.21",
+    "@sunbird-cb/toc": "0.0.25",
     "@types/file-saver": "^2.0.1",
     "@types/jest": "^29.5.13",
     "chart.js": "^4.1.1 ",

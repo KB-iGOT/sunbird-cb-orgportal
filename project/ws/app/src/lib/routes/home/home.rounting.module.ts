@@ -343,10 +343,10 @@ const routes: Routes = [
         path: 'custom-fields',
         loadChildren: () => import('./routes/custom-forms/custom-forms.module').then(m => m.CustomFormsModule),
       },
-      {
-        path: 'achievement-approvals',
-        loadChildren: () => import('./routes/achievement-approvals/achievement-approvals.module').then(m => m.AchievementApprovalsModule),
-      },
+      // {
+      //   path: 'achievement-approvals',
+      //   loadChildren: () => import('./routes/achievement-approvals/achievement-approvals.module').then(m => m.AchievementApprovalsModule),
+      // },
 
       {
         path: 'events',
