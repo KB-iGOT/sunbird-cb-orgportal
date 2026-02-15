@@ -455,6 +455,14 @@ const routes: Routes = [
         },
       },
       {
+        path: 'explore-content/viewer',
+        loadChildren: () => import('@ws/viewer').then(m => m.ViewerModule),
+        data: {
+          pageId: 'home/explore-content/viewer',
+          module: 'explore-content',
+        },
+      },
+      {
         path: 'odcs-mapping',
         component: OdcsMappingComponent,
         data: {

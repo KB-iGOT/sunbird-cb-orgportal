@@ -1,0 +1,46 @@
+<mat-selection-list  class="flex flex-1 flex-column app-class">
+    <div [ngClass]="{
+  'correct-answer':
+    (showAns && option?.isCorrect && isSelected(option)) ||
+    (showAns && option?.isCorrect),
+  'incorrect-answer': showAns && !option?.isCorrect && isSelected(option)
+}" *ngFor="let option of question?.options">
+      <mat-list-option #lo checkboxPosition="before" class="margin-top-s" [ngClass]="{
+        'ws-mat-accent-border': !(lo.selected),
+        'ws-mat-accent-border-active ': (lo.selected)
+      }" (click)="updateParent(option.optionId, lo.selected)"
+      
+      [selected]="isSelected(option)">
+        <span class="incorrect-option" *ngIf="showAns && !option?.isCorrect && isSelected(option)" [innerHtml]="getSanitizeString(option?.text)">
+          
+        </span>
+        <div [ngClass]="{
+      'correct-option':
+        (showAns && option?.isCorrect && isSelected(option)) ||
+        (showAns && option?.isCorrect)
+    }" [hidden]="showAns && !option?.isCorrect && isSelected(option)">
+          <!-- {{getSanitizeString(option?.text)}} -->
+          <div class="no-margin-p html-option" [innerHTML]="getSanitizeString(option?.text)"></div>
+        </div>
+      </mat-list-option>
+      <div class="background-well padding-left-m padding-xs"
+        *ngIf="showAns && isSelected(option) && option?.hint">
+        <mat-error *ngIf="showAns && !option?.isCorrect && isSelected(option)">
+          <p class="margin-remove mat-body-2" i18n="option explanation label">
+            Explanation
+          </p>
+          <p class="margin-remove" [innerHTML]="option?.hint"></p>
+        </mat-error>
+        <div [ngClass]="{
+      'correct-option':
+        (showAns && option?.isCorrect && isSelected(option)) ||
+        (showAns && option?.isCorrect)
+    }" [hidden]="showAns && !option?.isCorrect && isSelected(option)">
+          <p class="margin-remove mat-body-2" i18n="option explanation label">
+            Explanation
+          </p>
+          <p class="margin-remove mat-body-1" [innerHTML]="option?.hint"></p>
+        </div>
+      </div>
+    </div>
+  </mat-selection-list>

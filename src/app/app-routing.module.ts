@@ -51,6 +51,18 @@ const routes: Routes = [
     },
   },
   {
+    path: 'viewer',
+    loadChildren: () => import('@ws/viewer').then(m => m.ViewerModule),
+    data: {
+      pageId: 'home/explore-content/viewer',
+      module: 'explore-content',
+    },
+    canActivate: [GeneralGuard],
+    resolve: {
+      pageData: PageResolve,
+    },
+  },
+  {
     path: 'app/training-plan',
     loadChildren: () => import('./routes/route-training-plan.module').then(u => u.RouteTrainingPlanAppModule),
     canActivate: [GeneralGuard],
