@@ -129,6 +129,8 @@ import { WsCustomTooltipDirective } from './directives/ws-auth-ws-custom-tooltip
 import { LangToolTipComponent } from './routes/lang-tool-tip/lang-tool-tip.component'
 import { PreviewComponent } from './routes/explore-content/preview/preview.component'
 import { AppTocLibModule } from '@sunbird-cb/toc'
+import { WIDGET_REGISTRATION_TOC_LIB_CONFIG } from '@sunbird-cb/toc'
+import { WIDGET_REGISTRATION_LIB_CONFIG } from '@sunbird-cb/consumption'
 import { TranslateHttpLoader } from '@ngx-translate/http-loader'
 import { FiltersComponent } from './routes/explore-content/filters/filters.component'
 export function HttpLoaderFactory(http: HttpClient) {
@@ -239,7 +241,6 @@ export function HttpLoaderFactory(http: HttpClient) {
     AvatarPhotoModule,
     PipeOrderByModule,
     BreadcrumbsOrgModule,
-    SbUiResolverModule,
     ScrollspyLeftMenuModule,
     MatRadioModule,
     ExportAsModule,
@@ -269,6 +270,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     OnboardingModule,
     HorizontalDynamicStepperModule,
     AppTocLibModule,
+    SbUiResolverModule.forRoot([...WIDGET_REGISTRATION_LIB_CONFIG, ...WIDGET_REGISTRATION_TOC_LIB_CONFIG]),
     TranslateModule.forRoot({
       loader: {
         provide: TranslateLoader,
