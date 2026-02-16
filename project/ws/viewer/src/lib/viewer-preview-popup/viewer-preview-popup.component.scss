@@ -1,0 +1,27 @@
+::ng-deep .assessment-preview .mat-dialog-container {
+  padding: 10px !important;
+  overflow: visible
+}
+
+.assessment-preview-dialog {
+  position: relative;
+
+  .close-button {
+    border-radius: 50%;
+    border: 0.5px solid #6a6868;
+    width: 30px;
+    height: 30px;
+    position: absolute;
+    top: -20px;
+    right: -20px;
+    background-color: white;
+
+    .close-icon {
+      font-size: 20px;
+      margin-bottom: 12px;
+      margin-left: 1px;
+      color: #7c7b7b;
+    }
+  }
+
+}
