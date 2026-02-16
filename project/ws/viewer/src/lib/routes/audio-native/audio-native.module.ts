@@ -2,7 +2,7 @@ import { NgModule } from '@angular/core'
 import { CommonModule } from '@angular/common'
 import { RouterModule } from '@angular/router'
 
-import { WidgetResolverModule } from '@sunbird-cb/resolver'
+import { SbUiResolverModule } from '@sunbird-cb/resolver-v2'
 
 import {
   // BtnContentDownloadModule,
@@ -57,7 +57,7 @@ import { MatLegacySnackBarModule as MatSnackBarModule } from '@angular/material/
     RouterModule,
     UserContentRatingModule,
     UserImageModule,
-    WidgetResolverModule,
+    SbUiResolverModule,
     PipeSafeSanitizerModule,
   ],
 })

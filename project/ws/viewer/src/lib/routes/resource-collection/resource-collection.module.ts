@@ -20,7 +20,7 @@ import {
   PipePartialContentModule,
 } from '@sunbird-cb/utils'
 
-import { WidgetResolverModule } from '@sunbird-cb/resolver'
+import { SbUiResolverModule } from '@sunbird-cb/resolver-v2'
 
 import { ResourceCollectionRoutingModule } from './resource-collection-routing.module'
 
@@ -44,7 +44,7 @@ import { PlayerSurveyModule } from '../../components/player-survey/player-survey
     MatButtonModule,
     MatSnackBarModule,
     ResourceCollectionRoutingModule,
-    WidgetResolverModule,
+    SbUiResolverModule,
     // BtnContentDownloadModule,
     // BtnContentFeedbackModule,
     BtnContentLikeModule,

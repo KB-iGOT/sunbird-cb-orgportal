@@ -163,6 +163,7 @@ export class VideoComponent implements OnInit, OnDestroy {
             this.formDiscussionForumWidget(this.videoData)
           }
           this.widgetResolverVideoData = this.initWidgetResolverVideoData(this.videoData)
+          console.log('this.widgetResolverVideoData', this.widgetResolverVideoData)
           let url = ''
           // if (this.videoData.artifactUrl.indexOf('/content-store/') > -1) {
           //   url = `/apis/authContent/${new URL(this.videoData.artifactUrl).pathname}`
@@ -264,6 +265,7 @@ export class VideoComponent implements OnInit, OnDestroy {
       }
     }
     const newUrl = newLink.join('/')
+    console.log('newUrl', newUrl)
     return newUrl
   }
   ngOnDestroy() {

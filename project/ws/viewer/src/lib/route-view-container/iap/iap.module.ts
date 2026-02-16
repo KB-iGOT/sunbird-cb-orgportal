@@ -2,7 +2,7 @@ import { NgModule } from '@angular/core'
 import { CommonModule } from '@angular/common'
 import { IapComponent } from './iap.component'
 import { IapRoutingModule } from './iap-routing.module'
-import { WidgetResolverModule } from '@sunbird-cb/resolver'
+import { SbUiResolverModule } from '@sunbird-cb/resolver-v2'
 import { IapModule as IapPluginModule } from '../../plugins/iap/iap.module'
 
 import {
@@ -36,7 +36,7 @@ import { MatLegacySnackBarModule as MatSnackBarModule } from '@angular/material/
     CommonModule,
     IapPluginModule,
     IapRoutingModule,
-    WidgetResolverModule,
+    SbUiResolverModule,
     PipeDurationTransformModule,
     PipeLimitToModule,
     PipePartialContentModule,

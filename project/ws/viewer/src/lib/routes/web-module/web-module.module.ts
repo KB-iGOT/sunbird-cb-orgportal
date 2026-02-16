@@ -20,7 +20,7 @@ import {
   PipePartialContentModule,
 } from '@sunbird-cb/utils'
 
-import { WidgetResolverModule } from '@sunbird-cb/resolver'
+import { SbUiResolverModule } from '@sunbird-cb/resolver-v2'
 
 import { WebModuleRoutingModule } from './web-module-routing.module'
 
@@ -41,7 +41,7 @@ import { MatLegacySnackBarModule as MatSnackBarModule } from '@angular/material/
     MatButtonModule,
     MatSnackBarModule,
     WebModuleRoutingModule,
-    WidgetResolverModule,
+    SbUiResolverModule,
     // BtnContentDownloadModule,
     // BtnContentFeedbackModule,
     BtnContentLikeModule,

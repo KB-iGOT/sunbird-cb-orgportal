@@ -54,7 +54,7 @@
   </div>
   <mat-divider class="margin-top-xs"></mat-divider> -->
   <section *ngIf="!collection">
-    <div *ngIf="errorWidgetData?.widgetData?.errorType" [wsResolverWidget]="errorWidgetData"></div>
+    <div *ngIf="errorWidgetData?.widgetData?.errorType" [sbUiResolverWidget]="errorWidgetData"></div>
   </section>
   <!-- <mat-card *ngIf="collection && pathSet && !pathSet.has(resourceId)">
     <mat-card-content>
@@ -333,7 +333,7 @@
     </div>
     <mat-divider class="margin-top-xs"></mat-divider> -->
   <section *ngIf="!collection">
-    <div *ngIf="errorWidgetData?.widgetData?.errorType" [wsResolverWidget]="errorWidgetData"></div>
+    <div *ngIf="errorWidgetData?.widgetData?.errorType" [sbUiResolverWidget]="errorWidgetData"></div>
   </section>
   <!-- <mat-card *ngIf="collection && pathSet && !pathSet.has(resourceId)">
       <mat-card-content>

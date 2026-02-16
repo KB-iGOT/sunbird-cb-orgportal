@@ -32,7 +32,6 @@ import {
 
 import { ContentTocModule } from '@sunbird-cb/toc'
 
-import { WidgetResolverModule } from '@sunbird-cb/resolver'
 import { ViewerComponent } from './viewer.component'
 import { ViewerTocComponent } from './components/viewer-toc/viewer-toc.component'
 import { ViewerTopBarModule } from './components/viewer-top-bar/viewer-top-bar.module'
@@ -55,6 +54,7 @@ import { MatLegacyMenuModule as MatMenuModule } from '@angular/material/legacy-m
 import { NgCircleProgressModule } from 'ng-circle-progress'
 import { AppPreAssessmentContentResolverService } from '../../../app/src/lib/routes/app-toc/services/app-pre-assessment-content-read-resolver.service'
 import { PendingFunctionService } from './services/pending-function.service'
+import { SbUiResolverModule } from '@sunbird-cb/resolver-v2'
 
 // tslint:disable-next-line:function-name
 export function HttpLoaderFactory(http: HttpClient) {
@@ -83,7 +83,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     DefaultThumbnailModule,
     BtnPageBackModule,
     BtnFullscreenModule,
-    WidgetResolverModule,
+    SbUiResolverModule,
     DisplayContentTypeModule,
     // BtnContentDownloadModule,
     BtnContentLikeModule,
@@ -112,7 +112,7 @@ export function HttpLoaderFactory(http: HttpClient) {
   exports: [
     ViewerComponent, ViewerTocComponent, ContentTocModule,
   ],
-  providers: [PdfScormDataService, AppPreAssessmentContentResolverService, PendingFunctionService,
+  providers: [PdfScormDataService, AppPreAssessmentContentResolverService, PendingFunctionService
 
   ],
 })

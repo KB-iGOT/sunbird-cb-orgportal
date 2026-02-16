@@ -22,7 +22,7 @@ import {
   PipePartialContentModule,
 } from '@sunbird-cb/utils'
 
-import { WidgetResolverModule } from '@sunbird-cb/resolver'
+import { SbUiResolverModule } from '@sunbird-cb/resolver-v2'
 
 import { HtmlModule as HtmlViewContainerModule } from '../../route-view-container/html/html.module'
 
@@ -40,7 +40,7 @@ import { AccessControlService } from '@sunbird-cb/toc'
     CommonModule,
     HtmlViewContainerModule,
     RouterModule,
-    WidgetResolverModule,
+    SbUiResolverModule,
     PipeDurationTransformModule,
     PipeLimitToModule,
     PipePartialContentModule,

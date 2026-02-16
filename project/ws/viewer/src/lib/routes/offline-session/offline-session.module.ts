@@ -20,7 +20,7 @@ import {
   PipePartialContentModule,
 } from '@sunbird-cb/utils-v2'
 
-import { WidgetResolverModule } from '@sunbird-cb/resolver'
+import { SbUiResolverModule } from '@sunbird-cb/resolver-v2'
 
 import { OfflineSessionModule as OfflineSessionContainerModule } from '../../route-view-container/offline-session/offline-session.module'
 import { OfflineSessionComponent } from './offline-session.component'
@@ -62,7 +62,7 @@ const routes: Routes = [
     PipeDurationTransformModule,
     PipeLimitToModule,
     PipePartialContentModule,
-    WidgetResolverModule,
+    SbUiResolverModule,
     UserContentRatingModule,
     BtnContentFeedbackV2Module,
     OfflineSessionContainerModule,

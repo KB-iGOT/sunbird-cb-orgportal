@@ -21,7 +21,7 @@ import {
   PipePartialContentModule,
 } from '@sunbird-cb/utils'
 
-import { WidgetResolverModule } from '@sunbird-cb/resolver'
+import { SbUiResolverModule } from '@sunbird-cb/resolver-v2'
 
 import { QuizComponent } from './quiz.component'
 import { QuizRoutingModule } from './quiz-routing.module'
@@ -57,7 +57,7 @@ import { MatToolbarModule } from '@angular/material/toolbar'
     PipeDurationTransformModule,
     PipeLimitToModule,
     PipePartialContentModule,
-    WidgetResolverModule,
+    SbUiResolverModule,
     UserContentRatingModule,
     BtnContentFeedbackV2Module,
     BtnPageBackModule,

@@ -22,7 +22,7 @@ import {
   PipePartialContentModule,
 } from '@sunbird-cb/utils-v2'
 
-import { WidgetResolverModule } from '@sunbird-cb/resolver'
+import { SbUiResolverModule } from '@sunbird-cb/resolver-v2'
 
 import { QuizComponent } from './quiz.component'
 import { QuizRoutingModule } from './quiz-routing.module'
@@ -60,7 +60,7 @@ import { MatLegacySnackBarModule as MatSnackBarModule } from '@angular/material/
     PipeDurationTransformModule,
     PipeLimitToModule,
     PipePartialContentModule,
-    WidgetResolverModule,
+    SbUiResolverModule,
     UserContentRatingModule,
     BtnContentFeedbackV2Module,
     BtnPageBackModule,

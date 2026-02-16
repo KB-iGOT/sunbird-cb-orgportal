@@ -5,7 +5,7 @@
                 <mat-card-content>
                     <div id="fullScreenContainer" class="video-player">
                         <ng-container *ngIf="isFetchingDataComplete"
-                            [wsResolverWidget]="widgetResolverSurveyData"></ng-container>
+                            [sbUiResolverWidget]="widgetResolverSurveyData"></ng-container>
                     </div>
                     <div class="flex justify-end mt-3">
                         <ws-widget-btn-content-download [forPreview]="forPreview" [widgetData]="

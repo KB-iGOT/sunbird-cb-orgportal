@@ -1,4 +1,6 @@
-<section *ngIf="isNotEmbed && !isPreAssessment">
+<div class="cursor-pointer" (click)="moveToBack()"><mat-icon class="vertical-middle">arrow_back</mat-icon>Back to
+  Preview</div>
+<section *ngIf="isNotEmbed && !isPreAssessment" class="mt-5">
   <!-- <viewer-viewer-top-bar *ngIf="fullScreenContainer" [forPreview]="forPreview" [frameReference]="fullScreenContainer"
     (toggle)="toggleSideBar()">
   </viewer-viewer-top-bar>
@@ -39,7 +41,7 @@
         </viewer-viewer-secondary-top-bar>
       </ng-container>
       <section *ngIf="status === 'error'">
-        <div *ngIf="errorWidgetData?.widgetData?.errorType" [wsResolverWidget]="errorWidgetData"></div>
+        <div *ngIf="errorWidgetData?.widgetData?.errorType" [sbUiResolverWidget]="errorWidgetData"></div>
         <div *ngIf="error.errorType === errorType.mimeTypeMismatch">
           <mat-card>
             <mat-card-title>{{ 'viewercomponent.issueInContent' | translate }}</mat-card-title>
@@ -184,7 +186,7 @@
         </viewer-viewer-secondary-top-bar>
       </ng-container>
       <section *ngIf="status === 'error'">
-        <div *ngIf="errorWidgetData?.widgetData?.errorType" [wsResolverWidget]="errorWidgetData"></div>
+        <div *ngIf="errorWidgetData?.widgetData?.errorType" [sbUiResolverWidget]="errorWidgetData"></div>
         <div *ngIf="error.errorType === errorType.mimeTypeMismatch">
           <mat-card>
             <mat-card-title>{{ 'viewercomponent.issueInContent' | translate }}</mat-card-title>

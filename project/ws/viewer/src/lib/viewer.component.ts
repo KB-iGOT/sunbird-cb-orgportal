@@ -493,4 +493,17 @@ export class ViewerComponent implements OnInit, OnDestroy, AfterViewChecked {
 
   }
 
+  moveToBack() {
+    if (this.activatedRoute.snapshot.queryParams && this.activatedRoute.snapshot.queryParams['collectionId']) {
+      let url = `app/home/explore-content/${this.activatedRoute.snapshot.queryParams['collectionId']}/preview`
+      this.router.navigateByUrl('/', { skipLocationChange: true }).then(() => {
+        this.router.navigate([url])
+      })
+    }
+
+    // history.back()
+
+  }
+
+
 }

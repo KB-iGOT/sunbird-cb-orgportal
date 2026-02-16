@@ -21,7 +21,7 @@ import {
   PipePartialContentModule,
 } from '@sunbird-cb/utils-v2'
 
-import { WidgetResolverModule } from '@sunbird-cb/resolver'
+import { SbUiResolverModule } from '@sunbird-cb/resolver-v2'
 
 import { RouterModule } from '@angular/router'
 import { SurveyComponent } from './survey.component'
@@ -53,7 +53,7 @@ import { MatLegacyButtonModule as MatButtonModule } from '@angular/material/lega
     PipeDurationTransformModule,
     PipeLimitToModule,
     PipePartialContentModule,
-    WidgetResolverModule,
+    SbUiResolverModule,
     UserContentRatingModule,
     BtnContentFeedbackV2Module,
     PlayerBriefModule,

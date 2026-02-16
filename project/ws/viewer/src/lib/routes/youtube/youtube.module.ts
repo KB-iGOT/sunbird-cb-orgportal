@@ -21,7 +21,7 @@ import {
   PipePartialContentModule,
 } from '@sunbird-cb/utils'
 
-import { WidgetResolverModule } from '@sunbird-cb/resolver'
+import { SbUiResolverModule } from '@sunbird-cb/resolver-v2'
 
 import { YoutubeComponent } from './youtube.component'
 
@@ -51,7 +51,7 @@ import { MatLegacySnackBarModule as MatSnackBarModule } from '@angular/material/
     PipeLimitToModule,
     PipePartialContentModule,
     UserImageModule,
-    WidgetResolverModule,
+    SbUiResolverModule,
     UserContentRatingModule,
     BtnContentFeedbackV2Module,
     YoutubeViewContainerModule,

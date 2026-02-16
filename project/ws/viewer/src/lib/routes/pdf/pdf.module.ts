@@ -20,7 +20,7 @@ import {
   PipePartialContentModule,
 } from '@sunbird-cb/utils'
 
-import { WidgetResolverModule } from '@sunbird-cb/resolver'
+import { SbUiResolverModule } from '@sunbird-cb/resolver-v2'
 
 import { PdfComponent } from './pdf.component'
 import { RouterModule } from '@angular/router'
@@ -50,7 +50,7 @@ import { MatLegacySnackBarModule as MatSnackBarModule } from '@angular/material/
     PipeDurationTransformModule,
     PipeLimitToModule,
     PipePartialContentModule,
-    WidgetResolverModule,
+    SbUiResolverModule,
     UserContentRatingModule,
     BtnContentFeedbackV2Module,
     PdfViewContainerModule,

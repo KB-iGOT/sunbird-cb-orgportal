@@ -25,7 +25,7 @@ import {
   PipePartialContentModule,
 } from '@sunbird-cb/utils-v2'
 
-import { WidgetResolverModule } from '@sunbird-cb/resolver'
+import { SbUiResolverModule } from '@sunbird-cb/resolver-v2'
 import { MatLegacyButtonModule as MatButtonModule } from '@angular/material/legacy-button'
 import { MatLegacyCardModule as MatCardModule } from '@angular/material/legacy-card'
 import { MatLegacyDialogModule as MatDialogModule } from '@angular/material/legacy-dialog'
@@ -64,7 +64,7 @@ import { MatLegacyTabsModule as MatTabsModule } from '@angular/material/legacy-t
     PipeDurationTransformModule,
     PipeLimitToModule,
     PipePartialContentModule,
-    WidgetResolverModule,
+    SbUiResolverModule,
   ],
   exports: [
     ResourceCollectionComponent,

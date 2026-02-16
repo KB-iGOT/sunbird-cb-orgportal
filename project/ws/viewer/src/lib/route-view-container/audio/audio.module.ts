@@ -21,7 +21,7 @@ import {
   PipePartialContentModule,
 } from '@sunbird-cb/utils-v2'
 
-import { WidgetResolverModule } from '@sunbird-cb/resolver'
+import { SbUiResolverModule } from '@sunbird-cb/resolver-v2'
 
 import { AudioComponent } from './audio.component'
 import { RouterModule } from '@angular/router'
@@ -43,7 +43,7 @@ import { MatLegacySnackBarModule as MatSnackBarModule } from '@angular/material/
     MatButtonModule,
     MatDividerModule,
     MatSnackBarModule,
-    WidgetResolverModule,
+    SbUiResolverModule,
     PipeLimitToModule,
     PipePartialContentModule,
     PipeDurationTransformModule,
