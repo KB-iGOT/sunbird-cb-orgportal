@@ -25,6 +25,7 @@ export class ViewerResolve {
   ) { }
 
   resolve(route: ActivatedRouteSnapshot): Observable<IResolveResponse<NsContent.IContent>> | null {
+    console.log('route.data--', route)
     const resourceType = route.data.resourceType
     this.viewerDataSvc.reset(route.paramMap.get('resourceId'))
     if (!this.viewerDataSvc.resourceId) {

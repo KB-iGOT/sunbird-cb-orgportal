@@ -2,12 +2,7 @@ import { NestedTreeControl } from '@angular/cdk/tree'
 import { Component, EventEmitter, OnDestroy, OnInit, Output, Input, OnChanges, SimpleChanges, AfterViewInit } from '@angular/core'
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser'
 import { ActivatedRoute, NavigationExtras, Params } from '@angular/router'
-import {
-  // ContentProgressService,
 
-  VIEWER_ROUTE_FROM_MIME,
-  viewerRouteGenerator,
-} from '@sunbird-cb/collection'
 
 import { WidgetContentService } from '@sunbird-cb/toc'
 import { NsWidgetResolver } from '@sunbird-cb/resolver'
@@ -24,6 +19,7 @@ import { ViewerDataService } from '../../viewer-data.service'
 import { ViewerUtilService } from '../../viewer-util.service'
 import { MatTreeNestedDataSource } from '@angular/material/tree'
 import { NsContent } from '../../models/constant'
+import { VIEWER_ROUTE_FROM_MIME, viewerRouteGenerator } from '../../services/viewer-route-utils'
 // import { AppTocService } from '@ws/app/src/lib/routes/app-toc/services/app-toc.service'
 export interface IViewerTocCard {
   identifier: string
@@ -255,7 +251,6 @@ export class ViewerTocComponent implements OnInit, OnDestroy, OnChanges, AfterVi
       // })
 
       if (this.collectionId && this.collectionType && primaryCategory) {
-
         if (
 
           this.collectionType.toLowerCase() ===
@@ -581,6 +576,7 @@ export class ViewerTocComponent implements OnInit, OnDestroy, OnChanges, AfterVi
       this.contentSvc.currentMetaData = contentData
       this.collectionCard = this.createCollectionCard(contentData)
       const viewerTocCardContent = this.convertContentToIViewerTocCard(contentData)
+      console.log('viewerTocCardContent--', viewerTocCardContent)
       this.isFetching = false
       return viewerTocCardContent
     } catch (err: any) {
@@ -624,6 +620,7 @@ export class ViewerTocComponent implements OnInit, OnDestroy, OnChanges, AfterVi
       const content: any = playlistFetchResponse.data
       this.collectionCard = this.createCollectionCard(content)
       const viewerTocCardContent = this.convertContentToIViewerTocCard(content)
+      console.log('viewerTocCardContent--', viewerTocCardContent)
       this.isFetching = false
       return viewerTocCardContent
     } catch (err: any) {
@@ -669,6 +666,7 @@ export class ViewerTocComponent implements OnInit, OnDestroy, OnChanges, AfterVi
     // }
 
     // NOSONAR
+    console.log('content--', content)
     return {
       identifier: content.identifier,
       viewerUrl: `${this.forPreview ? '' : ''}/viewer/${VIEWER_ROUTE_FROM_MIME( // NOSONAR
