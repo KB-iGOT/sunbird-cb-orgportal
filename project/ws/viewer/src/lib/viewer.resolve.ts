@@ -4,11 +4,12 @@ import { catchError, map, tap } from 'rxjs/operators'
 import { Observable, of } from 'rxjs'
 // import { AccessControlService } from '@ws/author'
 import { WidgetContentService } from '@sunbird-cb/toc'
-import { NsContent, VIEWER_ROUTE_FROM_MIME } from '@sunbird-cb/collection'
+import { NsContent } from '@sunbird-cb/collection'
 import { IResolveResponse, AuthMicrosoftService, ConfigurationsService } from '@sunbird-cb/utils'
 import { ViewerDataService } from './viewer-data.service'
 import { MobileAppsService } from '../../../../../src/app/services/mobile-apps.service'
 import { Platform } from '@angular/cdk/platform'
+import { VIEWER_ROUTE_FROM_MIME } from './services/viewer-route-utils'
 
 const ADDITIONAL_FIELDS_IN_CONTENT = ['creatorContacts', 'source', 'exclusiveContent']
 @Injectable()
@@ -25,6 +26,7 @@ export class ViewerResolve {
   ) { }
 
   resolve(route: ActivatedRouteSnapshot): Observable<IResolveResponse<NsContent.IContent>> | null {
+    console.log('route.data--', route)
     const resourceType = route.data.resourceType
     this.viewerDataSvc.reset(route.paramMap.get('resourceId'))
     if (!this.viewerDataSvc.resourceId) {
@@ -42,8 +44,10 @@ export class ViewerResolve {
         ADDITIONAL_FIELDS_IN_CONTENT,
       ))
     ).pipe(map((data: any) => {
+      console.log('content data', data)
       return data
     })).pipe(tap((content: any) => {
+      console.log('content data 1', content)
       if (route.queryParamMap.get('preAssessment')) {
 
       } else {

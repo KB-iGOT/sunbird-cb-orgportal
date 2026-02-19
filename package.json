@@ -49,8 +49,8 @@
     "@ngx-translate/http-loader": "8.0.0",
     "@polyflix/vtt-parser": "^1.4.0",
     "@project-sunbird/telemetry-sdk": "0.0.26",
-    "@sunbird-cb/access-settings": "0.0.13-cbrelease-4.8.30",
     "@sunbird-cb/collection": "0.0.1-cbrelease-4.8.29",
+    "@sunbird-cb/access-settings": "0.0.4-cbrelease-4.8.33",
     "@sunbird-cb/consumption": "0.0.1-cbrelease-4.8.33",
     "@sunbird-cb/design-system": "0.0.3",
     "@sunbird-cb/discussion-v2": "0.0.8-cbrelease-4.8.28",
@@ -71,6 +71,7 @@
     "chartjs-plugin-datalabels": "^2.2.0",
     "ckeditor5": "^43.1.0",
     "d3": "^5.9.7",
+    "d3-funnel": "^2.1.1",
     "dayjs": "^1.11.13",
     "dom-to-image": "^2.6.0",
     "file-saver": "^2.0.2",
@@ -139,7 +140,7 @@
     "@types/zip.js": "2.0.28",
     "angular-cli-alias": "^1.0.9",
     "codelyzer": "^6.0.0",
-    "d3-funnel": "^2.1.1",
+
     "gzipper": "^2.8.1",
     "jasmine-core": "~3.6.0",
     "jasmine-spec-reporter": "~5.0.0",
@@ -159,5 +160,8 @@
     "typescript": "~4.9.5",
     "typescript-tslint-plugin": "^0.5.4",
     "webpack-bundle-analyzer": "^4.4.0"
+  },
+  "resolutions": {
+   "d3-selection": "^1.4.2"
   }
 }

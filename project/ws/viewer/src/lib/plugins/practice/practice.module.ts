@@ -47,6 +47,7 @@ import { MatLegacySelectModule as MatSelectModule } from '@angular/material/lega
 import { MatLegacyTableModule as MatTableModule } from '@angular/material/legacy-table'
 import { MatLegacyTooltipModule as MatTooltipModule } from '@angular/material/legacy-tooltip'
 import { SkeletonLoaderModule } from '../../components/skeleton-loader/skeleton-loader.module'
+import { ReplaceNbspPipe } from '../../pipes/replace-nbsp.pipe'
 @NgModule({
     declarations: [
         FillInTheBlankComponent,
@@ -67,6 +68,7 @@ import { SkeletonLoaderModule } from '../../components/skeleton-loader/skeleton-
         AssessmentPerformanceInsightSummaryComponent,
         FinalAssessmentPopupComponent,
         QuestionSafeUrlPipe,
+        ReplaceNbspPipe
     ],
     imports: [
         CommonModule,
@@ -105,6 +107,7 @@ import { SkeletonLoaderModule } from '../../components/skeleton-loader/skeleton-
         AssessmentQuestionCountContainerComponent,
         AssessmentPerformanceSummaryComponent,
         AssessmentPerformanceInsightSummaryComponent,
+        ReplaceNbspPipe
     ],
 })
 export class PracticePlModule { }

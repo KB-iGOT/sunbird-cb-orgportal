@@ -260,7 +260,7 @@ export class PracticeService {
     }
     if (forPreview && !forcreator) {
       const forPreviewData = {
-        assessmentIdentifier: assessmentId,
+        assessmentId: assessmentId,
         contextId: collectionId,
         request: {
           search: {
@@ -282,8 +282,11 @@ export class PracticeService {
   }
 
   getSectionV4(sectionId: string, forPreview?: any, postReqData?: any): Observable<any> {
-    if (forPreview && !forcreator) {
+    if (!forPreview && !forcreator) {
       return this.http.post<NSPractice.ISectionResponse>(API_END_POINTS.PUBLIC_QUESTION_READ, postReqData).pipe(retry(2))
+    }
+    if (forPreview) {
+      return this.http.get<NSPractice.ISectionResponse>(`${API_END_POINTS.QUESTION_PAPER_SECTIONS_V4}/${sectionId}?editMode=true`).pipe(retry(2))
     }
     if (forcreator) {
       // tslint:disable-next-line: max-line-length
@@ -295,6 +298,7 @@ export class PracticeService {
   }
   getQuestionsV4(identifiers: string[], assessmentId: string,
     forPreview?: any, userDetails?: any, collectionId?: any): Observable<{ count: Number, questions: any[] }> {
+
     const identifiersData = identifiers.map(id => {
       if (typeof id === 'string' && id.endsWith('.img')) {
         return id.replace('.img', '')
@@ -312,7 +316,7 @@ export class PracticeService {
 
     if (forPreview && !forcreator) {
       const forPreviewData = {
-        assessmentIdentifier: assessmentId,
+        assessmentId: assessmentId,
         contextId: collectionId,
         request: {
           search: {
@@ -322,7 +326,7 @@ export class PracticeService {
         ...userDetails,
       }
       return this.http.post<{ count: Number, questions: any[] }>(
-        API_END_POINTS.PUBLIC_QUESTION_LIST, forPreviewData)
+        `${API_END_POINTS.QUESTION_PAPER_QUESTIONS_V4}?editMode=true`, forPreviewData)
     }
     if (forcreator) {
       // tslint:disable-next-line: max-line-length

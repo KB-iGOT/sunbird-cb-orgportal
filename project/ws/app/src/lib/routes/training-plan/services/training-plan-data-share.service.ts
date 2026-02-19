@@ -7,6 +7,7 @@ import { Subject } from 'rxjs'
 export class TrainingPlanDataSharingService {
   clearFilter = new Subject()
   trainingPlanCategoryChangeEvent = new Subject()
+  isContentChanged = false
   moderatedCourseSelectStatus = new Subject()
   handleContentPageChange = new Subject()
   filterToggle = new Subject()

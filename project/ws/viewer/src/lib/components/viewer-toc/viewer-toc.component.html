@@ -228,8 +228,10 @@
             [backgroundPadding]="-9" [outerStrokeLinecap]="'butt'" matTooltip="Not started" [showSubtitle]="false"
             [showInnerStroke]="true" [clockwise]="true" [imageHeight]="22" [imageWidth]="22"
             [showBackground]="false"></circle-progress>
+          <!-- {{content | json}} -->
           <a [ngClass]="{ 'content-active': pathSet?.has(content.identifier), 'disabled': content?.mimeType === 'application/vnd.ekstep.content-collection' }"
             [routerLink]="content.viewerUrl" queryParamsHandling="preserve">
+
             <h3
               *ngIf="content?.type !== enumContentTypes.ASSESSMENT && content?.mimeType !== 'application/vnd.ekstep.content-collection'"
               class="margin-remove text-truncate flex pl-2">
