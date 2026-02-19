@@ -14,7 +14,7 @@ export class PendingFunctionService {
   ) { }
 
   getAssessmentHierarchy(id: string) {
-    return this.http.get(`apis/proxy/v8/questionset/v1/${id}?mode=edit`)
+    return this.http.get(`apis/proxies/v8/questionset/v1/hierarchy/${id}?mode=edit`)
   }
 
   getContentData(contentId: any): Observable<any> {
