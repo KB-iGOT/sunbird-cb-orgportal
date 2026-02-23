@@ -48,7 +48,9 @@ export class BreadcrumbComponent implements OnInit {
 
   cancel() {
     this.tpdsSvc.trainingPlanTitle = ''
-    this.router.navigateByUrl('app/home/training-plan-dashboard')
+    setTimeout(() => {
+      this.router.navigateByUrl('app/home/training-plan-dashboard')
+    }, 500)
   }
 
   nextStep() {
@@ -85,7 +87,7 @@ export class BreadcrumbComponent implements OnInit {
       if (this.editState) {
         this.router.navigate(['app', 'home', 'training-plan-dashboard'], {
           queryParams: {
-            type: this.tpdsSvc.trainingPlanStepperData.status.toLowerCase(),
+            type: this.tpdsSvc.trainingPlanStepperData.status === 'Live' ? this.tpdsSvc.trainingPlanStepperData.status : this.tpdsSvc.trainingPlanStepperData.status.toLowerCase(),
             tabSelected: this.tpdsSvc.trainingPlanStepperData.assignmentType,
           },
         })
@@ -267,8 +269,8 @@ export class BreadcrumbComponent implements OnInit {
     }
     const obj: any = { request: { ...this.tpdsSvc.trainingPlanStepperData, id: this.activeRoute.snapshot.data['contentData'].id } }
     if (obj.request.status && obj.request.status.toLowerCase() === 'live') {
-      delete obj.request.contentList
-      delete obj.request.contentType
+      //delete obj.request.contentList
+      //delete obj.request.contentType
       delete obj.request.assignmentType
     }
     delete obj.request.status
@@ -305,10 +307,10 @@ export class BreadcrumbComponent implements OnInit {
     }
     const obj = this.generateRequestPayload(this.tpdsSvc.trainingPlanStepperData, 'update')
     if (obj.request.status && obj.request.status.toLowerCase() === 'live') {
-      delete obj.request.contentList
-      delete obj.request.contentType
+      //delete obj.request.contentList
+      //delete obj.request.contentType
       delete obj.request.assignmentType
-      delete obj.request.orgIdList
+      //delete obj.request.orgIdList
     }
     delete obj.request.status
     this.showDialogBox('progress')
@@ -409,13 +411,17 @@ export class BreadcrumbComponent implements OnInit {
           autoFocus: false,
         })
         break
-      case 'updateAndPublish':
+      case 'updateAndPublish': {
+        let title: any = "Are you sure you want to update and publish the plan?"
+        if (this.tpdsSvc.isContentChanged) {
+          title = "Editing the course list may impact learners who have already accessed this training plan. Removing or modifying a course could change their learning experience. Please confirm before proceeding. Are you sure you want to update and publish the plan?"
+        }
         this.dialogRef = this.dialog.open(ConfirmationBoxComponent, {
           disableClose: true,
           data: {
             type: 'conformation',
             icon: 'radio_on',
-            title: 'Are you sure you want to update and publish the plan?',
+            title: title,
             // subTitle: 'You wont be able to revert this',
             primaryAction: 'Confirm',
             secondaryAction: 'Cancel',
@@ -423,6 +429,7 @@ export class BreadcrumbComponent implements OnInit {
           autoFocus: false,
         })
         break
+      }
     }
     this.dialogRef.afterClosed().subscribe((_res: any) => {
       if (_res === 'confirmed') {

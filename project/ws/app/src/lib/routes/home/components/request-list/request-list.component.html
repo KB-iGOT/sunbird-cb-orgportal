@@ -1,4 +1,4 @@
-<div class="request-container">
+<div class="request-container mt-5">
   <h2>Content Request</h2>
   <mat-card class="mb-8">
     <mat-card-content class="flex gap-10">
@@ -24,7 +24,9 @@
       </div> -->
     </mat-card-content>
   </mat-card>
-  <div class="create-action">
+  <div class="create-action gap-4">
+    <!-- <button mat-button type="button" class="search-btn" [routerLink]="['/app/home/explore-content']">Explore Content
+    </button> -->
     <button mat-button type="button" class="search-btn" [routerLink]="['/app/home/create-request-form']">Request
       Content</button>
   </div>
@@ -77,8 +79,7 @@
             <ng-container matColumnDef="interests">
               <th mat-header-cell *matHeaderCellDef class="row-heading">Interests</th>
               <td mat-cell class="title-class" *matCellDef="let element">
-                <a class="action-btn-view" *ngIf="element?.interestCount!== 0" href="javascript:void(0)"
-                  [ngStyle]="getPointerEventsStyle(element)">
+                <a class="action-btn-view" *ngIf="element?.interestCount!== 0" href="javascript:void(0)" [ngStyle]="getPointerEventsStyle(element)">
                   <span (click)="handleClick(element)">
                     {{element?.interestCount}}
                   </span></a>
@@ -152,8 +153,7 @@
                   [routerLink]="['/app/home/create-request-form']">Request Content</button>
               </div> -->
           <div class=" margin-top-m no-content-create">
-            <button mat-button type="button" class="search-btns"
-              [routerLink]="['/app/home/create-request-form']">Request Content</button>
+            <button mat-button type="button" class="search-btns" [routerLink]="['/app/home/create-request-form']">Request Content</button>
           </div>
 
         </div>

@@ -342,6 +342,11 @@ const routes: Routes = [
         loadChildren: () => import('./routes/custom-forms/custom-forms.module').then(m => m.CustomFormsModule),
       },
       {
+        path: 'achievement-approvals',
+        loadChildren: () => import('./routes/achievement-approvals/achievement-approvals.module').then(m => m.AchievementApprovalsModule),
+      },
+
+      {
         path: 'events',
         loadChildren: () => import('./routes/events-2/events-2.module').then(m => m.Events2Module),
       },
