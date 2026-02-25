@@ -32,7 +32,7 @@ import { ReactiveFormsModule, FormsModule } from '@angular/forms'
 import { RouterModule } from '@angular/router'
 // import { Ng2SearchPipeModule } from 'ng2-search-filter'
 import { NgxPaginationModule } from 'ngx-pagination'
-import { RainDashboardsModule } from '@sunbird-cb/rain-dashboards'
+//import { RainDashboardsModule } from '@sunbird-cb/rain-dashboards'
 
 import { ExportAsModule } from 'ngx-export-as'
 import { HomeRoutingModule } from './home.rounting.module'
@@ -91,7 +91,7 @@ import { CreateRequestFormComponent } from './components/request-list/create-req
 import { CompetencyViewComponent } from './components/request-list/competency-view/competency-view.component'
 import { AssignListPopupComponent } from './components/request-list/assign-list-popup/assign-list-popup.component'
 import { SingleAssignPopupComponent } from './components/request-list/single-assign-popup/single-assign-popup.component'
-import { HttpClientModule } from '@angular/common/http'
+import { HttpClient, HttpClientModule } from '@angular/common/http'
 import { DesignationModule } from './routes/designation/designation.module'
 import { OdcsMappingComponent } from './routes/odcs-mapping/odcs-mapping.component'
 import { environment } from '../../../../../../../src/environments/environment'
@@ -104,7 +104,7 @@ import { GroupsGradeComponent } from './components/groups-grade/groups-grade.com
 import { MAT_DATE_LOCALE } from '@angular/material/core'
 import { MyNotificationsComponent } from './routes/my-notifications/my-notifications.component'
 import { AllNotificationsModule } from '@sunbird-cb/notification'
-import { TranslateModule } from '@ngx-translate/core'
+import { TranslateLoader, TranslateModule } from '@ngx-translate/core'
 import { CreateUserComponent } from './routes/directory/create-user/create-user.component'
 import { DirectoryComponent } from './routes/directory/directory.component'
 import { DirectoryTableComponent } from './components/directory-table/directory-table.component'
@@ -123,7 +123,19 @@ import { UserOnboardingComponent } from './routes/directory/user-onbarding/user-
 import { UserBulkTransferComponent } from './routes/directory/user-bulk-transfer/user-bulk-transfer.component'
 import { HorizontalDynamicStepperModule, UserUpdateModule } from '@sunbird-cb/consumption'
 import { OnboardingModule } from './routes/onboarding/onboarding.module'
+import { ExploreContentComponent } from './routes/explore-content/explore-content.component'
+import { ExploreContentService } from './services/explore-content.service'
+import { WsCustomTooltipDirective } from './directives/ws-auth-ws-custom-tooltip.directive'
+import { LangToolTipComponent } from './routes/lang-tool-tip/lang-tool-tip.component'
+import { PreviewComponent } from './routes/explore-content/preview/preview.component'
+import { AppTocLibModule } from '@sunbird-cb/toc'
+import { TranslateHttpLoader } from '@ngx-translate/http-loader'
+import { FiltersComponent } from './routes/explore-content/filters/filters.component'
+import { WidgetCommunityHomeModule } from '@sunbird-cb/discussion-v2'
 
+export function HttpLoaderFactory(http: HttpClient) {
+  return new TranslateHttpLoader(http)
+}
 @NgModule({
   declarations: [
     HomeComponent,
@@ -188,7 +200,12 @@ import { OnboardingModule } from './routes/onboarding/onboarding.module'
     BulkUploadOrgComponent,
     UsersComponent,
     UserOnboardingComponent,
-    UserBulkTransferComponent
+    UserBulkTransferComponent,
+    ExploreContentComponent,
+    WsCustomTooltipDirective,
+    LangToolTipComponent,
+    PreviewComponent,
+    FiltersComponent,
   ],
   imports: [
     CommonModule,
@@ -224,14 +241,13 @@ import { OnboardingModule } from './routes/onboarding/onboarding.module'
     AvatarPhotoModule,
     PipeOrderByModule,
     BreadcrumbsOrgModule,
-    SbUiResolverModule,
     ScrollspyLeftMenuModule,
     MatRadioModule,
     ExportAsModule,
     WorkallocationModule,
     NgxPaginationModule,
     UIAdminTableModule,
-    RainDashboardsModule,
+    //RainDashboardsModule,
     MatTabsModule,
     MatTableModule,
     MatTooltipModule,
@@ -252,7 +268,17 @@ import { OnboardingModule } from './routes/onboarding/onboarding.module'
     TreeHierarchyModule,
     UserUpdateModule,
     OnboardingModule,
-    HorizontalDynamicStepperModule
+    HorizontalDynamicStepperModule,
+    AppTocLibModule,
+    WidgetCommunityHomeModule,
+    SbUiResolverModule,
+    TranslateModule.forRoot({
+      loader: {
+        provide: TranslateLoader,
+        useFactory: HttpLoaderFactory,
+        deps: [HttpClient],
+      },
+    }),
   ],
   providers: [
     { provide: 'environment', useValue: environment },
@@ -262,6 +288,7 @@ import { OnboardingModule } from './routes/onboarding/onboarding.module'
     UploadService,
     TrainingPlanDashboardService,
     UsersService,
+    ExploreContentService,
     { provide: MAT_DATE_LOCALE, useValue: 'en-GB' },
     OrgHierarchyService
   ],

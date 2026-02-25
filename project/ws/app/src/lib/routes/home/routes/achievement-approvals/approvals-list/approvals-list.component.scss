@@ -4,6 +4,7 @@
 .achievement-approvals-container {
   padding: 32px;
   min-height: 100vh;
+  background: #ffffff;
 }
 
 .header-section {
@@ -42,51 +43,49 @@
     align-items: center;
     text-align: center;
 
-    .stat-icon {
-      width: 64px;
-      height: 64px;
-      border-radius: 16px;
+
+
+    .stat-circle {
+      width: 92px;
+      height: 92px;
+      border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      margin-bottom: 16px;
+      margin-bottom: 12px;
+      background: #ffffff;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+      border: 8px solid transparent;
 
-      mat-icon {
-        font-size: 36px;
-        width: 36px;
-        height: 36px;
+      .circle-value {
+        font-size: 24px;
+        font-weight: 800;
+        color: #0f172a;
       }
+    }
 
-      &.pending-icon {
-        background-color: #dbeafe;
-        color: #135bec;
-      }
+    .pending-circle {
+      border-color: #1B4CA1;
+    }
 
-      &.approved-icon {
-        background-color: #d1fae5;
-        color: #059669;
-      }
+    .approved-circle {
+      border-color: #1D8923;
+    }
 
-      &.rejected-icon {
-        background-color: #fee2e2;
-        color: #dc2626;
-      }
+    .rejected-circle {
+      border-color: #D13924;
     }
 
     .stat-label {
-      font-size: 10px;
-      font-weight: 700;
-      color: #94a3b8;
-      letter-spacing: 0.15em;
-      margin-bottom: 4px;
-      text-transform: uppercase;
-    }
-
-    .stat-value {
-      font-size: 36px;
-      font-weight: 800;
-      color: #0f172a;
+      letter-spacing: 0.02em;
       margin-top: 4px;
+      text-transform: none;
+      font-family: Lato;
+      font-weight: 400;
+      font-style: Regular;
+      font-size: 14px;
+      line-height: 100%;
+      letter-spacing: 0%;
     }
   }
 }
@@ -133,13 +132,13 @@
 }
 
 .bulk-approve-btn {
-  background-color: #1B4CA1!important;
-  color: white!important;
+  border: 1px solid #1B4CA1!important;
+  color: #1B4CA1!important;
+  background-color: #fff!important;
   font-weight: 700;
   font-size: 14px;
   border-radius: 8px;
-  box-shadow: 0 4px 6px -1px rgba(19, 91, 236, 0.3);
-
+  border-radius: 26px;
   &:hover {
     background-color: #0e4fc4;
   }
@@ -152,8 +151,6 @@
   }
 
   &:disabled {
-    background-color: #1B4CA1!important;
-    color: white!important;
     box-shadow: none;
     opacity: 0.6;
   }
@@ -225,7 +222,7 @@ table .table-row-data {
   align-items: center;
   justify-content: center;
   font-weight: 700;
-  color: #0f172a;
+  color: #ffffff;
 }
 
 .achievement-cell .achievement-title {
@@ -234,24 +231,18 @@ table .table-row-data {
 }
 
 .status-pill {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 90px;
-  padding: 4px 10px;
-  border-radius: 999px;
-  font-size: 12px;
-  font-weight: 700;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 20px;
+  letter-spacing: 0.25px;
 }
 
 .status-approved {
-  background-color: #dcfce7;
-  color: #16a34a;
+  color: #1D8923;
 }
 
 .status-rejected {
-  background-color: #fee2e2;
-  color: #dc2626;
+  color: #D13924;
 }
 
 .actions-cell {
@@ -301,5 +292,18 @@ mat-header-row {
 
 .evidence-link {
   color: #1B4CA1;
+}
+
+.opened {
+  display: block;
+}
+
+.closed {
+  display: none;
+}
+
+.visibility-icon {
+  color: #1B4CA1;
+
 }
 
