@@ -1,0 +1,31 @@
+
+.link {
+  color: #6e6e6e;
+  cursor: pointer;
+}
+
+.default {
+  border-bottom: 2px solid #e0e0e0;
+}
+
+.active {
+  border-bottom: 2px solid #1b4ca1;
+  font-weight: 600;
+}
+
+.filter-option {
+  padding: 8px 16px;
+  cursor: pointer;
+  text-decoration: none;
+  color: #000;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.max-height-60 {
+  max-height: 60px;
+}
+
+.margin-fix {
+  margin-top: 8px;
+}

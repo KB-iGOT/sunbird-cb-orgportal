@@ -1,0 +1,41 @@
+<div class="details-wrapper">
+  <!-- Left Section -->
+  <div class="details-left">
+    <h2 class="training-title">{{ training.title }}</h2>
+    <div class="info-grid">
+      <div class="info-block">
+        <span class="info-label">LEARNING TYPE</span>
+        <span class="info-value">{{ training.learningType }}</span>
+      </div>
+      <div class="info-block">
+        <span class="info-label">DELIVERY MODE</span>
+        <span class="info-value">{{ training.deliveryMode }}</span>
+      </div>
+      <div class="info-block">
+        <span class="info-label">LEARNING HOURS</span>
+        <span class="info-value">{{ training.learningHours }}</span>
+      </div>
+      <div class="info-block">
+        <span class="info-label">PARTNER NAME</span>
+        <span class="info-value">{{ training.partnerName }}</span>
+      </div>
+    </div>
+
+    <div class="objective-section">
+      <span class="info-label">LEARNING OBJECTIVE</span>
+      <p class="objective-text">{{ training.learningObjective }}</p>
+    </div>
+  </div>
+
+  <!-- Right Section - Certificate Preview -->
+  <div class="details-right">
+    <div class="certificate-header">
+      <span class="certificate-title">Certificate Preview</span>
+      <mat-icon class="certificate-icon">visibility</mat-icon>
+    </div>
+    <div class="certificate-card">
+      <img class="certificate-img" src="https://portal.uat.karmayogibharat.net/content-store/cios-icon/1772113322108_CourseCertificate_Template.svg"
+        alt="Certificate Preview" />
+    </div>
+  </div>
+</div>

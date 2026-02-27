@@ -152,13 +152,15 @@ export class ListComponent implements OnInit, AfterViewInit {
   // Actions
   prepareActions() {
     this.currentRowActions = [
-      { key: 'viewDetails', name: 'Create Batch', icon: 'visibility' },
+      { key: 'createBatch', name: 'Create Batch', icon: 'add' },
     ]
 
   }
 
-  menuSelected() {
-
+  menuSelected(row: any) {
+    if (row?.id) {
+      this.router.navigate(['app', 'home', 'external-trainings', row.id, 'batches'])
+    }
   }
 
   viewDetails(row: any) {

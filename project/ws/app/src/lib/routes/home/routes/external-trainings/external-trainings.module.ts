@@ -25,10 +25,17 @@ import { MatDialogModule } from '@angular/material/dialog'
 import { ListComponent } from './list/list.component'
 import { ExternalTrainingsRoutingModule } from './external-trainings-routing.module'
 import { ExternalTrainingsService } from '../../services/external-trainings.service'
+import { DetailsComponent } from './details/details.component'
+import { BatchesComponent } from './batches/batches.component'
+import { TrainingViewComponent } from './training-view/training-view.component'
+
 @NgModule({
   declarations: [
     BaseComponent,
     ListComponent,
+    DetailsComponent,
+    BatchesComponent,
+    TrainingViewComponent,
   ],
   imports: [
     CommonModule,
