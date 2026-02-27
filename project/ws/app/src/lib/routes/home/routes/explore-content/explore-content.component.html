@@ -1,6 +1,6 @@
 <div class="explore-container">
   <div class="flex my-5 font-weight-600 text-24">
-    <span class="h-600-s-20-m color-87">Explore content</span>
+    <span class="h-600-s-20-m color-87">Explore Content</span>
   </div>
   <!-- Header search and filter -->
   <div class="explore-toolbar">
@@ -8,7 +8,6 @@
       <mat-icon class="search-icon">search</mat-icon>
       <input class="search-input" type="text" placeholder="Type here to search..." [(ngModel)]="searchQuery" (input)="applySearch(searchQuery)" />
       <button *ngIf="searchQuery" mat-icon-button class="clear-btn" (click)="clearSearch()" aria-label="Clear search">
-        <mat-icon>close</mat-icon>
       </button>
     </div>
 
@@ -19,7 +18,7 @@
   </div>
 
   <!-- Content table -->
-  <div class="table-card mat-elevation-z1" *ngIf="dataSource?.data?.length > 0">
+  <div class="table-card mat-elevation-z1" *ngIf="dataSource?.data?.length > 0; else noData">
     <table mat-table [dataSource]="dataSource" class="full-width" multiTemplateDataRows>
       <ng-container matColumnDef="expand">
         <th mat-header-cell *matHeaderCellDef [style.width.px]="40"></th>
@@ -178,6 +177,15 @@
       showFirstLastButtons>
     </mat-paginator>
   </div>
+
+  <ng-template #noData>
+    <div class="no-data-container">
+      <div class="no-data-message">
+        <mat-icon class="no-data-icon">search_off</mat-icon>
+        <p class="no-data-text">No data found</p>
+      </div>
+    </div>
+  </ng-template>
 </div>
 <div [ngClass]="{'opened': sideNavBarOpened, 'closed': !sideNavBarOpened }" class="filter-sidenav-container">
   <ws-app-filters [allFacets]="allFacets" (closeSidenav)="handleCloseSidenav()" (filtersChanged)="handleFiltersChanges($event)"></ws-app-filters>

@@ -121,6 +121,8 @@ export class ExploreContentComponent implements OnInit {
 
   private loadContent(): void {
     this.loaderService.changeLoaderState(true)
+    this.searchBody.request.limit = this.pageSize
+    this.searchBody.request.offset = this.pageIndex * this.pageSize
 
     this.exploreContentService.getAllContent(this.searchBody).subscribe(
       response => {

@@ -52,7 +52,7 @@
       <!-- Languages Section -->
       <div class="filter-section">
         <h3 class="filter-section-title">Languages</h3>
-        <mat-form-field appearance="outline" class="search-field">
+        <mat-form-field appearance="outline" class="search-field" *ngIf="filteredLanguages.length > 4">
           <mat-icon matPrefix>search</mat-icon>
           <input matInput placeholder="Search" [(ngModel)]="languageSearch" (input)="filterLanguages()">
         </mat-form-field>
@@ -71,7 +71,7 @@
       <!-- Organisation Section -->
       <div class="filter-section">
         <h3 class="filter-section-title">Organisation</h3>
-        <mat-form-field appearance="outline" class="search-field">
+        <mat-form-field appearance="outline" class="search-field" *ngIf="filteredOrganisations.length > 4">
           <mat-icon matPrefix>search</mat-icon>
           <input matInput placeholder="Search" [(ngModel)]="organisationSearch" (input)="filterOrganisations()">
         </mat-form-field>
@@ -89,7 +89,7 @@
       </div>
 
       <!-- Competency Area Section -->
-      <div class="filter-section">
+      <div class="filter-section" *ngIf="filteredCompetencies?.length">
         <h3 class="filter-section-title">Competency Area</h3>
         <div class="filter-options">
           <div *ngFor="let item of getDisplayedCompetencies()" class="filter-item">
@@ -105,9 +105,9 @@
       </div>
 
       <!-- Competency Theme Section -->
-      <div class="filter-section">
+      <div class="filter-section" *ngIf="filteredCompetencyTheme.length">
         <h3 class="filter-section-title">Competency Theme</h3>
-        <mat-form-field appearance="outline" class="search-field">
+        <mat-form-field appearance="outline" class="search-field" *ngIf="filteredCompetencyTheme.length > 4">
           <mat-icon matPrefix>search</mat-icon>
           <input matInput placeholder="Search" [(ngModel)]="competencyThemeSearch" (input)="filterCompetencyTheme()">
         </mat-form-field>
@@ -125,9 +125,9 @@
       </div>
 
       <!-- Competency Sub-Theme Section -->
-      <div class="filter-section">
+      <div class="filter-section" *ngIf="filteredCompetencySubTheme.length">
         <h3 class="filter-section-title">Competency Sub-Theme</h3>
-        <mat-form-field appearance="outline" class="search-field">
+        <mat-form-field appearance="outline" class="search-field" *ngIf="filteredCompetencySubTheme.length > 4">
           <mat-icon matPrefix>search</mat-icon>
           <input matInput placeholder="Search" [(ngModel)]="competencySubThemeSearch" (input)="filterCompetencySubTheme()">
         </mat-form-field>
