@@ -152,20 +152,24 @@ export class ListComponent implements OnInit, AfterViewInit {
   // Actions
   prepareActions() {
     this.currentRowActions = [
+      { key: 'viewDetails', name: 'View Details', icon: 'visibility' },
       { key: 'createBatch', name: 'Create Batch', icon: 'add' },
     ]
 
   }
 
-  menuSelected(row: any) {
+  menuSelected(row: any, actionKey: string) {
     if (row?.id) {
-      this.router.navigate(['app', 'home', 'external-trainings', row.id, 'batches'])
-    }
-  }
-
-  viewDetails(row: any) {
-    if (row?.id) {
-      this.router.navigate(['app', 'home', 'external-trainings', 'details', row.id])
+      switch (actionKey) {
+        case 'viewDetails':
+          this.router.navigate(['app', 'home', 'external-trainings', row.id, 'details'])
+          break
+        case 'createBatch':
+          this.router.navigate(['app', 'home', 'external-trainings', row.id, 'batches'])
+          break
+        default:
+          break
+      }
     }
   }
 

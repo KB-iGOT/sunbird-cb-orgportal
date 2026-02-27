@@ -61,7 +61,7 @@
                   </button>
                   <mat-menu #actionMenu="matMenu">
                     <button class="external-traings-actions" mat-menu-item *ngFor="let action of currentRowActions; trackBy: trackByActionKey"
-                      (click)="menuSelected(element); $event.stopPropagation()">
+                      (click)="menuSelected(element, action.key); $event.stopPropagation()">
                       <mat-icon class="my-icon">{{action.icon}}</mat-icon>
                       <span>{{action.name}}</span>
                     </button>

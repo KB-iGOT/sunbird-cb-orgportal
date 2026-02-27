@@ -132,3 +132,16 @@
   margin-top: 8px;
   text-align: center;
 }
+
+.compt-table {
+  border: none;
+  border-collapse: collapse;
+}
+
+.compt-table tr {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.16);
+}
+
+.font-bold {
+  font-weight: 700;
+}
