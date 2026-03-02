@@ -24,12 +24,15 @@ export class FiltersComponent implements OnInit, OnChanges {
   competencies: FilterItem[] = []
   competencyTheme: FilterItem[] = []
   competencySubTheme: FilterItem[] = []
+  difficultyLevels: FilterItem[] = []
 
   // Filtered and displayed data
   filteredLanguages: FilterItem[] = []
   filteredOrganisations: FilterItem[] = []
+  filteredCompetencies: FilterItem[] = []
   filteredCompetencyTheme: FilterItem[] = []
   filteredCompetencySubTheme: FilterItem[] = []
+  filteredDifficultyLevels: FilterItem[] = []
 
   // Search strings
   languageSearch = ''
@@ -45,6 +48,7 @@ export class FiltersComponent implements OnInit, OnChanges {
   showAllCompetencies = false
   showAllCompetencyTheme = false
   showAllCompetencySubTheme = false
+  showAllDifficultyLevels = false
 
   // Selected filters
   selectedFilters: any = {
@@ -54,7 +58,8 @@ export class FiltersComponent implements OnInit, OnChanges {
     organisations: [],
     competencyArea: [],
     competencyTheme: [],
-    competencySubTheme: []
+    competencySubTheme: [],
+    difficultyLevel: []
   }
 
   constructor() { }
@@ -98,13 +103,18 @@ export class FiltersComponent implements OnInit, OnChanges {
         case 'competencies_v6.competencySubThemeName':
           this.competencySubTheme = this.mapFacetValues(facet.values)
           break
+        case 'difficultyLevel':
+          this.difficultyLevels = this.mapFacetValues(facet.values)
+          break
       }
     })
 
     this.filteredLanguages = [...this.languages]
     this.filteredOrganisations = [...this.organisations]
+    this.filteredCompetencies = [...this.competencies]
     this.filteredCompetencyTheme = [...this.competencyTheme]
     this.filteredCompetencySubTheme = [...this.competencySubTheme]
+    this.filteredDifficultyLevels = [...this.difficultyLevels]
   }
 
   private mapFacetValues(values: any[]): FilterItem[] {
@@ -243,6 +253,15 @@ export class FiltersComponent implements OnInit, OnChanges {
     return this.showAllCompetencySubTheme ? this.filteredCompetencySubTheme : this.filteredCompetencySubTheme.slice(0, 4)
   }
 
+  // Difficulty Level methods
+  toggleDifficultyLevelShowAll(): void {
+    this.showAllDifficultyLevels = !this.showAllDifficultyLevels
+  }
+
+  getDisplayedDifficultyLevels(): FilterItem[] {
+    return this.showAllDifficultyLevels ? this.filteredDifficultyLevels : this.filteredDifficultyLevels.slice(0, 4)
+  }
+
   // Common filter methods
   isFilterSelected(filterType: string, value: string): boolean {
     return this.selectedFilters[filterType].includes(value)
@@ -278,7 +297,8 @@ export class FiltersComponent implements OnInit, OnChanges {
       organisations: [],
       competencyArea: [],
       competencyTheme: [],
-      competencySubTheme: []
+      competencySubTheme: [],
+      difficultyLevel: []
     }
     this.emitFilterChanges()
   }

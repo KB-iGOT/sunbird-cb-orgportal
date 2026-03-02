@@ -88,6 +88,22 @@
         </div>
       </div>
 
+      <!-- Difficulty Level Section -->
+      <div class="filter-section" *ngIf="filteredDifficultyLevels.length">
+        <h3 class="filter-section-title">Difficulty Level</h3>
+        <div class="filter-options">
+          <div *ngFor="let item of getDisplayedDifficultyLevels()" class="filter-item">
+            <mat-checkbox [checked]="isFilterSelected('difficultyLevel', item.name)"
+              (change)="onFilterChange('difficultyLevel', item.name, $event.checked)">
+              {{ item.name }}({{ item.count }})
+            </mat-checkbox>
+          </div>
+          <a *ngIf="filteredDifficultyLevels.length > 4" class="see-more-link" (click)="toggleDifficultyLevelShowAll()">
+            {{ showAllDifficultyLevels ? 'See Less' : 'See More' }}
+          </a>
+        </div>
+      </div>
+
       <!-- Competency Area Section -->
       <div class="filter-section" *ngIf="filteredCompetencies?.length">
         <h3 class="filter-section-title">Competency Area</h3>

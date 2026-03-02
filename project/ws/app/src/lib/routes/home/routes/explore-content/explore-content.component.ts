@@ -46,7 +46,7 @@ export class ExploreContentComponent implements OnInit {
   allFacets: any
   defaultFacets: any = ["courseCategory", "avgRating", "language", "organisation",
     "competencies_v6.competencyAreaName", "competencies_v6.competencyThemeName",
-    "competencies_v6.competencySubThemeName"]
+    "competencies_v6.competencySubThemeName", "difficultyLevel"]
   defaultCategories: string[] = [
     'Course',
     'Program',
@@ -237,12 +237,10 @@ export class ExploreContentComponent implements OnInit {
   }
 
   handleFiltersChanges(selectedFilters: any): void {
-    console.log('Selected filters received:', selectedFilters)
     this.pageIndex = 0
 
     // Update filters in searchBody
     this.searchBody.request.filters = this.processSelectedFilters(selectedFilters)
-    console.log('Updated searchBody with filters:', this.searchBody)
     this.loadContent()
   }
 
@@ -281,10 +279,12 @@ export class ExploreContentComponent implements OnInit {
         filters.avgRating = { '>=': String(threshold) }
       }
     }
+    addIfNonEmpty('language', selectedFilters.languages)
     addIfNonEmpty('organisation', selectedFilters.organisations)
     addIfNonEmpty('competencies_v6.competencyAreaName', selectedFilters.competencyArea)
     addIfNonEmpty('competencies_v6.competencyThemeName', selectedFilters.competencyTheme)
     addIfNonEmpty('competencies_v6.competencySubThemeName', selectedFilters.competencySubTheme)
+    addIfNonEmpty('difficultyLevel', selectedFilters.difficultyLevel)
     return filters
   }
 }
