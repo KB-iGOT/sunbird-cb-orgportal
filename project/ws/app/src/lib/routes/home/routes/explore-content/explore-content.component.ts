@@ -22,7 +22,6 @@ import { LoaderService } from '../../../../../../../../../src/app/services/loade
 })
 export class ExploreContentComponent implements OnInit {
   displayedColumns: string[] = [
-    'expand',
     'contentName',
     'createdBy',
     'language',
@@ -57,7 +56,7 @@ export class ExploreContentComponent implements OnInit {
     'invite-only assessment',
     'Case Study',
     'Comprehensive Assessment Program',
-    'multilingual course'
+    'Multilingual Course'
   ]
   constructor(
     readonly exploreContentService: ExploreContentService,
