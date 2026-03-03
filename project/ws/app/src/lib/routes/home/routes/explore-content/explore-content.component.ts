@@ -57,7 +57,7 @@ export class ExploreContentComponent implements OnInit {
     'invite-only assessment',
     'Case Study',
     'Comprehensive Assessment Program',
-    'multilingual course'
+    'Multilingual Course'
   ]
   constructor(
     readonly exploreContentService: ExploreContentService,

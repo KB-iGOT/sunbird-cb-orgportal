@@ -289,6 +289,21 @@ export class FiltersComponent implements OnInit, OnChanges {
     this.closeSidenav.emit()
   }
 
+  cancelFilters(): void {
+    this.selectedFilters = {
+      categoryType: [],
+      ratings: [],
+      languages: [],
+      organisations: [],
+      competencyArea: [],
+      competencyTheme: [],
+      competencySubTheme: [],
+      difficultyLevel: []
+    }
+    this.emitFilterChanges()
+    this.closeSidenav.emit()
+  }
+
   onClearAll(): void {
     this.selectedFilters = {
       categoryType: [],

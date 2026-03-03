@@ -4,7 +4,7 @@
       <h4 class="font-weight-bold margin-remove">
         <div class="flex flex-between flex-baseline">
           <span class="mat-h2 font-weight-500 margin-remove" i18n>Filter By</span>
-          <button mat-icon-button color="primary" class="text-middle close-button margin-remove" (click)="onClose()">
+          <button mat-icon-button color="primary" class="text-middle close-button margin-remove" (click)="cancelFilters()">
             <mat-icon class="">clear</mat-icon>
           </button>
         </div>
@@ -90,7 +90,7 @@
 
       <!-- Difficulty Level Section -->
       <div class="filter-section" *ngIf="filteredDifficultyLevels.length">
-        <h3 class="filter-section-title">Difficulty Level</h3>
+        <h3 class="filter-section-title">Proficiency Level</h3>
         <div class="filter-options">
           <div *ngFor="let item of getDisplayedDifficultyLevels()" class="filter-item">
             <mat-checkbox [checked]="isFilterSelected('difficultyLevel', item.name)"
