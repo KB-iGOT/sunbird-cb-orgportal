@@ -22,7 +22,6 @@ import { LoaderService } from '../../../../../../../../../src/app/services/loade
 })
 export class ExploreContentComponent implements OnInit {
   displayedColumns: string[] = [
-    'expand',
     'contentName',
     'createdBy',
     'language',
