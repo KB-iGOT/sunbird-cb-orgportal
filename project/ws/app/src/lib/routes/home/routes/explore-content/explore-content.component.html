@@ -166,8 +166,10 @@
   <ng-template #noData>
     <div class="no-data-container">
       <div class="no-data-message">
-        <mat-icon class="no-data-icon">search_off</mat-icon>
-        <p class="no-data-text">No data found</p>
+        <img src="assets/icons/no-events.png" alt="No data" class="no-data-icon" />
+        <p class="no-data-text">
+          <span class="font-bold" *ngIf="searchQuery">Sorry, we couldn't find any results, so please Try adjusting your search.</span>
+        </p>
       </div>
     </div>
   </ng-template>

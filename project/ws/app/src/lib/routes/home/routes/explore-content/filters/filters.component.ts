@@ -322,4 +322,8 @@ export class FiltersComponent implements OnInit, OnChanges {
     this.emitFilterChanges()
     this.onClose()
   }
+
+  hasAnyFacetWithValues(): boolean {
+    return this.allFacets?.some((facet: any) => facet.values && facet.values.length > 0) || false
+  }
 }

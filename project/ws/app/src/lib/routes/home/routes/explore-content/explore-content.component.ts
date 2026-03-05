@@ -128,9 +128,9 @@ export class ExploreContentComponent implements OnInit {
         const result = response?.result || {}
         const contents = result.content || []
         this.length = typeof result.count === 'number' ? result.count : contents.length
+        this.allFacets = result.facets || []
         if (contents.length) {
           this.dataSource.data = contents
-          this.allFacets = result.facets || []
           this.loaderService.changeLoaderState(false)
         } else {
           this.dataSource.data = []
