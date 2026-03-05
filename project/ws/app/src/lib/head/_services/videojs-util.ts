@@ -6,9 +6,29 @@ import 'videojs-vr'
 
 import { Subscription, interval, fromEvent } from 'rxjs'
 import { WsEvents } from '@sunbird-cb/utils-v2'
-import { ROOT_WIDGET_CONFIG } from '../collection.config'
-import { IWidgetsPlayerMediaData } from '../_models/player-media.model'
+import { ROOT_WIDGET_CONFIG } from '@sunbird-cb/collection'
 import { NsContent } from './widget-content.model'
+
+export interface IWidgetsPlayerMediaData {
+  subtitles?: {
+    srclang: string
+    label: string
+    url: string
+  }[]
+  identifier?: string
+  url?: string
+  autoplay?: boolean
+  markers?: string[]
+  resumePoint?: number
+  passThroughData?: any
+  posterImage?: string
+  setCookie?: boolean
+  disableTelemetry?: boolean
+  isVideojs?: boolean
+  platform?: any
+  mimeType?: any
+  continueLearning?: boolean
+}
 
 export const videojsEventNames = {
   disposing: 'disposing',
@@ -185,7 +205,7 @@ export function videoJsInitializer(
   resumePoint: number = 0,
   enableTelemetry: boolean,
   widgetData: IWidgetsPlayerMediaData,
-  mimeType: NsContent.EMimeTypes,
+  mimeType: NsContent.EMimeTypes.YOUTUBE,
 ): { player: videoJs.Player; dispose: () => void } {
   const player = videoJs(elem, config)
   const eventDispatcher = enableTelemetry
