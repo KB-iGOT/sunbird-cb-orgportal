@@ -205,7 +205,7 @@ export function videoJsInitializer(
   resumePoint: number = 0,
   enableTelemetry: boolean,
   widgetData: IWidgetsPlayerMediaData,
-  mimeType: NsContent.EMimeTypes.YOUTUBE,
+  mimeType: NsContent.EMimeTypes,
 ): { player: videoJs.Player; dispose: () => void } {
   const player = videoJs(elem, config)
   const eventDispatcher = enableTelemetry
