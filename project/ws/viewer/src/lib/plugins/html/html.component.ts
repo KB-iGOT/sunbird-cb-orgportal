@@ -223,6 +223,7 @@ export class HtmlComponent implements OnInit, OnChanges, OnDestroy {
       this.iframeUrl = null
       this.pageFetchStatus = 'error'
     }
+    console.log('this.iframeUrl', this.iframeUrl)
   }
 
   backToDetailsPage() {
@@ -313,10 +314,10 @@ export class HtmlComponent implements OnInit, OnChanges, OnDestroy {
     if (url && url.length > 0) {
       const tempData = url.split('content')
       if (url.indexOf(`/collection`) > 0) {
-        return `${environment.mdoPath}${environment.contentBucket}${tempData[tempData.length - 1]}`
+        return `${environment.mdoPath}/${environment.contentBucket}${tempData[tempData.length - 1]}`
       }
       if (tempData.length > 1) {
-        return `${environment.mdoPath}${environment.contentBucket}/content${tempData[tempData.length - 1]}`
+        return `${environment.mdoPath}/${environment.contentBucket}/content${tempData[tempData.length - 1]}`
       }
     }
     return url

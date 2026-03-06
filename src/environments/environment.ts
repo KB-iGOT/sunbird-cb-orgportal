@@ -33,6 +33,7 @@ export const environment: IEnvironment = {
   azureOldBuket: (window as { [key: string]: any })['env']['azureOldBuket'] || '',
   assessmentBuffer: (window as { [key: string]: any })['env']['assessmentBuffer'] || 0,
   quizResultTimeout: (window as { [key: string]: any })['env']['quizResultTimeout'] || 0,
+  publicContentSurveyId: (window as { [key: string]: any })['env']['publicContentSurveyId'] || 0,
 }
 interface IEnvironment {
   name: null | string
@@ -64,7 +65,8 @@ interface IEnvironment {
   azureOldHost: string
   azureOldBuket: string,
   assessmentBuffer: number,
-  quizResultTimeout: number
+  quizResultTimeout: number,
+  publicContentSurveyId: number
 }
 
 /*
