@@ -8,7 +8,7 @@ import { MatPaginator } from '@angular/material/paginator'
 import moment from 'moment'
 
 @Component({
-  selector: 'ws-app-list',
+  selector: 'ws-app-external-trainings-list',
   templateUrl: './list.component.html',
   styleUrls: ['./list.component.scss'],
 })
@@ -206,5 +206,9 @@ export class ListComponent implements OnInit, AfterViewInit {
 
   trackByActionKey(_index: number, action: any): any {
     return action.key
+  }
+
+  createNewTraining() {
+    this.router.navigate(['app', 'home', 'external-trainings', 'new'])
   }
 }

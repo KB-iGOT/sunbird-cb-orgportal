@@ -37,4 +37,8 @@ export class TrainingViewComponent implements OnInit {
     this.currentTab = tab
     this.router.navigate([tab], { relativeTo: this.route })
   }
+
+  createBatch() {
+    this.router.navigate(['create-batch'], { relativeTo: this.route })
+  }
 }

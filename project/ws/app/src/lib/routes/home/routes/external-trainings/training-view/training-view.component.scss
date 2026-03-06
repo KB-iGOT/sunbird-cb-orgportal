@@ -8,6 +8,22 @@
   border-bottom: 2px solid #e0e0e0;
 }
 
+.create-batch {
+  background: rgb(27, 76, 161) !important;
+  color: white !important;
+  /* stylelint-disable */
+  font-family: 'Lato';
+  /* stylelint-enable */
+  font-weight: 700;
+  font-size: 14px;
+  .add {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    color: white !important;
+  }
+}
+
 .active {
   border-bottom: 2px solid #1b4ca1;
   font-weight: 600;
