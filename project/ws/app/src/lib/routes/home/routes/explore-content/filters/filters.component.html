@@ -121,7 +121,7 @@
       </div>
 
       <!-- Competency Theme Section -->
-      <div class="filter-section" *ngIf="filteredCompetencyTheme.length">
+      <div class="filter-section" *ngIf="competencyTheme?.length">
         <h3 class="filter-section-title">Competency Theme</h3>
         <mat-form-field appearance="outline" class="search-field" *ngIf="competencyTheme?.length > 4">
           <mat-icon matPrefix>search</mat-icon>
@@ -141,7 +141,7 @@
       </div>
 
       <!-- Competency Sub-Theme Section -->
-      <div class="filter-section" *ngIf="filteredCompetencySubTheme.length">
+      <div class="filter-section" *ngIf="competencySubTheme?.length">
         <h3 class="filter-section-title">Competency Sub-Theme</h3>
         <mat-form-field appearance="outline" class="search-field" *ngIf="competencySubTheme?.length > 4">
           <mat-icon matPrefix>search</mat-icon>
