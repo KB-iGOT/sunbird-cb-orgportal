@@ -79,7 +79,7 @@ export class FiltersComponent implements OnInit, OnChanges {
       console.warn('No facets available')
       return
     }
-
+    this.competencyTheme = []
     this.allFacets.forEach((facet: any) => {
       switch (facet.name) {
         case 'courseCategory':
@@ -106,13 +106,14 @@ export class FiltersComponent implements OnInit, OnChanges {
         case 'difficultyLevel':
           this.difficultyLevels = this.mapFacetValues(facet.values)
           break
+        default:
       }
     })
 
     this.filteredLanguages = [...this.languages]
     this.filteredOrganisations = [...this.organisations]
     this.filteredCompetencies = [...this.competencies]
-    this.filteredCompetencyTheme = [...this.competencyTheme]
+    this.filteredCompetencyTheme = this.competencyTheme
     this.filteredCompetencySubTheme = [...this.competencySubTheme]
     this.filteredDifficultyLevels = [...this.difficultyLevels]
   }
@@ -300,6 +301,7 @@ export class FiltersComponent implements OnInit, OnChanges {
       competencySubTheme: [],
       difficultyLevel: []
     }
+    this.clearSearchFields()
     this.emitFilterChanges()
     this.closeSidenav.emit()
   }
@@ -319,8 +321,22 @@ export class FiltersComponent implements OnInit, OnChanges {
   }
 
   onApplyFilter(): void {
+    this.clearSearchFields()
     this.emitFilterChanges()
     this.onClose()
+  }
+
+  private clearSearchFields(): void {
+    this.languageSearch = ''
+    this.organisationSearch = ''
+    this.competencyThemeSearch = ''
+    this.competencySubThemeSearch = ''
+    this.organisationSearch = ''
+    this.languageSearch = ''
+    this.filteredLanguages = [...this.languages]
+    this.filteredOrganisations = [...this.organisations]
+    this.filteredCompetencyTheme = [...this.competencyTheme]
+    this.filteredCompetencySubTheme = [...this.competencySubTheme]
   }
 
   hasAnyFacetWithValues(): boolean {
