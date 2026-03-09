@@ -24,12 +24,15 @@ export class FiltersComponent implements OnInit, OnChanges {
   competencies: FilterItem[] = []
   competencyTheme: FilterItem[] = []
   competencySubTheme: FilterItem[] = []
+  difficultyLevels: FilterItem[] = []
 
   // Filtered and displayed data
   filteredLanguages: FilterItem[] = []
   filteredOrganisations: FilterItem[] = []
+  filteredCompetencies: FilterItem[] = []
   filteredCompetencyTheme: FilterItem[] = []
   filteredCompetencySubTheme: FilterItem[] = []
+  filteredDifficultyLevels: FilterItem[] = []
 
   // Search strings
   languageSearch = ''
@@ -45,6 +48,7 @@ export class FiltersComponent implements OnInit, OnChanges {
   showAllCompetencies = false
   showAllCompetencyTheme = false
   showAllCompetencySubTheme = false
+  showAllDifficultyLevels = false
 
   // Selected filters
   selectedFilters: any = {
@@ -54,7 +58,8 @@ export class FiltersComponent implements OnInit, OnChanges {
     organisations: [],
     competencyArea: [],
     competencyTheme: [],
-    competencySubTheme: []
+    competencySubTheme: [],
+    difficultyLevel: []
   }
 
   constructor() { }
@@ -74,7 +79,7 @@ export class FiltersComponent implements OnInit, OnChanges {
       console.warn('No facets available')
       return
     }
-
+    this.competencyTheme = []
     this.allFacets.forEach((facet: any) => {
       switch (facet.name) {
         case 'courseCategory':
@@ -98,13 +103,19 @@ export class FiltersComponent implements OnInit, OnChanges {
         case 'competencies_v6.competencySubThemeName':
           this.competencySubTheme = this.mapFacetValues(facet.values)
           break
+        case 'difficultyLevel':
+          this.difficultyLevels = this.mapFacetValues(facet.values)
+          break
+        default:
       }
     })
 
     this.filteredLanguages = [...this.languages]
     this.filteredOrganisations = [...this.organisations]
-    this.filteredCompetencyTheme = [...this.competencyTheme]
+    this.filteredCompetencies = [...this.competencies]
+    this.filteredCompetencyTheme = this.competencyTheme
     this.filteredCompetencySubTheme = [...this.competencySubTheme]
+    this.filteredDifficultyLevels = [...this.difficultyLevels]
   }
 
   private mapFacetValues(values: any[]): FilterItem[] {
@@ -243,6 +254,15 @@ export class FiltersComponent implements OnInit, OnChanges {
     return this.showAllCompetencySubTheme ? this.filteredCompetencySubTheme : this.filteredCompetencySubTheme.slice(0, 4)
   }
 
+  // Difficulty Level methods
+  toggleDifficultyLevelShowAll(): void {
+    this.showAllDifficultyLevels = !this.showAllDifficultyLevels
+  }
+
+  getDisplayedDifficultyLevels(): FilterItem[] {
+    return this.showAllDifficultyLevels ? this.filteredDifficultyLevels : this.filteredDifficultyLevels.slice(0, 4)
+  }
+
   // Common filter methods
   isFilterSelected(filterType: string, value: string): boolean {
     return this.selectedFilters[filterType].includes(value)
@@ -270,7 +290,7 @@ export class FiltersComponent implements OnInit, OnChanges {
     this.closeSidenav.emit()
   }
 
-  onClearAll(): void {
+  cancelFilters(): void {
     this.selectedFilters = {
       categoryType: [],
       ratings: [],
@@ -278,13 +298,68 @@ export class FiltersComponent implements OnInit, OnChanges {
       organisations: [],
       competencyArea: [],
       competencyTheme: [],
-      competencySubTheme: []
+      competencySubTheme: [],
+      difficultyLevel: []
     }
+    this.clearSearchFields()
+    this.emitFilterChanges()
+    this.closeSidenav.emit()
+  }
+
+  onClearAll(): void {
+    this.languageSearch = ''
+    this.organisationSearch = ''
+    this.competencyThemeSearch = ''
+    this.competencySubThemeSearch = ''
+    this.organisationSearch = ''
+    this.languageSearch = ''
+    this.selectedFilters = {
+      categoryType: [],
+      ratings: [],
+      languages: [],
+      organisations: [],
+      competencyArea: [],
+      competencyTheme: [],
+      competencySubTheme: [],
+      difficultyLevel: []
+    }
+    //this.dontExpandAllSections()
+    this.collapseAllSections()
     this.emitFilterChanges()
   }
 
   onApplyFilter(): void {
+    this.clearSearchFields()
+    this.collapseAllSections()
     this.emitFilterChanges()
     this.onClose()
+  }
+
+  private collapseAllSections(): void {
+    this.showAllCategories = false
+    this.showAllLanguages = false
+    this.showAllOrganisations = false
+    this.showAllCompetencies = false
+    this.showAllCompetencyTheme = false
+    this.showAllCompetencySubTheme = false
+    this.showAllDifficultyLevels = false
+    this.categoryExpanded = true
+  }
+
+  private clearSearchFields(): void {
+    this.languageSearch = ''
+    this.organisationSearch = ''
+    this.competencyThemeSearch = ''
+    this.competencySubThemeSearch = ''
+    this.organisationSearch = ''
+    this.languageSearch = ''
+    this.filteredLanguages = [...this.languages]
+    this.filteredOrganisations = [...this.organisations]
+    this.filteredCompetencyTheme = [...this.competencyTheme]
+    this.filteredCompetencySubTheme = [...this.competencySubTheme]
+  }
+
+  hasAnyFacetWithValues(): boolean {
+    return this.allFacets?.some((facet: any) => facet.values && facet.values.length > 0) || false
   }
 }

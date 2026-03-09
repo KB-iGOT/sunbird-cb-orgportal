@@ -210,9 +210,9 @@ export class PdfComponent implements OnInit, OnDestroy {
     if (url && url.length > 0) {
       const tempData = url.split('content')
       if (url.indexOf(`/collection`) > 0) {
-        return `${environment.mdoPath}${environment.contentBucket}${tempData[tempData.length - 1]}`
+        return `${environment.mdoPath}/${environment.contentBucket}${tempData[tempData.length - 1]}`
       }
-      return `${environment.mdoPath}${environment.contentBucket}/content${tempData[tempData.length - 1]}`
+      return `${environment.mdoPath}/${environment.contentBucket}/content${tempData[tempData.length - 1]}`
     }
     return url
   }
