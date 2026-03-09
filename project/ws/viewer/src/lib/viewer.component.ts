@@ -188,14 +188,18 @@ export class ViewerComponent implements OnInit, OnDestroy, AfterViewChecked {
       && this.activatedRoute.snapshot.data.enrollmentData.data || ''
     this.contentReadData = this.activatedRoute.snapshot.data.contentRead
       && this.activatedRoute.snapshot.data.contentRead.data || ''
-
+    console.log('contentData---', this.activatedRoute.snapshot.data)
     this.contentReadData = await this.fetchContentRead()
+    console.log('this.contentReadData', this.contentReadData)
     if (contentData && contentData.result && contentData.result.content) {
       this.coursePrimaryCategory = contentData.result.content.courseCategory
       if (contentData.result.content.children && contentData.result.content.children.length) {
         this.compatibilityLevel = contentData.result.content.children[0]['compatibilityLevel']
       }
       this.hierarchyData = contentData.result.content
+      console.log('this.content', this.content)
+      console.log('this.batchId', this.batchId)
+      console.log('this.hierarchyData', this.hierarchyData)
       await this.manipulateHierarchyData()
       this.resetAndFetchTocStructure()
       this.leafNodesCount = contentData.result.content.leafNodesCount
