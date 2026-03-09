@@ -307,6 +307,12 @@ export class FiltersComponent implements OnInit, OnChanges {
   }
 
   onClearAll(): void {
+    this.languageSearch = ''
+    this.organisationSearch = ''
+    this.competencyThemeSearch = ''
+    this.competencySubThemeSearch = ''
+    this.organisationSearch = ''
+    this.languageSearch = ''
     this.selectedFilters = {
       categoryType: [],
       ratings: [],
@@ -317,13 +323,27 @@ export class FiltersComponent implements OnInit, OnChanges {
       competencySubTheme: [],
       difficultyLevel: []
     }
+    //this.dontExpandAllSections()
+    this.collapseAllSections()
     this.emitFilterChanges()
   }
 
   onApplyFilter(): void {
     this.clearSearchFields()
+    this.collapseAllSections()
     this.emitFilterChanges()
     this.onClose()
+  }
+
+  private collapseAllSections(): void {
+    this.showAllCategories = false
+    this.showAllLanguages = false
+    this.showAllOrganisations = false
+    this.showAllCompetencies = false
+    this.showAllCompetencyTheme = false
+    this.showAllCompetencySubTheme = false
+    this.showAllDifficultyLevels = false
+    this.categoryExpanded = true
   }
 
   private clearSearchFields(): void {
