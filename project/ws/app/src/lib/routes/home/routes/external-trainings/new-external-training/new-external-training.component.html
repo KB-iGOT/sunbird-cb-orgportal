@@ -75,14 +75,42 @@
           <label for="partnerLogo">Partner Logo</label>
           <div class="file-upload-container">
             <input type="text" [value]="selectedFileName || 'No file selected'" readonly class="input-field file-display" />
-            <button type="button" mat-raised-button color="primary" class="upload-button" (click)="fileInput.click()">
-              <mat-icon>upload</mat-icon>
-              Upload Logo
+            <div class="upload-section" *ngIf="!uploadedFileUrl" (click)="fileInput.click()" (keydown.enter)="fileInput.click()">
+              <mat-icon>image_arrow_up</mat-icon>
+              <span class="upload-text">Upload Logo</span>
+            </div>
+            <button mat-icon-button class="cancel-upload-btn" *ngIf="uploadedFileUrl" (click)="removeUploadedFile()">
+              <mat-icon>close</mat-icon>
             </button>
-            <input #fileInput type="file" (change)="onFileSelected($event)" accept="image/*" style="display: none;" />
+            <input #fileInput type="file" (change)="onFileSelected($event)" accept=".svg,image/svg+xml" style="display: none;" />
           </div>
         </div>
       </div>
+      <div class="certificate-preview" *ngIf="uploadedFileUrl">
+        <div class="certificate-header">
+          <span class="certificate-title">Certificate Preview</span>
+          <mat-icon class="certificate-icon">visibility</mat-icon>
+        </div>
+        <div class="certificate-card">
+          <img class="certificate-img"
+            src="https://portal.uat.karmayogibharat.net/content-store/cios-icon/1772113322108_CourseCertificate_Template.svg"
+            alt="Certificate Preview" />
+          <img class="uploaded-logo" [src]="uploadedFileUrl" alt="Uploaded Logo" />
+        </div>
+      </div>
+
+
     </form>
+
+    <!-- Action Buttons -->
+    <div class="action-buttons">
+      <button mat-stroked-button class="cancel-training-btn" (click)="onCancel()">
+        Cancel
+      </button>
+      <button mat-raised-button color="primary" class="save-training-btn" [disabled]="!trainingForm.valid" (click)="onSubmit()">
+        Save Training Details
+      </button>
+    </div>
   </div>
+
 </div>
