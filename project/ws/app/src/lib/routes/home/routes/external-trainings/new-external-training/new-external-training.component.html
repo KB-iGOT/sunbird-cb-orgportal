@@ -1,0 +1,116 @@
+<div class="external-training-container">
+  <div class="header">
+    <button mat-icon-button class="back-button" (click)="goBack()">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <div class="header-content">
+      <h1 class="title">Upload External Training Details</h1>
+      <p class="subtitle">Provide training information and bulk upload participant records.</p>
+    </div>
+  </div>
+
+  <div class="form-container">
+    <form [formGroup]="trainingForm">
+      <div class="section-header">
+        <h2>Training / Workshop Details</h2>
+      </div>
+
+      <!-- Training Title -->
+      <div class="form-field">
+        <label for="trainingTitle" class="required">Training Title</label>
+        <input id="trainingTitle" type="text" formControlName="trainingTitle" placeholder="Enter the full title of the training program"
+          class="input-field" />
+      </div>
+
+      <!-- Learning Objective -->
+      <div class="form-field">
+        <label for="learningObjective">Learning Objective</label>
+        <textarea id="learningObjective" formControlName="learningObjective" placeholder="Describe the key learning outcomes and goals" rows="4"
+          class="input-field textarea-field"></textarea>
+      </div>
+
+      <!-- Delivery Mode, Learning Hours, Training Type Row -->
+      <div class="form-row">
+        <!-- Delivery Mode -->
+        <div class="form-field form-field-third">
+          <label for="deliveryMode">Delivery Mode</label>
+          <select id="deliveryMode" formControlName="deliveryMode" class="input-field select-field">
+            <option value="">Select Delivery Mode</option>
+            <option value="online">Online</option>
+            <option value="offline">Offline</option>
+            <option value="hybrid">Hybrid</option>
+          </select>
+        </div>
+
+        <!-- Learning Hours -->
+        <div class="form-field form-field-third">
+          <label for="learningHours">Learning Hours</label>
+          <input id="learningHours" type="number" formControlName="learningHours" placeholder="Total duration in hours" class="input-field" />
+        </div>
+
+        <!-- Training Type -->
+        <div class="form-field form-field-third">
+          <label for="trainingType" class="required">Training Type</label>
+          <select id="trainingType" formControlName="trainingType" class="input-field select-field">
+            <option value="">Select Training Type</option>
+            <option value="workshop">Workshop</option>
+            <option value="seminar">Seminar</option>
+            <option value="certification">Certification</option>
+            <option value="course">Course</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Partner Name and Partner Logo Row -->
+      <div class="form-row">
+        <!-- Partner Name -->
+        <div class="form-field form-field-half">
+          <label for="partnerName">Partner Name</label>
+          <input id="partnerName" type="text" formControlName="partnerName" placeholder="Enter training partner or organization name"
+            class="input-field" />
+        </div>
+
+        <!-- Partner Logo -->
+        <div class="form-field form-field-half">
+          <label for="partnerLogo">Partner Logo</label>
+          <div class="file-upload-container">
+            <input type="text" [value]="selectedFileName || 'No file selected'" readonly class="input-field file-display" />
+            <div class="upload-section" *ngIf="!uploadedFileUrl" (click)="fileInput.click()" (keydown.enter)="fileInput.click()">
+              <mat-icon>image_arrow_up</mat-icon>
+              <span class="upload-text">Upload Logo</span>
+            </div>
+            <button mat-icon-button class="cancel-upload-btn" *ngIf="uploadedFileUrl" (click)="removeUploadedFile()">
+              <mat-icon>close</mat-icon>
+            </button>
+            <input #fileInput type="file" (change)="onFileSelected($event)" accept=".svg,image/svg+xml" style="display: none;" />
+          </div>
+        </div>
+      </div>
+      <div class="certificate-preview" *ngIf="uploadedFileUrl">
+        <div class="certificate-header">
+          <span class="certificate-title">Certificate Preview</span>
+          <mat-icon class="certificate-icon">visibility</mat-icon>
+        </div>
+        <div class="certificate-card">
+          <img class="certificate-img"
+            src="https://portal.uat.karmayogibharat.net/content-store/cios-icon/1772113322108_CourseCertificate_Template.svg"
+            alt="Certificate Preview" />
+          <img class="uploaded-logo" [src]="uploadedFileUrl" alt="Uploaded Logo" />
+        </div>
+      </div>
+
+
+    </form>
+
+    <!-- Action Buttons -->
+    <div class="action-buttons">
+      <button mat-stroked-button class="cancel-training-btn" (click)="onCancel()">
+        Cancel
+      </button>
+      <button mat-raised-button color="primary" class="save-training-btn" [disabled]="!trainingForm.valid" (click)="onSubmit()">
+        Save Training Details
+      </button>
+    </div>
+  </div>
+
+</div>
