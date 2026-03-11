@@ -11,6 +11,7 @@ export class NewExternalTrainingComponent implements OnInit {
   trainingForm!: FormGroup
   selectedFileName: string = '';
   uploadedFileUrl: string = '';
+  selectedCompetencyList: any[] = []
 
   constructor(
     private readonly fb: FormBuilder,
@@ -62,6 +63,11 @@ export class NewExternalTrainingComponent implements OnInit {
     this.trainingForm.patchValue({
       partnerLogo: ''
     })
+  }
+
+  onSelectedCompetencyChange(selectedCompetency: any): void {
+    console.log('Selected Competency:', selectedCompetency)
+    this.selectedCompetencyList = selectedCompetency
   }
 
   onSubmit(): void {

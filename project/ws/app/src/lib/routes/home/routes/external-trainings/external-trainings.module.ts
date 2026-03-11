@@ -30,6 +30,7 @@ import { BatchesComponent } from './batches/batches.component'
 import { TrainingViewComponent } from './training-view/training-view.component'
 import { CreateBatchComponent } from './create-batch/create-batch.component'
 import { NewExternalTrainingComponent } from './new-external-training/new-external-training.component'
+import { CompetenciesModule } from '@sunbird-cb/consumption'
 
 @NgModule({
   declarations: [
@@ -77,6 +78,7 @@ import { NewExternalTrainingComponent } from './new-external-training/new-extern
     UIORGTableModule,
     MatProgressSpinnerModule,
     MatExpansionModule,
+    CompetenciesModule
   ],
   providers: [
     ExternalTrainingsService
