@@ -31,6 +31,7 @@ import { TrainingViewComponent } from './training-view/training-view.component'
 import { CreateBatchComponent } from './create-batch/create-batch.component'
 import { NewExternalTrainingComponent } from './new-external-training/new-external-training.component'
 import { CompetenciesModule } from '@sunbird-cb/consumption'
+import { MatLegacySnackBarModule } from '@angular/material/legacy-snack-bar'
 
 @NgModule({
   declarations: [
@@ -78,7 +79,8 @@ import { CompetenciesModule } from '@sunbird-cb/consumption'
     UIORGTableModule,
     MatProgressSpinnerModule,
     MatExpansionModule,
-    CompetenciesModule
+    CompetenciesModule,
+    MatLegacySnackBarModule
   ],
   providers: [
     ExternalTrainingsService

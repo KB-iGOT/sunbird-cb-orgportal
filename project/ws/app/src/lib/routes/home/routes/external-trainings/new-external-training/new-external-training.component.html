@@ -92,7 +92,7 @@
           </div>
         </div>
       </div>
-      <div class="certificate-preview" *ngIf="uploadedFileUrl">
+      <div class="certificate-preview">
         <div class="certificate-header">
           <span class="certificate-title">Certificate Preview</span>
           <mat-icon class="certificate-icon">visibility</mat-icon>
@@ -101,7 +101,7 @@
           <img class="certificate-img"
             src="https://portal.uat.karmayogibharat.net/content-store/cios-icon/1772113322108_CourseCertificate_Template.svg"
             alt="Certificate Preview" />
-          <img class="uploaded-logo" [src]="uploadedFileUrl" alt="Uploaded Logo" />
+          <!-- <img class="uploaded-logo" [src]="uploadedFileUrl" alt="Uploaded Logo" /> -->
         </div>
       </div>
 
@@ -116,11 +116,11 @@
 
     <!-- Action Buttons -->
     <div class="action-buttons">
-      <button mat-stroked-button class="cancel-training-btn" (click)="onCancel()">
+      <button mat-stroked-button class="cancel-training-btn" (click)="goBackToExternalTrainings()">
         Cancel
       </button>
-      <button mat-raised-button color="primary" class="save-training-btn" [disabled]="!trainingForm.valid"
-        (click)="onSubmit()">
+      <button mat-raised-button color="primary" class="save-training-btn"
+        [disabled]="!trainingForm.valid || selectedCompetencyList.length === 0" (click)="onSubmit()">
         Save Training Details
       </button>
     </div>
