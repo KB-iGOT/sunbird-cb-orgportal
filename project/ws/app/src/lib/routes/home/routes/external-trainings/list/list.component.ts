@@ -149,13 +149,13 @@ export class ListComponent implements OnInit, AfterViewInit {
   }
 
   menuSelected(row: any, actionKey: string) {
-    if (row?.id) {
+    if (row?.identifier) {
       switch (actionKey) {
         case 'viewDetails':
-          this.router.navigate(['app', 'home', 'external-trainings', row.id, 'details'])
+          this.router.navigate(['app', 'home', 'external-trainings', row.identifier, 'details'])
           break
         case 'createBatch':
-          this.router.navigate(['app', 'home', 'external-trainings', row.id, 'batches'])
+          this.router.navigate(['app', 'home', 'external-trainings', row.identifier, 'batches'])
           break
         default:
           break

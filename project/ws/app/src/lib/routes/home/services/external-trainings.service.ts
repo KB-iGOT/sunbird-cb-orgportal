@@ -6,6 +6,7 @@ import { Observable } from 'rxjs'
 const API_END_POINTS = {
   CREATE_EXTERNAL_TRAINING: '/apis/proxies/v8/externaltraining/v4/create',
   PUBLISH_EXTERNAL_TRAINING: (identifier: string) => `/apis/proxies/v8/externaltraining/v4/publish/${identifier}`,
+  MERGE_LOGO: '/apis/proxies/v8/externaltraining/v4/merge-logo',
   APPROVALS_LIST: '/apis/proxies/v8/sunbirdigot/search',
   STATUS_UPDATE: '/apis/proxies/v8/learner/achievement/status/update',
   GET_ACHIEVEMENT_DETAILS: (achievementId: string) => `/apis/proxies/v8/learner/achievement/${achievementId}`,
@@ -23,6 +24,10 @@ export class ExternalTrainingsService {
 
   publishExternalTraining(formData: any): Observable<any> {
     return this.http.post<any>(API_END_POINTS.PUBLISH_EXTERNAL_TRAINING(formData.request.event.identifier), formData)
+  }
+
+  mergeLogo(formData: FormData): Observable<any> {
+    return this.http.post<any>(API_END_POINTS.MERGE_LOGO, formData)
   }
 
   getApprovalsList(request: any): Observable<any> {

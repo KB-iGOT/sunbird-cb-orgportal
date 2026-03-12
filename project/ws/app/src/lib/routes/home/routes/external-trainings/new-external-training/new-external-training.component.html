@@ -1,6 +1,6 @@
 <div class="external-training-container">
   <div class="header">
-    <button mat-icon-button class="back-button" (click)="goBack()">
+    <button mat-icon-button class="back-button" (click)="goBackToExternalTrainings()">
       <mat-icon>arrow_back</mat-icon>
     </button>
     <div class="header-content">
@@ -77,14 +77,17 @@
         <div class="form-field form-field-half">
           <label for="partnerLogo">Partner Logo</label>
           <div class="file-upload-container">
-            <input type="text" [value]="selectedFileName || 'No file selected'" readonly
-              class="input-field file-display" />
-            <div class="upload-section" *ngIf="!uploadedFileUrl" (click)="fileInput.click()"
+            <input type="text" [value]="logoFileName || 'No file selected'" readonly class="input-field file-display" />
+            <div class="upload-section" *ngIf="!logoUploaded && !isLogoMerging" (click)="fileInput.click()"
               (keydown.enter)="fileInput.click()">
               <mat-icon>image_arrow_up</mat-icon>
               <span class="upload-text">Upload Logo</span>
             </div>
-            <button mat-icon-button class="cancel-upload-btn" *ngIf="uploadedFileUrl" (click)="removeUploadedFile()">
+            <div class="upload-section" *ngIf="isLogoMerging">
+              <span class="upload-text">Merging...</span>
+            </div>
+            <button mat-icon-button class="cancel-upload-btn" *ngIf="logoUploaded && !isLogoMerging"
+              (click)="removeUploadedLogo()">
               <mat-icon>close</mat-icon>
             </button>
             <input #fileInput type="file" (change)="onFileSelected($event)" accept=".svg,image/svg+xml"
@@ -98,10 +101,7 @@
           <mat-icon class="certificate-icon">visibility</mat-icon>
         </div>
         <div class="certificate-card">
-          <img class="certificate-img"
-            src="https://portal.uat.karmayogibharat.net/content-store/cios-icon/1772113322108_CourseCertificate_Template.svg"
-            alt="Certificate Preview" />
-          <!-- <img class="uploaded-logo" [src]="uploadedFileUrl" alt="Uploaded Logo" /> -->
+          <img class="certificate-img" [src]="previewLogoUrl || defaultLogoUrl" alt="Certificate Preview" />
         </div>
       </div>
 
