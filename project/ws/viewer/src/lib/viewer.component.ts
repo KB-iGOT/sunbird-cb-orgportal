@@ -188,15 +188,11 @@ export class ViewerComponent implements OnInit, OnDestroy, AfterViewChecked {
       && this.activatedRoute.snapshot.data.enrollmentData.data || ''
     this.contentReadData = this.activatedRoute.snapshot.data.contentRead
       && this.activatedRoute.snapshot.data.contentRead.data || ''
-    console.log('contentData---', this.activatedRoute.snapshot.data)
 
     this.contentReadData = await this.fetchContentRead()
-    console.log('this.contentReadData', this.contentReadData)
     if (this.contentReadData && this.contentReadData.identifier) {
-      console.log('nhbvnbvnmvbmnvbn')
 
       await this.widgetServ.fetchContent(this.contentReadData.identifier).subscribe(async (res: any) => {
-        console.log('res', res)
         this.hierarchyData = res.result.content
         await this.manipulateHierarchyData()
         this.resetAndFetchTocStructure()
@@ -455,7 +451,6 @@ export class ViewerComponent implements OnInit, OnDestroy, AfterViewChecked {
           break
         }
       }
-      console.log('this.tocStructure--', this.tocStructure)
     }
   }
 
