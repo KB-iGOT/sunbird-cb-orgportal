@@ -74,7 +74,12 @@
 
         <!-- Partner Logo -->
         <div class="form-field form-field-half">
-          <label for="partnerLogo">Partner Logo</label>
+          <label for="partnerLogo">Partner Logo
+            <mat-icon class="info-icon" matTooltip="Only SVG files are accepted. Maximum file size is 1 GB."
+              matTooltipPosition="above">
+              info_outlined
+            </mat-icon>
+          </label>
           <div class="file-upload-container">
             <input type="text" [value]="logoFileName || 'No file selected'" readonly class="input-field file-display" />
             <div class="upload-section" *ngIf="!logoUploaded && !isLogoMerging" (click)="fileInput.click()"
@@ -94,7 +99,7 @@
           </div>
         </div>
       </div>
-      <div class="certificate-preview">
+      <div class="certificate-preview mb-5">
         <div class="certificate-header">
           <span class="certificate-title">Certificate Preview</span>
           <mat-icon class="certificate-icon">visibility</mat-icon>

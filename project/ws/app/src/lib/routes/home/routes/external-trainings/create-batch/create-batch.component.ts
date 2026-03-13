@@ -17,18 +17,6 @@ export function endDateValidator(): ValidatorFn {
   }
 }
 
-export function startDateValidator(): ValidatorFn {
-  return (control: AbstractControl): ValidationErrors | null => {
-    const parent = control.parent
-    if (!parent) return null
-    const today = new Date()
-    today.setHours(0, 0, 0, 0)
-    const startDate = control.value
-    if (!startDate) return null
-    return new Date(startDate) < today ? { startInPast: true } : null
-  }
-}
-
 @Component({
   selector: 'ws-app-create-batch',
   templateUrl: './create-batch.component.html',
@@ -40,10 +28,6 @@ export class CreateBatchComponent implements OnInit {
   isDragOver = false;
   trainingId: string = ''
   configSvc: any
-
-  get todayStr(): string {
-    return this.formatDate(new Date())
-  }
 
   get startDateValue(): string {
     return this.batchForm?.get('startDate')?.value || ''
@@ -70,7 +54,7 @@ export class CreateBatchComponent implements OnInit {
   initializeForm(): void {
     this.batchForm = this.fb.group({
       batchName: ['', Validators.required],
-      startDate: ['', [Validators.required, startDateValidator()]],
+      startDate: ['', [Validators.required]],
       endDate: ['', [Validators.required, endDateValidator()]],
     })
 

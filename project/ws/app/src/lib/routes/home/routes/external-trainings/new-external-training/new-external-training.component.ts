@@ -7,6 +7,7 @@ import { mergeMap } from 'rxjs/operators'
 import * as _ from 'lodash'
 import { MatLegacySnackBar } from '@angular/material/legacy-snack-bar'
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser'
+import { environment } from '../../../../../../../../../../src/environments/environment'
 
 @Component({
   selector: 'ws-app-new-external-training',
@@ -29,14 +30,15 @@ export class NewExternalTrainingComponent implements OnInit {
   isLogoMerging = false
 
   //
+  originalContentFile: any
   contentFile: any
   fileName = ''
   certificateUrl = ''
   safeCertificateUrl: SafeResourceUrl | null = null
   selectedLogoImage: string | ArrayBuffer | null = null
   private readonly TARGET_HEIGHT = 73;
-  private readonly TARGET_Y_CENTER = 104;
-  private readonly TARGET_X_START = 1050;
+  private readonly TARGET_Y_CENTER = 115;
+  private readonly TARGET_X_START = 1150;
 
   private readonly FILE_UPLOAD_MAX_SIZE = 1 * 1024 * 1024 * 1024 // 1GB
 
@@ -56,25 +58,41 @@ export class NewExternalTrainingComponent implements OnInit {
     this.getDefaultTemplate()
   }
 
-  getDefaultTemplate() {
-    if (!this.defaultCertificateTemplateUrl) {
-      this.openSnackbar('Default certificate template not found.')
-      return
-    }
+  getDefaultTemplate(): void {
+    // TODO: Uncomment below block and remove temporary code once API is ready
+    // if (!this.defaultCertificateTemplateUrl) {
+    //   this.openSnackbar('Default certificate template not found.')
+    //   return
+    // }
+    // fetch(this.defaultCertificateTemplateUrl)
+    //   .then(res => res.blob())
+    //   .then(blob => {
+    //     const file = new File([blob], 'CourseCertificate_Template.svg', { type: 'image/svg+xml' })
+    //     this.contentFile = file
+    //     this.fileName = file.name
+    //     this.certificateUrl = URL.createObjectURL(file)
+    //     this.safeCertificateUrl = this.sanitizer.bypassSecurityTrustResourceUrl(this.certificateUrl)
+    //   })
+    //   .catch(() => {
+    //     this.openSnackbar('Failed to load default certificate template.')
+    //   })
 
-    fetch(this.defaultCertificateTemplateUrl)
-      .then(res => res.blob())
-      .then(blob => {
+    // Temporary: fetching from local asset until API is ready
+    // TODO: Replace with actual API call once API is ready
+    this.externalTrainingsSvc.getDefaultTemplate().subscribe({
+      next: (blob: Blob) => {
         const file = new File([blob], 'CourseCertificate_Template.svg', { type: 'image/svg+xml' })
+        this.originalContentFile = file
         this.contentFile = file
         this.fileName = file.name
-
         this.certificateUrl = URL.createObjectURL(file)
         this.safeCertificateUrl = this.sanitizer.bypassSecurityTrustResourceUrl(this.certificateUrl)
-      })
-      .catch(() => {
+        this.previewLogoUrl = this.certificateUrl
+      },
+      error: () => {
         this.openSnackbar('Failed to load default certificate template.')
-      })
+      },
+    })
   }
 
   initializeForm(): void {
@@ -109,27 +127,6 @@ export class NewExternalTrainingComponent implements OnInit {
       this.openSnackbar('Please upload a file less than 1 GB.')
       return
     }
-
-    // this.logoFileName = file.name
-    // this.isLogoMerging = true
-
-    // const formData = new FormData()
-    // formData.append('defaultCertificateTemplateUrl', this.defaultCertificateTemplateUrl)
-    // formData.append('logoFile', file)
-
-    // this.externalTrainingsSvc.mergeLogo(formData).subscribe({
-    //   next: (response: any) => {
-    //     this.mergedLogoUrl = response?.mergedLogoUrl || null
-    //     this.previewLogoUrl = this.mergedLogoUrl || this.defaultCertificateTemplateUrl
-    //     this.logoUploaded = true
-    //     this.isLogoMerging = false
-    //     this.openSnackbar('Logo merged successfully.')
-    //   },
-    //   error: () => {
-    //     this.isLogoMerging = false
-    //     this.openSnackbar('Failed to merge logo. Please try again.')
-    //   },
-    // })
 
     const fileName = file.name
     // const uploadedDate = new Date().toLocaleDateString()
@@ -170,7 +167,7 @@ export class NewExternalTrainingComponent implements OnInit {
           logoReader.readAsText(logoBlob)
         }
       }
-      certificateReader.readAsText(this.contentFile)
+      certificateReader.readAsText(this.originalContentFile)
     } catch (error: any) {
       this.openSnackbar(`Error processing files: ${error.message}`, 'close')
     }
@@ -196,6 +193,7 @@ export class NewExternalTrainingComponent implements OnInit {
       // Update certificate preview URL
       this.certificateUrl = URL.createObjectURL(updatedBlob)
       this.safeCertificateUrl = this.sanitizer.bypassSecurityTrustResourceUrl(this.certificateUrl)
+      this.previewLogoUrl = this.certificateUrl
 
     } catch (error: any) { }
   }
@@ -209,6 +207,15 @@ export class NewExternalTrainingComponent implements OnInit {
     if (certDoc.querySelector('parsererror')) {
       this.openSnackbar('Error parsing certificate SVG', 'close')
       return ''
+    }
+
+    // Find the ProvidersLogo_Placement group
+    let logoGroup = certDoc.getElementById('ProvidersLogo_Placement')
+    if (!logoGroup) {
+      logoGroup = certDoc.querySelector('[id="ProvidersLogo_Placement"]')
+    }
+    if (!logoGroup) {
+      logoGroup = certDoc.querySelector('g[id*="ProvidersLogo_Placement"]')
     }
 
     // Parse the new logo SVG
@@ -289,9 +296,15 @@ export class NewExternalTrainingComponent implements OnInit {
       }
     }
 
-    // if (logoGroup.parentNode) {
-    //   logoGroup.parentNode.replaceChild(newLogoGroup, logoGroup)
-    // }
+    if (logoGroup && logoGroup.parentNode) {
+      logoGroup.parentNode.replaceChild(newLogoGroup, logoGroup)
+    } else {
+      // If no existing group, append to the root SVG element
+      const rootSvg = certDoc.querySelector('svg')
+      if (rootSvg) {
+        rootSvg.appendChild(newLogoGroup)
+      }
+    }
 
     const serializer = new XMLSerializer()
     return serializer.serializeToString(certDoc)
@@ -299,9 +312,14 @@ export class NewExternalTrainingComponent implements OnInit {
 
   removeUploadedLogo(): void {
     this.mergedLogoUrl = null
-    this.previewLogoUrl = this.defaultCertificateTemplateUrl
     this.logoFileName = ''
     this.logoUploaded = false
+    this.selectedLogoImage = null
+    // Restore the original template
+    this.contentFile = this.originalContentFile
+    this.certificateUrl = URL.createObjectURL(this.originalContentFile)
+    this.safeCertificateUrl = this.sanitizer.bypassSecurityTrustResourceUrl(this.certificateUrl)
+    this.previewLogoUrl = this.certificateUrl
   }
 
   onSelectedCompetencyChange(selectedCompetency: any): void {
@@ -356,7 +374,8 @@ export class NewExternalTrainingComponent implements OnInit {
 
       this.externalTrainingsSvc.uploadTemplate(uploadFormData).pipe(
         mergeMap((uploadRes: any) => {
-          const cerTemplateUrl = _.get(uploadRes, 'result.url')
+          const rawUrl = _.get(uploadRes, 'result.url') || ''
+          const cerTemplateUrl = this.transformCerTemplateUrl(rawUrl)
           const payload = this.buildPayload
           const formData = {
             ...payload,
@@ -408,5 +427,19 @@ export class NewExternalTrainingComponent implements OnInit {
     this.matSnackBar.open(message, action, {
       duration: 3000,
     })
+  }
+
+  private transformCerTemplateUrl(url: string): string {
+    try {
+      const parsed = new URL(url)
+      const pathParts = parsed.pathname.split('/')
+      // Remove the first path segment (e.g. /igot/) and prepend /content-store/
+      // Input:  https://storage.googleapis.com/igot/cios-icon/filename.svg
+      // Output: https://{sitePath}/content-store/cios-icon/filename.svg
+      const remainingPath = pathParts.slice(2).join('/')
+      return `https://${environment.sitePath}/content-store/${remainingPath}`
+    } catch {
+      return url
+    }
   }
 }

@@ -13,6 +13,8 @@ const API_END_POINTS = {
   CREATE_BARCH: '/apis/proxies/v8/externaltraining/batch/create',
   BULK_UPLOAD: '/apis/proxies/v8/externaltraining/v1/bulkUpload',
   UPLOAD_TEMPLATE: '/apis/proxies/v8/storage/v1/uploadCiosIcon',
+  // TODO: Replace with real API endpoint when available
+  GET_DEFAULT_TEMPLATE: 'assets/images/sample/CourseCertificate_Template.svg',
 }
 @Injectable({
   providedIn: 'root'
@@ -67,6 +69,10 @@ export class ExternalTrainingsService {
 
   createBatch(request: any): Observable<any> {
     return this.http.post<any>(API_END_POINTS.CREATE_BARCH, request)
+  }
+
+  getDefaultTemplate(): Observable<Blob> {
+    return this.http.get(API_END_POINTS.GET_DEFAULT_TEMPLATE, { responseType: 'blob' })
   }
 
   bulkUsersUpload(formData: FormData): Observable<any> {
