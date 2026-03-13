@@ -20,7 +20,7 @@ export class NewExternalTrainingComponent implements OnInit {
   configSvc: any
 
   // Logo state variables
-  defaultCertificateTemplateUrl = 'assets/images/sample/CourseCertificate_Template.svg'
+  defaultCertificateTemplateUrl = 'assets/images/sample/Course_completion_certificate_New4.svg'
   mergedLogoUrl: string | null = null
   previewLogoUrl = ''
   logoFileName = ''
@@ -210,21 +210,6 @@ export class NewExternalTrainingComponent implements OnInit {
       return ''
     }
 
-    // Find the ProvidersLogo_Placement group
-    // let logoGroup = certDoc.getElementById('ProvidersLogo_Placement')
-    // if (!logoGroup) {
-    //   logoGroup = certDoc.querySelector('[id="ProvidersLogo_Placement"]')
-    // }
-    // if (!logoGroup) {
-    //   // Try partial match if id not exact
-    //   logoGroup = certDoc.querySelector('g[id*="ProvidersLogo_Placement"]')
-    // }
-
-    // if (!logoGroup) {
-    //   this.openSnackbar('Could not find ProvidersLogo_Placement group in the certificate SVG', 'close')
-    //   return ''
-    // }
-
     // Parse the new logo SVG
     const logoDoc = parser.parseFromString(logoSvgContent, 'image/svg+xml')
     if (logoDoc.querySelector('parsererror')) {
@@ -361,8 +346,29 @@ export class NewExternalTrainingComponent implements OnInit {
 
   onSubmit(): void {
     if (this.trainingForm.valid && this.selectedCompetencyList.length > 0) {
-      const formData = this.buildPayload
-      this.externalTrainingsSvc.createExternalTraining(formData).pipe(
+      const uploadFormData = new FormData()
+      uploadFormData.append(
+        'content',
+        this.contentFile as Blob,
+        (this.contentFile as File).name.replace(/[^A-Za-z0-9_.]/g, ''),
+      )
+
+      this.externalTrainingsSvc.uploadTemplate(uploadFormData).pipe(
+        mergeMap((uploadRes: any) => {
+          const cerTemplateUrl = _.get(uploadRes, 'result.url')
+          const payload = this.buildPayload
+          const formData = {
+            ...payload,
+            request: {
+              ...payload.request,
+              event: {
+                ...payload.request.event,
+                cerTemplate: cerTemplateUrl,
+              },
+            },
+          }
+          return this.externalTrainingsSvc.createExternalTraining(formData)
+        }),
         mergeMap((createRes: any) => {
           const publishPayload = {
             request: {

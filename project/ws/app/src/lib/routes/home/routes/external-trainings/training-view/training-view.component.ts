@@ -26,7 +26,7 @@ export class TrainingViewComponent implements OnInit {
       this.currentTab = 'batches'
     } else if (url.endsWith('/create-batch')) {
       this.createBatch()
-      this.currentTab = 'batches'
+      this.currentTab = 'create-batch'
     } else {
       this.currentTab = 'details'
     }
@@ -42,6 +42,7 @@ export class TrainingViewComponent implements OnInit {
   }
 
   createBatch() {
+    this.currentTab = 'create-batch'
     this.router.navigate(['create-batch'], { relativeTo: this.route })
   }
 }

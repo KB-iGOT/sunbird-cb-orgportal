@@ -11,6 +11,9 @@ const API_END_POINTS = {
   STATUS_UPDATE: '/apis/proxies/v8/learner/achievement/status/update',
   GET_ACHIEVEMENT_DETAILS: (achievementId: string) => `/apis/proxies/v8/learner/achievement/${achievementId}`,
   GET_EXTERNAL_TRAINING_DETAILS: (identifier: string) => `/apis/proxies/v8/externaltraining/v4/read/${identifier}`,
+  CREATE_BARCH: '/apis/proxies/v8/externaltraining/batch/create',
+  BULK_UPLOAD: '/apis/proxies/v8/externaltraining/v1/bulkUpload',
+  UPLOAD_TEMPLATE: '/apis/proxies/v8/storage/v1/uploadCiosIcon',
 }
 @Injectable({
   providedIn: 'root'
@@ -21,6 +24,14 @@ export class ExternalTrainingsService {
 
   createExternalTraining(request: any): Observable<any> {
     return this.http.post<any>(API_END_POINTS.CREATE_EXTERNAL_TRAINING, request)
+  }
+
+  uploadTemplate(template: any): Observable<any> {
+    const file = template.get('content') as File
+    const fileName = file.name
+    const newFormData = new FormData()
+    newFormData.append('file', file, fileName)
+    return this.http.post<any>(API_END_POINTS.UPLOAD_TEMPLATE, newFormData)
   }
 
   publishExternalTraining(formData: any): Observable<any> {
@@ -45,6 +56,14 @@ export class ExternalTrainingsService {
 
   getExternalTrainingDetails(identifier: string): Observable<any> {
     return this.http.get<any>(API_END_POINTS.GET_EXTERNAL_TRAINING_DETAILS(identifier))
+  }
+
+  createBatch(request: any): Observable<any> {
+    return this.http.post<any>(API_END_POINTS.CREATE_BARCH, request)
+  }
+
+  bulkUsersUpload(formData: FormData): Observable<any> {
+    return this.http.post<any>(API_END_POINTS.BULK_UPLOAD, formData)
   }
 
 }

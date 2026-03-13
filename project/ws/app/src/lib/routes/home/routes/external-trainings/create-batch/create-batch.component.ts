@@ -1,6 +1,33 @@
 import { Component, OnInit } from '@angular/core'
-import { FormBuilder, FormGroup, Validators } from '@angular/forms'
+import { AbstractControl, FormBuilder, FormGroup, ValidationErrors, ValidatorFn, Validators } from '@angular/forms'
 import { ActivatedRoute, Router } from '@angular/router'
+import { ExternalTrainingsService } from '../../../services/external-trainings.service'
+import { mergeMap } from 'rxjs/operators'
+import * as _ from 'lodash'
+import { MatLegacySnackBar } from '@angular/material/legacy-snack-bar'
+
+export function endDateValidator(): ValidatorFn {
+  return (control: AbstractControl): ValidationErrors | null => {
+    const parent = control.parent
+    if (!parent) return null
+    const startDate = parent.get('startDate')?.value
+    const endDate = control.value
+    if (!startDate || !endDate) return null
+    return new Date(endDate) < new Date(startDate) ? { endBeforeStart: true } : null
+  }
+}
+
+export function startDateValidator(): ValidatorFn {
+  return (control: AbstractControl): ValidationErrors | null => {
+    const parent = control.parent
+    if (!parent) return null
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    const startDate = control.value
+    if (!startDate) return null
+    return new Date(startDate) < today ? { startInPast: true } : null
+  }
+}
 
 @Component({
   selector: 'ws-app-create-batch',
@@ -12,24 +39,51 @@ export class CreateBatchComponent implements OnInit {
   uploadedFile: File | null = null;
   isDragOver = false;
   trainingId: string = ''
+  configSvc: any
+
+  get todayStr(): string {
+    return this.formatDate(new Date())
+  }
+
+  get startDateValue(): string {
+    return this.batchForm?.get('startDate')?.value || ''
+  }
+
+  get endDateValue(): string {
+    return this.batchForm?.get('endDate')?.value || ''
+  }
 
   constructor(
     private readonly fb: FormBuilder,
     private readonly router: Router,
-    private readonly route: ActivatedRoute
+    private readonly route: ActivatedRoute,
+    private externalTrainingsSvc: ExternalTrainingsService,
+    private matSnackBar: MatLegacySnackBar,
   ) { }
 
   ngOnInit(): void {
     this.trainingId = this.route.parent?.snapshot.params['id'] || ''
+    this.configSvc = this.route.snapshot.data['configService']
     this.initializeForm()
   }
 
   initializeForm(): void {
     this.batchForm = this.fb.group({
       batchName: ['', Validators.required],
-      startDate: ['', Validators.required],
-      endDate: ['', Validators.required]
+      startDate: ['', [Validators.required, startDateValidator()]],
+      endDate: ['', [Validators.required, endDateValidator()]],
     })
+
+    this.batchForm.get('startDate')?.valueChanges.subscribe(() => {
+      this.batchForm.get('endDate')?.updateValueAndValidity()
+    })
+  }
+
+  private formatDate(date: Date): string {
+    const y = date.getFullYear()
+    const m = String(date.getMonth() + 1).padStart(2, '0')
+    const d = String(date.getDate()).padStart(2, '0')
+    return `${y}-${m}-${d}`
   }
 
   onFileSelected(event: Event): void {
@@ -98,10 +152,38 @@ export class CreateBatchComponent implements OnInit {
 
   onSubmit(): void {
     if (this.batchForm.valid && this.uploadedFile) {
-      console.log('Form Data:', this.batchForm.value)
-      console.log('Uploaded File:', this.uploadedFile)
-      // Add your submission logic here
-      // For example: this.batchService.createBatch(this.batchForm.value, this.uploadedFile);
+      const form = this.batchForm.value
+      const payload = {
+        request: {
+          eventId: this.trainingId,
+          name: _.get(form, 'batchName'),
+          enrollmentType: 'invite-only',
+          startDate: this.formatDate(new Date(_.get(form, 'startDate'))),
+          endDate: this.formatDate(new Date(_.get(form, 'endDate'))),
+          createdBy: _.get(this.configSvc, 'userProfile.userId'),
+        },
+      }
+
+      this.externalTrainingsSvc.createBatch(payload).pipe(
+        mergeMap((createBatchRes: any) => {
+          const batchId = _.get(createBatchRes, 'result.batchId')
+          const formData = new FormData()
+          formData.append('batchId', batchId)
+          if (this.uploadedFile) {
+            formData.append('file', this.uploadedFile)
+          }
+          return this.externalTrainingsSvc.bulkUsersUpload(formData)
+        })
+      ).subscribe({
+        next: () => {
+          this.matSnackBar.open('Batch created and participants uploaded successfully.', 'Close', { duration: 3000 })
+          this.goBack()
+        },
+        error: (err: any) => {
+          const errorMessage = _.get(err, 'error.params.errmsg', 'An error occurred while creating the batch.')
+          this.matSnackBar.open(errorMessage, 'Close', { duration: 3000 })
+        },
+      })
     }
   }
 
