@@ -18,6 +18,7 @@ export class NewExternalTrainingComponent implements OnInit {
   selectedCompetencyList: any[] = []
   deliveryModeList = deliveryModes
   configSvc: any
+  trainingName = ''
 
   // Logo state variables
   defaultCertificateTemplateUrl = 'assets/images/sample/CourseCertificate_Template.svg'
@@ -53,6 +54,7 @@ export class NewExternalTrainingComponent implements OnInit {
     this.previewLogoUrl = this.defaultCertificateTemplateUrl
     this.initializeForm()
     this.getDefaultTemplate()
+    this.subscribeToTrainingName()
   }
 
   getDefaultTemplate() {
@@ -84,6 +86,12 @@ export class NewExternalTrainingComponent implements OnInit {
       learningHours: [''],
       trainingType: ['', Validators.required],
       partnerName: ['']
+    })
+  }
+
+  subscribeToTrainingName(): void {
+    this.externalTrainingsSvc.trainingName$.subscribe((name: string) => {
+      this.trainingName = name
     })
   }
 

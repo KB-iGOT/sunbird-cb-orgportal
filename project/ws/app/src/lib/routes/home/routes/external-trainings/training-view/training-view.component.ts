@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
+import { ExternalTrainingsService } from '../../../services/external-trainings.service'
 
 @Component({
   selector: 'ws-app-training-view',
@@ -9,15 +10,24 @@ import { ActivatedRoute, Router } from '@angular/router'
 export class TrainingViewComponent implements OnInit {
   trainingId: string = ''
   currentTab = 'details'
+  trainingName: string = ''
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
+    private externalTrainingsSvc: ExternalTrainingsService,
   ) { }
 
   ngOnInit() {
     this.trainingId = this.route.snapshot.params['id'] || ''
     this.updateActiveTab()
+    this.subscribeToTrainingName()
+  }
+
+  subscribeToTrainingName(): void {
+    this.externalTrainingsSvc.trainingName$.subscribe((name: string) => {
+      this.trainingName = name
+    })
   }
 
   updateActiveTab() {

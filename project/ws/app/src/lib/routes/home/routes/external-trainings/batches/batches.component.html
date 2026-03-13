@@ -2,20 +2,20 @@
   <ng-container *ngIf="!isLoading && batches.length > 0">
     <div class="batches-grid">
       <mat-card class="batch-card" *ngFor="let batch of batches" (click)="viewBatch(batch)" (keyup)="viewBatch(batch)">
-        <div class="batch-name">{{ batch.name }}</div>
+        <div class="batch-name">{{ batch?.name }}</div>
         <div class="batch-dates">
           <div class="date-block">
             <span class="date-label">START DATE</span>
             <div class="date-value">
               <mat-icon class="date-icon">calendar_today</mat-icon>
-              <span>{{ batch.startDate | date: 'dd/MM/yyyy' }}</span>
+              <span>{{ batch?.startDate | date: 'dd/MM/yyyy' }}</span>
             </div>
           </div>
           <div class="date-block">
             <span class="date-label">END DATE</span>
             <div class="date-value">
               <mat-icon class="date-icon">calendar_today</mat-icon>
-              <span>{{ batch.endDate | date: 'dd/MM/yyyy' }}</span>
+              <span>{{ batch?.endDate | date: 'dd/MM/yyyy' }}</span>
             </div>
           </div>
         </div>
