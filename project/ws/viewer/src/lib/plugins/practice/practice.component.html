@@ -65,7 +65,7 @@
                 <ng-container *ngIf="!isXsmall">Next</ng-container>
               </a>
               &nbsp;&nbsp;
-              <a *ngIf="(currentQuestionIndex + 1) === totalQCount && !forCreatorMode"
+              <a *ngIf="(currentQuestionIndex + 1) === totalQCount && !forPreview"
                 class="text-white ws-mat-primary-background margin-xs quest_btn" mat-button (click)="proceedToSubmit()">
                 <ng-container *ngIf="!isXsmall">Submit</ng-container>
               </a>
@@ -725,7 +725,7 @@
             <ng-container>ext</ng-container>
           </a>
           &nbsp;&nbsp;
-          <a *ngIf="(currentQuestionIndex + 1) === totalQCount && !forCreatorMode"
+          <a *ngIf="(currentQuestionIndex + 1) === totalQCount && !forPreview"
             class="text-white ws-mat-primary-background quest_btn" mat-button (click)="proceedToSubmit()">
             <ng-container>Submit</ng-container>
           </a>
@@ -1218,7 +1218,7 @@
             </div>
           </div>
 
-          <div *ngIf="!forCreatorMode">
+          <div *ngIf="!forPreview">
             <a [ngClass]="(totalQCount != getAllQuestionAnswer() && assessmentType === 'optionalWeightage') ? 'pointer-events-none secondary-standalone text-standalone-black margin-xs quest_btn justify-right ': 'text-white ws-mat-primary-background margin-xs quest_btn justify-right' "
               mat-button (click)="proceedToSubmit()">
               <ng-container *ngIf="!isXsmall">Submit the test</ng-container>
@@ -1829,7 +1829,7 @@
             </div>
           </div>
 
-          <div *ngIf="!forCreatorMode">
+          <div *ngIf="!forPreview">
             <a mat-button (click)="proceedToSubmit()"
               [ngClass]="(totalQCount != getAllQuestionAnswer() && assessmentType === 'optionalWeightage') ? 'pointer-events-none secondary-standalone text-standalone-black margin-xs quest_btn_option_weightage': 'text-white ws-mat-primary-background margin-xs quest_btn' ">
               <ng-container>Submit the test</ng-container>

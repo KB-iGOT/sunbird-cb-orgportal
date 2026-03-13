@@ -8,15 +8,13 @@
 
 .back-btn {
   position: absolute;
-  top: 8%;
-  left: 12%;
+  top: 20px;
+  left: 2%;
   z-index: 1000;
 
   .back-button {
     mat-icon {
-      font-size: 48px;
-      width: 48px;
-      height: 48px;
+
       color: white;
     }
   }
@@ -142,4 +140,8 @@
   .right-content {
     top: 50px !important;
   }
+}
+
+::ng-deep .right-content-inner .action-button {
+  line-height: 12px!important;
 }

@@ -22,7 +22,6 @@ import { LoaderService } from '../../../../../../../../../src/app/services/loade
 })
 export class ExploreContentComponent implements OnInit {
   displayedColumns: string[] = [
-    'expand',
     'contentName',
     'createdBy',
     'language',
@@ -46,7 +45,7 @@ export class ExploreContentComponent implements OnInit {
   allFacets: any
   defaultFacets: any = ["courseCategory", "avgRating", "language", "organisation",
     "competencies_v6.competencyAreaName", "competencies_v6.competencyThemeName",
-    "competencies_v6.competencySubThemeName"]
+    "competencies_v6.competencySubThemeName", "difficultyLevel"]
   defaultCategories: string[] = [
     'Course',
     'Program',
@@ -57,7 +56,7 @@ export class ExploreContentComponent implements OnInit {
     'invite-only assessment',
     'Case Study',
     'Comprehensive Assessment Program',
-    'multilingual course'
+    'Multilingual Course'
   ]
   constructor(
     readonly exploreContentService: ExploreContentService,
@@ -121,15 +120,17 @@ export class ExploreContentComponent implements OnInit {
 
   private loadContent(): void {
     this.loaderService.changeLoaderState(true)
+    this.searchBody.request.limit = this.pageSize
+    this.searchBody.request.offset = this.pageIndex * this.pageSize
 
     this.exploreContentService.getAllContent(this.searchBody).subscribe(
       response => {
         const result = response?.result || {}
         const contents = result.content || []
         this.length = typeof result.count === 'number' ? result.count : contents.length
+        this.allFacets = result.facets || []
         if (contents.length) {
           this.dataSource.data = contents
-          this.allFacets = result.facets || []
           this.loaderService.changeLoaderState(false)
         } else {
           this.dataSource.data = []
@@ -235,12 +236,10 @@ export class ExploreContentComponent implements OnInit {
   }
 
   handleFiltersChanges(selectedFilters: any): void {
-    console.log('Selected filters received:', selectedFilters)
     this.pageIndex = 0
 
     // Update filters in searchBody
     this.searchBody.request.filters = this.processSelectedFilters(selectedFilters)
-    console.log('Updated searchBody with filters:', this.searchBody)
     this.loadContent()
   }
 
@@ -279,10 +278,12 @@ export class ExploreContentComponent implements OnInit {
         filters.avgRating = { '>=': String(threshold) }
       }
     }
+    addIfNonEmpty('language', selectedFilters.languages)
     addIfNonEmpty('organisation', selectedFilters.organisations)
     addIfNonEmpty('competencies_v6.competencyAreaName', selectedFilters.competencyArea)
     addIfNonEmpty('competencies_v6.competencyThemeName', selectedFilters.competencyTheme)
     addIfNonEmpty('competencies_v6.competencySubThemeName', selectedFilters.competencySubTheme)
+    addIfNonEmpty('difficultyLevel', selectedFilters.difficultyLevel)
     return filters
   }
 }
