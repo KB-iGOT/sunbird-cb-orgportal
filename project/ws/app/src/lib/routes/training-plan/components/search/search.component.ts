@@ -154,7 +154,7 @@ export class SearchComponent implements OnInit {
           offset: this.pageIndex,
           limit: this.pageSize,
           query: (this.searchText) ? this.searchText : '',
-          sort_by: { lastUpdatedOn: 'desc' },
+          // sort_by: { lastUpdatedOn: 'desc' },
           fields: ['name', 'appIcon', 'instructions', 'description', 'purpose', 'mimeType',
             'gradeLevel', 'identifier', 'medium', 'resourceType',
             'primaryCategory', 'contentType', 'channel', 'organisation', 'trackable', 'posterImage',

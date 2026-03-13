@@ -1,7 +1,6 @@
 import { HttpClient } from '@angular/common/http'
 import { Injectable } from '@angular/core'
-import { Observable } from 'rxjs'
-
+import { BehaviorSubject, Observable } from 'rxjs'
 
 const API_END_POINTS = {
   CREATE_EXTERNAL_TRAINING: '/apis/proxies/v8/externaltraining/v4/create',
@@ -20,6 +19,9 @@ const API_END_POINTS = {
 })
 export class ExternalTrainingsService {
 
+  private trainingNameSubject = new BehaviorSubject<string>('')
+  trainingName$ = this.trainingNameSubject.asObservable()
+
   constructor(private http: HttpClient,) { }
 
   createExternalTraining(request: any): Observable<any> {
@@ -33,6 +35,11 @@ export class ExternalTrainingsService {
     newFormData.append('file', file, fileName)
     return this.http.post<any>(API_END_POINTS.UPLOAD_TEMPLATE, newFormData)
   }
+
+  setTrainingName(name: string): void {
+    this.trainingNameSubject.next(name)
+  }
+
 
   publishExternalTraining(formData: any): Observable<any> {
     return this.http.post<any>(API_END_POINTS.PUBLISH_EXTERNAL_TRAINING(formData.request.event.identifier), formData)

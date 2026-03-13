@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
 import { ExternalTrainingsService } from '../../../services/external-trainings.service'
 import * as _ from 'lodash'
+import { LoaderService } from '../../../../../../../../../../src/app/services/loader.service'
 
 @Component({
   selector: 'ws-app-details',
@@ -15,7 +16,8 @@ export class DetailsComponent implements OnInit {
 
   constructor(
     private route: ActivatedRoute,
-    private externalTrainingsSvc: ExternalTrainingsService
+    private externalTrainingsSvc: ExternalTrainingsService,
+    private loaderService: LoaderService,
   ) { }
 
   ngOnInit() {
@@ -47,6 +49,11 @@ export class DetailsComponent implements OnInit {
           learningObjective: event.description,
           competency_v6: event.competencies_v6 || [],
         }
+        this.externalTrainingsSvc.setTrainingName(event.name || '')
+      },
+      error => {
+        this.loaderService.changeLoaderState(false)
+        console.error('Error fetching training details:', error)
       }
     )
   }

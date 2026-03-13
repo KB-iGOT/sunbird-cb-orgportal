@@ -21,6 +21,7 @@ export class NewExternalTrainingComponent implements OnInit {
 
   // Logo state variables
   defaultCertificateTemplateUrl = 'assets/images/sample/Course_completion_certificate_New4.svg'
+  trainingName = ''
   mergedLogoUrl: string | null = null
   previewLogoUrl = ''
   logoFileName = ''

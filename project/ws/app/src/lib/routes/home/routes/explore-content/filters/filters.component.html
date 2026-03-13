@@ -4,13 +4,13 @@
       <h4 class="font-weight-bold margin-remove">
         <div class="flex flex-between flex-baseline">
           <span class="mat-h2 font-weight-500 margin-remove" i18n>Filter By</span>
-          <button mat-icon-button color="primary" class="text-middle close-button margin-remove" (click)="onClose()">
+          <button mat-icon-button color="primary" class="text-middle close-button margin-remove" (click)="cancelFilters()">
             <mat-icon class="">clear</mat-icon>
           </button>
         </div>
       </h4>
     </div>
-    <div class="filter-content mt-4">
+    <div class="filter-content mt-4" *ngIf="hasAnyFacetWithValues()">
 
       <!-- Category Type Section -->
       <div class="filter-section">
@@ -52,7 +52,7 @@
       <!-- Languages Section -->
       <div class="filter-section">
         <h3 class="filter-section-title">Languages</h3>
-        <mat-form-field appearance="outline" class="search-field">
+        <mat-form-field appearance="outline" class="search-field" *ngIf="languages?.length > 4">
           <mat-icon matPrefix>search</mat-icon>
           <input matInput placeholder="Search" [(ngModel)]="languageSearch" (input)="filterLanguages()">
         </mat-form-field>
@@ -71,7 +71,7 @@
       <!-- Organisation Section -->
       <div class="filter-section">
         <h3 class="filter-section-title">Organisation</h3>
-        <mat-form-field appearance="outline" class="search-field">
+        <mat-form-field appearance="outline" class="search-field" *ngIf="organisations?.length > 4">
           <mat-icon matPrefix>search</mat-icon>
           <input matInput placeholder="Search" [(ngModel)]="organisationSearch" (input)="filterOrganisations()">
         </mat-form-field>
@@ -88,8 +88,24 @@
         </div>
       </div>
 
+      <!-- Difficulty Level Section -->
+      <div class="filter-section" *ngIf="filteredDifficultyLevels?.length">
+        <h3 class="filter-section-title">Proficiency Level</h3>
+        <div class="filter-options">
+          <div *ngFor="let item of getDisplayedDifficultyLevels()" class="filter-item">
+            <mat-checkbox [checked]="isFilterSelected('difficultyLevel', item.name)"
+              (change)="onFilterChange('difficultyLevel', item.name, $event.checked)">
+              {{ item.name }}({{ item.count }})
+            </mat-checkbox>
+          </div>
+          <a *ngIf="filteredDifficultyLevels.length > 4" class="see-more-link" (click)="toggleDifficultyLevelShowAll()">
+            {{ showAllDifficultyLevels ? 'See Less' : 'See More' }}
+          </a>
+        </div>
+      </div>
+
       <!-- Competency Area Section -->
-      <div class="filter-section">
+      <div class="filter-section" *ngIf="filteredCompetencies?.length">
         <h3 class="filter-section-title">Competency Area</h3>
         <div class="filter-options">
           <div *ngFor="let item of getDisplayedCompetencies()" class="filter-item">
@@ -105,9 +121,9 @@
       </div>
 
       <!-- Competency Theme Section -->
-      <div class="filter-section">
+      <div class="filter-section" *ngIf="competencyTheme?.length">
         <h3 class="filter-section-title">Competency Theme</h3>
-        <mat-form-field appearance="outline" class="search-field">
+        <mat-form-field appearance="outline" class="search-field" *ngIf="competencyTheme?.length > 4">
           <mat-icon matPrefix>search</mat-icon>
           <input matInput placeholder="Search" [(ngModel)]="competencyThemeSearch" (input)="filterCompetencyTheme()">
         </mat-form-field>
@@ -125,9 +141,9 @@
       </div>
 
       <!-- Competency Sub-Theme Section -->
-      <div class="filter-section">
+      <div class="filter-section" *ngIf="competencySubTheme?.length">
         <h3 class="filter-section-title">Competency Sub-Theme</h3>
-        <mat-form-field appearance="outline" class="search-field">
+        <mat-form-field appearance="outline" class="search-field" *ngIf="competencySubTheme?.length > 4">
           <mat-icon matPrefix>search</mat-icon>
           <input matInput placeholder="Search" [(ngModel)]="competencySubThemeSearch" (input)="filterCompetencySubTheme()">
         </mat-form-field>
@@ -145,7 +161,7 @@
       </div>
     </div>
 
-    <div class="filter-footer flex flex-center gap-6">
+    <div class="filter-footer flex flex-center gap-6" *ngIf="hasAnyFacetWithValues()">
       <button mat-button type="button" class="clear-all-btn" (click)="onClearAll()">
         Clear All
       </button>

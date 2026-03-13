@@ -372,3 +372,26 @@ tr.detail-row {
   display: none;
 }
 
+.no-data-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 300px;
+}
+
+.no-data-message {
+  text-align: center;
+  color: #9e9e9e;
+}
+
+.no-data-icon {
+  font-size: 48px;
+}
+
+.no-data-text {
+  font-size: 16px;
+  font-weight: 500;
+  margin-top: 8px;
+  color: black;
+}
+

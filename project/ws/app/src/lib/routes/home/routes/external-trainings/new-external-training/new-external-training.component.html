@@ -6,6 +6,7 @@
     <div class="header-content">
       <h1 class="title">Upload External Training Details</h1>
       <p class="subtitle">Provide training information and bulk upload participant records.</p>
+      <p *ngIf="trainingName" class="training-name">Current Training: {{ trainingName }}</p>
     </div>
   </div>
 
