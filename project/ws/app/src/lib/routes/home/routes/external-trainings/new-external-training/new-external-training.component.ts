@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core'
 import { FormBuilder, FormGroup, Validators } from '@angular/forms'
 import { ActivatedRoute, Router } from '@angular/router'
 import { ExternalTrainingsService } from '../../../services/external-trainings.service'
+import { deliveryModeList as deliveryModes } from '../models/external-trainings.model'
 import { mergeMap } from 'rxjs/operators'
 import * as _ from 'lodash'
 import { MatLegacySnackBar } from '@angular/material/legacy-snack-bar'
@@ -15,6 +16,7 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser'
 export class NewExternalTrainingComponent implements OnInit {
   trainingForm!: FormGroup
   selectedCompetencyList: any[] = []
+  deliveryModeList = deliveryModes
   configSvc: any
 
   // Logo state variables

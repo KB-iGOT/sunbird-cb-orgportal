@@ -61,6 +61,11 @@ export class ListComponent implements OnInit, AfterViewInit {
     this.getExternalTrainings()
   }
 
+  onSearch() {
+    this.pageIndex = 0
+    this.getExternalTrainings()
+  }
+
   // API call
   getExternalTrainings() {
     this.loaderService.changeLoaderState(true)
@@ -131,8 +136,8 @@ export class ListComponent implements OnInit, AfterViewInit {
           case 'createdOn': return item.createdOnSort
           case 'name': return _.get(item, 'name', '').toLowerCase()
           // case 'sourceName': return _.get(item, 'sourceName', '').toLowerCase()
-          case 'deliveryMode': return _.get(item, 'deliveryMode', '').toLowerCase()
-          case 'duration': return item.duration || 0
+          case 'eventType': return _.get(item, 'eventType', '').toLowerCase()
+          case 'durationFormatted': return item.duration || 0
           default: return item[property] || ''
         }
       }

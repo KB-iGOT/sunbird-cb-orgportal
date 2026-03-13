@@ -10,6 +10,7 @@ const API_END_POINTS = {
   APPROVALS_LIST: '/apis/proxies/v8/sunbirdigot/search',
   STATUS_UPDATE: '/apis/proxies/v8/learner/achievement/status/update',
   GET_ACHIEVEMENT_DETAILS: (achievementId: string) => `/apis/proxies/v8/learner/achievement/${achievementId}`,
+  GET_EXTERNAL_TRAINING_DETAILS: (identifier: string) => `/apis/proxies/v8/externaltraining/v4/read/${identifier}`,
 }
 @Injectable({
   providedIn: 'root'
@@ -40,6 +41,10 @@ export class ExternalTrainingsService {
 
   getAchievementDetails(achievementId: string): Observable<any> {
     return this.http.get<any>(API_END_POINTS.GET_ACHIEVEMENT_DETAILS(achievementId))
+  }
+
+  getExternalTrainingDetails(identifier: string): Observable<any> {
+    return this.http.get<any>(API_END_POINTS.GET_EXTERNAL_TRAINING_DETAILS(identifier))
   }
 
 }

@@ -37,9 +37,7 @@
           <label for="deliveryMode">Delivery Mode</label>
           <select id="deliveryMode" formControlName="deliveryMode" class="input-field select-field">
             <option value="">Select Delivery Mode</option>
-            <option value="online">Online</option>
-            <option value="offline">Offline</option>
-            <option value="hybrid">Hybrid</option>
+            <option *ngFor="let mode of deliveryModeList | keyvalue" [value]="mode.key">{{ mode.value }}</option>
           </select>
         </div>
 
