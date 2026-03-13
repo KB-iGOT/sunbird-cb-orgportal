@@ -65,10 +65,10 @@
             mat-button (click)="filter('nonverified'); tabTelemetry('nonverified', 0)" role="button">Non-verified
             ({{nonverifiedUsersDataCount}})</a>
 
-          <a routerLink="/app/home/users/notmyuser" routerLinkActive="router-link-active" class="filter-option"
+          <!-- <a routerLink="/app/home/users/notmyuser" routerLinkActive="router-link-active" class="filter-option"
             [ngClass]="{'ws-mat-accent-border-active' : currentFilter === 'notmyuser','ws-mat-accent-border font-medium':currentFilter !== 'notmyuser'}"
             mat-button (click)="filter('notmyuser'); tabTelemetry('notmyuser', 0)" role="button">Not my user
-            ({{notmyuserUsersDataCount}})</a>
+            ({{notmyuserUsersDataCount}})</a> -->
         </div>
       </div>
       <!-- <ws-widget-org-user-table-v2 [userId]="currentUser" [tableData]="tabledata" [data]="dataForTable"

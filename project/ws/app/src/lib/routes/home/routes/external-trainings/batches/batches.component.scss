@@ -1,0 +1,103 @@
+@import 'ws-common';
+@import 'ws-vars';
+@import 'ws-mixins';
+
+.link {
+  color: #6e6e6e;
+  cursor: pointer;
+}
+
+.batches-container {
+  padding: 16px 0;
+}
+
+.batches-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+}
+
+.batch-card {
+  padding: 16px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: box-shadow 0.2s ease;
+  background-color: #f0f3f4!important;
+
+  &:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  }
+}
+
+.batch-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 12px;
+}
+
+.batch-dates {
+  display: flex;
+  gap: 24px;
+}
+
+.date-block {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.date-label {
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.date-value {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 13px;
+
+  .date-icon {
+    font-size: 16px;
+    height: 16px;
+    width: 16px;
+  }
+}
+
+
+.no-data-container-table {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 40px;
+  text-align: center;
+  min-height: 300px;
+  background-color: #fafafa;
+  border: 1px solid #e0e0e0;
+
+  .no-data-image {
+    width: 120px;
+    height: 120px;
+    margin-bottom: 24px;
+    opacity: 0.8;
+  }
+
+  h3 {
+    color: #666;
+    margin-bottom: 8px;
+    font-size: 18px;
+    font-weight: 500;
+  }
+
+  p {
+    color: #999;
+    font-size: 14px;
+    max-width: 300px;
+    line-height: 1.5;
+  }
+}

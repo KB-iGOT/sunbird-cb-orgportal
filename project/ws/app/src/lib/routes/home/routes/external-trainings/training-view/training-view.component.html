@@ -1,0 +1,24 @@
+<div class="mt-4">
+  <div class="flex mat-h2 margin-remove gap-2 items-center justify-between pr-4">
+    <div class="flex gap-2 items-center">
+      <div class="link" (click)="navigateToExternalTrainings()" (keydown.enter)="navigateToExternalTrainings()">External Trainings</div>
+      <mat-icon>chevron_right</mat-icon>
+      <div>{{trainingName}}</div>
+    </div>
+    <button mat-raised-button class="create-batch" (click)="createBatch()" *ngIf="currentTab === 'batches'">
+      <mat-icon class="add">add</mat-icon>
+      Create Batch
+    </button>
+  </div>
+  <div class="pl-4 pr-4">
+    <div class="flex flex-1 flex-column margin-fix mb-2">
+      <div class="flex flex-1 filter max-height-60 gap-3">
+        <div class="filter-option default" [ngClass]="{'active': currentTab === 'details', 'font-medium': currentTab !== 'details'}"
+          (click)="onTabChange('details')" (keydown.enter)="onTabChange('details')">Training details</div>
+        <div class="filter-option default" [ngClass]="{'active': currentTab === 'batches', 'font-medium': currentTab !== 'batches'}"
+          (click)="onTabChange('batches')" (keydown.enter)="onTabChange('batches')">Batches</div>
+      </div>
+    </div>
+    <router-outlet></router-outlet>
+  </div>
+</div>

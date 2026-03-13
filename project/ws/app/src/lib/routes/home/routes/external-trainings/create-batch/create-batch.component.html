@@ -1,0 +1,91 @@
+<div class="create-batch-container">
+  <!-- Header -->
+  <div class="header">
+    <button mat-icon-button class="back-button" (click)="goBack()">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <div class="header-content">
+      <h1 class="title">Upload External Training Details</h1>
+      <p class="subtitle">Provide training information and bulk upload participant records.</p>
+    </div>
+  </div>
+
+  <!-- Batch Details Card -->
+  <div class="batch-details-card">
+    <h2 class="section-title">Batch Details</h2>
+
+    <form [formGroup]="batchForm">
+      <div class="form-row">
+        <!-- Batch Name -->
+        <div class="form-field">
+          <label for="batchName" class="required">Batch Name</label>
+          <input id="batchName" type="text" formControlName="batchName" placeholder="Enter the batch name (e.g., Q3 Leadership Training)"
+            class="input-field" />
+        </div>
+
+        <!-- Start Date -->
+        <div class="form-field">
+          <label for="startDate" class="required">Start Date</label>
+          <input id="startDate" type="date" formControlName="startDate" placeholder="mm/dd/yyyy" class="input-field date-field" />
+        </div>
+
+        <!-- End Date -->
+        <div class="form-field">
+          <label for="endDate" class="required">End Date</label>
+          <input id="endDate" type="date" formControlName="endDate" placeholder="mm/dd/yyyy" class="input-field date-field" />
+        </div>
+      </div>
+
+      <!-- Instructions and File Upload Section -->
+      <div class="upload-section">
+        <div class="instructions-box">
+          <h3 class="instructions-title">Open & follow these instructions</h3>
+          <ol class="instructions-list">
+            <li>Keep the row of the items you wish to process</li>
+            <li>Keep the row of the items you wish to process</li>
+            <li>Delete the entire row you donot intend to process</li>
+          </ol>
+          <button type="button" mat-stroked-button class="download-button" (click)="downloadSampleFile()">
+            Download Sample File
+          </button>
+        </div>
+
+        <div class="file-upload-box">
+          <div class="drop-zone" (drop)="onFileDrop($event)" (dragover)="onDragOver($event)" (dragleave)="onDragLeave($event)"
+            [class.drag-over]="isDragOver">
+            <div class="browse-files-text">Browse files</div>
+            <p class="or-text">Or</p>
+            <p class="drag-text">Drag file to upload</p>
+
+            <input #fileInput type="file" (change)="onFileSelected($event)" accept=".csv" style="display: none;" />
+          </div>
+
+          <div class="file-info">
+            <p class="max-size">MAX SIZE: 100 MB</p>
+            <p class="file-types">SUPPORTED FILE TYPES: CSV</p>
+          </div>
+
+          <div *ngIf="uploadedFile" class="uploaded-file-info">
+            <mat-icon>description</mat-icon>
+            <span class="file-name">{{ uploadedFile.name }}</span>
+            <button mat-icon-button (click)="removeFile()">
+              <mat-icon>close</mat-icon>
+            </button>
+          </div>
+        </div>
+      </div>
+    </form>
+
+    <div class="action-buttons mt-4">
+      <button mat-stroked-button class="cancel-batch" (click)="onCancel()">
+        Cancel
+      </button>
+      <button mat-raised-button color="primary" class="submit-batch" [disabled]="!batchForm.valid || !uploadedFile" (click)="onSubmit()">
+        Submit
+      </button>
+    </div>
+  </div>
+
+  <!-- Action Buttons -->
+
+</div>

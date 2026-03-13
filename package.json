@@ -49,9 +49,9 @@
     "@ngx-translate/http-loader": "8.0.0",
     "@polyflix/vtt-parser": "^1.4.0",
     "@project-sunbird/telemetry-sdk": "0.0.26",
-    "@sunbird-cb/access-settings": "0.0.4-cbrelease-4.8.33",
-    "@sunbird-cb/collection": "0.0.2-cbrelease-4.8.34",
-    "@sunbird-cb/consumption": "0.0.1-cbrelease-4.8.33",
+    "@sunbird-cb/access-settings": "0.0.7-cbrelease-4.8.33",
+    "@sunbird-cb/collection": "0.0.4-cbrelease-4.8.34",
+    "@sunbird-cb/consumption": "0.0.1-cbrelease-4.8.35",
     "@sunbird-cb/design-system": "0.0.3",
     "@sunbird-cb/discussion-v2": "0.0.8-cbrelease-4.8.28",
     "@sunbird-cb/micro-surveys": "2.0.20-ang-13-16",
@@ -61,7 +61,7 @@
     "@sunbird-cb/resolver-v2": "0.0.7-ang-13-16",
     "@sunbird-cb/search-listing": "0.0.28-cbrelease-4.8.29",
     "@sunbird-cb/taxonomy-editor": "0.0.4-cbrelease-4.8.29",
-    "@sunbird-cb/toc": "0.0.33",
+    "@sunbird-cb/toc": "0.0.34",
     "@sunbird-cb/tree-hierarchy": "0.0.1-cbrelease-4.8.32",
     "@sunbird-cb/utils": "1.0.21-ang-13-16",
     "@sunbird-cb/utils-v2": "0.0.2-cbrelease-4.8.31",
@@ -161,5 +161,8 @@
     "typescript": "~4.9.5",
     "typescript-tslint-plugin": "^0.5.4",
     "webpack-bundle-analyzer": "^4.4.0"
+  },
+  "resolutions": {
+    "d3-selection": "1.4.2"
   }
 }
