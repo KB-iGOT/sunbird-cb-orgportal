@@ -1,39 +1,69 @@
 import { Component, OnInit } from '@angular/core'
-
+import { ExternalTrainingsService } from '../../../services/external-trainings.service'
+import { ActivatedRoute } from '@angular/router'
+import * as _ from 'lodash'
+import { LoaderService } from '../../../../../../../../../../src/app/services/loader.service'
 @Component({
   selector: 'ws-app-batches',
   templateUrl: './batches.component.html',
   styleUrls: ['./batches.component.scss']
 })
 export class BatchesComponent implements OnInit {
-  batches: { name: string; startDate: string; endDate: string }[] = []
+  batches: any[] = []
+  training: any = {}
+  isLoading = false
+  constructor(private externalTrainingsSvc: ExternalTrainingsService,
+    private route: ActivatedRoute,
+    private loaderService: LoaderService,
+  ) {
+
+  }
 
   ngOnInit() {
-    this.batches = [
-      { name: 'Angular Upgrade', startDate: '2025-11-29', endDate: '2025-12-31' },
-      { name: 'Java Certification', startDate: '2025-12-18', endDate: '2025-12-25' },
-      { name: 'Python for Data Science', startDate: '2026-01-01', endDate: '2026-01-23' },
-      { name: 'AWS Cloud Practitioner', startDate: '2026-01-15', endDate: '2026-02-28' },
-      { name: 'React Native Basics', startDate: '2026-02-01', endDate: '2026-03-15' },
-      { name: 'DevOps with Docker', startDate: '2026-02-10', endDate: '2026-03-20' },
-      { name: 'Machine Learning Fundamentals', startDate: '2026-03-01', endDate: '2026-04-30' },
-      { name: 'Kubernetes Administration', startDate: '2026-03-10', endDate: '2026-04-10' },
-      { name: 'UI/UX Design Principles', startDate: '2026-03-15', endDate: '2026-04-25' },
-      { name: 'Agile & Scrum Mastery', startDate: '2026-04-01', endDate: '2026-05-01' },
-      { name: 'TypeScript Advanced', startDate: '2026-04-05', endDate: '2026-05-10' },
-      { name: 'Cyber Security Essentials', startDate: '2026-04-15', endDate: '2026-05-30' },
-      { name: 'Spring Boot Microservices', startDate: '2026-05-01', endDate: '2026-06-15' },
-      { name: 'Azure Fundamentals', startDate: '2026-05-10', endDate: '2026-06-20' },
-      { name: 'SQL & Database Design', startDate: '2026-05-20', endDate: '2026-06-30' },
-      { name: 'Node.js Backend Development', startDate: '2026-06-01', endDate: '2026-07-15' },
-      { name: 'GraphQL API Workshop', startDate: '2026-06-10', endDate: '2026-07-10' },
-      { name: 'Flutter Mobile Development', startDate: '2026-06-15', endDate: '2026-07-30' },
-      { name: 'Data Engineering with Spark', startDate: '2026-07-01', endDate: '2026-08-15' },
-      { name: 'Go Programming Essentials', startDate: '2026-07-10', endDate: '2026-08-10' },
-      { name: 'Blockchain Fundamentals', startDate: '2026-07-20', endDate: '2026-08-30' },
-      { name: 'Terraform Infrastructure', startDate: '2026-08-01', endDate: '2026-09-15' },
-      { name: 'Power BI Analytics', startDate: '2026-08-10', endDate: '2026-09-20' },
-      { name: 'Rust Systems Programming', startDate: '2026-08-15', endDate: '2026-09-30' },
-    ]
+    this.getRoutingDetails()
+  }
+
+  getRoutingDetails() {
+    const id = this.route.parent?.snapshot.params['id']
+    if (id) {
+      this.getTrainingDetails(id)
+    }
+  }
+
+  getTrainingDetails(id: string) {
+    this.loaderService.changeLoaderState(true)
+    this.isLoading = true
+    this.externalTrainingsSvc.getExternalTrainingDetails(id).subscribe(
+      (response: any) => {
+        const event = _.get(response, 'result.event', {})
+        const durationInSeconds = event.duration || 0
+        const hours = durationInSeconds / 3600
+        const learningHours = Number.isInteger(hours)
+          ? `${hours} Hour${hours !== 1 ? 's' : ''}`
+          : `${hours.toFixed(2)} Hours`
+
+        this.training = {
+          ...event,
+          title: event.name,
+          deliveryMode: event.eventType,
+          learningHours,
+          learningObjective: event.description,
+          competency_v6: event.competencies_v6 || [],
+        }
+        this.batches = event.batches || []
+        this.loaderService.changeLoaderState(false)
+        this.isLoading = false
+        console.log('Batches:', this.batches)
+      }, error => {
+        this.loaderService.changeLoaderState(false)
+        this.isLoading = false
+        console.error('Error fetching training details:', error)
+      }
+    )
+  }
+
+  viewBatch(batch: any) {
+    // Implement navigation to batch details page when available
+    console.log('View batch details for:', batch)
   }
 }
