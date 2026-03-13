@@ -35,6 +35,13 @@
               <span>{{ currentBatch?.endDate | date: 'dd/MM/yyyy' }}</span>
             </div>
           </div>
+          <div class="date-block">
+            <span class="date-label">Users</span>
+            <div class="date-value">
+              <mat-icon class="date-icon">people</mat-icon>
+              <span>{{ currentBatch?.users || 0 }}</span>
+            </div>
+          </div>
         </div>
       </mat-card>
     </ng-container>
