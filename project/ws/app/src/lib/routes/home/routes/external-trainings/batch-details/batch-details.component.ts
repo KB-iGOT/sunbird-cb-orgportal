@@ -1,21 +1,28 @@
-import { Component, OnInit } from '@angular/core'
-import { ExternalTrainingsService } from '../../../services/external-trainings.service'
+import { Component } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
-import * as _ from 'lodash'
 import { LoaderService } from '../../../../../../../../../../src/app/services/loader.service'
+import { ExternalTrainingsService } from '../../../services/external-trainings.service'
+import * as _ from 'lodash'
+
 @Component({
-  selector: 'ws-app-batches',
-  templateUrl: './batches.component.html',
-  styleUrls: ['./batches.component.scss']
+  selector: 'ws-app-batch-details',
+  templateUrl: './batch-details.component.html',
+  styleUrls: ['./batch-details.component.scss']
 })
-export class BatchesComponent implements OnInit {
+export class BatchDetailsComponent {
+
   batches: any[] = []
   training: any = {}
   isLoading = false
-  constructor(private externalTrainingsSvc: ExternalTrainingsService,
+  currentBatch: any
+  batchId: string = ''
+  trainingId: string = ''
+
+  constructor(
     private route: ActivatedRoute,
     private loaderService: LoaderService,
-    private router: Router
+    private externalTrainingsSvc: ExternalTrainingsService,
+    private router: Router,
   ) {
 
   }
@@ -25,9 +32,10 @@ export class BatchesComponent implements OnInit {
   }
 
   getRoutingDetails() {
-    const id = this.route.parent?.snapshot.params['id']
-    if (id) {
-      this.getTrainingDetails(id)
+    this.trainingId = this.route.snapshot.params['id']
+    this.batchId = this.route.snapshot.params['batchId']
+    if (this.trainingId) {
+      this.getTrainingDetails(this.trainingId)
     }
   }
 
@@ -51,11 +59,12 @@ export class BatchesComponent implements OnInit {
           learningObjective: event.description,
           competency_v6: event.competencies_v6 || [],
         }
-        this.externalTrainingsSvc.setTrainingName(event.name || '')
         this.batches = event.batches || []
         this.loaderService.changeLoaderState(false)
         this.isLoading = false
-        console.log('Batches:', this.batches)
+        if (this.batches.length > 0) {
+          this.currentBatch = this.batches.find((batch: any) => batch.batchId === this.batchId)
+        }
       }, error => {
         this.loaderService.changeLoaderState(false)
         this.isLoading = false
@@ -64,7 +73,11 @@ export class BatchesComponent implements OnInit {
     )
   }
 
-  viewBatch(batch: any) {
-    this.router.navigate([batch.batchId], { relativeTo: this.route })
+  navigateToExternalTrainings() {
+    this.router.navigate(['/app/home/external-trainings'])
+  }
+
+  navigateToBatches() {
+    this.router.navigate(['/app/home/external-trainings/', this.trainingId, 'batches'])
   }
 }

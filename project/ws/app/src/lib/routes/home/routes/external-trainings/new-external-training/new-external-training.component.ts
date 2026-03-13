@@ -18,6 +18,7 @@ export class NewExternalTrainingComponent implements OnInit {
   selectedCompetencyList: any[] = []
   deliveryModeList = deliveryModes
   configSvc: any
+  trainingName = ''
 
   // Logo state variables
   defaultCertificateTemplateUrl = 'assets/images/sample/CourseCertificate_Template.svg'

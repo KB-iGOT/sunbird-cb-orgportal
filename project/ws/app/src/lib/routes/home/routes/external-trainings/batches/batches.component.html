@@ -1,23 +1,33 @@
 <div class="batches-container">
-  <div class="batches-grid">
-    <mat-card class="batch-card" *ngFor="let batch of batches">
-      <div class="batch-name">{{ batch.name }}</div>
-      <div class="batch-dates">
-        <div class="date-block">
-          <span class="date-label">START DATE</span>
-          <div class="date-value">
-            <mat-icon class="date-icon">calendar_today</mat-icon>
-            <span>{{ batch.startDate | date: 'dd/MM/yyyy' }}</span>
+  <ng-container *ngIf="!isLoading && batches.length > 0">
+    <div class="batches-grid">
+      <mat-card class="batch-card" *ngFor="let batch of batches" (click)="viewBatch(batch)" (keyup)="viewBatch(batch)">
+        <div class="batch-name">{{ batch?.name }}</div>
+        <div class="batch-dates">
+          <div class="date-block">
+            <span class="date-label">START DATE</span>
+            <div class="date-value">
+              <mat-icon class="date-icon">calendar_today</mat-icon>
+              <span>{{ batch?.startDate | date: 'dd/MM/yyyy' }}</span>
+            </div>
+          </div>
+          <div class="date-block">
+            <span class="date-label">END DATE</span>
+            <div class="date-value">
+              <mat-icon class="date-icon">calendar_today</mat-icon>
+              <span>{{ batch?.endDate | date: 'dd/MM/yyyy' }}</span>
+            </div>
           </div>
         </div>
-        <div class="date-block">
-          <span class="date-label">END DATE</span>
-          <div class="date-value">
-            <mat-icon class="date-icon">calendar_today</mat-icon>
-            <span>{{ batch.endDate | date: 'dd/MM/yyyy' }}</span>
-          </div>
-        </div>
-      </div>
-    </mat-card>
-  </div>
+      </mat-card>
+    </div>
+  </ng-container>
+
+  <ng-container *ngIf="!isLoading && batches.length === 0">
+    <div class="no-data-container-table">
+      <img src="/assets/images/no-content-data-search.svg" alt="No batches available" class="no-data-image">
+      <h3>No batches available for this training.</h3>
+      <p>There are no batches available at the moment.</p>
+    </div>
+  </ng-container>
 </div>

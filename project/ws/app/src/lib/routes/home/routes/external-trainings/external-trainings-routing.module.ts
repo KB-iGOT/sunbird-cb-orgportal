@@ -8,6 +8,7 @@ import { DetailsComponent } from "./details/details.component"
 import { TrainingViewComponent } from "./training-view/training-view.component"
 import { CreateBatchComponent } from "./create-batch/create-batch.component"
 import { NewExternalTrainingComponent } from "./new-external-training/new-external-training.component"
+import { BatchDetailsComponent } from "./batch-details/batch-details.component"
 
 const routes: Routes = [
   {
@@ -49,6 +50,20 @@ const routes: Routes = [
         component: NewExternalTrainingComponent,
         data: {
           pageId: 'home/external-trainings/new',
+          module: 'external-trainings',
+          pageType: 'feature',
+          pageKey: 'ExternalTrainings',
+          path: '',
+        },
+        resolve: {
+          configService: ConfigResolveService,
+        },
+      },
+      {
+        path: ':id/batches/:batchId',
+        component: BatchDetailsComponent,
+        data: {
+          pageId: 'home/external-trainings/id/batches/:batchId',
           module: 'external-trainings',
           pageType: 'feature',
           pageKey: 'ExternalTrainings',

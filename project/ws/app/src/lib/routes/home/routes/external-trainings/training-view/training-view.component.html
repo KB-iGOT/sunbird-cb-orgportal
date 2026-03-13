@@ -3,7 +3,7 @@
     <div class="flex gap-2 items-center">
       <div class="link" (click)="navigateToExternalTrainings()" (keydown.enter)="navigateToExternalTrainings()">External Trainings</div>
       <mat-icon>chevron_right</mat-icon>
-      <div>Advanced Leadership Workshop</div>
+      <div>{{trainingName}}</div>
     </div>
     <button mat-raised-button class="create-batch" (click)="createBatch()" *ngIf="currentTab === 'batches'">
       <mat-icon class="add">add</mat-icon>
