@@ -34,6 +34,8 @@ import { CompetenciesModule } from '@sunbird-cb/consumption'
 import { MatLegacySnackBarModule } from '@angular/material/legacy-snack-bar'
 import { BatchDetailsComponent } from './batch-details/batch-details.component'
 import { AvatarPhotoModule } from '@sunbird-cb/collection'
+import { FileLogsComponent } from './file-logs/file-logs.component'
+import { PipeOrderByModule } from '@sunbird-cb/utils-v2'
 
 @NgModule({
   declarations: [
@@ -45,6 +47,7 @@ import { AvatarPhotoModule } from '@sunbird-cb/collection'
     NewExternalTrainingComponent,
     CreateBatchComponent,
     BatchDetailsComponent,
+    FileLogsComponent,
   ],
   imports: [
     CommonModule,
@@ -84,7 +87,8 @@ import { AvatarPhotoModule } from '@sunbird-cb/collection'
     MatExpansionModule,
     CompetenciesModule,
     MatLegacySnackBarModule,
-    AvatarPhotoModule
+    AvatarPhotoModule,
+    PipeOrderByModule,
   ],
   providers: [
     ExternalTrainingsService

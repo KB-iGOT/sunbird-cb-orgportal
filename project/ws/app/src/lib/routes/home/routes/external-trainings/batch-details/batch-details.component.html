@@ -47,42 +47,51 @@
     </ng-container>
   </div>
 
+  <!-- Tabs Section -->
   <ng-container *ngIf="!isLoading && currentBatch">
-    <div class="learners-section mt-4">
-      <h2 class="mat-h2 learners-title">Enrolled Learners</h2>
-    </div>
-
-    <ng-container *ngIf="filteredUsers?.length > 0; else noLearners">
-      <!-- Search Bar -->
-      <div class="search-container">
-        <mat-form-field class="search-field" appearance="outline">
-          <mat-icon matPrefix class="search-icon">search</mat-icon>
-          <input matInput placeholder="Search for a learner" [(ngModel)]="searchTerm" (ngModelChange)="onSearchChange()">
-        </mat-form-field>
-      </div>
-      <!-- Enrolled Users Grid -->
-      <div class="learners-grid">
-        <ng-container *ngFor="let user of filteredUsers">
-          <div class="learner-card">
-            <div class="learner-content">
-              <ws-widget-avatar-photo [name]="user?.name" [photoUrl]="user?.photo" size="m">
-              </ws-widget-avatar-photo>
-              <div class="learner-info">
-                <div class="learner-name">{{ user.name }}</div>
-                <div class="learner-designation">{{ user.designation }}</div>
-                <div class="learner-department">{{ user.department }}</div>
+    <mat-tab-group [(selectedIndex)]="selectedTabIndex" class="batch-tabs mt-4 external-traings">
+      <!-- Enrolled Users Tab -->
+      <mat-tab label="Enrolled Users">
+        <ng-container *ngIf="filteredUsers?.length > 0; else noLearners">
+          <!-- Search Bar -->
+          <div class="search-container">
+            <mat-form-field class="search-field" appearance="outline">
+              <mat-icon matPrefix class="search-icon">search</mat-icon>
+              <input matInput placeholder="Search for a learner" [(ngModel)]="searchTerm" (ngModelChange)="onSearchChange()">
+            </mat-form-field>
+          </div>
+          <!-- Enrolled Users Grid -->
+          <div class="learners-grid">
+            <ng-container *ngFor="let user of filteredUsers">
+              <div class="learner-card">
+                <div class="learner-content">
+                  <ws-widget-avatar-photo [name]="user?.name" [photoUrl]="user?.photo" size="m">
+                  </ws-widget-avatar-photo>
+                  <div class="learner-info">
+                    <div class="learner-name">{{ user.name }}</div>
+                    <div class="learner-designation">{{ user.designation }}</div>
+                    <div class="learner-department">{{ user.department }}</div>
+                  </div>
+                </div>
               </div>
-            </div>
+            </ng-container>
           </div>
         </ng-container>
-      </div>
-    </ng-container>
 
-    <ng-template #noLearners>
-      <div class="no-learners-message">
-        <mat-icon class="no-learners-icon">people_outline</mat-icon>
-        <p class="no-learners-text">No learners enrolled in this batch yet</p>
-      </div>
-    </ng-template>
+        <ng-template #noLearners>
+          <div class="no-learners-message">
+            <mat-icon class="no-learners-icon">people_outline</mat-icon>
+            <p class="no-learners-text">No learners enrolled in this batch yet</p>
+          </div>
+        </ng-template>
+      </mat-tab>
+
+      <!-- File Logs Tab -->
+      <mat-tab label="File Logs">
+        <div class="tab-content">
+          <ws-app-file-logs></ws-app-file-logs>
+        </div>
+      </mat-tab>
+    </mat-tab-group>
   </ng-container>
 </div>

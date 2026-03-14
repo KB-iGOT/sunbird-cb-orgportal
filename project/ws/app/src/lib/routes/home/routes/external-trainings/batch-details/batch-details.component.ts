@@ -17,7 +17,8 @@ export class BatchDetailsComponent {
   currentBatch: any
   batchId: string = ''
   trainingId: string = ''
-
+  currentTab: string = 'learners'
+  selectedTabIndex = 0
   enrolledUsers: any[] = []
   filteredUsers: any[] = []
   searchTerm = ''
@@ -39,24 +40,18 @@ export class BatchDetailsComponent {
         name: 'DoPM Program Coordinator',
         designation: 'Additional Chief Election Commissioner',
         department: 'Dept of Project management',
-        initials: 'DP',
-        avatarColor: '#9C27B0'
       },
       {
         id: 2,
         name: 'Catalinap Haagy',
         designation: 'ACCOUNT SUPERINTENDENT',
         department: 'Dept of Project management',
-        initials: 'CH',
-        avatarColor: '#009688'
       },
       {
         id: 3,
         name: 'Sonar Funkn Dot Content Creator',
         designation: 'Administrative Medical Officer',
         department: 'Dept of Project management',
-        initials: 'SF',
-        avatarColor: '#9C27B0'
       }
     ]
     this.filteredUsers = [...this.enrolledUsers]

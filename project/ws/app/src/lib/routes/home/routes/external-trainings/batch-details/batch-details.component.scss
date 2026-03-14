@@ -228,3 +228,32 @@
   margin: 0;
 }
 
+// Tabs
+.batch-tabs {
+  margin-top: 24px;
+
+  ::ng-deep {
+    .mat-tab-label {
+      font-size: 16px;
+      font-weight: 500;
+      min-width: 120px;
+      border-bottom: 2px solid #c3c3c3;
+    }
+    .mat-tab-header {
+      border-bottom: none!important;
+    }
+    .mat-tab-label-active {
+      color: #000 !important;
+      opacity: 1 !important;
+      font-weight: 700 !important;
+    }
+    .mat-tab-body-active {
+      overflow: unset !important;
+    }
+  }
+}
+
+.tab-content {
+  padding: 0;
+}
+
