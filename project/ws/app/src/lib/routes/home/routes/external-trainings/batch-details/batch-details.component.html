@@ -39,9 +39,50 @@
             <span class="date-label">Users</span>
             <div class="date-value">
               <mat-icon class="date-icon">people</mat-icon>
-              <span>{{ currentBatch?.users || 0 }}</span>
+              <span>{{ enrolledUsers?.length || 0 }}</span>
             </div>
           </div>
         </div>
       </mat-card>
     </ng-container>
+  </div>
+
+  <ng-container *ngIf="!isLoading && currentBatch">
+    <div class="learners-section mt-4">
+      <h2 class="mat-h2 learners-title">Enrolled Learners</h2>
+    </div>
+
+    <ng-container *ngIf="filteredUsers?.length > 0; else noLearners">
+      <!-- Search Bar -->
+      <div class="search-container">
+        <mat-form-field class="search-field" appearance="outline">
+          <mat-icon matPrefix class="search-icon">search</mat-icon>
+          <input matInput placeholder="Search for a learner" [(ngModel)]="searchTerm" (ngModelChange)="onSearchChange()">
+        </mat-form-field>
+      </div>
+      <!-- Enrolled Users Grid -->
+      <div class="learners-grid">
+        <ng-container *ngFor="let user of filteredUsers">
+          <div class="learner-card">
+            <div class="learner-content">
+              <ws-widget-avatar-photo [name]="user?.name" [photoUrl]="user?.photo" size="m">
+              </ws-widget-avatar-photo>
+              <div class="learner-info">
+                <div class="learner-name">{{ user.name }}</div>
+                <div class="learner-designation">{{ user.designation }}</div>
+                <div class="learner-department">{{ user.department }}</div>
+              </div>
+            </div>
+          </div>
+        </ng-container>
+      </div>
+    </ng-container>
+
+    <ng-template #noLearners>
+      <div class="no-learners-message">
+        <mat-icon class="no-learners-icon">people_outline</mat-icon>
+        <p class="no-learners-text">No learners enrolled in this batch yet</p>
+      </div>
+    </ng-template>
+  </ng-container>
+</div>

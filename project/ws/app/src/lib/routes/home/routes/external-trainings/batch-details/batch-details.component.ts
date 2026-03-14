@@ -18,6 +18,10 @@ export class BatchDetailsComponent {
   batchId: string = ''
   trainingId: string = ''
 
+  enrolledUsers: any[] = []
+  filteredUsers: any[] = []
+  searchTerm = ''
+
   constructor(
     private route: ActivatedRoute,
     private loaderService: LoaderService,
@@ -29,6 +33,50 @@ export class BatchDetailsComponent {
 
   ngOnInit() {
     this.getRoutingDetails()
+    this.enrolledUsers = [
+      {
+        id: 1,
+        name: 'DoPM Program Coordinator',
+        designation: 'Additional Chief Election Commissioner',
+        department: 'Dept of Project management',
+        initials: 'DP',
+        avatarColor: '#9C27B0'
+      },
+      {
+        id: 2,
+        name: 'Catalinap Haagy',
+        designation: 'ACCOUNT SUPERINTENDENT',
+        department: 'Dept of Project management',
+        initials: 'CH',
+        avatarColor: '#009688'
+      },
+      {
+        id: 3,
+        name: 'Sonar Funkn Dot Content Creator',
+        designation: 'Administrative Medical Officer',
+        department: 'Dept of Project management',
+        initials: 'SF',
+        avatarColor: '#9C27B0'
+      }
+    ]
+    this.filteredUsers = [...this.enrolledUsers]
+  }
+
+  onSearchChange() {
+    const term = this.searchTerm.toLowerCase()
+    if (term) {
+      this.filteredUsers = this.enrolledUsers.filter(user =>
+        user.name.toLowerCase().includes(term) ||
+        user.designation.toLowerCase().includes(term) ||
+        user.department.toLowerCase().includes(term)
+      )
+    } else {
+      this.filteredUsers = [...this.enrolledUsers]
+    }
+  }
+
+  viewUserDetails(user: any) {
+    console.log('View details for:', user)
   }
 
   getRoutingDetails() {
