@@ -110,7 +110,7 @@ export class BatchDetailsComponent {
     }
     this.externalTrainingsSvc.getParticipantsList(request).subscribe((response) => {
       if (response && response.userlist) {
-        //this.enrolledUsers = response.userlist
+        this.enrolledUsers = response.userlist
         this.learnersCount = response.totalCount || 0
         this.filteredUsers = [...this.enrolledUsers]
       }
