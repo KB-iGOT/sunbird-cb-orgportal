@@ -352,4 +352,9 @@ export class FileLogsComponent {
     this.lastIndex = this.startIndex + _event.pageSize
   }
 
+  handleDownloadFile(listObj: any): void {
+    const filePath = `/apis/proxies/v8/user/v1/bulkuser/download/${listObj.fileName}`
+    window.open(filePath, '_blank')
+  }
+
 }

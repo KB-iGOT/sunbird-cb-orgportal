@@ -39,7 +39,7 @@
             <span class="date-label">Users</span>
             <div class="date-value">
               <mat-icon class="date-icon">people</mat-icon>
-              <span>{{ enrolledUsers?.length || 0 }}</span>
+              <span>{{ learnersCount || 0 }}</span>
             </div>
           </div>
         </div>
@@ -49,7 +49,7 @@
 
   <!-- Tabs Section -->
   <ng-container *ngIf="!isLoading && currentBatch">
-    <mat-tab-group [(selectedIndex)]="selectedTabIndex" class="batch-tabs mt-4 external-traings">
+    <mat-tab-group [(selectedIndex)]="selectedTabIndex" class="batch-tabs mt-2 external-traings">
       <!-- Enrolled Users Tab -->
       <mat-tab label="Enrolled Users">
         <ng-container *ngIf="filteredUsers?.length > 0; else noLearners">
@@ -65,10 +65,10 @@
             <ng-container *ngFor="let user of filteredUsers">
               <div class="learner-card">
                 <div class="learner-content">
-                  <ws-widget-avatar-photo [name]="user?.name" [photoUrl]="user?.photo" size="m">
+                  <ws-widget-avatar-photo [name]="user?.first_name" [photoUrl]="user?.photo" size="m">
                   </ws-widget-avatar-photo>
                   <div class="learner-info">
-                    <div class="learner-name">{{ user.name }}</div>
+                    <div class="learner-name">{{ user.first_name }}</div>
                     <div class="learner-designation">{{ user.designation }}</div>
                     <div class="learner-department">{{ user.department }}</div>
                   </div>
@@ -79,7 +79,7 @@
         </ng-container>
 
         <ng-template #noLearners>
-          <div class="no-learners-message">
+          <div class="no-learners-message mt-6">
             <mat-icon class="no-learners-icon">people_outline</mat-icon>
             <p class="no-learners-text">No learners enrolled in this batch yet</p>
           </div>

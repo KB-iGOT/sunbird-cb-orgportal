@@ -10,6 +10,7 @@ const API_END_POINTS = {
   STATUS_UPDATE: '/apis/proxies/v8/learner/achievement/status/update',
   GET_ACHIEVEMENT_DETAILS: (achievementId: string) => `/apis/proxies/v8/learner/achievement/${achievementId}`,
   GET_EXTERNAL_TRAINING_DETAILS: (identifier: string) => `/apis/proxies/v8/externaltraining/v4/read/${identifier}`,
+  GET_PARTICIPANTS_LIST: '/apis/proxies/v8/externaltraining/v1/batch/getParticipants',
 }
 @Injectable({
   providedIn: 'root'
@@ -51,6 +52,10 @@ export class ExternalTrainingsService {
 
   getExternalTrainingDetails(identifier: string): Observable<any> {
     return this.http.get<any>(API_END_POINTS.GET_EXTERNAL_TRAINING_DETAILS(identifier))
+  }
+
+  getParticipantsList(request: any): Observable<any> {
+    return this.http.post<any>(API_END_POINTS.GET_PARTICIPANTS_LIST, request)
   }
 
 }

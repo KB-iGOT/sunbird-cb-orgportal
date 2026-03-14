@@ -22,7 +22,8 @@ export class BatchDetailsComponent {
   enrolledUsers: any[] = []
   filteredUsers: any[] = []
   searchTerm = ''
-
+  currentPage: number = 0
+  learnersCount: number = 0
   constructor(
     private route: ActivatedRoute,
     private loaderService: LoaderService,
@@ -34,27 +35,6 @@ export class BatchDetailsComponent {
 
   ngOnInit() {
     this.getRoutingDetails()
-    this.enrolledUsers = [
-      {
-        id: 1,
-        name: 'DoPM Program Coordinator',
-        designation: 'Additional Chief Election Commissioner',
-        department: 'Dept of Project management',
-      },
-      {
-        id: 2,
-        name: 'Catalinap Haagy',
-        designation: 'ACCOUNT SUPERINTENDENT',
-        department: 'Dept of Project management',
-      },
-      {
-        id: 3,
-        name: 'Sonar Funkn Dot Content Creator',
-        designation: 'Administrative Medical Officer',
-        department: 'Dept of Project management',
-      }
-    ]
-    this.filteredUsers = [...this.enrolledUsers]
   }
 
   onSearchChange() {
@@ -108,12 +88,36 @@ export class BatchDetailsComponent {
         if (this.batches.length > 0) {
           this.currentBatch = this.batches.find((batch: any) => batch.batchId === this.batchId)
         }
+        this.getUsers()
       }, error => {
         this.loaderService.changeLoaderState(false)
         this.isLoading = false
         console.error('Error fetching training details:', error)
       }
     )
+  }
+
+  getUsers() {
+    const request: any = {
+      request: {
+        filters: {
+          active: true,
+          batchId: this.currentBatch.batchId,
+          limit: 200,
+          currentOffSet: this.currentPage
+        }
+      }
+    }
+    this.externalTrainingsSvc.getParticipantsList(request).subscribe((response) => {
+      if (response && response.userlist) {
+        //this.enrolledUsers = response.userlist
+        this.learnersCount = response.totalCount || 0
+        this.filteredUsers = [...this.enrolledUsers]
+      }
+    }, error => {
+      console.log('Error fetching participants list:', error)
+    })
+
   }
 
   navigateToExternalTrainings() {
