@@ -12,6 +12,7 @@ export class BatchesComponent implements OnInit {
   batches: any[] = []
   training: any = {}
   isLoading = false
+  durationInMinutes = 0
   constructor(private externalTrainingsSvc: ExternalTrainingsService,
     private route: ActivatedRoute,
     private loaderService: LoaderService,
@@ -39,6 +40,7 @@ export class BatchesComponent implements OnInit {
         const event = _.get(response, 'result.event', {})
         const durationInSeconds = event.duration || 0
         const hours = durationInSeconds / 3600
+        this.durationInMinutes = Math.round(durationInSeconds / 60)
         const learningHours = Number.isInteger(hours)
           ? `${hours} Hour${hours !== 1 ? 's' : ''}`
           : `${hours.toFixed(2)} Hours`
@@ -55,7 +57,6 @@ export class BatchesComponent implements OnInit {
         this.batches = event.batches || []
         this.loaderService.changeLoaderState(false)
         this.isLoading = false
-        console.log('Batches:', this.batches)
       }, error => {
         this.loaderService.changeLoaderState(false)
         this.isLoading = false

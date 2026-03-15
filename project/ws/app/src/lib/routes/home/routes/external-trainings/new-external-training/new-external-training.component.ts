@@ -98,7 +98,7 @@ export class NewExternalTrainingComponent implements OnInit {
   initializeForm(): void {
     this.trainingForm = this.fb.group({
       trainingTitle: ['', Validators.required],
-      learningObjective: [''],
+      learningObjective: ['', Validators.maxLength(500)],
       deliveryMode: [''],
       learningHours: [''],
       trainingType: ['', Validators.required],
@@ -404,6 +404,7 @@ export class NewExternalTrainingComponent implements OnInit {
         next: (result) => {
           if (_.get(result, 'result.identifier')) {
             this.openSnackbar('Training created and published successfully.')
+            this.externalTrainingsSvc.setTrainingName(this.trainingForm.value.trainingTitle)
             this.navigateToCreateBatch(_.get(result, 'result.identifier'))
           }
         },

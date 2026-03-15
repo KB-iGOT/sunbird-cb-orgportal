@@ -32,13 +32,17 @@ export class CreateBatchComponent implements OnInit {
   configSvc: any
   isEditMode = false
   currentBatch: any = null
+  eventDurationInMinutes = 0
+  todayDate = new Date()
 
-  get startDateValue(): string {
-    return this.batchForm?.get('startDate')?.value || ''
+  get startDateAsDate(): Date | null {
+    const val = this.batchForm?.get('startDate')?.value
+    return val ? new Date(val) : null
   }
 
-  get endDateValue(): string {
-    return this.batchForm?.get('endDate')?.value || ''
+  get endDateAsDate(): Date | null {
+    const val = this.batchForm?.get('endDate')?.value
+    return val ? new Date(val) : null
   }
 
   get isSubmitDisabled(): boolean {
@@ -62,16 +66,16 @@ export class CreateBatchComponent implements OnInit {
     this.configSvc = this.route.snapshot.data['configService']
 
     this.initializeForm()
+    this.getBatchDetails()
 
     // Check for batchId in query parameters to determine edit mode
     this.route.queryParams.subscribe(params => {
       this.batchId = params['batchId'] || ''
-      this.isEditMode = !!this.batchId
+      this.isEditMode = this.batchId !== ''
 
       if (this.isEditMode) {
         // Disable form and get batch details
         this.batchForm.disable()
-        this.getBatchDetails()
       }
     })
   }
@@ -95,19 +99,20 @@ export class CreateBatchComponent implements OnInit {
       next: (response: any) => {
         const event = _.get(response, 'result.event', {})
         const batches = event.batches || []
+        this.eventDurationInMinutes = Math.round((event.duration || 0) / 60)
 
         // Find current batch by batchId
         this.currentBatch = batches.find((batch: any) => batch.batchId === this.batchId)
 
-        if (this.currentBatch) {
+        if (this.currentBatch && this.isEditMode) {
           this.patchFormWithBatchData()
         }
 
         this.loaderService.changeLoaderState(false)
       },
       error: (error) => {
-        console.error('Error fetching batch details:', error)
-        this.matSnackBar.open('Error fetching batch details', 'Close', { duration: 3000 })
+        const errorMessage = _.get(error, 'error.params.errmsg', 'Error fetching batch details')
+        this.matSnackBar.open(errorMessage, 'Close', { duration: 3000 })
         this.loaderService.changeLoaderState(false)
       }
     })
@@ -117,8 +122,8 @@ export class CreateBatchComponent implements OnInit {
     if (this.currentBatch && this.batchForm) {
       this.batchForm.patchValue({
         batchName: this.currentBatch.name || '',
-        startDate: this.currentBatch.startDate || '',
-        endDate: this.currentBatch.endDate || ''
+        startDate: this.currentBatch.startDate ? new Date(this.currentBatch.startDate) : null,
+        endDate: this.currentBatch.endDate ? new Date(this.currentBatch.endDate) : null,
       })
     }
   }
@@ -218,6 +223,9 @@ export class CreateBatchComponent implements OnInit {
           startDate: this.formatDate(new Date(_.get(form, 'startDate'))),
           endDate: this.formatDate(new Date(_.get(form, 'endDate'))),
           createdBy: _.get(this.configSvc, 'userProfile.userId'),
+          batchAttributes: {
+            duration: this.eventDurationInMinutes
+          }
         },
       }
 

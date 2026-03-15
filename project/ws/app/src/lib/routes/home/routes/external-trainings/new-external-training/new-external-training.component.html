@@ -11,98 +11,116 @@
   </div>
 
   <div class="form-container">
-    <form [formGroup]="trainingForm">
+    <form [formGroup]="trainingForm" class="flex flex-col gap-4">
       <div class="section-header">
         <h2>Training / Workshop Details</h2>
       </div>
 
       <!-- Training Title -->
-      <div class="form-field">
-        <label for="trainingTitle" class="required">Training Title</label>
-        <input id="trainingTitle" type="text" formControlName="trainingTitle"
-          placeholder="Enter the full title of the training program" class="input-field" />
+      <div class="flex flex-column gap-2 event-form round-control">
+        <div class="form-lable required">Training Title</div>
+        <mat-form-field appearance="outline">
+          <input matInput placeholder="Enter the full title of the training program" formControlName="trainingTitle" />
+          <mat-error *ngIf="trainingForm.get('trainingTitle')?.hasError('required')">
+            Training title is required.
+          </mat-error>
+        </mat-form-field>
       </div>
 
       <!-- Learning Objective -->
-      <div class="form-field">
-        <label for="learningObjective">Learning Objective</label>
-        <textarea id="learningObjective" formControlName="learningObjective"
-          placeholder="Describe the key learning outcomes and goals" rows="4"
-          class="input-field textarea-field"></textarea>
+      <div class="flex flex-column gap-2 event-form">
+        <div class="form-lable">Learning Objective</div>
+        <mat-form-field appearance="outline">
+          <textarea matInput placeholder="Describe the key learning outcomes and goals"
+            formControlName="learningObjective" rows="4" maxlength="500"></textarea>
+          <mat-hint align="end">{{trainingForm.get('learningObjective')?.value?.length || 0}}/500</mat-hint>
+          <mat-error *ngIf="trainingForm.get('learningObjective')?.hasError('maxlength')">
+            Maximum 500 characters allowed.
+          </mat-error>
+        </mat-form-field>
       </div>
 
       <!-- Delivery Mode, Learning Hours, Training Type Row -->
       <div class="form-row">
         <!-- Delivery Mode -->
-        <div class="form-field form-field-third">
-          <label for="deliveryMode">Delivery Mode</label>
-          <select id="deliveryMode" formControlName="deliveryMode" class="input-field select-field">
-            <option value="">Select Delivery Mode</option>
-            <option *ngFor="let mode of deliveryModeList | keyvalue" [value]="mode.key">{{ mode.value }}</option>
-          </select>
+        <div class="flex flex-column gap-2 event-form round-control">
+          <div class="form-lable">Delivery Mode</div>
+          <mat-form-field appearance="outline">
+            <mat-select placeholder="Select Delivery Mode" formControlName="deliveryMode">
+              <mat-option *ngFor="let mode of deliveryModeList | keyvalue" [value]="mode.key">{{ mode.value
+                }}</mat-option>
+            </mat-select>
+          </mat-form-field>
         </div>
 
         <!-- Learning Hours -->
-        <div class="form-field form-field-third">
-          <label for="learningHours">Learning Hours</label>
-          <input id="learningHours" type="number" formControlName="learningHours" placeholder="Total duration in hours"
-            class="input-field" />
+        <div class="flex flex-column gap-2 event-form round-control">
+          <div class="form-lable">Learning Hours</div>
+          <mat-form-field appearance="outline">
+            <input matInput type="number" placeholder="Total duration in hours" formControlName="learningHours" />
+          </mat-form-field>
         </div>
 
         <!-- Training Type -->
-        <div class="form-field form-field-third">
-          <label for="trainingType" class="required">Training Type</label>
-          <select id="trainingType" formControlName="trainingType" class="input-field select-field">
-            <option value="">Select Training Type</option>
-            <option value="Domestic Training">Domestic Training</option>
-            <option value="Foreign Training">Foreign Training</option>
-            <option value="In Service Training">In Service Training</option>
-            <option value="Mid-Career Training">Mid-Career Training</option>
-            <option value="Other Training">Other Training</option>
-          </select>
+        <div class="flex flex-column gap-2 event-form round-control">
+          <div class="form-lable required">Training Type</div>
+          <mat-form-field appearance="outline">
+            <mat-select placeholder="Select Training Type" formControlName="trainingType">
+              <mat-option value="Domestic Training">Domestic Training</mat-option>
+              <mat-option value="Foreign Training">Foreign Training</mat-option>
+              <mat-option value="In Service Training">In Service Training</mat-option>
+              <mat-option value="Mid-Career Training">Mid-Career Training</mat-option>
+              <mat-option value="Other Training">Other Training</mat-option>
+            </mat-select>
+            <mat-error *ngIf="trainingForm.get('trainingType')?.hasError('required')">
+              Training type is required.
+            </mat-error>
+          </mat-form-field>
         </div>
       </div>
 
       <!-- Partner Name and Partner Logo Row -->
       <div class="form-row">
         <!-- Partner Name -->
-        <div class="form-field form-field-half">
-          <label for="partnerName">Partner Name
+        <div class="flex flex-column gap-2 event-form round-control">
+          <div class="form-lable">Partner Name
             <mat-icon class="info-icon"
               matTooltip="Please fill if this training is jointly conducted with a partner organization"
               matTooltipPosition="above">
               info_outlined
             </mat-icon>
-          </label>
-          <input id="partnerName" type="text" formControlName="partnerName"
-            placeholder="Enter training partner or organization name" class="input-field" />
+          </div>
+          <mat-form-field appearance="outline">
+            <input matInput placeholder="Enter training partner or organization name" formControlName="partnerName" />
+          </mat-form-field>
         </div>
 
         <!-- Partner Logo -->
-        <div class="form-field form-field-half">
-          <label for="partnerLogo">Partner Logo
+        <div class="flex flex-column gap-2 event-form round-control">
+          <div class="form-lable">Partner Logo
             <mat-icon class="info-icon" matTooltip="Please upload the logo of the partner organization"
               matTooltipPosition="above">
               info_outlined
             </mat-icon>
-          </label>
-          <div class="file-upload-container">
-            <input type="text" [value]="logoFileName || 'No file selected'" readonly class="input-field file-display" />
-            <div class="upload-section" *ngIf="!logoUploaded && !isLogoMerging" (click)="fileInput.click()"
-              (keydown.enter)="fileInput.click()">
-              <mat-icon>image_arrow_up</mat-icon>
-              <span class="upload-text">Upload Logo</span>
+          </div>
+          <mat-form-field appearance="outline" class="disable-round w-full">
+            <input matInput [value]="logoFileName || 'No file selected'" readonly />
+            <div matSuffix class="logo-suffix">
+              <div class="upload-section" *ngIf="!logoUploaded && !isLogoMerging" (click)="fileInput.click()"
+                (keydown.enter)="fileInput.click()">
+                <mat-icon>image_arrow_up</mat-icon>
+                <span class="upload-text">Upload Logo</span>
+              </div>
+              <div class="upload-section" *ngIf="isLogoMerging">
+                <span class="upload-text">Merging...</span>
+              </div>
+              <button mat-icon-button *ngIf="logoUploaded && !isLogoMerging" (click)="removeUploadedLogo()">
+                <mat-icon class="cancel-icon">close</mat-icon>
+              </button>
             </div>
-            <div class="upload-section" *ngIf="isLogoMerging">
-              <span class="upload-text">Merging...</span>
-            </div>
-            <button mat-icon-button class="cancel-upload-btn" *ngIf="logoUploaded && !isLogoMerging"
-              (click)="removeUploadedLogo()">
-              <mat-icon>close</mat-icon>
-            </button>
             <input #fileInput type="file" (change)="onFileSelected($event)" accept=".svg,image/svg+xml"
               style="display: none;" />
-          </div>
+          </mat-form-field>
         </div>
       </div>
       <div class="certificate-preview mb-5">

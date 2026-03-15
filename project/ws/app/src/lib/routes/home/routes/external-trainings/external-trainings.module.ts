@@ -22,6 +22,8 @@ import { UIORGTableModule } from '@sunbird-cb/collection'
 import { MatLegacyProgressSpinnerModule as MatProgressSpinnerModule } from '@angular/material/legacy-progress-spinner'
 import { MatExpansionModule } from '@angular/material/expansion'
 import { MatDialogModule } from '@angular/material/dialog'
+import { MatDatepickerModule } from '@angular/material/datepicker'
+import { MatNativeDateModule } from '@angular/material/core'
 import { ListComponent } from './list/list.component'
 import { ExternalTrainingsRoutingModule } from './external-trainings-routing.module'
 import { ExternalTrainingsService } from '../../services/external-trainings.service'
@@ -85,6 +87,8 @@ import { PipeOrderByModule } from '@sunbird-cb/utils-v2'
     UIORGTableModule,
     MatProgressSpinnerModule,
     MatExpansionModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
     CompetenciesModule,
     MatLegacySnackBarModule,
     AvatarPhotoModule,

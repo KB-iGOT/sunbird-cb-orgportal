@@ -1,3 +1,5 @@
+@import 'round-controls';
+
 .create-batch-container {
   padding: 24px 0;
 }
@@ -48,52 +50,14 @@
   margin-bottom: 32px;
 }
 
-.form-field {
-  label {
-    display: block;
-    font-size: 14px;
-    font-weight: 700;
-    margin-bottom: 8px!important;
-    color: #000;
-  }
+.form-lable {
+  /* stylelint-disable */
+  font: 700 14px Lato;
+  /* stylelint-enable */
 
-  .input-field {
-    width: 100%;
-    padding: 12px;
-    font-size: 14px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    outline: none;
-    transition: border-color 0.2s;
-    box-sizing: border-box;
-
-    &:focus {
-      border-color: #6200ea;
-    }
-
-    &::placeholder {
-      color: #999;
-    }
-
-    &[readonly] {
-      background-color: #f5f5f5;
-      color: #666;
-      cursor: default;
-      border-color: #e0e0e0;
-
-      &:focus {
-        border-color: #e0e0e0;
-        box-shadow: none;
-      }
-    }
-  }
-
-  .date-field {
-    cursor: pointer;
-
-    &[readonly] {
-      cursor: default;
-    }
+  &.required::after {
+    content: ' *';
+    color: #f44336;
   }
 }
 
