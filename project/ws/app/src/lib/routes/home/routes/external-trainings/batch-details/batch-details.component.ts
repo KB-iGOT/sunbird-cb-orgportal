@@ -50,10 +50,6 @@ export class BatchDetailsComponent {
     }
   }
 
-  viewUserDetails(user: any) {
-    console.log('View details for:', user)
-  }
-
   getRoutingDetails() {
     this.trainingId = this.route.snapshot.params['id']
     this.batchId = this.route.snapshot.params['batchId']
