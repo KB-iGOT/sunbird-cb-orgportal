@@ -1,3 +1,5 @@
+@import 'round-controls';
+
 .create-batch-container {
   padding: 24px 0;
 }
@@ -48,36 +50,28 @@
   margin-bottom: 32px;
 }
 
-.form-field {
-  label {
-    display: block;
-    font-size: 14px;
-    font-weight: 700;
-    margin-bottom: 8px!important;
-    color: #000;
+.form-lable {
+  /* stylelint-disable */
+  font: 700 14px Lato;
+  /* stylelint-enable */
+
+  &.required::after {
+    content: ' *';
+    color: #f44336;
   }
+}
 
-  .input-field {
-    width: 100%;
-    padding: 12px;
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+
+  p {
+    margin-top: 16px;
     font-size: 14px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    outline: none;
-    transition: border-color 0.2s;
-    box-sizing: border-box;
-
-    &:focus {
-      border-color: #6200ea;
-    }
-
-    &::placeholder {
-      color: #999;
-    }
-  }
-
-  .date-field {
-    cursor: pointer;
+    color: #666;
   }
 }
 
@@ -230,6 +224,10 @@
   font-weight: 700;
   font-size: 14px;
   border-radius: 24px;
+
+  &:disabled {
+    opacity: 0.6;
+  }
 }
 
 .cancel-batch {

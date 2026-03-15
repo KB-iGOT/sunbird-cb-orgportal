@@ -4,8 +4,8 @@
     <h2 class="training-title">{{ training.title }}</h2>
     <div class="info-grid">
       <div class="info-block">
-        <span class="info-label">TRAINING TYPE</span>
-        <span class="info-value">{{ training.learningType }}</span>
+        <span class="info-label">Training Type</span>
+        <span class="info-value">{{ training.categoryType }}</span>
       </div>
       <div class="info-block">
         <span class="info-label">DELIVERY MODE</span>
@@ -15,14 +15,12 @@
         <span class="info-label">LEARNING HOURS</span>
         <span class="info-value">{{ training.learningHours }}</span>
       </div>
-      <div class="info-block">
-        <span class="info-label">Training Type</span>
-        <span class="info-value">{{ training.categoryType }}</span>
-      </div>
-      <!-- <div class="info-block">
-        <span class="info-label">PARTNER NAME</span>
-        <span class="info-value">{{ training.partnerName }}</span>
-      </div> -->
+      <ng-container *ngIf="training.partnerName">
+        <div class="info-block">
+          <span class="info-label">PARTNER NAME</span>
+          <span class="info-value">{{ training.partnerName }}</span>
+        </div>
+      </ng-container>
     </div>
 
     <div class="objective-section">

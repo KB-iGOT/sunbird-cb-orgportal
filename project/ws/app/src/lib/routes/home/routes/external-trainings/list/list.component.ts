@@ -21,7 +21,6 @@ export class ListComponent implements OnInit, AfterViewInit {
 
   // Data Properties
   externalTrainingsData: any = []
-  fetchContentDone = false
   totalCount = 0
   dataSource = new MatTableDataSource<any>([])
 
@@ -31,7 +30,7 @@ export class ListComponent implements OnInit, AfterViewInit {
   searchQuery = ''
 
   // Table columns
-  displayedColumns: string[] = ['name', 'deliveryMode', 'duration', 'createdOn', 'actions']
+  displayedColumns: string[] = ['name', 'deliveryMode', 'categoryType', 'duration', 'createdOn', 'actions']
 
   // Config
   configSvc: any
@@ -69,7 +68,6 @@ export class ListComponent implements OnInit, AfterViewInit {
   // API call
   getExternalTrainings() {
     this.loaderService.changeLoaderState(true)
-    this.fetchContentDone = false
 
     const payload: any = {
       locale: ['en'],
@@ -115,7 +113,6 @@ export class ListComponent implements OnInit, AfterViewInit {
       },
       error: () => {
         this.loaderService.changeLoaderState(false)
-        this.fetchContentDone = true
       },
     })
   }
@@ -124,7 +121,6 @@ export class ListComponent implements OnInit, AfterViewInit {
   convertDataForTable() {
     this.dataSource = new MatTableDataSource(this.externalTrainingsData)
     this.setupTableSorting()
-    this.fetchContentDone = true
     this.loaderService.changeLoaderState(false)
   }
 

@@ -1,3 +1,5 @@
+@import 'round-controls';
+
 .external-training-container {
   padding: 24px;
 }
@@ -51,50 +53,14 @@
   color: #000;
 }
 
-.form-field {
-  margin-bottom: 24px;
+.form-lable {
+  /* stylelint-disable */
+  font: 700 14px Lato;
+  /* stylelint-enable */
 
-  label {
-    display: block;
-    font-size: 14px;
-    font-weight: 700;
-    margin-bottom: 8px;
-    color: #000;
-  }
-
-  .input-field {
-    width: 100%;
-    padding: 12px;
-    font-size: 14px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    outline: none;
-    transition: border-color 0.2s;
-    box-sizing: border-box;
-
-    &:focus {
-      border-color: #1976d2;
-    }
-
-    &::placeholder {
-      color: #999;
-    }
-  }
-
-  .textarea-field {
-    resize: vertical;
-    min-height: 100px;
-    font-family: inherit;
-  }
-
-  .select-field {
-    background-color: #fff;
-    cursor: pointer;
-    appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23333' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 12px center;
-    padding-right: 36px;
+  &.required::after {
+    content: ' *';
+    color: #f44336;
   }
 }
 
@@ -103,58 +69,40 @@
   gap: 16px;
   margin-bottom: 24px;
 
-  .form-field-third {
+  .event-form {
     flex: 1;
-    margin-bottom: 0;
-  }
-
-  .form-field-half {
-    flex: 1;
-    margin-bottom: 0;
   }
 }
 
-.file-upload-container {
-  position: relative;
-
-  .file-display {
-    flex: 1;
-    cursor: default;
-  }
-
-  .upload-button {
-    flex-shrink: 0;
-    white-space: nowrap;
-
-    mat-icon {
-      margin-right: 8px;
-    }
-  }
+.logo-suffix {
+  display: flex;
+  align-items: center;
 
   .upload-section {
-    top:10px;
-    right: 15px;
-    position: absolute;
     display: flex;
     align-items: center;
-    gap: 0px;
+    gap: 4px;
     cursor: pointer;
     color: #1b4ca1;
 
     mat-icon {
       font-size: 18px;
+      height: 18px;
+      width: 18px;
     }
 
     .upload-text {
-      padding-bottom: 8px
+      font-size: 13px;
+      font-weight: 600;
+      white-space: nowrap;
     }
   }
 
-  .cancel-upload-btn {
-    position: absolute;
-    top: 5px;
-    right: 10px;
+  .cancel-icon {
     color: #f44336;
+    font-size: 18px;
+    height: 18px;
+    width: 18px;
   }
 }
 
@@ -254,4 +202,12 @@
       width: 100%;
     }
   }
+}
+
+
+.info-icon {
+    font-size: 14px !important;
+    color: #0009;
+    height: 14px;
+    width: 14px;
 }

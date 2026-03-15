@@ -14,25 +14,49 @@
   <div class="batch-details-card">
     <h2 class="section-title">Batch Details</h2>
 
-    <form [formGroup]="batchForm">
+    <form [formGroup]="batchForm" *ngIf="batchForm">
       <div class="form-row">
         <!-- Batch Name -->
-        <div class="form-field">
-          <label for="batchName" class="required">Batch Name</label>
-          <input id="batchName" type="text" formControlName="batchName" placeholder="Enter the batch name (e.g., Q3 Leadership Training)"
-            class="input-field" />
+        <div class="flex flex-column gap-2 event-form round-control">
+          <div class="form-lable required">Batch Name</div>
+          <mat-form-field appearance="outline" class="disable-round">
+            <input matInput placeholder="Enter the batch name (e.g., Q3 Leadership Training)"
+              formControlName="batchName" [readonly]="isEditMode" />
+            <mat-error *ngIf="!isEditMode && batchForm.get('batchName')?.hasError('required')">
+              Batch name is required.
+            </mat-error>
+          </mat-form-field>
         </div>
 
         <!-- Start Date -->
-        <div class="form-field">
-          <label for="startDate" class="required">Start Date</label>
-          <input id="startDate" type="date" formControlName="startDate" placeholder="mm/dd/yyyy" class="input-field date-field" />
+        <div class="flex flex-column gap-2 event-form round-control">
+          <div class="form-lable required">Start Date</div>
+          <mat-form-field appearance="outline" class="disable-round">
+            <input matInput [matDatepicker]="startPicker" [max]="endDateAsDate || todayDate" formControlName="startDate"
+              placeholder="mm/dd/yyyy" readonly />
+            <mat-datepicker-toggle matSuffix [for]="startPicker"></mat-datepicker-toggle>
+            <mat-datepicker #startPicker [disabled]="isEditMode"></mat-datepicker>
+            <mat-error *ngIf="!isEditMode && batchForm.get('startDate')?.hasError('required')">
+              Start date is required.
+            </mat-error>
+          </mat-form-field>
         </div>
 
         <!-- End Date -->
-        <div class="form-field">
-          <label for="endDate" class="required">End Date</label>
-          <input id="endDate" type="date" formControlName="endDate" placeholder="mm/dd/yyyy" class="input-field date-field" />
+        <div class="flex flex-column gap-2 event-form round-control">
+          <div class="form-lable required">End Date</div>
+          <mat-form-field appearance="outline" class="disable-round">
+            <input matInput [matDatepicker]="endPicker" [min]="startDateAsDate" [max]="todayDate"
+              formControlName="endDate" placeholder="mm/dd/yyyy" readonly />
+            <mat-datepicker-toggle matSuffix [for]="endPicker"></mat-datepicker-toggle>
+            <mat-datepicker #endPicker [disabled]="isEditMode"></mat-datepicker>
+            <mat-error *ngIf="!isEditMode && batchForm.get('endDate')?.hasError('required')">
+              End date is required.
+            </mat-error>
+            <mat-error *ngIf="!isEditMode && batchForm.get('endDate')?.hasError('endBeforeStart')">
+              End date cannot be before start date.
+            </mat-error>
+          </mat-form-field>
         </div>
       </div>
 
@@ -44,6 +68,8 @@
             <li>Keep the row of the items you wish to process</li>
             <li>Keep the row of the items you wish to process</li>
             <li>Delete the entire row you donot intend to process</li>
+            <li>A maximum of 200 user records can be uploaded in a single batch.</li>
+            <li>To upload additional users, please create a new batch.</li>
           </ol>
           <button type="button" mat-stroked-button class="download-button" (click)="downloadSampleFile()">
             Download Sample File
@@ -51,9 +77,10 @@
         </div>
 
         <div class="file-upload-box">
-          <div class="drop-zone" (drop)="onFileDrop($event)" (dragover)="onDragOver($event)" (dragleave)="onDragLeave($event)"
-            [class.drag-over]="isDragOver">
-            <div class="browse-files-text">Browse files</div>
+          <div class="drop-zone" (drop)="onFileDrop($event)" (dragover)="onDragOver($event)"
+            (dragleave)="onDragLeave($event)" [class.drag-over]="isDragOver">
+            <div class="browse-files-text" (click)="fileInput.click()" (keydown.enter)="fileInput.click()">Browse files
+            </div>
             <p class="or-text">Or</p>
             <p class="drag-text">Drag file to upload</p>
 
@@ -80,7 +107,7 @@
       <button mat-stroked-button class="cancel-batch" (click)="onCancel()">
         Cancel
       </button>
-      <button mat-raised-button color="primary" class="submit-batch" [disabled]="!batchForm.valid || !uploadedFile" (click)="onSubmit()">
+      <button mat-raised-button color="primary" class="submit-batch" [disabled]="isSubmitDisabled" (click)="onSubmit()">
         Submit
       </button>
     </div>

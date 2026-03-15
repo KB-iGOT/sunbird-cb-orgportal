@@ -10,6 +10,12 @@ const API_END_POINTS = {
   STATUS_UPDATE: '/apis/proxies/v8/learner/achievement/status/update',
   GET_ACHIEVEMENT_DETAILS: (achievementId: string) => `/apis/proxies/v8/learner/achievement/${achievementId}`,
   GET_EXTERNAL_TRAINING_DETAILS: (identifier: string) => `/apis/proxies/v8/externaltraining/v4/read/${identifier}`,
+  CREATE_BARCH: '/apis/proxies/v8/externaltraining/batch/create',
+  BULK_UPLOAD: (eventId: string, batchId: string) => `/apis/proxies/v8/externaltraining/v1/bulkupload/${eventId}/${batchId}`,
+  BULK_UPLOAD_SAMPLE: '/apis/proxies/v8/externaltraining/v1/bulkupload/sample',
+  UPLOAD_TEMPLATE: '/apis/proxies/v8/storage/v1/uploadCiosIcon',
+  // TODO: Replace with real API endpoint when available
+  GET_DEFAULT_TEMPLATE: 'assets/images/sample/CourseCertificate_Template.svg',
   GET_PARTICIPANTS_LIST: '/apis/proxies/v8/externaltraining/v1/batch/getParticipants',
   FILE_LOGS: 'apis/proxies/v8/externaltraining/v1/bulkupload/status'
 }
@@ -23,13 +29,22 @@ export class ExternalTrainingsService {
 
   constructor(private http: HttpClient,) { }
 
+  createExternalTraining(request: any): Observable<any> {
+    return this.http.post<any>(API_END_POINTS.CREATE_EXTERNAL_TRAINING, request)
+  }
+
+  uploadTemplate(template: any): Observable<any> {
+    const file = template.get('content') as File
+    const fileName = file.name
+    const newFormData = new FormData()
+    newFormData.append('file', file, fileName)
+    return this.http.post<any>(API_END_POINTS.UPLOAD_TEMPLATE, newFormData)
+  }
+
   setTrainingName(name: string): void {
     this.trainingNameSubject.next(name)
   }
 
-  createExternalTraining(request: any): Observable<any> {
-    return this.http.post<any>(API_END_POINTS.CREATE_EXTERNAL_TRAINING, request)
-  }
 
   publishExternalTraining(formData: any): Observable<any> {
     return this.http.post<any>(API_END_POINTS.PUBLISH_EXTERNAL_TRAINING(formData.request.event.identifier), formData)
@@ -53,6 +68,22 @@ export class ExternalTrainingsService {
 
   getExternalTrainingDetails(identifier: string): Observable<any> {
     return this.http.get<any>(API_END_POINTS.GET_EXTERNAL_TRAINING_DETAILS(identifier))
+  }
+
+  createBatch(request: any): Observable<any> {
+    return this.http.post<any>(API_END_POINTS.CREATE_BARCH, request)
+  }
+
+  getDefaultTemplate(): Observable<Blob> {
+    return this.http.get(API_END_POINTS.GET_DEFAULT_TEMPLATE, { responseType: 'blob' })
+  }
+
+  bulkUsersUpload(formData: FormData, eventId: string, batchId: string): Observable<any> {
+    return this.http.post<any>(API_END_POINTS.BULK_UPLOAD(eventId, batchId), formData)
+  }
+
+  downloadSampleFile(): Observable<Blob> {
+    return this.http.get(API_END_POINTS.BULK_UPLOAD_SAMPLE, { responseType: 'blob' })
   }
 
   getParticipantsList(request: any): Observable<any> {

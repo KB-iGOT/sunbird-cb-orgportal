@@ -41,7 +41,7 @@ export class BatchDetailsComponent {
     const term = this.searchTerm.toLowerCase()
     if (term) {
       this.filteredUsers = this.enrolledUsers.filter(user =>
-        user?.name?.toLowerCase().includes(term) ||
+        user?.first_name?.toLowerCase().includes(term) ||
         user?.designation?.toLowerCase().includes(term) ||
         user?.department?.toLowerCase().includes(term)
       )
