@@ -1,4 +1,4 @@
-<div class="flex flex-col gap-6 bulk-container mt-6">
+<div class="flex flex-col gap-6 bulk-container mt-6" *ngIf="lastUploadList?.length else noData">
   <div class="file-container" *ngFor="let list of lastUploadList | slice : startIndex : lastIndex | orderBy:'dateCreatedOn':'desc'">
     <div class="flex flex-col gap-4">
       <div class="flex flex-row justify-between items-center">
@@ -50,3 +50,10 @@
       (page)="handleChangePage($event)"></mat-paginator>
   </div>
 </div>
+
+<ng-template #noData>
+  <div class="no-data-message mt-6">
+    <mat-icon class="no-data-icon">list_alt</mat-icon>
+    <p class="no-data-text">No file logs exists for this batch.</p>
+  </div>
+</ng-template>

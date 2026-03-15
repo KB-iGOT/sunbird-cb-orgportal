@@ -41,9 +41,9 @@ export class BatchDetailsComponent {
     const term = this.searchTerm.toLowerCase()
     if (term) {
       this.filteredUsers = this.enrolledUsers.filter(user =>
-        user.name.toLowerCase().includes(term) ||
-        user.designation.toLowerCase().includes(term) ||
-        user.department.toLowerCase().includes(term)
+        user?.name?.toLowerCase().includes(term) ||
+        user?.designation?.toLowerCase().includes(term) ||
+        user?.department?.toLowerCase().includes(term)
       )
     } else {
       this.filteredUsers = [...this.enrolledUsers]
@@ -95,6 +95,13 @@ export class BatchDetailsComponent {
         console.error('Error fetching training details:', error)
       }
     )
+  }
+
+  onTabChange() {
+    if (this.selectedTabIndex === 0) {
+      this.filteredUsers = [...this.enrolledUsers]
+      this.searchTerm = ''
+    }
   }
 
   getUsers() {
