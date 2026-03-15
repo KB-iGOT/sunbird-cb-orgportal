@@ -39,9 +39,59 @@
             <span class="date-label">Users</span>
             <div class="date-value">
               <mat-icon class="date-icon">people</mat-icon>
-              <span>{{ currentBatch?.users || 0 }}</span>
+              <span>{{ learnersCount || 0 }}</span>
             </div>
           </div>
         </div>
       </mat-card>
     </ng-container>
+  </div>
+
+  <!-- Tabs Section -->
+  <ng-container *ngIf="!isLoading && currentBatch">
+    <mat-tab-group [(selectedIndex)]="selectedTabIndex" class="batch-tabs mt-2 external-traings" (selectedTabChange)="onTabChange($event)">
+      <!-- Enrolled Users Tab -->
+      <mat-tab label="Enrolled Users">
+        <!-- Search Bar -->
+        <div class="search-container">
+          <mat-form-field class="search-field" appearance="outline">
+            <mat-icon matPrefix class="search-icon">search</mat-icon>
+            <input matInput placeholder="Search for a learner" [(ngModel)]="searchTerm" (ngModelChange)="onSearchChange()">
+          </mat-form-field>
+        </div>
+        <ng-container *ngIf="filteredUsers?.length > 0; else noLearners">
+          <!-- Enrolled Users Grid -->
+          <div class="learners-grid">
+            <ng-container *ngFor="let user of filteredUsers">
+              <div class="learner-card">
+                <div class="learner-content">
+                  <ws-widget-avatar-photo [name]="user?.first_name" [photoUrl]="user?.photo" size="m">
+                  </ws-widget-avatar-photo>
+                  <div class="learner-info">
+                    <div class="learner-name">{{ user.first_name }}</div>
+                    <div class="learner-designation">{{ user.designation }}</div>
+                    <div class="learner-department">{{ user.department }}</div>
+                  </div>
+                </div>
+              </div>
+            </ng-container>
+          </div>
+        </ng-container>
+
+        <ng-template #noLearners>
+          <div class="no-learners-message mt-6">
+            <mat-icon class="no-learners-icon">people_outline</mat-icon>
+            <p class="no-learners-text">No learners enrolled in this batch yet</p>
+          </div>
+        </ng-template>
+      </mat-tab>
+
+      <!-- File Logs Tab -->
+      <mat-tab label="File Logs">
+        <div class="tab-content">
+          <ws-app-file-logs [batchId]="batchId" [trainingId]="trainingId"></ws-app-file-logs>
+        </div>
+      </mat-tab>
+    </mat-tab-group>
+  </ng-container>
+</div>

@@ -16,6 +16,8 @@ const API_END_POINTS = {
   UPLOAD_TEMPLATE: '/apis/proxies/v8/storage/v1/uploadCiosIcon',
   // TODO: Replace with real API endpoint when available
   GET_DEFAULT_TEMPLATE: 'assets/images/sample/CourseCertificate_Template.svg',
+  GET_PARTICIPANTS_LIST: '/apis/proxies/v8/externaltraining/v1/batch/getParticipants',
+  FILE_LOGS: 'apis/proxies/v8/externaltraining/v1/bulkupload/status'
 }
 @Injectable({
   providedIn: 'root'
@@ -82,6 +84,14 @@ export class ExternalTrainingsService {
 
   downloadSampleFile(): Observable<Blob> {
     return this.http.get(API_END_POINTS.BULK_UPLOAD_SAMPLE, { responseType: 'blob' })
+  }
+
+  getParticipantsList(request: any): Observable<any> {
+    return this.http.post<any>(API_END_POINTS.GET_PARTICIPANTS_LIST, request)
+  }
+
+  getFileLogs(trainingId: string, batchId: string): Observable<any> {
+    return this.http.get<any>(`${API_END_POINTS.FILE_LOGS}?eventId=${trainingId}&batchId=${batchId}`)
   }
 
 }
