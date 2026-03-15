@@ -74,10 +74,40 @@
     &::placeholder {
       color: #999;
     }
+
+    &[readonly] {
+      background-color: #f5f5f5;
+      color: #666;
+      cursor: default;
+      border-color: #e0e0e0;
+
+      &:focus {
+        border-color: #e0e0e0;
+        box-shadow: none;
+      }
+    }
   }
 
   .date-field {
     cursor: pointer;
+
+    &[readonly] {
+      cursor: default;
+    }
+  }
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+
+  p {
+    margin-top: 16px;
+    font-size: 14px;
+    color: #666;
   }
 }
 
@@ -230,6 +260,10 @@
   font-weight: 700;
   font-size: 14px;
   border-radius: 24px;
+
+  &:disabled {
+    opacity: 0.6;
+  }
 }
 
 .cancel-batch {

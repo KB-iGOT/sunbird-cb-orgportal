@@ -11,7 +11,8 @@ const API_END_POINTS = {
   GET_ACHIEVEMENT_DETAILS: (achievementId: string) => `/apis/proxies/v8/learner/achievement/${achievementId}`,
   GET_EXTERNAL_TRAINING_DETAILS: (identifier: string) => `/apis/proxies/v8/externaltraining/v4/read/${identifier}`,
   CREATE_BARCH: '/apis/proxies/v8/externaltraining/batch/create',
-  BULK_UPLOAD: '/apis/proxies/v8/externaltraining/v1/bulkUpload',
+  BULK_UPLOAD: (eventId: string, batchId: string) => `/apis/proxies/v8/externaltraining/v1/bulkupload/${eventId}/${batchId}`,
+  BULK_UPLOAD_SAMPLE: '/apis/proxies/v8/externaltraining/v1/bulkupload/sample',
   UPLOAD_TEMPLATE: '/apis/proxies/v8/storage/v1/uploadCiosIcon',
   // TODO: Replace with real API endpoint when available
   GET_DEFAULT_TEMPLATE: 'assets/images/sample/CourseCertificate_Template.svg',
@@ -75,8 +76,12 @@ export class ExternalTrainingsService {
     return this.http.get(API_END_POINTS.GET_DEFAULT_TEMPLATE, { responseType: 'blob' })
   }
 
-  bulkUsersUpload(formData: FormData): Observable<any> {
-    return this.http.post<any>(API_END_POINTS.BULK_UPLOAD, formData)
+  bulkUsersUpload(formData: FormData, eventId: string, batchId: string): Observable<any> {
+    return this.http.post<any>(API_END_POINTS.BULK_UPLOAD(eventId, batchId), formData)
+  }
+
+  downloadSampleFile(): Observable<Blob> {
+    return this.http.get(API_END_POINTS.BULK_UPLOAD_SAMPLE, { responseType: 'blob' })
   }
 
 }

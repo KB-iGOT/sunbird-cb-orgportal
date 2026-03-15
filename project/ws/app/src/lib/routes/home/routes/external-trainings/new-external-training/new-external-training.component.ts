@@ -40,7 +40,7 @@ export class NewExternalTrainingComponent implements OnInit {
   private readonly TARGET_Y_CENTER = 115;
   private readonly TARGET_X_START = 1150;
 
-  private readonly FILE_UPLOAD_MAX_SIZE = 1 * 1024 * 1024 * 1024 // 1GB
+  private readonly FILE_UPLOAD_MAX_SIZE = 1 * 1024 * 1024 // 1MB
 
   constructor(
     private readonly fb: FormBuilder,
@@ -124,7 +124,7 @@ export class NewExternalTrainingComponent implements OnInit {
     }
 
     if (file.size > this.FILE_UPLOAD_MAX_SIZE) {
-      this.openSnackbar('Please upload a file less than 1 GB.')
+      this.openSnackbar('Please upload a file less than 1 MB.')
       return
     }
 

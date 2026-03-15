@@ -67,7 +67,13 @@
       <div class="form-row">
         <!-- Partner Name -->
         <div class="form-field form-field-half">
-          <label for="partnerName">Partner Name</label>
+          <label for="partnerName">Partner Name
+            <mat-icon class="info-icon"
+              matTooltip="Please fill if this training is jointly conducted with a partner organization"
+              matTooltipPosition="above">
+              info_outlined
+            </mat-icon>
+          </label>
           <input id="partnerName" type="text" formControlName="partnerName"
             placeholder="Enter training partner or organization name" class="input-field" />
         </div>
@@ -75,7 +81,7 @@
         <!-- Partner Logo -->
         <div class="form-field form-field-half">
           <label for="partnerLogo">Partner Logo
-            <mat-icon class="info-icon" matTooltip="Only SVG files are accepted. Maximum file size is 1 GB."
+            <mat-icon class="info-icon" matTooltip="Please upload the logo of the partner organization"
               matTooltipPosition="above">
               info_outlined
             </mat-icon>
@@ -101,7 +107,13 @@
       </div>
       <div class="certificate-preview mb-5">
         <div class="certificate-header">
-          <span class="certificate-title">Certificate Preview</span>
+          <span class="certificate-title">Certificate Preview
+            <mat-icon class="info-icon"
+              matTooltip="The certificate shown below will be issued to users who have undertaken this training."
+              matTooltipPosition="above">
+              info_outlined
+            </mat-icon>
+          </span>
           <mat-icon class="certificate-icon">visibility</mat-icon>
         </div>
         <div class="certificate-card">

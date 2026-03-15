@@ -5,6 +5,7 @@ import { ExternalTrainingsService } from '../../../services/external-trainings.s
 import { mergeMap } from 'rxjs/operators'
 import * as _ from 'lodash'
 import { MatLegacySnackBar } from '@angular/material/legacy-snack-bar'
+import { LoaderService } from '../../../../../../../../../../src/app/services/loader.service'
 
 export function endDateValidator(): ValidatorFn {
   return (control: AbstractControl): ValidationErrors | null => {
@@ -27,7 +28,10 @@ export class CreateBatchComponent implements OnInit {
   uploadedFile: File | null = null;
   isDragOver = false;
   trainingId: string = ''
+  batchId: string = ''
   configSvc: any
+  isEditMode = false
+  currentBatch: any = null
 
   get startDateValue(): string {
     return this.batchForm?.get('startDate')?.value || ''
@@ -37,18 +41,39 @@ export class CreateBatchComponent implements OnInit {
     return this.batchForm?.get('endDate')?.value || ''
   }
 
+  get isSubmitDisabled(): boolean {
+    if (this.isEditMode) {
+      return !this.uploadedFile
+    }
+    return !this.batchForm?.valid || !this.uploadedFile
+  }
+
   constructor(
     private readonly fb: FormBuilder,
     private readonly router: Router,
     private readonly route: ActivatedRoute,
     private externalTrainingsSvc: ExternalTrainingsService,
     private matSnackBar: MatLegacySnackBar,
+    private loaderService: LoaderService,
   ) { }
 
   ngOnInit(): void {
     this.trainingId = this.route.parent?.snapshot.params['id'] || ''
     this.configSvc = this.route.snapshot.data['configService']
+
     this.initializeForm()
+
+    // Check for batchId in query parameters to determine edit mode
+    this.route.queryParams.subscribe(params => {
+      this.batchId = params['batchId'] || ''
+      this.isEditMode = !!this.batchId
+
+      if (this.isEditMode) {
+        // Disable form and get batch details
+        this.batchForm.disable()
+        this.getBatchDetails()
+      }
+    })
   }
 
   initializeForm(): void {
@@ -61,6 +86,41 @@ export class CreateBatchComponent implements OnInit {
     this.batchForm.get('startDate')?.valueChanges.subscribe(() => {
       this.batchForm.get('endDate')?.updateValueAndValidity()
     })
+  }
+
+  getBatchDetails(): void {
+    this.loaderService.changeLoaderState(true)
+
+    this.externalTrainingsSvc.getExternalTrainingDetails(this.trainingId).subscribe({
+      next: (response: any) => {
+        const event = _.get(response, 'result.event', {})
+        const batches = event.batches || []
+
+        // Find current batch by batchId
+        this.currentBatch = batches.find((batch: any) => batch.batchId === this.batchId)
+
+        if (this.currentBatch) {
+          this.patchFormWithBatchData()
+        }
+
+        this.loaderService.changeLoaderState(false)
+      },
+      error: (error) => {
+        console.error('Error fetching batch details:', error)
+        this.matSnackBar.open('Error fetching batch details', 'Close', { duration: 3000 })
+        this.loaderService.changeLoaderState(false)
+      }
+    })
+  }
+
+  patchFormWithBatchData(): void {
+    if (this.currentBatch && this.batchForm) {
+      this.batchForm.patchValue({
+        batchName: this.currentBatch.name || '',
+        startDate: this.currentBatch.startDate || '',
+        endDate: this.currentBatch.endDate || ''
+      })
+    }
   }
 
   private formatDate(date: Date): string {
@@ -123,18 +183,31 @@ export class CreateBatchComponent implements OnInit {
   }
 
   downloadSampleFile(): void {
-    // Create sample CSV content
-    const csvContent = 'Participant Name,Email,Phone,Department\nJohn Doe,john@example.com,1234567890,IT\nJane Smith,jane@example.com,0987654321,HR\n'
-    const blob = new Blob([csvContent], { type: 'text/csv' })
-    const url = globalThis.URL.createObjectURL(blob)
-    const link = document.createElement('a')
-    link.href = url
-    link.download = 'sample_participants.csv'
-    link.click()
-    globalThis.URL.revokeObjectURL(url)
+    this.externalTrainingsSvc.downloadSampleFile().subscribe({
+      next: (blob: Blob) => {
+        const url = globalThis.URL.createObjectURL(blob)
+        const link = document.createElement('a')
+        link.href = url
+        link.download = 'sample_participants.csv'
+        link.click()
+        globalThis.URL.revokeObjectURL(url)
+      },
+      error: (error) => {
+        console.error('Error downloading sample file:', error)
+        this.matSnackBar.open('Error downloading sample file', 'Close', { duration: 3000 })
+      }
+    })
   }
 
   onSubmit(): void {
+    if (this.isEditMode) {
+      this.handleEditSubmit()
+    } else {
+      this.handleCreateSubmit()
+    }
+  }
+
+  handleCreateSubmit(): void {
     if (this.batchForm.valid && this.uploadedFile) {
       const form = this.batchForm.value
       const payload = {
@@ -152,11 +225,12 @@ export class CreateBatchComponent implements OnInit {
         mergeMap((createBatchRes: any) => {
           const batchId = _.get(createBatchRes, 'result.batchId')
           const formData = new FormData()
-          formData.append('batchId', batchId)
-          if (this.uploadedFile) {
-            formData.append('file', this.uploadedFile)
-          }
-          return this.externalTrainingsSvc.bulkUsersUpload(formData)
+          formData.append(
+            'file',
+            this.uploadedFile as Blob,
+            (this.uploadedFile as File).name.replace(/[^A-Za-z0-9_.]/g, ''),
+          )
+          return this.externalTrainingsSvc.bulkUsersUpload(formData, this.trainingId, batchId)
         })
       ).subscribe({
         next: () => {
@@ -168,6 +242,30 @@ export class CreateBatchComponent implements OnInit {
           this.matSnackBar.open(errorMessage, 'Close', { duration: 3000 })
         },
       })
+    }
+  }
+
+  handleEditSubmit(): void {
+    if (this.uploadedFile) {
+      const formData = new FormData()
+      formData.append(
+        'file',
+        this.uploadedFile as Blob,
+        (this.uploadedFile as File).name.replace(/[^A-Za-z0-9_.]/g, ''),
+      )
+
+      this.externalTrainingsSvc.bulkUsersUpload(formData, this.trainingId, this.batchId).subscribe({
+        next: () => {
+          this.matSnackBar.open('Participants uploaded successfully to the batch.', 'Close', { duration: 3000 })
+          this.goBack()
+        },
+        error: (err: any) => {
+          const errorMessage = _.get(err, 'error.params.errmsg', 'An error occurred while uploading participants.')
+          this.matSnackBar.open(errorMessage, 'Close', { duration: 3000 })
+        },
+      })
+    } else {
+      this.matSnackBar.open('Please select a CSV file to upload participants.', 'Close', { duration: 3000 })
     }
   }
 
