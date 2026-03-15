@@ -17,7 +17,13 @@ export class BatchDetailsComponent {
   currentBatch: any
   batchId: string = ''
   trainingId: string = ''
-
+  currentTab: string = 'learners'
+  selectedTabIndex = 0
+  enrolledUsers: any[] = []
+  filteredUsers: any[] = []
+  searchTerm = ''
+  currentPage: number = 0
+  learnersCount: number = 0
   constructor(
     private route: ActivatedRoute,
     private loaderService: LoaderService,
@@ -29,6 +35,19 @@ export class BatchDetailsComponent {
 
   ngOnInit() {
     this.getRoutingDetails()
+  }
+
+  onSearchChange() {
+    const term = this.searchTerm.toLowerCase()
+    if (term) {
+      this.filteredUsers = this.enrolledUsers.filter(user =>
+        user?.name?.toLowerCase().includes(term) ||
+        user?.designation?.toLowerCase().includes(term) ||
+        user?.department?.toLowerCase().includes(term)
+      )
+    } else {
+      this.filteredUsers = [...this.enrolledUsers]
+    }
   }
 
   getRoutingDetails() {
@@ -65,12 +84,43 @@ export class BatchDetailsComponent {
         if (this.batches.length > 0) {
           this.currentBatch = this.batches.find((batch: any) => batch.batchId === this.batchId)
         }
+        this.getUsers()
       }, error => {
         this.loaderService.changeLoaderState(false)
         this.isLoading = false
         console.error('Error fetching training details:', error)
       }
     )
+  }
+
+  onTabChange() {
+    if (this.selectedTabIndex === 0) {
+      this.filteredUsers = [...this.enrolledUsers]
+      this.searchTerm = ''
+    }
+  }
+
+  getUsers() {
+    const request: any = {
+      request: {
+        filters: {
+          active: true,
+          batchId: this.currentBatch.batchId,
+          limit: 200,
+          currentOffSet: this.currentPage
+        }
+      }
+    }
+    this.externalTrainingsSvc.getParticipantsList(request).subscribe((response) => {
+      if (response && response.userlist) {
+        this.enrolledUsers = response.userlist
+        this.learnersCount = response.totalCount || 0
+        this.filteredUsers = [...this.enrolledUsers]
+      }
+    }, error => {
+      console.log('Error fetching participants list:', error)
+    })
+
   }
 
   navigateToExternalTrainings() {

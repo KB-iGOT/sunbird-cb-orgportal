@@ -1,0 +1,59 @@
+<div class="flex flex-col gap-6 bulk-container mt-6" *ngIf="lastUploadList?.length else noData">
+  <div class="file-container" *ngFor="let list of lastUploadList | slice : startIndex : lastIndex | orderBy:'dateCreatedOn':'desc'">
+    <div class="flex flex-col gap-4">
+      <div class="flex flex-row justify-between items-center">
+        <div class="flex flex-row gap-1">
+          <div class="font-bold">File Information</div>
+        </div>
+        <div class="flex flex-row gap-2 outline-button items-center" (click)="handleDownloadFile(list)">
+          <mat-icon>download_2</mat-icon>
+          {{ list?.status !== 'SUCCESSFUL' ? 'Download error log' : 'Download file' }}
+        </div>
+      </div>
+      <div class="grid grid-flow-row sm:grid-flow-col gap-10 grid-col grid-container-25">
+        <div class="flex flex-col">
+          <div class="label">Name</div>
+          <div class="value">{{ list?.fileName }}</div>
+        </div>
+        <div class="flex flex-col">
+          <div class="label">Status</div>
+          <div class="value">{{ list?.status }}</div>
+        </div>
+        <div class="flex flex-col">
+          <div class="label">Failed Records</div>
+          <div class="value">{{ list?.failedRecordsCount }}</div>
+        </div>
+        <div class="flex flex-col">
+          <div class="label">Success Records</div>
+          <div class="value">{{ list?.successfulRecordsCount }}</div>
+        </div>
+      </div>
+      <div class="grid grid-flow-row sm:grid-flow-col gap-10 grid-col grid-container-25">
+        <div class="flex flex-col">
+          <div class="label">Total Records</div>
+          <div class="value">{{ list?.totalRecords }}</div>
+        </div>
+        <div class="flex flex-col">
+          <div class="label">Initiated On</div>
+          <div class="value">{{ list?.dateCreatedOn | date: 'dd MMM yyyy h:mm a' }}</div>
+        </div>
+        <div class="flex flex-col">
+          <div class="label">Completed On</div>
+          <div class="value">{{ list?.dateUpdatedOn | date: 'dd MMM yyyy h:mm a' }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="flex flex-row justify-end mt-4">
+    <mat-paginator [pageSize]="pageSize" [length]="lastUploadList.length" [pageSizeOptions]="sizeOptions"
+      (page)="handleChangePage($event)"></mat-paginator>
+  </div>
+</div>
+
+<ng-template #noData>
+  <div class="no-data-message mt-6">
+    <mat-icon class="no-data-icon">list_alt</mat-icon>
+    <p class="no-data-text">No file logs exists for this batch.</p>
+  </div>
+</ng-template>
