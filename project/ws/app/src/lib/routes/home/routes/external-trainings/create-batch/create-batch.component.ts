@@ -34,6 +34,8 @@ export class CreateBatchComponent implements OnInit {
   currentBatch: any = null
   eventDurationInMinutes = 0
   todayDate = new Date()
+  // tslint:disable-next-line: max-line-length
+  noSpecialChar = new RegExp(/^[\u0900-\u097F\u0980-\u09FF\u0C00-\u0C7F\u0B80-\u0BFF\u0C80-\u0CFF\u0D00-\u0D7F\u0A80-\u0AFF\u0B00-\u0B7F\u0A00-\u0A7Fa-zA-Z0-9.,_\-\$\/\:\[\]\(\) '!]+$/) //NOSONAR
 
   get startDateAsDate(): Date | null {
     const val = this.batchForm?.get('startDate')?.value
@@ -82,7 +84,7 @@ export class CreateBatchComponent implements OnInit {
 
   initializeForm(): void {
     this.batchForm = this.fb.group({
-      batchName: ['', Validators.required],
+      batchName: ['', [Validators.required, Validators.maxLength(70), Validators.pattern(this.noSpecialChar)]],
       startDate: ['', [Validators.required]],
       endDate: ['', [Validators.required, endDateValidator()]],
     })

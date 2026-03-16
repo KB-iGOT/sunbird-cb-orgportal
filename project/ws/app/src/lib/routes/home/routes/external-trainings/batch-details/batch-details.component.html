@@ -82,6 +82,9 @@
           <div class="no-learners-message mt-6">
             <mat-icon class="no-learners-icon">people_outline</mat-icon>
             <p class="no-learners-text">No learners enrolled in this batch yet</p>
+            <div class="flex items-center justify-between cursor-pointer upload-users pt-4 gap-1" (click)="uploadUsers()" (keyup)="uploadUsers()">
+              <mat-icon class="add-users-icon">add</mat-icon>Upload Users
+            </div>
           </div>
         </ng-template>
       </mat-tab>

@@ -20,10 +20,16 @@
         <div class="flex flex-column gap-2 event-form round-control">
           <div class="form-lable required">Batch Name</div>
           <mat-form-field appearance="outline" class="disable-round">
-            <input matInput placeholder="Enter the batch name (e.g., Q3 Leadership Training)"
-              formControlName="batchName" [readonly]="isEditMode" />
-            <mat-error *ngIf="!isEditMode && batchForm.get('batchName')?.hasError('required')">
+            <input matInput placeholder="Enter the batch name (e.g., Q3 Leadership Training)" formControlName="batchName" [readonly]="isEditMode" />
+            <mat-hint align="end">{{batchForm.get('batchName')?.value?.length || 0}}/70</mat-hint>
+            <mat-error *ngIf="!isEditMode && batchForm.get('batchName')?.touched && batchForm.get('batchName')?.hasError('required')">
               Batch name is required.
+            </mat-error>
+            <mat-error *ngIf="!isEditMode && batchForm.get('batchName')?.touched && batchForm.get('batchName')?.hasError('maxlength')">
+              Batch name cannot exceed 70 characters.
+            </mat-error>
+            <mat-error *ngIf="!isEditMode && batchForm.get('batchName')?.touched && batchForm.get('batchName')?.hasError('pattern')">
+              Only {{specialCharList}} characters are supported.
             </mat-error>
           </mat-form-field>
         </div>
@@ -32,11 +38,11 @@
         <div class="flex flex-column gap-2 event-form round-control">
           <div class="form-lable required">Start Date</div>
           <mat-form-field appearance="outline" class="disable-round">
-            <input matInput [matDatepicker]="startPicker" [max]="endDateAsDate || todayDate" formControlName="startDate"
-              placeholder="mm/dd/yyyy" readonly />
+            <input matInput [matDatepicker]="startPicker" [max]="endDateAsDate || todayDate" formControlName="startDate" placeholder="mm/dd/yyyy"
+              readonly />
             <mat-datepicker-toggle matSuffix [for]="startPicker"></mat-datepicker-toggle>
             <mat-datepicker #startPicker [disabled]="isEditMode"></mat-datepicker>
-            <mat-error *ngIf="!isEditMode && batchForm.get('startDate')?.hasError('required')">
+            <mat-error *ngIf="!isEditMode && batchForm.get('startDate')?.touched && batchForm.get('startDate')?.hasError('required')">
               Start date is required.
             </mat-error>
           </mat-form-field>
@@ -46,14 +52,14 @@
         <div class="flex flex-column gap-2 event-form round-control">
           <div class="form-lable required">End Date</div>
           <mat-form-field appearance="outline" class="disable-round">
-            <input matInput [matDatepicker]="endPicker" [min]="startDateAsDate" [max]="todayDate"
-              formControlName="endDate" placeholder="mm/dd/yyyy" readonly />
+            <input matInput [matDatepicker]="endPicker" [min]="startDateAsDate" [max]="todayDate" formControlName="endDate" placeholder="mm/dd/yyyy"
+              readonly />
             <mat-datepicker-toggle matSuffix [for]="endPicker"></mat-datepicker-toggle>
             <mat-datepicker #endPicker [disabled]="isEditMode"></mat-datepicker>
-            <mat-error *ngIf="!isEditMode && batchForm.get('endDate')?.hasError('required')">
+            <mat-error *ngIf="!isEditMode && batchForm.get('endDate')?.touched && batchForm.get('endDate')?.hasError('required')">
               End date is required.
             </mat-error>
-            <mat-error *ngIf="!isEditMode && batchForm.get('endDate')?.hasError('endBeforeStart')">
+            <mat-error *ngIf="!isEditMode && batchForm.get('endDate')?.touched && batchForm.get('endDate')?.hasError('endBeforeStart')">
               End date cannot be before start date.
             </mat-error>
           </mat-form-field>
@@ -77,8 +83,8 @@
         </div>
 
         <div class="file-upload-box">
-          <div class="drop-zone" (drop)="onFileDrop($event)" (dragover)="onDragOver($event)"
-            (dragleave)="onDragLeave($event)" [class.drag-over]="isDragOver">
+          <div class="drop-zone" (drop)="onFileDrop($event)" (dragover)="onDragOver($event)" (dragleave)="onDragLeave($event)"
+            [class.drag-over]="isDragOver">
             <div class="browse-files-text" (click)="fileInput.click()" (keydown.enter)="fileInput.click()">Browse files
             </div>
             <p class="or-text">Or</p>

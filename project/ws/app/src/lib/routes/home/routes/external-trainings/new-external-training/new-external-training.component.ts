@@ -41,6 +41,8 @@ export class NewExternalTrainingComponent implements OnInit {
   private readonly TARGET_X_START = 1150;
 
   private readonly FILE_UPLOAD_MAX_SIZE = 1 * 1024 * 1024 // 1MB
+  // tslint:disable-next-line: max-line-length
+  noSpecialChar = new RegExp(/^[\u0900-\u097F\u0980-\u09FF\u0C00-\u0C7F\u0B80-\u0BFF\u0C80-\u0CFF\u0D00-\u0D7F\u0A80-\u0AFF\u0B00-\u0B7F\u0A00-\u0A7Fa-zA-Z0-9.,_\-\$\/\:\[\]\(\) '!]+$/) //NOSONAR
 
   constructor(
     private readonly fb: FormBuilder,
@@ -59,26 +61,6 @@ export class NewExternalTrainingComponent implements OnInit {
   }
 
   getDefaultTemplate(): void {
-    // TODO: Uncomment below block and remove temporary code once API is ready
-    // if (!this.defaultCertificateTemplateUrl) {
-    //   this.openSnackbar('Default certificate template not found.')
-    //   return
-    // }
-    // fetch(this.defaultCertificateTemplateUrl)
-    //   .then(res => res.blob())
-    //   .then(blob => {
-    //     const file = new File([blob], 'CourseCertificate_Template.svg', { type: 'image/svg+xml' })
-    //     this.contentFile = file
-    //     this.fileName = file.name
-    //     this.certificateUrl = URL.createObjectURL(file)
-    //     this.safeCertificateUrl = this.sanitizer.bypassSecurityTrustResourceUrl(this.certificateUrl)
-    //   })
-    //   .catch(() => {
-    //     this.openSnackbar('Failed to load default certificate template.')
-    //   })
-
-    // Temporary: fetching from local asset until API is ready
-    // TODO: Replace with actual API call once API is ready
     this.externalTrainingsSvc.getDefaultTemplate().subscribe({
       next: (blob: Blob) => {
         const file = new File([blob], 'CourseCertificate_Template.svg', { type: 'image/svg+xml' })
@@ -97,12 +79,12 @@ export class NewExternalTrainingComponent implements OnInit {
 
   initializeForm(): void {
     this.trainingForm = this.fb.group({
-      trainingTitle: ['', Validators.required],
-      learningObjective: ['', Validators.maxLength(500)],
+      trainingTitle: ['', [Validators.required, Validators.maxLength(70), Validators.pattern(this.noSpecialChar)]],
+      learningObjective: ['', [Validators.maxLength(500), Validators.pattern(this.noSpecialChar)]],
       deliveryMode: [''],
       learningHours: [''],
       trainingType: ['', Validators.required],
-      partnerName: ['']
+      partnerName: ['', [Validators.maxLength(70), Validators.pattern(this.noSpecialChar)]]
     })
   }
 
