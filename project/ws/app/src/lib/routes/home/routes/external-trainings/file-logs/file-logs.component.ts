@@ -365,7 +365,7 @@ export class FileLogsComponent {
   }
 
   handleDownloadFile(listObj: any): void {
-    const filePath = `/apis/proxies/v8/externaltraining/v1/bulkuser/download/${listObj.fileName}`
+    const filePath = `/apis/proxies/v8/externaltraining/v1/bulkupload/download/${listObj.fileName}`
     window.open(filePath, '_blank')
   }
 
