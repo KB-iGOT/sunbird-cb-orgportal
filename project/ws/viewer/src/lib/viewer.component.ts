@@ -191,7 +191,7 @@ export class ViewerComponent implements OnInit, OnDestroy, AfterViewChecked {
 
     this.contentReadData = await this.fetchContentRead()
     if (this.contentReadData && this.contentReadData.identifier) {
-
+      console.log('contentReadData', this.contentReadData)
       await this.widgetServ.fetchContent(this.contentReadData.identifier).subscribe(async (res: any) => {
         this.hierarchyData = res.result.content
         await this.manipulateHierarchyData()
