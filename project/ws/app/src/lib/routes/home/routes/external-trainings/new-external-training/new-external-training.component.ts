@@ -383,7 +383,8 @@ export class NewExternalTrainingComponent implements OnInit {
               ...payload.request,
               event: {
                 ...payload.request.event,
-                cerTemplate: cerTemplateUrl,
+                certTemplate: cerTemplateUrl,
+                certTemplateId: ''
               },
             },
           }
