@@ -1,6 +1,7 @@
 import { Component, Input } from '@angular/core'
 import { PageEvent } from '@angular/material/paginator'
 import { ExternalTrainingsService } from '../../../services/external-trainings.service'
+import { LoaderService } from '../../../../../../../../../../src/app/services/loader.service'
 
 @Component({
   selector: 'ws-app-file-logs',
@@ -11,7 +12,7 @@ export class FileLogsComponent {
   lastUploadList: any[] = []
   startIndex = 0
   lastIndex: any
-
+  isLoading = false
   pageSize = 10
 
   sizeOptions = [10, 20]
@@ -20,6 +21,7 @@ export class FileLogsComponent {
 
   constructor(
     private externalTrainingsSvc: ExternalTrainingsService,
+    private loaderService: LoaderService
   ) {
     // this.lastUploadList = [
     //   {
@@ -344,11 +346,19 @@ export class FileLogsComponent {
   }
 
   getLogs() {
+    this.isLoading = true
+    this.loaderService.changeLoad.next(true)
+
     this.externalTrainingsSvc.getFileLogs(this.trainingId, this.batchId).subscribe((res: any) => {
       if (res && res.result && res.result.content) {
         this.lastUploadList = res.result.content.sort((a: any, b: any) => new Date(b.dateCreatedOn).getTime() - new Date(a.dateCreatedOn).getTime())
       }
+      this.isLoading = false
+      this.loaderService.changeLoad.next(false)
     }, error => {
+      this.isLoading = false
+      this.loaderService.changeLoad.next(false)
+
       console.log(error)
     })
   }
