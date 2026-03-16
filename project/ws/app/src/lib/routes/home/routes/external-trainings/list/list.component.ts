@@ -54,13 +54,8 @@ export class ListComponent implements OnInit, AfterViewInit {
   }
 
   // Search
-  searchTrainings(searchString: string) {
-    this.pageIndex = 0
-    this.searchQuery = searchString.trim()
-    this.getExternalTrainings()
-  }
-
   onSearch() {
+    this.searchQuery = this.searchQuery.trim()
     this.pageIndex = 0
     this.getExternalTrainings()
   }
@@ -164,26 +159,6 @@ export class ListComponent implements OnInit, AfterViewInit {
     }
   }
 
-  updateStatus(row: any, status: string) {
-    this.loaderService.changeLoaderState(true)
-    const payload = {
-      request: {
-        id: row.id,
-        status,
-      },
-    }
-
-    this.externalTrainingsSvc.updateApprovalStatus(payload).subscribe({
-      next: () => {
-        this.loaderService.changeLoaderState(false)
-        this.getExternalTrainings()
-      },
-      error: () => {
-        this.loaderService.changeLoaderState(false)
-      },
-    })
-  }
-
   // Pagination
   onPaginateChange(pageData: any) {
     this.pageIndex = pageData?.pageIndex || 0
@@ -191,8 +166,8 @@ export class ListComponent implements OnInit, AfterViewInit {
     this.getExternalTrainings()
   }
 
-  onSortChange(event: any) {
-    console.log('Sort changed:', event)
+  onSortChange(_event: any) {
+    // handled by matSort directive
   }
 
   trackByActionKey(_index: number, action: any): any {
