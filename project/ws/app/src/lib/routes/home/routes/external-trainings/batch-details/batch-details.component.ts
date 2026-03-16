@@ -1,7 +1,8 @@
-import { Component } from '@angular/core'
+import { Component, ViewChild } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
 import { LoaderService } from '../../../../../../../../../../src/app/services/loader.service'
 import { ExternalTrainingsService } from '../../../services/external-trainings.service'
+import { FileLogsComponent } from '../file-logs/file-logs.component'
 import * as _ from 'lodash'
 
 @Component({
@@ -24,6 +25,9 @@ export class BatchDetailsComponent {
   searchTerm = ''
   currentPage: number = 0
   learnersCount: number = 0
+
+  @ViewChild(FileLogsComponent) fileLogsComponent!: FileLogsComponent
+
   constructor(
     private route: ActivatedRoute,
     private loaderService: LoaderService,
@@ -101,8 +105,12 @@ export class BatchDetailsComponent {
     )
   }
 
-  onTabChange() {
-    if (this.selectedTabIndex === 0) {
+  onTabChange(event: any) {
+    // When File Logs tab is selected (index 1), reload the logs
+    if (event.index === 1 && this.fileLogsComponent) {
+      this.fileLogsComponent.getLogs()
+    } else if (event.index === 0) {
+      // When Enrolled Users tab is selected, reset filters
       this.filteredUsers = [...this.enrolledUsers]
       this.searchTerm = ''
     }
