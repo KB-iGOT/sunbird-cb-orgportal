@@ -146,4 +146,13 @@ export class BatchDetailsComponent {
   navigateToBatches() {
     this.router.navigate(['/app/home/external-trainings/', this.trainingId, 'batches'])
   }
+
+  uploadUsers() {
+    this.router.navigate([`/app/home/external-trainings/${this.training.identifier}/create-batch`], {
+      queryParams: {
+        batchId: this.currentBatch.batchId,
+      }
+    })
+
+  }
 }
