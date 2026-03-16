@@ -35,6 +35,11 @@
   font-weight: 600;
   color: #333;
   margin-bottom: 12px;
+  text-transform: lowercase;
+
+  &::first-letter {
+    text-transform: uppercase;
+  }
 }
 
 .batch-dates {

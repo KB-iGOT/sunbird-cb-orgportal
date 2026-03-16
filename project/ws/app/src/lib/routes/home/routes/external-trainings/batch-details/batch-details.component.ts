@@ -39,6 +39,14 @@ export class BatchDetailsComponent {
 
   ngOnInit() {
     this.getRoutingDetails()
+    this.route.queryParams.subscribe(params => {
+      const tab = params['tab']
+      if (tab === 'fileLogs') {
+        this.selectedTabIndex = 1
+      } else {
+        this.selectedTabIndex = 0
+      }
+    })
   }
 
   onSearchChange() {

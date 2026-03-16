@@ -214,6 +214,7 @@ export class CreateBatchComponent implements OnInit {
 
   handleCreateSubmit(): void {
     if (this.batchForm.valid && this.uploadedFile) {
+      this.loaderService.changeLoaderState(true)
       const form = this.batchForm.value
       const payload = {
         request: {
@@ -229,23 +230,32 @@ export class CreateBatchComponent implements OnInit {
         },
       }
 
+      let createdBatchId = ''
+
       this.externalTrainingsSvc.createBatch(payload).pipe(
         mergeMap((createBatchRes: any) => {
-          const batchId = _.get(createBatchRes, 'result.batchId')
+          createdBatchId = _.get(createBatchRes, 'result.batchId')
           const formData = new FormData()
           formData.append(
             'file',
             this.uploadedFile as Blob,
             (this.uploadedFile as File).name.replace(/[^A-Za-z0-9_.]/g, ''),
           )
-          return this.externalTrainingsSvc.bulkUsersUpload(formData, this.trainingId, batchId)
+          return this.externalTrainingsSvc.bulkUsersUpload(formData, this.trainingId, createdBatchId)
         })
       ).subscribe({
         next: () => {
-          this.matSnackBar.open('Batch created and participants uploaded successfully.', 'Close', { duration: 3000 })
-          this.goBack()
+          this.matSnackBar.open('Participant data uploaded successfully. Please refer to the file log for any failed records.', 'Close', { duration: 3000 })
+          setTimeout(() => {
+            this.loaderService.changeLoaderState(false)
+            this.router.navigate(
+              ['app', 'home', 'external-trainings', this.trainingId, 'batches', createdBatchId],
+              { queryParams: { tab: 'fileLogs' } }
+            )
+          }, 3000)
         },
         error: (err: any) => {
+          this.loaderService.changeLoaderState(false)
           const errorMessage = _.get(err, 'error.params.errmsg', 'An error occurred while creating the batch.')
           this.matSnackBar.open(errorMessage, 'Close', { duration: 3000 })
         },
@@ -264,8 +274,14 @@ export class CreateBatchComponent implements OnInit {
 
       this.externalTrainingsSvc.bulkUsersUpload(formData, this.trainingId, this.batchId).subscribe({
         next: () => {
-          this.matSnackBar.open('Participants uploaded successfully to the batch.', 'Close', { duration: 3000 })
-          this.goBack()
+          this.matSnackBar.open('Participant data uploaded successfully. Please refer to the file log for any failed records.', 'Close', { duration: 3000 })
+          setTimeout(() => {
+            this.loaderService.changeLoaderState(false)
+            this.router.navigate(
+              ['app', 'home', 'external-trainings', this.trainingId, 'batches', this.batchId],
+              { queryParams: { tab: 'fileLogs' } }
+            )
+          }, 3000)
         },
         error: (err: any) => {
           const errorMessage = _.get(err, 'error.params.errmsg', 'An error occurred while uploading participants.')

@@ -14,7 +14,6 @@ const API_END_POINTS = {
   BULK_UPLOAD: (eventId: string, batchId: string) => `/apis/proxies/v8/externaltraining/v1/bulkupload/${eventId}/${batchId}`,
   BULK_UPLOAD_SAMPLE: '/apis/proxies/v8/externaltraining/v1/bulkupload/sample',
   UPLOAD_TEMPLATE: '/apis/proxies/v8/storage/v1/uploadCiosIcon',
-  // TODO: Replace with real API endpoint when available
   GET_DEFAULT_TEMPLATE: 'assets/images/sample/CourseCertificate_Template.svg',
   GET_PARTICIPANTS_LIST: '/apis/proxies/v8/externaltraining/v1/batch/getParticipants',
   FILE_LOGS: 'apis/proxies/v8/externaltraining/v1/bulkupload/status'
