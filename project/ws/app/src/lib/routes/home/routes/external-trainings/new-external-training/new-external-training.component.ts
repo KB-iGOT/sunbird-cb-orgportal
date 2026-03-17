@@ -7,7 +7,6 @@ import { mergeMap } from 'rxjs/operators'
 import * as _ from 'lodash'
 import { MatLegacySnackBar } from '@angular/material/legacy-snack-bar'
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser'
-import { environment } from '../../../../../../../../../../src/environments/environment'
 
 @Component({
   selector: 'ws-app-new-external-training',
@@ -28,6 +27,8 @@ export class NewExternalTrainingComponent implements OnInit {
   logoFileName = ''
   logoUploaded = false
   isLogoMerging = false
+  templateId = ''
+  defaultTemplateUrl = ''
 
   //
   originalContentFile: any
@@ -62,14 +63,32 @@ export class NewExternalTrainingComponent implements OnInit {
 
   getDefaultTemplate(): void {
     this.externalTrainingsSvc.getDefaultTemplate().subscribe({
-      next: (blob: Blob) => {
-        const file = new File([blob], 'CourseCertificate_Template.svg', { type: 'image/svg+xml' })
-        this.originalContentFile = file
-        this.contentFile = file
-        this.fileName = file.name
-        this.certificateUrl = URL.createObjectURL(file)
-        this.safeCertificateUrl = this.sanitizer.bypassSecurityTrustResourceUrl(this.certificateUrl)
-        this.previewLogoUrl = this.certificateUrl
+      next: (res: any) => {
+        const valueStr = _.get(res, 'result.response.value', '')
+        try {
+          const valueObj = JSON.parse(valueStr)
+          const templateUrl = _.get(valueObj, 'template', '')
+          this.templateId = _.get(valueObj, 'identifier', '')
+          this.defaultTemplateUrl = templateUrl
+          if (templateUrl) {
+            this.externalTrainingsSvc.fetchTemplateByUrl(templateUrl).subscribe({
+              next: (blob: Blob) => {
+                const file = new File([blob], 'CourseCertificate_Template.svg', { type: 'image/svg+xml' })
+                this.originalContentFile = file
+                this.contentFile = file
+                this.fileName = file.name
+                this.certificateUrl = URL.createObjectURL(file)
+                this.safeCertificateUrl = this.sanitizer.bypassSecurityTrustResourceUrl(this.certificateUrl)
+                this.previewLogoUrl = this.certificateUrl
+              },
+              error: () => {
+                this.openSnackbar('Failed to load certificate template SVG.')
+              },
+            })
+          }
+        } catch {
+          this.openSnackbar('Failed to parse default certificate template response.')
+        }
       },
       error: () => {
         this.openSnackbar('Failed to load default certificate template.')
@@ -347,55 +366,118 @@ export class NewExternalTrainingComponent implements OnInit {
 
   onSubmit(): void {
     if (this.trainingForm.valid && this.selectedCompetencyList.length > 0) {
-      const uploadFormData = new FormData()
-      uploadFormData.append(
-        'content',
-        this.contentFile as Blob,
-        (this.contentFile as File).name.replace(/[^A-Za-z0-9_.]/g, ''),
-      )
+      if (this.logoUploaded) {
+        // Scenario 2: Merged template — create content asset, upload merged file, then create training
+        const createContentPayload = {
+          request: {
+            content: {
+              code: `${Date.now()}`,
+              contentType: 'Asset',
+              createdBy: _.get(this.configSvc, 'userProfile.userId'),
+              creator: _.get(this.configSvc, 'userProfile.firstName'),
+              mimeType: 'image/svg+xml',
+              mediaType: 'image',
+              name: (this.contentFile as File).name,
+              language: ['English'],
+              license: 'CC BY 4.0',
+              primaryCategory: 'Asset',
+            },
+          },
+        }
 
-      this.externalTrainingsSvc.uploadTemplate(uploadFormData).pipe(
-        mergeMap((uploadRes: any) => {
-          const rawUrl = _.get(uploadRes, 'result.url') || ''
-          const cerTemplateUrl = this.transformCerTemplateUrl(rawUrl)
-          const payload = this.buildPayload
-          const formData = {
-            ...payload,
-            request: {
-              ...payload.request,
-              event: {
-                ...payload.request.event,
-                certTemplate: cerTemplateUrl,
-                certTemplateId: ''
+        this.externalTrainingsSvc.createContent(createContentPayload).pipe(
+          mergeMap((createContentRes: any) => {
+            const contentIdentifier = _.get(createContentRes, 'result.identifier', '')
+            const uploadFormData = new FormData()
+            uploadFormData.append(
+              'data',
+              this.contentFile as Blob,
+              (this.contentFile as File).name.replace(/[^A-Za-z0-9_.]/g, ''),
+            )
+            return this.externalTrainingsSvc.uploadContent(contentIdentifier, uploadFormData)
+          }),
+          mergeMap((uploadRes: any) => {
+            const certTemplateUrl = _.get(uploadRes, 'result.artifactUrl', '')
+            const certTemplateId = _.get(uploadRes, 'result.identifier', '')
+            const payload = this.buildPayload
+            const formData = {
+              ...payload,
+              request: {
+                ...payload.request,
+                event: {
+                  ...payload.request.event,
+                  certTemplate: certTemplateUrl,
+                  certTemplateId,
+                },
               },
-            },
-          }
-          return this.externalTrainingsSvc.createExternalTraining(formData)
-        }),
-        mergeMap((createRes: any) => {
-          const publishPayload = {
-            request: {
-              event: {
-                identifier: _.get(createRes, 'result.identifier'),
-                versionKey: _.get(createRes, 'result.versionKey'),
+            }
+            return this.externalTrainingsSvc.createExternalTraining(formData)
+          }),
+          mergeMap((createRes: any) => {
+            const publishPayload = {
+              request: {
+                event: {
+                  identifier: _.get(createRes, 'result.identifier'),
+                  versionKey: _.get(createRes, 'result.versionKey'),
+                },
               },
-            },
-          }
-          return this.externalTrainingsSvc.publishExternalTraining(publishPayload)
+            }
+            return this.externalTrainingsSvc.publishExternalTraining(publishPayload)
+          })
+        ).subscribe({
+          next: (result) => {
+            if (_.get(result, 'result.identifier')) {
+              this.openSnackbar('Training created and published successfully.')
+              this.externalTrainingsSvc.setTrainingName(this.trainingForm.value.trainingTitle)
+              this.navigateToCreateBatch(_.get(result, 'result.identifier'))
+            }
+          },
+          error: (err) => {
+            const errorMessage = _.get(err, 'error.params.errmsg', 'An error occurred while creating the training.')
+            this.openSnackbar(errorMessage)
+          },
         })
-      ).subscribe({
-        next: (result) => {
-          if (_.get(result, 'result.identifier')) {
-            this.openSnackbar('Training created and published successfully.')
-            this.externalTrainingsSvc.setTrainingName(this.trainingForm.value.trainingTitle)
-            this.navigateToCreateBatch(_.get(result, 'result.identifier'))
-          }
-        },
-        error: (err) => {
-          const errorMessage = _.get(err, 'error.params.errmsg', 'An error occurred while creating the training.')
-          this.openSnackbar(errorMessage)
-        },
-      })
+      } else {
+        // Scenario 1: Default template — create training directly
+        const payload = this.buildPayload
+        const formData = {
+          ...payload,
+          request: {
+            ...payload.request,
+            event: {
+              ...payload.request.event,
+              certTemplate: this.defaultTemplateUrl,
+              certTemplateId: this.templateId,
+            },
+          },
+        }
+
+        this.externalTrainingsSvc.createExternalTraining(formData).pipe(
+          mergeMap((createRes: any) => {
+            const publishPayload = {
+              request: {
+                event: {
+                  identifier: _.get(createRes, 'result.identifier'),
+                  versionKey: _.get(createRes, 'result.versionKey'),
+                },
+              },
+            }
+            return this.externalTrainingsSvc.publishExternalTraining(publishPayload)
+          })
+        ).subscribe({
+          next: (result) => {
+            if (_.get(result, 'result.identifier')) {
+              this.openSnackbar('Training created and published successfully.')
+              this.externalTrainingsSvc.setTrainingName(this.trainingForm.value.trainingTitle)
+              this.navigateToCreateBatch(_.get(result, 'result.identifier'))
+            }
+          },
+          error: (err) => {
+            const errorMessage = _.get(err, 'error.params.errmsg', 'An error occurred while creating the training.')
+            this.openSnackbar(errorMessage)
+          },
+        })
+      }
     }
   }
 
@@ -411,19 +493,5 @@ export class NewExternalTrainingComponent implements OnInit {
     this.matSnackBar.open(message, action, {
       duration: 3000,
     })
-  }
-
-  private transformCerTemplateUrl(url: string): string {
-    try {
-      const parsed = new URL(url)
-      const pathParts = parsed.pathname.split('/')
-      // Remove the first path segment (e.g. /igot/) and prepend /content-store/
-      // Input:  https://storage.googleapis.com/igot/cios-icon/filename.svg
-      // Output: https://{sitePath}/content-store/cios-icon/filename.svg
-      const remainingPath = pathParts.slice(2).join('/')
-      return `https://${environment.sitePath}/content-store/${remainingPath}`
-    } catch {
-      return url
-    }
   }
 }

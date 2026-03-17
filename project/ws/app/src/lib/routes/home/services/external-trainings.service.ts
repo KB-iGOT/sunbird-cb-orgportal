@@ -14,7 +14,9 @@ const API_END_POINTS = {
   BULK_UPLOAD: (eventId: string, batchId: string) => `/apis/proxies/v8/externaltraining/v1/bulkupload/${eventId}/${batchId}`,
   BULK_UPLOAD_SAMPLE: '/apis/proxies/v8/externaltraining/v1/bulkupload/sample',
   UPLOAD_TEMPLATE: '/apis/proxies/v8/storage/v1/uploadCiosIcon',
-  GET_DEFAULT_TEMPLATE: 'assets/images/sample/CourseCertificate_Template.svg',
+  CREATE_CONTENT: '/apis/proxies/v8/action/content/v3/create',
+  UPLOAD_CONTENT: (identifier: string) => `/apis/proxies/v8/upload/action/content/v3/upload/${identifier}`,
+  GET_DEFAULT_TEMPLATE: '/apis/proxies/v8/data/v1/system/settings/get/defaultCertTemplate',
   GET_PARTICIPANTS_LIST: '/apis/proxies/v8/externaltraining/v1/batch/getParticipants',
   FILE_LOGS: 'apis/proxies/v8/externaltraining/v1/bulkupload/status'
 }
@@ -73,8 +75,20 @@ export class ExternalTrainingsService {
     return this.http.post<any>(API_END_POINTS.CREATE_BARCH, request)
   }
 
-  getDefaultTemplate(): Observable<Blob> {
-    return this.http.get(API_END_POINTS.GET_DEFAULT_TEMPLATE, { responseType: 'blob' })
+  getDefaultTemplate(): Observable<any> {
+    return this.http.get<any>(API_END_POINTS.GET_DEFAULT_TEMPLATE)
+  }
+
+  fetchTemplateByUrl(url: string): Observable<Blob> {
+    return this.http.get(url, { responseType: 'blob' })
+  }
+
+  createContent(request: any): Observable<any> {
+    return this.http.post<any>(API_END_POINTS.CREATE_CONTENT, request)
+  }
+
+  uploadContent(identifier: string, formData: FormData): Observable<any> {
+    return this.http.post<any>(API_END_POINTS.UPLOAD_CONTENT(identifier), formData)
   }
 
   bulkUsersUpload(formData: FormData, eventId: string, batchId: string): Observable<any> {

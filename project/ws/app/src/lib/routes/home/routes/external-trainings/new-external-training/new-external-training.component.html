@@ -25,10 +25,12 @@
           <mat-error *ngIf="trainingForm.get('trainingTitle')?.hasError('required')">
             Training title is required.
           </mat-error>
-          <mat-error *ngIf="trainingForm.get('trainingTitle')?.touched && trainingForm.get('trainingTitle')?.hasError('maxlength')">
+          <mat-error
+            *ngIf="trainingForm.get('trainingTitle')?.touched && trainingForm.get('trainingTitle')?.hasError('maxlength')">
             Maximum 70 characters allowed.
           </mat-error>
-          <mat-error *ngIf="trainingForm.get('trainingTitle')?.touched && trainingForm.get('trainingTitle')?.hasError('pattern')">
+          <mat-error
+            *ngIf="trainingForm.get('trainingTitle')?.touched && trainingForm.get('trainingTitle')?.hasError('pattern')">
             Only {{specialCharList}} characters are supported.
           </mat-error>
         </mat-form-field>
@@ -38,13 +40,15 @@
       <div class="flex flex-column gap-2 event-form">
         <div class="form-lable">Learning Objective</div>
         <mat-form-field appearance="outline">
-          <textarea matInput placeholder="Describe the key learning outcomes and goals" formControlName="learningObjective" rows="4"
-            maxlength="500"></textarea>
+          <textarea matInput placeholder="Describe the key learning outcomes and goals"
+            formControlName="learningObjective" rows="4" maxlength="500"></textarea>
           <mat-hint align="end">{{trainingForm.get('learningObjective')?.value?.length || 0}}/500</mat-hint>
-          <mat-error *ngIf="trainingForm.get('learningObjective')?.touched && trainingForm.get('learningObjective')?.hasError('maxlength')">
+          <mat-error
+            *ngIf="trainingForm.get('learningObjective')?.touched && trainingForm.get('learningObjective')?.hasError('maxlength')">
             Maximum 500 characters allowed.
           </mat-error>
-          <mat-error *ngIf="trainingForm.get('learningObjective')?.touched && trainingForm.get('learningObjective')?.hasError('pattern')">
+          <mat-error
+            *ngIf="trainingForm.get('learningObjective')?.touched && trainingForm.get('learningObjective')?.hasError('pattern')">
             Only {{specialCharList}} characters are supported.
           </mat-error>
         </mat-form-field>
@@ -94,7 +98,8 @@
         <!-- Partner Name -->
         <div class="flex flex-column gap-2 event-form round-control">
           <div class="form-lable">Partner Name
-            <mat-icon class="info-icon" matTooltip="Please fill if this training is jointly conducted with a partner organization"
+            <mat-icon class="info-icon"
+              matTooltip="Please fill if this training is jointly conducted with a partner organization"
               matTooltipPosition="above">
               info_outlined
             </mat-icon>
@@ -102,10 +107,12 @@
           <mat-form-field appearance="outline">
             <input matInput placeholder="Enter training partner or organization name" formControlName="partnerName" />
             <mat-hint align="end">{{trainingForm.get('partnerName')?.value?.length || 0}}/70</mat-hint>
-            <mat-error *ngIf="trainingForm.get('partnerName')?.touched && trainingForm.get('partnerName')?.hasError('maxlength')">
+            <mat-error
+              *ngIf="trainingForm.get('partnerName')?.touched && trainingForm.get('partnerName')?.hasError('maxlength')">
               Maximum 70 characters allowed.
             </mat-error>
-            <mat-error *ngIf="trainingForm.get('partnerName')?.touched && trainingForm.get('partnerName')?.hasError('pattern')">
+            <mat-error
+              *ngIf="trainingForm.get('partnerName')?.touched && trainingForm.get('partnerName')?.hasError('pattern')">
               Only {{specialCharList}} characters are supported.
             </mat-error>
           </mat-form-field>
@@ -114,14 +121,16 @@
         <!-- Partner Logo -->
         <div class="flex flex-column gap-2 event-form round-control">
           <div class="form-lable">Partner Logo
-            <mat-icon class="info-icon" matTooltip="Please upload the logo of the partner organization" matTooltipPosition="above">
+            <mat-icon class="info-icon" matTooltip="Please upload the logo of the partner organization"
+              matTooltipPosition="above">
               info_outlined
             </mat-icon>
           </div>
           <mat-form-field appearance="outline" class="disable-round w-full">
             <input matInput [value]="logoFileName || 'No file selected'" readonly />
             <div matSuffix class="logo-suffix">
-              <div class="upload-section" *ngIf="!logoUploaded && !isLogoMerging" (click)="fileInput.click()" (keydown.enter)="fileInput.click()">
+              <div class="upload-section" *ngIf="!logoUploaded && !isLogoMerging" (click)="fileInput.click()"
+                (keydown.enter)="fileInput.click()">
                 <mat-icon>image_arrow_up</mat-icon>
                 <span class="upload-text">Upload Logo</span>
               </div>
@@ -132,15 +141,17 @@
                 <mat-icon class="cancel-icon">close</mat-icon>
               </button>
             </div>
-            <mat-hint align="start">Only .svg file supported (maximum size: 1 MB).</mat-hint>
-            <input #fileInput type="file" (change)="onFileSelected($event)" accept=".svg,image/svg+xml" style="display: none;" />
+            <mat-hint class="pl-2" align="start">Only .svg file supported (maximum size: 1 MB).</mat-hint>
+            <input #fileInput type="file" (change)="onFileSelected($event)" accept=".svg,image/svg+xml"
+              style="display: none;" />
           </mat-form-field>
         </div>
       </div>
       <div class="certificate-preview mb-5">
         <div class="certificate-header">
           <span class="certificate-title">Certificate Preview
-            <mat-icon class="info-icon" matTooltip="The certificate shown below will be issued to users who have undertaken this training."
+            <mat-icon class="info-icon"
+              matTooltip="The certificate shown below will be issued to users who have undertaken this training."
               matTooltipPosition="above">
               info_outlined
             </mat-icon>
@@ -166,8 +177,8 @@
       <button mat-stroked-button class="cancel-training-btn" (click)="goBackToExternalTrainings()">
         Cancel
       </button>
-      <button mat-raised-button color="primary" class="save-training-btn" [disabled]="!trainingForm.valid || selectedCompetencyList.length === 0"
-        (click)="onSubmit()">
+      <button mat-raised-button color="primary" class="save-training-btn"
+        [disabled]="!trainingForm.valid || selectedCompetencyList.length === 0" (click)="onSubmit()">
         Save Training Details
       </button>
     </div>
