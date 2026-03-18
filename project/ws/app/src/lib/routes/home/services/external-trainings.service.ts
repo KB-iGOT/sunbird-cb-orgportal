@@ -13,6 +13,7 @@ const API_END_POINTS = {
   CREATE_BARCH: '/apis/proxies/v8/externaltraining/batch/create',
   BULK_UPLOAD: (eventId: string, batchId: string) => `/apis/proxies/v8/externaltraining/v1/bulkupload/${eventId}/${batchId}`,
   BULK_UPLOAD_SAMPLE: '/apis/proxies/v8/externaltraining/v1/bulkupload/sample',
+  ADD_CERT_TEMPLATE: '/apis/proxies/v8/event/batch/cert/template/add',
   UPLOAD_TEMPLATE: '/apis/proxies/v8/storage/v1/uploadCiosIcon',
   CREATE_CONTENT: '/apis/proxies/v8/action/content/v3/create',
   UPLOAD_CONTENT: (identifier: string) => `/apis/proxies/v8/upload/action/content/v3/upload/${identifier}`,
@@ -105,6 +106,10 @@ export class ExternalTrainingsService {
 
   getFileLogs(trainingId: string, batchId: string): Observable<any> {
     return this.http.get<any>(`${API_END_POINTS.FILE_LOGS}?eventId=${trainingId}&batchId=${batchId}`)
+  }
+
+  addCertTemplate(request: any): Observable<any> {
+    return this.http.patch<any>(API_END_POINTS.ADD_CERT_TEMPLATE, request)
   }
 
 }
