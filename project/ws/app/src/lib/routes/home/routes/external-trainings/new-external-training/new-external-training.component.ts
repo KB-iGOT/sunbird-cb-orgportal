@@ -7,6 +7,7 @@ import { mergeMap } from 'rxjs/operators'
 import * as _ from 'lodash'
 import { MatLegacySnackBar } from '@angular/material/legacy-snack-bar'
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser'
+import { environment } from '../../../../../../../../../../src/environments/environment'
 
 @Component({
   selector: 'ws-app-new-external-training',
@@ -37,9 +38,9 @@ export class NewExternalTrainingComponent implements OnInit {
   certificateUrl = ''
   safeCertificateUrl: SafeResourceUrl | null = null
   selectedLogoImage: string | ArrayBuffer | null = null
-  private readonly TARGET_HEIGHT = 73;
-  private readonly TARGET_Y_CENTER = 115;
-  private readonly TARGET_X_START = 1150;
+  private readonly TARGET_HEIGHT = 100;
+  private readonly TARGET_Y_CENTER = 300;
+  private readonly TARGET_X_START = 2250;
 
   private readonly FILE_UPLOAD_MAX_SIZE = 1 * 1024 * 1024 // 1MB
   // tslint:disable-next-line: max-line-length
@@ -51,7 +52,7 @@ export class NewExternalTrainingComponent implements OnInit {
     private activeRoute: ActivatedRoute,
     private externalTrainingsSvc: ExternalTrainingsService,
     private matSnackBar: MatLegacySnackBar,
-    public sanitizer: DomSanitizer
+    public sanitizer: DomSanitizer,
   ) { }
 
   ngOnInit(): void {
@@ -67,9 +68,12 @@ export class NewExternalTrainingComponent implements OnInit {
         const valueStr = _.get(res, 'result.response.value', '')
         try {
           const valueObj = JSON.parse(valueStr)
-          const templateUrl = _.get(valueObj, 'template', '')
+          let templateUrl = _.get(valueObj, 'template', '')
           this.templateId = _.get(valueObj, 'identifier', '')
+          let splitURL = templateUrl.split('/content-store')
+          templateUrl = environment.portalsForNotifications.mdo + '/content-store/' + splitURL[1]
           this.defaultTemplateUrl = templateUrl
+
           if (templateUrl) {
             this.externalTrainingsSvc.fetchTemplateByUrl(templateUrl).subscribe({
               next: (blob: Blob) => {
@@ -397,7 +401,9 @@ export class NewExternalTrainingComponent implements OnInit {
             return this.externalTrainingsSvc.uploadContent(contentIdentifier, uploadFormData)
           }),
           mergeMap((uploadRes: any) => {
-            const certTemplateUrl = _.get(uploadRes, 'result.artifactUrl', '')
+            let certTemplateUrl = _.get(uploadRes, 'result.artifactUrl', '')
+            let splitURL = certTemplateUrl.split('/content')
+            certTemplateUrl = environment.portalsForNotifications.mdo + '/content-store/content/' + splitURL[1]
             const certTemplateId = _.get(uploadRes, 'result.identifier', '')
             const payload = this.buildPayload
             const formData = {
