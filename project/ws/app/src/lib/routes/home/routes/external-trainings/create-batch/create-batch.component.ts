@@ -3,6 +3,7 @@ import { AbstractControl, FormBuilder, FormGroup, ValidationErrors, ValidatorFn,
 import { ActivatedRoute, Router } from '@angular/router'
 import { ExternalTrainingsService } from '../../../services/external-trainings.service'
 import { mergeMap } from 'rxjs/operators'
+import { forkJoin } from 'rxjs'
 import * as _ from 'lodash'
 import { MatLegacySnackBar } from '@angular/material/legacy-snack-bar'
 import { LoaderService } from '../../../../../../../../../../src/app/services/loader.service'
@@ -27,6 +28,7 @@ export class CreateBatchComponent implements OnInit {
   batchForm!: FormGroup
   uploadedFile: File | null = null;
   isDragOver = false;
+  showFileError = false;
   trainingId: string = ''
   batchId: string = ''
   configSvc: any
@@ -34,6 +36,7 @@ export class CreateBatchComponent implements OnInit {
   currentBatch: any = null
   eventDurationInMinutes = 0
   todayDate = new Date()
+  templateUrl = ''
   // tslint:disable-next-line: max-line-length
   noSpecialChar = new RegExp(/^[\u0900-\u097F\u0980-\u09FF\u0C00-\u0C7F\u0B80-\u0BFF\u0C80-\u0CFF\u0D00-\u0D7F\u0A80-\u0AFF\u0B00-\u0B7F\u0A00-\u0A7Fa-zA-Z0-9.,_\-\$\/\:\[\]\(\) '!]+$/) //NOSONAR
 
@@ -102,6 +105,7 @@ export class CreateBatchComponent implements OnInit {
         const event = _.get(response, 'result.event', {})
         const batches = event.batches || []
         this.eventDurationInMinutes = Math.round((event.duration || 0) / 60)
+        this.templateUrl = _.get(event, 'certTemplate', '')
 
         // Find current batch by batchId
         this.currentBatch = batches.find((batch: any) => batch.batchId === this.batchId)
@@ -243,7 +247,48 @@ export class CreateBatchComponent implements OnInit {
             this.uploadedFile as Blob,
             (this.uploadedFile as File).name.replace(/[^A-Za-z0-9_.]/g, ''),
           )
-          return this.externalTrainingsSvc.bulkUsersUpload(formData, this.trainingId, createdBatchId)
+
+          const certTemplatePayload = {
+            request: {
+              batch: {
+                batchId: createdBatchId,
+                eventId: this.trainingId,
+                template: {
+                  template: this.templateUrl,
+                  identifier: createdBatchId,
+                  previewUrl: this.templateUrl,
+                  criteria: {
+                    enrollment: {
+                      status: 2,
+                    },
+                  },
+                  name: 'Completion Certificate',
+                  issuer: {
+                    name: 'in',
+                    url: 'https://diksha.gov.in/gj/',
+                  },
+                  signatoryList: [
+                    {
+                      image: 'https://diksha.gov.in/gj/header-logo.png',
+                      name: 'Govt Of India',
+                      id: 'in',
+                      designation: 'Home Minister',
+                    },
+                  ],
+                  notifyTemplate: {
+                    subject: 'Certificate Generated',
+                    emailTemplateType: 'certNotifTemplate',
+                    mode: 'email',
+                  },
+                },
+              },
+            },
+          }
+
+          return forkJoin([
+            this.externalTrainingsSvc.bulkUsersUpload(formData, this.trainingId, createdBatchId),
+            this.externalTrainingsSvc.addCertTemplate(certTemplatePayload),
+          ])
         })
       ).subscribe({
         next: () => {

@@ -204,10 +204,13 @@
   }
 }
 
-
 .info-icon {
-    font-size: 14px !important;
-    color: #0009;
-    height: 14px;
-    width: 14px;
+  font-size: 14px !important;
+  color: #0009;
+  height: 14px;
+  width: 14px;
+}
+
+:host ::ng-deep .external-training-container .round-control .mat-form-field-appearance-outline .mat-form-field-suffix {
+  top: 4px !important;
 }

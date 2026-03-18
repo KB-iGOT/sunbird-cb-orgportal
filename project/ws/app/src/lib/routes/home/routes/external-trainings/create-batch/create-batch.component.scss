@@ -76,107 +76,47 @@
 }
 
 .upload-section {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  background: #f8f9fa;
-  border-radius: 8px;
-  border: 1px solid #c3c3c3;
+  margin-bottom: 16px;
 }
 
-.instructions-box {
-  border-right: 1px solid #c3c3c3;
-  padding: 24px;
-  .instructions-title {
-    font-size: 16px;
-    margin: 0 0 16px 0;
-    color: #1a1a1a;
-  }
+.dashed-card {
+  border: 1px dashed #c3c3c3;
+  padding: 20px 24px;
+  font-size: 14px;
 
-  .instructions-list {
-    margin: 0 0 24px 0;
-    padding-left: 20px;
-
-    li {
-      font-size: 14px;
-      color: #666;
-      margin-bottom: 12px;
-      line-height: 1.5;
-    }
-  }
-
-  .download-button {
-    border: 2px solid #1b4ca1;
-    color: #1b4ca1;
-    font-weight: 500;
-    border-radius: 24px;
-    background: white;
-  }
-}
-
-.file-upload-box {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 24px;
-}
-
-.drop-zone {
-  width: 100%;
-  border-radius: 8px;
-  padding: 40px 20px;
-  text-align: center;
-  transition: all 0.3s ease;
-  cursor: pointer;
-
-
-
- .browse-files-text {
-    font-size: 16px;
-    color: #1b4ca1;
-    font-weight: 600;
-  }
-
-  .browse-button {
-    margin-top: 16px;
-    padding: 8px 32px;
-    font-weight: 500;
-    border-radius: 4px;
-
- }
-
-  .or-text {
-    margin: 8px 0;
-    color: #999;
-    font-size: 14px;
-  }
-
-  .drag-text {
+  .custom-ol {
     margin: 0;
-    color: #666;
-    font-size: 14px;
-    font-weight: 600;
+    padding-left: 12px;
+  }
+
+  .text-primary {
+    color: #1b4ca1;
+    font-weight: bold;
   }
 }
 
-.file-info {
-  text-align: center;
+.outline-button {
+  padding: 8px 16px;
+  border: 1px solid #1b4ca1;
+  color: #1b4ca1;
+  font: 600 14px 'Lato';
+  border-radius: 4px;
+  background: white;
+  cursor: pointer;
+}
 
-  .max-size {
-    font-size: 12px;
-    color: #999;
-    margin: 4px 0;
-    font-weight: 500;
-    letter-spacing: 0.5px;
-  }
+.error-msg {
+  color: #f44336;
+  font-weight: 600;
+  font-size: 14px;
+}
 
-  .file-types {
-    font-size: 11px;
-    color: #999;
-    margin: 4px 0;
-    font-weight: 500;
-    letter-spacing: 0.5px;
-  }
+.margin-top-m {
+  margin-top: 16px;
+}
+
+.margin-bottom-m {
+  margin-bottom: 16px;
 }
 
 .uploaded-file-info {
@@ -252,7 +192,7 @@
   }
 
   .upload-section {
-    grid-template-columns: 1fr;
+    flex-direction: column;
   }
 
   .action-buttons {
