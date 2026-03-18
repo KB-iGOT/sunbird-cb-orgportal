@@ -37,6 +37,7 @@ export class CreateBatchComponent implements OnInit {
   eventDurationInMinutes = 0
   todayDate = new Date()
   templateUrl = ''
+  templeateId = ''
   // tslint:disable-next-line: max-line-length
   noSpecialChar = new RegExp(/^[\u0900-\u097F\u0980-\u09FF\u0C00-\u0C7F\u0B80-\u0BFF\u0C80-\u0CFF\u0D00-\u0D7F\u0A80-\u0AFF\u0B00-\u0B7F\u0A00-\u0A7Fa-zA-Z0-9.,_\-\$\/\:\[\]\(\) '!]+$/) //NOSONAR
 
@@ -106,6 +107,7 @@ export class CreateBatchComponent implements OnInit {
         const batches = event.batches || []
         this.eventDurationInMinutes = Math.round((event.duration || 0) / 60)
         this.templateUrl = _.get(event, 'certTemplate', '')
+        this.templeateId = _.get(event, 'certTemplateId', '')
 
         // Find current batch by batchId
         this.currentBatch = batches.find((batch: any) => batch.batchId === this.batchId)
@@ -255,7 +257,7 @@ export class CreateBatchComponent implements OnInit {
                 eventId: this.trainingId,
                 template: {
                   template: this.templateUrl,
-                  identifier: createdBatchId,
+                  identifier: this.templeateId,
                   previewUrl: this.templateUrl,
                   criteria: {
                     enrollment: {
