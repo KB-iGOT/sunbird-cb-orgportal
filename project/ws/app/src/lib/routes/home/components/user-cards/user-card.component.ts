@@ -656,7 +656,7 @@ export class UserCardComponent implements OnInit, OnChanges, AfterViewChecked, A
   }
 
   getApprovalUserData(user: any, data: any, openPanel: MatExpansionPanel) {
-    if (openPanel.expanded) {
+    if (openPanel?.expanded && user) {
       user.enableEdit = false
       this.approveUserDataForm.reset()
       user.needApprovalList = []
@@ -667,7 +667,7 @@ export class UserCardComponent implements OnInit, OnChanges, AfterViewChecked, A
   }
 
   getUerData(user: any, openPanel: MatExpansionPanel, index: any) {
-    if (openPanel.expanded) {
+    if (openPanel?.expanded && user) {
       user.enableEdit = false
       const profileDataAll = user
 
