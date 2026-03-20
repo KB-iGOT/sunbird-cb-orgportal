@@ -103,7 +103,6 @@ export class PlayerYoutubeComponent extends WidgetBaseComponent
   }
 
   ngAfterViewInit() {
-    console.log('this.widgetData.url--', this.widgetData.url)
     if (this.widgetData && this.widgetData.url) {
       if (this.widgetData.url.includes('embed/')) {
         this.initializeYPlayer(this.widgetData.url.split('embed/')[1])
