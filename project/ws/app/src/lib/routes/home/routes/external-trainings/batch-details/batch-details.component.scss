@@ -2,6 +2,26 @@
 @import 'ws-vars';
 @import 'ws-mixins';
 
+.breadcrumb-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  flex: 1;
+}
+
+.breadcrumb-item {
+  flex: 0 1 auto;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.breadcrumb-separator {
+  flex-shrink: 0;
+}
+
 .batches-container {
   padding: 16px 0;
 }

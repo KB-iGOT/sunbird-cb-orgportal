@@ -1,10 +1,14 @@
 <div class="mt-4">
   <div class="flex mat-h2 margin-remove gap-2 items-center justify-between pr-4">
-    <div class="flex gap-2 items-center">
-      <div class="link" (click)="navigateToExternalTrainings()" (keydown.enter)="navigateToExternalTrainings()">External
-        Trainings</div>
-      <mat-icon>chevron_right</mat-icon>
-      <div>{{trainingName}}</div>
+    <div class="breadcrumb-row">
+      <div class="breadcrumb-item link cursor-pointer" (click)="navigateToExternalTrainings()"
+        (keydown.enter)="navigateToExternalTrainings()" matTooltip="External Trainings" matTooltipPosition="above">
+        External Trainings
+      </div>
+      <mat-icon class="breadcrumb-separator">chevron_right</mat-icon>
+      <div class="breadcrumb-item" [matTooltip]="trainingName" matTooltipPosition="above">
+        {{trainingName}}
+      </div>
     </div>
     <button mat-raised-button class="create-batch" (click)="createBatch()" *ngIf="currentTab === 'batches'">
       <mat-icon class="add">add</mat-icon>

@@ -1,14 +1,19 @@
 <div class="mt-4">
   <div class="flex mat-h2 margin-remove gap-2 items-center justify-between pr-4">
-    <div class="flex gap-2 items-center">
-      <div class="link cursor-pointer" (click)="navigateToExternalTrainings()" (keydown.enter)="navigateToExternalTrainings()">External Trainings
+    <div class="breadcrumb-row">
+      <div class="breadcrumb-item link cursor-pointer" (click)="navigateToExternalTrainings()"
+        (keydown.enter)="navigateToExternalTrainings()" matTooltip="External Trainings" matTooltipPosition="above">
+        External Trainings
       </div>
-      <mat-icon>chevron_right</mat-icon>
-      <div class="link cursor-pointer" (click)="navigateToBatches()" (keydown.enter)="navigateToBatches()">
+      <mat-icon class="breadcrumb-separator">chevron_right</mat-icon>
+      <div class="breadcrumb-item link cursor-pointer" (click)="navigateToBatches()"
+        (keydown.enter)="navigateToBatches()" [matTooltip]="training?.title" matTooltipPosition="above">
         {{ training?.title }}
       </div>
-      <mat-icon>chevron_right</mat-icon>
-      <div>{{ currentBatch?.name }}</div>
+      <mat-icon class="breadcrumb-separator">chevron_right</mat-icon>
+      <div class="breadcrumb-item" [matTooltip]="currentBatch?.name" matTooltipPosition="above">
+        {{ currentBatch?.name }}
+      </div>
     </div>
     <button mat-raised-button class="create-batch" (click)="createBatch()" *ngIf="currentTab === 'batches'">
       <mat-icon class="add">add</mat-icon>
@@ -49,14 +54,16 @@
 
   <!-- Tabs Section -->
   <ng-container *ngIf="!isLoading && currentBatch">
-    <mat-tab-group [(selectedIndex)]="selectedTabIndex" class="batch-tabs mt-2 external-traings" (selectedTabChange)="onTabChange($event)">
+    <mat-tab-group [(selectedIndex)]="selectedTabIndex" class="batch-tabs mt-2 external-traings"
+      (selectedTabChange)="onTabChange($event)">
       <!-- Enrolled Users Tab -->
       <mat-tab label="Enrolled Users">
         <!-- Search Bar -->
         <div class="search-container">
           <mat-form-field class="search-field" appearance="outline">
             <mat-icon matPrefix class="search-icon">search</mat-icon>
-            <input matInput placeholder="Search for a learner" [(ngModel)]="searchTerm" (ngModelChange)="onSearchChange()">
+            <input matInput placeholder="Search for a learner" [(ngModel)]="searchTerm"
+              (ngModelChange)="onSearchChange()">
           </mat-form-field>
         </div>
         <ng-container *ngIf="filteredUsers?.length > 0; else noLearners">
@@ -82,7 +89,8 @@
           <div class="no-learners-message mt-6">
             <mat-icon class="no-learners-icon">people_outline</mat-icon>
             <p class="no-learners-text">No learners enrolled in this batch yet</p>
-            <div class="flex items-center justify-between cursor-pointer upload-users pt-4 gap-1" (click)="uploadUsers()" (keyup)="uploadUsers()">
+            <div class="flex items-center justify-between cursor-pointer upload-users pt-4 gap-1"
+              (click)="uploadUsers()" (keyup)="uploadUsers()">
               <mat-icon class="add-users-icon">add</mat-icon>Upload Users
             </div>
           </div>
