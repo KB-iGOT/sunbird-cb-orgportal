@@ -104,10 +104,23 @@ export class PlayerYoutubeComponent extends WidgetBaseComponent
 
   ngAfterViewInit() {
     if (this.widgetData && this.widgetData.url) {
+      if (this.widgetData.url.includes('embed/')) {
+        this.initializeYPlayer(this.widgetData.url.split('embed/')[1])
+      } else {
+        const videoId: any = this.extractVideoId(this.widgetData.url)
+        this.initializeYPlayer(videoId)
 
-      this.initializeYPlayer(this.widgetData.url.split('embed/')[1])
+      }
+
     }
   }
+
+  extractVideoId(url: string): string | null {
+    const regExp = /(?:youtube\.com\/(?:.*v=|.*\/)|youtu\.be\/)([^#\&\?]{11})/
+    const match = url.match(regExp)
+    return match ? match[1] : null
+  }
+
   ngOnDestroy() {
     if (this.player) {
       this.player.dispose()
