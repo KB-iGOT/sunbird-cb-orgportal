@@ -60,7 +60,7 @@ export class NewExternalTrainingComponent implements OnInit {
     this.configSvc = this.activeRoute.snapshot.data['configService']
     this.previewLogoUrl = this.defaultCertificateTemplateUrl
     this.initializeForm()
-    // this.getDefaultTemplate()
+    this.getDefaultTemplate()
   }
 
   getDefaultTemplate(): void {
@@ -337,7 +337,6 @@ export class NewExternalTrainingComponent implements OnInit {
     const eventType = _.get(form, 'deliveryMode') || ''
     const learningHours = _.get(form, 'learningHours') || 0
     const logoUrl = this.mergedLogoUrl || this.defaultCertificateTemplateUrl
-
     return {
       request: {
         event: {
@@ -351,7 +350,6 @@ export class NewExternalTrainingComponent implements OnInit {
           categoryType: _.get(form, 'trainingType'),
           sourceName: _.get(this.configSvc, 'unMappedUser.rootOrg.orgName'),
           orgLogo: logoUrl,
-          cerTemplate: logoUrl,
           code: 'externalTraining',
           eventType,
           createdFor: [_.get(this.configSvc, 'userProfile.rootOrgId')],
@@ -362,7 +360,7 @@ export class NewExternalTrainingComponent implements OnInit {
             autoBatch: 'No',
           },
           creatorName: _.get(this.configSvc, 'userProfile.firstName'),
-          createrEmail: _.get(this.configSvc, 'userProfile.email'),
+          createrEmail: _.get(this.configSvc, 'userProfileV2.email'),
           partnerName: _.get(form, 'partnerName'),
         },
       },
@@ -370,7 +368,7 @@ export class NewExternalTrainingComponent implements OnInit {
   }
 
   onSubmit(): void {
-    if (this.trainingForm.valid && this.selectedCompetencyList.length > 0) {
+    if (this.trainingForm.valid && this.selectedCompetencyList.length > 0 && this.templateId) {
       if (this.logoUploaded) {
         // Scenario 2: Merged template — create content asset, upload merged file, then create training
         const createContentPayload = {
@@ -485,6 +483,8 @@ export class NewExternalTrainingComponent implements OnInit {
           },
         })
       }
+    } else {
+      this.openSnackbar('Please fill all required fields, certificate template and select at least one competency.')
     }
   }
 

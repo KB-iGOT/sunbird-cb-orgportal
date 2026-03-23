@@ -169,6 +169,12 @@
     border-radius: 24px;
   }
 
+  .save-training-btn:disabled {
+    background: #1b4ca1 !important;
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
   .cancel-training-btn {
     border: 1px solid rgb(27, 76, 161) !important;
     color: rgb(27, 76, 161) !important;
