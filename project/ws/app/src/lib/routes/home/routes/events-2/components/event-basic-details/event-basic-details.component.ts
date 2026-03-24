@@ -24,7 +24,7 @@ export class EventBasicDetailsComponent implements OnInit, OnChanges {
   @Input() userProfile: any
   @Input() openTab = 'draft'
 
-  eventCategoriesList = ['Webinar', 'Karmayogi Talks', 'Karmayogi Saptah']
+  eventCategoriesList = ['Webinar', 'Karmayogi Talks', 'Karmayogi Saptah', 'Sadhna Saptah']
   minDate = new Date()
 
   maxTimeToStart = '11:44 pm'
