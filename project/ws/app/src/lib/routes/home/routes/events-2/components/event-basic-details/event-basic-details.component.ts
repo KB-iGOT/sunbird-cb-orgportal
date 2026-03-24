@@ -131,7 +131,7 @@ export class EventBasicDetailsComponent implements OnInit, OnChanges {
         })
       }
       if (this.edf?.typeofEvent?.value?.toLowerCase() === 'live') {
-        this.edf.maxEnrolments?.setValidators([Validators.required, Validators.min(10), Validators.max(200)])
+        this.edf.maxEnrolments?.setValidators([Validators.required, Validators.min(10), Validators.max(10000)])
         this.edf.maxEnrolments?.updateValueAndValidity()
         this.edf.registrationLink?.setValidators([])
         this.edf.registrationLink?.updateValueAndValidity()
