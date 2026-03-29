@@ -156,11 +156,18 @@
         or Upload from URL
       </div>
       <mat-form-field appearance="outline" class="disable-round">
-        <input matInput placeholder="Enter url" formControlName="registrationLink">
+        <input matInput
+          [placeholder]="edf?.typeofEvent?.value?.toLowerCase() === 'record' ? 'Enter YouTube URL' : 'Enter url'"
+          formControlName="registrationLink">
         <mat-error *ngIf="showValidationMsg('registrationLink','required')">
           Resource is mandatory
         </mat-error>
-        <mat-error *ngIf="showValidationMsg('registrationLink','pattern')">
+        <mat-error
+          *ngIf="showValidationMsg('registrationLink','pattern') && edf?.typeofEvent?.value?.toLowerCase() === 'record'">
+          Please provide a valid YouTube or embedded YouTube URL
+        </mat-error>
+        <mat-error
+          *ngIf="showValidationMsg('registrationLink','pattern') && edf?.typeofEvent?.value?.toLowerCase() !== 'record'">
           Please give valid URL
         </mat-error>
       </mat-form-field>
