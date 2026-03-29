@@ -2,7 +2,7 @@ import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/cor
 import { FormGroup, Validators } from '@angular/forms'
 import { MatLegacySnackBar } from '@angular/material/legacy-snack-bar'
 import * as _ from 'lodash'
-import { URL_PATRON, events } from '../../models/events.model'
+import { URL_PATRON, YOUTUBE_URL_PATRON, events } from '../../models/events.model'
 import { EventsService } from '../../services/events.service'
 import { map, mergeMap } from 'rxjs/operators'
 import { environment } from '../../../../../../../../../../../src/environments/environment'
@@ -121,7 +121,8 @@ export class EventBasicDetailsComponent implements OnInit, OnChanges {
               this.disableUpload = true
               this.eventDetails.controls.recoredEventUrl.patchValue('')
               this.eventDetails.controls.recoredEventUrl.clearValidators()
-              this.eventDetails.controls.registrationLink.setValidators([Validators.required, Validators.pattern(URL_PATRON)])
+              const urlPattern = this.edf?.typeofEvent?.value?.toLowerCase() === 'record' ? YOUTUBE_URL_PATRON : URL_PATRON
+              this.eventDetails.controls.registrationLink.setValidators([Validators.required, Validators.pattern(urlPattern)])
               this.eventDetails.controls.recoredEventUrl.updateValueAndValidity()
               this.eventDetails.controls.registrationLink.updateValueAndValidity()
             }
@@ -262,7 +263,8 @@ export class EventBasicDetailsComponent implements OnInit, OnChanges {
       this.eventDetails.controls.recoredEventUrl.patchValue('')
       this.eventDetails.controls.recoredEventUrl.updateValueAndValidity()
       if (this.openTab !== 'past') {
-        this.eventDetails.controls.registrationLink.setValidators([Validators.required, Validators.pattern(URL_PATRON)])
+        const urlPattern = this.edf?.typeofEvent?.value?.toLowerCase() === 'record' ? YOUTUBE_URL_PATRON : URL_PATRON
+        this.eventDetails.controls.registrationLink.setValidators([Validators.required, Validators.pattern(urlPattern)])
         this.eventDetails.controls.registrationLink.updateValueAndValidity()
         this.eventDetails.controls.registrationLink.enable()
         this.disableUrl = false
