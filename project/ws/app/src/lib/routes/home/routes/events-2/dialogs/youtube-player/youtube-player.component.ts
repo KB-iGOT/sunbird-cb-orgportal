@@ -42,10 +42,16 @@ export class YoutubePlayerComponent implements OnInit {
     if (url) {
 
       if (this.videoId.includes('embed')) {
-        this.videoId = this.videoId.split('embed/')[1]
+        this.videoId = this.videoId.split('embed/')[1].split('?')[0]
         this.generateVideoLink()
       } else if (this.videoId.includes('watch')) {
         this.videoId = this.getYouTubeVideoId(this.videoId)
+        this.generateVideoLink()
+      } else if (this.videoId.includes('youtube.com/live/')) {
+        this.videoId = this.videoId.split('youtube.com/live/')[1].split('?')[0]
+        this.generateVideoLink()
+      } else if (this.videoId.includes('youtu.be/')) {
+        this.videoId = this.videoId.split('youtu.be/')[1].split('?')[0]
         this.generateVideoLink()
       } else {
         this.youtubeURL = false
