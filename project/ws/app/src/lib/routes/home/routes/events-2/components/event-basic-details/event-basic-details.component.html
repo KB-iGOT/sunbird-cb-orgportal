@@ -206,15 +206,18 @@
           minutes</mat-hint>
       </mat-form-field>
     </div>
-    <div class="flex flex-column gap-2 event-form w-full" [ngClass]="{'disableForm': uploadedVideoDuration > 0}">
+    <div class="flex flex-column gap-2 event-form w-full"
+      [ngClass]="{'disableForm': uploadedVideoDuration > 0 && uploadedVideoDuration < 15}">
       <div class="form-lable required">
         End Time
       </div>
       <mat-form-field appearance="outline" class="disable-round">
         <input matInput placeholder="Enter End Time" formControlName="endTime" [ngxTimepicker]="endTimepicker"
-          [min]="minTimeToEnd" readonly>
-        <ngx-material-timepicker-toggle [for]="endTimepicker" matSuffix></ngx-material-timepicker-toggle>
-        <ngx-material-timepicker #endTimepicker (change)="onEndTimeChange($event)"></ngx-material-timepicker>
+          [min]="minTimeToEnd" [disabled]="uploadedVideoDuration > 0 && uploadedVideoDuration < 15"
+          [disableClick]="uploadedVideoDuration > 0 && uploadedVideoDuration < 15" readonly>
+        <ngx-material-timepicker-toggle [for]="endTimepicker" matSuffix
+          [disabled]="uploadedVideoDuration > 0 && uploadedVideoDuration < 15"></ngx-material-timepicker-toggle>
+        <ngx-material-timepicker #endTimepicker></ngx-material-timepicker>
         <mat-error *ngIf="showValidationMsg('endTime','required')">
           End time is mandatory
         </mat-error>
