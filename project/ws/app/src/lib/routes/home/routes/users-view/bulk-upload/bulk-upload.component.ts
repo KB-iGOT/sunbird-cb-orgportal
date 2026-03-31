@@ -10,7 +10,7 @@ import { Subject } from 'rxjs'
 import { takeUntil } from 'rxjs/operators'
 
 import { FileService } from '../../../../users/services/upload.service'
-// import { UsersService } from '../../../../users/services/users.service'
+import { UsersService } from '../../../../users/services/users.service'
 import { VerifyOtpComponent } from '../verify-otp/verify-otp.component'
 import { FileProgressComponent } from '../file-progress/file-progress.component'
 
@@ -45,7 +45,7 @@ export class BulkUploadComponent implements OnInit, AfterViewInit, OnDestroy {
     private matSnackBar: MatSnackBar,
     private router: ActivatedRoute,
     public dialog: MatDialog,
-    // private usersService: UsersService
+    private usersService: UsersService
   ) {
 
 
@@ -121,24 +121,24 @@ export class BulkUploadComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   generateAndVerifyOTP(contactType: string, resendFlag?: string): void {
-    // const postValue = contactType === 'email' ? this.userProfile.email : this.userProfile.mobile
     if (!resendFlag) {
       this.verifyOTP(contactType)
+    } else {
+      const postValue = contactType === 'email' ? this.userProfile.email : this.userProfile.mobile
+      this.usersService.sendOtp(postValue, contactType)
+        .pipe(takeUntil(this.destroySubject$))
+        .subscribe((_res: any) => {
+          this.matSnackBar.open(`An OTP has been sent to your ${contactType === 'phone' ? 'Mobile number'
+            : 'Email address'}, (Valid for 15 min's)`)
+
+          // tslint:disable-next-line
+        }, (error: HttpErrorResponse) => {
+          if (!error.ok) {
+            this.matSnackBar.open(_.get(error, 'error.params.errmsg') || `Unable to send OTP to your ${contactType}, please try again later!`)
+          }
+        })
     }
-    // this.usersService.sendOtp(postValue, contactType)
-    //   .pipe(takeUntil(this.destroySubject$))
-    //   .subscribe((_res: any) => {
-    //     this.matSnackBar.open(`An OTP has been sent to your ${contactType === 'phone' ? 'Mobile number'
-    //       : 'Email address'}, (Valid for 15 min's)`)
-    //     if (!resendFlag) {
-    //       this.verifyOTP(contactType)
-    //     }
-    //     // tslint:disable-next-line
-    //   }, (error: HttpErrorResponse) => {
-    //     if (!error.ok) {
-    //       this.matSnackBar.open(_.get(error, 'error.params.errmsg') || `Unable to send OTP to your ${contactType}, please try again later!`)
-    //     }
-    //   })
+
   }
 
   handleOnFileChange(event: any): void {
