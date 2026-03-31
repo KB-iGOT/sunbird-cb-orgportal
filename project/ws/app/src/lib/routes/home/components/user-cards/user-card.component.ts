@@ -113,7 +113,7 @@ export class UserCardComponent implements OnInit, OnChanges, AfterViewChecked, A
   masterLanguages: Observable<any[]> | undefined
   masterLanguagesEntries: any
   genderList = ['Male', 'Female', 'Others']
-  categoryList = ['General', 'OBC', 'SC', 'ST', 'PWD']
+  categoryList = ['General', 'OBC', 'SC', 'ST', 'PWD', 'ST-1', 'ST-2', 'RBA', 'ALC/IB', 'EWS(Economically Weaker Section)', 'Physically Challenged Person', 'Ex - Servicemen']
   // needApprovalList: any[] = []
   profileData: any[] = []
   userwfData!: any
