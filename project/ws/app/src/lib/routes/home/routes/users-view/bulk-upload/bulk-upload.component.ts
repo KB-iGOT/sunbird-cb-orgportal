@@ -146,7 +146,7 @@ export class BulkUploadComponent implements OnInit, AfterViewInit, OnDestroy {
       this.fileName = file.name
       this.fileSelected = file
       if (this.fileService.validateFile(this.fileName)) {
-        this.sendOTP()
+        // this.sendOTP()
         // this.verifyOTP(this.userProfile.email ? 'email' : 'phone')
         // this.uploadWithOtp() // dont use this function this is for dev purposes only
       } else {
