@@ -11,9 +11,9 @@
             </span>
           </div>
           <mat-form-field appearance="outline" class="w-full">
-            <input matInput placeholder="Add your event name" formControlName="eventName" maxlength="150">
+            <input matInput placeholder="Add your event name" formControlName="eventName" maxlength="90">
             <mat-hint>Only ( a-z/A-Z , 0-9 . - _ $ / : [ ]' ' " " !) characters are supported</mat-hint>
-            <mat-hint align="end" class="text-sm">{{eventForm.controls['eventName'].value.length}}/150</mat-hint>
+            <mat-hint align="end" class="text-sm">{{eventForm.controls['eventName'].value.length}}/90</mat-hint>
             <mat-error *ngIf="!eventForm.controls['eventName'].hasError('required') && !eventForm.controls['eventName'].errors?.pattern &&
               eventForm.controls['eventName'].errors?.minlength">
               Minimum characters left to create {{ 10 - eventForm?.controls['eventName'].value.length}}
