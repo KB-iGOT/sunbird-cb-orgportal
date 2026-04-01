@@ -56,9 +56,9 @@
       Event Name
     </div>
     <mat-form-field appearance="outline" class="disable-round">
-      <input matInput placeholder="Add your event name" formControlName="eventName" maxlength="150">
+      <input matInput placeholder="Add your event name" formControlName="eventName" maxlength="90">
       <mat-hint>Only ( a-z/A-Z , 0-9 . - _ $ / : [ ]' ' " "!) characters are supported</mat-hint>
-      <mat-hint align="end" class="text-sm">{{eventDetails?.controls['eventName']?.value?.length}}/150</mat-hint>
+      <mat-hint align="end" class="text-sm">{{eventDetails?.controls['eventName']?.value?.length}}/90</mat-hint>
       <mat-error *ngIf="showValidationMsg('eventName','required')">
         Event name is mandatory
       </mat-error>
