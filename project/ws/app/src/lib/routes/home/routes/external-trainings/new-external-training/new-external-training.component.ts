@@ -345,6 +345,7 @@ export class NewExternalTrainingComponent implements OnInit {
           name: _.get(form, 'trainingTitle'),
           description: _.get(form, 'learningObjective'),
           category: 'externalTraining',
+          resourceType: 'externalTraining',
           duration: learningHours * 3600,
           createdBy: _.get(this.configSvc, 'userProfile.userId'),
           categoryType: _.get(form, 'trainingType'),
