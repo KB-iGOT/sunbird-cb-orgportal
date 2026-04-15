@@ -7,7 +7,7 @@ COPY --chown=node:node . .
 
 USER node
 
-RUN rm -rf node_modules
+RUN corepack enable
 RUN yarn cache clean && yarn && yarn add moment && yarn add vis-util && npm run build --prod --build-optimizer
 
 RUN npm run compress:brotli
