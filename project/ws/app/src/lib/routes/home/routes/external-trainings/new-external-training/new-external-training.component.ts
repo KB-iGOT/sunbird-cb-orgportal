@@ -61,7 +61,7 @@ export class NewExternalTrainingComponent implements OnInit {
     this.configSvc = this.activeRoute.snapshot.data['configService']
     this.previewLogoUrl = this.defaultCertificateTemplateUrl
     this.initializeForm()
-    // this.getDefaultTemplate()
+    this.getDefaultTemplate()
   }
 
   getDefaultTemplate(): void {
