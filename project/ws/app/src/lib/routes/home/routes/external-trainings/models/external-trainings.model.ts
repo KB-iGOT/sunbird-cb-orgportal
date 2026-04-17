@@ -1,5 +1,5 @@
 export const deliveryModeList: { [key: string]: string } = {
-  Offline: 'Offline',
   Online: 'Online',
+  Offline: 'Offline',
   OnlineAndOffline: 'Hybrid',
 }
