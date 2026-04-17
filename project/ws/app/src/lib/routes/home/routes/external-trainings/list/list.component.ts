@@ -8,6 +8,7 @@ import { MatSort } from '@angular/material/sort'
 import { MatPaginator } from '@angular/material/paginator'
 import { map } from 'rxjs/operators'
 import * as _ from 'lodash'
+import { deliveryModeList } from '../models/external-trainings.model'
 
 @Component({
   selector: 'ws-app-external-trainings-list',
@@ -91,6 +92,7 @@ export class ListComponent implements OnInit, AfterViewInit {
           const hours = Math.floor(durationSec / 3600)
           return {
             ...item,
+            eventType: deliveryModeList[item.eventType] || item.eventType || '',
             createdOnFormatted: item.createdOn
               ? this.datePipe.transform(item.createdOn, 'MMM dd, yyyy') || ''
               : '',
