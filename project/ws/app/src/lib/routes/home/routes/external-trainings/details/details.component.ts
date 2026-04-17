@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
 import { ExternalTrainingsService } from '../../../services/external-trainings.service'
 import * as _ from 'lodash'
+import { deliveryModeList } from '../models/external-trainings.model'
 import { LoaderService } from '../../../../../../../../../../src/app/services/loader.service'
 
 @Component({
@@ -44,7 +45,7 @@ export class DetailsComponent implements OnInit {
         this.training = {
           ...event,
           title: event.name,
-          deliveryMode: event.eventType,
+          deliveryMode: deliveryModeList[event.eventType] || event.eventType,
           learningHours,
           learningObjective: event.description,
           competency_v6: event.competencies_v6 || [],
