@@ -64,7 +64,7 @@
           <div class="form-lable">Delivery Mode</div>
           <mat-form-field appearance="outline">
             <mat-select placeholder="Select Delivery Mode" formControlName="deliveryMode">
-              <mat-option *ngFor="let mode of deliveryModeList | keyvalue" [value]="mode.key">{{ mode.value
+              <mat-option *ngFor="let mode of deliveryModeList" [value]="mode.key">{{ mode.value
                 }}</mat-option>
             </mat-select>
           </mat-form-field>

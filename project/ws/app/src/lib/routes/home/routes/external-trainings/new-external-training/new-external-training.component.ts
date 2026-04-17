@@ -17,7 +17,7 @@ import { environment } from '../../../../../../../../../../src/environments/envi
 export class NewExternalTrainingComponent implements OnInit {
   trainingForm!: FormGroup
   selectedCompetencyList: any[] = []
-  deliveryModeList = deliveryModes
+  deliveryModeList = Object.entries(deliveryModes).map(([key, value]) => ({ key, value }))
   configSvc: any
 
   // Logo state variables
