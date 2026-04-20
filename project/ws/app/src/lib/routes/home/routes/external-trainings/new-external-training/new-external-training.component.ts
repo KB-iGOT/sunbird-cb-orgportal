@@ -28,6 +28,7 @@ export class NewExternalTrainingComponent implements OnInit {
   logoFileName = ''
   logoUploaded = false
   isLogoMerging = false
+  templateLoadFailed = false
   templateId = ''
   defaultTemplateUrl = ''
 
@@ -44,9 +45,9 @@ export class NewExternalTrainingComponent implements OnInit {
 
   private readonly FILE_UPLOAD_MAX_SIZE = 1 * 1024 * 1024 // 1MB
   // tslint:disable-next-line: max-line-length
-  noSpecialChar = new RegExp(/^[\u0900-\u097F\u0980-\u09FF\u0C00-\u0C7F\u0B80-\u0BFF\u0C80-\u0CFF\u0D00-\u0D7F\u0A80-\u0AFF\u0B00-\u0B7F\u0A00-\u0A7Fa-zA-Z0-9.,_\-\$\/\:\[\]\(\) '!]+$/) //NOSONAR
-  noSpecialCharMultiline = new RegExp(/^[\u0900-\u097F\u0980-\u09FF\u0C00-\u0C7F\u0B80-\u0BFF\u0C80-\u0CFF\u0D00-\u0D7F\u0A80-\u0AFF\u0B00-\u0B7F\u0A00-\u0A7Fa-zA-Z0-9.,_\-\$\/\:\[\]\(\) '!\n\r]+$/) //NOSONAR
-  specialCharList = `( a-z/A-Z , 0-9 . _ - $ / \ : [ ]' ' !)`
+  noSpecialChar = new RegExp(/^[\u0900-\u097F\u0980-\u09FF\u0C00-\u0C7F\u0B80-\u0BFF\u0C80-\u0CFF\u0D00-\u0D7F\u0A80-\u0AFF\u0B00-\u0B7F\u0A00-\u0A7Fa-zA-Z0-9.,_\-\$\/\:\[\]\(\) '!&]+$/) //NOSONAR
+  noSpecialCharMultiline = new RegExp(/^[\u0900-\u097F\u0980-\u09FF\u0C00-\u0C7F\u0B80-\u0BFF\u0C80-\u0CFF\u0D00-\u0D7F\u0A80-\u0AFF\u0B00-\u0B7F\u0A00-\u0A7Fa-zA-Z0-9.,_\-\$\/\:\[\]\(\) '!&\n\r]+$/) //NOSONAR
+  specialCharList = `( a-z/A-Z , 0-9 . _ - $ / \ : [ ]' ' ! &)`
 
   constructor(
     private readonly fb: FormBuilder,
@@ -88,15 +89,18 @@ export class NewExternalTrainingComponent implements OnInit {
                 this.previewLogoUrl = this.certificateUrl
               },
               error: () => {
+                this.templateLoadFailed = true
                 this.openSnackbar('Failed to load certificate template SVG.')
               },
             })
           }
         } catch {
+          this.templateLoadFailed = true
           this.openSnackbar('Failed to parse default certificate template response.')
         }
       },
       error: () => {
+        this.templateLoadFailed = true
         this.openSnackbar('Failed to load default certificate template.')
       },
     })
@@ -152,6 +156,10 @@ export class NewExternalTrainingComponent implements OnInit {
   }
 
   private mergeLogo(): void {
+    if (!this.originalContentFile) {
+      return
+    }
+    this.isLogoMerging = true
     try {
       const certificateReader = new FileReader()
       certificateReader.onload = (certEvent) => {
@@ -176,6 +184,7 @@ export class NewExternalTrainingComponent implements OnInit {
       }
       certificateReader.readAsText(this.originalContentFile)
     } catch (error: any) {
+      this.isLogoMerging = false
       this.openSnackbar(`Error processing files: ${error.message}`, 'close')
     }
   }
@@ -201,8 +210,11 @@ export class NewExternalTrainingComponent implements OnInit {
       this.certificateUrl = URL.createObjectURL(updatedBlob)
       this.safeCertificateUrl = this.sanitizer.bypassSecurityTrustResourceUrl(this.certificateUrl)
       this.previewLogoUrl = this.certificateUrl
+      this.isLogoMerging = false
 
-    } catch (error: any) { }
+    } catch (error: any) {
+      this.isLogoMerging = false
+    }
   }
 
   // Extracts the logo and places it at the ProvidersLogo_Placement location in the certificate

@@ -9,11 +9,11 @@
       </div>
       <div class="info-block">
         <span class="info-label">DELIVERY MODE</span>
-        <span class="info-value">{{ training.deliveryMode }}</span>
+        <span class="info-value">{{ training.deliveryMode || '-' }}</span>
       </div>
       <div class="info-block">
         <span class="info-label">LEARNING HOURS</span>
-        <span class="info-value">{{ training.learningHours }}</span>
+        <span class="info-value">{{ training.learningHours || '-' }}</span>
       </div>
       <ng-container *ngIf="training.partnerName">
         <div class="info-block">
@@ -25,7 +25,7 @@
 
     <div class="objective-section">
       <span class="info-label">LEARNING OBJECTIVE</span>
-      <p class="objective-text">{{ training.learningObjective }}</p>
+      <p class="objective-text">{{ training.learningObjective || '-' }}</p>
     </div>
   </div>
 

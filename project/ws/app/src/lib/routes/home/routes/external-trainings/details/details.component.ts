@@ -38,9 +38,11 @@ export class DetailsComponent implements OnInit {
         const event = _.get(response, 'result.event', {})
         const durationInSeconds = event.duration || 0
         const hours = durationInSeconds / 3600
-        const learningHours = Number.isInteger(hours)
-          ? `${hours} Hour${hours !== 1 ? 's' : ''}`
-          : `${hours.toFixed(2)} Hours`
+        const learningHours = hours > 0
+          ? (Number.isInteger(hours)
+            ? `${hours} Hour${hours !== 1 ? 's' : ''}`
+            : `${hours.toFixed(2)} Hours`)
+          : ''
 
         this.training = {
           ...event,
