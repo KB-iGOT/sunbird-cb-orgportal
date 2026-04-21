@@ -60,6 +60,9 @@ export class BulkUploadComponent implements OnInit, AfterViewInit, OnDestroy {
   ngOnInit() {
     this.rootOrgId = (this.selectedOrgData) ? (this.selectedOrgData.roleId) : _.get(this.router.snapshot.parent, 'data.configService.unMappedUser.rootOrg.rootOrgId')
     this.userProfile = _.get(this.router.snapshot.parent, 'data.configService.userProfileV2')
+    if (!this.userProfile) {
+      this.userProfile = _.get(this.router.snapshot, 'data.configService.userProfileV2')
+    }
     if (this.selectedOrgData) {
       this.downloadSampleFilePath = _.get(this.router.snapshot.data.pageData.data.bulkUploadConfig, 'downloadSampleUserFilePath')
       this.downloadAsFileName = _.get(this.router.snapshot.data.pageData.data.bulkUploadConfig, 'downloadAsUserFileName')
@@ -118,21 +121,24 @@ export class BulkUploadComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   generateAndVerifyOTP(contactType: string, resendFlag?: string): void {
-    const postValue = contactType === 'email' ? this.userProfile.email : this.userProfile.mobile
-    this.usersService.sendOtp(postValue, contactType)
-      .pipe(takeUntil(this.destroySubject$))
-      .subscribe((_res: any) => {
-        this.matSnackBar.open(`An OTP has been sent to your ${contactType === 'phone' ? 'Mobile number'
-          : 'Email address'}, (Valid for 15 min's)`)
-        if (!resendFlag) {
-          this.verifyOTP(contactType)
-        }
-        // tslint:disable-next-line
-      }, (error: HttpErrorResponse) => {
-        if (!error.ok) {
-          this.matSnackBar.open(_.get(error, 'error.params.errmsg') || `Unable to send OTP to your ${contactType}, please try again later!`)
-        }
-      })
+    if (!resendFlag) {
+      this.verifyOTP(contactType)
+    } else {
+      const postValue = contactType === 'email' ? this.userProfile.email : this.userProfile.mobile
+      this.usersService.sendOtp(postValue, contactType)
+        .pipe(takeUntil(this.destroySubject$))
+        .subscribe((_res: any) => {
+          this.matSnackBar.open(`An OTP has been sent to your ${contactType === 'phone' ? 'Mobile number'
+            : 'Email address'}, (Valid for 15 min's)`)
+
+          // tslint:disable-next-line
+        }, (error: HttpErrorResponse) => {
+          if (!error.ok) {
+            this.matSnackBar.open(_.get(error, 'error.params.errmsg') || `Unable to send OTP to your ${contactType}, please try again later!`)
+          }
+        })
+    }
+
   }
 
   handleOnFileChange(event: any): void {
@@ -143,9 +149,9 @@ export class BulkUploadComponent implements OnInit, AfterViewInit, OnDestroy {
       this.fileName = file.name
       this.fileSelected = file
       if (this.fileService.validateFile(this.fileName)) {
-        // this.sendOTP()
+        this.sendOTP()
         // this.verifyOTP(this.userProfile.email ? 'email' : 'phone')
-        this.uploadWithOtp() // dont use this function this is for dev purposes only
+        // this.uploadWithOtp() // dont use this function this is for dev purposes only
       } else {
         this.showFileError = true
       }

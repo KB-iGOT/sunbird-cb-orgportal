@@ -1,0 +1,31 @@
+<div class="mt-4">
+  <div class="flex mat-h2 margin-remove gap-2 items-center justify-between pr-4">
+    <div class="breadcrumb-row">
+      <div class="breadcrumb-item link cursor-pointer" (click)="navigateToExternalTrainings()"
+        (keydown.enter)="navigateToExternalTrainings()" matTooltip="External Trainings" matTooltipPosition="above">
+        External Trainings
+      </div>
+      <mat-icon class="breadcrumb-separator">chevron_right</mat-icon>
+      <div class="breadcrumb-item" [matTooltip]="trainingName" matTooltipPosition="above">
+        {{trainingName}}
+      </div>
+    </div>
+    <button mat-raised-button class="create-batch" (click)="createBatch()" *ngIf="currentTab === 'batches'">
+      <mat-icon class="add">add</mat-icon>
+      Create Batch
+    </button>
+  </div>
+  <div class="pl-4 pr-4">
+    <div class="flex flex-1 flex-column margin-fix mb-2">
+      <div class="flex flex-1 filter max-height-60 gap-3">
+        <div class="filter-option default"
+          [ngClass]="{'active': currentTab === 'details', 'font-medium': currentTab !== 'details'}"
+          (click)="onTabChange('details')" (keydown.enter)="onTabChange('details')">Training details</div>
+        <div class="filter-option default"
+          [ngClass]="{'active': currentTab === 'batches' || currentTab === 'create-batch', 'font-medium': currentTab !== 'batches'}"
+          (click)="onTabChange('batches')" (keydown.enter)="onTabChange('batches')">Batches</div>
+      </div>
+    </div>
+    <router-outlet></router-outlet>
+  </div>
+</div>

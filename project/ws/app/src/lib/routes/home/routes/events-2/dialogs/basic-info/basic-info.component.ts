@@ -9,6 +9,7 @@ import { map, mergeMap } from 'rxjs/operators'
 import { HttpErrorResponse } from '@angular/common/http'
 import { environment } from '../../../../../../../../../../../src/environments/environment'
 import { LoaderService } from '../../../../../../../../../../../src/app/services/loader.service'
+import { ConfigurationsService } from '@sunbird-cb/utils-v2'
 
 @Component({
   selector: 'ws-app-basic-info',
@@ -22,6 +23,7 @@ export class BasicInfoComponent implements OnInit {
   imagePath: any
   userProfile: any
   userEmail = ''
+  orgData: any
 
   constructor(
     private dialogRef: MatDialogRef<BasicInfoComponent>,
@@ -29,7 +31,8 @@ export class BasicInfoComponent implements OnInit {
     private formBuilder: FormBuilder,
     private matSnackBar: MatSnackBar,
     private eventSvc: EventsService,
-    private loaderService: LoaderService
+    private loaderService: LoaderService,
+    private configSvc: ConfigurationsService
   ) {
     this.userProfile = data.userProfile
     this.userEmail = data.userEmail
@@ -37,12 +40,13 @@ export class BasicInfoComponent implements OnInit {
 
   ngOnInit(): void {
     this.createForm()
+    this.orgData = _.get(this.configSvc, 'orgReadData', {})
   }
 
   createForm() {
     this.eventForm = this.formBuilder.group({
       eventName: new FormControl('', [Validators.required, Validators.minLength(10),
-      Validators.maxLength(70), Validators.pattern(noSpecialCharEvent)]),
+      Validators.maxLength(90), Validators.pattern(noSpecialCharEvent)]),
       eventType: new FormControl('record', [Validators.required]),
     })
   }

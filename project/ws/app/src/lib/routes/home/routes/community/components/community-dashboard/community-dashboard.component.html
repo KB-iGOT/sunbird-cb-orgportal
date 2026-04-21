@@ -2,7 +2,7 @@
   <div class="header">
     <h1>Communities</h1>
 
-    <button mat-button class="createBtn" (click)="onCreateCommunity()" *ngIf="isCommunityCreateRole">Create New
+    <button mat-button class="createBtn" (click)="onCreateCommunity()" *ngIf="filteredTabs.length>1">Create New
       Community</button>
   </div>
 
@@ -21,17 +21,10 @@
   </mat-tab-group> -->
 
   <mat-tab-group [(selectedIndex)]="selectedTabIndex" (selectedTabChange)="onTabChange($event)">
-    <ng-container *ngIf="isCommunityModeratorOnly">
-      <mat-tab>
-        <ng-template mat-tab-label>
-          Community
-        </ng-template>
-        <ng-container *ngTemplateOutlet="tabContent"></ng-container>
-      </mat-tab>
-    </ng-container>
 
-    <ng-container *ngIf="!isCommunityModeratorOnly">
-      <mat-tab *ngFor="let tab of tabs">
+
+    <ng-container *ngIf="!(filteredTabs?.length === 1 && (filteredTabs[0] | keyvalue).length === 0)">
+      <mat-tab *ngFor="let tab of filteredTabs">
         <ng-template mat-tab-label>
           {{tab?.label}}
         </ng-template>
@@ -142,7 +135,7 @@
             </button>
 
             <button mat-menu-item (click)="onActionClick('manage', row)"
-              *ngIf="isCommunityModeratorRole && currentStatus==='active'">
+              *ngIf="filteredTabs.length>1&& currentStatus==='active'">
               <mat-icon>settings</mat-icon>
               <span>Manage</span>
             </button>

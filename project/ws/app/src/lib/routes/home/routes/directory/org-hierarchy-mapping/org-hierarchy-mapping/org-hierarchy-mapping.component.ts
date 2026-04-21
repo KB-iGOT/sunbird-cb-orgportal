@@ -373,12 +373,14 @@ export class OrgHierarchyMappingComponent implements OnInit, AfterViewInit {
 
   checkIfMdoL0() {
     const userRoles = this.orgHieService.getUserRoles()
-    return (this.orgReadData?.sbOrgType?.toLowerCase() === 'ministry' && userRoles.has('mdo_leader'))
+    return ((this.orgReadData?.sbOrgType?.toLowerCase() === 'ministry' ||
+      this.orgReadData?.sbOrgType?.toLowerCase() === 'state') && userRoles.has('mdo_leader'))
   }
 
   checkIfMdoL0Admin() {
     const userRoles = this.orgHieService.getUserRoles()
-    return (this.orgReadData?.sbOrgType?.toLowerCase() === 'ministry' && userRoles.has('mdo_admin'))
+    return ((this.orgReadData?.sbOrgType?.toLowerCase() === 'ministry' ||
+      this.orgReadData?.sbOrgType?.toLowerCase() === 'state') && userRoles.has('mdo_admin'))
   }
 
   checkIfParentIsMdoL0() {
@@ -397,7 +399,8 @@ export class OrgHierarchyMappingComponent implements OnInit, AfterViewInit {
       switchMap((res: any) => {
         if (res && res.params && res.params.status.toLowerCase() === 'success') {
           this.orgReadData = res.result?.response || null
-          if (res.result?.response && res.result?.response?.ministryOrStateType?.toLowerCase() === 'ministry') {
+          if (res.result?.response && (res.result?.response?.ministryOrStateType?.toLowerCase() === 'ministry' ||
+            res.result?.response?.ministryOrStateType?.toLowerCase() === 'state')) {
             const reqBody = {
               request: {
                 organisationId: res.result?.response?.ministryOrStateId || '',

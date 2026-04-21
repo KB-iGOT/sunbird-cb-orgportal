@@ -1,0 +1,170 @@
+::ng-deep.course-survey .main-container {
+    width: auto !important;
+    overflow-y: auto !important;
+    max-height: auto !important;
+}
+
+::ng-deep.course-survey .main-lib-body {
+    // margin: 10px;
+
+}
+
+.auto-list {
+    display: flex;
+    border: 1px solid #e3dede;
+    padding: 15px 0;
+    border-radius: 7px;
+    max-height: 200px;
+    overflow: auto;
+    position: absolute;
+    background: white;
+    z-index: 99;
+    width: 100%;
+
+    .item {
+        padding: 5px 15px;
+    }
+
+    .item:hover {
+        background-color: #f3f3f3;
+        cursor: pointer;
+    }
+
+    .item-active {
+        background-color: #1b4ca1 !important;
+        color: white !important
+    }
+}
+
+.auto-language-list {
+    display: flex;
+    border: 1px solid #e3dede;
+    padding: 15px 0;
+    border-radius: 7px;
+    max-height: 200px;
+    overflow: auto;
+    position: absolute;
+    background: white;
+    z-index: 99;
+    width: 100%;
+
+    .language-item {
+        padding: 5px 15px;
+    }
+
+    .language-item:hover {
+        background-color: #f3f3f3;
+        cursor: pointer;
+    }
+
+    .language-item-active {
+        background-color: #1b4ca1 !important;
+        color: white !important
+    }
+}
+
+::ng-deep.mat-calendar-body-active {
+    background: #1b4ca1 !important;
+    border-radius: 100% !important;
+}
+
+::ng-deep.course-survey .lib-container {
+    height: 100% !important;
+
+    @media screen and (max-width: 430px) {
+        padding-left: 0px !important;
+        padding-right: 0px !important;
+        padding-bottom: 1rem !important;
+    }
+}
+
+::ng-deep.userDetailsForm .mat-form-field-appearance-outline .mat-form-field-infix {
+    padding: 0.5rem 0 0.8rem 0;
+}
+
+input[disabled]+mat-icon.disagnation-caret {
+    opacity: 0.5;
+}
+
+input[disabled]+mat-icon.mother-toungue-caret {
+    opacity: 0.5;
+}
+
+::ng-deep.course-survey .lib-container-2 {
+    height: auto;
+    min-height: unset !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+    margin-bottom: 2rem !important;
+
+    @media screen and (max-width: 430px) {
+        padding-left: 0px !important;
+        padding-right: 0px !important;
+    }
+
+}
+
+.profile-form-field .mat-select {
+    border: none;
+}
+
+.customForm {
+    /* stylelint-disable */
+    padding-right: 0 !important;
+    padding-bottom: 1rem !important;
+    padding: 1rem 3rem;
+    /* stylelint-enable */
+}
+
+.cadreControl-name {
+    background: #c3c3c3;
+    padding: 10px;
+}
+
+.country-code {
+    margin: 0.4375em 0;
+    padding: 14px 0px;
+    text-align: center;
+    width: 60px;
+    height: 19px;
+    display: block !important;
+    position: relative;
+    top: -3px;
+    border: 1px solid #d6d5d5;
+    border-radius: 5px;
+}
+
+.get-otp {
+    color: #1B4CA1;
+    font-weight: 700;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.enter-otp {
+    align-items: center;
+    justify-content: space-between;
+}
+
+.custom-size {
+    width: 96%;
+}
+
+.resend-otp {
+    color: #1b4ca1;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.verified-check {
+    position: absolute;
+    right: 3px;
+    color: #5fa800;
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+}
+
+.save-button:disabled {
+    opacity: 0.6 !important;
+}

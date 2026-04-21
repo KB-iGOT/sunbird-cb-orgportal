@@ -9,14 +9,20 @@
     </div>
     <div class="flex gap-4">
       <ng-container *ngIf="openMode === 'edit' && pathUrl !== 'past'">
-        <button mat-raised-button class="flex justify-center items-center save-and-exit" (click)="saveAndExit()">Save
-          Draft & Exit</button>
+        <button mat-raised-button class="flex justify-center items-center save-and-exit" (click)="saveAndExit()">
+          Save Draft & Exit</button>
       </ng-container>
-      <ng-container *ngIf="openMode === 'edit' && pathUrl === 'past'">
+      <ng-container
+        *ngIf="openMode === 'edit' && pathUrl === 'past' && edf?.typeofEvent?.value?.toLowerCase() !== 'live'">
         <button mat-raised-button class="flex justify-center items-center save-and-exit" (click)="saveAndPublish()">Save
         </button>
       </ng-container>
-      <ng-container *ngIf="selectedStepperLable !== 'Preview' && selectedStepperLable !== 'Add Competency'">
+      <ng-container *ngIf="currentStepperIndex > 0">
+        <button mat-raised-button class="flex justify-center items-center next-btn"
+          (click)="moveToPreviousForm()">Previous</button>
+      </ng-container>
+      <ng-container
+        *ngIf="selectedStepperLable !== 'Preview' && selectedStepperLable !== 'Add Competency' && currentStepperIndex < (stepper?.steps?.length - 1)">
         <button mat-raised-button class="flex justify-center items-center next-btn"
           (click)="moveToNextForm()">Next</button>
       </ng-container>
@@ -24,14 +30,19 @@
         <button mat-raised-button class="flex items-center publish-btn" (click)="preview()">Preview</button>
       </ng-container>
       <ng-container
-        *ngIf="(selectedStepperLable === 'Preview' || selectedStepperLable === 'Add Competency') && openMode === 'edit' && pathUrl !== 'past'">
+        *ngIf="(selectedStepperLable === 'Event Setup' ||selectedStepperLable === 'Preview' || selectedStepperLable === 'Add Competency') && openMode === 'edit' && pathUrl !== 'past'">
         <button mat-raised-button class="flex items-center publish-btn" (click)="publish()">Send to Publisher</button>
+      </ng-container>
+      <ng-container
+        *ngIf="pathUrl === 'past' && edf?.typeofEvent?.value?.toLowerCase() === 'live' && selectedStepperLable === 'Event Setup'">
+        <button mat-raised-button class="flex items-center publish-btn" (click)="updatePostEvent()">
+          Update Post Event </button>
       </ng-container>
     </div>
   </div>
 
   <mat-stepper labelPosition="bottom" [selectedIndex]="currentStepperIndex"
-    (selectionChange)="onSelectionChange($event)" class="mx-10" #stepper>
+    (selectionChange)="onSelectionChange($event)" class="mx-10" #stepper><!-- add [linear]="true" -->
     <mat-step label="Basic Details">
       <ng-template matStepLabel>Basic Details</ng-template>
       <ws-app-event-basic-details [eventStatus]="eventStatus" [eventDetails]="eventDetailsForm" [openMode]="openMode"
@@ -43,14 +54,33 @@
       <ws-app-speakers [speakersList]="speakersList" [openMode]="openMode"
         [userProfile]="userProfile"></ws-app-speakers>
     </mat-step> -->
+    <ng-container *ngIf="edf?.typeofEvent?.value?.toLowerCase() === 'live' && contentLoaded">
+      <mat-step label="Course Linking" [stepControl]="courseSelectionForm">
+        <ng-template matStepLabel>Course Linking</ng-template>
+        <ws-app-course-listing [courseDetails]="courseSelectionForm?.value?.selectedCourse"
+          [eventDetailsData]="eventDetails" [openMode]="openMode" [openTab]="pathUrl" [eventStatus]="eventStatus"
+          (courseSelected)="onCourseSelected($event)"></ws-app-course-listing>
+      </mat-step>
+    </ng-container>
 
-    <mat-step label="Add Material">
-      <ng-template matStepLabel>Add Material</ng-template>
-      <ws-app-event-materials [materialsList]="materialsList" [openMode]="openMode"
-        [openTab]="pathUrl"></ws-app-event-materials>
-    </mat-step>
+    <ng-container *ngIf="edf?.typeofEvent?.value?.toLowerCase() === 'live'">
+      <mat-step label="Event Setup">
+        <ng-template matStepLabel>Event Setup</ng-template>
+        <ws-app-event-details [eventDetailsData]="eventDetails" [openMode]="openMode" [openTab]="pathUrl"
+          [eventStatus]="eventStatus" (preEventFormReady)="onPreEventFormReady($event)"
+          (postEventFormReady)="onPostEventFormReady($event)"></ws-app-event-details>
+      </mat-step>
+    </ng-container>
 
-    <mat-step label="Add Competency">
+    <ng-container *ngIf="edf?.typeofEvent?.value?.toLowerCase() === 'record'">
+      <mat-step label="Add Material">
+        <ng-template matStepLabel>Add Material</ng-template>
+        <ws-app-event-materials [materialsList]="materialsList" [openMode]="openMode"
+          [openTab]="pathUrl"></ws-app-event-materials>
+      </mat-step>
+    </ng-container>
+
+    <mat-step label="Add Competency" *ngIf="edf?.typeofEvent?.value?.toLowerCase() === 'record'">
       <ng-template matStepLabel>Add Competency</ng-template>
       <ws-app-event-competencies [competenciesList]="competencies" [openMode]="openMode" [openTab]="pathUrl"
         (addCompetencies)="addCompetencies($event)"></ws-app-event-competencies>

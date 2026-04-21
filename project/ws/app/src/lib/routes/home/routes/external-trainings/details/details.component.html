@@ -1,0 +1,54 @@
+<div class="details-wrapper">
+  <!-- Left Section -->
+  <div class="details-left">
+    <h2 class="training-title">{{ training.title }}</h2>
+    <div class="info-grid">
+      <div class="info-block">
+        <span class="info-label">Training Type</span>
+        <span class="info-value">{{ training.categoryType }}</span>
+      </div>
+      <div class="info-block">
+        <span class="info-label">DELIVERY MODE</span>
+        <span class="info-value">{{ training.deliveryMode || '-' }}</span>
+      </div>
+      <div class="info-block">
+        <span class="info-label">LEARNING HOURS</span>
+        <span class="info-value">{{ training.learningHours || '-' }}</span>
+      </div>
+      <ng-container *ngIf="training.partnerName">
+        <div class="info-block">
+          <span class="info-label">PARTNER NAME</span>
+          <span class="info-value">{{ training.partnerName }}</span>
+        </div>
+      </ng-container>
+    </div>
+
+    <div class="objective-section">
+      <span class="info-label">LEARNING OBJECTIVE</span>
+      <p class="objective-text">{{ training.learningObjective || '-' }}</p>
+    </div>
+  </div>
+
+  <!-- Right Section - Certificate Preview -->
+  <!-- <div class="details-right">
+    <div class="certificate-header">
+      <span class="certificate-title">Certificate Preview</span>
+      <mat-icon class="certificate-icon">visibility</mat-icon>
+    </div>
+    <div class="certificate-card">
+      <img class="certificate-img" src="https://portal.uat.karmayogibharat.net/content-store/cios-icon/1772113322108_CourseCertificate_Template.svg"
+        alt="Certificate Preview" />
+    </div>
+  </div> -->
+</div>
+<div class="details-wrapper">
+  <!-- Left Section -->
+  <div class="details-left">
+    <div class="training-title mb-4">Competencies</div>
+    <div class="flex new-mobile w-full" *ngIf="training?.competency_v6 && training?.competency_v6?.length > 0">
+      <sb-uic-competency-list class="w-full" [selectedCompetencies]="training?.competency_v6" [viewMode]="'view'"
+        [showCompetencyAdd]="false">
+      </sb-uic-competency-list>
+    </div>
+  </div>
+</div>

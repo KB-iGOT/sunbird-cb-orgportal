@@ -7,9 +7,30 @@ import 'videojs-vr'
 import { Subscription, interval, fromEvent } from 'rxjs'
 // import { IWidgetsPlayerMediaData } from '../_models/player-media.model'
 import { WsEvents } from '@sunbird-cb/utils-v2'
-
+import { ROOT_WIDGET_CONFIG } from '@sunbird-cb/collection'
 import { NsContent } from './widget-content.model'
 import { IWidgetsPlayerMediaData, ROOT_WIDGET_CONFIG } from '@sunbird-cb/collection'
+
+export interface IWidgetsPlayerMediaData {
+  subtitles?: {
+    srclang: string
+    label: string
+    url: string
+  }[]
+  identifier?: string
+  url?: string
+  autoplay?: boolean
+  markers?: string[]
+  resumePoint?: number
+  passThroughData?: any
+  posterImage?: string
+  setCookie?: boolean
+  disableTelemetry?: boolean
+  isVideojs?: boolean
+  platform?: any
+  mimeType?: any
+  continueLearning?: boolean
+}
 
 export const videojsEventNames = {
   disposing: 'disposing',

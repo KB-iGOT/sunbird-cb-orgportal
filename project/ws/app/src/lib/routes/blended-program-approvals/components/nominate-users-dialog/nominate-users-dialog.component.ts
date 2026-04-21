@@ -7,7 +7,7 @@ import { UsersService } from '../../../users/services/users.service'
 import { MatSort } from '@angular/material/sort'
 import { BlendedApporvalService } from '../../services/blended-approval.service'
 import { DialogConfirmComponent } from '../../../../../../../../../src/app/component/dialog-confirm/dialog-confirm.component'
-
+import { ConfigurationsService } from '@sunbird-cb/utils-v2'
 @Component({
   selector: 'ws-app-nominate-users-dialog',
   templateUrl: './nominate-users-dialog.component.html',
@@ -38,6 +38,7 @@ export class NominateUsersDialogComponent implements OnInit {
 
   constructor(public dialogRef: MatDialogRef<NominateUsersDialogComponent>,
     private usersService: UsersService,
+    private configSvc: ConfigurationsService,
     private dialogue: MatDialog,
     @Inject(MAT_DIALOG_DATA) public data: any, private bpService: BlendedApporvalService,
     private snackBar: MatSnackBar) { }
@@ -107,62 +108,97 @@ export class NominateUsersDialogComponent implements OnInit {
 
   async addLearners() {
     await this.getUsersCount()
-    const seletedLearner: any = []
     if (this.selection.selected.length > 0) {
       const differenceCount = this.data.totalBatchCount - this.userscount.totalApplied
       if (this.selection.selected.length <= differenceCount) {
+        let userIds: any = []
         this.selection.selected.forEach((user: any) => {
-          const obj = {
-            userId: user.userId,
-            rootOrgId: this.data.orgId,
-            actorUserId: user.userId,
-            state: 'INITIATE',
-            serviceName: 'blendedprogram',
-            deptName: user.deptName,
-            courseId: this.data.courseId, // blended program course ID
-            applicationId: this.data.applicationId, // blended program batch ID
-            updateFieldValues: user.updateFieldValues,
-          }
-          seletedLearner.push(obj)
+          userIds.push(user.userId)
         })
-        this.bpService.nominateLearners(seletedLearner).subscribe((_res: any) => {
-          let successCount = 0
-          let failedCount = 0
-          if (_res && _res.length > 0) {
-            _res.forEach((ele: any) => {
-              if (ele.result.status === 'OK') {
-                successCount = successCount + 1
-              } else {
-                failedCount = failedCount + 1
+        const request = {
+          batchId: this.data.applicationId,
+          courseId: this.data.courseId,
+          userIds: userIds,
+          serviceName: 'blendedprogram',
+          deptName: this.configSvc?.userProfile?.departmentName
+        }
+        this.bpService.inviteUserToBatch(request).subscribe(
+          (res: any) => {
+            const response = res?.result?.data
+            if (response && Array.isArray(response)) {
+              let successCount = 0
+              let alreadyExistsCount = 0
+              let batchFullCount = 0
+              let scheduleConflictCount = 0
+              let otherFailureCount = 0
+
+              for (const userResponse of response) {
+                const status = (userResponse?.status || '').toUpperCase()
+                if (status === 'APPROVED') {
+                  successCount++
+                } else if (status === 'ALREADY_EXISTS') {
+                  alreadyExistsCount++
+                } else if (status === 'BATCH_FULL') {
+                  batchFullCount++
+                } else if (status === 'SCHEDULE_CONFLICT') {
+                  scheduleConflictCount++
+                } else {
+                  otherFailureCount++
+                }
               }
-            })
+
+              const totalFailures = alreadyExistsCount + batchFullCount + scheduleConflictCount + otherFailureCount
+              const messages: string[] = []
+
+              // Build success message
+              if (successCount > 0) {
+                const successLabel = successCount > 1 ? 'users' : 'user'
+                messages.push(`${successCount} ${successLabel} added successfully`)
+              }
+
+              // Build failure messages
+              const failureMessages: string[] = []
+              if (alreadyExistsCount > 0) {
+                const alreadyLabel = alreadyExistsCount > 1 ? 'users' : 'user'
+                failureMessages.push(`${alreadyExistsCount} ${alreadyLabel} already enrolled`)
+              }
+              if (batchFullCount > 0) {
+                const batchLabel = batchFullCount > 1 ? 'users' : 'user'
+                failureMessages.push(`${batchFullCount} ${batchLabel} failed (batch full)`)
+              }
+              if (scheduleConflictCount > 0) {
+                const scheduleLabel = scheduleConflictCount > 1 ? 'users' : 'user'
+                failureMessages.push(`${scheduleConflictCount} ${scheduleLabel} failed (schedule conflict)`)
+              }
+              if (otherFailureCount > 0) {
+                const otherLabel = otherFailureCount > 1 ? 'users' : 'user'
+                failureMessages.push(`${otherFailureCount} ${otherLabel} failed`)
+              }
+
+              if (failureMessages.length > 0) {
+                messages.push(`Failed: ${failureMessages.join(', ')}`)
+              }
+
+              // Display appropriate message
+              const finalMessage = messages.join('; ')
+              if (successCount > 0 && totalFailures > 0) {
+                this.snackBar.open(finalMessage, 'OK', { duration: 6000 })
+              } else if (successCount > 0) {
+                this.snackBar.open(finalMessage, 'OK', { duration: 4000 })
+              } else {
+                this.snackBar.open(`Nomination failed: ${failureMessages.join(', ')}`, 'OK', { duration: 6000 })
+              }
+            } else {
+              this.snackBar.open('User is successfully added to the invitee list', 'OK', { duration: 4000 })
+            }
+            this.dialogRef.close('done')
+          },
+          (error: any) => {
+            let errMsg = 'Some error occurred! Please try again'
+            console.log('Error nominating users to batch:', error)
+            this.snackBar.open(errMsg, 'OK', { duration: 6000 })
           }
-          if (successCount > 0 || failedCount > 0) {
-            this.openSnackbar(`${successCount} learner(s) nominated successfully,
-            while ${failedCount} failed to nominate as it is part of the program.`)
-          }
-          if (successCount === _res.length) {
-            this.openSnackbar(`${successCount} learner(s) nominated successfully.`)
-          }
-          if (failedCount === _res.length) {
-            this.openSnackbar(`${failedCount} failed to nominate as it is part of the program.`)
-          }
-          // if (_res[0] && _res[0].result && _res[0].result.status === 'OK' &&
-          //   this.data.wfApprovalType === 'twoStepMDOAndPCApproval') {
-          //   this.openSnackbar('Request sent to Program coordinator for approval.')
-          // } else if (_res[0] && _res[0].result && _res[0].result.status === 'NOT_ACCEPTABLE') {
-          //   this.openSnackbar(`Learner is already a part of another batch. It can't be added here.`)
-          // } else {
-          //   if (_res[0] && _res[0].result && _res[0].result.status === 'BAD_REQUEST') {
-          //     this.openSnackbar(_res[0].result.errmsg)
-          //   } else {
-          //     this.openSnackbar('User(s) nominated successfully!')
-          //   }
-          // }
-          this.dialogRef.close('done')
-        }, (_err: { error: any }) => {
-          this.openSnackbar('some thing went wrong, Please try after sometime.')
-        })
+        )
       } else {
         this.dialogue.open(DialogConfirmComponent, {
           width: '35vw',
@@ -184,11 +220,6 @@ export class NominateUsersDialogComponent implements OnInit {
     this.dialogRef.close('close')
   }
 
-  private openSnackbar(primaryMsg: string, duration: number = 5000) {
-    this.snackBar.open(primaryMsg, 'X', {
-      duration,
-    })
-  }
   async getUsersCount() {
     if (this.data && this.data.applicationId) {
       // const req = {

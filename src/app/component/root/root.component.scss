@@ -20,7 +20,7 @@ ws-app-nav-bar {
 }
 
 ::ng-deep .mat-drawer-content {
-  overflow-x: hidden!important;
+  overflow-x: hidden !important;
 }
 
 .height-on-top {
@@ -52,6 +52,7 @@ ws-app-nav-bar {
 .bg-white {
   background-color: #fff;
 }
+
 .bg-gray {
   background-color: #F0F3F4;
 }
@@ -105,7 +106,7 @@ router-outlet+* {
   align-items: center;
   justify-content: center;
   z-index: 2000 !important;
-  // background: rgba(0,0,0,0.3);
+  background: rgba(0, 0, 0, 0.2);
 }
 
 .loader-container {

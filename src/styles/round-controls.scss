@@ -1,0 +1,100 @@
+.round-control-label {
+  color: #212529;
+  /*stylelint-disable-next-line*/
+  font: 700 14px Lato;
+}
+
+::ng-deep .round-control {
+  .mat-form-field-appearance-outline .mat-form-field-flex {
+    height: 50px;
+  }
+
+  .mat-form-field-appearance-outline .mat-form-field-infix {
+    padding: 15px 0px 0px !important;
+  }
+
+  .mat-form-field-infix {
+    border-top: 0.7em !important;
+  }
+
+  .mat-form-field-appearance-outline .mat-form-field-suffix {
+    top: 0px !important;
+  }
+
+  .mat-mdc-icon-button svg {
+    width: 16px !important;
+    height: 16px !important;
+  }
+
+  .mat-form-field-appearance-outline .mat-form-field-outline-end {
+    border-radius: 25px !important;
+    border-left-style: solid !important;
+  }
+
+  .mat-form-field-appearance-outline .mat-form-field-outline-start {
+    display: none !important;
+  }
+
+  .mat-form-field-wrapper {
+    padding-bottom: 0px !important;
+  }
+
+  .mat-form-field-appearance-outline .mat-form-field-subscript-wrapper {
+    padding: 4px !important;
+    margin-top: 25px;
+  }
+
+  .add-subscript-wrapper { // give this class to mat-form-field if you have mat-hint or mat-error
+    margin-bottom: 20px;
+  }
+
+  mat-checkbox,
+  mat-radio-button {
+    display: flex;
+    align-items: center;
+    justify-items: center;
+    height: 50px;
+    border-radius: 25px;
+    border: 1px solid rgba(0, 0, 0, 0.16);
+    padding: 0 15px;
+  }
+
+  .mat-checkbox-inner-container {
+    margin-left: 0px !important;
+  }
+
+  .mat-checkbox-layout .mat-checkbox-label,
+  .mat-radio-label-content {
+    width: 100%;
+    display: flex;
+    align-items: center;
+  }
+
+  .mat-optgroup-label {
+    height: 60px !important;
+  }
+
+}
+
+::ng-deep .search-panel {
+  .sticky-search-container {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background: white;
+    padding: 8px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+  }
+  .search-input {
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    padding-left: 10px;
+    width: calc(100% - 10px);;
+    height: 30px;
+    &:focus {
+      outline: none;
+      border-color: #F3962F;
+      box-shadow: 0 0 0 1px rgba(243, 150, 47, 0.2);
+    }
+  }
+}

@@ -70,6 +70,7 @@ export class MentorManageComponent implements OnInit, OnDestroy {
   sortOrder: any
   searchText = ''
   filterFacets = []
+  resetPagination: any
 
   constructor(
     public dialog: MatDialog,
@@ -241,7 +242,7 @@ export class MentorManageComponent implements OnInit, OnDestroy {
           'roles',
         ],
         limit: this.limit,
-        offset: this.getSearchText(query) ? 0 : this.pageIndex,
+        offset: query && query.searchText !== this.searchText ? 0 : this.pageIndex,
         query: this.getSearchText(query),
         sort_by: this.getSortOrder(query),
       },
@@ -299,7 +300,7 @@ export class MentorManageComponent implements OnInit, OnDestroy {
           'roles',
         ],
         limit: this.limit,
-        offset: this.getSearchText(query) ? 0 : this.pageIndex,
+        offset: query && query.searchText !== this.searchText ? 0 : this.pageIndex,
         query: this.getSearchText(query),
         sort_by: this.getSortOrder(query),
       },
@@ -404,6 +405,14 @@ export class MentorManageComponent implements OnInit, OnDestroy {
 
   onEnterkySearch(enterValue: any) {
     this.searchQuery = enterValue
+    this.pageIndex = 0
+    const pagination: any = { pageIndex: this.pageIndex, pageSize: this.limit }
+    if (this.currentFilter === 'verified') {
+      pagination['length'] = this.verifiedUsersDataCount || 0
+    } else if (this.currentFilter === 'mentor') {
+      pagination['length'] = this.mentorUsersDataCount || 0
+    }
+    this.resetPagination = pagination
     this.filterData(this.searchQuery)
   }
 
