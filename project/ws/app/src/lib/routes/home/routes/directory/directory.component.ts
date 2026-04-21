@@ -50,6 +50,7 @@ export class DirectoryComponent implements OnInit, AfterViewInit {
     this.orgHieService.setUserRoles(_.get(this.configSvc, 'userRoles', []))
     switch (ministryOrStateType?.toLowerCase()) {
       case 'ministry':
+      case 'state':
         this.tabs = this.tabs.filter((tab: any) => tab.value !== 'organisation')
         break
       case 'spv':

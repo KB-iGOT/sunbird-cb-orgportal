@@ -1,0 +1,23 @@
+<div class="custom-tooltip-container">
+  <ng-container *ngIf="tooltipTemplate; else defaultTooltip">
+    <ng-container *ngTemplateOutlet="tooltipTemplate; context: {data: tooltipData}"></ng-container>
+  </ng-container>
+  <ng-template #defaultTooltip>
+    <div *ngFor="let item of tooltipData | keyvalue" class="tooltip-item">
+      <span class="lang-name">{{item?.value?.key | titlecase}}</span>
+      <div class="flex flex-middle status-pill" [ngClass]="getStatusClass(item?.value?.value?.status)">
+        <div class="dot" *ngIf="item?.value?.value?.status?.toLowerCase() === 'live'"></div>
+        <mat-icon class="status-icon" *ngIf="item?.value?.value?.status?.toLowerCase() !== 'live' && course?.status !== 'retired'">schedule</mat-icon>
+        <span>
+          {{(item?.value?.value?.status?.toLowerCase() === 'review' && item?.value?.value?.reviewStatus?.toLowerCase()
+          ===
+          'inreview') ? 'Under Review'
+          : (item?.value?.value?.status?.toLowerCase() === 'review' && item?.value?.value?.reviewStatus?.toLowerCase()
+          ===
+          'reviewed') ? 'Under Publish' :
+          item?.value?.value?.status }}
+        </span>
+      </div>
+    </div>
+  </ng-template>
+</div>

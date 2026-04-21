@@ -8,6 +8,7 @@
   min-height: 85vh;
   padding: 20px;
   box-sizing: border-box;
+  background: #EFF3F9;
 }
 
 .container2 {
@@ -19,8 +20,13 @@
   height: auto;
 }
 
+
+.bg-white {
+  background-color: #fff;
+}
+
 .left-nav {
-  min-width: 240px;
+  max-width: 240px;
   overflow: hidden !important;
   box-sizing: border-box;
   // height: 100vh;
@@ -103,9 +109,11 @@
   &.container-balanced {
     padding-top: 0;
   }
+
   &.mat-sidenav-container {
     z-index: unset;
-    .mat-sidenav-content{
+
+    .mat-sidenav-content {
       z-index: 22;
     }
   }

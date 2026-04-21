@@ -1,8 +1,8 @@
-import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core'
+import { Component, Input, NgZone, OnChanges, OnInit, SimpleChanges } from '@angular/core'
 import { FormGroup, Validators } from '@angular/forms'
 import { MatLegacySnackBar } from '@angular/material/legacy-snack-bar'
 import * as _ from 'lodash'
-import { URL_PATRON, events } from '../../models/events.model'
+import { URL_PATRON, YOUTUBE_URL_PATRON, events } from '../../models/events.model'
 import { EventsService } from '../../services/events.service'
 import { map, mergeMap } from 'rxjs/operators'
 import { environment } from '../../../../../../../../../../../src/environments/environment'
@@ -24,7 +24,7 @@ export class EventBasicDetailsComponent implements OnInit, OnChanges {
   @Input() userProfile: any
   @Input() openTab = 'draft'
 
-  evntCategorysList = ['Webinar', 'Karmayogi Talks', 'Karmayogi Saptah']
+  eventCategoriesList = ['Webinar', 'Karmayogi Talks', 'Karmayogi Saptah', 'Sadhana Saptah', 'Samuhik Charcha - NLW 2026']
   minDate = new Date()
 
   maxTimeToStart = '11:44 pm'
@@ -42,6 +42,7 @@ export class EventBasicDetailsComponent implements OnInit, OnChanges {
     private eventSvc: EventsService,
     private loaderService: LoaderService,
     private datePipe: DatePipe,
+    private ngZone: NgZone,
   ) { }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -96,6 +97,13 @@ export class EventBasicDetailsComponent implements OnInit, OnChanges {
   }
 
   ngOnInit(): void {
+    if (this.eventDetails) {
+      if (this.edf?.typeofEvent?.value?.toLowerCase() === 'live') {
+        this.eventCategoriesList = ['Samuhik Charcha']
+        this.timeGap = 30
+        this.maxTimeToStart = '11:29 pm'
+      }
+    }
     if (this.eventDetails && this.eventDetails.controls && this.openMode === 'edit' && this.openTab !== 'past') {
       if (this.eventDetails.controls.startDate) {
         this.eventDetails.controls.startDate.valueChanges.subscribe((date) => {
@@ -114,7 +122,8 @@ export class EventBasicDetailsComponent implements OnInit, OnChanges {
               this.disableUpload = true
               this.eventDetails.controls.recoredEventUrl.patchValue('')
               this.eventDetails.controls.recoredEventUrl.clearValidators()
-              this.eventDetails.controls.registrationLink.setValidators([Validators.required, Validators.pattern(URL_PATRON)])
+              const urlPattern = this.edf?.typeofEvent?.value?.toLowerCase() === 'record' ? YOUTUBE_URL_PATRON : URL_PATRON
+              this.eventDetails.controls.registrationLink.setValidators([Validators.required, Validators.pattern(urlPattern)])
               this.eventDetails.controls.recoredEventUrl.updateValueAndValidity()
               this.eventDetails.controls.registrationLink.updateValueAndValidity()
             }
@@ -123,7 +132,23 @@ export class EventBasicDetailsComponent implements OnInit, OnChanges {
           }
         })
       }
+      if (this.edf?.typeofEvent?.value?.toLowerCase() === 'live') {
+        this.edf.maxEnrolments?.setValidators([Validators.required, Validators.min(10), Validators.max(10000)])
+        this.edf.maxEnrolments?.updateValueAndValidity()
+        this.edf.registrationLink?.setValidators([])
+        this.edf.registrationLink?.updateValueAndValidity()
+        this.eventCategoriesList = ['Samuhik Charcha']
+      }
+    } else if (this.openMode === 'view') {
+      if (this.edf?.typeofEvent?.value?.toLowerCase() === 'live') {
+        this.eventCategoriesList = ['Samuhik Charcha']
+      }
     }
+
+  }
+
+  get edf() {
+    return this.eventDetails?.controls
   }
 
   checkMinTimeToStart(selectedDate: any) {
@@ -169,10 +194,16 @@ export class EventBasicDetailsComponent implements OnInit, OnChanges {
   }
 
   generatMinTimeToEnd(time: string, resetEndTime = true) {
+    if (!time || !time.trim()) {
+      return
+    }
     let [timePart, period] = time.split(' ')
     let [hours, minutes] = timePart.split(':').map(Number)
+    if (isNaN(hours) || isNaN(minutes)) {
+      return
+    }
     minutes = minutes + (this.uploadedVideoDuration > this.timeGap ? this.uploadedVideoDuration : this.timeGap)
-    if (minutes >= 60) {
+    while (minutes >= 60) {
       minutes -= 60
       hours += 1
     }
@@ -216,6 +247,14 @@ export class EventBasicDetailsComponent implements OnInit, OnChanges {
     return name
   }
 
+  get disableSchedule(): boolean {
+    if (this.openTab === 'past' || this.openTab === 'upcoming' ||
+      (this.eventStatus === 'live' && (this.openTab === 'draft' || this.openTab === 'rejected'))) {
+      return true
+    }
+    return false
+  }
+
   removeFile(item = 'appIcon') {
     if (item === 'appIcon' && this.eventDetails.controls.appIcon) {
       this.eventDetails.controls.appIcon.patchValue('')
@@ -231,7 +270,8 @@ export class EventBasicDetailsComponent implements OnInit, OnChanges {
       this.eventDetails.controls.recoredEventUrl.patchValue('')
       this.eventDetails.controls.recoredEventUrl.updateValueAndValidity()
       if (this.openTab !== 'past') {
-        this.eventDetails.controls.registrationLink.setValidators([Validators.required, Validators.pattern(URL_PATRON)])
+        const urlPattern = this.edf?.typeofEvent?.value?.toLowerCase() === 'record' ? YOUTUBE_URL_PATRON : URL_PATRON
+        this.eventDetails.controls.registrationLink.setValidators([Validators.required, Validators.pattern(urlPattern)])
         this.eventDetails.controls.registrationLink.updateValueAndValidity()
         this.eventDetails.controls.registrationLink.enable()
         this.disableUrl = false
@@ -384,18 +424,20 @@ export class EventBasicDetailsComponent implements OnInit, OnChanges {
     video.preload = 'metadata'
 
     video.onloadedmetadata = () => {
-      const videoDuration = video.duration
-      const minutes = videoDuration / 60
-      this.uploadedVideoDuration = Math.round(minutes)
-      this.getMaxTimeToStart()
-      if (this.eventDetails.controls && this.eventDetails.controls.startTime && this.eventDetails.controls.endTime) {
-        this.eventDetails.controls.startTime.patchValue('')
-        this.eventDetails.controls.startTime.updateValueAndValidity()
-        this.eventDetails.controls.endTime.patchValue('')
-        this.eventDetails.controls.endTime.updateValueAndValidity()
-      }
+      this.ngZone.run(() => {
+        const videoDuration = video.duration
+        const minutes = videoDuration / 60
+        this.uploadedVideoDuration = Math.ceil(minutes)
+        this.getMaxTimeToStart()
+        if (this.eventDetails.controls && this.eventDetails.controls.startTime && this.eventDetails.controls.endTime) {
+          this.eventDetails.controls.startTime.patchValue('')
+          this.eventDetails.controls.startTime.updateValueAndValidity()
+          this.eventDetails.controls.endTime.patchValue('')
+          this.eventDetails.controls.endTime.updateValueAndValidity()
+        }
 
-      URL.revokeObjectURL(videoURL)
+        URL.revokeObjectURL(videoURL)
+      })
     }
     video.src = videoURL
   }
@@ -433,6 +475,35 @@ export class EventBasicDetailsComponent implements OnInit, OnChanges {
 
   private openSnackBar(message: string) {
     this.matSnackBar.open(message)
+  }
+
+  allowNumbers(event: KeyboardEvent): void {
+    const allowedKeys = ['Backspace', 'ArrowLeft', 'ArrowRight', 'Tab', 'Delete']
+    if (allowedKeys.indexOf(event.key) !== -1) {
+      return
+    }
+    // Allow only single digit keys 0-9
+    if (!/^[0-9]$/.test(event.key)) {
+      event.preventDefault()
+    }
+  }
+
+  onPasteNumber(event: ClipboardEvent): void {
+    const paste = event.clipboardData ? event.clipboardData.getData('text') : ''
+    if (!/^[0-9]+$/.test(paste)) {
+      event.preventDefault()
+    }
+  }
+
+  checkIfSCEvent(): boolean {
+    return this.edf?.typeofEvent?.value?.toLowerCase() === 'live'
+  }
+
+  get checkIfLiveEvent() {
+    if ((this.openTab === 'draft' || this.openTab?.toLowerCase() === 'rejected' || this.openTab?.toLowerCase() === 'upcoming') && this.eventStatus?.toLowerCase() === 'live') {
+      return true
+    }
+    return false
   }
 
 }

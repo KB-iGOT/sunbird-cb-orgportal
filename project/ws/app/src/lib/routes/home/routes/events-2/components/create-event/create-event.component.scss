@@ -37,7 +37,6 @@
   }
 
   .next-btn {
-    width: 65px;
     height: 32px;
     border-radius: 17px;
     background-color: #1B4CA1 !important;
@@ -65,6 +64,7 @@
     min-width: 800px;
     align-self: center;
   }
+
   .mat-step-icon {
     width: 25px;
     height: 25px;
@@ -76,7 +76,14 @@
   }
 
   .mat-step-icon-selected {
-    background-color: #F3962F!important;
+    background-color: #F3962F !important;
+  }
+
+  .mat-step-label-selected {
+    /* stylelint-disable */
+    font: 700 14px Lato !important;
+    /* stylelint-enable */
+    color: #1B4CA1 !important;
   }
 
   // .mat-step-icon-completed {
@@ -84,6 +91,11 @@
   // }
 
   .mat-step-icon:not(.mat-step-icon-selected):not(.mat-step-icon-completed) {
-    background-color: #96ADD4!important;
+    background-color: #96ADD4 !important;
+  }
+
+  .disable-step {
+    pointer-events: none;
+    opacity: 0.6;
   }
 }

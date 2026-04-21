@@ -45,10 +45,6 @@ export class CommunityDashboardComponent implements OnInit {
   currentStatus = 'active'
   // private destroySubject$ = new Subject()
   masterData: any = {}
-  isCommunityModeratorRole = false
-  isCommunityCreateRole = false
-  isCommunityModeratorOnly = false
-
   tabs = [
     {
       label: 'Community',
@@ -66,6 +62,7 @@ export class CommunityDashboardComponent implements OnInit {
     //   icon: 'archive'
     // }
   ]
+  filteredTabs = [{}];
   selectedTabIndex = 0
 
   @ViewChild(MatPaginator) paginator!: MatPaginator
@@ -93,21 +90,10 @@ export class CommunityDashboardComponent implements OnInit {
   getOrgRolesList(): void {
     if (_.get(this.activatedRoute, 'snapshot.data.configService.unMappedUser')) {
       this.userProfile = _.get(this.activatedRoute, 'snapshot.data.configService.unMappedUser')
-      const userRole = this.userProfile.roles
-      const targetRoles = ['COMMUNITY_MODERATOR', 'MDO_LEADER']
-      const itemPresent = targetRoles?.some((role: any) => userRole?.includes(role))
-      if (itemPresent) {
-        this.isCommunityModeratorRole = true
-      }
-      const mdoLeaderPresent = userRole?.some((role: any) => role?.includes('MDO_LEADER'))
-      if (mdoLeaderPresent) {
-        this.isCommunityCreateRole = true
-      }
-      const isCommunityModeratorOnlyPresent = userRole?.some((role: any) => role?.includes('COMMUNITY_MODERATOR'))
-      if (isCommunityModeratorOnlyPresent) {
-        this.isCommunityModeratorOnly = true
-      }
-
+      const rolesSet = new Set(this.userProfile.roles)
+      this.filteredTabs = rolesSet.has('COMMUNITY_MODERATOR') && !rolesSet.has('MDO_LEADER')
+        ? this.tabs.filter(t => t.label === 'Community')
+        : this.tabs
     }
 
   }

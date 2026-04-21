@@ -2,8 +2,7 @@ import { HttpClient } from '@angular/common/http'
 import { Injectable } from '@angular/core'
 import { ConfigurationsService } from '@sunbird-cb/utils-v2'
 import { Observable, of } from 'rxjs'
-import { catchError, retry, map } from 'rxjs/operators'
-//import { NsContentStripMultiple } from '../content-strip-multiple/content-strip-multiple.model'
+import { catchError, map } from 'rxjs/operators'
 import { NsContent } from './widget-content.model'
 import { NSSearch } from './widget-search.model'
 import { NsContentStripMultiple } from '@sunbird-cb/collection'
@@ -99,7 +98,6 @@ export class WidgetContentService {
     //   .pipe(retry(1))
     const apiData = this.http
       .get<NsContent.IContent>(url)
-      .pipe(retry(1))
     // if (apiData && apiData.result) {
     //   return apiData.result.content
     // }
@@ -107,7 +105,7 @@ export class WidgetContentService {
   }
   fetchAuthoringContent(contentId: string): Observable<NsContent.IContent> {
     const url = `${API_END_POINTS.AUTHORING_CONTENT}/${contentId}`
-    return this.http.get<NsContent.IContent>(url).pipe(retry(1))
+    return this.http.get<NsContent.IContent>(url)
   }
   fetchMultipleContent(ids: string[]): Observable<NsContent.IContent[]> {
     return this.http.get<NsContent.IContent[]>(
@@ -127,7 +125,6 @@ export class WidgetContentService {
     return this.http
       .post<NsContent.IBatchListResponse>(API_END_POINTS.COURSE_BATCH_LIST, req)
       .pipe(
-        retry(1),
         map(
           (data: any) => data.result.response
         )

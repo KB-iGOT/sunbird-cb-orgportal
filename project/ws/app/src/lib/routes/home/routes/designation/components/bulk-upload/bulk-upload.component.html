@@ -32,9 +32,9 @@
       </div>
       <div class="flex-1">
         <div class="flex flex-col gap-2 dashed-card items-center">
-          <div class="flex cursor-pointer margin-top-m" (click)="fileInput.click()" (dblclick)="$event.preventDefault()"
-            (keydown)="$event.preventDefault()">
-            <img src="/assets/icons/csv-file.svg" alt="CSV file logo" />
+          <div class="flex cursor-pointer margin-top-m" (click)="fileInput.click()"
+            (dblclick)="$event.preventDefault()">
+            <img src="/assets/icons/xlsx-file.svg" alt="XLSX file logo" />
           </div>
           <div *ngIf="showFileError" class="error-msg">{{bulkUploadConfig?.supportedFileTypeText2}}</div>
           <div class="flex flex-col items-center">

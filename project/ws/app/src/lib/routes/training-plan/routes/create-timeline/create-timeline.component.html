@@ -11,7 +11,7 @@
         </div>
     </div>
     <ws-app-standard-card [checkboxVisibility]="false" [contentData]="contentData" [showDeleteFlag]="true"
-        [ngClass]="{'disable': isContentLive}" (selectedContentRemoved)="contentRemoved()"></ws-app-standard-card>
+        (selectedContentRemoved)="contentRemoved()"></ws-app-standard-card>
 </ng-container>
 <ng-container *ngIf="assigneeData && (assigneeData?.data?.length || assigneeData?.data?.content?.length)">
     <div class="margin-top-m">

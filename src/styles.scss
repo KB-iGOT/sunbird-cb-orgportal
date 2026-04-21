@@ -536,14 +536,14 @@ samp {
  *    CSS Remedy, with `svg` added as well.
  *
  *    https://github.com/mozdevs/cssremedy/issues/14
- *
+ * 
  * 2. Add `vertical-align: middle` to align replaced elements more
  *    sensibly by default when overriding `display` by adding a
  *    utility like `inline`.
  *
  *    This can trigger a poorly considered linting error in some
  *    tools but is included by design.
- *
+ * 
  *    https://github.com/jensimmons/cssremedy/issues/14#issuecomment-634934210
  */
 
@@ -20912,13 +20912,11 @@ video {
 }
 
 .decoration-slice {
-  -webkit-box-decoration-break: slice;
-          box-decoration-break: slice;
+  box-decoration-break: slice;
 }
 
 .decoration-clone {
-  -webkit-box-decoration-break: clone;
-          box-decoration-break: clone;
+  box-decoration-break: clone;
 }
 
 .bg-auto {
@@ -50488,13 +50486,11 @@ video {
   }
 
   .sm\:decoration-slice {
-    -webkit-box-decoration-break: slice;
-            box-decoration-break: slice;
+    box-decoration-break: slice;
   }
 
   .sm\:decoration-clone {
-    -webkit-box-decoration-break: clone;
-            box-decoration-break: clone;
+    box-decoration-break: clone;
   }
 
   .sm\:bg-auto {
@@ -79712,13 +79708,11 @@ video {
   }
 
   .md\:decoration-slice {
-    -webkit-box-decoration-break: slice;
-            box-decoration-break: slice;
+    box-decoration-break: slice;
   }
 
   .md\:decoration-clone {
-    -webkit-box-decoration-break: clone;
-            box-decoration-break: clone;
+    box-decoration-break: clone;
   }
 
   .md\:bg-auto {
@@ -108936,13 +108930,11 @@ video {
   }
 
   .lg\:decoration-slice {
-    -webkit-box-decoration-break: slice;
-            box-decoration-break: slice;
+    box-decoration-break: slice;
   }
 
   .lg\:decoration-clone {
-    -webkit-box-decoration-break: clone;
-            box-decoration-break: clone;
+    box-decoration-break: clone;
   }
 
   .lg\:bg-auto {
@@ -138160,13 +138152,11 @@ video {
   }
 
   .xl\:decoration-slice {
-    -webkit-box-decoration-break: slice;
-            box-decoration-break: slice;
+    box-decoration-break: slice;
   }
 
   .xl\:decoration-clone {
-    -webkit-box-decoration-break: clone;
-            box-decoration-break: clone;
+    box-decoration-break: clone;
   }
 
   .xl\:bg-auto {
@@ -167384,13 +167374,11 @@ video {
   }
 
   .\32xl\:decoration-slice {
-    -webkit-box-decoration-break: slice;
-            box-decoration-break: slice;
+    box-decoration-break: slice;
   }
 
   .\32xl\:decoration-clone {
-    -webkit-box-decoration-break: clone;
-            box-decoration-break: clone;
+    box-decoration-break: clone;
   }
 
   .\32xl\:bg-auto {

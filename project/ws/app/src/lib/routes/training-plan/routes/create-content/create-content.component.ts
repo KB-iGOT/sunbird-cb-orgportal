@@ -101,11 +101,11 @@ export class CreateContentComponent implements OnInit, OnChanges {
             }
           })
         }
-        this.contentData = this.tpdsSvc.trainingPlanContentData.data.content
+        this.contentData = [...this.tpdsSvc.trainingPlanContentData.data.content]
         this.count = this.tpdsSvc.trainingPlanContentData.data.count
         this.handleSelectedChips(true)
       } else {
-        this.contentData = this.tpdsSvc.trainingPlanContentData.data.content
+        this.contentData = [...this.tpdsSvc.trainingPlanContentData.data.content]
         this.count = this.tpdsSvc.trainingPlanContentData.data.count
       }
     }
@@ -114,7 +114,7 @@ export class CreateContentComponent implements OnInit, OnChanges {
   handleSelectedChips(event: any) {
     this.selectContentCount = 0
     if (event) {
-      this.selectedContentChips = this.tpdsSvc.trainingPlanContentData.data.content
+      this.selectedContentChips = [...this.tpdsSvc.trainingPlanContentData.data.content]
       if (this.selectedContentChips) {
         this.selectedContentChips.forEach(sitem => {
           if (sitem && sitem.selected) {
@@ -132,6 +132,9 @@ export class CreateContentComponent implements OnInit, OnChanges {
 
   itemsRemovedFromChip() {
     this.handleSelectedChips(true)
+    if (this.tpdsSvc.trainingPlanStepperData.status === 'Live') {
+      this.tpdsSvc.isContentChanged = true
+    }
   }
 
   // showAddContentDialog() {

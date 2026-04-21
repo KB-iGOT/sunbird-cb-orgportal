@@ -26,19 +26,22 @@ import { UsersListResolve } from './resolvers/users-list-resolve.service'
 import { UserCreationComponent } from './routes/users-view/user-creation/user-creation.component'
 import { BulkUploadApprovalComponent } from './routes/approvals/bulk-upload/bulk-upload.component'
 import { RequestListComponent } from './components/request-list/request-list.component'
-import { CreateRequestFormComponent } from './components/request-list/create-request-form/create-request-form.component'
+// import { CreateRequestFormComponent } from './components/request-list/create-request-form/create-request-form.component'
 import { OdcsMappingComponent } from './routes/odcs-mapping/odcs-mapping.component'
 import { MentorManageComponent } from './routes/mentor-manage/mentor-manage.component'
 import { BulkUploadOdcsComponent } from './routes/odcs-mapping/bulk-upload-odcs/bulk-upload-odcs.component'
 import { GroupsGradeComponent } from './components/groups-grade/groups-grade.component'
 import { MyNotificationsComponent } from './routes/my-notifications/my-notifications.component'
+import { FormDataResolverService } from './resolvers/form-data-resolver.service'
 import { DirectoryComponent } from './routes/directory/directory.component'
 import { OrganisationUsersComponent } from './routes/directory/organisation-users/organisation-users.component'
+import { ExploreContentComponent } from './routes/explore-content/explore-content.component'
+import { PreviewComponent } from './routes/explore-content/preview/preview.component'
 const routes: Routes = [
   {
     path: '',
     pathMatch: 'full',
-    redirectTo: 'onboarding',
+    redirectTo: 'welcome',
   },
   {
     path: '',
@@ -340,6 +343,16 @@ const routes: Routes = [
         path: 'custom-fields',
         loadChildren: () => import('./routes/custom-forms/custom-forms.module').then(m => m.CustomFormsModule),
       },
+      // {
+      //   path: 'achievement-approvals',
+      //   loadChildren: () => import('./routes/achievement-approvals/achievement-approvals.module').then(m => m.AchievementApprovalsModule),
+      // },
+
+      {
+        path: 'external-trainings',
+        loadChildren: () => import('./routes/external-trainings/external-trainings.module').then(m => m.ExternalTrainingsModule),
+      },
+
       {
         path: 'events',
         loadChildren: () => import('./routes/events-2/events-2.module').then(m => m.Events2Module),
@@ -350,6 +363,19 @@ const routes: Routes = [
         resolve: {
           configService: ConfigResolveService,
         },
+      },
+
+      {
+        path: 'microsite',
+        loadChildren: () => import('./routes/microsite/microsite.module').then(m => m.MicrositeModule),
+        data: {
+          pageKey: 'microsite-v3',
+        },
+        resolve: {
+          formData: FormDataResolverService,
+          configService: ConfigResolveService,
+        },
+
       },
       {
         path: 'reports-section',
@@ -385,13 +411,35 @@ const routes: Routes = [
           pageData: PageResolve,
         },
       },
+      // {
+      //   path: 'create-request-form',
+      //   component: CreateRequestFormV2Component,
+      //   data: {
+      //     pageId: 'create-request-form',
+      //     pageType: 'feature',
+      //     pageKey: 'create-request-form',
+      //   },
+      //   resolve: {
+      //     configService: ConfigResolveService,
+      //     pageData: PageResolve,
+      //   },
+      // },
       {
         path: 'create-request-form',
-        component: CreateRequestFormComponent,
+        loadChildren: () => import('./routes/create-request/create-request.module').then(m => m.CreateRequestModule),
+      },
+      {
+        path: 'org-designations',
+        loadChildren: () => import('./routes/designation/designation.module').then(m => m.DesignationModule),
+      },
+      {
+        path: 'explore-content',
+        component: ExploreContentComponent,
         data: {
-          pageId: 'create-request-form',
+          pageId: 'home/explore-content',
+          module: 'explore-content',
           pageType: 'feature',
-          pageKey: 'create-request-form',
+          pageKey: 'explore-content',
         },
         resolve: {
           configService: ConfigResolveService,
@@ -399,8 +447,25 @@ const routes: Routes = [
         },
       },
       {
-        path: 'org-designations',
-        loadChildren: () => import('./routes/designation/designation.module').then(m => m.DesignationModule),
+        path: 'explore-content/:identifier/preview',
+        component: PreviewComponent,
+        data: {
+          pageId: 'home/explore-content/:identifier/preview',
+          module: 'explore-content',
+          pageType: 'feature',
+          pageKey: 'explore-content-preview',
+        },
+        resolve: {
+          configService: ConfigResolveService,
+        },
+      },
+      {
+        path: 'explore-content/viewer',
+        loadChildren: () => import('@ws/viewer').then(m => m.ViewerModule),
+        data: {
+          pageId: 'home/explore-content/viewer',
+          module: 'explore-content',
+        },
       },
       {
         path: 'odcs-mapping',
@@ -457,6 +522,17 @@ const routes: Routes = [
         resolve: {
           configService: ConfigResolveService,
         }
+      },
+      {
+        path: 'peer-validation',
+        loadChildren: () => import('./routes/peer-validation/peer-validation.module').then(m => m.PeerValidationModule),
+        data: {
+          pageKey: 'peer-validation',
+        },
+        resolve: {
+          configService: ConfigResolveService,
+        },
+
       },
     ],
   },

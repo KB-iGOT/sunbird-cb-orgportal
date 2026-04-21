@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core'
 import { HttpClient } from '@angular/common/http'
 import { Observable, Subject } from 'rxjs'
-import { map, retry } from 'rxjs/operators'
+import { map } from 'rxjs/operators'
 // tslint:disable
 import * as _ from 'lodash'
 
@@ -36,6 +36,8 @@ const API_END_POINTS = {
   getApprovalPendingFields: '/apis/proxies/v8/workflow/v2/userWFApplicationFieldsSearch',
   getPendingRequests: '/apis/proxies/v8/workflow/admin/pending/request',
   GET_ALL_USERS_V3: '/apis/proxies/v8/user/v3/search',
+  GET_SUNBIRD_IGOT_SEARCH: '/apis/proxies/v8/sunbirdigot/v4/search',
+  GET_SEARCH_DESIGNATIONS: '/apis/proxies/v8/designation/search',
 }
 
 @Injectable()
@@ -218,9 +220,9 @@ export class UsersService {
       },
     }
     return this.http.post<any>(`${API_END_POINTS.GET_ALL_USERS}`, reqBody).pipe(
-      retry(1),
       map(
-        (data: any) => ({ role, count: _.get(data, 'result.response.count') })))
+        (data: any) => ({ role, count: _.get(data, 'result.response.count') }))
+    )
   }
 
   getRolesCountsApi(reqBody: any): Observable<any> {
@@ -241,9 +243,9 @@ export class UsersService {
       },
     }
     return this.http.post<any>(`${API_END_POINTS.GET_ALL_USERS}`, reqBody).pipe(
-      retry(1),
       map(
-        (data: any) => ({ role, count: _.get(data, 'result.response') })))
+        (data: any) => ({ role, count: _.get(data, 'result.response') }))
+    )
   }
 
   searchUserByenter(value: string, rootOrgId: string) {
@@ -265,6 +267,13 @@ export class UsersService {
 
   getDesignations(_req?: any) {
     return this.http.get<any>(API_END_POINTS.getDesignation)
+  }
+
+  searchIgotDesignation(_req: any): Observable<any> {
+    return this.http.post<any>(API_END_POINTS.GET_SUNBIRD_IGOT_SEARCH, _req)
+  }
+  searchDesignation(_req: any): Observable<any> {
+    return this.http.post<any>(API_END_POINTS.GET_SEARCH_DESIGNATIONS, _req)
   }
 
   updateUserDetails(reqBody: any) {

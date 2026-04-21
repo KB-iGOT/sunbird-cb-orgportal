@@ -21,7 +21,7 @@
   <meta id="id-app-theme-color" name="theme-color" content="#000" />
   <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Open+Sans" />
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-  <!-- <script src="/assets/env.js"></script> -->
+  <!-- <script src="/assets/env-dev.js"></script> -->
   <script rel="preload">
     (async function getData() {
       const url = "/assets/env.json"
@@ -53,6 +53,14 @@
         window["env"]["compentencyVersionKey"] = envJson.compentencyVersionKey
         window["env"]["dicussV2Bucket"] = envJson.dicussV2Bucket
         window['env']['portalsForNotifications'] = envJson.portalsForNotifications
+        window['env']['googleStorageUrl'] = envJson.googleStorageUrl
+        window['env']['mdoChannelsBookmarkId'] = envJson.mdoChannelsBookmarkId || ''
+        window['env']['spvorgID'] = envJson.spvorgID || ''
+        window['env']['azureHost'] = envJson.azureHost || ''
+        window['env']['azureOldHost'] = envJson.azureOldHost || ''
+        window['env']['azureOldBuket'] = envJson.azureOldBuket || ''
+        window['env']['publicContentSurveyId'] = envJson.publicContentSurveyId || ''
+
       } catch (error) {
         console.error("Error in fetching env json")
       }

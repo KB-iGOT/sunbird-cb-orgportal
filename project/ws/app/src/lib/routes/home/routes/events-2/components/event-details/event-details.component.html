@@ -1,0 +1,299 @@
+<div class="course-listing-details p-6">
+  <div class="flex flex-middle gap-1">
+    <div class="course-listing-header">
+      Event Details
+    </div>
+  </div>
+
+  <!-- Pre Event Setup Section -->
+  <div class="event-section mt-6">
+    <div class="section-header flex items-center justify-between cursor-pointer" (click)="togglePreEventSetup()">
+      <h3 class="section-title">Pre Event Setup</h3>
+      <mat-icon class="toggle-icon">{{isPreEventExpanded ? 'keyboard_arrow_up' : 'keyboard_arrow_down'}}</mat-icon>
+    </div>
+
+    <div class="section-content" *ngIf="isPreEventExpanded" [formGroup]="preEventForm">
+      <!-- Upload Pre-read Document -->
+      <div class="form-field mt-4">
+        <label class="field-label">Upload Pre-read Document</label>
+
+        <!-- Upload Container - Show when no document uploaded -->
+        <div class="upload-container" *ngIf="!showUploadedDoc" (drop)="onDrop($event)"
+          (dragover)="preventDefaultCDK($event)" (dragenter)="preventDefaultCDK($event, 'enter')"
+          (dragleave)="preventDefaultCDK($event, 'leave')"
+          [class.disabled]="(eventDetailsData?.status?.toLowerCase() !== 'draft' && eventDetailsData?.status?.toLowerCase() !== 'rejected') && !checkIfLiveEvent || openMode === 'view'">
+          <mat-icon class="upload-icon" svgIcon="single-color-upload-file"></mat-icon>
+          <p class="upload-text">Select document to upload</p>
+          <p class="upload-subtext">or drag and drop here</p>
+          <p class="upload-limit">Max Size - 10MB</p>
+          <input type="file" class="file-input" (change)="onPreReadDocumentChange($event)" accept=".pdf">
+        </div>
+
+        <!-- Uploaded Document Display - Show after successful upload -->
+        <div class="uploaded-doc-container" *ngIf="showUploadedDoc">
+          <div class="uploaded-doc-card">
+            <img [src]="uploadedDocTypeImg" alt="document" class="doc-icon">
+            <div class="doc-info">
+              <p class="doc-name">{{uploadedFileName(preEventControls['preEventReads'].value)}}</p>
+              <p class="doc-type">{{materialType}}</p>
+            </div>
+            <ng-container *ngIf="isDraft || checkIfLiveEvent">
+              <button mat-icon-button class="remove-btn" (click)="removeUploadedDoc()" type="button">
+                <mat-icon>close</mat-icon>
+              </button>
+            </ng-container>
+          </div>
+        </div>
+      </div>
+
+      <!-- Paste meeting link -->
+      <div class="form-field mt-4 event-form">
+        <label class="field-label required">Paste meeting link</label>
+        <mat-form-field appearance="outline" class="full-width">
+          <input matInput placeholder="Paste Zoom, Teams, or Google Meet link for participants"
+            formControlName="meetingLink">
+          <mat-error *ngIf="preEventControls['meetingLink'].hasError('required')">
+            Meeting link is required
+          </mat-error>
+          <mat-error *ngIf="preEventControls['meetingLink'].hasError('pattern')">
+            Please enter a valid URL starting with http:// or https://
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <!-- Add agenda -->
+      <div class="form-field mt-4">
+        <label class="field-label flex items-center gap-1 required">
+          Add agenda
+          <mat-icon class="info-icon" matTooltip="Add agenda for the event">info_outline</mat-icon>
+        </label>
+        <mat-form-field appearance="outline" class="full-width">
+          <textarea matInput placeholder="Add your description" formControlName="agenda" rows="4"
+            maxlength="1000"></textarea>
+          <mat-error *ngIf="preEventControls['agenda'].hasError('required')">
+            Agenda is required
+          </mat-error>
+          <mat-error *ngIf="preEventControls['agenda'].hasError('minlength')">
+            Minimum characters needed for valid agenda {{100 - (preEventControls['agenda'].value?.length || 0)}}
+          </mat-error>
+        </mat-form-field>
+        <span class="description-count flex justify-end">{{preEventControls['agenda'].value?.length || 0}}/1000</span>
+      </div>
+
+      <!-- Add Speaker - Old Implementation (Commented Out) -->
+      <!-- <div class="form-field mt-4 event-form">
+        <label class="field-label flex items-center gap-1">
+          Add Speaker
+          <mat-icon class="info-icon" matTooltip="Add speaker information">info_outline</mat-icon>
+        </label>
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-chip-list #speakerChipList aria-label="Speaker selection">
+            <mat-chip *ngFor="let speaker of preEventForm.controls['selectedSpeaker'].value" [selectable]="selectable"
+              [removable]="removable" (removed)="removeSpeaker(speaker)">
+              {{ speaker?.name }}
+              <ng-container *ngIf="isDraft">
+                <mat-icon matChipRemove *ngIf="removable">cancel</mat-icon>
+              </ng-container>
+            </mat-chip>
+            <input placeholder="Enter speaker name or email" #speakerInput [formControl]="speakerCtrl"
+              [matChipInputFor]="speakerChipList" [matAutocomplete]="speakerAuto"
+              [matChipInputSeparatorKeyCodes]="separatorKeysCodes" [matChipInputAddOnBlur]="false"
+              (matChipInputTokenEnd)="validateAndAddSpeaker($event)" [disabled]="!isDraft" />
+          </mat-chip-list>
+          <mat-autocomplete #speakerAuto="matAutocomplete" (optionSelected)="addSpeaker($event)">
+            <mat-option *ngIf="fetchSpeakersStatus === 'fetching'">Fetching speakers...</mat-option>
+            <mat-option *ngIf="fetchSpeakersStatus === 'done' && speakersList.length === 0">
+              No speaker found. Please check the value entered.
+            </mat-option>
+            <mat-option *ngFor="let speaker of speakersList" [value]="speaker">
+              {{ speaker?.profileDetails?.personalDetails?.firstname }} | {{
+              speaker?.profileDetails?.personalDetails?.primaryEmail }}
+            </mat-option>
+          </mat-autocomplete>
+        </mat-form-field>
+      </div> -->
+
+      <!-- Add Speaker - New Implementation -->
+      <div class="flex gap-5">
+        <div class="form-field mt-4 event-form w-full">
+          <label class="field-label flex items-center gap-1">
+            Add Speaker
+            <mat-icon class="info-icon" matTooltip="Add speaker information">info_outline</mat-icon>
+          </label>
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-select placeholder="Select Speaker Type" formControlName="speakerType"
+              (selectionChange)="onSpeakerTypeChange($event)">
+              <mat-option value="courseCreator">Course Creator</mat-option>
+              <mat-option value="others">Others</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <!-- Speaker Name -->
+        <div class="form-field mt-4 event-form w-full">
+          <ng-container *ngIf="preEventControls['speakerType'].value">
+            <label class="field-label">Speaker Name</label>
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-chip-list #speakerChipList aria-label="Speaker selection">
+                <mat-chip *ngFor="let speaker of preEventForm.controls['selectedSpeaker'].value"
+                  [selectable]="selectable" [removable]="removable" (removed)="removeSpeaker(speaker)">
+                  {{ speaker?.name }}
+                  <ng-container *ngIf="!isSpeakerDisabled && isDraft && eventStatus !== 'live'">
+                    <mat-icon matChipRemove *ngIf="removable">cancel</mat-icon>
+                  </ng-container>
+                </mat-chip>
+                <ng-container *ngIf="preEventForm?.controls['speakerType'].value !== 'courseCreator'">
+                  <input placeholder="Enter speaker name" #speakerInput [matChipInputFor]="speakerChipList"
+                    [matChipInputSeparatorKeyCodes]="separatorKeysCodes" [matChipInputAddOnBlur]="true"
+                    (matChipInputTokenEnd)="addSpeakerFromInput($event)"
+                    [disabled]="isSpeakerDisabled || !isDraft || eventStatus === 'live'" />
+                </ng-container>
+              </mat-chip-list>
+            </mat-form-field>
+          </ng-container>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Post Event Setup Section -->
+  <div class="event-section mt-6">
+    <div class="section-header flex items-center justify-between cursor-pointer" (click)="togglePostEventSetup()">
+      <h3 class="section-title">Post Event Setup</h3>
+      <mat-icon class="toggle-icon">{{isPostEventExpanded ? 'keyboard_arrow_up' : 'keyboard_arrow_down'}}</mat-icon>
+    </div>
+
+    <div class="section-content" *ngIf="isPostEventExpanded" [formGroup]="postEventForm">
+      <!-- Upload session recording -->
+      <!-- <div class="form-field mt-4">
+        <label class="field-label required">Upload session recording</label>
+
+         <div class="upload-container" *ngIf="!showUploadedVideo"
+          [class.disabled]="isDraft && !isDateTimePassed(eventDetailsData?.endDateTime)">
+          <mat-icon class="upload-icon" svgIcon="single-color-upload-file"></mat-icon>
+          <p class="upload-text">Select video to upload</p>
+          <p class="upload-subtext">or drag and drop here</p>
+          <p class="upload-limit">Max Size - 500 MB</p>
+          <input type="file" class="file-input" (change)="onVideoUpload($event)" accept=".mp4"
+            [disabled]="isDraft && !isDateTimePassed(eventDetailsData?.endDateTime)">
+        </div>
+        <div class="uploaded-doc-container" *ngIf="showUploadedVideo">
+          <div class="uploaded-doc-card">
+            <mat-icon class="video-icon">video_library</mat-icon>
+            <div class="doc-info">
+              <p class="doc-name">Session Video</p>
+              <p class="doc-type">MP4 video</p>
+            </div>
+            <button mat-icon-button class="remove-btn" (click)="removeUploadedVideo()" type="button">
+              <mat-icon>close</mat-icon>
+            </button>
+          </div>
+        </div>
+
+        <div class="or-divider mt-4">or upload from URL</div>
+        <div class="form-field mt-4 event-form">
+          <mat-form-field appearance="outline" class="full-width mt-2 ">
+            <input matInput placeholder="https://meet.google.com/kjv-xxun-ctn" formControlName="recordedMediaLink">
+            <mat-error *ngIf="postEventControls['recordedMediaLink'].hasError('required')">
+              Video URL is required
+            </mat-error>
+          </mat-form-field>
+        </div>
+      </div> -->
+
+      <!-- Summary Document -->
+      <div id="summaryDocumentSection" class="form-field mt-4">
+        <label class="field-label required">Summary Document </label>
+
+        <!-- Upload Container - Show when no document uploaded -->
+        <div class="upload-container" *ngIf="!showUploadedSummaryDoc"
+          [class.disabled]="!isDateTimePassed(eventDetailsData?.endDateTime) || eventDetailsData.status.toLowerCase() !== 'live' || openMode === 'view'">
+          <mat-icon class="upload-icon" svgIcon="single-color-upload-file"></mat-icon>
+          <p class="upload-text">Select document to upload</p>
+          <p class="upload-subtext">or drag and drop here</p>
+          <p class="upload-limit">Max Size - 10MB</p>
+          <input type="file" class="file-input" (change)="onSummaryDocUpload($event)" accept=".pdf"
+            [disabled]="!isDateTimePassed(eventDetailsData?.endDateTime)">
+        </div>
+        <mat-error class="font-75-pre"
+          *ngIf="postEventControls['postEventSummary'].hasError('required') && postEventControls['postEventSummary'].touched">
+          Summary document is required
+        </mat-error>
+
+        <!-- Uploaded Document Display - Show after successful upload -->
+        <div class="uploaded-doc-container" *ngIf="showUploadedSummaryDoc">
+          <div class="uploaded-doc-card">
+            <img src="/assets/icons/pdf.svg" alt="document" class="doc-icon">
+            <div class="doc-info">
+              <p class="doc-name">{{uploadedFileName(postEventControls['postEventSummary'].value)}}</p>
+              <p class="doc-type">PDF document</p>
+            </div>
+            <button mat-icon-button class="remove-btn" (click)="removeUploadedSummaryDoc()" type="button"
+              *ngIf="!isSavedPostEvent">
+              <mat-icon>close</mat-icon>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Number of attendees -->
+      <div class="form-field mt-4 event-form">
+        <label class="field-label required">Number of attendees</label>
+        <mat-form-field appearance="outline" class="full-width">
+          <input matInput placeholder="Enter attendees" formControlName="noOfAttendes" type="number" min="1" step="1"
+            (keypress)="onNumberKeyPress($event)" (input)="onAttendeesInput($event)" (paste)="onAttendeesPaste($event)">
+          <mat-error *ngIf="postEventControls['noOfAttendes'].hasError('required')">
+            Number of attendees is required
+          </mat-error>
+          <mat-error *ngIf="postEventControls['noOfAttendes'].hasError('min')">
+            Number of attendees cannot be less than 1
+          </mat-error>
+          <mat-error *ngIf="postEventControls['noOfAttendes'].hasError('max')">
+            Number of attendees cannot exceed {{ eventDetailsData.maxEnrolments || 200 }}
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <!-- Event Duration -->
+      <div class="form-field mt-4 event-form">
+        <label class="field-label required">Event Duration</label>
+        <mat-form-field appearance="outline" class="full-width">
+          <input matInput formControlName="eventDuration" type="text" placeholder="1h 30m 55s">
+          <mat-error *ngIf="postEventControls['eventDuration'].hasError('required')">
+            Event duration is required
+          </mat-error>
+          <mat-error *ngIf="postEventControls['eventDuration'].hasError('pattern')">
+            Please enter duration in format: 1h 30m 45s (e.g., 1h 30m, 45m 30s, 2h)
+          </mat-error>
+          <mat-error *ngIf="postEventControls['eventDuration'].hasError('zeroDuration')">
+            Duration cannot be 0h 0m 0s. Please enter a valid duration
+          </mat-error>
+          <mat-error *ngIf="postEventControls['eventDuration'].hasError('minDuration')">
+            Event duration must be at least 30 minutes
+          </mat-error>
+          <mat-error *ngIf="postEventControls['eventDuration'].hasError('maxDuration')">
+            Event duration should be less than 24H
+          </mat-error>
+          <mat-error *ngIf="postEventControls['eventDuration'].hasError('invalidMinutes')">
+            Minutes must be between 0 and 59
+          </mat-error>
+          <mat-error *ngIf="postEventControls['eventDuration'].hasError('invalidSeconds')">
+            Seconds must be between 0 and 59
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <!-- Key takeaways -->
+      <div class="form-field mt-4">
+        <label class="field-label">Key takeaways</label>
+        <mat-form-field appearance="outline" class="full-width">
+          <textarea matInput placeholder="Add your description" formControlName="meetingSummary" rows="4"
+            maxlength="1000"></textarea>
+          <mat-hint align="end">{{postEventControls['meetingSummary'].value?.length || 0}}/1000</mat-hint>
+          <mat-error *ngIf="postEventControls['meetingSummary'].hasError('minlength')">
+            Key takeaways must be at least {{ 100 - postEventControls['meetingSummary'].value?.length }} characters
+          </mat-error>
+        </mat-form-field>
+      </div>
+    </div>
+  </div>

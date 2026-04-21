@@ -96,11 +96,12 @@ export class LearnerResponsesComponent implements OnInit {
 
   async getFormById() {
     const _result = await this.bpService.getSurveyByFormId(this.formId).toPromise().catch(_error => { })
-    if (_result && _result.responseData && _result.responseData.fields) {
-      this.formfields = _result.responseData.fields
-      this.formTitle = _result.responseData.title
-      this.newForm = (_result.responseData.clientVersion && _result.responseData.clientVersion === 1.1 ||
-        _result.responseData.clientVerion && _result.responseData.clientVerion === 1.1
+    if (_.get(_result, 'result.response')) {
+      const responce = _result.result.response
+      this.formfields = responce.fields
+      this.formTitle = responce.title || ''
+      this.newForm = (responce.clientVersion && responce.clientVersion === 1.1 ||
+        responce.clientVerion && responce.clientVerion === 1.1
       )
       this.getSurveyReport()
     }
@@ -139,21 +140,21 @@ export class LearnerResponsesComponent implements OnInit {
 
   async getSurveyReport() {
     const req = {
-      searchObjects: [
-        {
-          key: 'formId',
-          values: this.formId,
-        },
-        {
-          key: 'updatedBy',
-          values: this.userId,
-        },
-      ],
+      filters: {
+        formId: this.formId,
+        status: 'SUBMITTED',
+        createdBy: this.userId
+      },
+      page: 0,
+      size: 20,
+      sortBy: 'createdDate',
+      sortOrder: 'ASC'
     }
-    const resList = await this.bpService.getSurveyByUserID(req).toPromise().catch(_error => { })
-    if (resList && resList.statusInfo && resList.statusInfo.statusCode && resList.statusInfo.statusCode === 200) {
-      const tempData = _.sortBy(resList.responseData, ['timestamp'])
+    const resList = await this.bpService.getSubmissionsByUserId(req).toPromise().catch(_error => { })
+    if (_.get(resList, 'params.status') === 'success') {
+      const tempData = _.sortBy(_.get(resList, 'result.response.content'), ['timestamp'])
       this.latestData = tempData[tempData.length - 1]
+      this.latestData['dataObject'] = this.formateLatestDataObject
       setTimeout(() => {
         this.showSpinner = false
       }, 1000)
@@ -164,6 +165,18 @@ export class LearnerResponsesComponent implements OnInit {
       getAllApplications: `/apis/proxies/v8/forms/getAllApplications`,
       customizedHeader: {},
     }
+  }
+
+  get formateLatestDataObject(): any {
+    let dataObject: { [key: string]: any } = {}
+    if (this.latestData && this.latestData.responses) {
+      this.latestData.responses.forEach((item: any) => {
+        if (item.question) {
+          dataObject[item.question] = item.answer
+        }
+      })
+    }
+    return dataObject
   }
 
   onReject() {

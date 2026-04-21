@@ -48,7 +48,9 @@ export class BreadcrumbComponent implements OnInit {
 
   cancel() {
     this.tpdsSvc.trainingPlanTitle = ''
-    this.router.navigateByUrl('app/home/training-plan-dashboard')
+    setTimeout(() => {
+      this.router.navigateByUrl('app/home/training-plan-dashboard')
+    }, 500)
   }
 
   nextStep() {
@@ -85,7 +87,7 @@ export class BreadcrumbComponent implements OnInit {
       if (this.editState) {
         this.router.navigate(['app', 'home', 'training-plan-dashboard'], {
           queryParams: {
-            type: this.tpdsSvc.trainingPlanStepperData.status.toLowerCase(),
+            type: this.tpdsSvc.trainingPlanStepperData.status === 'Live' ? this.tpdsSvc.trainingPlanStepperData.status : this.tpdsSvc.trainingPlanStepperData.status.toLowerCase(),
             tabSelected: this.tpdsSvc.trainingPlanStepperData.assignmentType,
           },
         })
@@ -169,7 +171,6 @@ export class BreadcrumbComponent implements OnInit {
     // let hasMultipleCriteriaValues = false
     // let hasRootOrgId = false
     let userRootOrgId = this.configSvc?.userProfile?.rootOrgId || this.configSvc?.unMappedUser?.rootOrgId || ''
-    let orgIdList = [userRootOrgId]
     let isCCA = this.configSvc?.orgReadData?.isCCA || false
     for (const group of userGroups) {
       const criteriaList = group.userGroupCriteriaList || []
@@ -182,32 +183,6 @@ export class BreadcrumbComponent implements OnInit {
           criteriaKey: "rootOrgId",
           criteriaValue: [userRootOrgId]
         })
-        // hasRootOrgId = true
-      } else {
-        // If rootOrgId criteria exists, check if user's orgId is present
-        if (rootOrgIdCriteria.criteriaValue && rootOrgIdCriteria.criteriaValue.length > 0) {
-
-          if (!rootOrgIdCriteria.criteriaValue.includes(userRootOrgId)) {
-            // Add user's orgId if not present
-            rootOrgIdCriteria.criteriaValue.push(userRootOrgId)
-          }
-          rootOrgIdCriteria.criteriaValue.forEach((item: any) => {
-            if (!orgIdList.includes(item)) {
-              orgIdList.push(item)
-            }
-          })
-        } else {
-          // If criteriaValue is empty or undefined, initialize it with user's orgId
-          rootOrgIdCriteria.criteriaValue = [userRootOrgId]
-        }
-        // hasRootOrgId = true
-      }
-
-      // Check for multiple criteria values
-      for (const criteria of criteriaList) {
-        if (criteria.criteriaValue && criteria.criteriaValue.length > 1) {
-          // hasMultipleCriteriaValues = true
-        }
       }
 
       // Check for multiple criteria values
@@ -227,7 +202,7 @@ export class BreadcrumbComponent implements OnInit {
     if (type === 'create') {
       return {
         request: {
-          orgIdList: orgIdList,
+          orgIdList: [userRootOrgId],
           comment: trainingPlanStepperData?.comment ?? 'cbPlanId1 is created',
           contentList: trainingPlanStepperData?.contentList || [],
           contentType: trainingPlanStepperData?.contentType || "Course",
@@ -294,8 +269,8 @@ export class BreadcrumbComponent implements OnInit {
     }
     const obj: any = { request: { ...this.tpdsSvc.trainingPlanStepperData, id: this.activeRoute.snapshot.data['contentData'].id } }
     if (obj.request.status && obj.request.status.toLowerCase() === 'live') {
-      delete obj.request.contentList
-      delete obj.request.contentType
+      //delete obj.request.contentList
+      //delete obj.request.contentType
       delete obj.request.assignmentType
     }
     delete obj.request.status
@@ -332,10 +307,10 @@ export class BreadcrumbComponent implements OnInit {
     }
     const obj = this.generateRequestPayload(this.tpdsSvc.trainingPlanStepperData, 'update')
     if (obj.request.status && obj.request.status.toLowerCase() === 'live') {
-      delete obj.request.contentList
-      delete obj.request.contentType
+      //delete obj.request.contentList
+      //delete obj.request.contentType
       delete obj.request.assignmentType
-      delete obj.request.orgIdList
+      //delete obj.request.orgIdList
     }
     delete obj.request.status
     this.showDialogBox('progress')
@@ -381,7 +356,7 @@ export class BreadcrumbComponent implements OnInit {
           this.tpdsSvc.trainingPlanTitle = ''
           this.router.navigate(['app', 'home', 'training-plan-dashboard'], {
             queryParams: {
-              type: this.tpdsSvc.trainingPlanStepperData.status.toLowerCase(),
+              type: this.tpdsSvc.trainingPlanStepperData.status,
               tabSelected: this.tpdsSvc.trainingPlanStepperData.assignmentType,
             },
           })
@@ -436,13 +411,17 @@ export class BreadcrumbComponent implements OnInit {
           autoFocus: false,
         })
         break
-      case 'updateAndPublish':
+      case 'updateAndPublish': {
+        let title: any = "Are you sure you want to update and publish the plan?"
+        if (this.tpdsSvc.isContentChanged) {
+          title = "Editing the course list may impact learners who have already accessed this training plan. Removing or modifying a course could change their learning experience. Please confirm before proceeding. Are you sure you want to update and publish the plan?"
+        }
         this.dialogRef = this.dialog.open(ConfirmationBoxComponent, {
           disableClose: true,
           data: {
             type: 'conformation',
             icon: 'radio_on',
-            title: 'Are you sure you want to update and publish the plan?',
+            title: title,
             // subTitle: 'You wont be able to revert this',
             primaryAction: 'Confirm',
             secondaryAction: 'Cancel',
@@ -450,6 +429,7 @@ export class BreadcrumbComponent implements OnInit {
           autoFocus: false,
         })
         break
+      }
     }
     this.dialogRef.afterClosed().subscribe((_res: any) => {
       if (_res === 'confirmed') {

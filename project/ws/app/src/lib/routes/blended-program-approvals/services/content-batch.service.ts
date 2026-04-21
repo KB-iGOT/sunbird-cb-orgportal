@@ -14,7 +14,7 @@ const API_END_POINTS = {
   CONTENT_LEARNERS_DETAILS: `${AUTH_API_SLUG}batch/getUserProgress`,
   CONTENT_LEARNERS_DETAILSV2: `${AUTH_API_SLUG}batch/getUserProgressV2`,
   UPDATE_REQUEST: '/v1/blendedprogram/workflow/update',
-  INVITE_USERS: 'apis/proxies/v8/program/v2/admin/bulkEnroll',
+  INVITE_USERS: 'apis/proxies/v8/workflow/blendedprogram/nominate',
   DEFAULT_CERT_TEMP: '/apis/proxies/v8/data/v1/system/settings/get/defaultCertTemplate',
   DEFAULT_CERT: '/apis/proxies/v8/course/batch/cert/v1/template/add',
   BATCH_CUSTOM_ATTRIBUTES: '/apis/proxies/v8/data/v2/system/settings/get/bpEnrolMandatoryProfileFields',

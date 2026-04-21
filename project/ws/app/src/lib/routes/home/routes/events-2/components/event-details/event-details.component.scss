@@ -1,0 +1,257 @@
+.course-listing-details {
+  border: 1px solid #1B4CA1;
+  border-radius: 12px;
+
+  .course-listing-header {
+    color: #1B4CA1;
+    font: 600 20px Montserrat;
+  }
+
+  .event-section {
+    border: 1px solid #E0E0E0;
+    border-radius: 8px;
+    padding: 16px;
+    background: #FFFFFF;
+
+    .section-header {
+      padding: 8px 0;
+      user-select: none;
+
+      .section-title {
+        font: 600 18px/24px Lato;
+        color: #000000;
+        margin: 0;
+      }
+
+      .toggle-icon {
+        color: #666;
+        transition: transform 0.3s ease;
+      }
+    }
+
+    .section-content {
+      padding-top: 16px;
+    }
+  }
+
+  .form-field {
+    .field-label {
+      display: flex;
+      align-items: center;
+      font: 700 14px/20px Lato;
+      color: #333;
+      margin-bottom: 8px;
+
+      .required-asterisk {
+        color: #D32F2F;
+        margin-left: 4px;
+      }
+
+      .info-icon {
+        width: 16px;
+        height: 16px;
+        font-size: 16px;
+        color: #666;
+        cursor: pointer;
+      }
+    }
+
+    .upload-container {
+      border: 2px dashed #1B4CA1;
+      border-radius: 8px;
+      padding: 32px;
+      text-align: center;
+      background: #EDF7FF;
+      position: relative;
+      cursor: pointer;
+
+      &.disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        pointer-events: none;
+      }
+
+      .upload-icon {
+        width: 48px;
+        height: 48px;
+        font-size: 48px;
+        color: #1B4CA1;
+        margin: 0 auto 0;
+      }
+
+      .upload-text {
+        font: 700 14px/20px Lato;
+        color: #1B4CA1;
+        margin: 0 0 4px 0;
+      }
+
+      .upload-subtext {
+        font: 400 12px/16px Lato;
+        color: #666;
+        margin: 0 0 8px 0;
+      }
+
+      .upload-limit {
+        font: 400 12px/16px Lato;
+        color: #999;
+        margin: 0;
+      }
+
+      .file-input {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+        cursor: pointer;
+      }
+    }
+
+    .uploaded-doc-container {
+      margin-top: 8px;
+
+      .uploaded-doc-card {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 16px;
+        border: 1px solid #E0E0E0;
+        border-radius: 8px;
+        background: #EDF7FF;
+
+        .doc-icon {
+          width: 40px;
+          height: 40px;
+          object-fit: contain;
+        }
+
+        .video-icon {
+          width: 40px;
+          height: 40px;
+          font-size: 40px;
+          color: #1B4CA1;
+        }
+
+        .doc-info {
+          flex: 1;
+
+          .doc-name {
+            font: 500 14px/20px Lato;
+            color: #333;
+            margin: 0 0 4px 0;
+          }
+
+          .doc-type {
+            font: 400 12px/16px Lato;
+            color: #666;
+            margin: 0;
+          }
+        }
+
+        .remove-btn {
+          color: #D32F2F;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+
+          mat-icon {
+            font-size: 20px;
+            width: 20px;
+            height: 20px;
+            line-height: 20px;
+          }
+        }
+      }
+    }
+
+    .or-divider {
+      text-align: center;
+      position: relative;
+      font: 400 14px/20px Lato;
+      color: #666;
+
+      &::before,
+      &::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        width: 45%;
+        height: 1px;
+        background: #E0E0E0;
+      }
+
+      &::before {
+        left: 0;
+      }
+
+      &::after {
+        right: 0;
+      }
+    }
+  }
+
+  .full-width {
+    width: 100%;
+  }
+
+  ::ng-deep .mat-form-field {
+    .mat-form-field-wrapper {
+      padding-bottom: 1.25em;
+    }
+
+    .mat-form-field-outline {
+      color: #E0E0E0;
+    }
+
+    .mat-form-field-infix {
+      padding: 12px 0;
+    }
+
+    input,
+    textarea {
+      font: 400 14px/20px Lato;
+      color: #333;
+    }
+
+    ::placeholder {
+      color: #999;
+    }
+
+    .mat-form-field-subscript-wrapper {
+      margin-top: 4px;
+    }
+
+    .mat-hint {
+      font: 400 12px/16px Lato;
+      color: #666;
+    }
+  }
+
+  ::ng-deep .mat-select {
+    font: 400 14px/20px Lato;
+  }
+}
+
+:host ::ng-deep .event-form {
+  .mat-form-field-appearance-outline .mat-form-field-infix {
+    padding: 5px 0px 10px;
+  }
+
+  .mat-form-field-appearance-outline .mat-form-field-outline-end {
+    border-left-style: solid !important;
+    border-radius: 25px !important;
+  }
+
+  .mat-form-field-appearance-outline .mat-form-field-outline-start {
+    display: none;
+  }
+}
+
+.font-75-pre {
+  font-size: 75%;
+}
+
+.description-count {
+  margin-top: -25px;
+}

@@ -13,6 +13,7 @@ import { DatePipe } from '@angular/common'
 import { LoaderService } from '../../../../../../../../../../../src/app/services/loader.service'
 import { MatLegacyDialog } from '@angular/material/legacy-dialog'
 import { ConfirmDialogComponent } from '../../../../../workallocation-v2/components/confirm-dialog/confirm-dialog.component'
+import { CourseListingComponent } from '../course-listing/course-listing.component'
 
 @Component({
   selector: 'ws-app-create-event',
@@ -23,11 +24,15 @@ export class CreateEventComponent implements OnInit, AfterViewInit {
   //#region (global varialbles)
   private readonly locationService = inject(Location);
   @ViewChild(MatStepper) stepper: MatStepper | undefined
+  @ViewChild(CourseListingComponent) courseListingComponent: CourseListingComponent | undefined
   eventId = ''
   eventIconUrl = ''
   eventDetails: any
   updatedEventDetails: any
   eventDetailsForm!: FormGroup
+  courseSelectionForm!: FormGroup
+  preEventForm!: FormGroup
+  postEventForm!: FormGroup
   speakersList: speaker[] = []
   materialsList: material[] = []
   competencies: any = []
@@ -38,6 +43,7 @@ export class CreateEventComponent implements OnInit, AfterViewInit {
   showPreview = false
   selectedStepperLable = 'Basic Details'
   eventStatus = 'draft'
+  contentLoaded = false
   //#endregion
 
   constructor(
@@ -61,7 +67,7 @@ export class CreateEventComponent implements OnInit, AfterViewInit {
   initializeFormAndParams() {
     this.eventDetailsForm = this.formBuilder.group({
       eventName: new FormControl('', [Validators.required, Validators.minLength(10),
-      Validators.maxLength(70), Validators.pattern(noSpecialCharEvent)]),
+      Validators.maxLength(90), Validators.pattern(noSpecialCharEvent)]),
       description: new FormControl('', [Validators.required, Validators.minLength(250), Validators.maxLength(2000)]),
       eventCategory: new FormControl('', [Validators.required]),
       streamType: new FormControl(''),
@@ -72,8 +78,15 @@ export class CreateEventComponent implements OnInit, AfterViewInit {
       recoredEventUrl: new FormControl(''),
       appIcon: new FormControl('', [Validators.required]),
       typeofEvent: new FormControl('', [Validators.required]),
+      maxEnrolments: new FormControl('', [Validators.min(10), Validators.max(10000)]),
+    })
+
+    this.courseSelectionForm = this.formBuilder.group({
+      selectedCourse: new FormControl(null, [])
     })
   }
+
+  get edf() { return this.eventDetailsForm.controls }
 
   getEventDetailsFromResolver() {
     this.activatedRoute.queryParams.subscribe((params: any) => {
@@ -90,7 +103,7 @@ export class CreateEventComponent implements OnInit, AfterViewInit {
     }
   }
 
-  patchEventDetails() {
+  async patchEventDetails() {
     this.eventId = _.get(this.eventDetails, 'identifier')
     this.eventStatus = _.get(this.eventDetails, 'status', 'draft').toLowerCase()
     if (this.eventStatus.toLocaleLowerCase() === 'senttopublish' && this.pathUrl === 'upcoming' && this.openMode === 'edit') {
@@ -126,7 +139,8 @@ export class CreateEventComponent implements OnInit, AfterViewInit {
       registrationLink: '',
       recoredEventUrl: '',
       appIcon: _.get(this.eventDetails, 'appIcon', ''),
-      typeofEvent: _.get(this.eventDetails, 'typeofEvent', '')
+      typeofEvent: _.get(this.eventDetails, 'typeofEvent', ''),
+      maxEnrolments: _.get(this.eventDetails, 'maxEnrolments', ''),
     }
 
     if (registrationLink) {
@@ -138,6 +152,38 @@ export class CreateEventComponent implements OnInit, AfterViewInit {
     }
 
     this.eventDetailsForm.patchValue(eventBaseDetails)
+
+    if (this.eventDetails?.typeofEvent?.toLowerCase() === 'live') {
+      this.courseSelectionForm.controls.selectedCourse.setValidators([Validators.required])
+      if (this.eventDetails?.courseLinked) {
+        const contentData: any = await this.eventSvc.getContentRead(this.eventDetails?.courseLinked).toPromise().catch(_err => { })
+        if (contentData?.result) {
+          this.eventSvc.setCourseDetails(contentData?.result?.content || {})
+          this.courseSelectionForm.controls.selectedCourse.setValue(contentData?.result?.content || {})
+          this.competencies = this.getLatestCompetencies(contentData?.result?.content)
+          this.contentLoaded = true
+          setTimeout(() => {
+            // Check if event is live and endDateTime has passed
+            if (this.eventDetails?.status?.toLowerCase() === 'live' && this.eventDetails?.endDateTime && this.openMode === 'edit') {
+              const endDateTime = new Date(this.eventDetails.endDateTime)
+              const currentDateTime = new Date()
+              if (endDateTime < currentDateTime && this.stepper) {
+                const stepersList = this.stepper.steps.toArray()
+                const eventSetupIndex = stepersList.findIndex((step) => step.label === 'Event Setup')
+                if (eventSetupIndex !== -1) {
+                  this.currentStepperIndex = eventSetupIndex
+                  this.selectedStepperLable = 'Event Setup'
+                }
+              }
+            }
+          }, 300)
+        }
+      } else {
+        this.courseSelectionForm.controls.selectedCourse.setValue({})
+        this.contentLoaded = true
+      }
+      this.courseSelectionForm.controls.selectedCourse.updateValueAndValidity()
+    }
 
     if (this.pathUrl === 'past' && this.openMode === 'edit') {
       this.eventDetailsForm.disable()
@@ -151,6 +197,11 @@ export class CreateEventComponent implements OnInit, AfterViewInit {
       this.eventDetailsForm.controls.description.disable()
       this.eventDetailsForm.controls.typeofEvent.disable()
       this.eventDetailsForm.controls.streamType.disable()
+      if (_.get(this.edf, 'typeofEvent.value', '').toString().toLowerCase() === 'live') {
+        this.eventDetailsForm.controls.startDate.disable()
+        this.eventDetailsForm.controls.startTime.disable()
+        this.eventDetailsForm.controls.endTime.disable()
+      }
       this.eventStatus = 'live' // this is to handle the case when user is trying to edit duplicate record of the event which is already live
     }
 
@@ -158,7 +209,10 @@ export class CreateEventComponent implements OnInit, AfterViewInit {
 
     this.speakersList = _.get(this.eventDetails, 'speakers', [])
     this.materialsList = _.get(this.eventDetails, 'eventHandouts', [])
-    this.competencies = _.get(this.eventDetails, 'competencies_v6', [])
+    if (this.competencies.length === 0) {
+      this.competencies = _.get(this.eventDetails, 'competencies_v6', [])
+    }
+
   }
 
   ngAfterViewInit() {
@@ -167,19 +221,73 @@ export class CreateEventComponent implements OnInit, AfterViewInit {
       this.cdr.detectChanges()
     }
   }
+
+  getLatestCompetencies(obj: any): any[] {
+    const competencyKeys = Object.keys(obj || {}).filter(key => key.startsWith('competencies_v'))
+    if (competencyKeys.length === 0) {
+      return []
+    }
+    // Extract version numbers and sort descending
+    const sortedKeys = competencyKeys.sort((a, b) => {
+      const versionA = parseInt(a.replace('competencies_v', ''), 10)
+      const versionB = parseInt(b.replace('competencies_v', ''), 10)
+      return versionB - versionA
+    })
+    return _.get(obj, sortedKeys[0], [])
+  }
   //#endregion
 
   //#region (ui interactions)
   onSelectionChange(event: StepperSelectionEvent) {
+    const selectedStep = this.stepper?.steps.toArray()[event.selectedIndex]
+    const previousStep = this.stepper?.steps.toArray()[event.previouslySelectedIndex]
+    const selectedLabel = selectedStep?.label
+    const previousLabel = previousStep?.label
+    if (previousLabel === 'Basic Details') {
+      this.eventDetailsForm.markAllAsTouched()
+      this.eventDetailsForm.updateValueAndValidity()
+    }
     this.currentStepperIndex = event.selectedIndex
     if (this.stepper) {
-      const selectedStep = this.stepper.steps.toArray()[this.currentStepperIndex]
-      this.selectedStepperLable = selectedStep.label
+      this.selectedStepperLable = selectedLabel || ''
       this.cdr.detectChanges()
     }
     if (this.selectedStepperLable === 'Preview') {
       this.updatedEventDetails = this.getFormBodyOfEvent(this.eventDetails['status'])
     }
+  }
+
+  onCourseSelected(course: any) {
+    // Update the form control immediately when a course is selected
+    this.courseSelectionForm.patchValue({
+      selectedCourse: course
+    })
+    this.eventSvc.setCourseDetails(course)
+    // Mark the form as touched and update validity
+    this.courseSelectionForm.markAllAsTouched()
+    this.courseSelectionForm.updateValueAndValidity()
+
+    this.competencies = this.getLatestCompetencies(course)
+
+    // Reset speaker type and speaker names when course changes
+    if (this.preEventForm && this.preEventForm.get('speakerType')?.value === 'courseCreator') {
+      this.preEventForm.patchValue({
+        speakerType: '',
+        selectedSpeaker: []
+      })
+    }
+
+    this.cdr.detectChanges()
+  }
+
+  onPreEventFormReady(form: FormGroup) {
+    this.preEventForm = form
+    console.log('Pre-event form received in parent:', this.preEventForm)
+  }
+
+  onPostEventFormReady(form: FormGroup) {
+    this.postEventForm = form
+    console.log('Post-event form received in parent:', this.postEventForm)
   }
 
 
@@ -252,11 +360,23 @@ export class CreateEventComponent implements OnInit, AfterViewInit {
   }
 
   moveToNextForm() {
+    // const currentStep = this.stepper?.steps.toArray()[this.currentStepperIndex]
+    // const currentStepLabel = currentStep?.label || ''
     this.eventDetailsForm.markAllAsTouched()
     this.eventDetailsForm.updateValueAndValidity()
-    if (this.openMode === 'view' || this.canMoveToNext) {
+    // if (currentStepLabel === 'Basic Details' && this.eventDetailsForm.invalid) {
+    //   this.matSnackBar.open('Please fill mandatory fields')
+    //   return
+    // }
+    if (this.stepper && this.currentStepperIndex < this.stepper.steps.length - 1) {
       this.currentStepperIndex = this.currentStepperIndex + 1
     }
+  }
+
+  moveToPreviousForm() {
+    this.eventDetailsForm.markAllAsTouched()
+    this.eventDetailsForm.updateValueAndValidity()
+    this.currentStepperIndex = this.currentStepperIndex - 1
   }
 
   preview() {
@@ -281,6 +401,11 @@ export class CreateEventComponent implements OnInit, AfterViewInit {
   }
 
   publish() {
+    if (this.eventDetails?.typeofEvent?.toLowerCase() === 'live' && !(this.competencies && this.competencies.length)) {
+      if (this.courseSelectionForm?.valid) {
+        this.competencies = this.getLatestCompetencies(this.courseSelectionForm?.value?.selectedCourse)
+      }
+    }
     if (this.canPublish) {
       this.saveAndExit('SentToPublish')
     }
@@ -320,7 +445,7 @@ export class CreateEventComponent implements OnInit, AfterViewInit {
   }
 
   get canPublish(): boolean {
-    if (this.selectedStepperLable === 'Add Competency' || this.selectedStepperLable === 'Preview') {
+    if (this.selectedStepperLable === 'Add Competency' || this.selectedStepperLable === 'Preview' || this.selectedStepperLable === 'Event Setup') {
       if (this.eventDetailsForm.invalid) {
         this.openSnackBar('Please fill mandatory fields in Basic Details')
         return false
@@ -334,13 +459,42 @@ export class CreateEventComponent implements OnInit, AfterViewInit {
         return false
       }
       if (!(this.competencies && this.competencies.length)) {
-        this.openSnackBar('Please add atleast one competency in Add Competency')
+        this.openSnackBar(this.eventDetails.typeofEvent === 'live' ? 'Select course from course linking' : 'Please add atleast one competency in Add Competency')
         return false
       }
 
       if (!this.isValidTimeToStart) {
         this.openSnackBar('Please select a future date and time to start the event.')
         return false
+      }
+
+      if (this.eventDetails?.status?.toLowerCase() === 'draft' && this.eventDetails?.typeofEvent?.toLowerCase() === 'live') {
+        if (this.preEventForm?.invalid) {
+          this.preEventForm.markAllAsTouched()
+          this.preEventForm.updateValueAndValidity()
+          this.openSnackBar('Please fill mandatory fields in Event Setup > Pre Event Setup')
+          return false
+        }
+        if (this.courseSelectionForm?.invalid) {
+          this.openSnackBar('Please select one course in course Linking')
+          return false
+        }
+      }
+
+      if (this.eventDetails?.status?.toLowerCase() === 'live' && this.eventDetails?.typeofEvent?.toLowerCase() === 'live') {
+        if (this.preEventForm?.invalid) {
+          this.preEventForm.markAllAsTouched()
+          this.preEventForm.updateValueAndValidity()
+          this.openSnackBar('Please fill mandatory fields in Event Setup > Pre Event Setup')
+          return false
+        }
+      }
+
+      if (this.eventDetails?.status?.toLowerCase() === 'live' && this.eventDetails?.typeofEvent?.toLowerCase() === 'live') {
+        if (this.postEventForm?.invalid) {
+          this.openSnackBar('Please fill mandatory fields in Event Setup > Post Event Setup')
+          return false
+        }
       }
       return true
     }
@@ -399,7 +553,9 @@ export class CreateEventComponent implements OnInit, AfterViewInit {
     this.eventSvc.updateEvent(formBody, this.eventId).subscribe({
       next: res => {
         if (res) {
-          const successMessage = status === 'Draft' ? 'Event details saved successfully' : 'Event details sent for approval successfully'
+          const successMessage = status === 'Draft' ? 'Event details saved successfully' :
+            status === 'updatePostEvent' ? 'Post event details updated successfully' :
+              'Event details sent for approval successfully'
           this.openSnackBar(successMessage)
           setTimeout(() => {
             this.navigateBack()
@@ -448,7 +604,7 @@ export class CreateEventComponent implements OnInit, AfterViewInit {
                 setTimeout(() => {
                   this.navigateBack()
                   this.loaderService.changeLoaderState(false)
-                }, 1000)
+                }, 2000)
               } else {
                 this.loaderService.changeLoaderState(false)
               }
@@ -539,7 +695,23 @@ export class CreateEventComponent implements OnInit, AfterViewInit {
       eventDetails['endDateTime'] = endDateTime
     }
 
-    eventDetails['status'] = status
+    eventDetails['status'] = (status === 'updatePostEvent') ? this.eventDetails['status'] : status
+
+    if (eventBaseDetails?.typeofEvent?.toLowerCase() === 'live') {
+      eventDetails['maxEnrolments'] = eventBaseDetails?.maxEnrolments || 0
+      if (this.courseSelectionForm?.value?.selectedCourse) {
+        eventDetails['courseLinked'] = this.courseSelectionForm?.value?.selectedCourse?.identifier || ''
+      }
+      eventDetails['registrationLink'] = this.preEventForm.controls['meetingLink'].value || ''
+      eventDetails['meetingAgenda'] = this.preEventForm.controls['agenda'].value || ''
+      eventDetails['preEventReads'] = [this.preEventForm.controls['preEventReads'].value || '']
+      eventDetails['speakerDetails'] = JSON.stringify(this.preEventForm.controls['selectedSpeaker'].value) || []
+      this.competencies = this.getLatestCompetencies(this.courseSelectionForm?.value?.selectedCourse)
+      eventDetails['noOfAttendes'] = this.postEventForm?.controls['noOfAttendes'].value || 0
+      eventDetails['eventDuration'] = this.convertDurationToMinutes(this.postEventForm?.controls['eventDuration'].value) || 0
+      eventDetails['meetingSummary'] = this.postEventForm?.controls['meetingSummary'].value || ''
+      eventDetails['postEventSummary'] = [this.postEventForm?.controls['postEventSummary'].value || '']
+    }
 
     return eventDetails
   }
@@ -601,6 +773,45 @@ export class CreateEventComponent implements OnInit, AfterViewInit {
 
   private openSnackBar(message: string) {
     this.matSnackBar.open(message)
+  }
+
+  updatePostEvent() {
+    if (this.postEventForm.invalid) {
+      this.postEventForm.markAllAsTouched()
+      this.postEventForm.updateValueAndValidity()
+      this.openSnackBar('Please fill mandatory fields in Post Event Setup')
+      return
+    } else {
+      this.saveAndPublish()
+    }
+  }
+
+  convertDurationToMinutes(duration: string): number {
+    if (!duration) {
+      return 0
+    }
+
+    let totalMinutes = 0
+
+    // Extract hours
+    const hoursMatch = duration.match(/(\d+)h/)
+    if (hoursMatch) {
+      totalMinutes += parseInt(hoursMatch[1], 10) * 60
+    }
+
+    // Extract minutes
+    const minutesMatch = duration.match(/(\d+)m/)
+    if (minutesMatch) {
+      totalMinutes += parseInt(minutesMatch[1], 10)
+    }
+
+    // Extract seconds and convert to minutes (rounded)
+    const secondsMatch = duration.match(/(\d+)s/)
+    if (secondsMatch) {
+      totalMinutes += Math.round(parseInt(secondsMatch[1], 10) / 60)
+    }
+
+    return totalMinutes
   }
 
 }
