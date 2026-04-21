@@ -527,8 +527,8 @@
             [name]="getUserFullName(user)">
         </ws-widget-avatar-photo>
         <div class="margin-left-l">
-            <div (click)="goToUserProfile(user)" [ngClass]="{'cursor-pointer': enablePeopleSearch}"
-                class="width-expand padding-left-xs">
+            <div (click)="goToUserProfile(user)" (keyup.enter)="goToUserProfile(user)"
+                [ngClass]="{'cursor-pointer': enablePeopleSearch}" class="width-expand padding-left-xs">
                 <div class="mat-body-1 cohorts-name">
                     {{
                     { firstName: user.first_name, email: user.email }
@@ -548,8 +548,8 @@
             [name]="getUserFullName(user)">
         </ws-widget-avatar-photo>
         <div class="margin-left-l">
-            <div (click)="goToUserProfile(user)" [ngClass]="{'cursor-pointer': enablePeopleSearch}"
-                class="width-expand padding-left-xs">
+            <div (click)="goToUserProfile(user)" (keyup.enter)="goToUserProfile(user)"
+                [ngClass]="{'cursor-pointer': enablePeopleSearch}" class="width-expand padding-left-xs">
                 <!-- <div class="mat-body-1 cohorts-name">
                 {{
                     { firstName: user.first_name, lastName: user.last_name, email: user.email }

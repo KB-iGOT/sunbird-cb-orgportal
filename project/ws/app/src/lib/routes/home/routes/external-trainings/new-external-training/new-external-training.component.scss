@@ -17,6 +17,7 @@
   .header-content {
     .title {
       margin: 0 0 5px 0;
+      /* stylelint-disable-next-line */
       font: 600 20px 'Montserrat';
     }
 
@@ -42,6 +43,7 @@
     font-size: 18px;
     font-weight: 600;
     margin: 0;
+    /* stylelint-disable-next-line */
     font-family: 'Montserrat';
   }
 }

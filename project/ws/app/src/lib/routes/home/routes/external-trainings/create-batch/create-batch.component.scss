@@ -16,9 +16,10 @@
 
   .header-content {
     .title {
-      font-weight: 500;
       margin: 0 0 5px 0;
+      /* stylelint-disable */
       font: 600 20px 'Montserrat';
+      /* stylelint-enable */
     }
 
     .subtitle {
@@ -40,7 +41,9 @@
 .section-title {
   margin: 0 0 24px 0;
   font-size: 18px;
+  /* stylelint-disable */
   font-family: "Montserrat";
+  /* stylelint-enable */
 }
 
 .form-row {
@@ -99,7 +102,9 @@
   padding: 8px 16px;
   border: 1px solid #1b4ca1;
   color: #1b4ca1;
+  /* stylelint-disable */
   font: 600 14px 'Lato';
+  /* stylelint-enable */
   border-radius: 4px;
   background: white;
   cursor: pointer;

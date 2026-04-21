@@ -46,7 +46,7 @@
 }
 
 .xyz {
-    margin: calc(#{$size-s / 2})
+    margin: calc(#{$size-s} / 2);
 }
 
 .max-w {

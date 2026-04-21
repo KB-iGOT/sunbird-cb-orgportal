@@ -69,7 +69,7 @@
   <ng-container *ngIf="isMobile">
     <div class="flex flex-1 mobile-viewer-header justify-between">
       <div class="cross-icon">
-        <div *ngIf="handleBackFromPdfScormFullScreenFlag" (click)="backToPrev()">
+        <div *ngIf="handleBackFromPdfScormFullScreenFlag" (click)="backToPrev()" (keyup.enter)="backToPrev()">
           <img src="assets/icons/final-assessment/mobile-cross.svg" alt="mobile-cross" />
         </div>
         <div *ngIf="!handleBackFromPdfScormFullScreenFlag">
@@ -98,7 +98,7 @@
           {{ resourceName }}
         </p>
       </div>
-      <div (click)="onClickOfShare()" *ngIf="canShare"
+      <div (click)="onClickOfShare()" (keyup.enter)="onClickOfShare()" *ngIf="canShare"
         class="flex flex-row cursor-pointer items-center justify-end gap-2 share-tag">
         <mat-icon class="">share</mat-icon>
       </div>

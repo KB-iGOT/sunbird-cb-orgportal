@@ -4,7 +4,7 @@
       <div class="filter-12">
         <div class="flex justify-between right-sidenav-header px-5 pt-5 pb-4">
           <div>{{ openMode === 'createNew' ? 'Create Organisation' : 'MDO Details'}}</div>
-          <mat-icon class="closeIcon" (click)="closeNaveBar()">close</mat-icon>
+          <mat-icon class="closeIcon" (click)="closeNaveBar()" (keyup.enter)="closeNaveBar()">close</mat-icon>
         </div>
         <div class="px-5 pt-6">
           <ng-container *ngIf="openMode !== 'createNew'">
@@ -19,7 +19,8 @@
                 <ng-container *ngIf="!selectedLogo">
                   <div class="">Logo</div>
                 </ng-container>
-                <div class="edit-logo" onclick="document.getElementById('edit-orgLogo').click()">
+                <div class="edit-logo" onclick="document.getElementById('edit-orgLogo').click()"
+                  onkeydown="if(event.key==='Enter'){document.getElementById('edit-orgLogo').click()}">
                   <mat-icon>edit</mat-icon>
                 </div>
               </div>
@@ -152,7 +153,8 @@
                       </div>
                       <div class="flex flex-column justify-center gap-2">
                         <div class="file-upload-header hover:underline cursor-pointer"
-                          onclick="document.getElementById('upload-logo').click()">
+                          onclick="document.getElementById('upload-logo').click()"
+                          onkeydown="if(event.key==='Enter'){document.getElementById('upload-logo').click()}">
                           Click here to upload file
                         </div>
                         <div class="upload-description">
@@ -167,7 +169,8 @@
                           <img [src]="selectedLogo" alt="logo" width="50px" height="50px">
                           <p class="upload-description font-bold">{{selectedLogoName}}</p>
                         </div>
-                        <div (click)="selectedLogo = null"><mat-icon>close</mat-icon></div>
+                        <div (click)="selectedLogo = null" (keyup.enter)="selectedLogo = null">
+                          <mat-icon>close</mat-icon></div>
                       </div>
                     </ng-container>
                   </div>

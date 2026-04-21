@@ -1,7 +1,7 @@
 <div class="w-full h-full c-r-form">
   <mat-card class="card-section">
     <span class="flex gap-2 items-center mt-4">
-      <mat-icon class="arrow-btn" (click)="navigateBack()">arrow_back</mat-icon>
+      <mat-icon class="arrow-btn" (keyup.enter)="navigateBack()" (click)="navigateBack()">arrow_back</mat-icon>
       <mat-card-title class="title-request">
         {{isHideData ? 'Go Back':'Request Content'}}
       </mat-card-title>
