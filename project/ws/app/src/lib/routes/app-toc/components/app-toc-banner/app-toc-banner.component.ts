@@ -607,7 +607,7 @@ export class AppTocBannerComponent implements OnInit, OnChanges, OnDestroy {
         this.openSnackbar('Something went wrong, please try again later!')
         this.disableEnrollBtn = false
       }
-    },                                                               (error: any) => {
+    }, (error: any) => {
       this.openSnackbar(_.get(error, 'error.params.errmsg') ||
         _.get(error, 'error.result.errmsg') ||
         'Something went wrong, please try again later!')
@@ -860,6 +860,7 @@ export class AppTocBannerComponent implements OnInit, OnChanges, OnDestroy {
       const msg = this.WFSTATUS_MSG_MAPPING[status]
       return this.tocConfig[msg]
     }
+    return ''
   }
 
   get showIcon() {
@@ -1284,7 +1285,7 @@ export class AppTocBannerComponent implements OnInit, OnChanges, OnDestroy {
         }
         this.timerFunc(this.serverDate + t * 1000)
         t = t + 1
-      },                                    1000)
+      }, 1000)
 
     }
   }
@@ -1377,7 +1378,7 @@ export class AppTocBannerComponent implements OnInit, OnChanges, OnDestroy {
         if (el != null) {
           setTimeout(() => {
             el[0].scrollTop = el[0].scrollHeight
-          },         200)
+          }, 200)
         }
       } else {
         this.openSnackbar(this.translateLabels('invalidEmail', 'contentSharing', ''))
@@ -1412,7 +1413,7 @@ export class AppTocBannerComponent implements OnInit, OnChanges, OnDestroy {
     if (el != null) {
       setTimeout(() => {
         el[0].scrollTop = el[0].scrollHeight
-      },         200)
+      }, 200)
     }
   }
 

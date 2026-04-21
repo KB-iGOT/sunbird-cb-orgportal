@@ -29,7 +29,7 @@
       <div class="left-container">
         <div class="flex flex-row justify-between align-center assessment-header">
           <div>
-            <div (click)="back()" class="no-border flex cursor-pointer back_button">
+            <div (click)="back()" (keyup.enter)="back()" class="no-border flex cursor-pointer back_button">
               <span class="subheading-back">{{resourceName}}</span>
             </div>
           </div>
@@ -261,7 +261,7 @@
             <div class="flex flex-wrap margin-right-s margin-left-s quest_num_box quest_num_box"
               *ngIf="fetchingQuestionsStatus === 'done'">
               <div class="col question-list-item" *ngFor="let question of secQuestions; let i = index">
-                <div (click)="scroll(i + 1)" [ngClass]="{
+                <div (click)="scroll(i + 1)" (keyup.enter)="scroll(i + 1)" [ngClass]="{
                 'marked-question': isQuestionMarked(question?.questionId),
                 'attempted-question':
                   !isQuestionMarked(question?.questionId) &&
@@ -377,7 +377,7 @@
                 <mat-card-content class="cursor-pointer"
                   [class.spinner]="fetchingQuestionsStatus === 'fetching' && section.identifier === selectedSection.identifier"
                   [attr.disabled]="fetchingQuestionsStatus === 'fetching' && section.identifier === selectedSection.identifier"
-                  (click)="startSection(section)">
+                  (click)="startSection(section)" (keyup.enter)="startSection(section)">
                   <div class="flex flex-1 flex-column">
                     <span class="flex mat-subheading-1 text-truncate ">{{section.name || 'Section'}}</span>
                     <span class="flex mat-body-2">Percentage to pass - <ng-container>
@@ -404,11 +404,11 @@
     <div class="flex flex-column" *ngIf="!isSubmitted">
       <div>
         <div class="flex flex-row justify-around align-end mobile-question-header">
-          <div (click)="back()">
+          <div (click)="back()" (keyup.enter)="back()">
             <img class="vertical-middle cursor-pointer" src="assets/icons/final-assessment/mobile-cross.svg"
               alt="mobile-cross" />
           </div>
-          <div class="no-border flex cursor-pointer back_button">
+          <div class="no-border flex cursor-pointer back_button" (click)="back()" (keyup.enter)="back()">
             <span class="subheading-back">{{resourceName}}</span>
 
           </div>
@@ -619,7 +619,7 @@
                 <div class="flex flex-wrap margin-right-s margin-left-s quest_num_box quest_num_box_mobile"
                   *ngIf="fetchingQuestionsStatus === 'done'">
                   <div class="col question-list-item" *ngFor="let question of secQuestions; let i = index">
-                    <div (click)="scroll(i + 1)" [ngClass]="{
+                    <div (click)="scroll(i + 1)" (keyup.enter)="scroll(i + 1)" [ngClass]="{
                       'marked-question': isQuestionMarked(question?.questionId),
                       'attempted-question':
                         !isQuestionMarked(question?.questionId) &&
@@ -657,7 +657,7 @@
 
             </div>
             <div class="exapnd-collapse-mweb flex justify-center">
-              <div class="expand-icon-mweb" (click)="toggleExpandforMobile()">
+              <div class="expand-icon-mweb" (click)="toggleExpandforMobile()" (keyup.enter)="toggleExpandforMobile()">
                 <mat-icon class="mat-icon notranslate material-icons mat-icon-no-color" role="img" aria-hidden="true">
                   <span *ngIf="expandFalse">expand_more</span>
                   <span *ngIf="!expandFalse">expand_less</span>
@@ -767,7 +767,7 @@
                 <mat-card-content class="cursor-pointer"
                   [class.spinner]="fetchingQuestionsStatus === 'fetching' && section.identifier === selectedSection.identifier"
                   [attr.disabled]="fetchingQuestionsStatus === 'fetching' && section.identifier === selectedSection.identifier"
-                  (click)="startSection(section)">
+                  (click)="startSection(section)" (keyup.enter)="startSection(section)">
                   <div class="flex flex-1 flex-column">
                     <span class="flex mat-subheading-1 text-truncate ">{{section.name || 'Section'}}</span>
                     <span class="flex mat-body-2">Percentage to pass - <ng-container>
@@ -793,7 +793,7 @@
     <div class="left-container">
       <div class="flex flex-row margin-m justify-between">
         <div>
-          <div (click)="back()" class="no-border flex cursor-pointer back_button">
+          <div (click)="back()" (keyup.enter)="back()" class="no-border flex cursor-pointer back_button">
             <mat-icon>arrow_back</mat-icon>
             <span class="subheading-back">
               <ws-widget-skeleton-loader [width]="'182px'" [height]="'28px'"
@@ -972,7 +972,7 @@
                 [bindingClass]="'flex h-16'"></ws-widget-skeleton-loader>
             </span>
           </div>
-          <div (click)="back()" class="no-border flex cursor-pointer back_button">
+          <div (click)="back()" (keyup.enter)="back()" class="no-border flex cursor-pointer back_button">
             <span class="subheading-back">
               <ws-widget-skeleton-loader [width]="'120px'" [height]="'28px'"
                 [bindingClass]="'flex h-16'"></ws-widget-skeleton-loader>
@@ -1048,7 +1048,7 @@
               <div class="flex flex-nowrap margin-right-s margin-left-s quest_num_box"
                 *ngIf="fetchingQuestionsStatus === 'done'">
                 <div class="col" *ngFor="let question of secQuestions; let i = index">
-                  <div (click)="scroll(i + 1)" [ngClass]="{
+                  <div (click)="scroll(i + 1)" (keyup.enter)="scroll(i + 1)" [ngClass]="{
                       'marked-question': isQuestionMarked(question?.questionId),
                       'attempted-question':
                         !isQuestionMarked(question?.questionId) &&
@@ -1173,7 +1173,7 @@
 
         <div class="flex flex-row justify-between align-center assessment-header">
           <div>
-            <div (click)="back()" class="no-border flex cursor-pointer back_button">
+            <div (click)="back()" (keyup.enter)="back()" class="no-border flex cursor-pointer back_button">
               <span class="subheading-back">{{resourceName}}</span>
             </div>
           </div>
@@ -1286,7 +1286,7 @@
           </div>
         </div>
         <div *ngIf="assessmentType !== 'optionalWeightage'" class="exapnd-collapse-desktop">
-          <div class="expand-icon" (click)="toggleExpandforMobile()">
+          <div class="expand-icon" (click)="toggleExpandforMobile()" (keyup.enter)="toggleExpandforMobile()">
             <mat-icon class="mat-icon notranslate material-icons mat-icon-no-color" role="img" aria-hidden="true">
               <span *ngIf="expandFalse">arrow_forward</span>
               <span *ngIf="!expandFalse">arrow_backward</span>
@@ -1363,7 +1363,8 @@
               <div class="flex flex-wrap margin-right-s margin-left-s quest_num_box quest_num_box"
                 *ngIf="fetchingQuestionsStatus === 'done'">
                 <div class="col question-list-item" *ngFor="let question of secQuestions; let i = index">
-                  <div (click)="scroll(i + 1)" class="not-visited-question not-visited-background" [ngClass]="{
+                  <div (click)="scroll(i + 1)" (keyup.enter)="scroll(i + 1)"
+                    class="not-visited-question not-visited-background" [ngClass]="{
                     'marked-question-standalone marked-question-standalone-background': isQuestionMarked(question?.questionId),
                     'attempted-question attempted-question-background':isQuestionAttempted(question?.questionId),
                     'not-attempted-question not-answered-background':!isQuestionAttempted(question?.questionId) && !isQuestionMarked(question?.questionId) && isQuestionVisited(question.questionId)
@@ -1402,10 +1403,12 @@
               <div class="flex justify-end items-center mt-1 mb-4 gap-3 margin-right-s">
                 <mat-icon *ngIf="!(currentSetNumber <= 0)"
                   [ngClass]="currentSetNumber <= 0 ? 'questions-navigate-disable' : 'questions-navigate-enable' "
-                  (click)="currentSetNumber = currentSetNumber - 1">keyboard_arrow_left</mat-icon>
+                  (click)="currentSetNumber = currentSetNumber - 1"
+                  (keyup.enter)="currentSetNumber = currentSetNumber - 1">keyboard_arrow_left</mat-icon>
                 <mat-icon *ngIf="hasNextSet"
                   [ngClass]="hasNextSet ? 'questions-navigate-enable' : 'questions-navigate-disable' "
-                  (click)="currentSetNumber = currentSetNumber + 1">keyboard_arrow_right</mat-icon>
+                  (click)="currentSetNumber = currentSetNumber + 1"
+                  (keyup.enter)="currentSetNumber = currentSetNumber + 1">keyboard_arrow_right</mat-icon>
               </div>
             </ng-container>
             <div class="seperate-text-standalone">
@@ -1523,7 +1526,7 @@
                 <mat-card-content class="cursor-pointer"
                   [class.spinner]="fetchingQuestionsStatus === 'fetching' && section.identifier === selectedSection.identifier"
                   [attr.disabled]="fetchingQuestionsStatus === 'fetching' && section.identifier === selectedSection.identifier"
-                  (click)="startSection(section)">
+                  (click)="startSection(section)" (keyup.enter)="startSection(section)">
                   <div class="flex flex-1 flex-column">
                     <span class="flex mat-subheading-1 text-truncate ">{{section.name || 'Section'}}</span>
                     <span class="flex mat-body-2">Percentage to pass - <ng-container>
@@ -1807,7 +1810,7 @@
     <div class="flex flex-column overflow-hidden" *ngIf="!isSubmitted">
       <div>
         <div class="flex flex-row justify-around align-center my-2 mx-2">
-          <div (click)="back()">
+          <div (click)="back()" (keyup.enter)="back()">
             <img class="vertical-middle cursor-pointer" src="assets/icons/final-assessment/mobile-cross.svg"
               alt="mobile-cross" />
           </div>
@@ -1931,7 +1934,7 @@
                 <div class="flex flex-wrap margin-right-s margin-left-s quest_num_box quest_num_box_mobile"
                   *ngIf="fetchingQuestionsStatus === 'done'">
                   <div class="col question-list-item" *ngFor="let question of secQuestions; let i = index">
-                    <div (click)="scroll(i + 1)" [ngClass]="{
+                    <div (click)="scroll(i + 1)" (keyup.enter)="scroll(i + 1)" [ngClass]="{
                      'marked-question-standalone marked-question-standalone-background': isQuestionMarked(question?.questionId),
                      'attempted-question attempted-question-background':
                        !isQuestionMarked(question?.questionId) &&
@@ -1973,9 +1976,11 @@
                   <div class="flex justify-end items-center mt-1 mb-4 gap-3 margin-right-s">
                     <mat-icon
                       [ngClass]="currentSetNumber <= 0 ? 'questions-navigate-disable' : 'questions-navigate-enable' "
-                      (click)="currentSetNumber = currentSetNumber - 1">keyboard_arrow_left</mat-icon>
+                      (click)="currentSetNumber = currentSetNumber - 1"
+                      (keyup.enter)="currentSetNumber = currentSetNumber - 1">keyboard_arrow_left</mat-icon>
                     <mat-icon [ngClass]="hasNextSet ? 'questions-navigate-enable' : 'questions-navigate-disable' "
-                      (click)="currentSetNumber = currentSetNumber + 1">keyboard_arrow_right</mat-icon>
+                      (click)="currentSetNumber = currentSetNumber + 1"
+                      (keyup.enter)="currentSetNumber = currentSetNumber + 1">keyboard_arrow_right</mat-icon>
                   </div>
                 </ng-container>
                 <div class="seperate-text-standalone">
@@ -2014,7 +2019,8 @@
 
             </div>
             <div class="exapnd-collapse-standalone">
-              <div class="expand-icon-standalone" (click)="toggleExpandforMobile()">
+              <div class="expand-icon-standalone" (click)="toggleExpandforMobile()"
+                (keyup.enter)="toggleExpandforMobile()">
                 <mat-icon class="mat-icon notranslate material-icons mat-icon-no-color" role="img" aria-hidden="true">
                   <span *ngIf="expandFalse">arrow_downward</span>
                   <span *ngIf="!expandFalse">arrow_upward</span>
@@ -2134,7 +2140,7 @@
                 <mat-card-content class="cursor-pointer"
                   [class.spinner]="fetchingQuestionsStatus === 'fetching' && section.identifier === selectedSection.identifier"
                   [attr.disabled]="fetchingQuestionsStatus === 'fetching' && section.identifier === selectedSection.identifier"
-                  (click)="startSection(section)">
+                  (click)="startSection(section)" (click)="getSectionalData(section.identifier)">
                   <div class="flex flex-1 flex-column">
                     <span class="flex mat-subheading-1 text-truncate ">{{section.name || 'Section'}}</span>
                     <span class="flex mat-body-2">Percentage to pass - <ng-container>
@@ -2166,7 +2172,7 @@
                 [bindingClass]="'flex h-16'"></ws-widget-skeleton-loader>
             </span>
           </div>
-          <div (click)="back()" class="no-border flex cursor-pointer back_button">
+          <div (click)="back()" (keyup.enter)="back()" class="no-border flex cursor-pointer back_button">
             <span class="subheading-back">
               <ws-widget-skeleton-loader [width]="'120px'" [height]="'28px'"
                 [bindingClass]="'flex h-16'"></ws-widget-skeleton-loader>
@@ -2224,7 +2230,7 @@
               <div class="flex flex-nowrap margin-right-s margin-left-s quest_num_box"
                 *ngIf="fetchingQuestionsStatus === 'done'">
                 <div class="col" *ngFor="let question of secQuestions; let i = index">
-                  <div (click)="scroll(i + 1)" [ngClass]="{
+                  <div (click)="scroll(i + 1)" (keyup.enter)="scroll(i + 1)" [ngClass]="{
                       'marked-question': isQuestionMarked(question?.questionId),
                       'attempted-question':
                         !isQuestionMarked(question?.questionId) &&

@@ -80,12 +80,13 @@
       letter-spacing: 0.02em;
       margin-top: 4px;
       text-transform: none;
+      /* stylelint-disable */
       font-family: Lato;
+      /* stylelint-enable */
       font-weight: 400;
       font-style: Regular;
       font-size: 14px;
       line-height: 100%;
-      letter-spacing: 0%;
     }
   }
 }

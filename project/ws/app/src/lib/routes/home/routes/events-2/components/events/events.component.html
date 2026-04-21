@@ -23,7 +23,7 @@
             [ngClass]="{'ws-mat-accent-border-active' : currentRoute === 'past'}" mat-button routerLink="past"
             role="button">Past
           </a>
-          <a class="filter-option" [ngClass]="{'ws-mat-accent-border-active' : currentRoute === 'cancelled'}" mat-button
+          <a (keydown)="$event.preventDefault()" class="filter-option" [ngClass]="{'ws-mat-accent-border-active' : currentRoute === 'cancelled'}" mat-button
             routerLink="cancelled" role="button">Cancelled
           </a>
           <a (keydown)="$event.preventDefault()" class="filter-option"

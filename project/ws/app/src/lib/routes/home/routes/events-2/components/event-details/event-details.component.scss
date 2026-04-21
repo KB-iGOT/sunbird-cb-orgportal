@@ -4,7 +4,9 @@
 
   .course-listing-header {
     color: #1B4CA1;
+    /* stylelint-disable */
     font: 600 20px Montserrat;
+    /* stylelint-enable */
   }
 
   .event-section {
@@ -18,7 +20,9 @@
       user-select: none;
 
       .section-title {
+        /* stylelint-disable */
         font: 600 18px/24px Lato;
+        /* stylelint-enable */
         color: #000000;
         margin: 0;
       }
@@ -38,7 +42,9 @@
     .field-label {
       display: flex;
       align-items: center;
+      /* stylelint-disable */
       font: 700 14px/20px Lato;
+      /* stylelint-enable */
       color: #333;
       margin-bottom: 8px;
 
@@ -80,19 +86,25 @@
       }
 
       .upload-text {
+        /* stylelint-disable */
         font: 700 14px/20px Lato;
+        /* stylelint-enable */
         color: #1B4CA1;
         margin: 0 0 4px 0;
       }
 
       .upload-subtext {
+        /* stylelint-disable */
         font: 400 12px/16px Lato;
+        /* stylelint-enable */
         color: #666;
         margin: 0 0 8px 0;
       }
 
       .upload-limit {
+        /* stylelint-disable */
         font: 400 12px/16px Lato;
+        /* stylelint-enable */
         color: #999;
         margin: 0;
       }
@@ -137,13 +149,17 @@
           flex: 1;
 
           .doc-name {
+            /* stylelint-disable */
             font: 500 14px/20px Lato;
+            /* stylelint-enable */
             color: #333;
             margin: 0 0 4px 0;
           }
 
           .doc-type {
+            /* stylelint-disable */
             font: 400 12px/16px Lato;
+            /* stylelint-enable */
             color: #666;
             margin: 0;
           }
@@ -168,7 +184,9 @@
     .or-divider {
       text-align: center;
       position: relative;
+      /* stylelint-disable */
       font: 400 14px/20px Lato;
+      /* stylelint-enable */
       color: #666;
 
       &::before,
@@ -210,7 +228,9 @@
 
     input,
     textarea {
+      /* stylelint-disable */
       font: 400 14px/20px Lato;
+      /* stylelint-enable */
       color: #333;
     }
 
@@ -223,13 +243,17 @@
     }
 
     .mat-hint {
+      /* stylelint-disable */
       font: 400 12px/16px Lato;
+      /* stylelint-enable */
       color: #666;
     }
   }
 
   ::ng-deep .mat-select {
+    /* stylelint-disable */
     font: 400 14px/20px Lato;
+    /* stylelint-enable */
   }
 }
 

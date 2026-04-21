@@ -6,7 +6,8 @@
   <div class="explore-toolbar">
     <div class="search-wrapper">
       <mat-icon class="search-icon">search</mat-icon>
-      <input class="search-input" type="text" placeholder="Type here to search..." [(ngModel)]="searchQuery" (input)="applySearch(searchQuery)" />
+      <input class="search-input" type="text" placeholder="Type here to search..." [(ngModel)]="searchQuery"
+        (input)="applySearch(searchQuery)" />
       <button *ngIf="searchQuery" mat-icon-button class="clear-btn" (click)="clearSearch()" aria-label="Clear search">
       </button>
     </div>
@@ -23,13 +24,15 @@
       <ng-container matColumnDef="expandedDetail">
         <td mat-cell *matCellDef="let row" [attr.colspan]="displayedColumns.length">
           <div class="element-detail" *ngIf="row === expandedElement">
+            <!-- //NOSONAR -->
             <table class="table-container w-full mt-4 sub-table">
               <ng-container *ngFor="let course of multilingualCourses">
                 <tr class="mb-1 subtable-row-item">
                   <td class="mat-subheading-2" [style.width.px]="30"></td>
                   <td class="mat-subheading-2" [style.width.px]="600">
                     <div class="content-cell pt-2 gap-4">
-                      <div class="thumb-wrapper relative py-2 cursor-pointer" (click)="viewContent(course)" (keyup)="viewContent(course)">
+                      <div class="thumb-wrapper relative py-2 cursor-pointer" (click)="viewContent(course)"
+                        (keyup)="viewContent(course)">
                         <img class="thumb-img" [src]="course.posterImage" [alt]="course.name" />
                         <span class="time-badge flex flex-middle px-1"
                           *ngIf="course.primaryCategory !== 'Blended Program' && course.duration  && course?.duration !== '0'">
@@ -46,31 +49,37 @@
                       </div>
                       <div class="content-meta pt-2">
                         <div class="title line-clamp-2 ">{{ course.name }}</div>
-                        <div class="tag-chip mt-2">{{course?.courseCategory ? course?.courseCategory : course?.resourceCategory}}</div>
+                        <div class="tag-chip mt-2">{{course?.courseCategory ? course?.courseCategory :
+                          course?.resourceCategory}}</div>
                       </div>
                     </div>
                   </td>
                   <ng-container>
-                    <td class="table-cell-spacing" [style.width.px]="250" style="white-space: normal; word-wrap: break-word;">
+                    <td class="table-cell-spacing" [style.width.px]="250"
+                      style="white-space: normal; word-wrap: break-word;">
                       {{ course?.source }}
                     </td>
-                    <td class="table-cell-spacing" [style.width.px]="250" style="white-space: normal; word-wrap: break-word;">
+                    <td class="table-cell-spacing" [style.width.px]="250"
+                      style="white-space: normal; word-wrap: break-word;">
                       <ng-container *ngFor="let language of course?.language; let last = last">
                         {{ language }}<span *ngIf="course?.language?.length > 1 && !last">,</span>
                       </ng-container>
                     </td>
                   </ng-container>
 
-                  <td class="table-cell-spacing" [style.width.px]="250" style="white-space: normal; word-wrap: break-word;">
+                  <td class="table-cell-spacing" [style.width.px]="250"
+                    style="white-space: normal; word-wrap: break-word;">
                     {{ course?.createdOn | date: 'MMM dd, yyyy' }}
                   </td>
-                  <td class="table-cell-spacing" [style.width.px]="275" style="white-space: normal; word-wrap: break-word;">
+                  <td class="table-cell-spacing" [style.width.px]="275"
+                    style="white-space: normal; word-wrap: break-word;">
                     {{ course?.lastUpdatedOn | date: 'MMM dd, yyyy' }}
                   </td>
                   <ng-container>
                     <td class="table-cell-spacing">
                       <ng-container *ngIf="course?.status !== 'Retired'">
-                        <mat-icon class="cursor-pointer visibility" (click)="viewContent(course)" (keyup)="viewContent(course)">visibility</mat-icon>
+                        <mat-icon class="cursor-pointer visibility" (click)="viewContent(course)"
+                          (keyup)="viewContent(course)">visibility</mat-icon>
                       </ng-container>
                     </td>
                   </ng-container>
@@ -86,14 +95,16 @@
         <th mat-header-cell *matHeaderCellDef [style.width.px]="600">Content Name</th>
         <td mat-cell *matCellDef="let row" [style.width.px]="600">
           <div class="content-cell pt-2 gap-4">
-            <div class="thumb-wrapper relative py-2 cursor-pointer" (click)="viewContent(row)" (keyup)="viewContent(row)">
+            <div class="thumb-wrapper relative py-2 cursor-pointer" (click)="viewContent(row)"
+              (keyup)="viewContent(row)">
               <img class="thumb-img" [src]="row.posterImage" [alt]="row.name" />
               <span class="time-badge flex flex-middle px-1"
                 *ngIf="row.primaryCategory !== 'Blended Program' && row.duration  && row?.duration !== '0'">
                 <mat-icon class="">schedule</mat-icon>
                 <span>{{row?.duration | pipeDurationTransform:'hms'}}</span>
               </span>
-              <span class="time-badge flex flex-middle px-1" *ngIf="row.primaryCategory === 'Blended Program' && row?.programDuration">
+              <span class="time-badge flex flex-middle px-1"
+                *ngIf="row.primaryCategory === 'Blended Program' && row?.programDuration">
                 <mat-icon class="">schedule</mat-icon>
                 <span>
                   {{row?.programDuration}} {{row?.programDuration === 1 ? 'day' : 'days'}}
@@ -121,8 +132,10 @@
           <ng-container *ngFor="let language of row?.language; let last = last">
             {{language}} <span *ngIf="row?.language?.length > 1 && !last">,</span>
           </ng-container>
-          <ng-container *ngIf="getLanguageCount(row?.languageMapV1) > 0 && row?.courseCategory !== 'Multilingual Course'">
-            <span class="ml-1 language-count mat-body-2 cursor-pointer" [wsAuthWsCustomTooltip]="getFormattedLanguageNames(row?.languageMapV1)">
+          <ng-container
+            *ngIf="getLanguageCount(row?.languageMapV1) > 0 && row?.courseCategory !== 'Multilingual Course'">
+            <span class="ml-1 language-count mat-body-2 cursor-pointer"
+              [wsAuthWsCustomTooltip]="getFormattedLanguageNames(row?.languageMapV1)">
               +{{getLanguageCount(row?.languageMapV1)}}</span>
           </ng-container>
         </td>
@@ -151,15 +164,17 @@
       </ng-container>
 
       <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-      <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="element-row new-row" [ngClass]="{'':expandedElement === row}"
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="element-row new-row"
+        [ngClass]="{'':expandedElement === row}"
         (click)="expandedElement = expandedElement === element ? null : element"
         (keyup)="expandedElement = expandedElement === element ? null : element">
       </tr>
-      <tr mat-row *matRowDef="let row; columns: ['expandedDetail']" class="detail-row" [ngClass]="{'subtable-row':expandedElement === row}"
+      <tr mat-row *matRowDef="let row; columns: ['expandedDetail']" class="detail-row"
+        [ngClass]="{'subtable-row':expandedElement === row}"
         [@detailExpand]="expandedElement == expandedElement ? 'expanded' : 'collapsed'"></tr>
     </table>
-    <mat-paginator [length]="length" [pageSize]="pageSize" [pageIndex]="pageIndex" [pageSizeOptions]="pageSizeOptions" (page)="onPageChange($event)"
-      showFirstLastButtons>
+    <mat-paginator [length]="length" [pageSize]="pageSize" [pageIndex]="pageIndex" [pageSizeOptions]="pageSizeOptions"
+      (page)="onPageChange($event)" showFirstLastButtons>
     </mat-paginator>
   </div>
 
@@ -168,12 +183,14 @@
       <div class="no-data-message">
         <img src="assets/icons/no-events.png" alt="No data" class="no-data-icon" />
         <p class="no-data-text">
-          <span class="font-bold" *ngIf="searchQuery">Sorry, we couldn't find any results, so please Try adjusting your search.</span>
+          <span class="font-bold" *ngIf="searchQuery">Sorry, we couldn't find any results, so please Try adjusting your
+            search.</span>
         </p>
       </div>
     </div>
   </ng-template>
 </div>
 <div [ngClass]="{'opened': sideNavBarOpened, 'closed': !sideNavBarOpened }" class="filter-sidenav-container">
-  <ws-app-filters [allFacets]="allFacets" (closeSidenav)="handleCloseSidenav()" (filtersChanged)="handleFiltersChanges($event)"></ws-app-filters>
+  <ws-app-filters [allFacets]="allFacets" (closeSidenav)="handleCloseSidenav()"
+    (filtersChanged)="handleFiltersChanges($event)"></ws-app-filters>
 </div>

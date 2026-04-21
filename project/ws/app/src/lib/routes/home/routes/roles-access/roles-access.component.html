@@ -43,8 +43,8 @@
             </div>
             <div class="roles-grid" *ngIf="data?.length > 0">
               <ng-container *ngFor="let role of data">
-                <mat-card *ngIf="role.count > 0" class="role-card" (click)="onRoleClick(role)" role="button"
-                  tabindex="0">
+                <mat-card *ngIf="role.count > 0" class="role-card" (click)="onRoleClick(role)"
+                  (keyup.enter)="onRoleClick(role)" role="button" tabindex="0">
                   <mat-card-header class="flex-center">
                     <mat-card-title>{{(role.role).split('_').join(' ')}}</mat-card-title>
                   </mat-card-header>

@@ -38,6 +38,7 @@
           [ngClass]="{'organization-table': selectedDepartment === 'organisation'}"> {{col?.displayName}}
         </mat-header-cell>
         <mat-cell *matCellDef="let element" (click)="selection?.toggle(element); onRowClick(element)"
+          (keyup.enter)="selection?.toggle(element); onRowClick(element)"
           [ngClass]="{'organization-table': selectedDepartment === 'organisation'}">
           <span *ngIf="col?.isList" class="textclass" [matTooltip]="(element[col?.key])?.split('<br />')?.join(', ')">
             <div innerHTML="{{element[col?.key]}}"></div>

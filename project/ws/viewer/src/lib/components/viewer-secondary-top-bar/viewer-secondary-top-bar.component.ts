@@ -160,7 +160,8 @@ export class ViewerSecondaryTopBarComponent implements OnInit, OnDestroy {
     this.viewerDataServiceSubscription = this.viewerDataSvc.tocChangeSubject.subscribe((data: any) => {
       if (data.prevResource) {
         if (data.prevResource && !data.prevResource.viewerUrl) {
-          data.prevResource['viewerUrl'] = `${this.forPreview ? '' : ''}/viewer/${VIEWER_ROUTE_FROM_MIME(
+          // data.prevResource['viewerUrl'] = `${this.forPreview ? '' : ''}/viewer/${VIEWER_ROUTE_FROM_MIME(
+          data.prevResource['viewerUrl'] = `/viewer/${VIEWER_ROUTE_FROM_MIME(
             data.prevResource.mimeType,
             // )}/${content.identifier}?primaryCategory=${content.primaryCategory}
             // &collectionId=${this.viewerDataSvc.collectionId}&collectionType=${this.collectionType}
@@ -193,7 +194,8 @@ export class ViewerSecondaryTopBarComponent implements OnInit, OnDestroy {
       }
       if (data.nextResource) {
         if (data.nextResource && !data.nextResource.viewerUrl) {
-          data.nextResource['viewerUrl'] = `${this.forPreview ? '' : ''}/viewer/${VIEWER_ROUTE_FROM_MIME(
+          // data.nextResource['viewerUrl'] = `${this.forPreview ? '' : ''}/viewer/${VIEWER_ROUTE_FROM_MIME(
+          data.nextResource['viewerUrl'] = `/viewer/${VIEWER_ROUTE_FROM_MIME(
             data.nextResource.mimeType,
             // )}/${content.identifier}?primaryCategory=${content.primaryCategory}
             // &collectionId=${this.viewerDataSvc.collectionId}&collectionType=${this.collectionType}
