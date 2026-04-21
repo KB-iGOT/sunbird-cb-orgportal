@@ -74,9 +74,15 @@
         <div class="flex flex-column gap-2 event-form round-control">
           <div class="form-lable">Learning Hours</div>
           <mat-form-field appearance="outline">
-            <input matInput type="number" placeholder="Total duration in hours" formControlName="learningHours" min="1"
+            <input matInput type="number" placeholder="1 - 100" formControlName="learningHours" min="1" max="100"
               step="1"
               (keydown)="$event.key === '.' || $event.key === '-' || $event.key === 'e' || $event.key === '+' || ($event.key === '0' && !$event.target.value) ? $event.preventDefault() : null" />
+            <mat-error *ngIf="trainingForm.get('learningHours')?.hasError('min')">
+              Learning hours must be greater than 0.
+            </mat-error>
+            <mat-error *ngIf="trainingForm.get('learningHours')?.hasError('max')">
+              Learning hours should be less than 100.
+            </mat-error>
           </mat-form-field>
         </div>
 
