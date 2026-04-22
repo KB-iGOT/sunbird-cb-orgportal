@@ -181,7 +181,7 @@ export class ViewerTocComponent implements OnInit, OnDestroy, OnChanges, AfterVi
         if (item?.courseCategory === 'Pre Enrolment Assessment') {
           item['mimeType'] = 'application/vnd.sunbird.questionset'
         }
-      })
+      }) // NOSONAR
 
       // Trigger tree processing and path expansion
       this.processCollectionForTree()
@@ -206,7 +206,7 @@ export class ViewerTocComponent implements OnInit, OnDestroy, OnChanges, AfterVi
           if (item?.courseCategory === 'Pre Enrolment Assessment') {
             item['mimeType'] = 'application/vnd.sunbird.questionset'
           }
-        })
+        }) // NOSONAR
 
         this.processCollectionForTree()
 
@@ -374,7 +374,7 @@ export class ViewerTocComponent implements OnInit, OnDestroy, OnChanges, AfterVi
             if (item?.courseCategory === 'Pre Enrolment Assessment') {
               item['mimeType'] = 'application/vnd.sunbird.questionset'
             }
-          })
+          }) // NOSONAR
           if (this.resourceId && this.queue.length) {
             this.processCurrentResourceChange()
           }

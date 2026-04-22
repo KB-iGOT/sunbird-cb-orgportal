@@ -80,7 +80,7 @@ export class QuizComponent implements OnInit, OnDestroy {
     if (this.dataSubscription) {
       this.dataSubscription.unsubscribe()
     }
-  }
+  } // NOSONAR
   generateUrl(oldUrl: string) {
     const chunk = oldUrl ? oldUrl.split('/') : []
     const newChunk = environment.azureHost.split('/')

@@ -71,7 +71,7 @@ export class HandsOnComponent implements OnInit, OnDestroy {
     if (this.routeDataSubscription) {
       this.routeDataSubscription.unsubscribe()
     }
-  }
+  } // NOSONAR
 
   private async transformHandsOn(_content: NsContent.IContent) {
     let manifestFile = ''

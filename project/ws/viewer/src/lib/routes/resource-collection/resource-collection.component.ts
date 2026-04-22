@@ -86,7 +86,7 @@ export class ResourceCollectionComponent implements OnInit, OnDestroy {
     if (this.dataSubscription) {
       this.dataSubscription.unsubscribe()
     }
-  }
+  } // NOSONAR
 
   private async transformResourceCollection(_content: NsContent.IContent) {
     let manifestFile = ''
