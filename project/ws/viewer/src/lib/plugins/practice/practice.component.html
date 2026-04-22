@@ -2139,7 +2139,8 @@
                 <mat-card-content class="cursor-pointer"
                   [class.spinner]="fetchingQuestionsStatus === 'fetching' && section.identifier === selectedSection.identifier"
                   [attr.disabled]="fetchingQuestionsStatus === 'fetching' && section.identifier === selectedSection.identifier"
-                  (click)="startSection(section)" (click)="getSectionalData(section.identifier)">
+                  (click)="startSection(section); getSectionalData(section.identifier)"
+                  (keyup)="startSection(section); getSectionalData(section.identifier)">
                   <div class="flex flex-1 flex-column">
                     <span class="flex mat-subheading-1 text-truncate ">{{section.name || 'Section'}}</span>
                     <span class="flex mat-body-2">Percentage to pass - <ng-container>

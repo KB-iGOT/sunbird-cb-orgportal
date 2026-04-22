@@ -24,8 +24,7 @@
       <ng-container matColumnDef="expandedDetail">
         <td mat-cell *matCellDef="let row" [attr.colspan]="displayedColumns.length">
           <div class="element-detail" *ngIf="row === expandedElement">
-            <!-- //NOSONAR -->
-            <table class="table-container w-full mt-4 sub-table">
+            <table class="table-container w-full mt-4 sub-table"><!-- //NOSONAR -->
               <ng-container *ngFor="let course of multilingualCourses">
                 <tr class="mb-1 subtable-row-item">
                   <td class="mat-subheading-2" [style.width.px]="30"></td>

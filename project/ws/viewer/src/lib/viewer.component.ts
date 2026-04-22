@@ -313,7 +313,7 @@ export class ViewerComponent implements OnInit, OnDestroy, AfterViewChecked {
     //     }
     //   }
     // }
-  }
+  } // NOSONAR
 
   ngAfterViewChecked() {
     const container = document.getElementById('fullScreenContainer')

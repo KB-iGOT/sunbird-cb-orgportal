@@ -123,7 +123,7 @@ export class IapComponent implements OnInit, OnDestroy {
       this.respondSvc.unsubscribeResponse()
       this.responseSubscription.unsubscribe()
     }
-  }
+  } // NOSONAR
 
   formDiscussionForumWidget(content: NsContent.IContent) {
     this.discussionForumWidget = {

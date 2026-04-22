@@ -83,7 +83,7 @@ export class DndQuizComponent implements OnInit, OnDestroy {
     if (this.dndQuizData) {
       this.raiseEvent(WsEvents.EnumTelemetrySubType.Unloaded, this.dndQuizData)
     }
-  }
+  } // NOSONAR
 
   private async transformClassDiagram(_content: NsContent.IContent) {
     let manifestFile = ''

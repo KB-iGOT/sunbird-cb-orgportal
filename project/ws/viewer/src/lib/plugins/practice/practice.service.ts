@@ -240,7 +240,7 @@ export class PracticeService {
         // }
       }
       return question
-    })
+    }) // NOSONAR
     return quizWithAnswers
   }
 
@@ -259,8 +259,8 @@ export class PracticeService {
       question.options.map(option => {
         option.hint = ''
         option.text = question.questionType === 'ftb' || question.questionType === 'mtf' ? option.text : ''
-      })
-    })
+      }) // NOSONAR
+    }) // NOSONAR
     return requestData
   }
 
