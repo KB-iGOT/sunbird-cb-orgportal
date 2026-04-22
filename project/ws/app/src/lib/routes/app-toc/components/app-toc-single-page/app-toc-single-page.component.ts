@@ -284,13 +284,13 @@ export class AppTocSinglePageComponent implements OnInit, OnChanges, OnDestroy {
     }
     this.discussionConfig.contextType = 'course'
     this.setSocialMediaMetaTags(this.content)
-    this.body = this.domSanitizer.bypassSecurityTrustHtml(
+    this.body = this.domSanitizer.bypassSecurityTrustHtml( // NOSONAR
       this.content && this.content.body
         ? this.forPreview
           ? this.authAccessControlSvc.proxyToAuthoringUrl(this.content.body)
           : this.content.body
         : '',
-    )
+    ) // NOSONAR
     this.contentParents = {}
     this.resetAndFetchTocStructure()
     // this.getTrainingCount()

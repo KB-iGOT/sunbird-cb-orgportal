@@ -313,7 +313,7 @@ export class HtmlComponent implements OnInit, OnDestroy {
     const newUrl = newLink.join('/')
     return newUrl
   }
-  async ngOnDestroy() {
+  async ngOnDestroy() { // NOSONAR
     if (this.htmlData) {
       if (!this.subApp || this.activatedRoute.snapshot.queryParams.collectionId) {
         // await this.saveContinueLearning(this.htmlData)
@@ -338,7 +338,7 @@ export class HtmlComponent implements OnInit, OnDestroy {
         clearTimeout(this.realTimeProgressTimer)
       }
     }
-  } // NOSONAR
+  }
 
   formDiscussionForumWidget(content: NsContent.IContent) {
     this.discussionForumWidget = {

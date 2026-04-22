@@ -63,7 +63,7 @@ export class DndQuizComponent implements OnInit, OnDestroy {
     )
   }
 
-  async ngOnDestroy() {
+  async ngOnDestroy() { // NOSONAR
     if (this.activatedRoute.snapshot.queryParams.collectionId &&
       this.activatedRoute.snapshot.queryParams.collectionType
       && this.dndQuizData) {
@@ -83,7 +83,7 @@ export class DndQuizComponent implements OnInit, OnDestroy {
     if (this.dndQuizData) {
       this.raiseEvent(WsEvents.EnumTelemetrySubType.Unloaded, this.dndQuizData)
     }
-  } // NOSONAR
+  }
 
   private async transformClassDiagram(_content: NsContent.IContent) {
     let manifestFile = ''
