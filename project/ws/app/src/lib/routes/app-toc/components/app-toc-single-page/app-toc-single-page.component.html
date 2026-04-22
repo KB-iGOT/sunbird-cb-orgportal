@@ -527,7 +527,7 @@
             [name]="getUserFullName(user)">
         </ws-widget-avatar-photo>
         <div class="margin-left-l">
-            <div (click)="goToUserProfile(user)" (keyup.enter)="goToUserProfile(user)"
+            <div (click)="goToUserProfile(user)" (keyup)="goToUserProfile(user)"
                 [ngClass]="{'cursor-pointer': enablePeopleSearch}" class="width-expand padding-left-xs">
                 <div class="mat-body-1 cohorts-name">
                     {{
@@ -548,7 +548,7 @@
             [name]="getUserFullName(user)">
         </ws-widget-avatar-photo>
         <div class="margin-left-l">
-            <div (click)="goToUserProfile(user)" (keyup.enter)="goToUserProfile(user)"
+            <div (click)="goToUserProfile(user)" (keyup)="goToUserProfile(user)"
                 [ngClass]="{'cursor-pointer': enablePeopleSearch}" class="width-expand padding-left-xs">
                 <!-- <div class="mat-body-1 cohorts-name">
                 {{

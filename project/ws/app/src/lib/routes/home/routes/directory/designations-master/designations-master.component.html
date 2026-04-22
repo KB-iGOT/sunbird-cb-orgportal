@@ -19,11 +19,11 @@
         <div class="flex">
           <span class="mat-body-1 font-bold-imp flex-1">{{designationConfig?.topsection?.heading}}</span>
           <mat-icon class="cursor-pointer mat-icon mr-4" *ngIf="showTopSection"
-            (keyup.enter)="showTopSection = !showTopSection"
+            (keyup)="showTopSection = !showTopSection"
             (click)="showTopSection = !showTopSection">keyboard_arrow_up</mat-icon>
           <mat-icon class="cursor-pointer mat-icon mr-4" *ngIf="!showTopSection"
             (click)="showTopSection = !showTopSection"
-            (keyup.enter)="showTopSection = !showTopSection">keyboard_arrow_down</mat-icon>
+            (keyup)="showTopSection = !showTopSection">keyboard_arrow_down</mat-icon>
         </div>
         <div class="mt-5" *ngIf="showTopSection">
           <div class="flex gap-20">
@@ -38,7 +38,7 @@
             <div class="">
               <div class="videoDemo flex justify-end section-2">
                 <div class="videoDemoVideo flex flex-column flex-middle justify-center" (click)="openVideoPopup()"
-                  (keyup.enter)="$event.preventDefault()">
+                  (keyup)="$event.preventDefault()">
                   <mat-icon class="video_icon mb-2">play_arrow</mat-icon>
                   <div>
                     Watch how it works

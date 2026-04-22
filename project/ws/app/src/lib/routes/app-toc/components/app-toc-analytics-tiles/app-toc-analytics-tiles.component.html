@@ -7,14 +7,14 @@
     <div class="cursor-pointer font-bold ws-mat-primary-text">
       <p *ngIf="analyticsDataClient?.department?.length > 0"
         class="margin-remove-bottom underline margin-left-xs text-left" (click)="onClick('departments')"
-        (keyup.enter)="onClick('departments')">{{category1}}
+        (keyup)="onClick('departments')">{{category1}}
       </p>
       <p *ngIf="analyticsDataClient?.country?.length > 0"
         class="margin-remove-bottom underline margin-left-xs text-left" (click)="onClick('countries')"
-        (keyup.enter)="onClick('countries')">{{category2}}
+        (keyup)="onClick('countries')">{{category2}}
       </p>
       <p *ngIf="analyticsDataClient?.device?.length > 0" class="margin-remove-bottom underline margin-left-xs text-left"
-        (click)="onClick('devices')" (keyup.enter)="onClick('devices')">{{category3}}</p>
+        (click)="onClick('devices')" (keyup)="onClick('devices')">{{category3}}</p>
     </div>
   </div>
 </mat-card>

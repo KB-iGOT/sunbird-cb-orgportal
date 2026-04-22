@@ -2,7 +2,7 @@
     <div *ngIf="showLoader" class="text-center my-2 loader">
         <mat-spinner class="inline-block"></mat-spinner>
     </div>
-    <div class="cursor-pointer close-share-dialog"><mat-icon (click)="onClose()" (keyup.enter)="onClose()"
+    <div class="cursor-pointer close-share-dialog"><mat-icon (click)="onClose()" (keyup)="onClose()"
             class="close-icon">close</mat-icon></div>
     <div class="share-modal">
         <div class="karmasahayogi-icon"><img alt="karmasahayogi-icon" src="/assets/icons/KarmaSahayogi.svg"></div>
@@ -54,7 +54,7 @@
                         <div class="flex mt-5">
                             <div class="flex flex-1 flex-end">
                                 <span class="copy-link-btn cursor-pointer" (click)="copyToClipboard()"
-                                    (keyup.enter)="copyToClipboard()">{{'contentSharing.copyLink' | translate}}
+                                    (keyup)="copyToClipboard()">{{'contentSharing.copyLink' | translate}}
                                     &nbsp;&nbsp;<mat-icon>link</mat-icon></span>
                                 <button mat-stroked-button type="submit" class="text-white flex-auto-display send-btn"
                                     [ngClass]="(userCtrl.value.length || users.length === 0 || users.length > maxEmailsLimit) ? 'gray-background' : 'active-background' "

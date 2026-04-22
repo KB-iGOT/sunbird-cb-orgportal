@@ -81,7 +81,7 @@
               <td mat-cell class="title-class" *matCellDef="let element">
                 <a class="action-btn-view" *ngIf="element?.interestCount!== 0" href="javascript:void(0)"
                   [ngStyle]="getPointerEventsStyle(element)">
-                  <span (click)="handleClick(element)" (keyup.enter)="handleClick(element)">
+                  <span (click)="handleClick(element)" (keyup)="handleClick(element)">
                     {{element?.interestCount}}
                   </span></a>
                 <a class="" *ngIf="element?.interestCount === 0" href="javascript:void(0)">{{element?.requestType ==
@@ -93,7 +93,7 @@
               <th mat-header-cell *matHeaderCellDef class="row-heading">Details</th>
               <td mat-cell *matCellDef="let element">
                 <mat-icon (click)="navigateToDetails(element?.demand_id)"
-                  (keyup.enter)="navigateToDetails(element?.demand_id)" class="cursor-pointer">visibility</mat-icon>
+                  (keyup)="navigateToDetails(element?.demand_id)" class="cursor-pointer">visibility</mat-icon>
               </td>
             </ng-container>
 
