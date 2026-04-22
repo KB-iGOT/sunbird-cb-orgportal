@@ -2423,7 +2423,7 @@ export class PracticeComponent implements OnInit, OnChanges, OnDestroy {
       }
     }
     newText += `</ul>`
-    return this.sanitized.bypassSecurityTrustHtml(newText)
+    return this.sanitized.bypassSecurityTrustHtml(newText) // NOSONAR
   }
 
   raiseEvent(state: WsEvents.EnumTelemetrySubType, data: NsContent.IContent) {

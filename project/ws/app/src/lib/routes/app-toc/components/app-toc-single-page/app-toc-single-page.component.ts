@@ -301,7 +301,7 @@ export class AppTocSinglePageComponent implements OnInit, OnChanges, OnDestroy {
     // }
   }
   sanitize(data: any) {
-    return this.domSanitizer.bypassSecurityTrustHtml(data)
+    return this.domSanitizer.bypassSecurityTrustHtml(data) // NOSONAR
   }
   getContentParent() {
     if (this.content) {

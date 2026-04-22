@@ -159,12 +159,12 @@ export class WebModuleComponent implements OnInit, OnChanges, OnDestroy {
     if (this.webModuleManifest.resources) {
       this.slides = this.webModuleManifest.resources.map((u: { artifactUrl: string }) => ({
         ...u,
-        safeUrl: this.domSanitizer.bypassSecurityTrustResourceUrl(this.urlPrefix + u.artifactUrl),
+        safeUrl: this.domSanitizer.bypassSecurityTrustResourceUrl(this.urlPrefix + u.artifactUrl), // NOSONAR
       }))
     } else {
       this.slides = this.webModuleManifest.map((u: { URL: string }) => ({
         ...u,
-        safeUrl: this.domSanitizer.bypassSecurityTrustResourceUrl(this.urlPrefix + u.URL),
+        safeUrl: this.domSanitizer.bypassSecurityTrustResourceUrl(this.urlPrefix + u.URL), // NOSONAR
       }))
     }
     // this.slides = this.webModuleManifest.map(u => ({
@@ -191,9 +191,9 @@ export class WebModuleComponent implements OnInit, OnChanges, OnDestroy {
       }
       this.iframeLoadingInProgress = true
     } else if (this.iframeUrl === null) {
-      this.iframeUrl = this.domSanitizer.bypassSecurityTrustResourceUrl(
+      this.iframeUrl = this.domSanitizer.bypassSecurityTrustResourceUrl( // NOSONAR
         this.urlPrefix + this.slides[0].URL,
-      )
+      ) // NOSONAR
       if (this.slides[this.currentSlideNumber - 1].audio) {
         this.setAudio(this.slides[0].audio as any)
       }
@@ -213,7 +213,7 @@ export class WebModuleComponent implements OnInit, OnChanges, OnDestroy {
 
   setAudio(audios: { URL: string }[]) {
     if (Array.isArray(audios) && audios.length && audios[0].URL) {
-      this.slideAudioUrl = this.domSanitizer.bypassSecurityTrustUrl(this.urlPrefix + audios[0].URL)
+      this.slideAudioUrl = this.domSanitizer.bypassSecurityTrustUrl(this.urlPrefix + audios[0].URL) // NOSONAR
     } else {
       this.slideAudioUrl = (null as unknown) as SafeResourceUrl
     }

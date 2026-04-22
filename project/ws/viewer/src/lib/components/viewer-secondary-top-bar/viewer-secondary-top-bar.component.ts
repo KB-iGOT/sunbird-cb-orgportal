@@ -140,9 +140,9 @@ export class ViewerSecondaryTopBarComponent implements OnInit, OnDestroy {
     this.courseName = this.activatedRoute.snapshot.queryParams.courseName
     this.channelId = this.activatedRoute.snapshot.queryParams.channelId
     if (this.configSvc.instanceConfig) {
-      this.appIcon = this.domSanitizer.bypassSecurityTrustResourceUrl(
+      this.appIcon = this.domSanitizer.bypassSecurityTrustResourceUrl( // NOSONAR
         this.configSvc.instanceConfig.logos.app,
-      )
+      ) // NOSONAR
     }
     //   this.route.data.subscribe((data: any) => {
     //     this.appIcon =

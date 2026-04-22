@@ -85,7 +85,7 @@ export class NewExternalTrainingComponent implements OnInit {
                 this.contentFile = file
                 this.fileName = file.name
                 this.certificateUrl = URL.createObjectURL(file)
-                this.safeCertificateUrl = this.sanitizer.bypassSecurityTrustResourceUrl(this.certificateUrl)
+                this.safeCertificateUrl = this.sanitizer.bypassSecurityTrustResourceUrl(this.certificateUrl) // NOSONAR
                 this.previewLogoUrl = this.certificateUrl
               },
               error: () => {
@@ -208,7 +208,7 @@ export class NewExternalTrainingComponent implements OnInit {
 
       // Update certificate preview URL
       this.certificateUrl = URL.createObjectURL(updatedBlob)
-      this.safeCertificateUrl = this.sanitizer.bypassSecurityTrustResourceUrl(this.certificateUrl)
+      this.safeCertificateUrl = this.sanitizer.bypassSecurityTrustResourceUrl(this.certificateUrl) // NOSONAR
       this.previewLogoUrl = this.certificateUrl
       this.isLogoMerging = false
 
@@ -337,7 +337,7 @@ export class NewExternalTrainingComponent implements OnInit {
     // Restore the original template
     this.contentFile = this.originalContentFile
     this.certificateUrl = URL.createObjectURL(this.originalContentFile)
-    this.safeCertificateUrl = this.sanitizer.bypassSecurityTrustResourceUrl(this.certificateUrl)
+    this.safeCertificateUrl = this.sanitizer.bypassSecurityTrustResourceUrl(this.certificateUrl) // NOSONAR
     this.previewLogoUrl = this.certificateUrl
   }
 

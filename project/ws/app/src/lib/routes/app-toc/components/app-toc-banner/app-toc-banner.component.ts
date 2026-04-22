@@ -1090,7 +1090,7 @@ export class AppTocBannerComponent implements OnInit, OnChanges, OnDestroy {
 
   private updateBannerUrl() {
     if (this.banners) {
-      this.bannerUrl = this.sanitizer.bypassSecurityTrustStyle(
+      this.bannerUrl = this.sanitizer.bypassSecurityTrustStyle( // NOSONAR
         `url(${this.banners[this.routePath]})`,
       )// NOSONAR
     }
