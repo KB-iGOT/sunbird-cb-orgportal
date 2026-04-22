@@ -442,7 +442,7 @@
                 <div>
                   <mat-selection-list id="roles" formControlName="roles" #roles class="roles-list">
                     <mat-list-option *ngFor="let role of rolesList" (click)="modifyUserRoles(role?.roleName)"
-                      (keyup.enter)="modifyUserRoles(role?.roleName)" [selected]="userRoles.has(role?.roleName)"
+                      (keyup)="modifyUserRoles(role?.roleName)" [selected]="userRoles.has(role?.roleName)"
                       [value]="role?.roleName">
                       {{role?.roleName}}
                     </mat-list-option>

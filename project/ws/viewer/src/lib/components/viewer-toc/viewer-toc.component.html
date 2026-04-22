@@ -99,7 +99,7 @@
                     [imageHeight]="22" [imageWidth]="22" [showBackground]="false"></circle-progress>
                 </div>
                 <div class="w-3/4">
-                  <span role="button" (keyup.enter)="nestedTreeControl.toggle(node)"
+                  <span role="button" (keyup)="nestedTreeControl.toggle(node)"
                     [ngClass]="{ 'content-active': pathSet?.has(node.identifier) }" matRipple matTreeNodeToggle
                     class="flat-list-content-title width-expand margin-left-xs">
                     <p class="text-truncate margin-remove text-truncate mat-subheading-1 flex-auto font-bold ">
@@ -390,7 +390,7 @@
                     [imageHeight]="22" [imageWidth]="22" [showBackground]="false"></circle-progress>
                 </div>
                 <div class="w-3/4">
-                  <span role="button" (keyup.enter)="nestedTreeControl.toggle(node)"
+                  <span role="button" (keyup)="nestedTreeControl.toggle(node)"
                     [ngClass]="{ 'content-active': pathSet?.has(node.identifier) }" matRipple matTreeNodeToggle
                     class="flat-list-content-title width-expand margin-left-xs">
                     <p class="text-truncate margin-remove text-truncate mat-subheading-1 flex-auto font-bold ">

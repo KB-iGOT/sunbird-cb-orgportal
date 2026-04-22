@@ -6,7 +6,7 @@
           (click)="viewChildren = !viewChildren" [wsUtilsDefaultThumbnail]="defaultThumbnail" /> -->
         <div class="flex flex-col flex-wrap flex-between width-expand pr-0 w-100 sm:pr-4 sm:w-auto">
           <div class="text-truncate" [ngClass]="{'cursor-pointer': !isEnabled}" (click)="viewChildren = !viewChildren"
-            (keyup.enter)="viewChildren = !viewChildren">
+            (keyup)="viewChildren = !viewChildren">
             <div class="flex flex-col sm:flex-row flex-wrap">
               <p class="margin-remove text-truncate mat-subheading-1 flex-auto">
                 {{ content?.name }}
@@ -149,8 +149,8 @@
           </div> -->
           <div class="see-all-container">
             <a href="javascript:void(0)" role="button" (click)="viewChildren = !viewChildren"
-              (keyup.enter)="viewChildren = !viewChildren"
-              class="margin-left-m see-all-btn tab custom-chevron customicon" mat-button>
+              (keyup)="viewChildren = !viewChildren" class="margin-left-m see-all-btn tab custom-chevron customicon"
+              mat-button>
               <!-- <ng-container *ngIf="!viewChildren" >See All</ng-container>
               <ng-container *ngIf="viewChildren" >See Less</ng-container> -->
               <mat-icon *ngIf="!viewChildren">keyboard_arrow_down</mat-icon>
@@ -208,7 +208,7 @@
         [queryParams]="(isAllowed && !forPreview && !isEnabled)  ? resourceLink.queryParams : null">
         <div class="text-truncate " [ngClass]="{'cursor-pointer': !isEnabled}"
           (click)="viewChildren = !viewChildren; raiseTelemetry()"
-          (keyup.enter)="viewChildren = !viewChildren; raiseTelemetry()">
+          (keyup)="viewChildren = !viewChildren; raiseTelemetry()">
           <div class="flex flex-col sm:flex-row flex-wrap">
             <p class="margin-remove text-truncate mat-subheading-1 flex-auto">
               <!-- <mat-icon class="margin-right-xs radiobtn time-icon">radio_button_unchecked </mat-icon> -->

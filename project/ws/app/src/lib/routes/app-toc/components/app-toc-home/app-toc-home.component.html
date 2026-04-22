@@ -394,7 +394,7 @@
               </ng-container>
 
               <div class="flex items-center text-white mob-share" *ngIf="canShare">
-                <mat-icon (click)="onClickOfShare()" (keyup.enter)="onClickOfShare()">share</mat-icon>
+                <mat-icon (click)="onClickOfShare()" (keyup)="onClickOfShare()">share</mat-icon>
               </div>
             </div>
             <div class="flex flex-col gap-2">
@@ -423,7 +423,7 @@
             <ng-container *ngIf="!skeletonLoader">
               <div class="flex gap-4 items-center" *ngIf="content?.averageRating || content?.additionalTags?.length">
                 <div class="flex flex-row rating-chip py-2 items-center cursor-pointer"
-                  (click)="handleNavigateToReviews()" (keyup.enter)="handleNavigateToReviews()"
+                  (click)="handleNavigateToReviews()" (keyup)="handleNavigateToReviews()"
                   *ngIf="content?.averageRating">
                   <div class="flex flex-row gap-1 margin-left-s items-center">
                     <mat-icon>grade</mat-icon>
@@ -527,7 +527,7 @@
                         <div class="text-xs font-bold text-white leading-3">{{ content?.primaryCategory }}</div>
                       </ng-container>
                     </div>
-                    <div (click)="onClickOfShare()" (keyup.enter)="onClickOfShare()"
+                    <div (click)="onClickOfShare()" (keyup)="onClickOfShare()"
                       class="flex flex-row items-center justify-end gap-2 share-tag" *ngIf="canShare && !forPreview">
                       <mat-icon>share</mat-icon>
                       <div>Share</div>

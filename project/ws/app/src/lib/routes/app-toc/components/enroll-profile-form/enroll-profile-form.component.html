@@ -35,8 +35,8 @@
           Invalid Email
         </mat-error>
         <div class="flex justify-end" *ngIf="verifyEmail && !otpSent && !eVerified">
-          <span class="get-otp" (click)="handleGenerateEmailOTP('email')"
-            (keyup.enter)="handleGenerateEmailOTP('email')">{{ 'profileInfo.getOTP' | translate
+          <span class="get-otp" (click)="handleGenerateEmailOTP('email')" (keyup)="handleGenerateEmailOTP('email')">{{
+            'profileInfo.getOTP' | translate
             }}</span>
         </div>
         <div *ngIf="emailOtpSent">
@@ -57,7 +57,7 @@
               <div class="flex justify-center" *ngIf="showEmailResendOTP">
                 <div class="flex flex-row">
                   <div class="timer">"Didn't receive the OTP?</div>
-                  <div class="resend-otp" (click)="handleResendEmailOTP()" (keyup.enter)="handleResendEmailOTP()">
+                  <div class="resend-otp" (click)="handleResendEmailOTP()" (keyup)="handleResendEmailOTP()">
                     &nbsp;&nbsp;Resend OTP</div>
                 </div>
               </div>
@@ -102,7 +102,7 @@
           <div (mousedown)="preventBlur($event)"
             class="item {{userDetailsForm.controls['designation']?.value?.toLowerCase() === designation?.name?.toLowerCase() ? 'item-active' : ''}}"
             *ngFor="let designation of filterDesignationsMeta" (click)="selectDesignation(designation.name)"
-            (keyup.enter)="selectDesignation(designation.name)">
+            (keyup)="selectDesignation(designation.name)">
             {{ designation?.name }}
           </div>
         </div>
@@ -141,7 +141,7 @@
             </div>
             <div class="flex justify-end" *ngIf="verifyMobile && !otpSent && !mVerified">
               <span class="get-otp sm:mr-4" (click)="handleGenerateOTP('phone')"
-                (keyup.enter)="handleGenerateOTP('phone')">Get OTP</span>
+                (keyup)="handleGenerateOTP('phone')">Get OTP</span>
             </div>
           </div>
         </div>
@@ -163,7 +163,7 @@
               <div class="flex justify-center" *ngIf="showResendOTP">
                 <div class="flex flex-row">
                   <div class="timer">Didn't Receive OTP</div>
-                  <div class="resend-otp" (click)="handleResendOTP()" (keyup.enter)="handleResendOTP()">
+                  <div class="resend-otp" (click)="handleResendOTP()" (keyup)="handleResendOTP()">
                     &nbsp;&nbsp;Resend OTP</div>
                 </div>
               </div>
@@ -220,7 +220,7 @@
           <div (mousedown)="preventLanguageBlur($event)"
             class="language-item {{userDetailsForm.controls['domicileMedium']?.value?.toLowerCase() === language?.name?.toLowerCase() ? 'language-item-active' : ''}}"
             *ngFor="let language of masterLanguages" (click)="selectLanguage(language.name)"
-            (keyup.enter)="selectLanguage(language.name)">
+            (keyup)="selectLanguage(language.name)">
             {{ language?.name }}
           </div>
         </div>

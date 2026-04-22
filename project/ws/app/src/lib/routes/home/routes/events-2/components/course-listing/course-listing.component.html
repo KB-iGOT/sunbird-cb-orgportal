@@ -13,7 +13,7 @@
     <div class="selected-chip">
       <span class="chip-text">{{selectedCourse.name}}</span>
       <ng-container *ngIf="isDraft">
-        <mat-icon class="chip-close" (click)="removeCourse()" (keyup.enter)="removeCourse()">close</mat-icon>
+        <mat-icon class="chip-close" (click)="removeCourse()" (keyup)="removeCourse()">close</mat-icon>
       </ng-container>
     </div>
   </div>
@@ -62,8 +62,7 @@
   </div>
 
   <div class="course-grid mt-5">
-    <div class="course-card" [ngClass]="{'disable-card': !isDraft}"
-      (keyup.enter)="(isDraft) ? onCourseSelect(course) : null"
+    <div class="course-card" [ngClass]="{'disable-card': !isDraft}" (keyup)="(isDraft) ? onCourseSelect(course) : null"
       *ngFor="let course of contentList; trackBy: trackByCourse" (click)="(isDraft) ? onCourseSelect(course) : null">
       <div class="card-image-container">
         <img [src]="getCorrectUrl(course?.posterImage) || '/assets/images/parliament.jpg'" [alt]="course.name"

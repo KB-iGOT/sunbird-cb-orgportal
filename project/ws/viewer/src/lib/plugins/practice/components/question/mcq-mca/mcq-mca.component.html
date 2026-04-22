@@ -8,8 +8,8 @@
     <mat-list-option #lo checkboxPosition="before" class="margin-top-s" [ngClass]="{
         'ws-mat-accent-border': !(lo.selected),
         'ws-mat-accent-border-active ': (lo.selected)
-      }" (click)="updateParent(option.optionId, lo.selected)"
-      (keyup.enter)="updateParent(option.optionId, lo.selected)" [selected]="isSelected(option)">
+      }" (click)="updateParent(option.optionId, lo.selected)" (keyup)="updateParent(option.optionId, lo.selected)"
+      [selected]="isSelected(option)">
       <span class="incorrect-option" *ngIf="showAns && !option?.isCorrect && isSelected(option)"
         [innerHtml]="getSanitizeString(option?.text)">
 

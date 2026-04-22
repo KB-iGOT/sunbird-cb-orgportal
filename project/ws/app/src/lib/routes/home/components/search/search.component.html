@@ -16,15 +16,15 @@
         <mat-menu #cardMenu="matMenu">
             <ng-template matMenuContent>
                 <div mat-menu-item class="flex items-center" [ngClass]="{'activeSort': sortOrder === 'alphabetical'}"
-                    (click)="sortData('alphabetical')" (keyup.enter)="sortData('alphabetical')">
+                    (click)="sortData('alphabetical')" (keyup)="sortData('alphabetical')">
                     <span>Alphabetical</span>
                 </div>
                 <div mat-menu-item class="flex items-center" [ngClass]="{'activeSort': sortOrder === 'newest'}"
-                    (click)="sortData('newest')" (keyup.enter)="sortData('newest')">
+                    (click)="sortData('newest')" (keyup)="sortData('newest')">
                     <span>Newest</span>
                 </div>
                 <div mat-menu-item class="flex items-center" [ngClass]="{'activeSort': sortOrder === 'oldest'}"
-                    (click)="sortData('oldest')" (keyup.enter)="sortData('oldest')">
+                    (click)="sortData('oldest')" (keyup)="sortData('oldest')">
                     <span>Oldest</span>
                 </div>
             </ng-template>
