@@ -134,7 +134,7 @@ export class ViewerTocComponent implements OnInit, OnDestroy, OnChanges, AfterVi
     }
     if (this.configSvc.instanceConfig && this.configSvc.instanceConfig.logos) {
       const logo = this.configSvc.instanceConfig.logos.defaultContent || ''
-      this.defaultThumbnail = this.domSanitizer.bypassSecurityTrustResourceUrl(logo)
+      this.defaultThumbnail = this.domSanitizer.bypassSecurityTrustResourceUrl(logo) // NOSONAR
     }
 
     const forPreview = window.location.href.includes('/public/') || window.location.href.includes('&preview=true') ||

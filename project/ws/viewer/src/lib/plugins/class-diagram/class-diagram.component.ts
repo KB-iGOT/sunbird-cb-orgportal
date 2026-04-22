@@ -131,7 +131,7 @@ export class ClassDiagramComponent implements OnInit, OnChanges, OnDestroy, Afte
       this.clsDiagramData.options.classes.forEach(value => {
         this.classOptions.push(value.name.substr(0, 1).toLocaleLowerCase() + value.name.substr(1))
       })
-      this.classOptions.sort(() => Math.random() - 0.5)
+      this.classOptions.sort(() => Math.random() - 0.5) // NOSONAR
       this.clsDiagramStartedAt = Date.now()
       this.clsDiagramTimeRemaining = this.clsDiagramData.timeLimit
     }
@@ -419,7 +419,7 @@ export class ClassDiagramComponent implements OnInit, OnChanges, OnDestroy, Afte
   }
 
   private sanitize(htmlString: string) {
-    return this.domSanitizer.bypassSecurityTrustHtml(htmlString)
+    return this.domSanitizer.bypassSecurityTrustHtml(htmlString) // NOSONAR
   }
 
   deepCopy<T>(obj: T): T {

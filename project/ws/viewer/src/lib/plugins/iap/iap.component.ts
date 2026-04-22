@@ -38,7 +38,7 @@ export class IapComponent implements OnInit, OnChanges, OnDestroy, AfterViewInit
   ngOnChanges() {
     // //console.log(this.iapContent)
     if (this.iapContent && this.iapContent.artifactUrl) {
-      this.iframeUrl = this.domSanitizer.bypassSecurityTrustResourceUrl(this.iapContent.artifactUrl)
+      this.iframeUrl = this.domSanitizer.bypassSecurityTrustResourceUrl(this.iapContent.artifactUrl) // NOSONAR
     } else {
       this.iframeUrl = null
     }

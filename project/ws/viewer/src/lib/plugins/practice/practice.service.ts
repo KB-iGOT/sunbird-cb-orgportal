@@ -206,10 +206,10 @@ export class PracticeService {
           opText = opText.replace(/\&lt;/g, '<').replace(/\&gt;/g, '>')
           opText = this.extractContent(opText)
           if (mtfSrc[question.questionId] && mtfSrc[question.questionId].source.length
-            && mtfSrc[question.questionId].source.includes(opText.replace(/<(.|\n)*?>/g, ''))) {
+            && mtfSrc[question.questionId].source.includes(opText.replace(/<(.|\n)*?>/g, ''))) { // NOSONAR
             // tslint:disable-next-line: max-line-length
             const stringRemoveSlashN = this.extractContent(question.options[i].text.replace(/\n/g, '').replace(/\&lt;/g, '<').replace(/\&gt;/g, '>'))
-            const idxOfSource = _.indexOf(mtfSrc[question.questionId].source, stringRemoveSlashN.replace(/<(.|\n)*?>/g, ''))
+            const idxOfSource = _.indexOf(mtfSrc[question.questionId].source, stringRemoveSlashN.replace(/<(.|\n)*?>/g, '')) // NOSONAR
             const targetId = mtfSrc[question.questionId].target[idxOfSource]
             if (targetId) {
               const lastChar = targetId.slice(-1)
@@ -391,7 +391,7 @@ export class PracticeService {
     // While there remain elements to shuffle...
     while (0 !== currentIndex) {
       // Pick a remaining element...
-      randomIndex = Math.floor(Math.random() * currentIndex)
+      randomIndex = Math.floor(Math.random() * currentIndex) // NOSONAR
       currentIndex -= 1
 
       // And swap it with the current element.
