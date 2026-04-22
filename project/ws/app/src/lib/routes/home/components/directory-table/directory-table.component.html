@@ -57,7 +57,11 @@
           <div *ngFor="let ac of tableData!.actions">
             <ng-container *ngIf="ac?.type === 'button'">
               <div *ngIf="ac?.optional">
-                <ws-widget-app-button *ngIf="row[ac?.optional_key] === ac?.optional_Value" [type]="ac?.type" [icon]="ac?.icon" [disabled]="ac?.disabled || false" [label]="ac?.label" (click)="buttonClick(ac?.name,row)"></ws-widget-app-button> <!-- NOSONAR -->
+                <!-- NOSONAR -->
+                <ws-widget-app-button *ngIf="row[ac?.optional_key] === ac?.optional_Value" [type]="ac?.type"
+                  [icon]="ac?.icon" [disabled]="ac?.disabled || false" [label]="ac?.label"
+                  (click)="buttonClick(ac?.name,row)" (keyup)="buttonClick(ac?.name,row)"><!-- NOSONAR -->
+                </ws-widget-app-button><!-- NOSONAR -->
               </div>
               <div *ngIf="!ac?.optional" class="mar-lft"><ws-widget-app-button [type]="ac?.type" [icon]="ac?.icon"
                   [label]="ac?.label" [disabled]="true">
