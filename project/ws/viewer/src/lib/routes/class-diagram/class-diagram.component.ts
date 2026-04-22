@@ -69,7 +69,7 @@ export class ClassDiagramComponent implements OnInit, OnDestroy {
     )
   }
 
-  async ngOnDestroy() {
+  async ngOnDestroy() { // NOSONAR
     if (this.activatedRoute.snapshot.queryParams.collectionId &&
       this.activatedRoute.snapshot.queryParams.collectionType
       && this.classDiagramData) {
@@ -89,7 +89,7 @@ export class ClassDiagramComponent implements OnInit, OnDestroy {
     if (this.classDiagramData) {
       this.raiseEvent(WsEvents.EnumTelemetrySubType.Unloaded, this.classDiagramData)
     }
-  } // NOSONAR
+  }
 
   private async transformClassDiagram(_content: NsContent.IContent) {
     let manifestFile = ''

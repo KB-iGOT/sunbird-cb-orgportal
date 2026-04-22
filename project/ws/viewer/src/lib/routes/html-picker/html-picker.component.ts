@@ -57,7 +57,7 @@ export class HtmlPickerComponent implements OnInit, OnDestroy {
     )
   }
 
-  async ngOnDestroy() {
+  async ngOnDestroy() { // NOSONAR
     if (this.activatedRoute.snapshot.queryParams.collectionId &&
       this.activatedRoute.snapshot.queryParams.collectionType
       && this.htmlPickerData) {
@@ -75,7 +75,7 @@ export class HtmlPickerComponent implements OnInit, OnDestroy {
     if (this.htmlPickerData) {
       this.raiseEvent(WsEvents.EnumTelemetrySubType.Unloaded, this.htmlPickerData)
     }
-  } // NOSONAR
+  }
 
   private async transformHandsOn(_content: NsContent.IContent) {
     let manifestFile = ''

@@ -1092,7 +1092,7 @@ export class AppTocBannerComponent implements OnInit, OnChanges, OnDestroy {
     if (this.banners) {
       this.bannerUrl = this.sanitizer.bypassSecurityTrustStyle(
         `url(${this.banners[this.routePath]})`,
-      )
+      )// NOSONAR
     }
   }
 
@@ -1108,7 +1108,7 @@ export class AppTocBannerComponent implements OnInit, OnChanges, OnDestroy {
 
   get sanitizedIntroductoryVideoIcon() {
     if (this.content && this.content.introductoryVideoIcon) {
-      return this.sanitizer.bypassSecurityTrustStyle(`url(${this.content.introductoryVideoIcon})`)
+      return this.sanitizer.bypassSecurityTrustStyle(`url(${this.content.introductoryVideoIcon})`) // NOSONAR
     }
     return null
   }

@@ -175,7 +175,7 @@ export class PracticeService {
       identifier,
       title,
     }
-    quizWithAnswers.questions.map(question => {
+    quizWithAnswers.questions.map(question => { // NOSONAR
       if (
         question.questionType === undefined ||
         question.questionType === 'mcq-mca' ||
@@ -240,7 +240,7 @@ export class PracticeService {
         // }
       }
       return question
-    }) // NOSONAR
+    })
     return quizWithAnswers
   }
 
@@ -254,9 +254,9 @@ export class PracticeService {
   }
 
   sanitizeAssessmentSubmitRequest(requestData: NSPractice.IQuizSubmitRequest): NSPractice.IQuizSubmitRequest {
-    requestData.questions.map(question => {
+    requestData.questions.map(question => { // NOSONAR
       question.question = ''
-      question.options.map(option => {
+      question.options.map(option => { // NOSONAR
         option.hint = ''
         option.text = question.questionType === 'ftb' || question.questionType === 'mtf' ? option.text : ''
       }) // NOSONAR

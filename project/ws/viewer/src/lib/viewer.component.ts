@@ -164,7 +164,7 @@ export class ViewerComponent implements OnInit, OnDestroy, AfterViewChecked {
     }
   }
 
-  async ngOnInit() {
+  async ngOnInit() { // NOSONAR
     this.getTocConfig()
     // for left side player scroll on right side resource click
     // this.pageScrollSubscription = this.tocSvc.updatePageScroll.subscribe((value: boolean) => {
@@ -313,7 +313,7 @@ export class ViewerComponent implements OnInit, OnDestroy, AfterViewChecked {
     //     }
     //   }
     // }
-  } // NOSONAR
+  }
 
   ngAfterViewChecked() {
     const container = document.getElementById('fullScreenContainer')

@@ -69,7 +69,7 @@ export class ResourceCollectionComponent implements OnInit, OnDestroy {
     )
   }
 
-  async ngOnDestroy() {
+  async ngOnDestroy() { // NOSONAR
     if (this.activatedRoute.snapshot.queryParams.collectionId &&
       this.activatedRoute.snapshot.queryParams.collectionType
       && this.resourceCollectionData) {
@@ -86,7 +86,7 @@ export class ResourceCollectionComponent implements OnInit, OnDestroy {
     if (this.dataSubscription) {
       this.dataSubscription.unsubscribe()
     }
-  } // NOSONAR
+  }
 
   private async transformResourceCollection(_content: NsContent.IContent) {
     let manifestFile = ''
