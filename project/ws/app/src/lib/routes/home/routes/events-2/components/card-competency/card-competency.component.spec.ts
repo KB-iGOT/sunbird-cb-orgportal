@@ -48,4 +48,8 @@ describe('CardCompetencyComponent', () => {
     expect(component.competencyArea).toBe(mockCompetencyArea)
   })
 
+  it('ngOnInit should not throw', () => {
+    expect(() => component.ngOnInit()).not.toThrow()
+  })
+
 })

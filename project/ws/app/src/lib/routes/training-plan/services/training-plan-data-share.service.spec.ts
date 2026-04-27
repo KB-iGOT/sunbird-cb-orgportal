@@ -51,6 +51,7 @@ describe('TrainingPlanDataSharingService', () => {
         assignmentType: '',
         assignmentTypeInfo: [],
         endDate: '',
+        accessControl: null,
       }
       expect(service.trainingPlanStepperData).toEqual(expectedStepperData)
     })
@@ -223,6 +224,7 @@ describe('TrainingPlanDataSharingService', () => {
         assignmentType: '',
         assignmentTypeInfo: [],
         endDate: '',
+        accessControl: null,
       }
       expect(service.trainingPlanStepperData).toEqual(expectedStepperData)
     })
@@ -241,6 +243,7 @@ describe('TrainingPlanDataSharingService', () => {
         assignmentType: '',
         assignmentTypeInfo: [],
         endDate: '',
+        accessControl: null,
       })
     })
 
