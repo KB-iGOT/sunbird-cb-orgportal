@@ -68,6 +68,22 @@ describe('FileService', () => {
                 }
             })
         })
+
+        it('should upload to V3 endpoint when selectedOrgData is provided', (done) => {
+            const mockResponse = { success: true }
+            const formData = new FormData()
+            const selectedOrgData = { roleId: 'role123', depatName: 'Dept A' }
+            httpClientSpy.post.mockReturnValue(of(mockResponse))
+
+            service.upload('test.csv', formData, selectedOrgData).subscribe(response => {
+                expect(response).toEqual(mockResponse)
+                expect(httpClientSpy.post).toHaveBeenCalledWith(
+                    '/apis/proxies/v8/user/v3/bulkupload?orgId=role123&channel=Dept A',
+                    formData
+                )
+                done()
+            })
+        })
     })
 
     describe('download', () => {
@@ -187,10 +203,29 @@ describe('FileService', () => {
             expect(service.validateFile('test.CSV')).toBe(true)
         })
 
-        it('should return false for non-CSV files', () => {
-            expect(service.validateFile('test.xlsx')).toBe(false)
+        it('should return true for xlsx by default (default formats = csv + xlsx)', () => {
+            expect(service.validateFile('test.xlsx')).toBe(true)
+        })
+
+        it('should return false for disallowed extensions', () => {
             expect(service.validateFile('test.txt')).toBe(false)
             expect(service.validateFile('test.pdf')).toBe(false)
+        })
+
+        it('should return false for xlsx when explicit csv-only format list is passed', () => {
+            expect(service.validateFile('test.xlsx', ['csv'])).toBe(false)
+        })
+    })
+
+    describe('validateXlFile', () => {
+        it('should return true for xlsx and xls files', () => {
+            expect(service.validateXlFile('test.xlsx')).toBe(true)
+            expect(service.validateXlFile('test.xls')).toBe(true)
+        })
+
+        it('should return false for non-excel files', () => {
+            expect(service.validateXlFile('test.csv')).toBe(false)
+            expect(service.validateXlFile('test.pdf')).toBe(false)
         })
     })
 
@@ -353,6 +388,70 @@ describe('FileService', () => {
             it('should return competency status URL', () => {
                 const result = service.getBulkCompetencyStatus('test-file.csv')
                 expect(result).toBe('/apis/proxies/v8/organisation/v1/competencyDesignationMappings/download/test-file.csv')
+            })
+        })
+    })
+
+    describe('downloadSampleBulkUserTransferFile', () => {
+        it('should download sample bulk user transfer file', () => {
+            const mockBlob = new Blob(['content'])
+            httpClientSpy.get.mockReturnValue(of(mockBlob))
+
+            service.downloadSampleBulkUserTransferFile('sample.xlsx', 'framework123')
+
+            expect(httpClientSpy.get).toHaveBeenCalledWith(
+                '/apis/proxies/v8/user/v1/org-migration/sample-file/framework123',
+                { responseType: 'blob' }
+            )
+            expect(fileSaver.saveAs).toHaveBeenCalledWith(mockBlob, 'sample.xlsx')
+        })
+    })
+
+    describe('uploadBulkUserTransfer', () => {
+        it('should upload bulk user transfer with org data', (done) => {
+            const mockResponse = { success: true }
+            const formData = new FormData()
+            const selectedOrgData = { rootOrgId: 'rootOrg123' }
+            const parentOrgData = { orgHierarchyFrameworkId: 'framework456' }
+            httpClientSpy.post.mockReturnValue(of(mockResponse))
+
+            service.uploadBulkUserTransfer(formData, selectedOrgData, parentOrgData).subscribe(response => {
+                expect(response).toEqual(mockResponse)
+                expect(httpClientSpy.post).toHaveBeenCalledWith(
+                    '/apis/proxies/v8/user/v1/org-migration/bulk-upload/framework456?orgId=rootOrg123',
+                    formData
+                )
+                done()
+            })
+        })
+
+        it('should upload bulk user transfer without org data (empty fallbacks)', (done) => {
+            const mockResponse = { success: true }
+            const formData = new FormData()
+            httpClientSpy.post.mockReturnValue(of(mockResponse))
+
+            service.uploadBulkUserTransfer(formData).subscribe(response => {
+                expect(response).toEqual(mockResponse)
+                expect(httpClientSpy.post).toHaveBeenCalledWith(
+                    '/apis/proxies/v8/user/v1/org-migration/bulk-upload/?orgId=',
+                    formData
+                )
+                done()
+            })
+        })
+    })
+
+    describe('statusOfBulkUserTransfer', () => {
+        it('should return status of bulk user transfer', (done) => {
+            const mockResponse = { status: 'completed' }
+            httpClientSpy.get.mockReturnValue(of(mockResponse))
+
+            service.statusOfBulkUserTransfer('orgId123').subscribe(response => {
+                expect(response).toEqual(mockResponse)
+                expect(httpClientSpy.get).toHaveBeenCalledWith(
+                    '/apis/proxies/v8/user/v1/org-migration/bulk-upload/progress/orgId123'
+                )
+                done()
             })
         })
     })

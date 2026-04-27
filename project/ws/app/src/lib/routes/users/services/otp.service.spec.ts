@@ -55,6 +55,7 @@ describe('OtpService', () => {
             const mockMobile = 9876543210
             const result = service.sendOtp(mockMobile)
             expect(result.subscribe).toBeDefined()
+            result.subscribe()
 
             const req = httpMock.expectOne(API_ENDPOINTS.sendOtp)
             req.flush({})
@@ -143,6 +144,7 @@ describe('OtpService', () => {
             const mockEmail = 'test@example.com'
             const result = service.sendEmailOtp(mockEmail)
             expect(result.subscribe).toBeDefined()
+            result.subscribe()
 
             const req = httpMock.expectOne(API_ENDPOINTS.sendEmailOtp)
             req.flush({})
@@ -175,6 +177,7 @@ describe('OtpService', () => {
             const mockEmail = 'test@example.com'
             const result = service.reSendEmailOtp(mockEmail)
             expect(result.subscribe).toBeDefined()
+            result.subscribe()
 
             const req = httpMock.expectOne(API_ENDPOINTS.sendEmailOtp)
             req.flush({})

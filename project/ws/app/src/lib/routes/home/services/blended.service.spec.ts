@@ -1,25 +1,46 @@
+describe('BlendedService - High Coverage', () => {
+    let service: any
+    let http: any
 
+    beforeEach(() => {
+        http = {
+            post: jest.fn(),
+        }
 
-import { HttpClient } from '@angular/common/http'
-import { BlendedService } from './blended.service'
+        const { BlendedService } = require('./blended.service')
 
-describe('BlendedService', () => {
-    let component: BlendedService
+        service = new BlendedService(http)
+    })
 
-    const http: Partial<HttpClient> = {}
+    // ---------------- GET BLENDED PROGRAMS ----------------
+    it('should call getBlendedPrograms API', () => {
+        http.post.mockReturnValue({
+            subscribe: jest.fn(),
+        })
 
-    beforeAll(() => {
-        component = new BlendedService(
-            http as HttpClient
+        const req = { a: 1 }
+
+        service.getBlendedPrograms(req).subscribe()
+
+        expect(http.post).toHaveBeenCalledWith(
+            '/apis/proxies/v8/sunbirdigot/read',
+            req
         )
     })
 
-    beforeEach(() => {
-        jest.clearAllMocks()
-        jest.resetAllMocks()
-    })
+    // ---------------- GET REQUESTS ----------------
+    it('should call getRequests API', () => {
+        http.post.mockReturnValue({
+            subscribe: jest.fn(),
+        })
 
-    it('should create a instance of component', () => {
-        expect(component).toBeTruthy()
+        const req = { b: 2 }
+
+        service.getRequests(req).subscribe()
+
+        expect(http.post).toHaveBeenCalledWith(
+            '/apis/proxies/v8/workflow/blendedprogram/search',
+            req
+        )
     })
 })
