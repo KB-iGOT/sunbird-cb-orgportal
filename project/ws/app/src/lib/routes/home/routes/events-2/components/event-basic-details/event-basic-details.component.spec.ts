@@ -7,6 +7,7 @@ import { DatePipe } from '@angular/common'
 import { of, throwError } from 'rxjs'
 import { URL_PATRON } from '../../models/events.model'
 import * as _ from 'lodash'
+import { NgZone } from '@angular/core'
 
 describe('EventBasicDetailsComponent', () => {
   let component: EventBasicDetailsComponent
@@ -14,6 +15,7 @@ describe('EventBasicDetailsComponent', () => {
   let mockEventsService: jest.Mocked<EventsService>
   let mockLoaderService: jest.Mocked<LoaderService>
   let mockDatePipe: jest.Mocked<DatePipe>
+  let mockNgZone: any
 
   const mockCreateContentResponse = {
     result: {
@@ -47,12 +49,17 @@ describe('EventBasicDetailsComponent', () => {
       transform: jest.fn()
     } as unknown as jest.Mocked<DatePipe>
 
+    mockNgZone = {
+      run: jest.fn().mockImplementation((fn: () => any) => fn()),
+    }
+
     // Initialize component with mocked dependencies
     component = new EventBasicDetailsComponent(
       mockMatSnackBar,
       mockEventsService,
       mockLoaderService,
-      mockDatePipe
+      mockDatePipe,
+      mockNgZone as NgZone
     )
 
     // Setup default form group
@@ -588,6 +595,233 @@ describe('EventBasicDetailsComponent', () => {
       const result = component.showValidationMsg('registrationLink', 'required')
 
       expect(result).toBe(false)
+    })
+  })
+
+  describe('allowNumbers', () => {
+    it('should allow digit keys (0-9)', () => {
+      const event = { key: '5', preventDefault: jest.fn() } as any
+      component.allowNumbers(event)
+      expect(event.preventDefault).not.toHaveBeenCalled()
+    })
+
+    it('should allow Backspace key', () => {
+      const event = { key: 'Backspace', preventDefault: jest.fn() } as any
+      component.allowNumbers(event)
+      expect(event.preventDefault).not.toHaveBeenCalled()
+    })
+
+    it('should prevent non-digit keys like letters', () => {
+      const event = { key: 'a', preventDefault: jest.fn() } as any
+      component.allowNumbers(event)
+      expect(event.preventDefault).toHaveBeenCalled()
+    })
+
+    it('should prevent special chars like @', () => {
+      const event = { key: '@', preventDefault: jest.fn() } as any
+      component.allowNumbers(event)
+      expect(event.preventDefault).toHaveBeenCalled()
+    })
+  })
+
+  describe('onPasteNumber', () => {
+    it('should allow paste of numeric text', () => {
+      const event = {
+        clipboardData: { getData: jest.fn().mockReturnValue('12345') },
+        preventDefault: jest.fn(),
+      } as any
+      component.onPasteNumber(event)
+      expect(event.preventDefault).not.toHaveBeenCalled()
+    })
+
+    it('should prevent paste of non-numeric text', () => {
+      const event = {
+        clipboardData: { getData: jest.fn().mockReturnValue('abc') },
+        preventDefault: jest.fn(),
+      } as any
+      component.onPasteNumber(event)
+      expect(event.preventDefault).toHaveBeenCalled()
+    })
+
+    it('should prevent paste when clipboardData is null', () => {
+      const event = {
+        clipboardData: null,
+        preventDefault: jest.fn(),
+      } as any
+      component.onPasteNumber(event)
+      expect(event.preventDefault).toHaveBeenCalled()
+    })
+  })
+
+  describe('checkIfSCEvent', () => {
+    it('should return true when typeofEvent is live', () => {
+      component.eventDetails = new FormGroup({
+        ...component.eventDetails.controls,
+        typeofEvent: new FormControl('live'),
+      })
+      expect(component.checkIfSCEvent()).toBe(true)
+    })
+
+    it('should return false when typeofEvent is not live', () => {
+      component.eventDetails = new FormGroup({
+        ...component.eventDetails.controls,
+        typeofEvent: new FormControl('record'),
+      })
+      expect(component.checkIfSCEvent()).toBe(false)
+    })
+  })
+
+  describe('checkIfLiveEvent getter', () => {
+    it('should return true when openTab is draft and eventStatus is live', () => {
+      component.openTab = 'draft'
+      component.eventStatus = 'live'
+      expect(component.checkIfLiveEvent).toBe(true)
+    })
+
+    it('should return true when openTab is rejected and eventStatus is live', () => {
+      component.openTab = 'rejected'
+      component.eventStatus = 'live'
+      expect(component.checkIfLiveEvent).toBe(true)
+    })
+
+    it('should return true when openTab is upcoming and eventStatus is live', () => {
+      component.openTab = 'upcoming'
+      component.eventStatus = 'live'
+      expect(component.checkIfLiveEvent).toBe(true)
+    })
+
+    it('should return false when eventStatus is not live', () => {
+      component.openTab = 'draft'
+      component.eventStatus = 'draft'
+      expect(component.checkIfLiveEvent).toBe(false)
+    })
+  })
+
+  describe('disableSchedule getter', () => {
+    it('should return true when openTab is past', () => {
+      component.openTab = 'past'
+      expect(component.disableSchedule).toBe(true)
+    })
+
+    it('should return true when openTab is upcoming', () => {
+      component.openTab = 'upcoming'
+      expect(component.disableSchedule).toBe(true)
+    })
+
+    it('should return true when eventStatus is live and openTab is draft', () => {
+      component.eventStatus = 'live'
+      component.openTab = 'draft'
+      expect(component.disableSchedule).toBe(true)
+    })
+
+    it('should return false when in edit mode with draft status', () => {
+      component.openTab = 'draft'
+      component.eventStatus = 'draft'
+      expect(component.disableSchedule).toBe(false)
+    })
+  })
+
+  describe('preventDefaultCDK', () => {
+    it('should call preventDefault and stopPropagation', () => {
+      const event = { preventDefault: jest.fn(), stopPropagation: jest.fn(), target: {} } as any
+      component.preventDefaultCDK(event)
+      expect(event.preventDefault).toHaveBeenCalled()
+      expect(event.stopPropagation).toHaveBeenCalled()
+    })
+
+    it('should set opacity 0.5 on enter', () => {
+      const target = { style: { opacity: '' } }
+      const event = { preventDefault: jest.fn(), stopPropagation: jest.fn(), target } as any
+      component.preventDefaultCDK(event, 'enter')
+      expect(target.style.opacity).toBe('0.5')
+    })
+
+    it('should set opacity 1 on leave', () => {
+      const target = { style: { opacity: '' } }
+      const event = { preventDefault: jest.fn(), stopPropagation: jest.fn(), target } as any
+      component.preventDefaultCDK(event, 'leave')
+      expect(target.style.opacity).toBe('1')
+    })
+  })
+
+  describe('onDrop', () => {
+    it('should call onVideoSelected when files are dropped', () => {
+      const spy = jest.spyOn(component, 'onVideoSelected').mockImplementation()
+      const mockFiles = [{ type: 'video/mp4', size: 100 }]
+      const event = {
+        preventDefault: jest.fn(),
+        stopPropagation: jest.fn(),
+        target: { style: {} },
+        dataTransfer: { files: mockFiles },
+      } as any
+      component.onDrop(event)
+      expect(spy).toHaveBeenCalledWith(mockFiles)
+    })
+
+    it('should not throw when dataTransfer is null', () => {
+      const event = {
+        preventDefault: jest.fn(),
+        stopPropagation: jest.fn(),
+        target: { style: {} },
+        dataTransfer: null,
+      } as any
+      expect(() => component.onDrop(event)).not.toThrow()
+    })
+  })
+
+  describe('ngOnInit with live typeofEvent', () => {
+    it('should set live event categories when typeofEvent is live', () => {
+      component.openMode = 'edit'
+      component.openTab = 'draft'
+      component.eventDetails = new FormGroup({
+        startDate: new FormControl(null),
+        startTime: new FormControl(null),
+        endTime: new FormControl(null),
+        appIcon: new FormControl(''),
+        recoredEventUrl: new FormControl(''),
+        registrationLink: new FormControl(''),
+        typeofEvent: new FormControl('live'),
+        maxEnrolments: new FormControl(null),
+      })
+      component.ngOnInit()
+      expect(component.eventCategoriesList).toEqual(['Samuhik Charcha'])
+      expect(component.timeGap).toBe(30)
+    })
+
+    it('should set live event categories in view mode when typeofEvent is live', () => {
+      component.openMode = 'view'
+      component.eventDetails = new FormGroup({
+        startDate: new FormControl(null),
+        startTime: new FormControl(null),
+        endTime: new FormControl(null),
+        appIcon: new FormControl(''),
+        recoredEventUrl: new FormControl(''),
+        registrationLink: new FormControl(''),
+        typeofEvent: new FormControl('live'),
+      })
+      component.ngOnInit()
+      expect(component.eventCategoriesList).toEqual(['Samuhik Charcha'])
+    })
+  })
+
+  describe('registrationLink valueChanges subscription', () => {
+    it('should disable upload and clear recoredEventUrl when registrationLink gets value', () => {
+      component.openMode = 'edit'
+      component.openTab = 'draft'
+      component.ngOnInit()
+
+      component.eventDetails.controls.registrationLink.setValue('https://example.com')
+      expect(component.disableUpload).toBe(true)
+    })
+
+    it('should re-enable upload when registrationLink is cleared', () => {
+      component.openMode = 'edit'
+      component.openTab = 'draft'
+      component.disableUpload = true
+      component.ngOnInit()
+
+      component.eventDetails.controls.registrationLink.setValue('')
+      expect(component.disableUpload).toBe(false)
     })
   })
 })
