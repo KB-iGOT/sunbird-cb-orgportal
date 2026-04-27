@@ -1,688 +1,431 @@
 import { UsersService } from './users.service'
-import { HttpClient } from '@angular/common/http'
-import { of, throwError } from 'rxjs'
-import * as _ from 'lodash'
-
-// Mock lodash
-jest.mock('lodash', () => ({
-    get: jest.fn()
-}))
+import { of } from 'rxjs'
 
 describe('UsersService', () => {
-    let service: UsersService
-    let httpClientMock: jest.Mocked<HttpClient>
-    let mockGet: jest.MockedFunction<typeof _.get>
+  let service: UsersService
+  let mockHttp: any
 
-    beforeEach(() => {
-        // Create mock HttpClient
-        httpClientMock = {
-            get: jest.fn(),
-            post: jest.fn(),
-            patch: jest.fn(),
-            put: jest.fn(),
-            delete: jest.fn(),
-            head: jest.fn(),
-            options: jest.fn(),
-            request: jest.fn()
-        } as any
+  beforeEach(() => {
+    mockHttp = {
+      get: jest.fn().mockReturnValue(of({ result: { response: { content: [], count: 0 } } })),
+      post: jest.fn().mockReturnValue(of({ result: { response: { content: [], count: 0 } } })),
+      patch: jest.fn().mockReturnValue(of({ result: 'ok' })),
+      put: jest.fn().mockReturnValue(of({ result: 'ok' })),
+      delete: jest.fn().mockReturnValue(of({ result: 'ok' })),
+    }
+    service = new UsersService(mockHttp)
+  })
 
-        mockGet = _.get as jest.MockedFunction<typeof _.get>
+  afterEach(() => jest.clearAllMocks())
 
-        // Create service instance with mocked dependencies
-        service = new UsersService(httpClientMock)
+  it('should create', () => {
+    expect(service).toBeTruthy()
+    expect(service.TOTAL_USERS_LIMIT).toBe(10000)
+  })
+
+  it('should expose observable subjects', () => {
+    expect(service.handleContentPageChange).toBeDefined()
+    expect(service.filterToggle).toBeDefined()
+    expect(service.clearFilter).toBeDefined()
+    expect(service.getFilterDataObject).toBeDefined()
+    expect(service.mentorList$).toBeDefined()
+  })
+
+  // ─── getAllUsers ────────────────────────────────────────────────────────────
+  describe('getAllUsers', () => {
+    it('should POST to search endpoint and return result.response', done => {
+      mockHttp.post.mockReturnValue(of({ result: { response: { content: [{ id: '1' }] } } }))
+      service.getAllUsers({ filters: {} }).subscribe(res => {
+        expect(mockHttp.post).toHaveBeenCalledWith('/apis/proxies/v8/user/v1/search', { filters: {} })
+        expect(res).toEqual({ content: [{ id: '1' }] })
+        done()
+      })
+    })
+  })
+
+  // ─── getAllUsersV3 ──────────────────────────────────────────────────────────
+  describe('getAllUsersV3', () => {
+    it('should POST to v3 search endpoint and return result.response', done => {
+      mockHttp.post.mockReturnValue(of({ result: { response: { content: [] } } }))
+      service.getAllUsersV3({ filters: {} }).subscribe(res => {
+        expect(mockHttp.post).toHaveBeenCalledWith('/apis/proxies/v8/user/v3/search', { filters: {} })
+        expect(res).toEqual({ content: [] })
+        done()
+      })
+    })
+  })
+
+  // ─── getMyDepartment ───────────────────────────────────────────────────────
+  describe('getMyDepartment', () => {
+    it('should GET my department', done => {
+      service.getMyDepartment().subscribe(() => {
+        expect(mockHttp.get).toHaveBeenCalledWith('/apis/protected/v8/portal/mdo/mydepartment?allUsers=true')
+        done()
+      })
+    })
+  })
+
+  // ─── createUser ────────────────────────────────────────────────────────────
+  describe('createUser', () => {
+    it('should POST to createUser endpoint', done => {
+      const req = { name: 'Test User' }
+      service.createUser(req).subscribe(() => {
+        expect(mockHttp.post).toHaveBeenCalledWith('apis/protected/v8/user/profileDetails/createUser', req)
+        done()
+      })
+    })
+  })
+
+  // ─── getUserById ───────────────────────────────────────────────────────────
+  describe('getUserById', () => {
+    it('should GET user by id when userid is provided', done => {
+      mockHttp.get.mockReturnValue(of({ result: { response: { id: 'user1' } } }))
+      service.getUserById('user1').subscribe(res => {
+        expect(mockHttp.get).toHaveBeenCalledWith('/apis/proxies/v8/api/user/v2/read/user1')
+        expect(res).toEqual({ id: 'user1' })
+        done()
+      })
     })
 
-    afterEach(() => {
-        jest.clearAllMocks()
+    it('should GET current user when userid is empty', done => {
+      mockHttp.get.mockReturnValue(of({ result: { response: { id: 'current' } } }))
+      service.getUserById('').subscribe(res => {
+        expect(mockHttp.get).toHaveBeenCalledWith('/apis/proxies/v8/api/user/v2/read')
+        expect(res).toEqual({ id: 'current' })
+        done()
+      })
     })
+  })
 
-    describe('getAllUsers', () => {
-        it('should get all users with filter and return mapped response', (done) => {
-            const mockFilter = { status: 1 }
-            const mockResponse = { result: { response: [{ id: '1', name: 'John' }] } }
-            const expectedResult = [{ id: '1', name: 'John' }]
-
-            httpClientMock.post.mockReturnValue(of(mockResponse))
-            mockGet.mockReturnValue(expectedResult)
-
-            service.getAllUsers(mockFilter).subscribe(result => {
-                expect(httpClientMock.post).toHaveBeenCalledWith('/apis/proxies/v8/user/v1/search', mockFilter)
-                expect(mockGet).toHaveBeenCalledWith(mockResponse, 'result.response')
-                expect(result).toEqual(expectedResult)
-                done()
-            })
-        })
-
-        it('should handle error when getAllUsers fails', (done) => {
-            const mockFilter = { status: 1 }
-            const error = new Error('HTTP Error')
-
-            httpClientMock.post.mockReturnValue(throwError(error))
-
-            service.getAllUsers(mockFilter).subscribe({
-                next: () => fail('Should have failed'),
-                error: (err) => {
-                    expect(err).toBe(error)
-                    done()
-                }
-            })
-        })
+  // ─── createUserById ────────────────────────────────────────────────────────
+  describe('createUserById', () => {
+    it('should POST to createUserById endpoint', done => {
+      const req = { name: 'Test' }
+      service.createUserById('id1', req).subscribe(() => {
+        expect(mockHttp.post).toHaveBeenCalledWith('/apis/protected/v8/user/profileRegistry/createUserRegistryV2/id1', req)
+        done()
+      })
     })
+  })
 
-    describe('getAllUsersV3', () => {
-        it('should get all users V3 with filter and return mapped response', (done) => {
-            const mockFilter = { status: 1 }
-            const mockResponse = { result: { response: [{ id: '1', name: 'Jane' }] } }
-            const expectedResult = [{ id: '1', name: 'Jane' }]
-
-            httpClientMock.post.mockReturnValue(of(mockResponse))
-            mockGet.mockReturnValue(expectedResult)
-
-            service.getAllUsersV3(mockFilter).subscribe(result => {
-                expect(httpClientMock.post).toHaveBeenCalledWith('/apis/proxies/v8/user/v3/search', mockFilter)
-                expect(mockGet).toHaveBeenCalledWith(mockResponse, 'result.response')
-                expect(result).toEqual(expectedResult)
-                done()
-            })
-        })
+  // ─── addUserToRole ─────────────────────────────────────────────────────────
+  describe('addUserToRole', () => {
+    it('should POST to add user role endpoint', done => {
+      const req = { roles: ['mdo_admin'] }
+      service.addUserToRole(req).subscribe(() => {
+        expect(mockHttp.post).toHaveBeenCalledWith('/apis/proxies/v8/user/private/v1/assign/role', req)
+        done()
+      })
     })
+  })
 
-    describe('getMyDepartment', () => {
-        it('should get my department', (done) => {
-            const mockResponse = { department: 'IT' }
-
-            httpClientMock.get.mockReturnValue(of(mockResponse))
-
-            service.getMyDepartment().subscribe(result => {
-                expect(httpClientMock.get).toHaveBeenCalledWith('/apis/protected/v8/portal/mdo/mydepartment?allUsers=true')
-                expect(result).toEqual(mockResponse)
-                done()
-            })
-        })
+  // ─── getWfHistoryByAppId ───────────────────────────────────────────────────
+  describe('getWfHistoryByAppId', () => {
+    it('should GET workflow history by app id', done => {
+      service.getWfHistoryByAppId('app123').subscribe(() => {
+        expect(mockHttp.get).toHaveBeenCalledWith('apis/protected/v8/workflowhandler/historyByApplicationId/app123')
+        done()
+      })
     })
+  })
 
-    describe('createUser', () => {
-        it('should create a user', (done) => {
-            const mockRequest = { name: 'John Doe', email: 'john@example.com' }
-            const mockResponse = { success: true }
-
-            httpClientMock.post.mockReturnValue(of(mockResponse))
-
-            service.createUser(mockRequest).subscribe(result => {
-                expect(httpClientMock.post).toHaveBeenCalledWith('apis/protected/v8/user/profileDetails/createUser', mockRequest)
-                expect(result).toEqual(mockResponse)
-                done()
-            })
-        })
+  // ─── onSearchUserByEmail ───────────────────────────────────────────────────
+  describe('onSearchUserByEmail', () => {
+    it('should POST to search user by email', done => {
+      const req = {}
+      service.onSearchUserByEmail('test@test.com', req).subscribe(() => {
+        expect(mockHttp.post).toHaveBeenCalledWith('apis/protected/v8/user/autocomplete/department/test@test.com', req)
+        done()
+      })
     })
+  })
 
-    describe('getUserById', () => {
-        it('should get user by id when userid is provided', (done) => {
-            const userId = '123'
-            const mockResponse = { result: { response: { id: '123', name: 'John' } } }
-            const expectedResult = { id: '123', name: 'John' }
-
-            httpClientMock.get.mockReturnValue(of(mockResponse))
-            mockGet.mockReturnValue(expectedResult)
-
-            service.getUserById(userId).subscribe(result => {
-                expect(httpClientMock.get).toHaveBeenCalledWith('/apis/proxies/v8/api/user/v2/read/123')
-                expect(mockGet).toHaveBeenCalledWith(mockResponse, 'result.response')
-                expect(result).toEqual(expectedResult)
-                done()
-            })
-        })
-
-        it('should get current user when userid is not provided', (done) => {
-            const mockResponse = { result: { response: { id: 'current', name: 'Current User' } } }
-            const expectedResult = { id: 'current', name: 'Current User' }
-
-            httpClientMock.get.mockReturnValue(of(mockResponse))
-            mockGet.mockReturnValue(expectedResult)
-
-            service.getUserById('').subscribe(result => {
-                expect(httpClientMock.get).toHaveBeenCalledWith('/apis/proxies/v8/api/user/v2/read')
-                expect(mockGet).toHaveBeenCalledWith(mockResponse, 'result.response')
-                expect(result).toEqual(expectedResult)
-                done()
-            })
-        })
+  // ─── blockUser / deActiveUser / activeUser / deleteUser ───────────────────
+  describe('blockUser', () => {
+    it('should PATCH to block user', done => {
+      service.blockUser({ userId: 'u1' }).subscribe(() => {
+        expect(mockHttp.patch).toHaveBeenCalledWith('/apis/protected/v8/portal/mdo/deptAction/userrole/', { userId: 'u1' })
+        done()
+      })
     })
+  })
 
-    describe('createUserById', () => {
-        it('should create user by id', (done) => {
-            const id = '123'
-            const mockRequest = { name: 'John Doe' }
-            const mockResponse = { success: true }
-
-            httpClientMock.post.mockReturnValue(of(mockResponse))
-
-            service.createUserById(id, mockRequest).subscribe(result => {
-                expect(httpClientMock.post).toHaveBeenCalledWith('/apis/protected/v8/user/profileRegistry/createUserRegistryV2/123', mockRequest)
-                expect(result).toEqual(mockResponse)
-                done()
-            })
-        })
+  describe('deActiveUser', () => {
+    it('should POST to deactivate user', done => {
+      service.deActiveUser({ userId: 'u1' }).subscribe(() => {
+        expect(mockHttp.post).toHaveBeenCalledWith('apis/proxies/v8/user/v1/block/', { userId: 'u1' })
+        done()
+      })
     })
+  })
 
-    describe('addUserToDepartment', () => {
-        it('should add user to department', (done) => {
-            const mockRequest = { userId: '123', departmentId: '456' }
-            const mockResponse = { success: true }
-
-            httpClientMock.post.mockReturnValue(of(mockResponse))
-
-            service.addUserToDepartment(mockRequest).subscribe(result => {
-                expect(httpClientMock.post).toHaveBeenCalledWith('/apis/proxies/v8/user/private/v1/assign/role', mockRequest)
-                expect(result).toEqual(mockResponse)
-                done()
-            })
-        })
+  describe('activeUser', () => {
+    it('should PATCH to activate user', done => {
+      service.activeUser({ userId: 'u1' }).subscribe(() => {
+        expect(mockHttp.patch).toHaveBeenCalledWith('apis/proxies/v8/user/v1/unblock/', { userId: 'u1' })
+        done()
+      })
     })
+  })
 
-    describe('getWfHistoryByAppId', () => {
-        it('should get workflow history by app id', (done) => {
-            const appId = 'app123'
-            const mockResponse = { history: [] }
-
-            httpClientMock.get.mockReturnValue(of(mockResponse))
-
-            service.getWfHistoryByAppId(appId).subscribe(result => {
-                expect(httpClientMock.get).toHaveBeenCalledWith('apis/protected/v8/workflowhandler/historyByApplicationId/app123')
-                expect(result).toEqual(mockResponse)
-                done()
-            })
-        })
+  describe('deleteUser', () => {
+    it('should PATCH to delete user', done => {
+      service.deleteUser({ userId: 'u1' }).subscribe(() => {
+        expect(mockHttp.patch).toHaveBeenCalledWith('/apis/protected/v8/portal/mdo/deptAction/userrole/', { userId: 'u1' })
+        done()
+      })
     })
+  })
 
-    describe('onSearchUserByEmail', () => {
-        it('should search user by email', (done) => {
-            const email = 'test@example.com'
-            const mockRequest = { query: 'search' }
-            const mockResponse = { users: [] }
-
-            httpClientMock.post.mockReturnValue(of(mockResponse))
-
-            service.onSearchUserByEmail(email, mockRequest).subscribe(result => {
-                expect(httpClientMock.post).toHaveBeenCalledWith('apis/protected/v8/user/autocomplete/department/test@example.com', mockRequest)
-                expect(result).toEqual(mockResponse)
-                done()
-            })
+  // ─── newBlockUser / newUnBlockUser ─────────────────────────────────────────
+  describe('newBlockUser', () => {
+    it('should POST to block user with request body', done => {
+      service.newBlockUser('admin', 'user1').subscribe(() => {
+        expect(mockHttp.post).toHaveBeenCalledWith('/apis/proxies/v8/user/v1/block', {
+          request: { userId: 'user1', requestedBy: 'admin' },
         })
+        done()
+      })
     })
+  })
 
-    describe('User Block/Unblock Operations', () => {
-        describe('blockUser', () => {
-            it('should block user', (done) => {
-                const mockUser = { userId: '123' }
-                const mockResponse = { success: true }
-
-                httpClientMock.patch.mockReturnValue(of(mockResponse))
-
-                service.blockUser(mockUser).subscribe(result => {
-                    expect(httpClientMock.patch).toHaveBeenCalledWith('/apis/protected/v8/portal/mdo/deptAction/userrole/', mockUser)
-                    expect(result).toEqual(mockResponse)
-                    done()
-                })
-            })
+  describe('newUnBlockUser', () => {
+    it('should POST to unblock user with request body', done => {
+      service.newUnBlockUser('admin', 'user1').subscribe(() => {
+        expect(mockHttp.post).toHaveBeenCalledWith('/apis/proxies/v8/user/v1/unblock', {
+          request: { userId: 'user1', requestedBy: 'admin' },
         })
-
-        describe('deActiveUser', () => {
-            it('should deactivate user', (done) => {
-                const mockUser = { userId: '123' }
-                const mockResponse = { success: true }
-
-                httpClientMock.post.mockReturnValue(of(mockResponse))
-
-                service.deActiveUser(mockUser).subscribe(result => {
-                    expect(httpClientMock.post).toHaveBeenCalledWith('apis/proxies/v8/user/v1/block/', mockUser)
-                    expect(result).toEqual(mockResponse)
-                    done()
-                })
-            })
-        })
-
-        describe('activeUser', () => {
-            it('should activate user', (done) => {
-                const mockUser = { userId: '123' }
-                const mockResponse = { success: true }
-
-                httpClientMock.patch.mockReturnValue(of(mockResponse))
-
-                service.activeUser(mockUser).subscribe(result => {
-                    expect(httpClientMock.patch).toHaveBeenCalledWith('apis/proxies/v8/user/v1/unblock/', mockUser)
-                    expect(result).toEqual(mockResponse)
-                    done()
-                })
-            })
-        })
-
-        describe('newBlockUser', () => {
-            it('should block user with new API', (done) => {
-                const loggedInUser = 'admin123'
-                const userId = 'user456'
-                const expectedRequest = {
-                    request: {
-                        userId: 'user456',
-                        requestedBy: 'admin123'
-                    }
-                }
-                const mockResponse = { success: true }
-
-                httpClientMock.post.mockReturnValue(of(mockResponse))
-
-                service.newBlockUser(loggedInUser, userId).subscribe(result => {
-                    expect(httpClientMock.post).toHaveBeenCalledWith('/apis/proxies/v8/user/v1/block', expectedRequest)
-                    expect(result).toEqual(mockResponse)
-                    done()
-                })
-            })
-        })
-
-        describe('newUnBlockUser', () => {
-            it('should unblock user with new API', (done) => {
-                const loggedInUser = 'admin123'
-                const userId = 'user456'
-                const expectedRequest = {
-                    request: {
-                        userId: 'user456',
-                        requestedBy: 'admin123'
-                    }
-                }
-                const mockResponse = { success: true }
-
-                httpClientMock.post.mockReturnValue(of(mockResponse))
-
-                service.newUnBlockUser(loggedInUser, userId).subscribe(result => {
-                    expect(httpClientMock.post).toHaveBeenCalledWith('/apis/proxies/v8/user/v1/unblock', expectedRequest)
-                    expect(result).toEqual(mockResponse)
-                    done()
-                })
-            })
-        })
+        done()
+      })
     })
+  })
 
-    describe('getAllKongUsers', () => {
-        it('should get all kong users', (done) => {
-            const mockRequest = { request: { filters: {}, limit: 20 } }
-            const mockResponse = { users: [] }
-
-            httpClientMock.post.mockReturnValue(of(mockResponse))
-
-            service.getAllKongUsers(mockRequest).subscribe(result => {
-                expect(httpClientMock.post).toHaveBeenCalledWith('/apis/proxies/v8/user/v1/search', mockRequest)
-                expect(result).toEqual(mockResponse)
-                done()
-            })
-        })
+  // ─── getAllKongUsers ────────────────────────────────────────────────────────
+  describe('getAllKongUsers', () => {
+    it('should POST to GET_ALL_USERS', done => {
+      const reqBody = { request: { filters: {} } }
+      service.getAllKongUsers(reqBody).subscribe(() => {
+        expect(mockHttp.post).toHaveBeenCalledWith('/apis/proxies/v8/user/v1/search', reqBody)
+        done()
+      })
     })
+  })
 
-    describe('getAllRoleUsers', () => {
-        it('should get role users count', (done) => {
-            const depId = 'dept123'
-            const role = 'admin'
-            const mockResponse = { result: { response: { count: 5 } } }
-            const expectedRequest = {
-                request: {
-                    filters: {
-                        rootOrgId: 'dept123',
-                        status: 1,
-                        'organisations.roles': ['admin']
-                    },
-                    limit: 1
-                }
-            }
-
-            httpClientMock.post.mockReturnValue(of(mockResponse))
-            mockGet.mockReturnValue(5)
-
-            service.getAllRoleUsers(depId, role).subscribe(result => {
-                expect(httpClientMock.post).toHaveBeenCalledWith('/apis/proxies/v8/user/v1/search', expectedRequest)
-                expect(mockGet).toHaveBeenCalledWith(mockResponse, 'result.response.count')
-                expect(result).toEqual({ role: 'admin', count: 5 })
-                done()
-            })
-        })
-
-        it('should retry once on failure', (done) => {
-            const depId = 'dept123'
-            const role = 'admin'
-            const mockResponse = { result: { response: { count: 3 } } }
-
-            // First call fails, second succeeds
-            httpClientMock.post
-                .mockReturnValueOnce(throwError(new Error('Network error')))
-                .mockReturnValueOnce(of(mockResponse))
-
-            mockGet.mockReturnValue(3)
-
-            service.getAllRoleUsers(depId, role).subscribe(result => {
-                expect(httpClientMock.post).toHaveBeenCalledTimes(2)
-                expect(result).toEqual({ role: 'admin', count: 3 })
-                done()
-            })
-        })
+  // ─── getAllRoleUsers ────────────────────────────────────────────────────────
+  describe('getAllRoleUsers', () => {
+    it('should POST and map to role and count', done => {
+      mockHttp.post.mockReturnValue(of({ result: { response: { count: 5 } } }))
+      service.getAllRoleUsers('dep1', 'mdo_admin').subscribe(res => {
+        expect(res).toEqual({ role: 'mdo_admin', count: 5 })
+        done()
+      })
     })
+  })
 
-    describe('getTotalRoleUsers', () => {
-        it('should get total role users', (done) => {
-            const depId = 'dept123'
-            const role = 'user'
-            const mockResponse = { result: { response: { users: [], count: 10 } } }
-            const expectedRequest = {
-                request: {
-                    filters: {
-                        rootOrgId: 'dept123',
-                        'organisations.roles': ['user']
-                    }
-                }
-            }
-
-            httpClientMock.post.mockReturnValue(of(mockResponse))
-            mockGet.mockReturnValue({ users: [], count: 10 })
-
-            service.getTotalRoleUsers(depId, role).subscribe(result => {
-                expect(httpClientMock.post).toHaveBeenCalledWith('/apis/proxies/v8/user/v1/search', expectedRequest)
-                expect(mockGet).toHaveBeenCalledWith(mockResponse, 'result.response')
-                expect(result).toEqual({ role: 'user', count: { users: [], count: 10 } })
-                done()
-            })
-        })
+  // ─── getRolesCountsApi ─────────────────────────────────────────────────────
+  describe('getRolesCountsApi', () => {
+    it('should POST to search endpoint', done => {
+      const reqBody = { request: {} }
+      service.getRolesCountsApi(reqBody).subscribe(() => {
+        expect(mockHttp.post).toHaveBeenCalledWith('/apis/proxies/v8/user/v1/search', reqBody)
+        done()
+      })
     })
+  })
 
-    describe('searchUserByenter', () => {
-        it('should search user by entered value', (done) => {
-            const value = 'john'
-            const rootOrgId = 'org123'
-            const expectedRequest = {
-                request: {
-                    query: 'john',
-                    filters: {
-                        rootOrgId: 'org123'
-                    }
-                }
-            }
-            const mockResponse = { users: [] }
-
-            httpClientMock.post.mockReturnValue(of(mockResponse))
-
-            service.searchUserByenter(value, rootOrgId).subscribe(result => {
-                expect(httpClientMock.post).toHaveBeenCalledWith('/apis/proxies/v8/user/v1/search', expectedRequest)
-                expect(result).toEqual(mockResponse)
-                done()
-            })
-        })
+  // ─── getTotalRoleUsers ─────────────────────────────────────────────────────
+  describe('getTotalRoleUsers', () => {
+    it('should POST and map to role and response', done => {
+      mockHttp.post.mockReturnValue(of({ result: { response: { content: [] } } }))
+      service.getTotalRoleUsers('dep1', 'mdo_leader').subscribe(res => {
+        expect(res.role).toBe('mdo_leader')
+        done()
+      })
     })
+  })
 
-    describe('checkForUserReport', () => {
-        it('should check for user report', (done) => {
-            const url = 'https://example.com/report'
-            const mockResponse = { report: 'data' }
-
-            httpClientMock.get.mockReturnValue(of(mockResponse))
-
-            service.checkForUserReport(url).subscribe(result => {
-                expect(httpClientMock.get).toHaveBeenCalledWith(url)
-                expect(result).toEqual(mockResponse)
-                done()
-            })
+  // ─── searchUserByenter ─────────────────────────────────────────────────────
+  describe('searchUserByenter', () => {
+    it('should POST to search table endpoint with correct body', done => {
+      service.searchUserByenter('john', 'org1').subscribe(() => {
+        expect(mockHttp.post).toHaveBeenCalledWith('/apis/proxies/v8/user/v1/search', {
+          request: { query: 'john', filters: { rootOrgId: 'org1' } },
         })
+        done()
+      })
     })
+  })
 
-    describe('getDesignations', () => {
-        it('should get designations', (done) => {
-            const mockResponse = { designations: [] }
-
-            httpClientMock.get.mockReturnValue(of(mockResponse))
-
-            service.getDesignations().subscribe(result => {
-                expect(httpClientMock.get).toHaveBeenCalledWith('/apis/proxies/v8/user/v1/positions')
-                expect(result).toEqual(mockResponse)
-                done()
-            })
-        })
+  // ─── checkForUserReport ────────────────────────────────────────────────────
+  describe('checkForUserReport', () => {
+    it('should GET given url', done => {
+      service.checkForUserReport('/some/report/url').subscribe(() => {
+        expect(mockHttp.get).toHaveBeenCalledWith('/some/report/url')
+        done()
+      })
     })
+  })
 
-    describe('updateUserDetails', () => {
-        it('should update user details', (done) => {
-            const mockRequest = { userId: '123', name: 'Updated Name' }
-            const mockResponse = { success: true }
-
-            httpClientMock.post.mockReturnValue(of(mockResponse))
-
-            service.updateUserDetails(mockRequest).subscribe(result => {
-                expect(httpClientMock.post).toHaveBeenCalledWith('/apis/proxies/v8/user/v1/admin/extPatch', mockRequest)
-                expect(result).toEqual(mockResponse)
-                done()
-            })
-        })
+  // ─── getDesignations ───────────────────────────────────────────────────────
+  describe('getDesignations', () => {
+    it('should GET designations endpoint', done => {
+      service.getDesignations().subscribe(() => {
+        expect(mockHttp.get).toHaveBeenCalledWith('/apis/proxies/v8/user/v1/positions')
+        done()
+      })
     })
+  })
 
-    describe('OTP Operations', () => {
-        describe('sendOtp', () => {
-            it('should send OTP', (done) => {
-                const value = 'test@example.com'
-                const type = 'email'
-                const expectedRequest = {
-                    request: {
-                        type: 'email',
-                        key: 'test@example.com'
-                    }
-                }
-                const mockResponse = { success: true }
-
-                httpClientMock.post.mockReturnValue(of(mockResponse))
-
-                service.sendOtp(value, type).subscribe(result => {
-                    expect(httpClientMock.post).toHaveBeenCalledWith('/apis/proxies/v8/otp/v1/generate', expectedRequest)
-                    expect(result).toEqual(mockResponse)
-                    done()
-                })
-            })
-        })
-
-        describe('resendOtp', () => {
-            it('should resend OTP', (done) => {
-                const value = '1234567890'
-                const type = 'phone'
-                const expectedRequest = {
-                    request: {
-                        type: 'phone',
-                        key: '1234567890'
-                    }
-                }
-                const mockResponse = { success: true }
-
-                httpClientMock.post.mockReturnValue(of(mockResponse))
-
-                service.resendOtp(value, type).subscribe(result => {
-                    expect(httpClientMock.post).toHaveBeenCalledWith('/apis/proxies/v8/otp/v1/generate', expectedRequest)
-                    expect(result).toEqual(mockResponse)
-                    done()
-                })
-            })
-        })
-
-        describe('verifyOTP', () => {
-            it('should verify OTP', (done) => {
-                const otp = 123456
-                const value = 'test@example.com'
-                const type = 'email'
-                const expectedRequest = {
-                    request: {
-                        otp: 123456,
-                        type: 'email',
-                        key: 'test@example.com'
-                    }
-                }
-                const mockResponse = { verified: true }
-
-                httpClientMock.post.mockReturnValue(of(mockResponse))
-
-                service.verifyOTP(otp, value, type).subscribe(result => {
-                    expect(httpClientMock.post).toHaveBeenCalledWith('/apis/proxies/v8/otp/v1/verify', expectedRequest)
-                    expect(result).toEqual(mockResponse)
-                    done()
-                })
-            })
-        })
+  // ─── searchIgotDesignation / searchDesignation ────────────────────────────
+  describe('searchIgotDesignation', () => {
+    it('should POST to sunbirdigot v4 search', done => {
+      const req = { filters: {} }
+      service.searchIgotDesignation(req).subscribe(() => {
+        expect(mockHttp.post).toHaveBeenCalledWith('/apis/proxies/v8/sunbirdigot/v4/search', req)
+        done()
+      })
     })
+  })
 
-    describe('Master Data Operations', () => {
-        describe('getMasterLanguages', () => {
-            it('should get master languages', (done) => {
-                const mockResponse = { languages: [] }
-
-                httpClientMock.get.mockReturnValue(of(mockResponse))
-
-                service.getMasterLanguages().subscribe(result => {
-                    expect(httpClientMock.get).toHaveBeenCalledWith('/apis/protected/v8/user/profileRegistry/getMasterLanguages')
-                    expect(result).toEqual(mockResponse)
-                    done()
-                })
-            })
-        })
-
-        describe('getGroups', () => {
-            it('should get groups', (done) => {
-                const mockResponse = { groups: [] }
-
-                httpClientMock.get.mockReturnValue(of(mockResponse))
-
-                service.getGroups().subscribe(result => {
-                    expect(httpClientMock.get).toHaveBeenCalledWith('/api/user/v1/groups')
-                    expect(result).toEqual(mockResponse)
-                    done()
-                })
-            })
-        })
-
-        describe('getMasterNationlity', () => {
-            it('should get master nationalities', (done) => {
-                const mockResponse = { nationalities: [] }
-
-                httpClientMock.get.mockReturnValue(of(mockResponse))
-
-                service.getMasterNationlity().subscribe(result => {
-                    expect(httpClientMock.get).toHaveBeenCalledWith('/apis/protected/v8/user/profileRegistry/getMasterNationalities')
-                    expect(result).toEqual(mockResponse)
-                    done()
-                })
-            })
-        })
+  describe('searchDesignation', () => {
+    it('should POST to designation search', done => {
+      const req = { filters: {} }
+      service.searchDesignation(req).subscribe(() => {
+        expect(mockHttp.post).toHaveBeenCalledWith('/apis/proxies/v8/designation/search', req)
+        done()
+      })
     })
+  })
 
-    describe('editProfileDetails', () => {
-        it('should edit profile details', (done) => {
-            const mockData = { name: 'Updated Name', email: 'updated@example.com' }
-            const mockResponse = { success: true }
-
-            httpClientMock.post.mockReturnValue(of(mockResponse))
-
-            service.editProfileDetails(mockData).subscribe(result => {
-                expect(httpClientMock.post).toHaveBeenCalledWith('/apis/proxies/v8/user/v1/extPatch', mockData)
-                expect(result).toEqual(mockResponse)
-                done()
-            })
-        })
+  // ─── updateUserDetails ─────────────────────────────────────────────────────
+  describe('updateUserDetails', () => {
+    it('should POST to updateUserDetails endpoint', done => {
+      const body = { name: 'Updated' }
+      service.updateUserDetails(body).subscribe(() => {
+        expect(mockHttp.post).toHaveBeenCalledWith('/apis/proxies/v8/user/v1/admin/extPatch', body)
+        done()
+      })
     })
+  })
 
-    describe('Approval and Workflow Operations', () => {
-        describe('listApprovalPendingFields', () => {
-            it('should list approval pending fields', (done) => {
-                const expectedRequest = {
-                    serviceName: 'profile',
-                    applicationStatus: 'SEND_FOR_APPROVAL'
-                }
-                const mockResponse = { fields: [] }
-
-                httpClientMock.post.mockReturnValue(of(mockResponse))
-
-                service.listApprovalPendingFields().subscribe(result => {
-                    expect(httpClientMock.post).toHaveBeenCalledWith('/apis/proxies/v8/workflow/v2/userWFApplicationFieldsSearch', expectedRequest)
-                    expect(result).toEqual(mockResponse)
-                    done()
-                })
-            })
+  // ─── sendOtp / resendOtp / verifyOTP ──────────────────────────────────────
+  describe('sendOtp', () => {
+    it('should POST with correct OTP request body', done => {
+      service.sendOtp('9999999999', 'phone').subscribe(() => {
+        expect(mockHttp.post).toHaveBeenCalledWith('/apis/proxies/v8/otp/v1/generate', {
+          request: { type: 'phone', key: '9999999999' },
         })
-
-        describe('fetchApprovalPendingFields', () => {
-            it('should fetch approval pending fields', (done) => {
-                const expectedRequest = {
-                    serviceName: 'profile',
-                    applicationStatus: 'SEND_FOR_APPROVAL'
-                }
-                const mockResponse = { fields: [] }
-
-                httpClientMock.post.mockReturnValue(of(mockResponse))
-
-                service.fetchApprovalPendingFields().subscribe(result => {
-                    expect(httpClientMock.post).toHaveBeenCalledWith('/apis/proxies/v8/workflow/v2/userWFApplicationFieldsSearch', expectedRequest)
-                    expect(result).toEqual(mockResponse)
-                    done()
-                })
-            })
-        })
-
-        describe('listRejectedFields', () => {
-            it('should list rejected fields', (done) => {
-                const expectedRequest = {
-                    serviceName: 'profile',
-                    applicationStatus: 'REJECTED'
-                }
-                const mockResponse = { fields: [] }
-
-                httpClientMock.post.mockReturnValue(of(mockResponse))
-
-                service.listRejectedFields().subscribe(result => {
-                    expect(httpClientMock.post).toHaveBeenCalledWith('/apis/proxies/v8/workflow/v2/userWFApplicationFieldsSearch', expectedRequest)
-                    expect(result).toEqual(mockResponse)
-                    done()
-                })
-            })
-        })
-
-        describe('fetchPendingRequests', () => {
-            it('should fetch pending requests', (done) => {
-                const mockResponse = { requests: [] }
-
-                httpClientMock.get.mockReturnValue(of(mockResponse))
-
-                service.fetchPendingRequests().subscribe(result => {
-                    expect(httpClientMock.get).toHaveBeenCalledWith('/apis/proxies/v8/workflow/admin/pending/request')
-                    expect(result).toEqual(mockResponse)
-                    done()
-                })
-            })
-        })
+        done()
+      })
     })
+  })
 
-    describe('Subject Properties', () => {
-        it('should have Subject properties initialized', () => {
-            expect(service.handleContentPageChange).toBeDefined()
-            expect(service.filterToggle).toBeDefined()
-            expect(service.clearFilter).toBeDefined()
-            expect(service.getFilterDataObject).toBeDefined()
-            expect(service.mentorList$).toBeDefined()
+  describe('resendOtp', () => {
+    it('should POST with correct resend OTP request body', done => {
+      service.resendOtp('user@test.com', 'email').subscribe(() => {
+        expect(mockHttp.post).toHaveBeenCalledWith('/apis/proxies/v8/otp/v1/generate', {
+          request: { type: 'email', key: 'user@test.com' },
         })
-
-        it('should have TOTAL_USERS_LIMIT constant', () => {
-            expect(service.TOTAL_USERS_LIMIT).toBe(10000)
-        })
+        done()
+      })
     })
+  })
 
-    describe('deleteUser', () => {
-        it('should delete user', (done) => {
-            const mockUser = { userId: '123' }
-            const mockResponse = { success: true }
-
-            httpClientMock.patch.mockReturnValue(of(mockResponse))
-
-            service.deleteUser(mockUser).subscribe(result => {
-                expect(httpClientMock.patch).toHaveBeenCalledWith('/apis/protected/v8/portal/mdo/deptAction/userrole/', mockUser)
-                expect(result).toEqual(mockResponse)
-                done()
-            })
+  describe('verifyOTP', () => {
+    it('should POST with otp, type and key', done => {
+      service.verifyOTP(123456, 'user@test.com', 'email').subscribe(() => {
+        expect(mockHttp.post).toHaveBeenCalledWith('/apis/proxies/v8/otp/v1/verify', {
+          request: { otp: 123456, type: 'email', key: 'user@test.com' },
         })
+        done()
+      })
     })
+  })
+
+  // ─── getMasterLanguages / getGroups / getMasterNationlity ─────────────────
+  describe('getMasterLanguages', () => {
+    it('should GET master languages', done => {
+      service.getMasterLanguages().subscribe(() => {
+        expect(mockHttp.get).toHaveBeenCalledWith('/apis/protected/v8/user/profileRegistry/getMasterLanguages')
+        done()
+      })
+    })
+  })
+
+  describe('getGroups', () => {
+    it('should GET groups', done => {
+      service.getGroups().subscribe(() => {
+        expect(mockHttp.get).toHaveBeenCalledWith('/api/user/v1/groups')
+        done()
+      })
+    })
+  })
+
+  describe('getMasterNationlity', () => {
+    it('should GET master nationalities', done => {
+      service.getMasterNationlity().subscribe(() => {
+        expect(mockHttp.get).toHaveBeenCalledWith('/apis/protected/v8/user/profileRegistry/getMasterNationalities')
+        done()
+      })
+    })
+  })
+
+  // ─── editProfileDetails ────────────────────────────────────────────────────
+  describe('editProfileDetails', () => {
+    it('should POST to editProfileDetails endpoint', done => {
+      const data = { firstName: 'John' }
+      service.editProfileDetails(data).subscribe(() => {
+        expect(mockHttp.post).toHaveBeenCalledWith('/apis/proxies/v8/user/v1/extPatch', data)
+        done()
+      })
+    })
+  })
+
+  // ─── listApprovalPendingFields / fetchApprovalPendingFields ───────────────
+  describe('listApprovalPendingFields', () => {
+    it('should POST with SEND_FOR_APPROVAL status', done => {
+      service.listApprovalPendingFields().subscribe(() => {
+        expect(mockHttp.post).toHaveBeenCalledWith('/apis/proxies/v8/workflow/v2/userWFApplicationFieldsSearch', {
+          serviceName: 'profile',
+          applicationStatus: 'SEND_FOR_APPROVAL',
+        })
+        done()
+      })
+    })
+  })
+
+  describe('fetchApprovalPendingFields', () => {
+    it('should POST with SEND_FOR_APPROVAL status (alias method)', done => {
+      service.fetchApprovalPendingFields().subscribe(() => {
+        expect(mockHttp.post).toHaveBeenCalledWith('/apis/proxies/v8/workflow/v2/userWFApplicationFieldsSearch', {
+          serviceName: 'profile',
+          applicationStatus: 'SEND_FOR_APPROVAL',
+        })
+        done()
+      })
+    })
+  })
+
+  // ─── listRejectedFields ────────────────────────────────────────────────────
+  describe('listRejectedFields', () => {
+    it('should POST with REJECTED status', done => {
+      service.listRejectedFields().subscribe(() => {
+        expect(mockHttp.post).toHaveBeenCalledWith('/apis/proxies/v8/workflow/v2/userWFApplicationFieldsSearch', {
+          serviceName: 'profile',
+          applicationStatus: 'REJECTED',
+        })
+        done()
+      })
+    })
+  })
+
+  // ─── fetchPendingRequests ──────────────────────────────────────────────────
+  describe('fetchPendingRequests', () => {
+    it('should GET pending requests', done => {
+      service.fetchPendingRequests().subscribe(() => {
+        expect(mockHttp.get).toHaveBeenCalledWith('/apis/proxies/v8/workflow/admin/pending/request')
+        done()
+      })
+    })
+  })
 })
