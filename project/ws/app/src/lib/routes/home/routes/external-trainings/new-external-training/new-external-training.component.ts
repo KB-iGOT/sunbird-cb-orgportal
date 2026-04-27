@@ -38,9 +38,9 @@ export class NewExternalTrainingComponent implements OnInit {
   certificateUrl = ''
   safeCertificateUrl: SafeResourceUrl | null = null
   selectedLogoImage: string | ArrayBuffer | null = null
-  private readonly TARGET_HEIGHT = 100;
-  private readonly TARGET_Y_CENTER = 300;
-  private readonly TARGET_X_START = 2250;
+  private readonly TARGET_HEIGHT = 80;
+  private readonly TARGET_Y_CENTER = -170;
+  private readonly TARGET_X_START = 600;
 
   private readonly FILE_UPLOAD_MAX_SIZE = 1 * 1024 * 1024 // 1MB
   // tslint:disable-next-line: max-line-length
