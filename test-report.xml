@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testExecutions version="1">
+  <file path="/home/mansurshaik/Desktop/Office/projects/igot/igot-mdo-sunbird-cb-orgportal/project/ws/viewer/src/lib/components/viewer-toc/viewer-toc.component.spec.ts">
+    <testCase name="ViewerTocComponent should create" duration="3"/>
+    <testCase name="ViewerTocComponent ngOnInit should initialize with default values" duration="1">
+      <failure message="TypeError: Cannot read properties of undefined (reading &apos;data&apos;)"><![CDATA[TypeError: Cannot read properties of undefined (reading 'data')
+    at ViewerTocComponent.data [as ngOnInit] (/home/mansurshaik/Desktop/Office/projects/igot/igot-mdo-sunbird-cb-orgportal/project/ws/viewer/src/lib/components/viewer-toc/viewer-toc.component.ts:126:55)
+    at /home/mansurshaik/Desktop/Office/projects/igot/igot-mdo-sunbird-cb-orgportal/project/ws/viewer/src/lib/components/viewer-toc/viewer-toc.component.spec.ts:93:23
+    at _ZoneDelegate.Object.<anonymous>._ZoneDelegate.invoke (/home/mansurshaik/Desktop/Office/projects/igot/igot-mdo-sunbird-cb-orgportal/node_modules/zone.js/bundles/zone.umd.js:411:30)
+    at ProxyZoneSpec.Object.<anonymous>.ProxyZoneSpec.onInvoke (/home/mansurshaik/Desktop/Office/projects/igot/igot-mdo-sunbird-cb-orgportal/node_modules/zone.js/bundles/zone-testing.umd.js:300:43)
+    at _ZoneDelegate.Object.<anonymous>._ZoneDelegate.invoke (/home/mansurshaik/Desktop/Office/projects/igot/igot-mdo-sunbird-cb-orgportal/node_modules/zone.js/bundles/zone.umd.js:410:56)
+    at Zone.Object.<anonymous>.Zone.run (/home/mansurshaik/Desktop/Office/projects/igot/igot-mdo-sunbird-cb-orgportal/node_modules/zone.js/bundles/zone.umd.js:165:47)
+    at Object.wrappedFunc (/home/mansurshaik/Desktop/Office/projects/igot/igot-mdo-sunbird-cb-orgportal/node_modules/zone.js/bundles/zone-testing.umd.js:789:34)
+    at Promise.then.completed (/home/mansurshaik/Desktop/Office/projects/igot/igot-mdo-sunbird-cb-orgportal/node_modules/jest-circus/build/utils.js:298:28)
+    at new Promise (<anonymous>)
+    at callAsyncCircusFn (/home/mansurshaik/Desktop/Office/projects/igot/igot-mdo-sunbird-cb-orgportal/node_modules/jest-circus/build/utils.js:231:10)
+    at _callCircusTest (/home/mansurshaik/Desktop/Office/projects/igot/igot-mdo-sunbird-cb-orgportal/node_modules/jest-circus/build/run.js:316:40)
+    at processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at _runTest (/home/mansurshaik/Desktop/Office/projects/igot/igot-mdo-sunbird-cb-orgportal/node_modules/jest-circus/build/run.js:252:3)
+    at _runTestsForDescribeBlock (/home/mansurshaik/Desktop/Office/projects/igot/igot-mdo-sunbird-cb-orgportal/node_modules/jest-circus/build/run.js:126:9)
+    at _runTestsForDescribeBlock (/home/mansurshaik/Desktop/Office/projects/igot/igot-mdo-sunbird-cb-orgportal/node_modules/jest-circus/build/run.js:121:9)
+    at _runTestsForDescribeBlock (/home/mansurshaik/Desktop/Office/projects/igot/igot-mdo-sunbird-cb-orgportal/node_modules/jest-circus/build/run.js:121:9)
+    at run (/home/mansurshaik/Desktop/Office/projects/igot/igot-mdo-sunbird-cb-orgportal/node_modules/jest-circus/build/run.js:71:3)
+    at runAndTransformResultsToJestFormat (/home/mansurshaik/Desktop/Office/projects/igot/igot-mdo-sunbird-cb-orgportal/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapterInit.js:122:21)]]></failure>
+    </testCase>
+    <testCase name="ViewerTocComponent ngOnInit should set default thumbnail from config service" duration="0">
+      <failure message="TypeError: Cannot read properties of undefined (reading &apos;data&apos;)"><![CDATA[TypeError: Cannot read properties of undefined (reading 'data')
+    at ViewerTocComponent.data [as ngOnInit] (/home/mansurshaik/Desktop/Office/projects/igot/igot-mdo-sunbird-cb-orgportal/project/ws/viewer/src/lib/components/viewer-toc/viewer-toc.component.ts:126:55)
+    at /home/mansurshaik/Desktop/Office/projects/igot/igot-mdo-sunbird-cb-orgportal/project/ws/viewer/src/lib/components/viewer-toc/viewer-toc.component.spec.ts:101:23
+    at _ZoneDelegate.Object.<anonymous>._ZoneDelegate.invoke (/home/mansurshaik/Desktop/Office/projects/igot/igot-mdo-sunbird-cb-orgportal/node_modules/zone.js/bundles/zone.umd.js:411:30)
+    at ProxyZoneSpec.Object.<anonymous>.ProxyZoneSpec.onInvoke (/home/mansurshaik/Desktop/Office/projects/igot/igot-mdo-sunbird-cb-orgportal/node_modules/zone.js/bundles/zone-testing.umd.js:300:43)
+    at _ZoneDelegate.Object.<anonymous>._ZoneDelegate.invoke (/home/mansurshaik/Desktop/Office/projects/igot/igot-mdo-sunbird-cb-orgportal/node_modules/zone.js/bundles/zone.umd.js:410:56)
+    at Zone.Object.<anonymous>.Zone.run (/home/mansurshaik/Desktop/Office/projects/igot/igot-mdo-sunbird-cb-orgportal/node_modules/zone.js/bundles/zone.umd.js:165:47)
+    at Object.wrappedFunc (/home/mansurshaik/Desktop/Office/projects/igot/igot-mdo-sunbird-cb-orgportal/node_modules/zone.js/bundles/zone-testing.umd.js:789:34)
+    at Promise.then.completed (/home/mansurshaik/Desktop/Office/projects/igot/igot-mdo-sunbird-cb-orgportal/node_modules/jest-circus/build/utils.js:298:28)
+    at new Promise (<anonymous>)
+    at callAsyncCircusFn (/home/mansurshaik/Desktop/Office/projects/igot/igot-mdo-sunbird-cb-orgportal/node_modules/jest-circus/build/utils.js:231:10)
+    at _callCircusTest (/home/mansurshaik/Desktop/Office/projects/igot/igot-mdo-sunbird-cb-orgportal/node_modules/jest-circus/build/run.js:316:40)
+    at processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at _runTest (/home/mansurshaik/Desktop/Office/projects/igot/igot-mdo-sunbird-cb-orgportal/node_modules/jest-circus/build/run.js:252:3)
+    at _runTestsForDescribeBlock (/home/mansurshaik/Desktop/Office/projects/igot/igot-mdo-sunbird-cb-orgportal/node_modules/jest-circus/build/run.js:126:9)
+    at _runTestsForDescribeBlock (/home/mansurshaik/Desktop/Office/projects/igot/igot-mdo-sunbird-cb-orgportal/node_modules/jest-circus/build/run.js:121:9)
+    at _runTestsForDescribeBlock (/home/mansurshaik/Desktop/Office/projects/igot/igot-mdo-sunbird-cb-orgportal/node_modules/jest-circus/build/run.js:121:9)
+    at run (/home/mansurshaik/Desktop/Office/projects/igot/igot-mdo-sunbird-cb-orgportal/node_modules/jest-circus/build/run.js:71:3)
+    at runAndTransformResultsToJestFormat (/home/mansurshaik/Desktop/Office/projects/igot/igot-mdo-sunbird-cb-orgportal/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapterInit.js:122:21)]]></failure>
+    </testCase>
+    <testCase name="ViewerTocComponent changeTocMode should toggle between FLAT and TREE modes" duration="3">
+      <failure message="Error: expect(received).toBe(expected) // Object.is equality"><![CDATA[Error: expect(received).toBe(expected) // Object.is equality
+
+Expected: "FLAT"
+Received: "TREE"
+    at /home/mansurshaik/Desktop/Office/projects/igot/igot-mdo-sunbird-cb-orgportal/project/ws/viewer/src/lib/components/viewer-toc/viewer-toc.component.spec.ts:108:33
+    at _ZoneDelegate.Object.<anonymous>._ZoneDelegate.invoke (/home/mansurshaik/Desktop/Office/projects/igot/igot-mdo-sunbird-cb-orgportal/node_modules/zone.js/bundles/zone.umd.js:411:30)
+    at ProxyZoneSpec.Object.<anonymous>.ProxyZoneSpec.onInvoke (/home/mansurshaik/Desktop/Office/projects/igot/igot-mdo-sunbird-cb-orgportal/node_modules/zone.js/bundles/zone-testing.umd.js:300:43)
+    at _ZoneDelegate.Object.<anonymous>._ZoneDelegate.invoke (/home/mansurshaik/Desktop/Office/projects/igot/igot-mdo-sunbird-cb-orgportal/node_modules/zone.js/bundles/zone.umd.js:410:56)
+    at Zone.Object.<anonymous>.Zone.run (/home/mansurshaik/Desktop/Office/projects/igot/igot-mdo-sunbird-cb-orgportal/node_modules/zone.js/bundles/zone.umd.js:165:47)
+    at Object.wrappedFunc (/home/mansurshaik/Desktop/Office/projects/igot/igot-mdo-sunbird-cb-orgportal/node_modules/zone.js/bundles/zone-testing.umd.js:789:34)
+    at Promise.then.completed (/home/mansurshaik/Desktop/Office/projects/igot/igot-mdo-sunbird-cb-orgportal/node_modules/jest-circus/build/utils.js:298:28)
+    at new Promise (<anonymous>)
+    at callAsyncCircusFn (/home/mansurshaik/Desktop/Office/projects/igot/igot-mdo-sunbird-cb-orgportal/node_modules/jest-circus/build/utils.js:231:10)
+    at _callCircusTest (/home/mansurshaik/Desktop/Office/projects/igot/igot-mdo-sunbird-cb-orgportal/node_modules/jest-circus/build/run.js:316:40)
+    at processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at _runTest (/home/mansurshaik/Desktop/Office/projects/igot/igot-mdo-sunbird-cb-orgportal/node_modules/jest-circus/build/run.js:252:3)
+    at _runTestsForDescribeBlock (/home/mansurshaik/Desktop/Office/projects/igot/igot-mdo-sunbird-cb-orgportal/node_modules/jest-circus/build/run.js:126:9)
+    at _runTestsForDescribeBlock (/home/mansurshaik/Desktop/Office/projects/igot/igot-mdo-sunbird-cb-orgportal/node_modules/jest-circus/build/run.js:121:9)
+    at _runTestsForDescribeBlock (/home/mansurshaik/Desktop/Office/projects/igot/igot-mdo-sunbird-cb-orgportal/node_modules/jest-circus/build/run.js:121:9)
+    at run (/home/mansurshaik/Desktop/Office/projects/igot/igot-mdo-sunbird-cb-orgportal/node_modules/jest-circus/build/run.js:71:3)
+    at runAndTransformResultsToJestFormat (/home/mansurshaik/Desktop/Office/projects/igot/igot-mdo-sunbird-cb-orgportal/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapterInit.js:122:21)]]></failure>
+    </testCase>
+    <testCase name="ViewerTocComponent minimizenav should emit false when minimizenav is called" duration="1"/>
+    <testCase name="ViewerTocComponent hasNestedChild should return true for nodes with children" duration="1"/>
+    <testCase name="ViewerTocComponent hasNestedChild should return false for nodes without children" duration="1"/>
+    <testCase name="ViewerTocComponent ngOnDestroy should unsubscribe from subscriptions" duration="1"/>
+  </file>
+</testExecutions>
