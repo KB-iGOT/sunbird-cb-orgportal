@@ -125,12 +125,15 @@ export class NewExternalTrainingComponent implements OnInit {
   }
 
   private isValidFile(file: File): boolean {
-    return file.name.toLowerCase().endsWith('.svg') || file.type === 'image/svg+xml'
+    const validTypes = ['image/png', 'image/jpeg', 'image/svg+xml']
+    const validExtensions = ['.png', '.jpg', '.jpeg', '.svg']
+    const extension = file.name.toLowerCase().slice(file.name.lastIndexOf('.'))
+    return validTypes.includes(file.type) || validExtensions.includes(extension)
   }
 
   private handleLogoUpload(file: File): void {
     if (!this.isValidFile(file)) {
-      this.openSnackbar('Please upload a valid SVG file.')
+      this.openSnackbar('Please upload a valid SVG, PNG, JPG, or  JPEG file.')
       return
     }
 
@@ -140,9 +143,8 @@ export class NewExternalTrainingComponent implements OnInit {
     }
 
     const fileName = file.name
-    // const uploadedDate = new Date().toLocaleDateString()
+    const isSvg = file.type === 'image/svg+xml' || file.name.toLowerCase().endsWith('.svg')
 
-    // Read file as data URL for preview
     const reader = new FileReader()
     reader.onload = (event) => {
       const imageData = event.target?.result
@@ -152,7 +154,13 @@ export class NewExternalTrainingComponent implements OnInit {
       this.selectedLogoImage = imageData || null
       this.mergeLogo()
     }
-    reader.readAsDataURL(file)
+    // SVG: read as text so it can be parsed and embedded as vector nodes.
+    // PNG/JPEG: read as data URL to embed via <image href>.
+    if (isSvg) {
+      reader.readAsText(file)
+    } else {
+      reader.readAsDataURL(file)
+    }
   }
 
   private mergeLogo(): void {
@@ -164,23 +172,8 @@ export class NewExternalTrainingComponent implements OnInit {
       const certificateReader = new FileReader()
       certificateReader.onload = (certEvent) => {
         const certificateSvgContent = certEvent.target?.result as string
-
-        // If selectedLogoImage is a data URL, we need to convert it
-        if (typeof this.selectedLogoImage === 'string' && this.selectedLogoImage.startsWith('data:')) {
-          // Extract the base64 content and decode it
-          const base64Content = this.selectedLogoImage.split(',')[1]
-          const binaryString = atob(base64Content)
-          const bytes = new Uint8Array(binaryString.length)
-          for (let i = 0; i < binaryString.length; i++) {
-            bytes[i] = binaryString.charCodeAt(i)
-          }
-          const logoBlob = new Blob([bytes])
-          const logoReader = new FileReader()
-          logoReader.onload = (logoEvent) => {
-            this.processMergeLogo(certificateSvgContent, logoEvent.target?.result as string)
-          }
-          logoReader.readAsText(logoBlob)
-        }
+        const logoDataUrl = this.selectedLogoImage as string
+        this.processMergeLogo(certificateSvgContent, logoDataUrl)
       }
       certificateReader.readAsText(this.originalContentFile)
     } catch (error: any) {
@@ -217,116 +210,88 @@ export class NewExternalTrainingComponent implements OnInit {
     }
   }
 
-  // Extracts the logo and places it at the ProvidersLogo_Placement location in the certificate
-  private updateCertificateWithLogo(certificateSvgContent: string, logoSvgContent: string): string {
+  // Embeds the uploaded logo at the ProvidersLogo_Placement location in the certificate SVG.
+  // For SVG logos: parses and embeds as vector child nodes with transform.
+  // For PNG/JPEG logos: embeds as an SVG <image> element using the data URL.
+  private updateCertificateWithLogo(certificateSvgContent: string, logoData: string): string {
     const parser = new DOMParser()
-    const certDoc = parser.parseFromString(certificateSvgContent, 'image/svg+xml')
+    // Use text/html for lenient parsing — avoids strict XML errors from HTML entities.
+    const htmlDoc = parser.parseFromString(certificateSvgContent, 'text/html')
+    const certSvgEl = htmlDoc.querySelector('svg')
 
-    // Check for parsing errors in certificate
-    if (certDoc.querySelector('parsererror')) {
+    if (!certSvgEl) {
       this.openSnackbar('Error parsing certificate SVG', 'close')
       return ''
     }
 
     // Find the ProvidersLogo_Placement group
-    let logoGroup = certDoc.getElementById('ProvidersLogo_Placement')
+    let logoGroup = htmlDoc.getElementById('ProvidersLogo_Placement')
     if (!logoGroup) {
-      logoGroup = certDoc.querySelector('[id="ProvidersLogo_Placement"]')
+      logoGroup = htmlDoc.querySelector('[id="ProvidersLogo_Placement"]')
     }
     if (!logoGroup) {
-      logoGroup = certDoc.querySelector('g[id*="ProvidersLogo_Placement"]')
+      logoGroup = htmlDoc.querySelector('g[id*="ProvidersLogo_Placement"]')
     }
 
-    // Parse the new logo SVG
-    const logoDoc = parser.parseFromString(logoSvgContent, 'image/svg+xml')
-    if (logoDoc.querySelector('parsererror')) {
-      this.openSnackbar('Error parsing logo SVG', 'close')
-      return ''
-    }
-
-    const logoSvg = logoDoc.querySelector('svg')
-    if (!logoSvg) {
-      this.openSnackbar('Invalid logo SVG structure: No <svg> tag found', 'close')
-      return ''
-    }
-
-    // Create a new group for the logo
-    const newLogoGroup = certDoc.createElementNS('http://www.w3.org/2000/svg', 'g')
+    const newLogoGroup = htmlDoc.createElementNS('http://www.w3.org/2000/svg', 'g')
     newLogoGroup.setAttribute('id', 'ProvidersLogo_Placement')
 
-    // --- Dimension Extraction & Alignment Logic ---
-    const viewBox = logoSvg.getAttribute('viewBox')
-    let minX = 0, minY = 0, logoWidth = 100, logoHeight = 100
-
-    if (viewBox) {
-      const vbParts = viewBox.split(/[\s,]+/).map(parseFloat)
-      if (vbParts.length >= 4) {
-        minX = vbParts[0]
-        minY = vbParts[1]
-        logoWidth = vbParts[2]
-        logoHeight = vbParts[3]
-      }
+    if (logoData.startsWith('data:')) {
+      // --- Raster (PNG/JPEG): embed as SVG <image> with data URL ---
+      const imageEl = htmlDoc.createElementNS('http://www.w3.org/2000/svg', 'image')
+      imageEl.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:href', logoData)
+      imageEl.setAttribute('href', logoData)
+      imageEl.setAttribute('x', String(this.TARGET_X_START))
+      imageEl.setAttribute('y', String(this.TARGET_Y_CENTER - this.TARGET_HEIGHT / 2))
+      imageEl.setAttribute('height', String(this.TARGET_HEIGHT))
+      imageEl.setAttribute('preserveAspectRatio', 'xMidYMid meet')
+      newLogoGroup.appendChild(imageEl)
     } else {
-      // Fallback to width/height attributes if viewBox is missing
-      const wAttr = logoSvg.getAttribute('width')
-      const hAttr = logoSvg.getAttribute('height')
+      // --- SVG: parse and embed vector child nodes with scale/translate transform ---
+      const logoHtmlDoc = parser.parseFromString(logoData, 'text/html')
+      const logoSvgEl = logoHtmlDoc.querySelector('svg')
 
-      // Attempt to parse pixel values, ignoring 'px'
-      logoWidth = wAttr ? parseFloat(wAttr) : 100
-      logoHeight = hAttr ? parseFloat(hAttr) : 100
-    }
+      if (!logoSvgEl) {
+        this.openSnackbar('Invalid SVG logo: no <svg> element found', 'close')
+        return ''
+      }
 
-    // 1. Calculate Scale to match target height
-    if (logoHeight === 0) logoHeight = 100
-    const scale = this.TARGET_HEIGHT / logoHeight
+      const viewBox = logoSvgEl.getAttribute('viewBox')
+      let minX = 0, minY = 0, logoHeight = 100
 
-    // 2. Calculate Translate X
-    // Rendered Left = (minX * scale) + tx => tx = TargetLeft - (minX * scale)
-    const tx = this.TARGET_X_START - (minX * scale)
-
-    // 3. Calculate Translate Y
-    // Rendered Center Y = ((minY + height/2) * scale) + ty => ty = TargetCenterY - (LocalCenterY * scale)
-    const localCenterY = minY + (logoHeight / 2)
-    const ty = this.TARGET_Y_CENTER - (localCenterY * scale)
-
-    const newTransform = `translate(${tx.toFixed(2)}, ${ty.toFixed(2)}) scale(${scale.toFixed(4)})`
-    newLogoGroup.setAttribute('transform', newTransform)
-
-    // We clone nodes to avoid modifying the parsed source logic references directly during iteration
-    const logoChildren = Array.from(logoSvg.childNodes)
-
-    for (const child of logoChildren) {
-      if (child.nodeType === 1) {
-        const importedNode = certDoc.importNode(child, true) as Element
-
-        if (importedNode.tagName.toLowerCase() === 'svg') {
-          if (!importedNode.getAttribute('width')) {
-            importedNode.setAttribute('width', logoWidth.toString())
-          }
-          if (!importedNode.getAttribute('height')) {
-            importedNode.setAttribute('height', logoHeight.toString())
-          }
-          if (!importedNode.getAttribute('viewBox') && viewBox) {
-            importedNode.setAttribute('viewBox', viewBox)
-          }
+      if (viewBox) {
+        const vbParts = viewBox.split(/[\s,]+/).map(parseFloat)
+        if (vbParts.length >= 4) {
+          minX = vbParts[0]; minY = vbParts[1]
+          logoHeight = vbParts[3]
         }
+      } else {
+        logoHeight = parseFloat(logoSvgEl.getAttribute('height') || '100')
+      }
 
-        newLogoGroup.appendChild(importedNode)
+      if (logoHeight === 0) logoHeight = 100
+      const scale = this.TARGET_HEIGHT / logoHeight
+      const tx = this.TARGET_X_START - (minX * scale)
+      const localCenterY = minY + (logoHeight / 2)
+      const ty = this.TARGET_Y_CENTER - (localCenterY * scale)
+
+      newLogoGroup.setAttribute('transform', `translate(${tx.toFixed(2)}, ${ty.toFixed(2)}) scale(${scale.toFixed(4)})`)
+
+      for (const child of Array.from(logoSvgEl.childNodes)) {
+        if (child.nodeType === 1) {
+          newLogoGroup.appendChild(htmlDoc.importNode(child, true))
+        }
       }
     }
 
     if (logoGroup && logoGroup.parentNode) {
       logoGroup.parentNode.replaceChild(newLogoGroup, logoGroup)
     } else {
-      // If no existing group, append to the root SVG element
-      const rootSvg = certDoc.querySelector('svg')
-      if (rootSvg) {
-        rootSvg.appendChild(newLogoGroup)
-      }
+      certSvgEl.appendChild(newLogoGroup)
     }
 
     const serializer = new XMLSerializer()
-    return serializer.serializeToString(certDoc)
+    return serializer.serializeToString(certSvgEl)
   }
 
   removeUploadedLogo(): void {
