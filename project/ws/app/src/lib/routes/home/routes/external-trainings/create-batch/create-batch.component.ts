@@ -90,8 +90,8 @@ export class CreateBatchComponent implements OnInit {
   initializeForm(): void {
     this.batchForm = this.fb.group({
       // tslint:disable-next-line: max-line-length
-      // batchName: ['', [Validators.required, Validators.minLength(10), Validators.maxLength(70), Validators.pattern(this.noSpecialChar)]],
-      batchName: ['', [Validators.required]],
+      batchName: ['', [Validators.required, Validators.maxLength(100)]],
+      //batchName: ['', [Validators.required]],
       startDate: ['', [Validators.required]],
       endDate: ['', [Validators.required, endDateValidator()]],
     })
