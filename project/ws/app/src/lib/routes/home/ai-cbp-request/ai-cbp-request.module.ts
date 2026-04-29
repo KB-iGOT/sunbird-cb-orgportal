@@ -10,7 +10,7 @@ import { MatMenuModule } from '@angular/material/menu'
 
 
 import { AICBPRequestRoutingModule } from './ai-cbp-request.routing.module'
-import { AcbpAiLibModule } from 'sb-cb-ui-acbp-ai'
+import { AiCbpModule } from '@sunbird-cb/cbp-ai'
 import { RouterModule } from '@angular/router'
 import { AICBPRequestListComponent } from './components/ai-cbp-request-list/ai-cbp-request-list.component'
 import { AICBPRequestComponent } from './ai-cbp-request.component'
@@ -18,12 +18,12 @@ import { AICBPRequestComponent } from './ai-cbp-request.component'
 
 @NgModule({
   declarations: [AICBPRequestComponent, AICBPRequestListComponent],
-  imports: [CommonModule, AICBPRequestRoutingModule, RouterModule, AcbpAiLibModule, MatTableModule,
+  imports: [CommonModule, AICBPRequestRoutingModule, RouterModule, AiCbpModule, MatTableModule,
     MatPaginatorModule,
     MatCardModule,
     MatButtonModule,
     MatIconModule,
     MatMenuModule],
-  exports: [AcbpAiLibModule]
+  exports: [AiCbpModule]
 })
 export class AICBPRequestModule { }

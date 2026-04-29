@@ -1,0 +1,187 @@
+@import "ws-vars";
+
+.treemode-slider {
+  text-align: right;
+  padding-right: $size-m;
+}
+
+.flat-list-content-title {
+  height: 40px;
+  display: flex;
+  align-items: center;
+}
+
+.leaf-node {
+  // padding-left: $size-m;
+}
+
+.toc-tree-invisible {
+  display: none;
+}
+
+.margin-0 {
+  margin: 0 !important;
+}
+
+.toc-tree {
+  padding-inline-start: 0px;
+
+  ul,
+  li {
+    margin-top: 0;
+    margin-bottom: 0;
+    list-style-type: none;
+  }
+}
+
+.content-active {
+  // background-color: #fff !important;
+  color: #000 !important;
+  // border: 1px solid #ccc
+}
+
+.content-duration {
+  margin: 0 $size-xs;
+}
+
+app-content-icon {
+  vertical-align: middle;
+  margin-right: $size-xs;
+}
+
+.completed-icon {
+  color: green;
+}
+
+.height-auto {
+  height: auto !important;
+  margin: auto;
+}
+
+.pad-ztb {
+  padding: #{$size-s / 4} 0 #{$size-s / 4} 0;
+  border-bottom: 0.5px solid;
+}
+
+.flat-list-content {
+  display: flex;
+  align-items: center;
+}
+
+.viewer-toc-thumbnail {
+  height: 40px !important;
+  width: 70px !important;
+}
+
+.viewer-toc-header-thumbnail {
+  height: 73px !important;
+  width: 130px !important;
+}
+
+.width-expand {
+  flex: 1;
+  min-width: 1px;
+}
+
+.align-self-start {
+  align-self: start;
+}
+
+.align-self-center {
+  align-self: center;
+}
+
+.resource-container {
+  display: flex !important;
+  align-items: center;
+  justify-content: space-between;
+  // margin: $size-s 0;
+  padding: 0 $size-s 0 0;
+  width: 100%;
+
+  ws-display-content-type-icon {
+    display: flex;
+    align-items: center;
+  }
+
+  .resource-meta {
+    margin-left: $size-s;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+}
+
+.module-container {
+  display: flex !important;
+  align-items: center;
+  justify-content: space-between;
+  margin: $size-s 0;
+  padding: 0;
+  width: 100%;
+
+  ws-display-content-type-icon {
+    display: flex;
+    align-items: center;
+  }
+
+  .resource-meta {
+    margin-left: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+}
+
+.width-max-content {
+  width: max-content;
+}
+
+.margin-left-xxs {
+  margin-left: 4px;
+}
+
+::ng-deep .active-node {
+  background-color: #fff !important;
+  color: #000 !important;
+  border: 1px solid #ccc
+}
+
+.toc-tree .mat-nested-tree-node {
+  border: 1px solid rgba(0, 0, 0, 0.16);
+  background: #fff;
+}
+
+.toc-tree .mat-nested-tree-node .mat-tree-node {
+  padding: 10px
+}
+
+.toc-tree .mat-tree-node {
+  // padding: 10px;
+  background: #fff;
+  margin: 10px 0
+}
+
+.toc-tree .mat-tree {
+  background-color: transparent !important;
+}
+
+.toc-tree ul.child-node-tree {
+  padding: 0;
+  margin: 0;
+  border: 1px solid rgb(0, 0, 0, 0.16)
+}
+
+.toc-tree .child-node-tree .mat-tree-node {
+  padding: 0;
+  border: none;
+  background: transparent;
+}
+
+.custom-icon {
+  color: #1a4ca1 !important;
+}
+
+.disabled {
+  cursor: default;
+}

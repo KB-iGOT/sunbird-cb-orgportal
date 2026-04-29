@@ -1,0 +1,137 @@
+<div class="create-batch-container">
+  <!-- Header -->
+  <div class="header">
+    <button mat-icon-button class="back-button" (click)="goBack()">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <div class="header-content">
+      <h1 class="title">Upload External Training Details</h1>
+      <p class="subtitle">Provide training information and bulk upload participant records.</p>
+    </div>
+  </div>
+
+  <!-- Batch Details Card -->
+  <div class="batch-details-card">
+    <h2 class="section-title">Batch Details</h2>
+
+    <form [formGroup]="batchForm" *ngIf="batchForm">
+      <div class="form-row">
+        <!-- Batch Name -->
+        <div class="flex flex-column gap-2 event-form round-control">
+          <div class="form-lable required">Batch Name</div>
+          <mat-form-field appearance="outline" class="disable-round">
+            <input matInput placeholder="Enter the batch name (e.g., Q3 Leadership Training)"
+              formControlName="batchName" [readonly]="isEditMode" />
+            <!-- <mat-hint align="end">{{batchForm.get('batchName')?.value?.length || 0}}/70</mat-hint> -->
+            <mat-error
+              *ngIf="!isEditMode && batchForm.get('batchName')?.touched && batchForm.get('batchName')?.hasError('required')">
+              Batch name is required.
+            </mat-error>
+            <!-- <mat-error
+              *ngIf="!isEditMode && batchForm.get('batchName')?.touched && batchForm.get('batchName')?.hasError('pattern')">
+              Only {{specialCharList}} characters are supported.
+            </mat-error>
+            <mat-error
+              *ngIf="!isEditMode && batchForm.get('batchName')?.touched && !batchForm.get('batchName')?.hasError('pattern') && batchForm.get('batchName')?.hasError('minlength')">
+              Minimum characters left to create {{ 10 - batchForm.get('batchName')?.value?.length }}
+            </mat-error>
+            <mat-error
+              *ngIf="!isEditMode && batchForm.get('batchName')?.touched && !batchForm.get('batchName')?.hasError('pattern') && batchForm.get('batchName')?.hasError('maxlength')">
+              Batch name cannot exceed 70 characters.
+            </mat-error> -->
+          </mat-form-field>
+        </div>
+
+        <!-- Start Date -->
+        <div class="flex flex-column gap-2 event-form round-control">
+          <div class="form-lable required">Start Date</div>
+          <mat-form-field appearance="outline" class="disable-round">
+            <input matInput [matDatepicker]="startPicker" [max]="endDateAsDate || todayDate" formControlName="startDate"
+              placeholder="dd/mm/yyyy" readonly />
+            <mat-datepicker-toggle matSuffix [for]="startPicker"></mat-datepicker-toggle>
+            <mat-datepicker #startPicker [disabled]="isEditMode"></mat-datepicker>
+            <mat-error
+              *ngIf="!isEditMode && batchForm.get('startDate')?.touched && batchForm.get('startDate')?.hasError('required')">
+              Start date is required.
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <!-- End Date -->
+        <div class="flex flex-column gap-2 event-form round-control">
+          <div class="form-lable required">End Date</div>
+          <mat-form-field appearance="outline" class="disable-round">
+            <input matInput [matDatepicker]="endPicker" [min]="startDateAsDate" [max]="todayDate"
+              formControlName="endDate" placeholder="dd/mm/yyyy" readonly />
+            <mat-datepicker-toggle matSuffix [for]="endPicker"></mat-datepicker-toggle>
+            <mat-datepicker #endPicker [disabled]="isEditMode"></mat-datepicker>
+            <mat-error
+              *ngIf="!isEditMode && batchForm.get('endDate')?.touched && batchForm.get('endDate')?.hasError('required')">
+              End date is required.
+            </mat-error>
+            <mat-error
+              *ngIf="!isEditMode && batchForm.get('endDate')?.touched && batchForm.get('endDate')?.hasError('endBeforeStart')">
+              End date cannot be before start date.
+            </mat-error>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <!-- Instructions and File Upload Section -->
+      <div class="flex flex-row gap-8 upload-section">
+        <div class="flex-1">
+          <div class="flex flex-col gap-3 dashed-card">
+            <div><strong>Open & follow these instructions</strong></div>
+            <div class="flex flex-col gap-4">
+              <ol class="custom-ol">
+                <li>Keep the row of the items you wish to process.</li>
+                <li>Delete the entire row you do not intend to process.</li>
+                <li>A maximum of 200 user records can be uploaded in a single batch.</li>
+                <li>To upload additional users, please create a new batch.</li>
+              </ol>
+            </div>
+            <div class="flex flex-row gap-6">
+              <button type="button" class="outline-button" (click)="downloadSampleFile()">Download Sample File</button>
+            </div>
+          </div>
+        </div>
+        <div class="flex-1">
+          <div class="flex flex-col gap-2 dashed-card items-center">
+            <div class="flex cursor-pointer margin-top-m" (click)="fileInput.click()">
+              <img src="/assets/icons/csv-file.svg" alt="CSV file logo" />
+            </div>
+            <div *ngIf="showFileError" class="error-msg">Upload csv format file only</div>
+            <div class="flex flex-col items-center">
+              <div class="text-primary cursor-pointer" (click)="fileInput.click()">Browse files</div>
+              <input hidden type="file" #fileInput (change)="onFileSelected($event)" accept=".csv" />
+            </div>
+            <div class="flex flex-col items-center margin-bottom-m">
+              <div class="flex">Max file size: 100 MB</div>
+              <div class="flex">Supported file types: CSV</div>
+            </div>
+
+            <div *ngIf="uploadedFile" class="uploaded-file-info">
+              <mat-icon>description</mat-icon>
+              <span class="file-name">{{ uploadedFile.name }}</span>
+              <button mat-icon-button (click)="removeFile()">
+                <mat-icon>close</mat-icon>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+
+    <div class="action-buttons mt-4">
+      <button mat-stroked-button class="cancel-batch" (click)="onCancel()">
+        Cancel
+      </button>
+      <button mat-raised-button color="primary" class="submit-batch" [disabled]="isSubmitDisabled" (click)="onSubmit()">
+        Submit
+      </button>
+    </div>
+  </div>
+
+  <!-- Action Buttons -->
+
+</div>

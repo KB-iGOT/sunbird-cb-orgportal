@@ -35,6 +35,8 @@ import { MyNotificationsComponent } from './routes/my-notifications/my-notificat
 import { FormDataResolverService } from './resolvers/form-data-resolver.service'
 import { DirectoryComponent } from './routes/directory/directory.component'
 import { OrganisationUsersComponent } from './routes/directory/organisation-users/organisation-users.component'
+import { ExploreContentComponent } from './routes/explore-content/explore-content.component'
+import { PreviewComponent } from './routes/explore-content/preview/preview.component'
 const routes: Routes = [
   {
     path: '',
@@ -341,6 +343,16 @@ const routes: Routes = [
         path: 'custom-fields',
         loadChildren: () => import('./routes/custom-forms/custom-forms.module').then(m => m.CustomFormsModule),
       },
+      // {
+      //   path: 'achievement-approvals',
+      //   loadChildren: () => import('./routes/achievement-approvals/achievement-approvals.module').then(m => m.AchievementApprovalsModule),
+      // },
+
+      {
+        path: 'external-trainings',
+        loadChildren: () => import('./routes/external-trainings/external-trainings.module').then(m => m.ExternalTrainingsModule),
+      },
+
       {
         path: 'events',
         loadChildren: () => import('./routes/events-2/events-2.module').then(m => m.Events2Module),
@@ -421,6 +433,41 @@ const routes: Routes = [
         loadChildren: () => import('./routes/designation/designation.module').then(m => m.DesignationModule),
       },
       {
+        path: 'explore-content',
+        component: ExploreContentComponent,
+        data: {
+          pageId: 'home/explore-content',
+          module: 'explore-content',
+          pageType: 'feature',
+          pageKey: 'explore-content',
+        },
+        resolve: {
+          configService: ConfigResolveService,
+          pageData: PageResolve,
+        },
+      },
+      {
+        path: 'explore-content/:identifier/preview',
+        component: PreviewComponent,
+        data: {
+          pageId: 'home/explore-content/:identifier/preview',
+          module: 'explore-content',
+          pageType: 'feature',
+          pageKey: 'explore-content-preview',
+        },
+        resolve: {
+          configService: ConfigResolveService,
+        },
+      },
+      {
+        path: 'explore-content/viewer',
+        loadChildren: () => import('@ws/viewer').then(m => m.ViewerModule),
+        data: {
+          pageId: 'home/explore-content/viewer',
+          module: 'explore-content',
+        },
+      },
+      {
         path: 'odcs-mapping',
         component: OdcsMappingComponent,
         data: {
@@ -479,6 +526,16 @@ const routes: Routes = [
       {
         path: 'ai-cbp-requests',
         loadChildren: () => import('./ai-cbp-request/ai-cbp-request.module').then(m => m.AICBPRequestModule),
+      },
+      {
+        path: 'peer-validation',
+        loadChildren: () => import('./routes/peer-validation/peer-validation.module').then(m => m.PeerValidationModule),
+        data: {
+          pageKey: 'peer-validation',
+        },
+        resolve: {
+          configService: ConfigResolveService,
+        },
 
       },
     ],

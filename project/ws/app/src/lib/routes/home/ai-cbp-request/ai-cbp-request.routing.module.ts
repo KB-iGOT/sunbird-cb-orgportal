@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core'
 import { Routes, RouterModule } from '@angular/router'
-import { AcbpAiLibComponent, RoleMappingListComponent } from 'sb-cb-ui-acbp-ai'
+import { AiCbpComponent, RoleMappingListComponent } from '@sunbird-cb/cbp-ai'
 import { PageResolve } from '@sunbird-cb/utils-v2'
 import { ConfigResolveService } from '../resolvers/config-resolve.service'
 import { AICBPRequestListComponent } from './components/ai-cbp-request-list/ai-cbp-request-list.component'
@@ -17,7 +17,7 @@ const routes: Routes = [
       },
       {
         path: 'acbp-list',
-        component: AcbpAiLibComponent,
+        component: AiCbpComponent,
         children: [
           { path: '', component: RoleMappingListComponent, resolve: { parentData: AICBPConfigResolver } },
 

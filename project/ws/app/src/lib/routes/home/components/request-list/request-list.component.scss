@@ -273,8 +273,18 @@ table tr .row-heading {
       /* stylelint-enable */
       font-weight: 700;
       font-size: 14px;
-      border-radius: 4px;
-      min-width: 179px;
+      border-radius: 24px;
+  }
+  .explore-btn {
+      background: #ffffff !important;
+      color: #1b4ca1 !important;
+      border: 1px solid #1b4ca1 !important;
+      /* stylelint-disable */
+      font-family: 'Lato';
+      /* stylelint-enable */
+      font-weight: 700;
+      font-size: 14px;
+      border-radius: 24px;
   }
 }
 

@@ -56,9 +56,9 @@
       Event Name
     </div>
     <mat-form-field appearance="outline" class="disable-round">
-      <input matInput placeholder="Add your event name" formControlName="eventName" maxlength="70">
+      <input matInput placeholder="Add your event name" formControlName="eventName" maxlength="90">
       <mat-hint>Only ( a-z/A-Z , 0-9 . - _ $ / : [ ]' ' " "!) characters are supported</mat-hint>
-      <mat-hint align="end" class="text-sm">{{eventDetails?.controls['eventName']?.value?.length}}/70</mat-hint>
+      <mat-hint align="end" class="text-sm">{{eventDetails?.controls['eventName']?.value?.length}}/90</mat-hint>
       <mat-error *ngIf="showValidationMsg('eventName','required')">
         Event name is mandatory
       </mat-error>
@@ -95,13 +95,13 @@
       <div class="form-lable required flex flex-middle gap-1">
         Maximum participants allowed
         <mat-icon class="cursor-pointer info-icon"
-          matTooltip="Maximum Participant : 200, Minimum Participant : 10.">info_outline</mat-icon>
+          matTooltip="Maximum Participant : 10000, Minimum Participant : 10.">info_outline</mat-icon>
       </div>
       <ng-container *ngIf="eventDetails?.controls?.maxEnrolments; else maxFallback">
         <mat-form-field appearance="outline" class="disable-round">
           <input matInput type="number"
-            placeholder="Enter number only. Minimum allowed is 10 and Maximum allowed is 200."
-            formControlName="maxEnrolments" min="10" max="200" step="1" inputmode="numeric" pattern="[0-9]*"
+            placeholder="Enter number only. Minimum allowed is 10 and Maximum allowed is 10000."
+            formControlName="maxEnrolments" min="10" max="10000" step="1" inputmode="numeric" pattern="[0-9]*"
             (keypress)="allowNumbers($event)" (paste)="onPasteNumber($event)">
           <mat-error *ngIf="showValidationMsg('maxEnrolments','required')">
             Maximum participants is mandatory
@@ -110,7 +110,7 @@
             Minimum 10 participants required
           </mat-error>
           <mat-error *ngIf="showValidationMsg('maxEnrolments','max')">
-            Maximum 200 participants allowed
+            Maximum 10000 participants allowed
           </mat-error>
         </mat-form-field>
       </ng-container>
@@ -156,11 +156,18 @@
         or Upload from URL
       </div>
       <mat-form-field appearance="outline" class="disable-round">
-        <input matInput placeholder="Enter url" formControlName="registrationLink">
+        <input matInput
+          [placeholder]="edf?.typeofEvent?.value?.toLowerCase() === 'record' ? 'Enter YouTube URL' : 'Enter url'"
+          formControlName="registrationLink">
         <mat-error *ngIf="showValidationMsg('registrationLink','required')">
           Resource is mandatory
         </mat-error>
-        <mat-error *ngIf="showValidationMsg('registrationLink','pattern')">
+        <mat-error
+          *ngIf="showValidationMsg('registrationLink','pattern') && edf?.typeofEvent?.value?.toLowerCase() === 'record'">
+          Please provide a valid YouTube or embedded YouTube URL
+        </mat-error>
+        <mat-error
+          *ngIf="showValidationMsg('registrationLink','pattern') && edf?.typeofEvent?.value?.toLowerCase() !== 'record'">
           Please give valid URL
         </mat-error>
       </mat-form-field>
@@ -199,15 +206,18 @@
           minutes</mat-hint>
       </mat-form-field>
     </div>
-    <div class="flex flex-column gap-2 event-form w-full" [ngClass]="{'disableForm': uploadedVideoDuration > 0}">
+    <div class="flex flex-column gap-2 event-form w-full"
+      [ngClass]="{'disableForm': uploadedVideoDuration > 0 && uploadedVideoDuration < 15}">
       <div class="form-lable required">
         End Time
       </div>
       <mat-form-field appearance="outline" class="disable-round">
         <input matInput placeholder="Enter End Time" formControlName="endTime" [ngxTimepicker]="endTimepicker"
-          [min]="minTimeToEnd" readonly>
-        <ngx-material-timepicker-toggle [for]="endTimepicker" matSuffix></ngx-material-timepicker-toggle>
-        <ngx-material-timepicker #endTimepicker (change)="onEndTimeChange($event)"></ngx-material-timepicker>
+          [min]="minTimeToEnd" [disabled]="uploadedVideoDuration > 0 && uploadedVideoDuration < 15"
+          [disableClick]="uploadedVideoDuration > 0 && uploadedVideoDuration < 15" readonly>
+        <ngx-material-timepicker-toggle [for]="endTimepicker" matSuffix
+          [disabled]="uploadedVideoDuration > 0 && uploadedVideoDuration < 15"></ngx-material-timepicker-toggle>
+        <ngx-material-timepicker #endTimepicker></ngx-material-timepicker>
         <mat-error *ngIf="showValidationMsg('endTime','required')">
           End time is mandatory
         </mat-error>
@@ -222,9 +232,9 @@
       </div>
     </div>
     <mat-radio-group aria-label="Select an option" class="flex" formControlName="typeofEvent">
-      <mat-radio-button class="mr-5 p-4" value="live" *ngIf="checkIfSCEvent()">
+      <!-- <mat-radio-button class="mr-5 p-4" value="live" *ngIf="checkIfSCEvent()">
         Live Event
-      </mat-radio-button>
+      </mat-radio-button> -->
       <mat-radio-button class="mr-5 p-4" value="record" *ngIf="edf?.typeofEvent?.value?.toLowerCase() === 'record'">
         Recorded Event
       </mat-radio-button>

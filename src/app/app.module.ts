@@ -28,8 +28,8 @@ import { MatLegacyTooltipModule as MatTooltipModule } from '@angular/material/le
 import { BrowserModule } from '@angular/platform-browser'
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
 import {
-  TourModule,
-  WIDGET_REGISTRATION_CONFIG, PipeContentRoutePipe, StickyHeaderModule,
+  WIDGET_REGISTRATION_CONFIG, TourModule,
+  PipeContentRoutePipe, StickyHeaderModule,
   AtGlanceModule,
   AvatarPhotoModule,
   BtnAppsModule,
@@ -137,13 +137,15 @@ import { NotificationsService } from './services/notifications.service'
 import { MatSnackBarModule } from '@angular/material/snack-bar'
 import { TranslateModule, TranslateLoader, } from '@ngx-translate/core'
 import { TranslateHttpLoader } from '@ngx-translate/http-loader'
-import {
-  WIDGET_REGISTRATION_LIB_CONFIG,
-} from '@sunbird-cb/consumption'
 import { GlobalEventsService } from './services/global-events.service'
 /** Collection Library Modules */
 
 import { SearchListingModule } from '@sunbird-cb/search-listing'
+import { WIDGET_REGISTERED_LIB_MODULES, WIDGET_REGISTRATION_TOC_LIB_CONFIG } from '@sunbird-cb/toc'
+import { WIDGET_REGISTRATION_LIB_CONFIG } from '@sunbird-cb/consumption'
+import { WidgetResolverModule } from '@sunbird-cb/resolver'
+import { WidgetCommunityHomeModule } from '@sunbird-cb/discussion-v2'
+
 
 // @Injectable()
 // export class HammerConfig extends GestureConfig {
@@ -194,7 +196,6 @@ export function HttpLoaderFactory(http: HttpClient) {
     BrowserAnimationsModule,
     // KeycloakAngularModule,
     AppRoutingModule,
-    SbUiResolverModule.forRoot([...WIDGET_REGISTRATION_CONFIG, ...WIDGET_REGISTRATION_LIB_CONFIG]),
     StickyHeaderModule,
     ErrorResolverModule,
     // Material Imports
@@ -293,6 +294,9 @@ export function HttpLoaderFactory(http: HttpClient) {
     BreadcrumbsOrgModule,
     AuthorCardModule,
     MatSnackBarModule,
+    ...WIDGET_REGISTERED_LIB_MODULES,
+    WidgetResolverModule.forRoot([...WIDGET_REGISTRATION_CONFIG, ...WIDGET_REGISTRATION_LIB_CONFIG, ...WIDGET_REGISTRATION_TOC_LIB_CONFIG]),
+    WidgetCommunityHomeModule,
     ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production }),
     NotificationDropdownModule,
     SearchListingModule,
@@ -303,6 +307,7 @@ export function HttpLoaderFactory(http: HttpClient) {
         deps: [HttpClient],
       },
     }),
+    SbUiResolverModule.forRoot([...WIDGET_REGISTRATION_CONFIG, ...WIDGET_REGISTRATION_LIB_CONFIG, ...WIDGET_REGISTRATION_TOC_LIB_CONFIG]),
   ],
   exports: [
     TncComponent,
