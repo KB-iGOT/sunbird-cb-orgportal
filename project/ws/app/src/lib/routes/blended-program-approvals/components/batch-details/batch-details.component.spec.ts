@@ -345,7 +345,8 @@ describe('BatchDetailsComponent', () => {
     describe('getNewRequestsList', () => {
         beforeEach(() => {
             component.batchData = { batchId: 'batch123' }
-            component.userProfile = { rootOrg: { orgName: 'Test Org' } }
+            component.userProfile = { channel: 'Test Org', rootOrg: { orgName: 'Test Org' } }
+            mockBpService.getRequests.mockClear()
         })
 
         it('should fetch new requests list', () => {
@@ -806,12 +807,154 @@ describe('BatchDetailsComponent', () => {
             component.actionsClick({ action: 'downloadReport' })
             expect(spy).toHaveBeenCalled()
         })
+
+        it('should do nothing for unknown action', () => {
+            const refreshSpy = jest.spyOn(component, 'getBpReportStatus')
+            const downloadSpy = jest.spyOn(component, 'downloadReport')
+            component.actionsClick({ action: 'unknownAction' })
+            expect(refreshSpy).not.toHaveBeenCalled()
+            expect(downloadSpy).not.toHaveBeenCalled()
+        })
     })
 
     describe('raiseTelemetry', () => {
         it('should raise telemetry event', () => {
             component.raiseTelemetry('test', 'subtype')
             expect(mockEvents.raiseInteractTelemetry).toHaveBeenCalled()
+        })
+    })
+
+    describe('getSessionDetails', () => {
+        it('should set sessionDetails from batchData batchAttributes', () => {
+            component.batchData = {
+                batchAttributes: {
+                    sessionDetails_v2: [{ id: 's1', title: 'Session 1' }],
+                },
+            }
+            component.getSessionDetails()
+            expect(component.sessionDetails).toEqual([{ id: 's1', title: 'Session 1' }])
+        })
+    })
+
+    describe('showError', () => {
+        it('should return false for untouched control', () => {
+            const result = component.showError('enroleType')
+            expect(result).toBe(false)
+        })
+
+        it('should return true for touched invalid control', () => {
+            component.contentForm.controls['enroleType'].markAsTouched()
+            component.contentForm.controls['enroleType'].setValue('')  // invalid (required)
+            const result = component.showError('enroleType')
+            expect(result).toBe(true)
+        })
+
+        it('should return false for touched valid control', () => {
+            component.contentForm.controls['enroleType'].markAsTouched()
+            component.contentForm.controls['enroleType'].setValue('Approved')
+            const result = component.showError('enroleType')
+            expect(result).toBe(false)
+        })
+
+        it('should return false for non-existent control', () => {
+            const result = component.showError('nonExistentField')
+            expect(result).toBe(false)
+        })
+    })
+
+    describe('selectedUsersData', () => {
+        it('should set displayedColumns and dataSource when valid event is passed', () => {
+            const event = {
+                columns: ['col1', 'col2'],
+                dataSource: [{ id: 1 }, { id: 2 }],
+            }
+            component.selectedUsersData(event)
+            expect(component.displayedColumnsForBulkRequestResponse).toEqual(['col1', 'col2'])
+            expect(component.bulkRequestResponseDataSource).toEqual([{ id: 1 }, { id: 2 }])
+        })
+
+        it('should not update when event is null', () => {
+            component.displayedColumnsForBulkRequestResponse = []
+            component.selectedUsersData(null)
+            expect(component.displayedColumnsForBulkRequestResponse).toEqual([])
+        })
+
+        it('should not update when columns is empty', () => {
+            component.displayedColumnsForBulkRequestResponse = []
+            component.selectedUsersData({ columns: [], dataSource: [{ id: 1 }] })
+            expect(component.displayedColumnsForBulkRequestResponse).toEqual([])
+        })
+    })
+
+    describe('getApprovalStatusList', () => {
+        beforeEach(() => {
+            component.batchData = { batchId: 'batch123' }
+            component.userProfile = { rootOrg: { orgName: 'Test Org' } }
+        })
+
+        it('should fetch approval status list', () => {
+            component.getApprovalStatusList()
+            expect(mockBpService.getSerchRequests).toHaveBeenCalled()
+        })
+    })
+
+    describe('getBpReportStatus', () => {
+        beforeEach(() => {
+            component.batchData = { batchId: 'batch123', name: 'Test Batch' }
+            component.programData = { identifier: 'program123' }
+            component.userDetails = { roles: ['MDO_ADMIN'], rootOrgId: 'org123' }
+        })
+
+        it('should fetch and set reportStatusList on success with completed status', async () => {
+            await component.getBpReportStatus()
+            expect(mockBpService.getBpReportStatusApi).toHaveBeenCalled()
+            expect(component.reportStatusList.length).toBe(1)
+            expect(component.reportStatusList[0].name).toBe('Enrollment Request Report')
+        })
+
+        it('should set fetchStatus false and clear list on null response', async () => {
+            mockBpService.getBpReportStatusApi.mockReturnValue(require('rxjs').of(null))
+            await component.getBpReportStatus()
+            expect(component.fetchStatus).toBe(false)
+            expect(component.reportStatusList).toEqual([])
+        })
+
+        it('should set empty reportStatusList when result is empty object', async () => {
+            mockBpService.getBpReportStatusApi.mockReturnValue(require('rxjs').of({ result: {} }))
+            await component.getBpReportStatus()
+            expect(component.reportStatusList).toEqual([])
+        })
+
+        it('should set refresh actions for in-progress status', async () => {
+            mockBpService.getBpReportStatusApi.mockReturnValue(require('rxjs').of({
+                result: {
+                    content: [{
+                        status: 'in-progress',
+                        lastReportGeneratedOn: '2023-01-01',
+                        downloadLink: 'http://example.com/gcpbpreports/report.xlsx'
+                    }]
+                }
+            }))
+            await component.getBpReportStatus()
+            expect(component.tabledata.actions.some((a: any) => a.name === 'refreshStatus')).toBe(true)
+        })
+    })
+
+    describe('filter - nominate-learner', () => {
+        it('should set currentFilter to nominate-learner', () => {
+            component.filter('nominate-learner')
+            expect(component.currentFilter).toBe('nominate-learner')
+        })
+    })
+
+    describe('getLearnersList', () => {
+        it('should set approvedUsers when response has learners', () => {
+            component.batchData = { batchId: 'batch123' }
+            component.userProfile = { channel: 'ch1' }
+            mockBpService.getLearnersWithoutOrg.mockReturnValue(require('rxjs').of([]))
+            component.getLearnersList()
+            expect(component.approvedUsers.length).toBe(1)
+            expect(component.clonedApprovedUsers.length).toBe(1)
         })
     })
 })

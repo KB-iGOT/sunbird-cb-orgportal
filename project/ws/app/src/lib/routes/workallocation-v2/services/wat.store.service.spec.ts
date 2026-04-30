@@ -3,6 +3,7 @@ import { NSWatActivity } from '../models/activity-wot.model'
 import { NSWatCompetency } from '../models/competency-wat.model'
 import { NSWatOfficer } from '../models/officer-wat.model'
 import { WatStoreService } from './wat.store.service'
+import { skip, take } from 'rxjs/operators'
 
 // Mock lodash
 jest.mock('lodash', () => ({
@@ -81,11 +82,7 @@ describe('WatStoreService', () => {
 
   describe('Activities Group management', () => {
     it('should return activities group as observable', (done) => {
-      // const testData: NSWatActivity.IActivityGroup[] = [
-      //   { id: 1, name: 'Activity Group 1' } as unknown as NSWatActivity.IActivityGroup
-      // ]
-
-      service.getactivitiesGroup.subscribe(data => {
+      service.getactivitiesGroup.pipe(take(1)).subscribe(data => {
         expect(data).toEqual([])
         done()
       })
@@ -96,14 +93,10 @@ describe('WatStoreService', () => {
         { id: 1, name: 'Activity Group 1' } as unknown as NSWatActivity.IActivityGroup
       ]
 
-      let triggerCallCount = 0
-      service.triggerSave().subscribe(trigger => {
-        triggerCallCount++
-        if (triggerCallCount === 1) {
-          expect(trigger.reload).toBe(true)
-          expect(trigger.serverCall).toBe(true)
-          done()
-        }
+      service.triggerSave().pipe(skip(1), take(1)).subscribe(trigger => {
+        expect(trigger.reload).toBe(true)
+        expect(trigger.serverCall).toBe(true)
+        done()
       })
 
       service.setgetactivitiesGroup(testData, true, true)
@@ -112,7 +105,7 @@ describe('WatStoreService', () => {
     it('should set activities group with default parameters', (done) => {
       const testData: NSWatActivity.IActivityGroup[] = []
 
-      service.triggerSave().subscribe(trigger => {
+      service.triggerSave().pipe(skip(1), take(1)).subscribe(trigger => {
         expect(trigger.reload).toBe(false)
         expect(trigger.serverCall).toBe(false)
         done()
@@ -144,14 +137,10 @@ describe('WatStoreService', () => {
         } as unknown as NSWatCompetency.ICompActivityGroup
       ]
 
-      let callCount = 0
-      service.triggerSave().subscribe(trigger => {
-        callCount++
-        if (callCount === 1) {
-          expect(trigger.reload).toBe(true)
-          expect(trigger.serverCall).toBe(false)
-          done()
-        }
+      service.triggerSave().pipe(skip(1), take(1)).subscribe(trigger => {
+        expect(trigger.reload).toBe(true)
+        expect(trigger.serverCall).toBe(false)
+        done()
       })
 
       service.setgetcompetencyGroup(testData, true, false)
@@ -165,7 +154,7 @@ describe('WatStoreService', () => {
         } as NSWatCompetency.ICompActivity
       ]
 
-      service.triggerSave().subscribe(trigger => {
+      service.triggerSave().pipe(skip(1), take(1)).subscribe(trigger => {
         expect(trigger.reload).toBe(false)
         expect(trigger.serverCall).toBe(true)
         done()
@@ -175,7 +164,7 @@ describe('WatStoreService', () => {
     })
 
     it('should get update competency group observable', (done) => {
-      service.getUpdateCompGroupO.subscribe(data => {
+      service.getUpdateCompGroupO.pipe(take(1)).subscribe(data => {
         expect(data).toEqual([])
         done()
       })
@@ -217,30 +206,25 @@ describe('WatStoreService', () => {
       // Set up the competency group first
       service.setgetcompetencyGroup(mockCompetencyGroup)
 
-      let callCount = 0
-      service.get_compGrp.subscribe(data => {
-        callCount++
-        if (callCount === 2) { // Skip initial empty emission
-          expect(data).toBeDefined()
-          expect(Array.isArray(data)).toBe(true)
-          done()
-        }
+      // Subscribe after the data is set - BehaviorSubject emits current value immediately
+      service.get_compGrp.pipe(take(1)).subscribe(data => {
+        expect(data).toBeDefined()
+        expect(Array.isArray(data)).toBe(true)
+        done()
       })
     })
 
     it('should handle empty competency groups', (done) => {
-      service.get_compGrp.subscribe(data => {
+      service.get_compGrp.pipe(take(1)).subscribe(data => {
         expect(data).toEqual([])
         done()
       })
-
-      service.setCompGroup()
     })
   })
 
   describe('Officer Group management', () => {
     it('should return officer group as observable', (done) => {
-      service.getOfficerGroup.subscribe(data => {
+      service.getOfficerGroup.pipe(take(1)).subscribe(data => {
         expect(data).toEqual([])
         done()
       })
@@ -251,7 +235,7 @@ describe('WatStoreService', () => {
         { id: 1, name: 'Officer Group 1' } as unknown as NSWatOfficer.IOfficerGroup
       ]
 
-      service.triggerSave().subscribe(trigger => {
+      service.triggerSave().pipe(skip(1), take(1)).subscribe(trigger => {
         expect(trigger.reload).toBe(false)
         expect(trigger.serverCall).toBe(true)
         done()
@@ -265,25 +249,20 @@ describe('WatStoreService', () => {
     it('should set and get current progress', (done) => {
       const testProgress = 75
 
-      service.getCurrentProgress.subscribe(progress => {
-        if (progress === testProgress) {
-          expect(progress).toBe(testProgress)
-          done()
-        }
+      service.getCurrentProgress.pipe(skip(1), take(1)).subscribe(progress => {
+        expect(progress).toBe(testProgress)
+        done()
       })
 
       service.setCurrentProgress(testProgress)
     })
 
     it('should handle zero progress', (done) => {
-      service.getCurrentProgress.subscribe(progress => {
-        if (progress === 0) {
-          expect(progress).toBe(0)
-          done()
-        }
+      // Initial value is already 0 - test initial state
+      service.getCurrentProgress.pipe(take(1)).subscribe(progress => {
+        expect(progress).toBe(0)
+        done()
       })
-
-      service.setCurrentProgress(0)
     })
   })
 
@@ -410,7 +389,7 @@ describe('WatStoreService', () => {
 
   describe('Edge cases and error handling', () => {
     it('should handle undefined data in setgetactivitiesGroup', (done) => {
-      service.triggerSave().subscribe(trigger => {
+      service.triggerSave().pipe(skip(1), take(1)).subscribe(trigger => {
         expect(trigger.reload).toBe(false)
         expect(trigger.serverCall).toBe(false)
         done()

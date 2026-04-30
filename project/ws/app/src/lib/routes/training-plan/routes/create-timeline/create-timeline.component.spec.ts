@@ -88,6 +88,36 @@ describe('CreateTimelineComponent', () => {
         })
     })
 
+    it('should call getContentData after dialog closes in showAll', () => {
+        const afterClosedSubject = { subscribe: jest.fn() }
+        dialogMock.open.mockReturnValue({ afterClosed: jest.fn().mockReturnValue(afterClosedSubject) })
+
+        const spy = jest.spyOn(component, 'getContentData')
+        component.showAll('content')
+
+        // Simulate afterClosed callback
+        const cb = afterClosedSubject.subscribe.mock.calls[0][0]
+        cb()
+
+        expect(spy).toHaveBeenCalled()
+    })
+
+    it('should call getCustomUserData after showAll dialog closes with CustomUser assignment', () => {
+        tpdsSvcMock.trainingPlanStepperData.assignmentType = 'CustomUser'
+        component = new (require('./create-timeline.component').CreateTimelineComponent)(tpdsSvcMock, dialogMock)
+
+        const afterClosedSubject = { subscribe: jest.fn() }
+        dialogMock.open.mockReturnValue({ afterClosed: jest.fn().mockReturnValue(afterClosedSubject) })
+
+        const spy = jest.spyOn(component, 'getCustomUserData')
+        component.showAll('assignee')
+
+        const cb = afterClosedSubject.subscribe.mock.calls[0][0]
+        cb()
+
+        expect(spy).toHaveBeenCalled()
+    })
+
     it('should call getContentData when contentRemoved is called', () => {
         const getContentDataSpy = jest.spyOn(component, 'getContentData')
 
@@ -112,4 +142,37 @@ describe('CreateTimelineComponent', () => {
 
         expect(getCustomUserDataSpy).toHaveBeenCalled()
     })
+
+    it('should not set assigneeData when category is not Designation in getDesignationData', () => {
+        tpdsSvcMock.trainingPlanAssigneeData.category = 'OtherCategory'
+        component.getDesignationData()
+        expect(component.assigneeData).toBeUndefined()
+    })
+
+    it('should set assigneeData for CustomUser via getCustomUserData', () => {
+        tpdsSvcMock.trainingPlanAssigneeData.category = 'CustomUser'
+        component.getCustomUserData()
+        expect(component.assigneeData.category).toBe('CustomUser')
+        expect(component.totalAssigneeCount).toBe(3)
+    })
+
+    it('should not set assigneeData when category is not CustomUser in getCustomUserData', () => {
+        tpdsSvcMock.trainingPlanAssigneeData.category = 'Designation'
+        component.assigneeData = undefined
+        component.getCustomUserData()
+        expect(component.assigneeData).toBeUndefined()
+    })
+
+    it('should handle empty contentData gracefully', () => {
+        tpdsSvcMock.trainingPlanContentData = null
+        component.getContentData()
+        expect(component.contentData).toEqual([])
+    })
+
+    it('should not be live when status is not live', () => {
+        tpdsSvcMock.trainingPlanStepperData.status = 'draft'
+        component.ngOnInit()
+        expect(component.isContentLive).toBe(false)
+    })
 })
+

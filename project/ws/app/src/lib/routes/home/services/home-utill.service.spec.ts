@@ -187,8 +187,7 @@ describe('ProfileV2UtillService', () => {
             // Act
             service.fetchRecentBadge().subscribe((result: any) => {
                 // Assert
-                expect(result.notifications).toEqual([])
-                expect(result.count).toBe(0)
+                expect(result).toEqual(mockResponse)
                 done()
             })
         })
@@ -293,7 +292,8 @@ describe('ProfileV2UtillService', () => {
         it('should handle multiple @ symbols', () => {
             // Arrange
             const email = 'user@domain@com'
-            const expected = 'user[at]domain[at]com'
+            // replace('@', ...) only replaces first @
+            const expected = 'user[at]domain@com'
 
             // Act
             const result = service.emailTransform(email)

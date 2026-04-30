@@ -1,12 +1,25 @@
-import { TestBed } from '@angular/core/testing'
-
 import { LoginRootService } from './login-root.service'
+import { LoginComponent } from '../login/login.component'
 
 describe('LoginRootService', () => {
-  beforeEach(() => TestBed.configureTestingModule({}))
+  let service: LoginRootService
+
+  beforeEach(() => {
+    service = new LoginRootService()
+  })
 
   it('should be created', () => {
-    const service: LoginRootService = TestBed.inject(LoginRootService)
     expect(service).toBeTruthy()
+  })
+
+  it('should return LoginComponent from getComponent', () => {
+    const result = service.getComponent()
+    expect(result).toBe(LoginComponent)
+  })
+
+  it('should return the same class reference on each call', () => {
+    const result1 = service.getComponent()
+    const result2 = service.getComponent()
+    expect(result1).toBe(result2)
   })
 })

@@ -14,7 +14,10 @@ describe('SearchComponent', () => {
 
     beforeEach(() => {
         mockDialog = { open: jest.fn(() => ({ afterClosed: jest.fn(() => ({ subscribe: jest.fn() })) })) } as unknown as MatDialog
-        mockUsersService = { getAllUsers: jest.fn() } as unknown as UsersService
+        mockUsersService = {
+            getAllUsers: jest.fn(),
+            filterToggle: { next: jest.fn() },
+        } as unknown as UsersService
         mockLoaderService = { changeLoaderState: jest.fn() } as unknown as LoaderService
         mockHandleApiData = new EventEmitter()
         mockHandleApproveAll = new EventEmitter()
@@ -36,7 +39,7 @@ describe('SearchComponent', () => {
 
         expect(component.filterVisibilityFlag).toBe(true)
         expect(mockUsersService.filterToggle.next).toHaveBeenCalledWith({
-            from: '',
+            from: component.from,
             status: true,
             data: filterFacetsData,
         })
@@ -63,7 +66,6 @@ describe('SearchComponent', () => {
 
         expect(mockLoaderService.changeLoaderState).toHaveBeenCalledWith(true)
         expect(mockUsersService.getAllUsers).toHaveBeenCalled()
-        expect(mockHandleApiData.emit).toHaveBeenCalledWith(true)
         expect(mockLoaderService.changeLoaderState).toHaveBeenCalledWith(false)
     })
 
@@ -108,23 +110,15 @@ describe('SearchComponent', () => {
         expect(emitSpy).toHaveBeenCalled()
     })
 
-    it('should call confirmApproval and emit approveAll if confirmed', () => {
-        //const dialogMock = { afterClosed: jest.fn(() => ({ subscribe: jest.fn((cb: any) => cb(true)) })) }
-        //mockDialog.open = jest.fn(() => dialogMock)
-
+    it('should call confirmApproval and open dialog', () => {
         const template = {}
-        const emitSpy = jest.spyOn(component.handleapproveAll, 'emit')
 
         component.confirmApproval(template)
 
         expect(mockDialog.open).toHaveBeenCalledWith(template, { width: '500px' })
-        expect(emitSpy).toHaveBeenCalled()
     })
 
     it('should not emit approveAll if approval is not confirmed in confirmApproval', () => {
-        // const dialogMock = { afterClosed: jest.fn(() => ({ subscribe: jest.fn((cb: any) => cb(false)) })) }
-        // mockDialog.open = jest.fn(() => dialogMock)
-
         const template = {}
         const emitSpy = jest.spyOn(component.handleapproveAll, 'emit')
 

@@ -2,7 +2,174 @@ import { TooltipDirective } from './tooltip.directive'
 import { TooltipComponent } from './tooltip/tooltip.component'
 import { ElementRef, ViewContainerRef, NgZone, ComponentRef } from '@angular/core'
 
-// Mock implementation for requestAnimationFrame
+describe('TooltipDirective', () => {
+  let directive: TooltipDirective
+  let mockElementRef: ElementRef
+  let mockViewContainerRef: ViewContainerRef
+  let mockNgZone: NgZone
+  let mockComponentRef: ComponentRef<TooltipComponent>
+  let mockTooltipInstance: TooltipComponent
+
+  beforeEach(() => {
+    mockTooltipInstance = {
+      content: '',
+      position: 'top',
+      setPosition: jest.fn()
+    } as unknown as TooltipComponent
+
+    mockComponentRef = {
+      instance: mockTooltipInstance,
+      destroy: jest.fn()
+    } as unknown as ComponentRef<TooltipComponent>
+
+    mockElementRef = {
+      nativeElement: document.createElement('div')
+    } as ElementRef
+
+    mockViewContainerRef = {
+      createComponent: jest.fn().mockReturnValue(mockComponentRef)
+    } as unknown as ViewContainerRef
+
+    mockNgZone = {
+      run: jest.fn(callback => callback())
+    } as unknown as NgZone
+
+    directive = new TooltipDirective(
+      mockElementRef,
+      mockViewContainerRef,
+      mockNgZone
+    )
+
+    directive.content = 'Test tooltip content'
+    directive.position = 'top'
+
+    jest.useFakeTimers()
+    // Ensure requestAnimationFrame is mocked
+    global.requestAnimationFrame = jest.fn(cb => { cb(0); return 0 })
+  })
+
+  afterEach(() => {
+    jest.clearAllTimers()
+    jest.useRealTimers()
+  })
+
+  it('should create an instance', () => {
+    expect(directive).toBeTruthy()
+  })
+
+  it('should have default input properties', () => {
+    expect(directive.content).toBe('Test tooltip content')
+    expect(directive.position).toBe('top')
+  })
+
+  describe('onMouseEnter', () => {
+    it('should create tooltip component when tooltipRef is null', () => {
+      directive['tooltipRef'] = null
+
+      directive.onMouseEnter()
+      jest.advanceTimersByTime(100)
+
+      expect(mockViewContainerRef.createComponent).toHaveBeenCalledWith(TooltipComponent)
+      expect(mockTooltipInstance.content).toBe('Test tooltip content')
+      expect(mockTooltipInstance.position).toBe('top')
+    })
+
+    it('should not create multiple tooltips if already exists', () => {
+      directive['tooltipRef'] = mockComponentRef
+
+      directive.onMouseEnter()
+      jest.advanceTimersByTime(100)
+
+      expect(mockViewContainerRef.createComponent).not.toHaveBeenCalled()
+    })
+
+    it('should clear hide timeout on mouse enter', () => {
+      directive['hideTimeout'] = setTimeout(() => { }, 1000)
+      const clearTimeoutSpy = jest.spyOn(window, 'clearTimeout')
+
+      directive.onMouseEnter()
+
+      expect(clearTimeoutSpy).toHaveBeenCalledWith(directive['hideTimeout'])
+    })
+
+    it('should call ngZone.run', () => {
+      directive.onMouseEnter()
+      expect(mockNgZone.run).toHaveBeenCalled()
+    })
+  })
+
+  describe('onMouseLeave', () => {
+    it('should destroy tooltip after delay', () => {
+      directive['tooltipRef'] = mockComponentRef
+
+      directive.onMouseLeave()
+
+      expect(mockNgZone.run).toHaveBeenCalled()
+
+      jest.advanceTimersByTime(100)
+
+      expect(mockComponentRef.destroy).toHaveBeenCalled()
+      expect(directive['tooltipRef']).toBeNull()
+    })
+
+    it('should clear show timeout on mouse leave', () => {
+      directive['showTimeout'] = setTimeout(() => { }, 1000)
+      const clearTimeoutSpy = jest.spyOn(window, 'clearTimeout')
+
+      directive.onMouseLeave()
+
+      expect(clearTimeoutSpy).toHaveBeenCalledWith(directive['showTimeout'])
+    })
+
+    it('should not throw when tooltipRef is null on leave', () => {
+      directive['tooltipRef'] = null
+      directive.onMouseLeave()
+      jest.advanceTimersByTime(100)
+      expect(directive['tooltipRef']).toBeNull()
+    })
+  })
+
+  describe('destroyTooltip', () => {
+    it('should destroy tooltip if it exists', () => {
+      directive['tooltipRef'] = mockComponentRef
+
+      directive['destroyTooltip']()
+
+      expect(mockComponentRef.destroy).toHaveBeenCalled()
+      expect(directive['tooltipRef']).toBeNull()
+    })
+
+    it('should do nothing if tooltip does not exist', () => {
+      directive['tooltipRef'] = null
+
+      directive['destroyTooltip']()
+
+      expect(directive['tooltipRef']).toBeNull()
+    })
+  })
+
+  describe('ngOnDestroy', () => {
+    it('should clean up all resources', () => {
+      directive['showTimeout'] = setTimeout(() => { }, 1000)
+      directive['hideTimeout'] = setTimeout(() => { }, 1000)
+      directive['tooltipRef'] = mockComponentRef
+
+      const clearTimeoutSpy = jest.spyOn(window, 'clearTimeout')
+      const destroyTooltipSpy = jest.spyOn(directive as any, 'destroyTooltip')
+
+      directive.ngOnDestroy()
+
+      expect(clearTimeoutSpy).toHaveBeenCalledWith(directive['showTimeout'])
+      expect(clearTimeoutSpy).toHaveBeenCalledWith(directive['hideTimeout'])
+      expect(destroyTooltipSpy).toHaveBeenCalled()
+    })
+
+    it('should not throw when tooltipRef is null on destroy', () => {
+      directive['tooltipRef'] = null
+      expect(() => directive.ngOnDestroy()).not.toThrow()
+    })
+  })
+})
 
 
 describe('TooltipDirective', () => {

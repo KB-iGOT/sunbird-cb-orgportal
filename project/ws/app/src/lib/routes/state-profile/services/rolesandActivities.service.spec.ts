@@ -7,13 +7,11 @@ describe('RolesAndActivityService', () => {
   let mockHttpClient: jest.Mocked<HttpClient>
 
   beforeEach(() => {
-    // Create a mock for the HttpClient
+    jest.clearAllMocks()
     mockHttpClient = {
       get: jest.fn(),
       post: jest.fn()
     } as unknown as jest.Mocked<HttpClient>
-
-    // Initialize the service with the mock
     service = new RolesAndActivityService(mockHttpClient)
   })
 
@@ -22,33 +20,45 @@ describe('RolesAndActivityService', () => {
   })
 
   describe('loadRoles', () => {
-    it('should call the correct API endpoint with the keyword', () => {
-      // Arrange
+    it('should call the correct API endpoint with the keyword', (done) => {
       const keyword = 'admin'
       const mockResponse = { roles: ['admin', 'editor'] }
       mockHttpClient.get.mockReturnValue(of(mockResponse))
 
-      // Act
       service.loadRoles(keyword).subscribe((response: any) => {
-        // Assert
         expect(response).toEqual(mockResponse)
+        done()
       })
 
-      // Assert
       expect(mockHttpClient.get).toHaveBeenCalledWith('apis/protected/v8/roleactivity/admin')
+    })
+
+    it('should work with different keyword values', (done) => {
+      mockHttpClient.get.mockReturnValue(of({ roles: [] }))
+      service.loadRoles('user').subscribe(() => done())
+      expect(mockHttpClient.get).toHaveBeenCalledWith('apis/protected/v8/roleactivity/user')
     })
   })
 
   describe('createRoles', () => {
-    it('should call the correct API endpoint with the role data', () => {
-
+    it('should POST to the UPDATE_PROFILE endpoint with role data', (done) => {
+      const mockRole = {
+        request: {
+          userId: 'user123',
+          profileDetails: {
+            userRoles: [{ id: 'role1', name: 'Admin' } as any]
+          }
+        }
+      }
       const mockResponse = { response: 'success' }
       mockHttpClient.post.mockReturnValue(of(mockResponse))
 
-      // Act
-      // Assert      })
+      service.createRoles(mockRole).subscribe((response: any) => {
+        expect(response).toEqual(mockResponse)
+        done()
+      })
 
-      // Assert
+      expect(mockHttpClient.post).toHaveBeenCalledWith('/apis/proxies/v8/user/v1/extPatch', mockRole)
     })
   })
 })

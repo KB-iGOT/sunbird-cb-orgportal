@@ -205,6 +205,7 @@ describe('ImportDesignationComponent', () => {
 
     describe('selectDesignation', () => {
         beforeEach(() => {
+            mockDesignation.selected = false
             component.igotDesignationsList = [mockDesignation]
             component.selectedDesignationsList = []
         })
@@ -314,6 +315,8 @@ describe('ImportDesignationComponent', () => {
             designationsServiceMock.createTerm = jest.fn().mockReturnValue(
                 throwError(() => new Error('Test error'))
             )
+            // Mock updateTerms to prevent it from resetting designationsImportFailed
+            jest.spyOn(component, 'updateTerms').mockImplementation(() => { })
 
             component.importDesignations()
 
@@ -358,9 +361,13 @@ describe('ImportDesignationComponent', () => {
                 .mockReturnValueOnce(throwError(() => new Error('Test error')))
                 .mockReturnValueOnce(of({ success: true }))
 
+            // Mock publishFrameWork to prevent it from overwriting the subTitle
+            jest.spyOn(component, 'publishFrameWork').mockImplementation(() => { })
+
             component.updateTerms(mockFrameworkInfo.categories[0])
 
-            expect(designationsServiceMock.updateTerms).toHaveBeenCalledTimes(1)
+            // Called twice: once for initial attempt, once for the retry
+            expect(designationsServiceMock.updateTerms).toHaveBeenCalledTimes(2)
             expect(component.progressDialogData.subTitle).toBe(mockDesignationConfig.associationRetryMsg)
 
             // Restore original function

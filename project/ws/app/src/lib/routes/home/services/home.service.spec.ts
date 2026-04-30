@@ -1,5 +1,5 @@
 
-import { of } from 'rxjs'
+import { of, throwError } from 'rxjs'
 import { ProfileV2Service } from './home.servive'
 
 // Mock lodash
@@ -294,9 +294,7 @@ describe('ProfileV2Service', () => {
       const mockUserId = 'user-123'
       const mockError = new Error('HTTP Error')
 
-      mockHttpClient.get.mockReturnValue(of().pipe(() => {
-        throw mockError
-      }))
+      mockHttpClient.get.mockReturnValue(throwError(mockError))
 
       service.fetchProfile(mockUserId).subscribe({
         next: () => fail('Should have thrown an error'),
@@ -311,9 +309,7 @@ describe('ProfileV2Service', () => {
       const mockRequest = { demand: 'test' }
       const mockError = new Error('Network Error')
 
-      mockHttpClient.post.mockReturnValue(of().pipe(() => {
-        throw mockError
-      }))
+      mockHttpClient.post.mockReturnValue(throwError(mockError))
 
       service.createDemand(mockRequest).subscribe({
         next: () => fail('Should have thrown an error'),

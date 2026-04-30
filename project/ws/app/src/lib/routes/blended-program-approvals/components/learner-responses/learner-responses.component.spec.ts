@@ -60,14 +60,6 @@ describe('LearnerResponsesComponent', () => {
         }
     }
 
-    const mockFormResponse = {
-        responseData: {
-            fields: ['field1', 'field2'],
-            title: 'Test Form',
-            clientVersion: 1.1
-        }
-    }
-
     const mockSurveyResponse = {
         statusInfo: {
             statusCode: 200
@@ -89,7 +81,8 @@ describe('LearnerResponsesComponent', () => {
         mockBpService = {
             getSurveyByFormId: jest.fn(),
             getUserById: jest.fn(),
-            getSurveyByUserID: jest.fn()
+            getSurveyByUserID: jest.fn(),
+            getSubmissionsByUserId: jest.fn(),
         } as any
 
         mockDialog = {
@@ -211,8 +204,17 @@ describe('LearnerResponsesComponent', () => {
 
     describe('getFormById', () => {
         it('should fetch form data and set component properties', async () => {
-            // Mock the service to return an Observable that converts to Promise
-            const mockObservable = of(mockFormResponse)
+            // Component expects: { result: { response: { fields, title, clientVersion } } }
+            const mockFormResp = {
+                result: {
+                    response: {
+                        fields: ['field1', 'field2'],
+                        title: 'Test Form',
+                        clientVersion: 1.1,
+                    }
+                }
+            }
+            const mockObservable = of(mockFormResp)
             mockBpService.getSurveyByFormId.mockReturnValue(mockObservable)
             jest.spyOn(component, 'getSurveyReport').mockImplementation()
 
@@ -249,24 +251,33 @@ describe('LearnerResponsesComponent', () => {
         })
 
         it('should fetch survey report and set apiData', async () => {
-            const mockObservable = of(mockSurveyResponse)
-            mockBpService.getSurveyByUserID.mockReturnValue(mockObservable)
+            // Component uses getSubmissionsByUserId and checks params.status === 'success'
+            const mockSubmissionResp = {
+                params: { status: 'success' },
+                result: {
+                    response: {
+                        content: [{
+                            formId: '123',
+                            timestamp: '2023-01-01',
+                            responses: [{ question: 'q1', answer: 'a1' }]
+                        }]
+                    }
+                }
+            }
+            mockBpService.getSubmissionsByUserId.mockReturnValue(of(mockSubmissionResp))
 
             await component.getSurveyReport()
 
-            expect(mockBpService.getSurveyByUserID).toHaveBeenCalledWith({
-                searchObjects: [
-                    { key: 'formId', values: '123' },
-                    { key: 'updatedBy', values: 'user123' }
-                ]
-            })
-
-            expect(component.latestData).toEqual(mockSurveyResponse.responseData[0])
-            expect(component.apiData).toEqual({
-                getAPI: `/apis/proxies/v8/forms/getFormById?id=${mockSurveyResponse.responseData[0].formId}`,
-                postAPI: `/apis/proxies/v8/forms/v1/saveFormSubmit`,
-                getAllApplications: `/apis/proxies/v8/forms/getAllApplications`,
-                customizedHeader: {}
+            expect(mockBpService.getSubmissionsByUserId).toHaveBeenCalledWith({
+                filters: {
+                    formId: '123',
+                    status: 'SUBMITTED',
+                    createdBy: 'user123'
+                },
+                page: 0,
+                size: 20,
+                sortBy: 'createdDate',
+                sortOrder: 'ASC'
             })
 
             // Fast forward timer
@@ -275,12 +286,14 @@ describe('LearnerResponsesComponent', () => {
         })
 
         it('should handle service error gracefully', async () => {
-            const mockObservable = throwError('Service error')
-            mockBpService.getSurveyByUserID.mockReturnValue(mockObservable)
+            mockBpService.getSubmissionsByUserId.mockReturnValue(throwError('Service error'))
+            // Pre-set latestData to prevent TypeError when component accesses latestData.formId
+            component.latestData = { formId: '123', responses: [] }
 
             await component.getSurveyReport()
 
-            expect(component.latestData).toBeUndefined()
+            // showSpinner should remain true since no successful response
+            expect(component.showSpinner).toBe(true)
         })
     })
 
@@ -437,7 +450,12 @@ describe('LearnerResponsesComponent', () => {
 
             component.getGroupAndDesignationFromSurevyForm()
 
-            expect(component.getProfileSurevyReport).toHaveBeenCalledWith('456', true, true)
+            // hasGroups and hasDesignation are the found field objects (truthy), not boolean true
+            expect(component.getProfileSurevyReport).toHaveBeenCalledWith(
+                '456',
+                expect.objectContaining({ field: 'profileDetails.professionalDetails.group' }),
+                expect.objectContaining({ field: 'profileDetails.professionalDetails.designation' })
+            )
         })
 
         it('should not call getProfileSurevyReport when doptOrg does not match', () => {

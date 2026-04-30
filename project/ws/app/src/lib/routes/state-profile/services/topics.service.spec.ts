@@ -1,132 +1,154 @@
 
-import { HttpClient } from '@angular/common/http'
-import { BehaviorSubject } from 'rxjs'
+import { of } from 'rxjs'
 import { TopicService } from './topics.service'
 
-// Mock HttpClient and BehaviorSubject
-jest.mock('@angular/common/http')
-jest.mock('rxjs')
-
 describe('TopicService', () => {
-  let topicService: TopicService
-  let mockHttpClient: HttpClient
-  let mockBehaviorSubject: jest.Mocked<BehaviorSubject<any>>
+  let service: TopicService
+  let mockHttpClient: any
 
   beforeEach(() => {
     mockHttpClient = {
-      get: jest.fn(),
-      post: jest.fn(),
-    } as any
+      get: jest.fn().mockReturnValue(of({})),
+      post: jest.fn().mockReturnValue(of({})),
+    }
+    service = new TopicService(mockHttpClient)
+  })
 
-    // Mock the BehaviorSubjects
-    mockBehaviorSubject = {
-      next: jest.fn(),
-      value: [],
-    } as any
-
-    topicService = new TopicService(mockHttpClient)
-    // Overriding BehaviorSubject for the tests
-    topicService.systemTopics = mockBehaviorSubject
-    topicService.desiredTopics = mockBehaviorSubject
+  afterEach(() => {
+    jest.clearAllMocks()
   })
 
   it('should be created', () => {
-    expect(topicService).toBeTruthy()
+    expect(service).toBeTruthy()
   })
 
-  it('should load topics using the http client', () => {
-    const mockResponse = { data: 'mockData' }
-    // mockHttpClient.get.mockReturnValueOnce(mockResponse) // Mocking the HTTP request
-
-    const result = topicService.loadTopics()
-
-    expect(mockHttpClient.get).toHaveBeenCalledWith('/apis/protected/v8/catalog')
-    expect(result).toEqual(mockResponse)
+  describe('loadTopics', () => {
+    it('should GET from catalog endpoint', (done) => {
+      const mockResponse = { topics: ['t1'] }
+      mockHttpClient.get.mockReturnValue(of(mockResponse))
+      service.loadTopics().subscribe(res => {
+        expect(res).toEqual(mockResponse)
+        expect(mockHttpClient.get).toHaveBeenCalledWith('/apis/protected/v8/catalog')
+        done()
+      })
+    })
   })
 
-  it('should add a system topic', () => {
-    const newTopic: any = { identifier: '123', name: 'testTopic' }
-    topicService.addSystemTopics(newTopic)
-
-    expect(mockBehaviorSubject.next).toHaveBeenCalledWith([newTopic])
+  describe('addSystemTopics', () => {
+    it('should add a topic to systemTopics', () => {
+      const spy = jest.spyOn(service.systemTopics, 'next')
+      const topic: any = { identifier: '1', name: 'Topic A' }
+      service.addSystemTopics(topic)
+      expect(spy).toHaveBeenCalledWith([topic])
+    })
   })
 
-  it('should add a desired topic', () => {
-    const newTopic = 'testDesiredTopic'
-    topicService.addDesiredTopics(newTopic)
-
-    expect(mockBehaviorSubject.next).toHaveBeenCalledWith([newTopic])
+  describe('addDesiredTopics', () => {
+    it('should add a desired topic string', () => {
+      const spy = jest.spyOn(service.desiredTopics, 'next')
+      service.addDesiredTopics('topic1')
+      expect(spy).toHaveBeenCalledWith(['topic1'])
+    })
   })
 
-  it('should initialize system topics', () => {
-    const initTopics: any = [{ identifier: '123', name: 'testTopic' }]
-    topicService.addInitSystemTopics(initTopics)
-
-    expect(mockBehaviorSubject.next).toHaveBeenCalledWith(initTopics)
+  describe('addInitSystemTopics', () => {
+    it('should initialize system topics', () => {
+      const spy = jest.spyOn(service.systemTopics, 'next')
+      const topics: any[] = [{ identifier: '1', name: 'T1' }]
+      service.addInitSystemTopics(topics)
+      expect(spy).toHaveBeenCalledWith(topics)
+    })
   })
 
-  it('should initialize desired topics', () => {
-    const initTopics = ['testDesiredTopic']
-    topicService.addInitDesiredTopics(initTopics)
-
-    expect(mockBehaviorSubject.next).toHaveBeenCalledWith(initTopics)
+  describe('addInitDesiredTopics', () => {
+    it('should initialize desired topics', () => {
+      const spy = jest.spyOn(service.desiredTopics, 'next')
+      const topics = ['t1', 't2']
+      service.addInitDesiredTopics(topics)
+      expect(spy).toHaveBeenCalledWith(topics)
+    })
   })
 
-  it('should remove a system topic', () => {
-    const existingTopic: any = { identifier: '123', name: 'testTopic' }
-    topicService.addSystemTopics(existingTopic) // Add topic first
+  describe('removeSystemTopics', () => {
+    it('should remove a system topic by identifier', () => {
+      const topic: any = { identifier: '1', name: 'T1' }
+      service.addSystemTopics(topic)
+      const spy = jest.spyOn(service.systemTopics, 'next')
+      service.removeSystemTopics(topic)
+      expect(spy).toHaveBeenCalledWith([])
+    })
 
-    topicService.removeSystemTopics(existingTopic)
-
-    expect(mockBehaviorSubject.next).toHaveBeenCalledWith([])
+    it('should not remove if identifier is missing', () => {
+      const topic: any = { name: 'no-id' }
+      service.addSystemTopics({ identifier: '1', name: 'keep' } as any)
+      const spy = jest.spyOn(service.systemTopics, 'next')
+      service.removeSystemTopics(topic)
+      // next is called but with same array since no index match
+      expect(spy).toHaveBeenCalled()
+    })
   })
 
-  it('should remove a desired topic', () => {
-    const topicToRemove = 'testDesiredTopic'
-    topicService.addDesiredTopics(topicToRemove) // Add topic first
+  describe('removeDesiredTopics', () => {
+    it('should remove a desired topic string', () => {
+      service.addDesiredTopics('topic1')
+      const spy = jest.spyOn(service.desiredTopics, 'next')
+      service.removeDesiredTopics('topic1')
+      expect(spy).toHaveBeenCalledWith([])
+    })
 
-    topicService.removeDesiredTopics(topicToRemove)
-
-    expect(mockBehaviorSubject.next).toHaveBeenCalledWith([])
+    it('should do nothing if topic not found', () => {
+      const spy = jest.spyOn(service.desiredTopics, 'next')
+      service.removeDesiredTopics('nonexistent')
+      expect(spy).not.toHaveBeenCalled()
+    })
   })
 
-  it('should return current selected desired topics', () => {
-    const currentTopics = ['desiredTopic1', 'desiredTopic2']
-    //mockBehaviorSubject.value = currentTopics
+  describe('getCurrentSelectedDesTopics', () => {
+    it('should return current desired topics', () => {
+      service.addInitDesiredTopics(['t1', 't2'])
+      expect(service.getCurrentSelectedDesTopics).toEqual(['t1', 't2'])
+    })
 
-    const result = topicService.getCurrentSelectedDesTopics
-
-    expect(result).toEqual(currentTopics)
+    it('should return empty array when no desired topics', () => {
+      expect(service.getCurrentSelectedDesTopics).toEqual([])
+    })
   })
 
-  it('should return current selected system topics', () => {
-    const currentTopics = [{ identifier: '123', name: 'sysTopic1' }]
-    //mockBehaviorSubject.value = currentTopics
+  describe('getCurrentSelectedSysTopics', () => {
+    it('should return current system topics', () => {
+      const topics: any[] = [{ identifier: '1', name: 'T1' }]
+      service.addInitSystemTopics(topics)
+      expect(service.getCurrentSelectedSysTopics).toEqual(topics)
+    })
 
-    const result = topicService.getCurrentSelectedSysTopics
-
-    expect(result).toEqual(currentTopics)
+    it('should return empty array when no system topics', () => {
+      expect(service.getCurrentSelectedSysTopics).toEqual([])
+    })
   })
 
-  it('should save desired topic using http client', () => {
-    const mockResponse = { data: 'mockResponse' }
-    const desiredTopic: any = { identifier: '123', name: 'desiredTopic' }
-    //mockHttpClient.post.mockReturnValueOnce(mockResponse)
-
-    const result = topicService.saveDesiredTopic(desiredTopic)
-
-    expect(mockHttpClient.post).toHaveBeenCalledWith('/apis/proxies/v8/user/v1/extPatch', desiredTopic)
-    expect(result).toEqual(mockResponse)
+  describe('saveDesiredTopic', () => {
+    it('should POST to addTopic endpoint', (done) => {
+      const mockData: any = { request: { userId: 'u1', profileDetails: {} } }
+      const mockResponse = { success: true }
+      mockHttpClient.post.mockReturnValue(of(mockResponse))
+      service.saveDesiredTopic(mockData).subscribe(res => {
+        expect(res).toEqual(mockResponse)
+        expect(mockHttpClient.post).toHaveBeenCalledWith('/apis/proxies/v8/user/v1/extPatch', mockData)
+        done()
+      })
+    })
   })
 
-  it('should save system topic using http client', () => {
-    const mockResponse = { data: 'mockResponse' }
-    const systemTopic: any = { identifier: '123', name: 'sysTopic' }
-    //mockHttpClient.post.mockReturnValueOnce(mockResponse)
-
-    const result = topicService.saveSystemTopic(systemTopic)
-
-    expect(mockHttpClient.post).toHaveBeenCalledWith('/apis/proxies/v8/user/v1/extPatch', systemTopic)
-    expect(result).toEqual(mockResponse)
+  describe('saveSystemTopic', () => {
+    it('should POST to addTopic endpoint', (done) => {
+      const mockData: any = { request: { userId: 'u1', profileDetails: {} } }
+      const mockResponse = { success: true }
+      mockHttpClient.post.mockReturnValue(of(mockResponse))
+      service.saveSystemTopic(mockData).subscribe(res => {
+        expect(res).toEqual(mockResponse)
+        expect(mockHttpClient.post).toHaveBeenCalledWith('/apis/proxies/v8/user/v1/extPatch', mockData)
+        done()
+      })
+    })
   })
 })
