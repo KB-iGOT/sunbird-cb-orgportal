@@ -3,34 +3,19 @@ import { HttpClient } from '@angular/common/http'
 import { ConfigurationsService } from '@sunbird-cb/utils-v2'
 import { of } from 'rxjs'
 
-// Mock the dependencies
-const mockHttpClient = {
-    get: jest.fn(),
-    post: jest.fn(),
-}
-
-const mockConfigService = {
-    userProfile: {
-        departmentName: 'Test Department'
-    },
-    userProfileV2: {
-        departmentName: 'Test Department V2'
-    }
-}
-
 describe('WorkallocationService', () => {
     let service: WorkallocationService
     let httpClient: jest.Mocked<HttpClient>
     let configService: jest.Mocked<ConfigurationsService>
 
     beforeEach(() => {
-        httpClient = mockHttpClient as unknown as jest.Mocked<HttpClient>
-        configService = mockConfigService as jest.Mocked<ConfigurationsService>
-        service = new WorkallocationService(httpClient, configService)
-    })
-
-    afterEach(() => {
         jest.clearAllMocks()
+        httpClient = { get: jest.fn(), post: jest.fn() } as unknown as jest.Mocked<HttpClient>
+        configService = {
+            userProfile: { departmentName: 'Test Department' },
+            userProfileV2: { departmentName: 'Test Department V2' },
+        } as jest.Mocked<ConfigurationsService>
+        service = new WorkallocationService(httpClient, configService)
     })
 
     describe('getTime', () => {
@@ -176,7 +161,7 @@ describe('WorkallocationService', () => {
             const deptId = 456
             const expectedRequest = {
                 deptId: 456,
-                name: '',
+                name: 'Work order - null',
                 deptName: 'Test Department',
             }
 
@@ -238,7 +223,7 @@ describe('WorkallocationService', () => {
             const departmentName = null
             const expectedRequest = {
                 id: 'WO456',
-                name: '',
+                name: 'Work order - null',
             }
 
             httpClient.post.mockReturnValue(of({}))

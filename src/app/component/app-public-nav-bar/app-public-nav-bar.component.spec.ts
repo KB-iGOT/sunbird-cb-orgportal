@@ -8,25 +8,22 @@ describe('AppPublicNavBarComponent', () => {
     let mockConfigSvc: Partial<ConfigurationsService>
 
     beforeEach(() => {
-        // Mock the DomSanitizer's bypassSecurityTrustResourceUrl method
         mockDomSanitizer = {
             bypassSecurityTrustResourceUrl: jest.fn().mockReturnValue('safeUrl'),
         }
 
-        // Mock the ConfigurationsService instanceConfig and primaryNavBar
         mockConfigSvc = {
-            // instanceConfig: {
-            //     logos: {
-            //         appTransparent: 'some-logo-url',
-            //     },
-            //     details: {
-            //         appName: 'Test App',
-            //     },
-            // },
-            // primaryNavBar: { background: 'blue' },
+            instanceConfig: {
+                logos: {
+                    appTransparent: 'some-logo-url',
+                },
+                details: {
+                    appName: 'Test App',
+                },
+            } as any,
+            primaryNavBar: { background: 'blue' } as any,
         }
 
-        // Create an instance of the component with the mocked services
         component = new AppPublicNavBarComponent(
             mockDomSanitizer as DomSanitizer,
             mockConfigSvc as ConfigurationsService
@@ -37,16 +34,33 @@ describe('AppPublicNavBarComponent', () => {
         expect(component).toBeTruthy()
     })
 
-    it('should set appIcon, appName, and navBar on ngOnInit', () => {
+    it('should have null appIcon, empty appName and null navBar before ngOnInit', () => {
+        expect(component.appIcon).toBeNull()
+        expect(component.appName).toBe('')
+        expect(component.navBar).toBeNull()
+    })
+
+    it('should set appIcon, appName, and navBar on ngOnInit when instanceConfig is present', () => {
         component.ngOnInit()
 
-        // Check if ngOnInit correctly sets the properties
         expect(component.appIcon).toBe('safeUrl')
         expect(component.appName).toBe('Test App')
         expect(component.navBar).toEqual({ background: 'blue' })
-
-        // Ensure bypassSecurityTrustResourceUrl was called with the correct argument
         expect(mockDomSanitizer.bypassSecurityTrustResourceUrl).toHaveBeenCalledWith('some-logo-url')
+    })
+
+    it('should not set properties when instanceConfig is null', () => {
+        mockConfigSvc.instanceConfig = null as any
+        component = new AppPublicNavBarComponent(
+            mockDomSanitizer as DomSanitizer,
+            mockConfigSvc as ConfigurationsService
+        )
+        component.ngOnInit()
+
+        expect(component.appIcon).toBeNull()
+        expect(component.appName).toBe('')
+        expect(component.navBar).toBeNull()
+        expect(mockDomSanitizer.bypassSecurityTrustResourceUrl).not.toHaveBeenCalled()
     })
 
     it('should return true for showPublicNavbar', () => {

@@ -1,6 +1,6 @@
 import { ProfileV3Service } from './profile_v3.service'
 import { HttpClient } from '@angular/common/http'
-import { of } from 'rxjs'
+import { of, throwError } from 'rxjs'
 
 // Mock HttpClient
 const mockHttpClient = {
@@ -257,51 +257,37 @@ describe('ProfileV3Service', () => {
   })
 
   describe('Error handling', () => {
-    it('should handle http errors in getAllCompetencies', () => {
-      // Arrange
+    it('should handle http errors in getAllCompetencies', (done) => {
       const mockRequest = { search: 'test' }
       const mockError = new Error('HTTP Error')
-      httpClient.post.mockReturnValue(of().pipe(() => {
-        throw mockError
-      }))
+      httpClient.post.mockReturnValue(throwError(mockError))
 
-      // Act & Assert
-      expect(() => {
-        service.getAllCompetencies(mockRequest).subscribe()
-      }).toThrow()
+      service.getAllCompetencies(mockRequest).subscribe({
+        next: () => fail('expected error'),
+        error: err => { expect(err).toBe(mockError); done() },
+      })
     })
 
-    it('should handle http errors in updateCCProfileDetails', () => {
-      // Arrange
-      const mockData = {
-        request: {
-          userId: 'user123',
-          profileDetails: { competencies: [] }
-        }
-      }
+    it('should handle http errors in updateCCProfileDetails', (done) => {
+      const mockData = { request: { userId: 'user123', profileDetails: { competencies: [] } } }
       const mockError = new Error('HTTP Error')
-      httpClient.post.mockReturnValue(of().pipe(() => {
-        throw mockError
-      }))
+      httpClient.post.mockReturnValue(throwError(mockError))
 
-      // Act & Assert
-      expect(() => {
-        service.updateCCProfileDetails(mockData).subscribe()
-      }).toThrow()
+      service.updateCCProfileDetails(mockData).subscribe({
+        next: () => fail('expected error'),
+        error: err => { expect(err).toBe(mockError); done() },
+      })
     })
 
-    it('should handle http errors in getUserdetailsFromRegistry', () => {
-      // Arrange
+    it('should handle http errors in getUserdetailsFromRegistry', (done) => {
       const wid = 'user123'
       const mockError = new Error('HTTP Error')
-      httpClient.get.mockReturnValue(of().pipe(() => {
-        throw mockError
-      }))
+      httpClient.get.mockReturnValue(throwError(mockError))
 
-      // Act & Assert
-      expect(() => {
-        service.getUserdetailsFromRegistry(wid).subscribe()
-      }).toThrow()
+      service.getUserdetailsFromRegistry(wid).subscribe({
+        next: () => fail('expected error'),
+        error: err => { expect(err).toBe(mockError); done() },
+      })
     })
   })
 

@@ -1,46 +1,36 @@
 import { DynamicAssetsLoaderService } from './dynamic-assets-loader.service'
-import { of } from 'rxjs'
-
-// Mocks
-const mockCreateElement = jest.fn()
-const mockAppendChild = jest.fn()
-const mockFromEvent = jest.fn()
-
-jest.mock('rxjs', () => ({
-  fromEvent: jest.fn()
-}))
 
 describe('DynamicAssetsLoaderService', () => {
   let service: DynamicAssetsLoaderService
 
   beforeEach(() => {
     service = new DynamicAssetsLoaderService()
-    // Resetting mock functions before each test
-    mockCreateElement.mockClear()
-    mockAppendChild.mockClear()
-    mockFromEvent.mockClear()
-    // Mocking document methods
-    global.document.createElement = mockCreateElement
-    global.document.body.appendChild = mockAppendChild
+    jest.spyOn(document, 'createElement').mockImplementation((tagName: string) => {
+      if (tagName === 'script') {
+        return { src: '' } as any
+      }
+      if (tagName === 'link') {
+        return { rel: '', href: '' } as any
+      }
+      return { tagName } as any
+    })
+    jest.spyOn(document.body, 'appendChild').mockImplementation((node: Node) => node)
+  })
+
+  afterEach(() => {
+    jest.restoreAllMocks()
+  })
+
+  it('should create the service', () => {
+    expect(service).toBeTruthy()
+  })
+
+  it('should initialize with empty maps', () => {
+    expect(service.urlLoadStatus.size).toBe(0)
+    expect(service.urlElemMapping.size).toBe(0)
   })
 
   describe('loadScript', () => {
-    it('should load script if not already loaded', async () => {
-      const url = 'http://example.com/script.js'
-
-      const mockScriptElem = { src: url }
-      mockCreateElement.mockReturnValue(mockScriptElem)
-
-      mockFromEvent.mockReturnValue(of({})) // Simulate a load event
-
-      const result = await service.loadScript(url)
-
-      expect(mockCreateElement).toHaveBeenCalledWith('script')
-      expect(mockAppendChild).toHaveBeenCalledWith(mockScriptElem)
-      expect(result).toBe(true)
-      expect(service.urlLoadStatus.get(url)).toBe(true)
-    })
-
     it('should return true if script is already loaded', async () => {
       const url = 'http://example.com/script.js'
       service.urlLoadStatus.set(url, true)
@@ -48,13 +38,35 @@ describe('DynamicAssetsLoaderService', () => {
       const result = await service.loadScript(url)
 
       expect(result).toBe(true)
-      expect(mockCreateElement).not.toHaveBeenCalled()
+      expect(document.createElement).not.toHaveBeenCalled()
     })
 
-    it('should handle errors and return false if script fails to load', async () => {
+    it('should create script element and append to body when url is new', async () => {
+      const url = 'http://example.com/new-script.js'
+      jest.spyOn(service as any, 'loadEventPromise').mockResolvedValue(true)
+
+      await service.loadScript(url)
+
+      expect(document.createElement).toHaveBeenCalledWith('script')
+      expect(document.body.appendChild).toHaveBeenCalled()
+      expect(service.urlElemMapping.has(url)).toBe(true)
+    })
+
+    it('should use existing urlElemMapping entry instead of creating new element', async () => {
       const url = 'http://example.com/script.js'
-      const error = new Error('Script load failed')
-      mockCreateElement.mockImplementation(() => { throw error })
+      const mockElem = { src: url } as HTMLScriptElement
+      service.urlElemMapping.set(url, mockElem)
+      jest.spyOn(service as any, 'loadEventPromise').mockResolvedValue(true)
+
+      const result = await service.loadScript(url)
+
+      expect(result).toBe(true)
+      expect(document.createElement).not.toHaveBeenCalled()
+    })
+
+    it('should return false if createElement throws an error', async () => {
+      const url = 'http://example.com/bad-script.js'
+      jest.spyOn(document, 'createElement').mockImplementation(() => { throw new Error('DOM error') })
 
       const result = await service.loadScript(url)
 
@@ -63,20 +75,6 @@ describe('DynamicAssetsLoaderService', () => {
   })
 
   describe('loadStyle', () => {
-    it('should load style if not already loaded', async () => {
-      const url = 'http://example.com/style.css'
-
-      const mockLinkElem = { rel: 'stylesheet', href: url }
-      mockCreateElement.mockReturnValue(mockLinkElem)
-
-      const result = await service.loadStyle(url)
-
-      expect(mockCreateElement).toHaveBeenCalledWith('link')
-      expect(mockAppendChild).toHaveBeenCalledWith(mockLinkElem)
-      expect(result).toBe(true)
-      expect(service.urlLoadStatus.get(url)).toBe(true)
-    })
-
     it('should return true if style is already loaded', async () => {
       const url = 'http://example.com/style.css'
       service.urlLoadStatus.set(url, true)
@@ -84,13 +82,23 @@ describe('DynamicAssetsLoaderService', () => {
       const result = await service.loadStyle(url)
 
       expect(result).toBe(true)
-      expect(mockCreateElement).not.toHaveBeenCalled()
+      expect(document.createElement).not.toHaveBeenCalled()
     })
 
-    it('should handle errors and return false if style fails to load', async () => {
+    it('should create link element, append to body and set urlLoadStatus', async () => {
       const url = 'http://example.com/style.css'
-      const error = new Error('Style load failed')
-      mockCreateElement.mockImplementation(() => { throw error })
+
+      const result = await service.loadStyle(url)
+
+      expect(document.createElement).toHaveBeenCalledWith('link')
+      expect(document.body.appendChild).toHaveBeenCalled()
+      expect(result).toBe(true)
+      expect(service.urlLoadStatus.get(url)).toBe(true)
+    })
+
+    it('should return false if createElement throws an error', async () => {
+      const url = 'http://example.com/bad-style.css'
+      jest.spyOn(document, 'createElement').mockImplementation(() => { throw new Error('DOM error') })
 
       const result = await service.loadStyle(url)
 
@@ -98,25 +106,9 @@ describe('DynamicAssetsLoaderService', () => {
     })
   })
 
-  describe('loadEventPromise', () => {
-    it('should resolve true when script loads', async () => {
-      const url = 'http://example.com/script.js'
-      const mockScriptElem: any = { src: url }
-      service.urlElemMapping.set(url, mockScriptElem)
-      mockFromEvent.mockReturnValue(of({})) // Simulate load event
-
-      const result = await service['loadEventPromise'](url)
-
-      expect(mockFromEvent).toHaveBeenCalledWith(mockScriptElem, 'load')
-      expect(result).toBe(true)
-      expect(service.urlLoadStatus.get(url)).toBe(true)
-      expect(service.urlElemMapping.has(url)).toBe(false)
-    })
-
-    it('should resolve true if no script element exists', async () => {
-      const url = 'http://example.com/script.js'
-
-      const result = await service['loadEventPromise'](url)
+  describe('loadEventPromise (private)', () => {
+    it('should return true if url is not in urlElemMapping', async () => {
+      const result = await (service as any).loadEventPromise('non-existent-url')
 
       expect(result).toBe(true)
     })

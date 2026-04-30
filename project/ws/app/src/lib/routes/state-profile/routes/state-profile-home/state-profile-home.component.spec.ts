@@ -1,11 +1,12 @@
 import { StateProfileHomeComponent } from './state-profile-home.component'
-import { of, BehaviorSubject } from 'rxjs'
+import { of, BehaviorSubject, Subject } from 'rxjs'
 import { NavigationEnd } from '@angular/router'
 import * as _ from 'lodash'
 
 // Mock dependencies
+const mockIsLtMediumSubject = new BehaviorSubject<boolean>(false)
 const mockValueService = {
-    isLtMedium$: of(false)
+    isLtMedium$: mockIsLtMediumSubject.asObservable()
 }
 
 const mockActivatedRoute = {
@@ -26,8 +27,9 @@ const mockActivatedRoute = {
     }
 }
 
+const mockRouterSubject = new Subject<any>()
 const mockRouter = {
-    events: of(new NavigationEnd(1, '/welcome', '/welcome')),
+    events: mockRouterSubject.asObservable(),
     navigate: jest.fn()
 }
 
@@ -71,6 +73,9 @@ describe('StateProfileHomeComponent', () => {
     beforeEach(() => {
         // Reset all mocks
         jest.clearAllMocks()
+        mockIsLtMediumSubject.next(false)
+        // Reset router navigate
+        mockRouter.navigate = jest.fn()
 
         // Create component instance
         component = new StateProfileHomeComponent(
@@ -119,19 +124,14 @@ describe('StateProfileHomeComponent', () => {
 
     describe('init method', () => {
         it('should subscribe to router events', () => {
-            const mockRouterEvents = new BehaviorSubject(new NavigationEnd(1, '/welcome', '/welcome'))
-            mockRouter.events = mockRouterEvents.asObservable()
-
             component.init()
-
-            // expect(component.routerSubscription).toBeDefined()
+            // Subscription should be active
+            expect(component.routerSubscription).toBeDefined()
         })
 
         it('should update message and current step on NavigationEnd', () => {
-            const mockRouterEvents = new BehaviorSubject(new NavigationEnd(1, '/institute', '/institute'))
-            mockRouter.events = mockRouterEvents.asObservable()
-
-            component.init()
+            // Emit a navigation event on the shared subject
+            mockRouterSubject.next(new NavigationEnd(1, '/institute', '/institute'))
 
             expect(component.message).toBe('Institute Profile')
             expect(component.currentStep).toBe(2)
@@ -140,7 +140,7 @@ describe('StateProfileHomeComponent', () => {
 
         it('should unsubscribe existing subscription before creating new one', () => {
             const mockUnsubscribe = jest.fn()
-            //  component.routerSubscription = { unsubscribe: mockUnsubscribe } as any
+            component.routerSubscription = { unsubscribe: mockUnsubscribe } as any
 
             component.init()
 
@@ -187,33 +187,26 @@ describe('StateProfileHomeComponent', () => {
         })
 
         it('should show snackbar on error', () => {
-            const errorResponse = { error: 'Error: Something went wrong' }
+            const { throwError } = require('rxjs')
             mockOrgService.updateOrgProfileDetails.mockReturnValue(
-                new BehaviorSubject(null).pipe(() => {
-                    throw errorResponse
-                })
+                throwError({ error: 'Error: Something went wrong' })
             )
 
-            try {
-                component.updateOrgProfile()
-            } catch (error) {
-                expect(mockSnackBar.open).toHaveBeenCalledWith('Something went wrong', 'X', { duration: 5000 })
-            }
+            component.updateOrgProfile()
+
+            expect(mockSnackBar.open).toHaveBeenCalledWith(' Something went wrong', 'X', { duration: 5000 })
         })
     })
 
     describe('ngOnInit', () => {
         it('should subscribe to isLtMedium$ and set sideNavBarOpened', () => {
-            const mockIsLtMedium = new BehaviorSubject(false)
-            mockValueService.isLtMedium$ = mockIsLtMedium.asObservable()
-
             component.ngOnInit()
 
             expect(component.sideNavBarOpened).toBe(true)
             expect(component.screenSizeIsLtMedium).toBe(false)
 
             // Test with medium screen
-            mockIsLtMedium.next(true)
+            mockIsLtMediumSubject.next(true)
             expect(component.sideNavBarOpened).toBe(false)
             expect(component.screenSizeIsLtMedium).toBe(true)
         })
@@ -396,15 +389,13 @@ describe('StateProfileHomeComponent', () => {
 
     describe('openSnackbar method', () => {
         it('should open snackbar with default duration', () => {
-            const privateMethod = (component as any).openSnackbar
-            privateMethod('Test message')
+            ; (component as any).openSnackbar.call(component, 'Test message')
 
             expect(mockSnackBar.open).toHaveBeenCalledWith('Test message', 'X', { duration: 5000 })
         })
 
         it('should open snackbar with custom duration', () => {
-            const privateMethod = (component as any).openSnackbar
-            privateMethod('Test message', 3000)
+            ; (component as any).openSnackbar.call(component, 'Test message', 3000)
 
             expect(mockSnackBar.open).toHaveBeenCalledWith('Test message', 'X', { duration: 3000 })
         })
@@ -421,11 +412,12 @@ describe('StateProfileHomeComponent', () => {
             expect(component.currentStep).toBe(1)
         })
 
-        it('should have mode$ observable that maps isLtMedium to side/over', (done) => {
+        it('should have mode$ observable that maps isLtMedium to side/over', () => {
+            let result: string | undefined
             component.mode$.subscribe(mode => {
-                expect(mode).toBe('side')
-                done()
+                result = mode
             })
+            expect(result).toBe('side')
         })
     })
 })
