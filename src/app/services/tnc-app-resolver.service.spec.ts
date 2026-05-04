@@ -47,7 +47,7 @@ describe('TncAppResolverService', () => {
         it('should return error response when getTnc fails', async () => {
             // Arrange
             const mockError = new Error('HTTP Error')
-            jest.spyOn(service, 'getTnc').mockReturnValue(throwError(() => mockError))
+            jest.spyOn(service, 'getTnc').mockReturnValue(throwError(mockError))
 
             // Act
             const result = await service.resolve().toPromise()
@@ -188,8 +188,6 @@ describe('TncAppResolverService', () => {
 
             // Assert
             expect(result).toEqual(mockResponse)
-            expect(result.id).toBe('test-id')
-            expect(result.content).toBe('Terms and Conditions content')
         })
 
         it('should handle empty locale parameter', () => {
@@ -258,7 +256,7 @@ describe('TncAppResolverService', () => {
         it('should propagate HTTP errors', async () => {
             // Arrange
             const httpError = new Error('Network error')
-            httpClientMock.get.mockReturnValue(throwError(() => httpError))
+            httpClientMock.get.mockReturnValue(throwError(httpError))
 
             // Act & Assert
             await expect(service.getTnc().toPromise()).rejects.toThrow('Network error')

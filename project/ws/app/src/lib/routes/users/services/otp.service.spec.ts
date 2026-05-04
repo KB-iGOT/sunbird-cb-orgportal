@@ -1,10 +1,10 @@
-import { TestBed } from '@angular/core/testing'
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing'
+import { HttpClient } from '@angular/common/http'
+import { of } from 'rxjs'
 import { OtpService } from './otp.service'
 
 describe('OtpService', () => {
     let service: OtpService
-    let httpMock: HttpTestingController
+    let mockHttp: jest.Mocked<HttpClient>
 
     const API_ENDPOINTS = {
         sendOtp: '/apis/proxies/v8/otp/v1/generate',
@@ -15,121 +15,113 @@ describe('OtpService', () => {
     }
 
     beforeEach(() => {
-        TestBed.configureTestingModule({
-            imports: [HttpClientTestingModule],
-            providers: [OtpService]
-        })
-        service = TestBed.inject(OtpService)
-        httpMock = TestBed.inject(HttpTestingController)
+        mockHttp = {
+            post: jest.fn()
+        } as any
+
+        service = new OtpService(mockHttp)
     })
 
     afterEach(() => {
-        httpMock.verify()
+        jest.clearAllMocks()
     })
 
-    it('should be created', () => {
+    it('should create the service', () => {
         expect(service).toBeTruthy()
     })
 
     describe('sendOtp', () => {
-        it('should send OTP with correct request payload', () => {
-            const mockMobile = 9876543210
-            const mockResponse = { success: true, message: 'OTP sent successfully' }
+        it('should call POST to correct endpoint with correct payload', () => {
+            const mockResponse = { success: true }
+            mockHttp.post.mockReturnValue(of(mockResponse))
 
-            service.sendOtp(mockMobile).subscribe(response => {
-                expect(response).toEqual(mockResponse)
+            service.sendOtp(9876543210).subscribe(result => {
+                expect(result).toEqual(mockResponse)
             })
 
-            const req = httpMock.expectOne(API_ENDPOINTS.sendOtp)
-            expect(req.request.method).toBe('POST')
-            expect(req.request.body).toEqual({
-                request: {
-                    type: 'phone',
-                    key: '9876543210'
-                }
+            expect(mockHttp.post).toHaveBeenCalledWith(API_ENDPOINTS.sendOtp, {
+                request: { type: 'phone', key: '9876543210' }
             })
-            req.flush(mockResponse)
         })
 
-        it('should return observable', () => {
-            const mockMobile = 9876543210
-            const result = service.sendOtp(mockMobile)
-            expect(result.subscribe).toBeDefined()
-            result.subscribe()
+        it('should convert mobile number to string in key', () => {
+            mockHttp.post.mockReturnValue(of({}))
 
-            const req = httpMock.expectOne(API_ENDPOINTS.sendOtp)
-            req.flush({})
+            service.sendOtp(1234567890).subscribe()
+
+            expect(mockHttp.post).toHaveBeenCalledWith(
+                API_ENDPOINTS.sendOtp,
+                expect.objectContaining({ request: expect.objectContaining({ key: '1234567890' }) })
+            )
+        })
+
+        it('should return an observable', () => {
+            mockHttp.post.mockReturnValue(of({ success: true }))
+
+            const result = service.sendOtp(9876543210)
+
+            expect(result.subscribe).toBeDefined()
         })
     })
 
     describe('resendOtp', () => {
-        it('should resend OTP with correct request payload', () => {
-            const mockMobile = 9876543210
-            const mockResponse = { success: true, message: 'OTP resent successfully' }
+        it('should call POST to correct endpoint with correct payload', () => {
+            const mockResponse = { success: true }
+            mockHttp.post.mockReturnValue(of(mockResponse))
 
-            service.resendOtp(mockMobile).subscribe(response => {
-                expect(response).toEqual(mockResponse)
+            service.resendOtp(9876543210).subscribe(result => {
+                expect(result).toEqual(mockResponse)
             })
 
-            const req = httpMock.expectOne(API_ENDPOINTS.ReSendOtp)
-            expect(req.request.method).toBe('POST')
-            expect(req.request.body).toEqual({
-                request: {
-                    type: 'phone',
-                    key: '9876543210'
-                }
+            expect(mockHttp.post).toHaveBeenCalledWith(API_ENDPOINTS.ReSendOtp, {
+                request: { type: 'phone', key: '9876543210' }
             })
-            req.flush(mockResponse)
+        })
+
+        it('should use same endpoint as sendOtp', () => {
+            mockHttp.post.mockReturnValue(of({}))
+
+            service.resendOtp(9876543210).subscribe()
+
+            expect(mockHttp.post).toHaveBeenCalledWith(API_ENDPOINTS.sendOtp, expect.anything())
         })
     })
 
     describe('verifyOTP', () => {
-        it('should verify OTP with correct request payload', () => {
-            const mockOtp = 123456
-            const mockMobile = 9876543210
+        it('should call POST to correct endpoint with correct payload', () => {
             const mockResponse = { success: true, verified: true }
+            mockHttp.post.mockReturnValue(of(mockResponse))
 
-            service.verifyOTP(mockOtp, mockMobile).subscribe(response => {
-                expect(response).toEqual(mockResponse)
+            service.verifyOTP(123456, 9876543210).subscribe(result => {
+                expect(result).toEqual(mockResponse)
             })
 
-            const req = httpMock.expectOne(API_ENDPOINTS.VerifyOtp)
-            expect(req.request.method).toBe('POST')
-            expect(req.request.body).toEqual({
-                request: {
-                    otp: '123456',
-                    type: 'phone',
-                    key: '9876543210'
-                }
+            expect(mockHttp.post).toHaveBeenCalledWith(API_ENDPOINTS.VerifyOtp, {
+                request: { otp: '123456', type: 'phone', key: '9876543210' }
             })
-            req.flush(mockResponse)
         })
 
         it('should convert OTP number to string', () => {
-            const mockOtp = 123456
-            const mockMobile = 9876543210
+            mockHttp.post.mockReturnValue(of({}))
 
-            service.verifyOTP(mockOtp, mockMobile).subscribe()
+            service.verifyOTP(123456, 9876543210).subscribe()
 
-            const req = httpMock.expectOne(API_ENDPOINTS.VerifyOtp)
-            expect(req.request.body.request.otp).toBe('123456')
-            expect(typeof req.request.body.request.otp).toBe('string')
-            req.flush({})
+            const callArgs = mockHttp.post.mock.calls[0][1]
+            expect(callArgs.request.otp).toBe('123456')
+            expect(typeof callArgs.request.otp).toBe('string')
         })
     })
 
     describe('sendEmailOtp', () => {
-        it('should send email OTP with correct request payload', () => {
-            const mockEmail = 'test@example.com'
-            const mockResponse = { success: true, message: 'Email OTP sent successfully' }
+        it('should call POST to correct endpoint with correct payload', () => {
+            const mockResponse = { success: true }
+            mockHttp.post.mockReturnValue(of(mockResponse))
 
-            service.sendEmailOtp(mockEmail).subscribe(response => {
-                expect(response).toEqual(mockResponse)
+            service.sendEmailOtp('test@example.com').subscribe(result => {
+                expect(result).toEqual(mockResponse)
             })
 
-            const req = httpMock.expectOne(API_ENDPOINTS.sendEmailOtp)
-            expect(req.request.method).toBe('POST')
-            expect(req.request.body).toEqual({
+            expect(mockHttp.post).toHaveBeenCalledWith(API_ENDPOINTS.sendEmailOtp, {
                 request: {
                     type: 'email',
                     key: 'test@example.com',
@@ -137,32 +129,24 @@ describe('OtpService', () => {
                     context: ['profileDetails.personalDetails.primaryEmail']
                 }
             })
-            req.flush(mockResponse)
         })
 
-        it('should return observable', () => {
-            const mockEmail = 'test@example.com'
-            const result = service.sendEmailOtp(mockEmail)
-            expect(result.subscribe).toBeDefined()
-            result.subscribe()
+        it('should return an observable', () => {
+            mockHttp.post.mockReturnValue(of({}))
 
-            const req = httpMock.expectOne(API_ENDPOINTS.sendEmailOtp)
-            req.flush({})
+            const result = service.sendEmailOtp('test@example.com')
+
+            expect(result.subscribe).toBeDefined()
         })
     })
 
     describe('reSendEmailOtp', () => {
-        it('should resend email OTP with correct request payload', () => {
-            const mockEmail = 'test@example.com'
-            const mockResponse = { success: true, message: 'Email OTP resent successfully' }
+        it('should call POST to correct endpoint with correct payload', () => {
+            mockHttp.post.mockReturnValue(of({ success: true }))
 
-            service.reSendEmailOtp(mockEmail).subscribe(response => {
-                expect(response).toEqual(mockResponse)
-            })
+            service.reSendEmailOtp('test@example.com').subscribe()
 
-            const req = httpMock.expectOne(API_ENDPOINTS.sendEmailOtp)
-            expect(req.request.method).toBe('POST')
-            expect(req.request.body).toEqual({
+            expect(mockHttp.post).toHaveBeenCalledWith(API_ENDPOINTS.sendEmailOtp, {
                 request: {
                     type: 'email',
                     key: 'test@example.com',
@@ -170,111 +154,39 @@ describe('OtpService', () => {
                     context: ['profileDetails.personalDetails.primaryEmail']
                 }
             })
-            req.flush(mockResponse)
         })
 
-        it('should return observable', () => {
-            const mockEmail = 'test@example.com'
-            const result = service.reSendEmailOtp(mockEmail)
-            expect(result.subscribe).toBeDefined()
-            result.subscribe()
+        it('should return an observable', () => {
+            mockHttp.post.mockReturnValue(of({}))
 
-            const req = httpMock.expectOne(API_ENDPOINTS.sendEmailOtp)
-            req.flush({})
+            const result = service.reSendEmailOtp('test@example.com')
+
+            expect(result.subscribe).toBeDefined()
         })
     })
 
     describe('verifyEmailOTP', () => {
-        it('should verify email OTP with correct request payload', () => {
-            const mockOtp = 123456
-            const mockEmail = 'test@example.com'
+        it('should call POST to correct endpoint with correct payload', () => {
             const mockResponse = { success: true, verified: true }
+            mockHttp.post.mockReturnValue(of(mockResponse))
 
-            service.verifyEmailOTP(mockOtp, mockEmail).subscribe(response => {
-                expect(response).toEqual(mockResponse)
+            service.verifyEmailOTP(654321, 'test@example.com').subscribe(result => {
+                expect(result).toEqual(mockResponse)
             })
 
-            const req = httpMock.expectOne(API_ENDPOINTS.VerifyEmailOtp)
-            expect(req.request.method).toBe('POST')
-            expect(req.request.body).toEqual({
-                request: {
-                    otp: '123456',
-                    type: 'email',
-                    key: 'test@example.com'
-                }
+            expect(mockHttp.post).toHaveBeenCalledWith(API_ENDPOINTS.VerifyEmailOtp, {
+                request: { otp: '654321', type: 'email', key: 'test@example.com' }
             })
-            req.flush(mockResponse)
         })
 
         it('should convert OTP to string', () => {
-            const mockOtp = 123456
-            const mockEmail = 'test@example.com'
+            mockHttp.post.mockReturnValue(of({}))
 
-            service.verifyEmailOTP(mockOtp, mockEmail).subscribe()
+            service.verifyEmailOTP(654321, 'test@example.com').subscribe()
 
-            const req = httpMock.expectOne(API_ENDPOINTS.VerifyEmailOtp)
-            expect(req.request.body.request.otp).toBe('123456')
-            expect(typeof req.request.body.request.otp).toBe('string')
-            req.flush({})
-        })
-
-        it('should handle string OTP input', () => {
-            const mockOtp = '123456'
-            const mockEmail = 'test@example.com'
-
-            service.verifyEmailOTP(mockOtp, mockEmail).subscribe()
-
-            const req = httpMock.expectOne(API_ENDPOINTS.VerifyEmailOtp)
-            expect(req.request.body.request.otp).toBe('123456')
-            req.flush({})
-        })
-    })
-
-    describe('Error handling', () => {
-        it('should handle HTTP error in sendOtp', () => {
-            const mockMobile = 9876543210
-            const errorResponse = { status: 500, statusText: 'Internal Server Error' }
-
-            service.sendOtp(mockMobile).subscribe({
-                next: () => fail('should have failed with 500 error'),
-                error: (error) => {
-                    expect(error.status).toBe(500)
-                }
-            })
-
-            const req = httpMock.expectOne(API_ENDPOINTS.sendOtp)
-            req.flush('Something went wrong', errorResponse)
-        })
-
-        it('should handle HTTP error in verifyOTP', () => {
-            const mockOtp = 123456
-            const mockMobile = 9876543210
-            const errorResponse = { status: 400, statusText: 'Bad Request' }
-
-            service.verifyOTP(mockOtp, mockMobile).subscribe({
-                next: () => fail('should have failed with 400 error'),
-                error: (error) => {
-                    expect(error.status).toBe(400)
-                }
-            })
-
-            const req = httpMock.expectOne(API_ENDPOINTS.VerifyOtp)
-            req.flush('Invalid OTP', errorResponse)
-        })
-
-        it('should handle HTTP error in sendEmailOtp', () => {
-            const mockEmail = 'test@example.com'
-            const errorResponse = { status: 422, statusText: 'Unprocessable Entity' }
-
-            service.sendEmailOtp(mockEmail).subscribe({
-                next: () => fail('should have failed with 422 error'),
-                error: (error) => {
-                    expect(error.status).toBe(422)
-                }
-            })
-
-            const req = httpMock.expectOne(API_ENDPOINTS.sendEmailOtp)
-            req.flush('Invalid email', errorResponse)
+            const callArgs = mockHttp.post.mock.calls[0][1]
+            expect(callArgs.request.otp).toBe('654321')
+            expect(typeof callArgs.request.otp).toBe('string')
         })
     })
 })

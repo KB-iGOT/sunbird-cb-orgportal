@@ -82,7 +82,7 @@ describe('TncPublicResolverService', () => {
         it('should propagate error when API call fails', (done) => {
             // Arrange
             const error = new Error('API Error')
-            httpClient.get.mockReturnValue(throwError(() => error))
+            httpClient.get.mockReturnValue(throwError(error))
 
             // Act
             service.getPublicTnc().subscribe({
@@ -125,7 +125,7 @@ describe('TncPublicResolverService', () => {
         it('should return resolve response with null data and error on failed API call', (done) => {
             // Arrange
             const error = new Error('API Error')
-            httpClient.get.mockReturnValue(throwError(() => error))
+            httpClient.get.mockReturnValue(throwError(error))
 
             // Act
             service.resolve().subscribe({
@@ -175,7 +175,7 @@ describe('TncPublicResolverService', () => {
                 message: 'Not Found',
                 error: 'TnC not found'
             }
-            httpClient.get.mockReturnValue(throwError(() => httpError))
+            httpClient.get.mockReturnValue(throwError(httpError))
 
             // Act
             service.resolve().subscribe({
@@ -191,7 +191,7 @@ describe('TncPublicResolverService', () => {
         it('should handle network errors in resolve method', (done) => {
             // Arrange
             const networkError = new Error('Network connection failed')
-            httpClient.get.mockReturnValue(throwError(() => networkError))
+            httpClient.get.mockReturnValue(throwError(networkError))
 
             // Act
             service.resolve().subscribe({

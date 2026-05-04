@@ -54,7 +54,7 @@ describe('NavigationExternalService', () => {
             const eventCallback = mockSubscribe.mock.calls[0][0]
 
             // Spy on navigateTo method
-            const navigateToSpy = jest.spyOn(service, 'navigateTo')
+            jest.spyOn(service, 'navigateTo')
 
             // Mock event data
             const mockEvent = {
@@ -67,7 +67,10 @@ describe('NavigationExternalService', () => {
             // Call the event callback
             eventCallback(mockEvent)
 
-            expect(navigateToSpy).toHaveBeenCalledWith('/test-url', { testParam: 'testValue' })
+            expect(mockRouter.navigate).toHaveBeenCalledWith(
+                ['/test-url'],
+                expect.objectContaining({ queryParams: expect.objectContaining({ testParam: 'testValue' }) })
+            )
         })
     })
 
@@ -129,7 +132,7 @@ describe('NavigationExternalService', () => {
                 {
                     queryParams: {
                         param1: 'value1',
-                        ref: '/existing-ref'
+                        ref: encodeURIComponent('/existing-ref')
                     }
                 }
             )
