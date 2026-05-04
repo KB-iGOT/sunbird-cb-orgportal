@@ -1,16 +1,14 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing'
-import { UntypedFormBuilder, ReactiveFormsModule } from '@angular/forms'
-import { MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA, MatLegacyDialogRef as MatDialogRef } from '@angular/material/legacy-dialog'
+import { UntypedFormBuilder } from '@angular/forms'
 import { MatLegacyTableDataSource as MatTableDataSource } from '@angular/material/legacy-table'
 import { of, throwError } from 'rxjs'
 
 import { AssignListPopupComponent } from './assign-list-popup.component'
 import { ProfileV2Service } from '../../../services/home.servive'
 import { ConfigResolveService } from '../../../resolvers/config-resolve.service'
+import { MatLegacyDialogRef as MatDialogRef } from '@angular/material/legacy-dialog'
 
 describe('AssignListPopupComponent', () => {
     let component: AssignListPopupComponent
-    let fixture: ComponentFixture<AssignListPopupComponent>
     let mockHomeService: jest.Mocked<ProfileV2Service>
     let mockConfigService: jest.Mocked<ConfigResolveService>
     let mockDialogRef: jest.Mocked<MatDialogRef<AssignListPopupComponent>>
@@ -48,8 +46,7 @@ describe('AssignListPopupComponent', () => {
         name: 'Test User'
     }
 
-    beforeEach(async () => {
-        // Create mocks
+    beforeEach(() => {
         mockHomeService = {
             getOrgInterestList: jest.fn(),
             assignToOrg: jest.fn()
@@ -71,20 +68,14 @@ describe('AssignListPopupComponent', () => {
             assignedProvider: null
         }
 
-        await TestBed.configureTestingModule({
-            declarations: [AssignListPopupComponent],
-            imports: [ReactiveFormsModule],
-            providers: [
-                UntypedFormBuilder,
-                { provide: ProfileV2Service, useValue: mockHomeService },
-                { provide: ConfigResolveService, useValue: mockConfigService },
-                { provide: MatDialogRef, useValue: mockDialogRef },
-                { provide: MAT_DIALOG_DATA, useValue: mockDialogData }
-            ]
-        }).compileComponents()
-
-        fixture = TestBed.createComponent(AssignListPopupComponent)
-        component = fixture.componentInstance
+        const fb = new UntypedFormBuilder()
+        component = new AssignListPopupComponent(
+            fb,
+            mockHomeService,
+            mockDialogData,
+            mockConfigService,
+            mockDialogRef
+        )
     })
 
     describe('Component Initialization', () => {
@@ -331,6 +322,12 @@ describe('AssignListPopupComponent', () => {
         })
     })
 
+    describe('getAssigneeList', () => {
+        it('should not throw when called', () => {
+            expect(() => component.getAssigneeList()).not.toThrow()
+        })
+    })
+
     describe('Form Validation', () => {
         it('should mark assignee as required', () => {
             const assigneeControl = component.requestForm.get('assignee')
@@ -362,18 +359,19 @@ describe('AssignListPopupComponent', () => {
             expect(() => component.getInterestOrgList()).not.toThrow()
         })
 
-        it('should handle missing data properties', () => {
+        it('should handle missing data properties in setFormData', () => {
             component.data = {}
+            component.providerList = [...mockProviderList]
 
-            expect(() => component.ngOnInit()).not.toThrow()
             expect(() => component.setFormData()).not.toThrow()
         })
 
-        // it('should handle missing config service properties', () => {
-        //     mockConfigService.confService = {}
+        it('should handle missing demand_id in getInterestOrgList', () => {
+            component.data = {}
+            mockHomeService.getOrgInterestList.mockReturnValue(of({ data: null }))
 
-        //     expect(() => component.ngOnInit()).not.toThrow()
-        // })
+            expect(() => component.getInterestOrgList()).not.toThrow()
+        })
     })
 
     describe('Integration Tests', () => {

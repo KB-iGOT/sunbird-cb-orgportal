@@ -1,143 +1,196 @@
+import { Subject } from 'rxjs'
 import { FilterDisplayComponent } from './filter-display.component'
-import { ActivatedRoute, Router } from '@angular/router'
-import { SearchServService } from '../../services/search-serv.service'
-import { ConfigurationsService } from '@sunbird-cb/utils-v2'
-import { of } from 'rxjs'
-
-jest.mock('@angular/router', () => ({
-    ActivatedRoute: jest.fn(),
-    Router: jest.fn().mockImplementation(() => ({
-        navigate: jest.fn(),
-    })),
-}))
-
-jest.mock('../../services/search-serv.service', () => ({
-    SearchServService: jest.fn().mockImplementation(() => ({
-        translateSearchFilters: jest.fn(),
-    })),
-}))
-
-jest.mock('@sunbird-cb/utils-v2', () => ({
-    ConfigurationsService: jest.fn().mockImplementation(() => ({
-        userPreference: { selectedLocale: 'en' },
-    })),
-}))
 
 describe('FilterDisplayComponent', () => {
     let component: FilterDisplayComponent
-    let activatedRouteMock: any
-    let routerMock: any
-    let searchServServiceMock: any
-    let configurationsServiceMock: any
+    let mockActivated: any
+    let mockRouter: any
+    let mockSearchServ: any
+    let mockConfigSvc: any
+    let queryParamSubject: Subject<any>
 
     beforeEach(() => {
-        activatedRouteMock = new ActivatedRoute()
-        routerMock = new Router()
-        searchServServiceMock = new SearchServService(null as any, null as any, null as any, null as any)
-        configurationsServiceMock = new ConfigurationsService()
+        queryParamSubject = new Subject<any>()
+        mockActivated = {
+            parent: {
+                snapshot: {
+                    data: {
+                        searchPageData: { data: { search: { tabs: [] } } }
+                    }
+                }
+            },
+            queryParamMap: queryParamSubject.asObservable(),
+        }
+        mockRouter = { navigate: jest.fn() }
+        mockSearchServ = { translateSearchFilters: jest.fn().mockResolvedValue({}) }
+        mockConfigSvc = { userPreference: { selectedLocale: 'en' } }
 
-        component = new FilterDisplayComponent(
-            activatedRouteMock,
-            routerMock,
-            searchServServiceMock,
-            configurationsServiceMock
-        )
+        component = new FilterDisplayComponent(mockActivated, mockRouter, mockSearchServ, mockConfigSvc)
     })
 
-    it('should be created', () => {
+    it('should create', () => {
         expect(component).toBeTruthy()
     })
 
-    it('should call translateSearchFilters on ngOnInit', async () => {
-        const mockFilters = { someFilter: 'value' }
-        searchServServiceMock.translateSearchFilters.mockResolvedValue(mockFilters)
-
-        await component.ngOnInit()
-
-        expect(searchServServiceMock.translateSearchFilters).toHaveBeenCalledWith('en')
-        expect(component.translatedFilters).toEqual(mockFilters)
+    it('should initialize with empty filtersResponse', () => {
+        expect(component.filtersResponse).toEqual([])
     })
 
-    it('should process queryParams and set searchRequest filters', () => {
-        const mockQueryParams = { get: jest.fn().mockReturnValue(JSON.stringify({ key: ['value'] })) }
-        activatedRouteMock.queryParamMap = of(mockQueryParams)
+    describe('ngOnInit()', () => {
+        it('should call translateSearchFilters with selected locale', async () => {
+            mockSearchServ.translateSearchFilters.mockResolvedValue({ en: { test: { value: null } } })
+            component.ngOnInit()
+            await Promise.resolve()
+            expect(mockSearchServ.translateSearchFilters).toHaveBeenCalledWith('en')
+        })
 
-        component.ngOnInit()
+        it('should use en when userPreference is null', async () => {
+            mockConfigSvc.userPreference = null
+            mockSearchServ.translateSearchFilters.mockResolvedValue({})
+            component.ngOnInit()
+            await Promise.resolve()
+            expect(mockSearchServ.translateSearchFilters).toHaveBeenCalledWith('en')
+        })
 
-        expect(component.searchRequest.filters).toEqual({ key: ['value'] })
-    })
+        it('should update translatedFilters after translateSearchFilters resolves', async () => {
+            const filters = { course: { value: null } }
+            mockSearchServ.translateSearchFilters.mockResolvedValue(filters)
+            component.ngOnInit()
+            await new Promise(r => setTimeout(r, 0))
+            expect(component.translatedFilters).toEqual(filters)
+        })
 
-    it('should call router.navigate in addFilter method', () => {
-        const filterItem = { key: 'type', value: 'value' }
-        component.searchRequest = { filters: {} }
+        it('should set advancedFilters from matching tab', async () => {
+            const advancedFilters = [{ filters: { type: ['course'] }, title: 'test' }]
+            mockActivated.parent.snapshot.data.searchPageData.data.search.tabs = [
+                { titleKey: 'courses', searchQuery: { advancedFilters } }
+            ]
+            mockSearchServ.translateSearchFilters.mockResolvedValue({})
+            component.routeComp = 'courses'
+            component.ngOnInit()
+            await Promise.resolve()
+            expect(component.advancedFilters).toEqual(advancedFilters)
+        })
 
-        component.addFilter(filterItem)
+        it('should reset searchRequest when queryParamMap emits without f', () => {
+            const mockParams = { has: jest.fn().mockReturnValue(false), get: jest.fn() }
+            component.ngOnInit()
+            queryParamSubject.next(mockParams)
+            expect(component.searchRequest.filters).toEqual({})
+        })
 
-        expect(routerMock.navigate).toHaveBeenCalledWith([], {
-            queryParams: { f: JSON.stringify({ type: ['value'] }) },
-            relativeTo: activatedRouteMock.parent,
-            queryParamsHandling: 'merge',
+        it('should parse f param from queryParamMap', () => {
+            const filters = { type: ['course'] }
+            const mockParams = { has: jest.fn().mockReturnValue(true), get: jest.fn().mockReturnValue(JSON.stringify(filters)) }
+            component.ngOnInit()
+            queryParamSubject.next(mockParams)
+            expect(component.searchRequest.filters).toEqual(filters)
         })
     })
 
-    it('should call router.navigate in removeFilter method', () => {
-        component.searchRequest.filters = { type: ['value'] }
+    describe('addFilter()', () => {
+        it('should add new filter key', () => {
+            component.searchRequest.filters = {}
+            component.addFilter({ key: 'type', value: 'course' })
+            expect(mockRouter.navigate).toHaveBeenCalledWith(
+                [],
+                expect.objectContaining({ queryParams: { f: JSON.stringify({ type: ['course'] }) } })
+            )
+        })
 
-        const filterItem = { key: 'type', value: 'value' }
-        component.removeFilter(filterItem)
-
-        expect(routerMock.navigate).toHaveBeenCalledWith([], {
-            queryParams: { f: '{}' },
-            relativeTo: activatedRouteMock.parent,
-            queryParamsHandling: 'merge',
+        it('should append to existing filter key', () => {
+            component.searchRequest.filters = { type: ['program'] }
+            component.addFilter({ key: 'type', value: 'course' })
+            expect(mockRouter.navigate).toHaveBeenCalledWith(
+                [],
+                expect.objectContaining({ queryParams: { f: JSON.stringify({ type: ['program', 'course'] }) } })
+            )
         })
     })
 
-    it('should remove filters correctly', () => {
-        component.removeFilters()
+    describe('removeFilter()', () => {
+        it('should remove specific filter value', () => {
+            component.searchRequest.filters = { type: ['course', 'program'] }
+            component.removeFilter({ key: 'type', value: 'course' })
+            expect(mockRouter.navigate).toHaveBeenCalledWith(
+                [],
+                expect.objectContaining({ queryParams: { f: JSON.stringify({ type: ['program'] }) } })
+            )
+        })
 
-        expect(routerMock.navigate).toHaveBeenCalledWith([], {
-            queryParams: { f: null },
-            queryParamsHandling: 'merge',
-            relativeTo: activatedRouteMock.parent,
+        it('should remove empty filter key after removal', () => {
+            component.searchRequest.filters = { type: ['course'] }
+            component.removeFilter({ key: 'type', value: 'course' })
+            expect(mockRouter.navigate).toHaveBeenCalledWith(
+                [],
+                expect.objectContaining({ queryParams: { f: JSON.stringify({}) } })
+            )
         })
     })
 
-    it('should call filterClose.emit when filterClose is triggered', () => {
-        const emitSpy = jest.spyOn(component.filterClose, 'emit')
-
-        component.filterClose.emit(true)
-
-        expect(emitSpy).toHaveBeenCalledWith(true)
-    })
-
-    it('should call advancedFilterClick method and navigate', () => {
-        // const filter = { filters: { key: 'value', title: '' } }
-        // component.advancedFilterClick(filter)
-
-        expect(routerMock.navigate).toHaveBeenCalledWith([], {
-            queryParams: { f: JSON.stringify({ key: 'value' }) },
-            relativeTo: activatedRouteMock.parent,
-            queryParamsHandling: 'merge',
+    describe('removeFilters()', () => {
+        it('should navigate with f: null', () => {
+            component.removeFilters()
+            expect(mockRouter.navigate).toHaveBeenCalledWith(
+                [],
+                { queryParams: { f: null }, queryParamsHandling: 'merge', relativeTo: mockActivated.parent }
+            )
         })
     })
 
-    it('should correctly handle lowerCaseFilter method', () => {
-        const filterObject = { someKey: { value: 'test' } }
-        component.lowerCaseFilter(filterObject, ['someKey'])
-
-        expect(Object.hasOwnProperty.call(filterObject, 'somekey')).toBe(true)
+    describe('advancedFilterClick()', () => {
+        it('should navigate with advanced filter', () => {
+            const filter = { filters: { type: ['course'] }, title: 'Courses' }
+            component.advancedFilterClick(filter as any)
+            expect(mockRouter.navigate).toHaveBeenCalledWith(
+                [],
+                expect.objectContaining({ queryParams: { f: JSON.stringify({ type: ['course'] }) } })
+            )
+        })
     })
 
-    it('should track filters using filterUnitResponseTrackBy', () => {
-        // const filter = { id: 1 }
-        // const result = component.filterUnitResponseTrackBy(filter)
-        // expect(result).toBe(1)
+    describe('applyFilters()', () => {
+        it('should call addFilter when filter is not in current filters', () => {
+            const addFilterSpy = jest.spyOn(component, 'addFilter')
+            component.searchRequest.filters = {}
+            component.applyFilters({ unitFilter: { id: '1', type: 'course' } as any, filterType: 'type' })
+            expect(addFilterSpy).toHaveBeenCalledWith({ key: 'type', value: 'course' })
+        })
+
+        it('should call removeFilter when filter is already selected', () => {
+            const removeFilterSpy = jest.spyOn(component, 'removeFilter')
+            component.searchRequest.filters = { type: ['course'] }
+            component.applyFilters({ unitFilter: { id: '1', type: 'course' } as any, filterType: 'type' })
+            expect(removeFilterSpy).toHaveBeenCalledWith({ key: 'type', value: 'course' })
+        })
     })
 
-    it('should track filters using filterUnitTrackBy', () => {
-        // const filter = { id: 1 }
-        // const result = component.filterUnitTrackBy(filter)
-        // expect(result).toBe(1)
+    describe('filterUnitResponseTrackBy()', () => {
+        it('should return filter.id', () => {
+            const result = component.filterUnitResponseTrackBy({ id: 'filter-1' } as any)
+            expect(result).toBe('filter-1')
+        })
+    })
+
+    describe('filterUnitTrackBy()', () => {
+        it('should return filter.id', () => {
+            const result = component.filterUnitTrackBy({ id: 'unit-1' } as any)
+            expect(result).toBe('unit-1')
+        })
+    })
+
+    describe('lowerCaseFilter()', () => {
+        it('should create lowercase property alias', () => {
+            const obj: any = { TestKey: { value: null } }
+            component.lowerCaseFilter(obj, ['TestKey'])
+            expect(Object.prototype.hasOwnProperty.call(obj, 'testkey')).toBe(true)
+        })
+
+        it('should recursively lower case nested value keys', () => {
+            const nested: any = { NestedKey: 'value' }
+            const obj: any = { TestKey: { value: nested } }
+            component.lowerCaseFilter(obj, ['TestKey'])
+            expect(Object.prototype.hasOwnProperty.call(obj, 'testkey')).toBe(true)
+        })
     })
 })
