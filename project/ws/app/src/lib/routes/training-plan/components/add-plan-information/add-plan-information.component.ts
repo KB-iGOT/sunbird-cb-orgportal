@@ -5,10 +5,10 @@ import { TrainingPlanDataSharingService } from '../../services/training-plan-dat
 import { Subscription } from 'rxjs'
 
 @Component({
-    selector: 'ws-app-add-plan-information',
-    templateUrl: './add-plan-information.component.html',
-    styleUrls: ['./add-plan-information.component.scss'],
-    standalone: false
+  selector: 'ws-app-add-plan-information',
+  templateUrl: './add-plan-information.component.html',
+  styleUrls: ['./add-plan-information.component.scss'],
+  standalone: false
 })
 export class AddPlanInformationComponent implements OnInit, OnDestroy {
 
@@ -33,7 +33,7 @@ export class AddPlanInformationComponent implements OnInit, OnDestroy {
         new UntypedFormControl('', [Validators.required, Validators.pattern(noSpecialChar), Validators.minLength(10)]),
     })
 
-    this.subscr = this.subscr.add(this.contentForm.controls['name'].valueChanges.pipe(debounceTime(500)).subscribe((_ele: any) => {
+    this.subscr.add(this.contentForm.controls['name'].valueChanges.pipe(debounceTime(500)).subscribe((_ele: any) => {
       if (!this.contentForm.invalid) {
         this.tpdsSvc.trainingPlanTitle = _ele
         this.tpdsSvc.trainingPlanStepperData.name = _ele
