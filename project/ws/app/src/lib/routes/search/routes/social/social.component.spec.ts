@@ -1,3 +1,12 @@
+jest.mock('@sunbird-cb/collection', () => ({
+    NsContent: { EMimeTypes: {} },
+    NsError: {},
+    ROOT_WIDGET_CONFIG: { errorResolver: { _type: 'errorResolver', errorResolver: 'errorResolver' } },
+}), { virtual: true })
+jest.mock('@sunbird-cb/resolver-v2', () => ({
+    NsWidgetResolver: {},
+}), { virtual: true })
+
 import { SocialComponent } from './social.component'
 import { Router, ActivatedRoute } from '@angular/router'
 import { SearchServService } from '../../services/search-serv.service'
@@ -68,8 +77,8 @@ describe('SocialComponent', () => {
         })
 
         it('should handle screen size changes', () => {
-            const mockIsLtMedium$ = of(true);
-            (mockValueService.isLtMedium$ as any) = mockIsLtMedium$
+            mockValueService.isLtMedium$ = of(true) as any
+            component = new SocialComponent(mockActivatedRoute, mockRouter, mockValueService, mockSearchService)
 
             component.ngOnInit()
 
@@ -80,7 +89,7 @@ describe('SocialComponent', () => {
 
     describe('Search Results Fetching', () => {
         it('should fetch search results successfully', () => {
-            component.ngOnInit()
+            component.searchResults = { total: 0, result: [], filters: [] } as any
             component.getResults()
 
             expect(mockSearchService.fetchSocialSearchUsers).toHaveBeenCalled()

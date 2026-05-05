@@ -1,5 +1,5 @@
 import { RolesAccessComponent } from './roles-access.component'
-import { Router, ActivatedRoute } from '@angular/router'
+import { ActivatedRoute } from '@angular/router'
 import { EventService } from '@sunbird-cb/utils-v2'
 import { RolesService } from '../../../users/services/roles.service'
 import { UsersService } from '../../../users/services/users.service'
@@ -15,7 +15,6 @@ jest.mock('lodash', () => ({
 
 describe('RolesAccessComponent', () => {
     let component: RolesAccessComponent
-    let mockRouter: jest.Mocked<Router>
     let mockActivatedRoute: jest.Mocked<ActivatedRoute>
     let mockUsersService: jest.Mocked<UsersService>
     let mockEventService: jest.Mocked<EventService>
@@ -23,10 +22,6 @@ describe('RolesAccessComponent', () => {
 
     beforeEach(() => {
         // Create mocks
-        mockRouter = {
-            navigate: jest.fn(),
-        } as any
-
         mockActivatedRoute = {
             snapshot: {
                 parent: {
@@ -57,7 +52,6 @@ describe('RolesAccessComponent', () => {
 
         // Create component instance
         component = new RolesAccessComponent(
-            mockRouter,
             mockActivatedRoute,
             mockUsersService,
             mockEventService,
@@ -99,7 +93,8 @@ describe('RolesAccessComponent', () => {
 
             component.onRoleClick(mockRole)
 
-            expect(mockRouter.navigate).toHaveBeenCalledWith(['/app/roles/ADMIN/users'])
+            expect(component.showSelectedRoleUsers).toBe(true)
+            expect(component.selectedRole).toBe('ADMIN')
             expect(mockEventService.raiseInteractTelemetry).toHaveBeenCalledWith(
                 {
                     type: TelemetryEvents.EnumInteractTypes.CLICK,

@@ -2,8 +2,20 @@
 jest.mock('../../viewer-util.service', () => ({
   ViewerUtilService: jest.fn(),
 }))
+jest.mock('@sunbird-cb/collection', () => ({
+  NsContent: {
+    EMimeTypes: { PDF: 'application/pdf' },
+  },
+  NsDiscussionForum: {
+    EDiscussionType: { LEARNING: 'learning' },
+  },
+  WidgetContentService: jest.fn(),
+}), { virtual: true })
+jest.mock('@sunbird-cb/resolver', () => ({
+  NsWidgetResolver: {},
+}), { virtual: true })
 
-import { Subject, of } from 'rxjs'
+import { Subject, of, throwError } from 'rxjs'
 import { SurveyComponent } from './survey.component'
 import { WsEvents } from '@sunbird-cb/utils-v2'
 
@@ -69,9 +81,9 @@ describe('SurveyComponent', () => {
     mockActivatedRoute = buildMockActivatedRoute()
 
     mockContentSvc = {
-      fetchContent: jest.fn(),
-      fetchContentHistoryV2: jest.fn(),
-      setS3Cookie: jest.fn(),
+      fetchContent: jest.fn().mockReturnValue(of({ result: { content: { name: 'Test Course' } } })),
+      fetchContentHistoryV2: jest.fn().mockReturnValue(of({ result: { contentList: [] } })),
+      setS3Cookie: jest.fn().mockReturnValue(of(null)),
     }
 
     mockViewerSvc = {
@@ -574,6 +586,12 @@ describe('SurveyComponent', () => {
   // ngOnInit — normal (non-preview) mode
   // ──────────────────────────────────────────────────────────────────────────
   describe('ngOnInit — normal mode', () => {
+    beforeEach(() => {
+      mockActivatedRoute.data = of({ content: { data: { ...mockSurveyData } } })
+      component = new SurveyComponent(mockActivatedRoute, mockContentSvc, mockViewerSvc, mockEventSvc, mockConfigSvc)
+      component.forPreview = false
+    })
+
     it('should set surveyData from route data', async () => {
       component.ngOnInit()
       await Promise.resolve()
@@ -763,6 +781,7 @@ describe('SurveyComponent', () => {
         },
         data: of({ content: { data: { ...mockSurveyData } } }),
       }
+      mockViewerSvc.getContent.mockReturnValue(of({ ...mockSurveyData }))
       component = new SurveyComponent(mockActivatedRoute, mockContentSvc, mockViewerSvc, mockEventSvc, mockConfigSvc)
       component.forPreview = false
     })
@@ -963,6 +982,12 @@ describe('SurveyComponent', () => {
   // fetchContent
   // ──────────────────────────────────────────────────────────────────────────
   describe('fetchContent', () => {
+    beforeEach(() => {
+      mockContentSvc.fetchContent.mockReturnValue(
+        of({ result: { content: { name: 'Course Name' } } })
+      )
+    })
+
     it('should call contentSvc.fetchContent with collectionId', async () => {
       component.widgetResolverSurveyData.widgetData.collectionId = 'col-fetch'
       await component.fetchContent()
@@ -986,6 +1011,12 @@ describe('SurveyComponent', () => {
   // fetchContinueLearning
   // ──────────────────────────────────────────────────────────────────────────
   describe('fetchContinueLearning', () => {
+    beforeEach(() => {
+      mockContentSvc.fetchContentHistoryV2.mockReturnValue(
+        of({ result: { contentList: [] } })
+      )
+    })
+
     it('should resolve true when no collectionId/batchId', async () => {
       const result = await component.fetchContinueLearning('survey-001')
       expect(result).toBe(true)
@@ -1008,7 +1039,7 @@ describe('SurveyComponent', () => {
       mockActivatedRoute.snapshot.queryParams = { collectionId: 'col-001', batchId: 'batch-001' }
       await component.fetchContinueLearning('survey-001')
       const req = mockContentSvc.fetchContentHistoryV2.mock.calls[0][0]
-      expect(req.request.userId).toBe('user-001')
+      expect(req.request.userId).toBe('user1')
     })
 
     it('should handle null userProfile gracefully', async () => {

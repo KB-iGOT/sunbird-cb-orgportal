@@ -314,4 +314,98 @@ describe('WebModuleComponent', () => {
       expect(component.current).toEqual(['1', '2'])
     })
   })
+
+  describe('ngOnInit prefChangeNotifier', () => {
+    it('should trigger setTheme when prefChangeNotifier emits', () => {
+      const setThemeSpy = jest.spyOn(component, 'setTheme').mockImplementation()
+      component.ngOnInit()
+      // prefChangeNotifier is of({}), emits immediately
+      expect(setThemeSpy).toHaveBeenCalled()
+    })
+
+    it('should set currentFontSize from activeFontObject if present', () => {
+      mockConfigService.activeFontObject = { baseFontSize: '16px' }
+      component.ngOnInit()
+      expect(component.currentFontSize).toBe('16px')
+      expect(component.defaultFontSize).toBe(16)
+    })
+
+    it('should not set currentFontSize when activeFontObject is absent', () => {
+      mockConfigService.activeFontObject = null
+      component.ngOnInit()
+      // currentFontSize should remain unset (undefined)
+      expect(component.currentFontSize).toBeUndefined()
+    })
+  })
+
+  describe('ngOnDestroy', () => {
+    it('should unsubscribe from screenSizeSubscription if it exists', () => {
+      component.ngOnInit()
+      const unsubSpy = jest.spyOn(component['screenSizeSubscription'] as any, 'unsubscribe')
+      component.ngOnDestroy()
+      expect(unsubSpy).toHaveBeenCalled()
+    })
+
+    it('should not throw if screenSizeSubscription is null', () => {
+      component['screenSizeSubscription'] = null
+      expect(() => component.ngOnDestroy()).not.toThrow()
+    })
+  })
+
+  describe('ngOnChanges with current entries', () => {
+    it('should call fireRealTimeProgress when current has entries and identifier changed', () => {
+      component.current = ['1', '2']
+      component.oldIdentifier = 'old-id'
+      component.widgetData = {
+        identifier: 'new-id',
+        artifactUrl: 'http://test.com/content/index.html',
+        mimeType: 'application/web-module',
+      }
+      const fireProgressSpy = jest.spyOn(component, 'fireRealTimeProgress').mockImplementation()
+      const changes: any = { widgetData: { currentValue: component.widgetData, previousValue: null, isFirstChange: () => false } }
+      component.ngOnChanges(changes)
+      expect(fireProgressSpy).toHaveBeenCalledWith('old-id')
+    })
+
+    it('should not call fireRealTimeProgress when current is empty', () => {
+      component.current = []
+      component.oldIdentifier = 'old-id'
+      component.widgetData = {
+        identifier: 'new-id',
+        artifactUrl: 'http://test.com/content/index.html',
+        mimeType: 'application/web-module',
+      }
+      const fireProgressSpy = jest.spyOn(component, 'fireRealTimeProgress').mockImplementation()
+      const changes: any = { widgetData: { currentValue: component.widgetData, previousValue: null, isFirstChange: () => false } }
+      component.ngOnChanges(changes)
+      expect(fireProgressSpy).not.toHaveBeenCalledWith('old-id')
+    })
+  })
+
+  describe('getColor', () => {
+    it('should return a string starting with #', () => {
+      // JSDOM returns '' for computed color values, so parseInt gives NaN but method still returns a string
+      const result = component.getColor('color')
+      expect(typeof result).toBe('string')
+      expect(result.startsWith('#')).toBe(true)
+    })
+  })
+
+  describe('setAudio', () => {
+    it('should set slideAudioUrl when valid audio array provided', () => {
+      component.urlPrefix = 'http://test.com'
+      component.setAudio([{ URL: '/audio/track.mp3' }])
+      expect(mockDomSanitizer.bypassSecurityTrustUrl).toHaveBeenCalledWith('http://test.com/audio/track.mp3')
+    })
+
+    it('should set slideAudioUrl to null when audio array is empty', () => {
+      component.setAudio([])
+      expect(component.slideAudioUrl).toBeNull()
+    })
+
+    it('should set slideAudioUrl to null when audios is null', () => {
+      component.setAudio(null as any)
+      expect(component.slideAudioUrl).toBeNull()
+    })
+  })
 })

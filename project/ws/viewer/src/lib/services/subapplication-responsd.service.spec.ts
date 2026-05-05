@@ -1,3 +1,8 @@
+jest.mock('@sunbird-cb/collection', () => ({
+  WidgetContentService: jest.fn(),
+  NsContent: {},
+}), { virtual: true })
+
 import { of, Subject } from 'rxjs'
 import { SubapplicationRespondService } from './subapplication-responsd.service'
 
