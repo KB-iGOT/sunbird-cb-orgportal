@@ -1,3 +1,8 @@
+jest.mock('@sunbird-cb/collection', () => ({
+  NsContent: {},
+  ROOT_WIDGET_CONFIG: {},
+}), { virtual: true })
+
 import { of, throwError, Subject } from 'rxjs'
 import { ShareTocComponent } from './share-toc.component'
 import { WsEvents } from '@sunbird-cb/utils-v2'

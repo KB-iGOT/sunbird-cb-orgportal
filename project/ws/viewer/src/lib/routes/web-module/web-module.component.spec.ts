@@ -1,7 +1,19 @@
 
-// Mock ViewerUtilService to prevent transitive ESM import issues (jspdf)
+// Mock packages with ESM/pdfjs transitive dependencies
 jest.mock('../../viewer-util.service', () => ({
     ViewerUtilService: jest.fn(),
+}))
+jest.mock('@sunbird-cb/collection', () => ({
+    NsContent: {
+        EMimeTypes: {
+            WEB_MODULE: 'application/web-module',
+            WEB_MODULE_EXERCISE: 'application/web-module-exercise',
+        },
+    },
+    NsDiscussionForum: {
+        EDiscussionType: { LEARNING: 'Learning' },
+    },
+    WidgetContentService: jest.fn(),
 }))
 
 import { Subject, of } from 'rxjs'

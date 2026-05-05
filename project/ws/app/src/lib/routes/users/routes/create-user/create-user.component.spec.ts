@@ -408,10 +408,15 @@ describe('CreateUserComponent', () => {
 
     it('should clean up subscriptions on destroy', () => {
         const mockSubscription = { unsubscribe: jest.fn() }
-        // component.defaultSideNavBarOpenedSubscription = mockSubscription
+        component['defaultSideNavBarOpenedSubscription'] = mockSubscription
 
         component.ngOnDestroy()
 
         expect(mockSubscription.unsubscribe).toHaveBeenCalled()
+    })
+
+    it('should not throw on destroy when no subscription', () => {
+        component['defaultSideNavBarOpenedSubscription'] = null
+        expect(() => component.ngOnDestroy()).not.toThrow()
     })
 })

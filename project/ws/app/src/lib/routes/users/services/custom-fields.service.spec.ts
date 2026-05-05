@@ -275,7 +275,7 @@ describe('CustomFieldsService', () => {
 
       expect(httpClient.post).toHaveBeenCalledWith(
         '/apis/proxies/v8/customFields/v1/masterList/update',
-        undefined
+        mockFilter
       )
     })
   })

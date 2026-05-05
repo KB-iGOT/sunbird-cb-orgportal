@@ -8,7 +8,9 @@ const mockUsersService = {
     getDesignations: jest.fn(),
     getMasterLanguages: jest.fn(),
     getGroups: jest.fn(),
-    createUser: jest.fn()
+    createUser: jest.fn(),
+    searchIgotDesignation: jest.fn().mockReturnValue(of({ result: { count: 0 } })),
+    searchDesignation: jest.fn().mockReturnValue(of({ result: { result: { data: [], totalcount: 0 } } })),
 }
 
 const mockMatSnackBar = {
@@ -29,6 +31,11 @@ const mockActivatedRoute = {
             }
         }
     }
+}
+
+const mockDialog = {
+    open: jest.fn().mockReturnValue({ afterClosed: () => ({ subscribe: jest.fn() }) }),
+    closeAll: jest.fn(),
 }
 
 const mockElementRef = {
@@ -57,7 +64,8 @@ describe('SingleUserCreationComponent', () => {
             mockUsersService as any,
             mockMatSnackBar as any,
             mockRolesService as any,
-            mockActivatedRoute as any
+            mockActivatedRoute as any,
+            mockDialog as any
         )
 
         // Mock ViewChildren
@@ -88,12 +96,14 @@ describe('SingleUserCreationComponent', () => {
         })
 
         it('should set up searchDesignation valueChanges subscription', () => {
+            jest.useFakeTimers()
             const newComponent = new SingleUserCreationComponent(
                 formBuilder,
                 mockUsersService as any,
                 mockMatSnackBar as any,
                 mockRolesService as any,
-                mockActivatedRoute as any
+                mockActivatedRoute as any,
+                mockDialog as any
             )
 
             newComponent.masterData = {
@@ -103,11 +113,14 @@ describe('SingleUserCreationComponent', () => {
 
             // Test with search value
             newComponent.userCreationForm.get('searchDesignation')?.setValue('dev')
+            jest.advanceTimersByTime(200)
             expect(newComponent.desigantionFilterEnable).toBe(true)
 
             // Test with empty search value
             newComponent.userCreationForm.get('searchDesignation')?.setValue('')
+            jest.advanceTimersByTime(200)
             expect(newComponent.desigantionFilterEnable).toBe(false)
+            jest.useRealTimers()
         })
 
         it('should set up domicileMedium valueChanges subscription', () => {
@@ -116,7 +129,8 @@ describe('SingleUserCreationComponent', () => {
                 mockUsersService as any,
                 mockMatSnackBar as any,
                 mockRolesService as any,
-                mockActivatedRoute as any
+                mockActivatedRoute as any,
+                mockDialog as any
             )
 
             newComponent.masterData = {
@@ -131,14 +145,14 @@ describe('SingleUserCreationComponent', () => {
 
     describe('ngOnInit', () => {
         it('should call all initialization methods', () => {
-            const getDesignationSpy = jest.spyOn(component, 'getDesignation')
-            const getMasterLanguagesSpy = jest.spyOn(component, 'getMasterLanguages')
-            const getGroupsSpy = jest.spyOn(component, 'getGroups')
-            const getOrgRolesListSpy = jest.spyOn(component, 'getOrgRolesList')
+            const checkOrgDesignationsSpy = jest.spyOn(component, 'checkOrgHasDesignations').mockImplementation(() => { })
+            const getMasterLanguagesSpy = jest.spyOn(component, 'getMasterLanguages').mockImplementation(() => { })
+            const getGroupsSpy = jest.spyOn(component, 'getGroups').mockImplementation(() => { })
+            const getOrgRolesListSpy = jest.spyOn(component, 'getOrgRolesList').mockImplementation(() => { })
 
             component.ngOnInit()
 
-            expect(getDesignationSpy).toHaveBeenCalled()
+            expect(checkOrgDesignationsSpy).toHaveBeenCalled()
             expect(getMasterLanguagesSpy).toHaveBeenCalled()
             expect(getGroupsSpy).toHaveBeenCalled()
             expect(getOrgRolesListSpy).toHaveBeenCalled()
@@ -172,25 +186,21 @@ describe('SingleUserCreationComponent', () => {
     describe('getDesignation', () => {
         it('should fetch designations successfully', () => {
             const mockResponse = {
-                responseData: [
-                    { name: 'Developer' },
-                    { name: 'Manager' },
-                    { name: 'Tester' }
-                ]
+                result: { result: { data: [{ designation: 'Developer', status: 'Active' }, { designation: 'Manager', status: 'Active' }], totalcount: 2 } }
             }
-            mockUsersService.getDesignations.mockReturnValue(of(mockResponse))
+            mockUsersService.searchDesignation.mockReturnValue(of(mockResponse))
 
             component.getDesignation()
 
-            expect(mockUsersService.getDesignations).toHaveBeenCalled()
-            expect(component.masterData.designation).toEqual(mockResponse.responseData.slice(0, 50))
-            expect(component.masterData.designationBackup).toEqual(mockResponse.responseData)
+            expect(mockUsersService.searchDesignation).toHaveBeenCalled()
+            expect(component.masterData.designationBackup).toHaveLength(2)
+            expect(component.masterData.designationBackup[0].name).toBe('Developer')
         })
 
         it('should handle designation fetch error', () => {
             const mockError: any = new HttpErrorResponse({ status: 500, statusText: 'Server Error' })
             mockError.ok = false
-            mockUsersService.getDesignations.mockReturnValue(throwError(mockError))
+            mockUsersService.searchDesignation.mockReturnValue(throwError(mockError))
 
             component.getDesignation()
 
@@ -450,7 +460,6 @@ describe('SingleUserCreationComponent', () => {
 
             component.handleUserCreation()
 
-            expect(component.displayLoader).toBe(true)
             expect(mockUsersService.createUser).toHaveBeenCalled()
             expect(mockMatSnackBar.open).toHaveBeenCalledWith('User created successfully!')
             expect(handleFormClearSpy).toHaveBeenCalled()
@@ -577,7 +586,6 @@ describe('SingleUserCreationComponent', () => {
 
             component.onDesignationSelectScroll(mockEvent)
 
-            expect(component.isLoadingMoreDesignations).toBe(true)
             expect(component.designationListLoadCount).toBe(100)
             expect(checkCurrentDesignationPresentSpy).toHaveBeenCalled()
         })

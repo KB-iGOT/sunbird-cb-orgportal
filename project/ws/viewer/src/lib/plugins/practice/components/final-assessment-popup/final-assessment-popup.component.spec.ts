@@ -13,7 +13,10 @@ describe('FinalAssessmentPopupComponent', () => {
     createComponent()
   })
 
-  afterEach(() => jest.clearAllMocks())
+  afterEach(() => {
+    component.dataSource.disconnect()
+    jest.clearAllMocks()
+  })
 
   // ─── creation ──────────────────────────────────────────────────────────────
 

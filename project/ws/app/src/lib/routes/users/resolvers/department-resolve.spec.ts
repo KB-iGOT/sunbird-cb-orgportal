@@ -50,11 +50,10 @@ describe('DepartmentResolve', () => {
     // Arrange: Mock the service method to throw an error
     usersServiceMock.getMyDepartment.mockReturnValue(throwError('Error'))
 
-    // Act: Call the resolve method
-    departmentResolve.resolve({} as any, {} as any).subscribe((result: IResolveResponse<NSProfileDataV2.IProfile>) => {
-      // Assert: Verify that the result is EMPTY (no data, no error)
-      expect(result).toBeUndefined()
-      done()
+    // Act: Call the resolve method - EMPTY completes without emitting, check complete callback
+    departmentResolve.resolve({} as any, {} as any).subscribe({
+      next: () => { /* EMPTY does not emit */ },
+      complete: () => done(),
     })
   })
 })

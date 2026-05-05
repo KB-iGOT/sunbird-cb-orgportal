@@ -1,3 +1,9 @@
+jest.mock('@sunbird-cb/collection', () => ({
+	BtnSettingsService: jest.fn().mockImplementation(() => ({
+		initializePrefChanges: jest.fn(),
+	})),
+}))
+
 import { InitService } from './init.service'
 import { of, throwError, Subject } from 'rxjs'
 

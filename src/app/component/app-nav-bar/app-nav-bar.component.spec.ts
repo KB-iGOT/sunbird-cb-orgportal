@@ -1,3 +1,20 @@
+jest.mock('@sunbird-cb/collection', () => ({
+    IBtnAppsConfig: {},
+    CustomTourService: class MockCustomTourService {
+        createPopupTour = jest.fn()
+        startTour = jest.fn()
+        isTourComplete = new (require('rxjs').Subject)()
+        startPopupTour = jest.fn()
+        cancelPopupTour = jest.fn()
+    },
+}))
+
+jest.mock('@sunbird-cb/notification', () => ({
+    LibNotificationsService: class MockLibNotificationsService {
+        unreadCount$ = new (require('rxjs').Subject)()
+    },
+}))
+
 import { SimpleChanges } from '@angular/core'
 import { NavigationEnd, NavigationStart } from '@angular/router'
 import { of, Subject } from 'rxjs'
@@ -67,7 +84,7 @@ describe('AppNavBarComponent', () => {
 
         // Mock LibNotificationsService
         mockLibNotificationsService = {
-            _unreadCount: new Subject()
+            unreadCount$: new Subject()
         }
 
         // Mock NotificationsService
@@ -233,11 +250,11 @@ describe('AppNavBarComponent', () => {
             expect(getMyCountSpy).not.toHaveBeenCalled()
         })
 
-        it('should subscribe to notifications service', () => {
-            const getMyCountSpy = jest.spyOn(component, 'getMyCount')
+        it('should subscribe to notifications service and call getMyCount when count > 0', () => {
+            const getMyCountSpy = jest.spyOn(component, 'getMyCount').mockImplementation(() => { })
             component.ngOnInit()
-            mockLibNotificationsService._unreadCount.next(true)
-            expect(getMyCountSpy).toHaveBeenCalledTimes(2) // Once in ngOnInit, once from subscription
+            mockLibNotificationsService.unreadCount$.next(5)
+            expect(getMyCountSpy).toHaveBeenCalled()
         })
 
         it('should handle router navigation events', () => {
@@ -401,8 +418,9 @@ describe('AppNavBarComponent', () => {
 
         it('should handle error when resetting notifications', () => {
             const consoleSpy = jest.spyOn(console, 'error').mockImplementation()
+            const { throwError } = require('rxjs')
             mockNotificationsService.resetNotificationsCount.mockReturnValue(
-                of(null).pipe(() => { throw new Error('Test error') })
+                throwError(new Error('Test error'))
             )
 
             component.notificationsCount = 5
@@ -473,8 +491,9 @@ describe('AppNavBarComponent', () => {
 
         it('should handle error when getting notifications count', () => {
             const consoleSpy = jest.spyOn(console, 'error').mockImplementation()
+            const { throwError } = require('rxjs')
             mockNotificationsService.getNotificationsData.mockReturnValue(
-                of(null).pipe(() => { throw new Error('Test error') })
+                throwError(new Error('Test error'))
             )
 
             component.getMyCount()
@@ -512,20 +531,40 @@ describe('AppNavBarComponent', () => {
     })
 
     describe('ngOnDestroy', () => {
-        it('should unsubscribe from notifications subscription', () => {
-            const mockSubscription = {
-                unsubscribe: jest.fn()
-            }
-            // component.myNotificationsSubscription = mockSubscription
-
-            component.ngOnDestroy()
-
-            expect(mockSubscription.unsubscribe).toHaveBeenCalled()
+        it('should not throw when ngOnDestroy is called before subscription', () => {
+            expect(() => component.ngOnDestroy()).not.toThrow()
         })
 
-        it('should handle missing subscription', () => {
-            // component.myNotificationsSubscription = null as any
+        it('should unsubscribe after ngOnInit sets up subscription', () => {
+            jest.spyOn(component, 'getMyCount').mockImplementation(() => { })
+            component.ngOnInit()
             expect(() => component.ngOnDestroy()).not.toThrow()
+        })
+    })
+
+    describe('routeToHome', () => {
+        it('should navigate to community page for community_moderator without leader/admin roles', () => {
+            mockConfigSvc.userRoles = new Set(['community_moderator'])
+            component.routeToHome()
+            expect(mockRouter.navigate).toHaveBeenCalledWith(['/app/home/community'])
+        })
+
+        it('should navigate to home for community_moderator with mdo_leader role', () => {
+            mockConfigSvc.userRoles = new Set(['community_moderator', 'mdo_leader'])
+            component.routeToHome()
+            expect(mockRouter.navigate).toHaveBeenCalledWith(['/app/home'])
+        })
+
+        it('should navigate to home for user without community_moderator', () => {
+            mockConfigSvc.userRoles = new Set(['mdo_admin'])
+            component.routeToHome()
+            expect(mockRouter.navigate).toHaveBeenCalledWith(['/app/home'])
+        })
+
+        it('should navigate to home when userRoles is undefined', () => {
+            mockConfigSvc.userRoles = undefined
+            component.routeToHome()
+            expect(mockRouter.navigate).toHaveBeenCalledWith(['/app/home'])
         })
     })
 

@@ -1,3 +1,13 @@
+jest.mock('@ws-widget/collection', () => ({
+    NsContent: {},
+    NsAutoComplete: {},
+}), { virtual: true })
+
+jest.mock('@sunbird-cb/collection', () => ({
+    WidgetContentService: class { },
+    NsContentConstants: {},
+}))
+
 import { AppTocCohortsComponent } from './app-toc-cohorts.component'
 import { AppTocCohortsDirective } from './app-toc-cohorts.directive'
 

@@ -1,3 +1,9 @@
+jest.mock('@sunbird-cb/collection', () => ({
+	BreadcrumbsOrgService: jest.fn(),
+	NsContent: {},
+	ROOT_WIDGET_CONFIG: {},
+}), { virtual: true })
+
 import { RootComponent } from './root.component'
 import {
 	Router,
@@ -151,22 +157,22 @@ describe('RootComponent', () => {
 
 		// Create component instance
 		component = new RootComponent(
-			mockRouter,
-			mockActivatedRoute,
-			mockAppRef,
-			mockLogger,
-			mockSwUpdate,
-			mockDialog,
-			mockConfigSvc,
-			mockValueSvc,
-			mockTelemetrySvc,
-			mockMobileAppsSvc,
-			mockRootSvc,
-			mockBtnBackSvc,
-			mockChangeDetector,
-			mockUtilitySvc,
-			mockEventSvc,
-			mockAuthSvc,
+			mockRouter as any,
+			mockActivatedRoute as any,
+			mockAppRef as any,
+			mockLogger as any,
+			mockSwUpdate as any,
+			mockDialog as any,
+			mockConfigSvc as any,
+			mockValueSvc as any,
+			mockTelemetrySvc as any,
+			mockMobileAppsSvc as any,
+			mockRootSvc as any,
+			mockBtnBackSvc as any,
+			mockChangeDetector as any,
+			mockUtilitySvc as any,
+			mockEventSvc as any,
+			mockAuthSvc as any,
 			mockLoader
 		)
 
@@ -202,6 +208,7 @@ describe('RootComponent', () => {
 		Object.defineProperty(window, 'location', {
 			value: {
 				href: '',
+				pathname: '/',
 				reload: jest.fn()
 			},
 			writable: true
@@ -422,38 +429,29 @@ describe('RootComponent', () => {
 			)
 		})
 
-		it('should activate update and clear caches when user confirms', async () => {
+		it('should activate update and clear caches when user confirms', () => {
 			component.initAppUpdateCheck()
 
-			// Trigger update available
+			// Trigger update available — dialogRef.afterClosed already returns of(true) from beforeEach
 			swUpdateAvailableSubject.next({})
-
-			// Simulate user confirming update
-			const dialogRef = mockDialog.open.mock.results[0].value
-			dialogRef.afterClosed.mockReturnValue(of(true))
-
-			await new Promise(resolve => setTimeout(resolve, 0))
 
 			expect(mockSwUpdate.activateUpdate).toHaveBeenCalled()
 		})
 
-		it('should not activate update when user cancels', async () => {
+		it('should not activate update when user cancels', () => {
+			// Override dialog to return of(false) BEFORE emitting so afterClosed fires with false
+			mockDialog.open.mockReturnValue({
+				afterClosed: jest.fn().mockReturnValue(of(false))
+			} as any)
 			component.initAppUpdateCheck()
 
-			// Trigger update available
 			swUpdateAvailableSubject.next({})
-
-			// Simulate user cancelling update
-			const dialogRef = mockDialog.open.mock.results[0].value
-			dialogRef.afterClosed.mockReturnValue(of(false))
-
-			await new Promise(resolve => setTimeout(resolve, 0))
 
 			expect(mockSwUpdate.activateUpdate).not.toHaveBeenCalled()
 		})
 
 		it('should handle service worker not enabled', () => {
-			//mockSwUpdate.isEnabled = false
+			Object.defineProperty(mockSwUpdate, 'isEnabled', { value: false, writable: true })
 			component.initAppUpdateCheck()
 
 			swUpdateAvailableSubject.next({})

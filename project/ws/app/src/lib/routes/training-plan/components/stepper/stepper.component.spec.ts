@@ -33,6 +33,7 @@ describe('StepperComponent', () => {
         component.titleInvalid.emit = jest.fn()
         component.addContentIsInvalid.emit = jest.fn()
         component.addAssigneeIsInvalid.emit = jest.fn()
+        component.addAccessSettingsIsInvalid.emit = jest.fn()
     })
 
     describe('Component Initialization', () => {
@@ -50,7 +51,7 @@ describe('StepperComponent', () => {
 
     describe('ngOnInit', () => {
         it('should set editState to true when contentData exists in route', () => {
-            //  mockActivatedRoute.snapshot.data['contentData'] = { id: 1 }
+            ; (mockActivatedRoute.snapshot.data as any)['contentData'] = { id: 1 }
 
             component.ngOnInit()
 
@@ -126,7 +127,7 @@ describe('StepperComponent', () => {
         })
 
         it('should set tabIndexValue to 2 for ADD_ASSIGNEE', () => {
-            component.changeTabOnNext = TrainingPlanContent.TTabLabelKey.ADD_ASSIGNEE
+            component.changeTabOnNext = TrainingPlanContent.TTabLabelKey.ADD_ACCESS_SETTINGS
 
             component.ngOnChanges()
 
@@ -223,7 +224,7 @@ describe('StepperComponent', () => {
             component.checkForaddContent(testValue)
 
             setTimeout(() => {
-                expect(component.addAssigneeDisable).toBe(testValue)
+                expect(component.addAccessSettingDisable).toBe(testValue)
                 expect(component.addContentIsInvalid.emit).toHaveBeenCalledWith(testValue)
                 done()
             }, 1)
@@ -235,38 +236,14 @@ describe('StepperComponent', () => {
             component.checkForaddContent(testValue)
 
             setTimeout(() => {
-                expect(component.addAssigneeDisable).toBe(testValue)
+                expect(component.addAccessSettingDisable).toBe(testValue)
                 expect(component.addContentIsInvalid.emit).toHaveBeenCalledWith(testValue)
                 done()
             }, 1)
         })
     })
 
-    describe('checkForaddAssignee', () => {
-        it('should update addTimelineDisable and emit addAssigneeIsInvalid after timeout', (done) => {
-            const testValue = false
-
-            component.checkForaddAssignee(testValue)
-
-            setTimeout(() => {
-                expect(component.addTimelineDisable).toBe(testValue)
-                expect(component.addAssigneeIsInvalid.emit).toHaveBeenCalledWith(testValue)
-                done()
-            }, 1)
-        })
-
-        it('should handle true value', (done) => {
-            const testValue = true
-
-            component.checkForaddAssignee(testValue)
-
-            setTimeout(() => {
-                expect(component.addTimelineDisable).toBe(testValue)
-                expect(component.addAssigneeIsInvalid.emit).toHaveBeenCalledWith(testValue)
-                done()
-            }, 1)
-        })
-    })
+    // checkForaddAssignee is commented out in source — skipped
 
     describe('tabChangeToTimeline', () => {
         it('should update addTimelineDisable, emit addAssigneeIsInvalid, and set tabIndexValue to 3', (done) => {
@@ -279,7 +256,7 @@ describe('StepperComponent', () => {
 
             setTimeout(() => {
                 expect(component.addTimelineDisable).toBe(testValue)
-                expect(component.addAssigneeIsInvalid.emit).toHaveBeenCalledWith(testValue)
+                expect(component.addAccessSettingsIsInvalid.emit).toHaveBeenCalledWith(testValue)
                 done()
             }, 1)
         })
@@ -294,7 +271,7 @@ describe('StepperComponent', () => {
 
             setTimeout(() => {
                 expect(component.addTimelineDisable).toBe(testValue)
-                expect(component.addAssigneeIsInvalid.emit).toHaveBeenCalledWith(testValue)
+                expect(component.addAccessSettingsIsInvalid.emit).toHaveBeenCalledWith(testValue)
                 done()
             }, 1)
         })
@@ -303,7 +280,7 @@ describe('StepperComponent', () => {
     describe('Integration Tests', () => {
         it('should handle complete workflow from ngOnInit to tabChangeToTimeline', (done) => {
             // Setup initial state
-            //  mockActivatedRoute.snapshot.data['contentData'] = { id: 1 }
+            ; (mockActivatedRoute.snapshot.data as any)['contentData'] = { id: 1 }
             mockTrainingPlanDataSharingService.trainingPlanStepperData.status = 'live'
 
             // Initialize component
@@ -325,7 +302,7 @@ describe('StepperComponent', () => {
 
             setTimeout(() => {
                 expect(component.addTimelineDisable).toBe(false)
-                expect(component.addAssigneeIsInvalid.emit).toHaveBeenCalledWith(false)
+                expect(component.addAccessSettingsIsInvalid.emit).toHaveBeenCalledWith(false)
                 done()
             }, 1)
         })
@@ -341,7 +318,7 @@ describe('StepperComponent', () => {
         })
 
         it('should handle missing properties in tabSelected event', () => {
-            const mockEvent = { index: 1 }
+            const mockEvent = { index: 1, tab: { textLabel: '' } }
 
             expect(() => {
                 component.tabSelected(mockEvent)

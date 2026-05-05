@@ -1,3 +1,9 @@
+jest.mock('@sunbird-cb/collection', () => ({
+    AppTourDialogComponent: jest.fn(),
+    NsContent: {},
+    ROOT_WIDGET_CONFIG: {},
+}), { virtual: true })
+
 import { SetupDoneComponent } from './setup-done.component'
 import { ConfigurationsService } from '@sunbird-cb/utils-v2'
 import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog'
@@ -47,9 +53,10 @@ describe('SetupDoneComponent', () => {
 
     describe('ngOnInit', () => {
         it('should set badges from route data and sanitize appIcon if instanceConfig is available', () => {
-            //const badgesData = { data: 'testBadge' }
-            // mockRoute.data.subscribe.mockImplementationOnce(callback => callback({ badges: badgesData }))
-            // mockConfigSvc.instanceConfig = { logos: { thumpsUp: 'testLogoUrl' } }
+            const badgesData = { data: 'testBadge' }
+                ; (mockRoute.data as any).subscribe.mockImplementationOnce((callback: any) => callback({ badges: badgesData }))
+                ; (mockConfigSvc as any).instanceConfig = { logos: { thumpsUp: 'testLogoUrl' } }
+                ; (mockDomSanitizer.bypassSecurityTrustResourceUrl as jest.Mock).mockReturnValue('safeUrl')
 
             component.ngOnInit()
 
