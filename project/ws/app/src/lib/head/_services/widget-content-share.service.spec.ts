@@ -1,7 +1,7 @@
 import { WidgetContentShareService } from './widget-content-share.service'
 import { HttpClient } from '@angular/common/http'
 import { of } from 'rxjs'
-import { ConfigurationsService } from '@sunbird-cb/utils'
+import { ConfigurationsService } from '@sunbird-cb/utils-v2'
 import { NsContent } from './widget-content.model'
 import { NsShare } from './widget-share.model'
 import { ICommon } from '@sunbird-cb/collection/lib/_models/common.model'

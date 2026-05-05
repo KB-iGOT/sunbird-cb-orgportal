@@ -1,22 +1,35 @@
+// Mock packages with ESM/pdfjs transitive dependencies
+jest.mock('@sunbird-cb/collection', () => ({
+  WidgetContentService: jest.fn(),
+  NsContent: {
+    EMimeTypes: {
+      WEB_MODULE: 'application/web-module',
+      WEB_MODULE_EXERCISE: 'application/web-module-exercise',
+    },
+  },
+}))
+jest.mock('@sunbird-cb/toc', () => ({
+  WidgetContentService: jest.fn(),
+}))
+jest.mock('../../viewer-util.service', () => ({
+  ViewerUtilService: jest.fn(),
+}))
+
 import { SimpleChanges, SimpleChange } from '@angular/core'
 import { WebModuleComponent } from './web-module.component'
 import { DomSanitizer } from '@angular/platform-browser'
-import { ValueService, ConfigurationsService } from '@sunbird-cb/utils'
-import { WidgetContentService } from '@sunbird-cb/toc'
-import { ViewerUtilService } from '../../viewer-util.service'
-import { EventService } from '@sunbird-cb/utils'
-import { ActivatedRoute } from '@angular/router'
+import { ValueService } from '@sunbird-cb/utils'
 import { of } from 'rxjs'
 
 describe('WebModuleComponent', () => {
   let component: WebModuleComponent
   let mockDomSanitizer: jest.Mocked<DomSanitizer>
   let mockValueService: jest.Mocked<ValueService>
-  let mockContentService: jest.Mocked<WidgetContentService>
-  let mockViewerService: jest.Mocked<ViewerUtilService>
-  let mockConfigService: jest.Mocked<ConfigurationsService>
-  let mockEventService: jest.Mocked<EventService>
-  let mockActivatedRoute: jest.Mocked<ActivatedRoute>
+  let mockContentService: any
+  let mockViewerService: any
+  let mockConfigService: any
+  let mockEventService: any
+  let mockActivatedRoute: any
 
   beforeEach(() => {
     mockDomSanitizer = {
