@@ -11,6 +11,7 @@ export class AppFooterComponent {
 
   isXSmall = false
   termsOfUser = true
+  // copyrightYears = `${new Date().getFullYear()}-${new Date().getFullYear() + 1}`
 
   constructor(
     private configSvc: ConfigurationsService,

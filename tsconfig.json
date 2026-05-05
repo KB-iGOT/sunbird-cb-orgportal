@@ -30,6 +30,12 @@
       ],
       "@ws/app/*": [
         "project/ws/app/*"
+      ],
+       "@ws/viewer": [
+        "project/ws/viewer"
+      ],
+      "@ws/viewer/*": [
+        "project/ws/viewer/*"
       ]
     },
     "removeComments": true,
@@ -57,5 +63,9 @@
       }
     ],
     "useDefineForClassFields": false
+  },
+  "angularCompilerOptions": {
+    "enableIvy": true,
+    "compilationMode": "partial"
   }
 }

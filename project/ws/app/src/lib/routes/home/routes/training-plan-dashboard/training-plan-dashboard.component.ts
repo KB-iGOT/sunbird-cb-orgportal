@@ -1,6 +1,5 @@
 import { Component, OnInit, AfterViewInit, ViewChild } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
-import { ITableData } from '@sunbird-cb/collection'
 import { TrainingPlanDashboardService } from '../../services/training-plan-dashboard.service'
 import moment from 'moment'
 import { LoaderService } from '../../../../../../../../../src/app/services/loader.service'
@@ -47,7 +46,7 @@ export class TrainingPlanDashboardComponent implements OnInit, AfterViewInit {
   currentUser: any
   urlQueryParams: any
   dialogRef: any
-  tabledata!: ITableData
+  tabledata!: any
 
   constructor(
     private router: Router,

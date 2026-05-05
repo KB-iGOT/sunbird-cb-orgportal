@@ -114,7 +114,7 @@ export class UserCardComponent implements OnInit, OnChanges, AfterViewChecked, A
   masterLanguages: Observable<any[]> | undefined
   masterLanguagesEntries: any
   genderList = ['Male', 'Female', 'Others']
-  categoryList = ['General', 'OBC', 'SC', 'ST', 'PWD']
+  categoryList = ['General', 'OBC', 'SC', 'ST', 'PWD', 'ST-1', 'ST-2', 'RBA', 'ALC/IB', 'EWS(Economically Weaker Section)', 'Physically Challenged Person', 'Ex - Servicemen']
   // needApprovalList: any[] = []
   profileData: any[] = []
   userwfData!: any
@@ -657,7 +657,7 @@ export class UserCardComponent implements OnInit, OnChanges, AfterViewChecked, A
   }
 
   getApprovalUserData(user: any, data: any, openPanel: MatExpansionPanel) {
-    if (openPanel.expanded) {
+    if (openPanel?.expanded && user) {
       user.enableEdit = false
       this.approveUserDataForm.reset()
       user.needApprovalList = []
@@ -668,7 +668,7 @@ export class UserCardComponent implements OnInit, OnChanges, AfterViewChecked, A
   }
 
   getUerData(user: any, openPanel: MatExpansionPanel, index: any) {
-    if (openPanel.expanded) {
+    if (openPanel?.expanded && user) {
       user.enableEdit = false
       const profileDataAll = user
 

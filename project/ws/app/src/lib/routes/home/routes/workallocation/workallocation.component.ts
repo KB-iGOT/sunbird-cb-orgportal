@@ -1,5 +1,4 @@
 import { Component, OnDestroy, OnInit, SimpleChanges } from '@angular/core'
-import { ITableData } from '@sunbird-cb/collection'
 import { MatDialog } from '@angular/material/dialog'
 import { MatPaginator } from '@angular/material/paginator'
 import { Router, ActivatedRoute } from '@angular/router'
@@ -22,8 +21,8 @@ export class WorkallocationComponent implements OnInit, OnDestroy {
   currentFilter = 'Draft'
   tabs: any
   currentUser!: string | null
-  tabledata!: ITableData
-  tabledataPublished!: ITableData
+  tabledata!: any
+  tabledataPublished!: any
   data: any = []
   term!: string | null
   length!: number

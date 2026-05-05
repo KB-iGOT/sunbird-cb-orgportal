@@ -45,6 +45,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   departmentName = ''
   subscription: Subscription
   containerCustomCls = false
+  isExternalTrainingDetail = false
 
   @HostListener('window:scroll', ['$event'])
   handleScroll() {
@@ -79,6 +80,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
       if (event instanceof NavigationEnd) {
         const urlData = _.get(this.activeRoute, 'snapshot._routerState.url')
         this.containerCustomCls = urlData && urlData.includes('odcs-mapping') ? true : false
+        this.isExternalTrainingDetail = urlData && urlData.includes('/external-trainings') && (urlData.includes('/details') || urlData.includes('/batches'))
 
         if (this.containerCustomCls) {
           document.getElementsByTagName('body')[0].classList.add('custom-height-odcs')

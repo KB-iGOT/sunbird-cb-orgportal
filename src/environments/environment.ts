@@ -26,7 +26,14 @@ export const environment: IEnvironment = {
   debug: (window as { [key: string]: any })['env']['debug'] || false,  // Add this missing property,
   googleStorageUrl: (window as { [key: string]: any })['env']['googleStorageUrl'] || '',
   mdoChannelsBookmarkId: (window as { [key: string]: any })['env']['mdoChannelsBookmarkId'] || '',
-  spvorgID: (window as { [key: string]: any })['env']['spvorgID'] || ''
+  spvorgID: (window as { [key: string]: any })['env']['spvorgID'] || '',
+  azureHost: (window as { [key: string]: any })['env']['azureHost'] || '',
+  azureBucket: (window as { [key: string]: any })['env']['azureBucket'] || '',
+  azureOldHost: (window as { [key: string]: any })['env']['azureOldHost'] || '',
+  azureOldBuket: (window as { [key: string]: any })['env']['azureOldBuket'] || '',
+  assessmentBuffer: (window as { [key: string]: any })['env']['assessmentBuffer'] || 0,
+  quizResultTimeout: (window as { [key: string]: any })['env']['quizResultTimeout'] || 0,
+  publicContentSurveyId: (window as { [key: string]: any })['env']['publicContentSurveyId'] || 0,
 }
 interface IEnvironment {
   name: null | string
@@ -52,7 +59,14 @@ interface IEnvironment {
   debug?: boolean  // Add this missing property
   googleStorageUrl: string,
   mdoChannelsBookmarkId: string,
-  spvorgID?: string
+  spvorgID?: string,
+  azureHost: string
+  azureBucket: string
+  azureOldHost: string
+  azureOldBuket: string,
+  assessmentBuffer: number,
+  quizResultTimeout: number,
+  publicContentSurveyId: number
 }
 
 /*

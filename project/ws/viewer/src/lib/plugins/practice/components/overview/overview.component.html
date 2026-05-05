@@ -1,0 +1,231 @@
+<!-- <div class="flex auto-w ws-mat-primary-lite-background-important box-height">
+  <div class="flex flex-1 max-w small-screen">
+      <div class="flex flex-1 flex-column flex-center center banner-text">
+          <span class="mat-title mat-body-2 ws-mat-black60-text padding-s attempt-text text-block">{{ 'practiceoverview.itsTimeForAssesment' | translate }}</span>
+      </div>
+    <img class="flex-1 exam_image" [src]="staticImage" alt="exam image" />
+  </div>
+  <div class="flex flex-1 flex-column margin-left-xl ws-mat-accent-border border-custom assessment_summary_box">
+    <div class="flex flex-1 flex-column">
+      <span class="mat-headline margin-bottom-xl">{{learningObjective | pipeLimitTo: 300 }}</span>
+      <a *ngIf="canAttempt?.attemptsMade < canAttempt?.attemptsAllowed" mat-button (click)="overviewed('start')"
+        [class.spinner]="loading" [disabled]="loading" class="ws-mat-primary-background text-white m-w padding-xs">
+        <span class="padding-xs" >{{ 'practiceoverview.startAssesmentNow' | translate }}</span>
+      </a>
+      <mat-hint class="mat-title" *ngIf="canAttempt?.attemptsMade >= canAttempt?.attemptsAllowed">You have exceeded the
+        maximum allowed attempt</mat-hint>
+      <div class="flex margin-top-xl flex-column">
+        <span class="mat-subheading-2 ws-mat-black60-text">Summary test</span>
+        <ng-container [ngTemplateOutlet]="testdetail" [ngTemplateOutletContext]="{
+                  icon: '/assets/icons/content/assessment.svg',
+                  isSVG: true,
+                  text: noOfQuestions + ' questions'
+                }"></ng-container>
+        <ng-container *ngIf="questionTYP.PRACTICE_RESOURCE === primaryCategory" [ngTemplateOutlet]="testdetail"
+          [ngTemplateOutletContext]="{
+                  icon: 'replay',
+                  isSVG: false,
+                  text: 'Unlimited retakes allowed'
+                }"></ng-container>
+        <ng-container *ngIf="questionTYP.FINAL_ASSESSMENT === primaryCategory && !isretakeAllowed" [ngTemplateOutlet]="testdetail"
+          [ngTemplateOutletContext]="{
+                  icon: 'replay',
+                  isSVG: false,
+                  text: 'Unlimited retakes allowed'
+                }"></ng-container>
+        <ng-container *ngIf="questionTYP.FINAL_ASSESSMENT === primaryCategory && isretakeAllowed" [ngTemplateOutlet]="testdetail"
+          [ngTemplateOutletContext]="{
+                  icon: 'replay',
+                  isSVG: false,
+                  text: 'Maximum '+ (canAttempt?.attemptsAllowed || 0) + ' retake(s) are allowed, and you already attempted ' + (canAttempt?.attemptsMade || 0) + ' time(s) '
+                }"></ng-container>
+        <ng-container *ngIf="complexityLevel" [ngTemplateOutlet]="testdetail" [ngTemplateOutletContext]="{
+                        icon: 'replay',
+                        isSVG: false,
+                        text: complexityLevel
+                      }"></ng-container>
+        <ng-container *ngIf="timeLimit" [ngTemplateOutlet]="testdetail" [ngTemplateOutletContext]="{
+                              icon: 'timer',
+                              isSVG: false,
+                              text: ( timeLimit | pipeDurationTransform: 'hms')
+                            }"></ng-container>
+      </div>
+      <div class="flex flex-1 flex-column margin-top-xl">
+        <span class="mat-subheading-2 ws-mat-black60-text">{{ 'practiceoverview.pointsToNote' | translate }}</span>
+        <div class="flex flex-column">
+          <ng-container *ngFor="let c of points" [ngTemplateOutlet]="detail" [ngTemplateOutletContext]="{
+                  icon: c.icon,
+                  text: c.text
+                }"></ng-container>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="flex flex-1 blank_box"></div>
+</div> -->
+<div class="flex flex-col ws-mat-primary-lite-background-important"
+  [ngClass]="selectedAssessmentCompatibilityLevel < 7 ? 'box-height':'box-height-standalone'">
+  <div class="assessment-container">
+    <div
+      [ngClass]="selectedAssessmentCompatibilityLevel < 7 ? 'assessment-stats-count':'standalone-assessment-stats-count'">
+      <div class="flex flex-row items-center justify-between">
+        <div class="flex flex-row">
+          <div class="flex gap-4">
+            <div class="  stats-label" *ngIf="noOfQuestions">
+              <div class="flex justify-center items-center"><img src="assets/icons/final-assessment/assessment.svg"
+                  alt="assessment"></div>
+              <div>Questions: {{noOfQuestions}}</div>
+            </div>
+            <div class="  stats-label" *ngIf="quizData?.duration">
+              <div class="flex justify-center items-center"><img src="assets/icons/final-assessment/timer.svg"
+                  alt="assessment"></div>
+              <div>Duration: {{quizData?.duration}}</div>
+            </div>
+            <div class="  stats-label" *ngIf="quizData?.maxAssessmentRetakeAttempts">
+              <div class="flex justify-center items-center"><mat-icon class="text-blue-800">replay</mat-icon></div>
+              <div>Re-attempts: {{quizData?.maxAssessmentRetakeAttempts}}</div>
+            </div>
+            <div class="  stats-label"
+              *ngIf="quizData?.minimumPassPercentage && quizData?.sectionalPassPercentage?.toLowerCase() !== 'yes'">
+              <div class="flex justify-center items-center"><mat-icon class="text-blue-800">offline_pin</mat-icon></div>
+              <div>Passing Criteria: {{quizData?.minimumPassPercentage}}</div>
+            </div>
+          </div>
+          <div>
+            <div class="flex flex-col stats-label ml-2"
+              *ngIf="questionTYP.FINAL_ASSESSMENT === primaryCategory || questionTYP.PRACTICE_RESOURCE === primaryCategory"
+              [ngClass]="selectedAssessmentCompatibilityLevel >= 7 ? 'ml-5':''">
+              <div *ngIf="timeLimit"><img src="assets/icons/final-assessment/timer.svg" alt="timer"></div>
+              <div>{{( timeLimit | pipeDurationTransform: 'hms')}}</div>
+            </div>
+          </div>
+          <div>
+            <div class="ml-5 start-assessment-cta-standalone block md:hidden"
+              *ngIf="selectedAssessmentCompatibilityLevel >= 7">
+              <button [disabled]="!consentGiven ? 'disabled': null"
+                *ngIf="canAttempt?.attemptsMade < canAttempt?.attemptsAllowed || forPreview || questionTYP.PRACTICE_RESOURCE == primaryCategory"
+                [class.spinner]="loading" (click)="overviewed('start')"
+                [ngClass]="consentGiven ? 'bg-blue-800 text-white' : 'secondary-standalone text-standalone-black'"
+                class=" text-sm font-semibold  py-3 px-5 rounded-full border-none cursor-pointer tracking-wide">
+                <span class="padding-xs">Start assessment</span>
+              </button>
+              <mat-hint class="mat-title"
+                *ngIf="canAttempt?.attemptsMade >= canAttempt?.attemptsAllowed && !forPreview && questionTYP.FINAL_ASSESSMENT === primaryCategory">You
+                have exceeded the maximum allowed attempt</mat-hint>
+            </div>
+          </div>
+        </div>
+        <div class="start-assessment-cta hidden md:block" *ngIf="selectedAssessmentCompatibilityLevel >= 7">
+          <button [disabled]="!consentGiven ? 'disabled': null"
+            *ngIf="canAttempt?.attemptsMade < canAttempt?.attemptsAllowed || forPreview || questionTYP.PRACTICE_RESOURCE == primaryCategory"
+            [class.spinner]="loading" (click)="overviewed('start')"
+            [ngClass]="consentGiven ? 'bg-blue-800 text-white' : 'secondary-standalone text-standalone-black'"
+            class="text-sm font-semibold py-3 px-5 rounded-full border-none cursor-pointer tracking-wide">
+            <span class="padding-xs">Start assessment</span>
+          </button>
+          <mat-hint class="mat-title"
+            *ngIf="canAttempt?.attemptsMade >= canAttempt?.attemptsAllowed && !forPreview && questionTYP.FINAL_ASSESSMENT === primaryCategory">You
+            have exceeded the maximum allowed attempt</mat-hint>
+        </div>
+        <div class="start-assessment-cta hidden md:block" *ngIf="selectedAssessmentCompatibilityLevel < 7">
+          <button
+            *ngIf="canAttempt?.attemptsMade < canAttempt?.attemptsAllowed || forPreview || questionTYP.PRACTICE_RESOURCE == primaryCategory"
+            [class.spinner]="loading" [disabled]="loading" (click)="overviewed('start')"
+            class="bg-blue-800 text-white text-sm font-semibold py-3 px-5 rounded-full border-none cursor-pointer tracking-wide">
+            <span class="padding-xs">Start assessment</span>
+          </button>
+          <mat-hint class="mat-title"
+            *ngIf="canAttempt?.attemptsMade >= canAttempt?.attemptsAllowed && !forPreview && questionTYP.FINAL_ASSESSMENT === primaryCategory">You
+            have exceeded the maximum allowed attempt</mat-hint>
+        </div>
+
+      </div>
+
+    </div>
+    <div class="summary flex flex-col" *ngIf="selectedAssessmentCompatibilityLevel < 7">
+      <div>
+        <h2 class="summary-label">Description</h2>
+      </div>
+      <div class="summary-detail">
+        <ul class="summary-detail-list">
+          <li *ngIf="questionTYP.PRACTICE_RESOURCE == primaryCategory">
+            <!-- <img src="assets/icons/final-assessment/star_empty.svg"> -->
+            <span class="summary-list-label">Unlimited Retakes are allowed</span>
+          </li>
+          <li *ngIf="questionTYP.FINAL_ASSESSMENT === primaryCategory">
+            <!-- <img src="assets/icons/final-assessment/star_empty.svg"> -->
+            <span class="summary-list-label">If the given time runs out, the answer will be auto submitted</span>
+          </li>
+          <li>
+            <!-- <img src="assets/icons/final-assessment/star_empty.svg"> -->
+            <span class="summary-list-label">Skipped questions can be attempted again before submitting</span>
+          </li>
+          <li>
+            <!-- <img src="assets/icons/final-assessment/star_empty.svg"> -->
+            <span class="summary-list-label">No negative marking</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <div class="summary-standalone flex flex-col" *ngIf="selectedAssessmentCompatibilityLevel >= 7">
+      <!-- <div>
+      <h2 class="summary-label">{{ 'practiceoverview.summary' | translate }}</h2>
+    </div> -->
+      <div class="flex justify-end gap-4 mt-3">
+        <ng-container *ngIf="currentPage !== 0">
+          <button (click)="previousPage()" mat-button class="flex gap-2 justify-center items-center blue-outline mr-10">
+            <mat-icon class="navigation-icons">navigate_before</mat-icon>
+            <span class="ml-1">Previous</span>
+          </button>
+        </ng-container>
+        <ng-container *ngIf="currentPage + 1 < instructionAssessment?.length">
+          <button (click)="nextPage()" mat-button class="flex gap-2 justify-center items-center blue-outline mr-10">
+            <span>Next</span>
+            <mat-icon class="navigation-icons">navigate_next</mat-icon>
+          </button>
+        </ng-container>
+      </div>
+      <div class="summary-detail mt-5">
+        <!-- <p [innerHtml]="instructionAssessment"></p> -->
+        <ng-container *ngIf="instructionAssessment && instructionAssessment[currentPage]">
+          <div [innerHTML]="instructionAssessment[currentPage]"></div>
+        </ng-container>
+      </div>
+      <ng-container>
+        <div class="consent-checkbox">
+          <mat-checkbox [disableRipple]="true" (change)="startTestEnable($event)">I have read and understood all the
+            instructions. I understand that using unfair means of any sort for any advantage will
+            lead to immediate disqualification. The decision of<b> iGOTkarmayogi.gov.in </b>will be final in these
+            matters.</mat-checkbox>
+        </div>
+      </ng-container>
+    </div>
+
+
+  </div>
+  <div class="start-assessment-cta block md:hidden" *ngIf="selectedAssessmentCompatibilityLevel < 7">
+    <button
+      *ngIf="canAttempt?.attemptsMade < canAttempt?.attemptsAllowed || questionTYP.PRACTICE_RESOURCE == primaryCategory"
+      [class.spinner]="loading" [disabled]="loading" (click)="overviewed('start')"
+      class="bg-blue-800 text-sm font-semibold text-white py-3 px-5 rounded-full border-none cursor-pointer tracking-wide">
+      <span class="padding-xs">Start assessment</span>
+    </button>
+    <mat-hint class="mat-title"
+      *ngIf="canAttempt?.attemptsMade >= canAttempt?.attemptsAllowed && questionTYP.FINAL_ASSESSMENT === primaryCategory">You
+      have exceeded the maximum allowed attempt</mat-hint>
+  </div>
+
+  <ng-template #detail let-icon="icon" let-text="text">
+    <mat-card class="flex max-card-w customcard margin-top-xs ws-mat-primary-tags">
+      <mat-icon>{{icon}}</mat-icon>
+      <span class="mat-body-2 margin-left-xs">{{ translateLabels(text, 'practiceoverview')}}</span>
+    </mat-card>
+  </ng-template>
+
+  <ng-template #testdetail let-icon="icon" let-text="text" let-isSVG="isSVG">
+    <mat-card class="flex max-card-w customcard margin-top-xs ws-mat-primary-tags">
+      <mat-icon color="accent" *ngIf="!isSVG">{{icon}}</mat-icon>
+      <img *ngIf="isSVG" [src]="icon" alt="Assessment" class="margin-right-xs">
+      <span class="mat-body-2 margin-left-xs">{{text}}</span>
+    </mat-card>
+  </ng-template>

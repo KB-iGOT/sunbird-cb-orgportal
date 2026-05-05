@@ -11,7 +11,6 @@ import { NominateUsersDialogComponent } from '../nominate-users-dialog/nominate-
 import moment from 'moment'
 import { NsContent } from '../../../../head/_services/widget-content.model'
 import { DialogConfirmComponent } from '../../../../../../../../../src/app/component/dialog-confirm/dialog-confirm.component'
-import { ITableData } from '@sunbird-cb/collection'
 import { IRequestLearnerType } from '../../enums/enrolment-type'
 import { FormControl, FormGroup, Validators } from '@angular/forms'
 @Component({
@@ -46,7 +45,7 @@ export class BatchDetailsComponent implements OnInit {
   checkSurveyLink = false
   reportStatusList: any[] = []
   enroleTypeList = Object.values(IRequestLearnerType)
-  tabledata: ITableData = {
+  tabledata: any = {
     actions: [],
     columns: [
       { displayName: 'Sl.No', key: 'SlNo' },

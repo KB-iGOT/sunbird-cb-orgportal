@@ -28,8 +28,8 @@ import { MatTooltipModule } from '@angular/material/tooltip'
 import { BrowserModule } from '@angular/platform-browser'
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
 import {
-  TourModule,
-  WIDGET_REGISTRATION_CONFIG, PipeContentRoutePipe, StickyHeaderModule,
+  WIDGET_REGISTRATION_CONFIG, TourModule,
+  PipeContentRoutePipe, StickyHeaderModule,
   AtGlanceModule,
   AvatarPhotoModule,
   BtnAppsModule,
@@ -137,13 +137,15 @@ import { NotificationsService } from './services/notifications.service'
 import { MatSnackBarModule } from '@angular/material/snack-bar'
 import { TranslateModule, TranslateLoader, } from '@ngx-translate/core'
 import { TranslateHttpLoader } from '@ngx-translate/http-loader'
-import {
-  WIDGET_REGISTRATION_LIB_CONFIG,
-} from '@sunbird-cb/consumption'
 import { GlobalEventsService } from './services/global-events.service'
 /** Collection Library Modules */
 
 import { SearchListingModule } from '@sunbird-cb/search-listing'
+import { WIDGET_REGISTERED_LIB_MODULES, WIDGET_REGISTRATION_TOC_LIB_CONFIG } from '@sunbird-cb/toc'
+import { WIDGET_REGISTRATION_LIB_CONFIG } from '@sunbird-cb/consumption'
+import { WidgetResolverModule } from '@sunbird-cb/resolver'
+import { WidgetCommunityHomeModule } from '@sunbird-cb/discussion-v2'
+
 
 // @Injectable()
 // export class HammerConfig extends GestureConfig {
@@ -194,7 +196,6 @@ export function HttpLoaderFactory(http: HttpClient) {
     BrowserAnimationsModule,
     // KeycloakAngularModule,
     AppRoutingModule,
-    SbUiResolverModule.forRoot([...WIDGET_REGISTRATION_CONFIG, ...WIDGET_REGISTRATION_LIB_CONFIG]),
     StickyHeaderModule,
     ErrorResolverModule,
     // Material Imports
@@ -293,6 +294,9 @@ export function HttpLoaderFactory(http: HttpClient) {
     BreadcrumbsOrgModule,
     AuthorCardModule,
     MatSnackBarModule,
+    ...WIDGET_REGISTERED_LIB_MODULES,
+    WidgetResolverModule.forRoot([...WIDGET_REGISTRATION_CONFIG, ...WIDGET_REGISTRATION_LIB_CONFIG, ...WIDGET_REGISTRATION_TOC_LIB_CONFIG]),
+    WidgetCommunityHomeModule,
     ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production }),
     NotificationDropdownModule,
     SearchListingModule,
@@ -302,58 +306,72 @@ export function HttpLoaderFactory(http: HttpClient) {
         useFactory: HttpLoaderFactory,
         deps: [HttpClient],
       },
-    })], providers: [
-      { provide: 'environment', useValue: environment },
-      {
-        deps: [InitService, LoggerService],
-        multi: true,
-        provide: APP_INITIALIZER,
-        useFactory: appInitializer,
+    }),
+    SbUiResolverModule.forRoot([...WIDGET_REGISTRATION_CONFIG, ...WIDGET_REGISTRATION_LIB_CONFIG, ...WIDGET_REGISTRATION_TOC_LIB_CONFIG]),
+  ],
+  providers: [
+    { provide: 'environment', useValue: environment },
+    {
+      deps: [InitService, LoggerService],
+      multi: true,
+      provide: APP_INITIALIZER,
+      useFactory: appInitializer,
+    },
+    {
+      provide: MAT_SNACK_BAR_DEFAULT_OPTIONS,
+      useValue: { duration: 5000 },
+    },
+    {
+      provide: MAT_PROGRESS_SPINNER_DEFAULT_OPTIONS,
+      useValue: {
+        diameter: 55,
+        strokeWidth: 4,
+      }
+    },
+    {
+      provide: MAT_SNACK_BAR_DEFAULT_OPTIONS,
+      useValue: { duration: 5000 },
+    },
+    {
+      provide: MAT_PROGRESS_SPINNER_DEFAULT_OPTIONS,
+      useValue: {
+        diameter: 55,
+        strokeWidth: 4,
       },
-      {
-        provide: MAT_SNACK_BAR_DEFAULT_OPTIONS,
-        useValue: { duration: 5000 },
-      },
-      {
-        provide: MAT_PROGRESS_SPINNER_DEFAULT_OPTIONS,
-        useValue: {
-          diameter: 55,
-          strokeWidth: 4,
-        },
-      },
-      { provide: HTTP_INTERCEPTORS, useClass: AppInterceptorService, multi: true },
-      { provide: HTTP_INTERCEPTORS, useClass: AppRetryInterceptorService, multi: true },
-      TncAppResolverService,
-      TncPublicResolverService,
-      PipeContentRoutePipe,
-      // AppTocResolverService,
-      {
-        provide: APP_BASE_HREF,
-        useFactory: getBaseHref,
-        deps: [PlatformLocation],
-      },
-      {
-        provide: TranslateLoader,
-        useFactory: HttpLoaderFactory,
-        deps: [HttpClient],
-      },
-      { provide: OverlayContainer, useClass: FullscreenOverlayContainer },
-      // { provide: HAMMER_GESTURE_CONFIG, useClass: HammerConfig },
-      { provide: ErrorHandler, useClass: GlobalErrorHandlingService },
-      MatDatepickerModule, MatNativeDateModule,
-      { provide: 'environment', useValue: environment },
-      LoaderService,
-      LibNotificationsService,
-      NotificationsService,
-      NPSGridService,
-      {
-        provide: TranslateLoader,
-        useFactory: HttpLoaderFactory,
-        deps: [HttpClient],
-      },
-      GlobalEventsService,
-      provideHttpClient(withInterceptorsFromDi(), withJsonpSupport())
-    ]
+    },
+    { provide: HTTP_INTERCEPTORS, useClass: AppInterceptorService, multi: true },
+    { provide: HTTP_INTERCEPTORS, useClass: AppRetryInterceptorService, multi: true },
+    TncAppResolverService,
+    TncPublicResolverService,
+    PipeContentRoutePipe,
+    // AppTocResolverService,
+    {
+      provide: APP_BASE_HREF,
+      useFactory: getBaseHref,
+      deps: [PlatformLocation],
+    },
+    {
+      provide: TranslateLoader,
+      useFactory: HttpLoaderFactory,
+      deps: [HttpClient],
+    },
+    { provide: OverlayContainer, useClass: FullscreenOverlayContainer },
+    // { provide: HAMMER_GESTURE_CONFIG, useClass: HammerConfig },
+    { provide: ErrorHandler, useClass: GlobalErrorHandlingService },
+    MatDatepickerModule, MatNativeDateModule,
+    { provide: 'environment', useValue: environment },
+    LoaderService,
+    LibNotificationsService,
+    NotificationsService,
+    NPSGridService,
+    {
+      provide: TranslateLoader,
+      useFactory: HttpLoaderFactory,
+      deps: [HttpClient],
+    },
+    GlobalEventsService,
+    provideHttpClient(withInterceptorsFromDi(), withJsonpSupport())
+  ]
 })
 
 export class AppModule { }

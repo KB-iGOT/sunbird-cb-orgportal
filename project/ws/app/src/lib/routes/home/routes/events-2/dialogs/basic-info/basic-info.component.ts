@@ -47,7 +47,7 @@ export class BasicInfoComponent implements OnInit {
   createForm() {
     this.eventForm = this.formBuilder.group({
       eventName: new FormControl('', [Validators.required, Validators.minLength(10),
-      Validators.maxLength(70), Validators.pattern(noSpecialCharEvent)]),
+      Validators.maxLength(90), Validators.pattern(noSpecialCharEvent)]),
       eventType: new FormControl('record', [Validators.required]),
     })
   }

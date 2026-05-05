@@ -1,0 +1,3371 @@
+
+import {
+  Component,
+  ElementRef,
+  HostListener,
+  Input,
+  OnChanges, OnDestroy, OnInit,
+  QueryList,
+  SimpleChanges,
+  ViewChild, ViewChildren,
+  Renderer2,
+  TemplateRef,
+  ChangeDetectorRef,
+} from '@angular/core'
+import { Subscription, interval } from 'rxjs'
+import { filter, map } from 'rxjs/operators'
+import { NSPractice } from './practice.model'
+import { QuestionComponent } from './components/question/question.component'
+import { SubmitQuizDialogComponent } from './components/submit-quiz-dialog/submit-quiz-dialog.component'
+import { OnConnectionBindInfo } from 'jsplumb'
+import { PracticeService } from './practice.service'
+import { ConfigurationsService, EventService, NsContent, ValueService, WsEvents } from '@sunbird-cb/utils-v2'
+import { VIEWER_ROUTE_FROM_MIME } from '@sunbird-cb/collection'
+
+import { ActivatedRoute, NavigationStart, Router } from '@angular/router'
+import { ViewerUtilService, WidgetContentService, AppTocService } from '@sunbird-cb/toc'
+// tslint:disable-next-line
+import _ from 'lodash'
+import { NSQuiz } from '../quiz/quiz.model'
+import { environment } from 'src/environments/environment'
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser'
+import { ViewerDataService } from '../../viewer-data.service'
+import { ViewerHeaderSideBarToggleService } from './../../viewer-header-side-bar-toggle.service'
+import { FinalAssessmentPopupComponent } from './components/final-assessment-popup/final-assessment-popup.component'
+import { MatDialog } from '@angular/material/dialog'
+import { MatSidenav } from '@angular/material/sidenav'
+import { MatSnackBar, MatSnackBarConfig } from '@angular/material/snack-bar'
+import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms'
+
+// import { ViewerDataService } from '../../viewer-data.service'
+export type FetchStatus = 'hasMore' | 'fetching' | 'done' | 'error' | 'none'
+@Component({
+  selector: 'viewer-plugin-practice',
+  templateUrl: './practice.component.html',
+  styleUrls: ['./practice.component.scss'],
+})
+// ComponentCanDeactivate
+export class PracticeComponent implements OnInit, OnChanges, OnDestroy {
+  @Input() identifier = ''
+  @Input() artifactUrl = ''
+  @Input() name = ''
+  @Input() learningObjective = ''
+  @Input() complexityLevel = ''
+  @Input() duration = 0
+  @Input() collectionId = ''
+  @Input() primaryCategory = NsContent.EPrimaryCategory.PRACTICE_RESOURCE
+  @Input() quizData: any
+  @Input() quizJson: NSQuiz.IQuiz = {
+    timeLimit: 300,
+    questions: [
+      {
+        multiSelection: false,
+        section: '',
+        question: '',
+        questionId: '',
+        instructions: '',
+        questionType: undefined,
+        questionLevel: '',
+        marks: 0,
+        options: [
+          {
+            optionId: '',
+            text: '',
+            isCorrect: false,
+          },
+        ],
+        choices: [],
+      },
+    ],
+    isAssessment: false,
+    allowSkip: 'No',
+    maxQuestions: 0,
+    requiresSubmit: 'Yes',
+    showTimer: 'Yes',
+    primaryCategory: NsContent.EPrimaryCategory.PRACTICE_RESOURCE,
+  }
+  @ViewChildren('questionsReference') questionsReference: QueryList<QuestionComponent> | null = null
+  @ViewChild('sidenav') sideNav: MatSidenav | null = null
+  @ViewChild('submitModal') submitModal: ElementRef | null = null
+  @ViewChild('itemTooltip') itemTooltip: ElementRef | null = null
+  @ViewChild('tooltipTrigger') tooltipTrigger: ElementRef | null = null
+  resourceName: string | null = this.viewerDataSvc.resource ? this.viewerDataSvc.resource.name : ''
+  currentQuestionIndex = 0
+  currentTheme = ''
+  fetchingResultsStatus: FetchStatus = 'none'
+  fetchingSectionsStatus: FetchStatus = 'none'
+  fetchingQuestionsStatus: FetchStatus = 'none'
+  isCompleted = false
+  isIdeal = false
+  retake = false
+  isSubmitted = false
+  markedQuestions = new Set([])
+  numCorrectAnswers = 0
+  numIncorrectAnswers = 0
+  numUnanswered = 0
+  passPercentage = 0
+  questionAnswerHash: NSPractice.IQAnswer = {}
+  result = 0
+  sidenavMode = 'start'
+  sidenavOpenDefault = false
+  finalResponse!: NSPractice.IQuizSubmitResponseV2
+  startTime = 0
+  submissionState: NSPractice.TQuizSubmissionState = 'unanswered'
+  telemetrySubscription: Subscription | null = null
+  attemptSubData!: NSPractice.ISecAttempted[]
+  attemptSubscription: Subscription | null = null
+  timeLeft = 55
+  timerSubscription: Subscription | null = null
+  viewState: NSPractice.TQuizViewMode = 'initial'
+  paramSubscription: Subscription | null = null
+  paperSections: NSPractice.IPaperSection[] | null = null
+  selectedSection: NSPractice.IPaperSection | null = null
+  ePrimaryCategory = NsContent.EPrimaryCategory
+  eCourseCategory = NsContent.ECourseCategory
+  currentQuestion!: NSPractice.IQuestionV2 | any
+  process = false
+  isXsmall = false
+  assessmentBuffer = 0
+  showAnswer = false
+  matchHintDisplay: any[] = []
+  canAttempt!: NSPractice.IRetakeAssessment
+  isMobile = false
+  questionAttemptedCount = 0
+  expandFalse = true
+  showOverlay = false
+  showToolTip = false
+  coursePrimaryCategory: any
+  currentSetNumber = 0
+  noOfQuestionsPerSet = 20
+  totalQuestionsCount = 0
+  instructionAssessment: any = ''
+  selectedSectionIdentifier: any
+  questionSectionTableData: any = []
+  questionVisitedData: any = []
+  assessmentType = 'optionalWeightage'
+  compatibilityLevel = 2
+  selectedAssessmentCompatibilityLevel = 0
+  sectionalInstruction: any = ''
+  allSectionTimeLimit = 0
+  totalAssessemntQuestionsCount = 0
+  sectionalTimer = false
+  questionStartTime: number = Date.now()
+  timeSpentOnQuestions: any = {}
+  charactersPerPage = 1300
+  showQuestionMarks = 'No'
+  questionParagraph = ''
+  resCollectionId = ''
+  resBatchId = ''
+  url = new URL(window.location.href);
+  forPreview =
+    ['public', 'author', 'editMode'].some(segment =>
+      this.url.pathname.split('/').includes(segment)
+    ) ||
+    this.url.searchParams.get('preview') === 'true';
+
+  forCreatorMode = window.location.href.includes('editMode=true')
+
+  public publicUserInfoForm!: UntypedFormGroup
+  public submitted = false
+  emailLengthVal = false
+
+  // Store next resource URL from TOC service subscription
+  private nextResourceUrl: string | null = null
+  private nextResourceUrlParams: any = null
+  private viewerDataTocSubscription: Subscription | null = null
+  private cachedSelectedQuestionNumber: number = 0
+  private cachedQuestionId: string = ''
+
+  @ViewChild('publicUserDialog', { static: true }) publicUserDialog!: TemplateRef<any>
+  constructor(
+    private events: EventService,
+    public dialog: MatDialog,
+    private quizSvc: PracticeService,
+    private activatedRoute: ActivatedRoute,
+    private viewerSvc: ViewerUtilService,
+    private router: Router,
+    private valueSvc: ValueService,
+    // private vws: ViewerDataService,
+    private configSvc: ConfigurationsService,
+    private formBuilder: UntypedFormBuilder,
+    public snackbar: MatSnackBar,
+    private sanitized: DomSanitizer,
+    private viewerDataSvc: ViewerDataService,
+    private viewerHeaderSideBarToggleService: ViewerHeaderSideBarToggleService,
+    private renderer: Renderer2,
+    private widgetContentService: WidgetContentService,
+    private tocSvc: AppTocService,
+    private cdr: ChangeDetectorRef
+
+  ) {
+    if (environment.assessmentBuffer) {
+      this.assessmentBuffer = environment.assessmentBuffer
+    }
+    this.renderer.listen('window', 'click', event => {
+      const infoToolTip: any = document.getElementById('toolTipSection')
+      if (infoToolTip && !infoToolTip.contains(event.target)) {
+        this.showToolTip = false
+      }
+    })
+
+  }
+
+  toggleToolTip() {
+    const tooltipStatus = this.showToolTip
+    if (tooltipStatus) {
+      this.showToolTip = false
+    } else if (tooltipStatus === false) {
+      this.showToolTip = true
+    }
+  }
+  init() {
+    if (window.innerWidth < 768) {
+      this.isMobile = true
+    } else {
+      this.isMobile = false
+    }
+
+    if ((this.forPreview && !this.forCreatorMode) &&
+      this.primaryCategory === this.ePrimaryCategory.FINAL_ASSESSMENT &&
+      (this.quizData && this.quizData.isPublic)) {
+      this.getPublicUserDetails()
+    }
+    // if (this.coursePrimaryCategory === 'Standalone Assessment') {
+    //   // this.getSections()
+    // }
+    this.isSubmitted = false
+    this.markedQuestions = new Set([])
+    this.questionAnswerHash = {}
+    // this.quizSvc.mtfSrc.next({})
+    // quizSvc.questionAnswerHash.subscribe(qaHash => {
+    //   this.questionAnswerHash = qaHash
+    // })
+    // console.log(activatedRoute.snapshot.data)
+    this.router.events.pipe(
+      filter(e => e instanceof NavigationStart && e.navigationTrigger === 'imperative'),
+      // switchMap(() => this.router.events.pipe(
+      //   filter(e => e instanceof NavigationEnd
+      //     || e instanceof NavigationCancel
+      //     || e instanceof NavigationError
+      //   ),
+      //   take(1),
+      //   filter(e => e instanceof NavigationEnd)
+      // ))
+    ).subscribe(() => {
+      if (this.viewState !== 'initial' && !this.isSubmitted) {
+        // this.submitQuiz()
+      }
+      // console.log(val)
+    })
+    this.valueSvc.isXSmall$.subscribe((isXSmall: any) => {
+      this.isXsmall = isXSmall
+    })
+
+    // this.quizSvc.checkAlreadySubmitAssessment.subscribe(result => {
+    //   if (result) {
+    //     this.isSubmitted = true
+    //     this.viewState = 'answer' || 'review'
+    //   }
+    // })
+  }
+
+  getPublicUserDetails() {
+    this.publicUserInfoForm = this.formBuilder.group({
+      name: ['', [Validators.required]],
+      email: [
+        '', [
+          Validators.required,
+          Validators.pattern(`^[\\w\-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$`),
+        ],
+      ],
+    })
+    this.dialog.open(this.publicUserDialog, {
+      disableClose: true,
+      panelClass: 'public-user-dialog',
+      backdropClass: 'public-user-backdrop',
+      height: 'auto',
+      data: {},
+    })
+  }
+
+  retakeAssessment() {
+    if (window.innerWidth < 768) {
+      this.isMobile = true
+    } else {
+      this.isMobile = false
+    }
+    // if (this.coursePrimaryCategory === 'Standalone Assessment') {
+    //   // this.getSections()
+    // }
+    this.isSubmitted = false
+    this.markedQuestions = new Set([])
+    this.questionAnswerHash = {}
+    // this.quizSvc.mtfSrc.next({})
+    // quizSvc.questionAnswerHash.subscribe(qaHash => {
+    //   this.questionAnswerHash = qaHash
+    // })
+    // console.log(activatedRoute.snapshot.data)
+    this.router.events.pipe(
+      filter(e => e instanceof NavigationStart && e.navigationTrigger === 'imperative'),
+      // switchMap(() => this.router.events.pipe(
+      //   filter(e => e instanceof NavigationEnd
+      //     || e instanceof NavigationCancel
+      //     || e instanceof NavigationError
+      //   ),
+      //   take(1),
+      //   filter(e => e instanceof NavigationEnd)
+      // ))
+    ).subscribe(() => {
+      if (this.viewState !== 'initial' && !this.isSubmitted) {
+        this.submitQuiz()
+      }
+      // console.log(val)
+    })
+    this.valueSvc.isXSmall$.subscribe((isXSmall: any) => {
+      this.isXsmall = isXSmall
+    })
+  }
+  @HostListener('window:beforeunload', ['$event'])
+  beforeUnloadHander(e: any) {
+    // or directly false
+    const confirmationMessage = `\o/`
+    if (this.viewState !== 'initial' && !this.isSubmitted) {
+      e.returnValue = confirmationMessage
+      return confirmationMessage
+    }
+    return
+  }
+  canAttend() {
+    // if (this.primaryCategory === NsContent.EPrimaryCategory.PRACTICE_RESOURCE) {
+    //   this.canAttempt = {
+    //     attemptsAllowed: 1,
+    //     attemptsMade: 0,
+    //   }
+    //   this.init()
+    //   this.updateVisivility()
+    // } else {
+    if ((this.forPreview && !this.forCreatorMode)) {
+      this.init()
+      this.updateVisivility()
+    } else {
+      if (this.selectedAssessmentCompatibilityLevel) {
+        if (this.selectedAssessmentCompatibilityLevel < 7) {
+          this.quizSvc.canAttend(this.identifier).subscribe(
+            response => {
+              if (response) {
+                this.canAttempt = response
+                //  this.canAttempt = {
+                //   attemptsAllowed: 1,
+                //   attemptsMade: 0,
+                // }
+              }
+              this.init()
+              this.updateVisivility()
+            },
+            (error: any) => {
+              // Handle error from canAttend API
+              this.handleCanAttendError(error)
+            }
+          )
+        } else {
+          this.quizSvc.canAttendV5(this.identifier).subscribe(
+            response => {
+              if (response) {
+                this.canAttempt = response
+                //  this.canAttempt = {
+                //   attemptsAllowed: 1,
+                //   attemptsMade: 0,
+                // }
+              }
+              this.init()
+              this.updateVisivility()
+            },
+            (error: any) => {
+              // Handle error from canAttendV5 API
+              this.handleCanAttendError(error)
+            }
+          )
+        }
+      }
+    }
+
+    // }
+  }
+
+  handleCanAttendError(error: any) {
+    // Extract error message from the error response
+    let errorMessage = 'Unable to load assessment. Please try again later.'
+
+    if (error && error.params && error.params.errmsg) {
+      errorMessage = error.params.errmsg
+    } else if (error && error.error && error.error.params && error.error.params.errmsg) {
+      errorMessage = error.error.params.errmsg
+    } else if (error && error.message) {
+      errorMessage = error.message
+    }
+
+    // Check if the error is about attempts being exhausted
+    const isAttemptsExhausted = errorMessage.toLowerCase().includes('attempts exhausted') ||
+      errorMessage.toLowerCase().includes('retry attempts') ||
+      errorMessage.toLowerCase().includes('maximum') ||
+      (error && error.error && error.error.responseCode === 'BAD_REQUEST')
+
+    if (isAttemptsExhausted) {
+      // Set canAttempt to indicate all attempts are used up
+      // When attemptsMade >= attemptsAllowed, the UI shows "You have exceeded the maximum allowed attempt"
+      this.canAttempt = {
+        attemptsAllowed: this.quizData?.maxAssessmentRetakeAttempts || 1,
+        attemptsMade: this.quizData?.maxAssessmentRetakeAttempts || 1, // Set equal to make it exhausted
+      }
+    }
+
+    // Show snackbar for quick notification
+    this.openSnackbar(errorMessage)
+
+    // Initialize and update UI to reflect the canAttempt status
+    this.init()
+    this.updateVisivility()
+  }
+  ngOnInit() {
+    this.attemptSubscription = this.quizSvc.secAttempted.subscribe(data => {
+      this.attemptSubData = data
+    })
+    if (this.quizSvc.questionAnswerHash.value) {
+      this.questionAnswerHash = this.quizSvc.questionAnswerHash.getValue()
+    }
+
+    this.coursePrimaryCategory = this.widgetContentService.currentMetaData.primaryCategory
+    if (this.widgetContentService.currentMetaData.children && this.widgetContentService.currentMetaData.children.length) {
+      let activeResourceFound = false
+      this.widgetContentService.currentMetaData.children.forEach((item: any) => {
+        const activeResource = this.findNested(item, 'identifier', this.identifier)
+        this.showQuestionMarks = item.showMarks ? item.showMarks : 'No'
+        // this.selectedAssessmentCompatibilityLevel = item.compatibilityLevel
+        // console.log('item.children', item.children)
+        // console.log('selectedAssessmentCompatibilityLevel', this.selectedAssessmentCompatibilityLevel)
+        // console.log('this.identifier',this.identifier, 'item.identifier', item.identifier)
+        // this.canAttend()
+        // if (this.identifier === item.identifier) {
+        //   // this.instructionAssessment = item.description
+        //   if (item.identifier) {
+        //     this.getInstructionAssessmentPagination(item.description)
+        //   }
+        //   this.totalAssessemntQuestionsCount = item.maxQuestions
+        // }
+        if (activeResource && activeResource.compatibilityLevel) {
+          this.selectedAssessmentCompatibilityLevel = activeResource.compatibilityLevel
+        }
+        if (activeResource && activeResource.maxQuestions) {
+          this.totalAssessemntQuestionsCount = activeResource.maxQuestions
+        }
+        if (activeResource && activeResource.description) {
+          this.instructionAssessment = activeResource.description
+          this.getInstructionAssessmentPagination(activeResource.description)
+        }
+        if (activeResource && !activeResourceFound) {
+          activeResourceFound = true
+        }
+      })
+      // Call canAttend only once after processing all children
+      if (activeResourceFound) {
+        this.canAttend()
+      }
+    } else if (this.widgetContentService.currentMetaData && this.widgetContentService.currentMetaData?.content &&
+      this.widgetContentService.currentMetaData?.content?.data &&
+      this.widgetContentService.currentMetaData?.content?.data?.contextCategory === 'Pre Enrolment Assessment') {
+
+      const activeResource = this.widgetContentService.currentMetaData?.content?.data
+      this.showQuestionMarks = activeResource?.showMarks ? activeResource?.showMarks : 'No'
+      // this.selectedAssessmentCompatibilityLevel = item.compatibilityLevel
+      // console.log('item.children', item.children)
+      // console.log('selectedAssessmentCompatibilityLevel', this.selectedAssessmentCompatibilityLevel)
+      // console.log('this.identifier',this.identifier, 'item.identifier', item.identifier)
+      // this.canAttend()
+      // if (this.identifier === item.identifier) {
+      //   // this.instructionAssessment = item.description
+      //   if (item.identifier) {
+      //     this.getInstructionAssessmentPagination(item.description)
+      //   }
+      //   this.totalAssessemntQuestionsCount = item.maxQuestions
+      // }
+      if (activeResource && activeResource.compatibilityLevel) {
+        this.selectedAssessmentCompatibilityLevel = activeResource.compatibilityLevel
+      }
+      if (activeResource && activeResource.maxQuestions) {
+        this.totalAssessemntQuestionsCount = activeResource.maxQuestions
+      }
+      if (activeResource && activeResource.description) {
+        this.instructionAssessment = activeResource.description
+        this.getInstructionAssessmentPagination(activeResource.description)
+      }
+      this.canAttend()
+    }
+
+    // console.log('this.widgetContentService.currentMetaData', this.widgetContentService)
+    // console.log('this.identifier', this.identifier)
+  }
+
+  /* tslint:disable */
+  findNested(obj: any, key: any, value: any) {
+
+    // Base case
+    if (obj[key] === value) {
+      return obj
+    } {
+      let keys = Object.keys(obj) // add this line to iterate over the keys
+
+      for (let i = 0, len = keys.length; i < len; i++) {
+        let k = keys[i] // use this key for iteration, instead of index "i"
+
+        // add "obj[k] &&" to ignore null values
+        if (obj[k] && typeof obj[k] == 'object') {
+          let found: any = this.findNested(obj[k], key, value)
+          if (found) {
+            // If the object was found in the recursive call, bubble it up.
+            return found
+          }
+        }
+      }
+    }
+  }
+  /* tslint:enable */
+  getInstructionAssessmentPagination(htmlData: any) {
+    const totalCharacters = htmlData.length
+    const totalPages = Math.ceil(totalCharacters / this.charactersPerPage)
+    this.instructionAssessment = []
+
+    for (let i = 0; i < totalPages; i += 1) {
+      const start = i * this.charactersPerPage
+      const pageContent = htmlData.substr(start, this.charactersPerPage)
+      this.instructionAssessment.push(pageContent)
+    }
+  }
+
+  get getTimeLimit(): number {
+    let jsonTime = (this.quizJson.timeLimit || 0)
+    if (this.retake && jsonTime === 0) {
+      jsonTime = _.get(this.activatedRoute, 'snapshot.data.content.data.expectedDuration') || 0
+      this.quizJson.timeLimit = jsonTime
+    }
+    return jsonTime + this.assessmentBuffer
+  }
+  getSections() {
+    // this.identifier
+    this.questionSectionTableData = []
+    this.markedQuestions = new Set([])
+    this.questionAnswerHash = {}
+    this.questionVisitedData = []
+    if (this.assessmentType === 'optionalWeightage') {
+      this.quizJson.questions = []
+    }
+
+    if (this.forPreview && this.quizData.isPublic) {
+      this.raiseEvent(WsEvents.EnumTelemetrySubType.Loaded, this.quizData)
+    }
+    this.fetchingSectionsStatus = 'fetching'
+    if (this.quizSvc.paperSections && this.quizSvc.paperSections.value
+      && _.get(this.quizSvc.paperSections, 'value.questionSet.children')) {
+      this.paperSections = _.get(this.quizSvc.paperSections, 'value.questionSet.children')
+      this.questionSectionTableData = _.get(this.quizSvc.paperSections, 'value.questionSet.children')
+
+      const showTimer = _.toLower(_.get(this.quizSvc.paperSections, 'value.questionSet.showTimer')) === 'yes'
+      if (showTimer || this.primaryCategory !== NsContent.EPrimaryCategory.PRACTICE_RESOURCE) {
+        this.quizJson.timeLimit = (_.get(this.quizSvc.paperSections, 'value.questionSet.expectedDuration') || 0)
+      } else {
+        // this.quizJson.timeLimit = this.duration * 60
+        this.quizJson.timeLimit = this.quizJson.timeLimit
+      }
+      this.allSectionTimeLimit = (_.get(this.quizSvc.paperSections, 'value.questionSet.expectedDuration') || 0)
+      this.fetchingSectionsStatus = 'done'
+      this.viewState = 'detail'
+      this.startIfonlySection()
+    } else {
+      if (this.selectedAssessmentCompatibilityLevel < 7) {
+
+        this.quizSvc.getSectionV4(this.identifier, this.forPreview,
+          this.getPublicContentRequestData(), this.collectionId).subscribe((section: NSPractice.ISectionResponse) => {
+            // console.log(section)
+            if (section && section.result && section.result.response) {
+              if ((this.forPreview && !this.forCreatorMode)) {
+                this.showPublicUserPopUp('noAtempt')
+              }
+            } else {
+              this.fetchingSectionsStatus = 'done'
+              if (section.responseCode && section.responseCode === 'OK') {
+                this.compatibilityLevel = section.result.questionSet.compatibilityLevel
+                this.assessmentType = section.result.questionSet.assessmentType
+                /** this is to enable or disable Timer */
+                const showTimer = _.toLower(_.get(section, 'result.questionSet.showTimer')) === 'yes'
+                if (showTimer) {
+                  this.quizJson.timeLimit = section.result.questionSet.expectedDuration
+                } else {
+                  // this.quizJson.timeLimit = this.duration * 60
+                  this.quizJson.timeLimit = this.quizJson.timeLimit
+                }
+                this.allSectionTimeLimit = section.result.questionSet.expectedDuration
+                // this.quizSvc.paperSections.next(section.result)
+                const tempObj = _.get(section, 'result.questionSet.children')
+                this.showQuestionMarks = _.get(section, 'result.questionSet.showMarks', 'No')
+                this.updataDB(tempObj)
+                this.paperSections = []
+                this.questionSectionTableData = []
+                let totalQuestions = 0
+                _.each(tempObj, o => {
+                  if (this.paperSections) {
+                    this.paperSections.push(o)
+                    this.questionSectionTableData.push(o)
+                    if (o.childNodes) {
+                      totalQuestions = totalQuestions + o.childNodes.length
+                    }
+                  }
+                })
+                this.totalAssessemntQuestionsCount = totalQuestions
+                // this.paperSections = _.get(section, 'result.questionSet.children')
+                this.viewState = 'detail'
+                // this.updateTimer()
+                this.startIfonlySection()
+              }
+            }
+          },
+            (error: any) => {
+              this.fetchingSectionsStatus = 'error'
+              // Only show specific message for 400 status code errors
+              if (error.status === 400) {
+                if (error.error && error.error.params && error.error.params.errmsg) {
+                  this.openSnackbar(`${error.error.params.errmsg}`)
+                  this.viewerHeaderSideBarToggleService.visibilityStatus.next(true)
+                }
+              } else {
+                this.openSnackbar('Failed to load assessment section. Please try again later.')
+              }
+            })
+      } else {
+        this.quizSvc.getSection(this.identifier, this.forPreview,
+          this.getPublicContentRequestData(), this.collectionId).subscribe((section: NSPractice.ISectionResponse) => {
+            // console.log(section)
+            if (section && section.result && section.result.response) {
+              if ((this.forPreview && !this.forCreatorMode)) {
+                this.showPublicUserPopUp('noAtempt')
+              }
+            } else {
+              this.fetchingSectionsStatus = 'done'
+              if (section.responseCode && section.responseCode === 'OK') {
+                this.compatibilityLevel = section.result.questionSet.compatibilityLevel
+                this.assessmentType = section.result.questionSet.assessmentType
+                /** this is to enable or disable Timer */
+                const showTimer = _.toLower(_.get(section, 'result.questionSet.showTimer')) === 'yes'
+                if (showTimer) {
+                  this.quizJson.timeLimit = section.result.questionSet.expectedDuration
+                } else {
+                  // this.quizJson.timeLimit = this.duration * 60
+                  this.quizJson.timeLimit = this.quizJson.timeLimit
+                }
+                this.allSectionTimeLimit = section.result.questionSet.expectedDuration
+                // this.quizSvc.paperSections.next(section.result)
+                const tempObj = _.get(section, 'result.questionSet.children')
+                this.showQuestionMarks = _.get(section, 'result.questionSet.showMarks', 'No')
+                this.updataDB(tempObj)
+                this.paperSections = []
+                this.questionSectionTableData = []
+                let totalQuestions = 0
+                _.each(tempObj, o => {
+                  if (this.paperSections) {
+                    this.paperSections.push(o)
+                    this.questionSectionTableData.push(o)
+                    if (o.childNodes) {
+                      totalQuestions = totalQuestions + o.childNodes.length
+                    }
+                  }
+                })
+                this.totalAssessemntQuestionsCount = totalQuestions
+                // this.paperSections = _.get(section, 'result.questionSet.children')
+                this.viewState = 'detail'
+                // this.updateTimer()
+                this.startIfonlySection()
+              }
+            }
+          },
+            (error: any) => {
+              this.fetchingSectionsStatus = 'error'
+              // Only show specific message for 400 status code errors
+              if (error.status === 400) {
+                if (error.error && error.error.params && error.error.params.errmsg) {
+                  this.openSnackbar(`${error.error.params.errmsg}`)
+                }
+              } else {
+                this.openSnackbar('Failed to load assessment section. Please try again later.')
+              }
+            })
+      }
+
+    }
+  }
+  startIfonlySection() {
+    // console.log('in start only section', this.isOnlySection)
+    // directly start section if only section is there is set
+    // if (this.isOnlySection) {
+    //   const firstSection = _.first(this.paperSections) || null
+    //   if (firstSection) {
+    //     this.nextSection(firstSection)
+    //     this.overViewed('start')
+    //   }
+    // }
+    const firstSection = _.first(this.paperSections) || null
+    if (firstSection) {
+      this.nextSection(firstSection)
+      this.overViewed('start')
+    }
+    this.updateTimer()
+
+  }
+  get isOnlySection(): boolean {
+    return !!this.paperSections && !!(this.paperSections.length === 1)
+  }
+  updataDB(sections: NSPractice.IPaperSection[]) {
+    const data: NSPractice.ISecAttempted[] = []
+    for (let i = 0; i < sections.length; i += 1) {
+      const nextsec = sections[i + 1]
+      data.push({
+        identifier: sections[i].identifier,
+        fullAttempted: false,
+        isAttempted: false,
+        nextSection: nextsec && nextsec.identifier ? nextsec.identifier : null,
+        totalQueAttempted: 0,
+        attemptData: null,
+      })
+    }
+    // console.log(data)
+    this.quizSvc.secAttempted.next(data)
+  }
+  get secQuestions(): any[] {
+    if (!(this.quizJson && this.quizJson.questions) || !(this.selectedSection && this.selectedSection.identifier)) {
+      return []
+    }
+    const qq = _.filter(this.quizJson.questions, { section: this.selectedSection.identifier })
+    this.totalQuestionsCount = qq ? qq.length : 0
+    const setStartIndex = this.noOfQuestionsPerSet * this.currentSetNumber
+    const setEndIndex = setStartIndex + this.noOfQuestionsPerSet
+    const secQuestions = qq.slice(setStartIndex, setEndIndex)
+    return this.selectedAssessmentCompatibilityLevel < 7 ? qq : secQuestions
+  }
+
+  get hasNextSet(): boolean {
+    return this.totalQuestionsCount > this.noOfQuestionsPerSet * (this.currentSetNumber + 1)
+  }
+
+  nextSection(section: NSPractice.IPaperSection) {
+    // this.quizSvc.currentSection.next(section)
+    this.startSection(section)
+  }
+
+  changeSection(identifier: any) {
+    const selectedSection: any = _.filter(this.paperSections, { identifier })
+    if (selectedSection && selectedSection.length) {
+      this.selectedSectionIdentifier = selectedSection[0]['identifier']
+      this.startSection(selectedSection[0])
+    }
+  }
+  startSection(section: NSPractice.IPaperSection) {
+
+    this.sectionalInstruction = section.additionalInstructions
+    this.selectedSectionIdentifier = section.identifier
+    if (section.childNodes && section.childNodes.length) {
+      this.totalQuestionsCount = section.childNodes.length
+      this.questionAttemptedCount = 0
+    }
+
+    if (section && section.expectedDuration) {
+      this.quizJson.timeLimit = section.expectedDuration
+      this.timeLeft = section.expectedDuration
+      this.sectionalTimer = true
+    } else {
+      this.sectionalTimer = false
+    }
+    // this.quizJson.timeLimit = (_.get(this.quizSvc.paperSections, 'value.questionSet.expectedDuration') || 0)
+    if (section) {
+      // this.quizSvc.currentSection.next(section)
+      this.fetchingQuestionsStatus = 'fetching'
+      this.selectedSection = section
+      if (this.secQuestions && this.secQuestions.length > 0) {
+        this.fetchingQuestionsStatus = 'done'
+        this.overViewed('start')
+      } else {
+        // updated because there is a 20 questions limit
+        const lst = _.chunk(section.childNodes || [], 20)
+        const prom: any[] = []
+        _.each(lst, l => {
+          prom.push(this.getMultiQuestions(l))
+        })
+        Promise.all(prom).then(qqr => {
+          this.fetchingQuestionsStatus = 'done'
+          const question = { questions: _.flatten(_.map(qqr, 'result.questions')) }
+          // console.log('question--', question)
+          const codes = _.compact(_.map(this.quizJson.questions, 'section') || [])
+          this.quizSvc.startSection(section)
+          // console.log(this.quizSvc.secAttempted.value)
+          _.each(question.questions, q => {
+            // const qHtml = document.createElement('div')
+            // qHtml.innerHTML = q.editorState.question
+            if (codes.indexOf(section.identifier) === -1 && q) {
+              this.quizJson.questions.push({
+                section: section.identifier,
+                question: q.body, // qHtml.textContent || qHtml.innerText || '',
+                multiSelection: ((q.qType || '').toLowerCase() === 'mcq-mca' ? true : false),
+                questionType: (q.qType || '').toLowerCase(),
+                questionId: q.identifier,
+                instructions: null,
+                options: this.getOptions(q),
+                editorState: q.editorState,
+                questionLevel: q.questionLevel,
+                marks: q.totalMarks,
+                rhsChoices: this.getRhsValue(q),
+                choices: q.choices ? q.choices : [],
+              })
+            }
+          })
+          this.overViewed('start')
+        })
+        // this.quizSvc.getQuestions(section.childNodes || [], this.identifier).subscribe(qqr => {
+        //   this.fetchingQuestionsStatus = 'done'
+        //   const question = _.get(qqr, 'result')
+        //   const codes = _.compact(_.map(this.quizJson.questions, 'section') || [])
+        //   this.quizSvc.startSection(section)
+        //   // console.log(this.quizSvc.secAttempted.value)
+        //   _.each(question.questions, q => {
+        //     // const qHtml = document.createElement('div')
+        //     // qHtml.innerHTML = q.editorState.question
+        //     if (codes.indexOf(section.identifier) === -1) {
+        //       this.quizJson.questions.push({
+        //         section: section.identifier,
+        //         question: q.body, // qHtml.textContent || qHtml.innerText || '',
+        //         multiSelection: ((q.qType || '').toLowerCase() === 'mcq-mca' ? true : false),
+        //         questionType: (q.qType || '').toLowerCase(),
+        //         questionId: q.identifier,
+        //         instructions: null,
+        //         options: this.getOptions(q),
+        //       })
+        //     }
+        //   })
+        //   this.overViewed('start')
+        // })
+      }
+
+      if (section && section.questionParagraph) {
+        const questionParagraph = section.questionParagraph
+        this.questionParagraph = questionParagraph.replace(/&nbsp;/g, ' ')
+      } else {
+        this.questionParagraph = ''
+      }
+    }
+  }
+  getMultiQuestions(ids: string[]) {
+    if (this.selectedAssessmentCompatibilityLevel < 7) {
+      return this.quizSvc.getQuestionsV4(ids, this.identifier, this.forPreview,
+        this.viewerSvc.publicUserDetails, this.collectionId).toPromise()
+    }
+    return this.quizSvc.getQuestions(ids, this.identifier, this.forPreview,
+      this.viewerSvc.publicUserDetails, this.collectionId).toPromise()
+  }
+  getRhsValue(question: NSPractice.IQuestionV2) {
+    if (question && question.qType) {
+      const qTyp = question.qType
+      switch (qTyp) {
+        case 'MTF':
+          return question.rhsChoices
+        default:
+          return []
+      }
+    }
+    return []
+  }
+  getOptions(question: NSPractice.IQuestionV2): NSPractice.IOption[] {
+    const options: NSPractice.IOption[] = []
+    if (question && question.qType) {
+      const qTyp = question.qType
+      switch (qTyp) {
+        // 'mcq-sca' | 'mcq-mca' | 'ftb' | 'mtf'
+        case 'mcq-sca':
+        case 'MCQ-SCA':
+        case 'mcq-mca':
+        case 'MCQ-MCA':
+        case 'MCQ-MCA-W':
+        case 'MCQ-SCA-TF':
+        case 'MCQ':
+          _.each(question.editorState
+            // tslint:disable-next-line: align
+            ? question.editorState.options : question.choices.options, o => {
+              // const aHtml = document.createElement('div')
+              // aHtml.innerHTML = o.value.body
+
+              // const vHtml = document.createElement('div')
+              // vHtml.innerHTML = o.value.value
+              options.push({
+                optionId: o.value.value,
+                text: o.value.body || '',
+                isCorrect: o.answer,
+                // hint: '',
+                // match: '',
+                // matchForView: '',
+                // response: '',
+                // userSelected: false,
+              })
+            })
+          break
+        case 'ftb':
+        case 'FTB':
+          const noOptions = _.split(question.body, '_______________')
+          noOptions.pop()
+          // _.each(question.choices.options, op => {
+          // const ansHtml = document.createElement('div')
+          // ansHtml.innerHTML = op.value.body || '<p></p>'
+
+          // const opIdHtml = document.createElement('div')
+          // opIdHtml.innerHTML = op.value.value || '<p></p>'
+          _.each(noOptions, (_op, idx) => {
+            options.push({
+              optionId: (idx).toString(),
+              text: '',
+              // isCorrect: op.answer,
+            })
+          })
+
+          // })
+
+          break
+        case 'mtf':
+        case 'MTF':
+          // const array = this.question.options.map(elem => elem.match)
+          // const arr = this.practiceSvc.shuffle(array)
+          // for (let i = 0; i < this.question.options.length; i += 1) {
+          //     this.question.options[i].matchForView = arr[i]
+          // }
+          _.each(question.editorState
+            // tslint:disable-next-line: align
+            ? question.editorState.options : question.choices.options, (o, idx) => {
+              options.push({
+                // isCorrect: true,
+                optionId: o.value.value,
+                text: (o.value.body || '').toString(), // modified
+                hint: this.primaryCategory === NsContent.EPrimaryCategory.PRACTICE_RESOURCE
+                  ? _.get(_.nth(question.editorState && question.editorState.options, idx), 'answer')
+                  : _.nth(question.rhsChoices, idx),
+                response: '',
+                userSelected: false,
+                matchForView: '',
+                match: _.nth(question.rhsChoices, idx),
+                // this.primaryCategory === NsContent.EPrimaryCategory.PRACTICE_RESOURCE
+                //   ? _.get(_.nth(question.editorState && question.editorState.options, idx), 'answer')
+                //   : _.nth(question.rhsChoices, idx),
+              })
+            })
+          break
+      }
+    }
+    return options
+  }
+  getClass(section: NSPractice.ISecAttempted) {
+    const storeData = _.first(_.filter(this.attemptSubData, { identifier: section.identifier }))
+    let className = 'not-started'
+    if (storeData) {
+      if (storeData.fullAttempted) {
+        className = 'complete'
+      } else {
+        if (storeData.isAttempted) {
+          className = 'incomplete'
+        }
+      }
+    }
+    return className
+  }
+  scroll(qIndex: number) {
+    if (qIndex > 0) {
+      this.getNextQuestion(qIndex - 1)
+    }
+    if (!this.sidenavOpenDefault && this.isXsmall) {
+      if (this.sideNav) {
+        this.sideNav.close()
+      }
+    }
+
+    // const questionElement = document.getElementById(`question${qIndex}`)
+    // if (questionElement) {
+    //   questionElement.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    // }
+  }
+  ngOnChanges(changes: SimpleChanges) {
+    for (const change in changes) {
+      if (change) {
+        if (change === 'quiz') {
+          if (
+            this.quizJson &&
+            this.quizJson.timeLimit
+          ) {
+            this.quizJson.timeLimit *= 1000
+          }
+        }
+        if (change === 'name') {
+          // this.quizJson.questions = []
+          // this.quizJson.timeLimit = 0
+          this.clearStorage()
+        }
+      }
+    }
+  }
+  getNextQuestion(idx: any) {
+    const currentQuestionId = this.currentQuestion ? this.currentQuestion.questionId : ''
+    if (currentQuestionId && this.secQuestions && this.currentQuestion.section === this.secQuestions[0]['section']) {
+      this.calculateTimeSpentOnQuestion(currentQuestionId)
+    } else {
+      this.setQuestionStartTime()
+    }
+    const questions = this.secQuestions
+    if (this.assessmentType === 'optionalWeightage') {
+      if (idx > 0) {
+        if (questions && questions[idx - 1]) {
+          const response = this.isQuestionAttempted(questions[idx - 1]['questionId'])
+          if (!response) {
+            this.openSnackbar('Please attempt the current question to move on next question.')
+          } else {
+            if (this.totalQCount > idx) {
+              this.process = true
+              if (idx !== this.currentQuestionIndex) {
+                this.currentQuestionIndex = idx
+              }
+
+              this.currentQuestion = questions && questions[idx] ? questions[idx] : null
+              if (questions[idx] && questions[idx]['questionId'] &&
+                !(this.questionVisitedData.indexOf(questions[idx]['questionId']) > -1)) {
+                this.questionVisitedData.push(questions[idx]['questionId'])
+              }
+
+              setTimeout(() => {
+                this.process = false
+                // tslint:disable-next-line
+              }, 10)
+              this.showAnswer = false
+              this.matchHintDisplay = []
+
+              if (this.compatibilityLevel <= 6) {
+                // console.log(this.generateRequest)
+              }
+            }
+          }
+        }
+      } else {
+        if (this.totalQCount > idx) {
+          this.process = true
+          if (idx !== this.currentQuestionIndex) {
+            this.currentQuestionIndex = idx
+          }
+
+          this.currentQuestion = questions && questions[idx] ? questions[idx] : null
+          if (questions[idx] && questions[idx]['questionId'] && !(this.questionVisitedData.indexOf(questions[idx]['questionId']) > -1)) {
+            this.questionVisitedData.push(questions[idx]['questionId'])
+          }
+
+          setTimeout(() => {
+            this.process = false
+            // tslint:disable-next-line
+          }, 10)
+          this.showAnswer = false
+          this.matchHintDisplay = []
+
+          if (this.compatibilityLevel <= 6) {
+            // console.log(this.generateRequest)
+          }
+        }
+      }
+
+    } else {
+      if (this.totalQCount > idx) {
+        this.process = true
+        if (idx !== this.currentQuestionIndex) {
+          this.currentQuestionIndex = idx
+        }
+
+        this.currentQuestion = questions && questions[idx] ? questions[idx] : null
+        if (questions[idx] && questions[idx]['questionId'] && !(this.questionVisitedData.indexOf(questions[idx]['questionId']) > -1)) {
+          this.questionVisitedData.push(questions[idx]['questionId'])
+        }
+
+        setTimeout(() => {
+          this.process = false
+          // tslint:disable-next-line
+        }, 10)
+        this.showAnswer = false
+        this.matchHintDisplay = []
+
+        if (this.compatibilityLevel <= 6) {
+          // console.log(this.generateRequest)
+        }
+      }
+    }
+
+  }
+
+  clearQuestion(question: any) {
+    if (this.questionAnswerHash[question.questionId]) {
+      delete this.questionAnswerHash[question.questionId]
+      this.quizSvc.questionAnswerHash.next(this.questionAnswerHash)
+    }
+    this.quizSvc.clearResponse.next(question.questionId)
+  }
+
+  get current_Question(): NSPractice.IQuestionV2 {
+    return this.currentQuestion
+  }
+  get currentIndex() {
+    return this.currentQuestionIndex
+  }
+  get totalQCount(): number {
+    const questions = this.secQuestions || []
+    return questions.length
+  }
+  get noOfQuestions(): number {
+    if (this.totalAssessemntQuestionsCount) {
+      return this.totalAssessemntQuestionsCount
+    }
+    if (this.retake) {
+      return _.get(this.activatedRoute, 'snapshot.data.content.data.maxQuestions') || 0
+    }
+    return 0
+  }
+
+  backToSections() {
+    this.viewState = 'detail'
+  }
+
+  overViewed(event: NSPractice.TUserSelectionType) {
+    if (event === 'start') {
+      this.retake = false
+      this.startQuiz()
+      // call content progress with status 1 i.e, started
+      this.updateProgress(1)
+      this.updatePreEnrollmentProgress(1)
+    } else if (event === 'skip') {
+      // alert('skip quiz TBI')
+    }
+  }
+
+  updateProgress(status: number) {
+    // status = 1 indicates started
+    // status = 2 indicates completed
+    const resData = this.viewerSvc.getBatchIdAndCourseId(this.activatedRoute.snapshot.queryParams.collectionId,
+      this.activatedRoute.snapshot.queryParams.batchId, this.identifier)
+    const collectionId = (resData && resData.courseId) ? resData.courseId : ''
+    const batchId = (resData && resData.batchId) ? resData.batchId : ''
+    // const collectionId = this.activatedRoute.snapshot.queryParams.collectionId ?
+    //   this.activatedRoute.snapshot.queryParams.collectionId : ''
+    // const batchId = this.activatedRoute.snapshot.queryParams.batchId ?
+    //   this.activatedRoute.snapshot.queryParams.batchId : ''
+    if (this.identifier && collectionId && batchId) {
+      if (this.selectedSection &&
+        this.selectedSection.primaryCategory !== NsContent.EPrimaryCategory.FINAL_ASSESSMENT &&
+        this.selectedSection.primaryCategory !== NsContent.EPrimaryCategory.PRACTICE_RESOURCE
+      ) {
+        this.viewerSvc.realTimeProgressUpdateQuiz(this.identifier, collectionId, batchId, status)
+      }
+    }
+  }
+  updatePreEnrollmentProgress(status: any) {
+
+    const isPreAssessment = this.activatedRoute.snapshot.queryParams.preAssessment
+    if (isPreAssessment) {
+      if (this.identifier) {
+        const MIME_TYPE = "application/vnd.sunbird.questionset"
+        console.log('🎯 [PRACTICE] Updating pre-assessment progress for:', this.identifier, 'status:', status)
+        this.viewerSvc.realTimeProgressUpdateForPreAssessmentQuiz(this.identifier, status, MIME_TYPE)
+        // Also update the local hashmap and trigger milestone lock update
+        setTimeout(() => {
+          if (this.tocSvc.hashmap && this.tocSvc.hashmap[this.identifier]) {
+            this.tocSvc.hashmap[this.identifier]['completionPercentage'] = 100
+            this.tocSvc.hashmap[this.identifier]['completionStatus'] = 2
+            this.tocSvc.hashmap[this.identifier]['status'] = 2
+            this.tocSvc.hashmap = { ...this.tocSvc.hashmap }
+            console.log('🔄 [PRACTICE] Triggering milestone lock update after pre-assessment completion')
+            if (this.tocSvc.triggerMilestoneLockUpdate) {
+              this.tocSvc.triggerMilestoneLockUpdate()
+            }
+          }
+        }, 700)
+      }
+    }
+  }
+  startQuiz() {
+    if (this.isXsmall) {
+      this.sidenavOpenDefault = true
+      setTimeout(() => { this.sidenavOpenDefault = false }, 500)
+    }
+    this.currentQuestionIndex = 0
+    this.viewState = 'attempt'
+    this.getNextQuestion(this.currentQuestionIndex)
+  }
+
+  updateTimer() {
+    this.startTime = Date.now()
+    this.timeLeft = this.getTimeLimit
+    // && this.primaryCategory !== this.ePrimaryCategory.PRACTICE_RESOURCE
+    if (this.getTimeLimit > 0
+    ) {
+      this.timerSubscription = interval(1000)
+        .pipe(
+          map(
+            () =>
+              this.startTime + this.getTimeLimit - Date.now(),
+          ),
+        )
+        .subscribe(_timeRemaining => {
+          this.timeLeft -= 1
+          if (this.timeLeft === 0) {
+            if (this.paperSections && this.paperSections.length) {
+              if (this.allSecAttempted.full) {
+                this.isIdeal = true
+                this.timeLeft = 0
+                if (this.timerSubscription) {
+                  this.timerSubscription.unsubscribe()
+                }
+                this.submitQuiz()
+              } else if (this.allSecAttempted.next) {
+                this.nextSection(this.allSecAttempted.next)
+              }
+            } else {
+              this.isIdeal = true
+              this.timeLeft = 0
+              if (this.timerSubscription) {
+                this.timerSubscription.unsubscribe()
+              }
+              this.submitQuiz()
+            }
+
+          }
+        })
+    }
+  }
+
+  get allSecAttempted(): { full: boolean, next: NSPractice.IPaperSection | null, sectionsCount: number } {
+    const sections = this.quizSvc.secAttempted.getValue()
+    let fullAttempted = false
+    let sectionsCount = 0
+    if (sections && sections.length) {
+      sectionsCount = sections.length
+      const attemped = _.filter(sections, s => s.fullAttempted || s.isAttempted)
+      fullAttempted = (attemped || []).length === sections.length
+    }
+    const currentSectionId = _.get(this.selectedSection, 'identifier') || _.get(this.quizSvc, 'currentSection.value.identifier')
+    const nextId = _.get(_.first(_.filter(_.get(this.quizSvc.secAttempted, 'value'), { identifier: currentSectionId })), 'nextSection')
+    // const next = _.first(_.filter(_.get(this.paperSections, 'childNodes'), { identifier: nextId }))
+    let next: any
+    if (this.paperSections) {
+      next = this.paperSections.filter(el => {
+        return el.identifier === nextId
+      })[0]
+    }
+
+    return { next, sectionsCount, full: fullAttempted }
+  }
+
+  fillSelectedItems(question: NSPractice.IQuestion, response: any) {
+    let optionId: any
+    let checked: any
+    if (this.assessmentType === 'optionalWeightage') {
+      optionId = response['index']
+      checked = response['status']
+    } else {
+      optionId = response
+    }
+
+    if (typeof (optionId) === 'string') {
+      this.raiseTelemetry('mark', optionId, 'click')
+    } if (this.viewState === 'answer') {
+      // if (this.questionsReference) {
+      //   this.questionsReference.forEach(qr => {
+      //     qr.reset()
+      //   })
+      // }
+    }
+    this.viewState = 'attempt'
+    if (
+      this.questionAnswerHash[question.questionId] &&
+      question.multiSelection
+    ) {
+      const questionIndex = this.questionAnswerHash[question.questionId].indexOf(optionId)
+      if (questionIndex === -1) {
+        this.questionAnswerHash[question.questionId].push(optionId)
+      } else {
+        this.questionAnswerHash[question.questionId].splice(questionIndex, 1)
+      }
+      if (!this.questionAnswerHash[question.questionId].length) {
+        delete this.questionAnswerHash[question.questionId]
+      }
+    } else {
+      if (this.assessmentType === 'optionalWeightage') {
+        if (!checked) {
+          if (this.questionAnswerHash[question.questionId]) {
+            // const questionIndex = this.questionAnswerHash[question.questionId].indexOf(optionId)
+            // this.questionAnswerHash[question.questionId].splice(questionIndex, 1)
+            delete this.questionAnswerHash[question.questionId]
+          }
+        } else {
+          this.questionAnswerHash[question.questionId] = [optionId]
+        }
+      } else {
+        this.questionAnswerHash[question.questionId] = [optionId]
+      }
+
+    }
+    // tslint:disable-next-line
+    if (question.questionType && question.questionType === 'mtf') {
+      const mTfval = this.quizSvc.mtfSrc.getValue()
+      mTfval[question.questionId] = {
+        // [_.first(_.map(optionId, 'source.innerText'))]: {
+        source: _.map(optionId, 'source.innerText'),
+        target: _.map(optionId, 'target.id'),
+        // target: [wrapper.firstChild.innerHTML]
+        // sourceId: _.first(_.map(optionId, 'source.id')),
+        // targetId: _.first(_.map(optionId, 'target.id')),
+        // },
+      }
+      // console.log('mTfval--', mTfval)
+      this.quizSvc.mtfSrc.next(mTfval)
+
+    }
+    this.quizSvc.qAnsHash({ ...this.questionAnswerHash })
+    const answered = (this.quizSvc.questionAnswerHash.getValue() || [])
+    if (this.markSectionAsComplete(answered) && this.selectedSection) {
+      this.quizSvc.setFullAttemptSection(this.selectedSection)
+    }
+    if (this.questionAnswerHash) {
+      this.questionAttemptedCount = Object.keys(this.questionAnswerHash).length
+    }
+  }
+  markSectionAsComplete(answered: any): boolean {
+    let seted = true
+    _.each(this.secQuestions, q => {
+      if (!answered[q.questionId]) {
+        seted = false
+      }
+    })
+    return seted
+  }
+  proceedToSubmit() {
+    // if (this.timeLeft || this.primaryCategory === this.ePrimaryCategory.PRACTICE_RESOURCE) {
+    // if (this.coursePrimaryCategory === 'Standalone Assessment') {
+    if (this.selectedAssessmentCompatibilityLevel >= 7) {
+      const submitAssessment = true
+      this.openSectionPopup(submitAssessment)
+    } else {
+      if (
+        Object.keys(this.questionAnswerHash).length !==
+        this.quizJson.questions.length
+      ) {
+        this.submissionState = 'unanswered'
+      } else if (this.markedQuestions.size) {
+        this.submissionState = 'marked'
+      } else {
+        this.submissionState = 'answered'
+      }
+      const dialogRef = this.dialog.open(SubmitQuizDialogComponent, {
+        width: '350px',
+        data: { submissionState: this.submissionState, canAttempt: this.canAttempt, primaryCategory: this.primaryCategory },
+      })
+      dialogRef.afterClosed().subscribe(result => {
+        if (result) {
+          this.submitQuiz()
+        }
+      })
+    }
+
+    // }
+  }
+  back() {
+    this.proceedToSubmit()
+  }
+  get generateRequest(): NSPractice.IQuizSubmit {
+    const submitQuizJson = JSON.parse(JSON.stringify(this.quizJson))
+    const requestCourse = this.viewerSvc.getBatchIdAndCourseId(
+      this.activatedRoute.snapshot.queryParams.collectionId,
+      this.activatedRoute.snapshot.queryParams.batchId,
+      this.identifier)
+    if (requestCourse && requestCourse.batchId && requestCourse.courseId) {
+      this.resCollectionId = requestCourse.courseId ? requestCourse.courseId : ''
+      this.resBatchId = requestCourse.batchId ? requestCourse.batchId : ''
+    }
+
+    //   const collectionId = this.activatedRoute.snapshot.queryParams.collectionId ?
+    //   this.activatedRoute.snapshot.queryParams.collectionId : ''
+    // const batchId = this.activatedRoute.snapshot.queryParams.batchId ?
+    //   this.activatedRoute.snapshot.queryParams.batchId : ''
+
+    const req = this.quizSvc.createAssessmentSubmitRequest(
+      this.identifier,
+      this.name,
+      {
+        ...submitQuizJson,
+        timeLimit: this.quizJson.timeLimit * 1000,
+      },
+      this.questionAnswerHash,
+      this.quizSvc.mtfSrc.getValue() as any,
+    )
+    let language: string = this.viewerSvc.getResourceContentLanguage(this.identifier)
+    let assessmentChildren: any = _.map(this.paperSections, (ps: NSPractice.IPaperSection) => {
+      return {
+        identifier: ps.identifier,
+        objectType: ps.objectType,
+        primaryCategory: ps.primaryCategory,
+        scoreCutoffType: ps.scoreCutoffType,
+        children: this.getQuestions(ps, req),
+      } as NSPractice.ISubSec
+    })
+    const request: NSPractice.IQuizSubmit = {
+      language,
+      batchId: this.resBatchId,
+      identifier: this.activatedRoute.snapshot.queryParams.preAssessment && this.widgetContentService.currentMetaData && this.widgetContentService.currentMetaData.content && this.widgetContentService.currentMetaData.content.data && this.widgetContentService.currentMetaData.content.data.identifier ? this.widgetContentService.currentMetaData?.content?.data?.identifier : this.identifier,
+      primaryCategory: this.primaryCategory,
+      courseId: this.forPreview ? this.collectionId : (this.activatedRoute.snapshot.queryParams.preAssessment && this.activatedRoute.snapshot.queryParams.preAssessment && this.widgetContentService.currentMetaData && this.widgetContentService.currentMetaData.content && this.widgetContentService.currentMetaData.content.data && this.widgetContentService.currentMetaData.content.data.parent ? this.widgetContentService.currentMetaData?.content.data.parent : this.resCollectionId),
+      isAssessment: true,
+      objectType: 'QuestionSet',
+      timeLimit: this.quizJson.timeLimit,
+      children: assessmentChildren,
+    }
+    // // tslint:disable-next-line
+    // console.log(request)
+    return request
+  }
+  getQuestions(section: NSPractice.IPaperSection, req: NSPractice.IQuizSubmitRequest): NSPractice.IRScratch[] {
+    const responseQ: NSPractice.IRScratch[] = []
+    if (section && section.identifier) {
+      const secQues = _.filter(req.questions, q => q.section === section.identifier)
+      _.each(secQues, sq => {
+        const timeSpent = this.timeSpentOnQuestions[sq.questionId] ? this.timeSpentOnQuestions[sq.questionId] : ''
+        switch (_.toLower(sq.questionType || '')) {
+          case 'mcq-mca':
+            const mcqMca: NSPractice.IMCQ_MCA = {
+              identifier: sq.questionId,
+              question: sq.question,
+              mimeType: NsContent.EMimeTypes.QUESTION,
+              objectType: 'Question',
+              primaryCategory: NsContent.EPrimaryCategory.MULTIPLE_CHOICE_QUESTION,
+              qType: 'MCQ-MCA',
+              questionLevel: sq.questionLevel ? sq.questionLevel : '',
+              timeTaken: timeSpent.toString(),
+              timeSpent: timeSpent.toString(),
+              editorState: {
+                options: _.compact(_.map(sq.options, (_o: NSPractice.IOption) => {
+                  if (_o.userSelected) {
+                    return {
+                      index: (_o.optionId).toString(),
+                      selectedAnswer: !!_o.userSelected,
+                    } as NSPractice.IResponseOptions
+                  } return null
+                })),
+              },
+            }
+            responseQ.push(mcqMca)
+            break
+          case 'mcq-mca-w':
+            const mcqMcaW: NSPractice.IMCQ_MCA_W = {
+              identifier: sq.questionId,
+              question: sq.question,
+              mimeType: NsContent.EMimeTypes.QUESTION,
+              objectType: 'Question',
+              primaryCategory: NsContent.EPrimaryCategory.MULTIPLE_CHOICE_QUESTION,
+              qType: 'MCQ-MCA-W',
+              questionLevel: sq.questionLevel,
+              timeTaken: timeSpent.toString(),
+              timeSpent: timeSpent.toString(),
+              editorState: {
+                options: _.compact(_.map(sq.options, (_o: NSPractice.IOption) => {
+                  if (_o.userSelected) {
+                    return {
+                      index: (_o.optionId).toString(),
+                      selectedAnswer: !!_o.userSelected,
+                    } as NSPractice.IResponseOptions
+                  } return null
+                })),
+              },
+            }
+            responseQ.push(mcqMcaW)
+            break
+          case 'mcq-sca':
+            const mcqSca: NSPractice.IMCQ_SCA = {
+              identifier: sq.questionId,
+              mimeType: NsContent.EMimeTypes.QUESTION,
+              objectType: 'Question',
+              question: sq.question,
+              primaryCategory: NsContent.EPrimaryCategory.SINGLE_CHOICE_QUESTION,
+              qType: 'MCQ-SCA',
+              questionLevel: sq.questionLevel ? sq.questionLevel : '',
+              timeTaken: timeSpent.toString(),
+              timeSpent: timeSpent.toString(),
+              editorState: {
+                options: _.compact(_.map(sq.options, (_o: NSPractice.IOption) => {
+                  if (_o.userSelected) {
+                    return {
+                      index: (_o.optionId).toString(),
+                      selectedAnswer: _o.userSelected,
+                    } as NSPractice.IResponseOptions
+                  } return null
+                })),
+              },
+            }
+            responseQ.push(mcqSca)
+            break
+          case 'ftb':
+            const obj: any = {}
+            let optionsAll: any = []
+            if (sq.options && sq.options.length) {
+              optionsAll = _.compact(_.map(sq.options, (_o: NSPractice.IOption, idx: number) => {
+                if (_o.response) {
+                  return {
+                    index: (_o.optionId || idx).toString(),
+                    selectedAnswer: _o.response || '',
+                  } as NSPractice.IResponseOptions
+                } return null
+              }))
+              // selectedAnswer: _.join(_.map(sq.options, (_o: NSPractice.IOption) => {
+              //   return _o.response
+              // }),
+              //   // tslint:disable-next-line:align
+              //   ','
+              // ),
+
+            } else {
+              /* tslint:disable */
+              for (let i = 0; i < Object.keys(this.questionAnswerHash).length; i++) {
+                if (Object.keys(this.questionAnswerHash)[i] === sq.questionId) {
+                  /* tslint:disable */
+                  for (let j = 0; j < Object.values(this.questionAnswerHash)[i].length; j++) {
+                    obj['index'] = j,
+                      obj['selectedAnswer'] = Object.values(this.questionAnswerHash)[i][j]
+                    optionsAll.push(obj)
+                  }
+
+                }
+              }
+            }
+            const ftb: NSPractice.IMCQ_FTB = {
+              identifier: sq.questionId,
+              mimeType: NsContent.EMimeTypes.QUESTION,
+              objectType: 'Question',
+              question: sq.question,
+              primaryCategory: NsContent.EPrimaryCategory.FTB_QUESTION,
+              qType: 'FTB',
+              questionLevel: sq.questionLevel,
+              timeTaken: timeSpent.toString(),
+              timeSpent: timeSpent.toString(),
+              editorState: { options: [] },
+            }
+
+            if (sq.options.length === 0 && this.questionAnswerHash[sq.questionId]) {
+              const ftbAns = this.questionAnswerHash[sq.questionId][0].split(',')
+              ftbAns.forEach((ans: string, index) => {
+                ftb.editorState.options.push({
+                  index: index.toString(),
+                  selectedAnswer: ans,
+                })
+              })
+            } else if (this.questionAnswerHash[sq.questionId]) {
+              const ftbAns = this.questionAnswerHash[sq.questionId][0].split(',')
+              ftbAns.forEach((ans: string, index) => {
+                ftb.editorState.options.push({
+                  index: index.toString(),
+                  selectedAnswer: ans,
+                })
+              })
+            }
+            responseQ.push(ftb)
+            break
+          case 'mtf':
+            let optionAll: any = []
+            optionAll = _.compact(_.map(sq.options, (_o: any) => {
+              if (_o.userSelected && this.questionAnswerHash[sq.questionId]) {
+                return {
+                  index: (_o.optionId).toString(),
+                  selectedAnswer: _o.response,
+                } as NSPractice.IResponseOptions
+              }
+              return null
+
+            }))
+            const mtf: NSPractice.IMCQ_MTF = {
+              identifier: sq.questionId,
+              mimeType: NsContent.EMimeTypes.QUESTION,
+              objectType: 'Question',
+              question: sq.question,
+              primaryCategory: NsContent.EPrimaryCategory.MTF_QUESTION,
+              qType: 'MTF',
+              questionLevel: sq.questionLevel,
+              timeTaken: timeSpent.toString(),
+              timeSpent: timeSpent.toString(),
+              editorState: {
+                options: optionAll.filter((o: any) => { return o.hasOwnProperty('index') }).length > 0 ? optionAll : [],
+              },
+            }
+            responseQ.push(mtf)
+            break
+          case 'mcq-sca-tf':
+            const mcqScaTF: any = {
+              identifier: sq.questionId,
+              mimeType: NsContent.EMimeTypes.QUESTION,
+              objectType: 'Question',
+              question: sq.question,
+              primaryCategory: NsContent.EPrimaryCategory.SINGLE_CHOICE_QUESTION,
+              qType: 'MCQ-SCA-TF',
+              questionLevel: sq.questionLevel ? sq.questionLevel : '',
+              timeTaken: timeSpent.toString(),
+              timeSpent: timeSpent.toString(),
+              editorState: {
+                options: _.compact(_.map(sq.options, (_o: NSPractice.IOption) => {
+                  if (_o.userSelected) {
+                    return {
+                      index: (_o.optionId).toString(),
+                      selectedAnswer: _o.userSelected,
+                    } as NSPractice.IResponseOptions
+                  } return null
+                })),
+              },
+            }
+            responseQ.push(mcqScaTF)
+            break
+        }
+      })
+    }
+    return responseQ
+  }
+  async submitQuiz() {
+    this.raiseTelemetry('quiz', null, 'submit')
+
+    if (this.assessmentType !== 'optionalWeightage') {
+      if (this.primaryCategory !== NsContent.EPrimaryCategory.PRACTICE_RESOURCE) {
+        this.showOverlay = true
+        setTimeout(() => {
+          this.showOverlay = false
+          this.viewerHeaderSideBarToggleService.visibilityStatus.next(true)
+        }, 5000)
+      } else {
+        this.viewerHeaderSideBarToggleService.visibilityStatus.next(true)
+      }
+
+      this.isSubmitted = true
+      this.ngOnDestroy()
+      if (!this.quizJson.isAssessment) {
+        this.viewState = 'review'
+        // this.calculateResults()
+      } else {
+        this.viewState = 'answer'
+      }
+
+      let allPromiseResolvedCount = 0
+      if (this.paperSections && this.paperSections.length) {
+        for (let i = 0; i < this.paperSections.length; i++) {
+          let section = this.paperSections[i]
+          const lst = _.chunk(section.childNodes || [], 1000)
+          const prom: any[] = []
+          _.each(lst, l => {
+            prom.push(this.getMultiQuestions(l))
+          })
+          Promise.all(prom).then(qqr => {
+            allPromiseResolvedCount++
+            const question = { questions: _.flatten(_.map(qqr, 'result.questions')) }
+            const codes = _.compact(_.map(this.quizJson.questions, 'section') || [])
+            // console.log(this.quizSvc.secAttempted.value)
+            _.each(question.questions, q => {
+              // const qHtml = document.createElement('div')
+              // qHtml.innerHTML = q.editorState.question
+              if (codes.indexOf(section.identifier) === -1) {
+                this.quizJson.questions.push({
+                  section: section.identifier,
+                  question: q.body, // qHtml.textContent || qHtml.innerText || '',
+                  multiSelection: ((q.qType || '').toLowerCase() === 'mcq-mca' ? true : false),
+                  questionType: (q.qType || '').toLowerCase(),
+                  questionId: q.identifier,
+                  instructions: null,
+                  options: this.getOptions(q),
+                  editorState: q.editorState,
+                  questionLevel: q.questionLevel,
+                  marks: q.totalMarks,
+                  rhsChoices: this.getRhsValue(q),
+                  choices: q.choices ? q.choices : []
+                })
+              }
+            })
+
+
+            if (this.paperSections && this.paperSections.length === allPromiseResolvedCount) {
+              // console.log('this.quizJson',this.quizJson)
+              // console.log('this.generateRequest',this.generateRequest)
+              this.submitAfterAllPromiseResolved()
+            }
+          })
+        }
+
+      }
+    } else {
+      this.submitQuizForOptionWeightage()
+    }
+
+
+    // this.quizSvc.submitQuizV3(this.generateRequest).subscribe(
+    //   (res: NSPractice.IQuizSubmitResponseV2) => {
+    //     // call content progress with status 2 i.e, completed
+    //     this.updateProgress(2)
+    //     this.finalResponse = res
+    //     if (this.quizJson.isAssessment) {
+    //       this.isIdeal = true
+    //     }
+    //     this.clearQuizJson()
+    //     this.fetchingResultsStatus = 'done'
+    //     this.numCorrectAnswers = res.correct
+    //     this.numIncorrectAnswers = res.incorrect
+    //     this.numUnanswered = res.blank
+    //     this.passPercentage = res.passPercentage
+    //     this.result = res.overallResult
+    //     if (this.result >= this.passPercentage) {
+    //       this.isCompleted = true
+    //     }
+    //     const top = document.getElementById('quiz-end')
+    //     if (top !== null) {
+    //       top.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    //     }
+    //     this.clearStoragePartial()
+    //   },
+    //   (_error: any) => {
+    //     this.fetchingResultsStatus = 'error'
+    //     this.snackbar.open(_error.error.params.errmsg)
+    //   },
+    // )
+  }
+
+  async submitAfterAllPromiseResolved() {
+    if (!this.forPreview || this.forCreatorMode) {
+      if (this.selectedAssessmentCompatibilityLevel < 7) {
+        let quizV4Res: any = {}
+        quizV4Res = await this.quizSvc.submitQuizV4(this.generateRequest).toPromise().catch(_error => { })
+        if (quizV4Res && quizV4Res.params && quizV4Res.params.status.toLowerCase() === 'success') {
+          if (quizV4Res.result.primaryCategory === 'Course Assessment') {
+            setTimeout(() => {
+              this.getQuizResult()
+            }, environment.quizResultTimeout)
+          } else if (quizV4Res.result.primaryCategory === 'Practice Question Set') {
+            this.assignQuizResult(quizV4Res.result)
+          }
+        }
+      } else {
+        if (this.selectedAssessmentCompatibilityLevel >= 8) {
+          let quizV4Res: any = {}
+          quizV4Res = await this.quizSvc.submitQuizV6(this.generateRequest).toPromise().catch(_error => { })
+          if (quizV4Res && quizV4Res.params && quizV4Res.params.status.toLowerCase() === 'success') {
+            if (quizV4Res.result.primaryCategory === 'Course Assessment') {
+              setTimeout(() => {
+                this.getQuizResult()
+              }, environment.quizResultTimeout)
+            } else if (quizV4Res.result.primaryCategory === 'Practice Question Set') {
+              this.assignQuizResult(quizV4Res.result)
+            }
+          }
+        } else {
+          let quizV4Res: any = {}
+          quizV4Res = await this.quizSvc.submitQuizV5(this.generateRequest).toPromise().catch(_error => { })
+          if (quizV4Res && quizV4Res.params && quizV4Res.params.status.toLowerCase() === 'success') {
+            if (quizV4Res.result.primaryCategory === 'Course Assessment') {
+              setTimeout(() => {
+                this.getQuizResult()
+              }, environment.quizResultTimeout)
+            } else if (quizV4Res.result.primaryCategory === 'Practice Question Set') {
+              this.assignQuizResult(quizV4Res.result)
+            }
+          }
+        }
+      }
+    } else {
+      let requestData = this.generateRequest
+      requestData = {
+        ...requestData,
+        ...this.viewerSvc.publicUserDetails,
+        contextId: this.collectionId
+      }
+
+      if (this.selectedAssessmentCompatibilityLevel < 7) {
+        const quizV4Res: any = await this.quizSvc.publicV4Submit(requestData).toPromise().catch(_error => { })
+        if (quizV4Res && quizV4Res.params && quizV4Res.params.status.toLowerCase() === 'success') {
+          if (quizV4Res.result.primaryCategory === 'Course Assessment') {
+            setTimeout(() => {
+              this.getQuizResult()
+              if (this.forPreview && this.quizData.isPublic) {
+                this.raiseEvent(WsEvents.EnumTelemetrySubType.Unloaded, this.quizData)
+              }
+            }, environment.quizResultTimeout)
+          } else if (quizV4Res.result.primaryCategory === 'Practice Question Set') {
+            this.assignQuizResult(quizV4Res.result)
+          }
+        }
+      } else {
+        const quizV4Res: any = await this.quizSvc.publicV5Submit(requestData).toPromise().catch(_error => { })
+        if (quizV4Res && quizV4Res.params && quizV4Res.params.status.toLowerCase() === 'success') {
+          if (quizV4Res.result.primaryCategory === 'Course Assessment') {
+            setTimeout(() => {
+              this.getQuizResult()
+              if (this.forPreview && this.quizData.isPublic) {
+                this.raiseEvent(WsEvents.EnumTelemetrySubType.Unloaded, this.quizData)
+              }
+            }, environment.quizResultTimeout)
+          } else if (quizV4Res.result.primaryCategory === 'Practice Question Set') {
+            this.assignQuizResult(quizV4Res.result)
+          }
+        }
+      }
+    }
+  }
+
+  async submitQuizForOptionWeightage() {
+    let allPromiseResolvedCount = 0
+    if (this.paperSections && this.paperSections.length) {
+      for (let i = 0; i < this.paperSections.length; i++) {
+        let section = this.paperSections[i]
+        const lst = _.chunk(section.childNodes || [], 1000)
+        const prom: any[] = []
+        _.each(lst, l => {
+          prom.push(this.getMultiQuestions(l))
+        })
+        Promise.all(prom).then(qqr => {
+          allPromiseResolvedCount++
+          const question = { questions: _.flatten(_.map(qqr, 'result.questions')) }
+          const codes = _.compact(_.map(this.quizJson.questions, 'section') || [])
+          // console.log(this.quizSvc.secAttempted.value)
+          _.each(question.questions, q => {
+            // const qHtml = document.createElement('div')
+            // qHtml.innerHTML = q.editorState.question
+            if (codes.indexOf(section.identifier) === -1) {
+              this.quizJson.questions.push({
+                section: section.identifier,
+                question: q.body, // qHtml.textContent || qHtml.innerText || '',
+                multiSelection: ((q.qType || '').toLowerCase() === 'mcq-mca' ? true : false),
+                questionType: (q.qType || '').toLowerCase(),
+                questionId: q.identifier,
+                instructions: null,
+                options: this.getOptions(q),
+                editorState: q.editorState,
+                questionLevel: q.questionLevel,
+                marks: q.totalMarks,
+                rhsChoices: this.getRhsValue(q),
+                choices: q.choices ? q.choices : []
+              })
+            }
+          })
+
+
+          if (this.paperSections && this.paperSections.length === allPromiseResolvedCount) {
+            // console.log('this.quizJson',this.quizJson)
+            // console.log('this.generateRequest',this.generateRequest)
+            this.submitAfterAllPromiseResolvedForOptionWeightage()
+          }
+        })
+      }
+
+    }
+  }
+
+  async submitAfterAllPromiseResolvedForOptionWeightage() {
+    if (!this.forPreview || this.forCreatorMode) {
+      if (this.selectedAssessmentCompatibilityLevel < 7) {
+        await this.quizSvc.submitQuizV4(this.generateRequest).toPromise().catch(_error => { })
+      } else {
+        if (this.selectedAssessmentCompatibilityLevel >= 8) {
+          await this.quizSvc.submitQuizV6(this.generateRequest).toPromise().catch(_error => { })
+        } else {
+          await this.quizSvc.submitQuizV5(this.generateRequest).toPromise().catch(_error => { })
+        }
+      }
+      this.fetchProgressOfAssessment()
+    } else {
+      let requestData: any = this.generateRequest
+      requestData = {
+        ...requestData,
+        ...this.viewerSvc.publicUserDetails,
+        contextId: this.collectionId
+      }
+
+      if (this.selectedAssessmentCompatibilityLevel < 7) {
+        await this.quizSvc.publicV4Submit(requestData).toPromise().catch(_error => { })
+      } else {
+        await this.quizSvc.publicV5Submit(requestData).toPromise().catch(_error => { })
+
+      }
+      if (this.forPreview && this.quizData.isPublic) {
+        this.raiseEvent(WsEvents.EnumTelemetrySubType.Unloaded, this.quizData)
+      }
+    }
+    if (!(this.quizJson.primaryCategory === 'Course Assessment' || this.quizJson.primaryCategory === 'Practice Question Set')) {
+      this.updateProgress(2)
+    }
+    this.updatePreEnrollmentProgress(2)
+  }
+
+  showAnswers() {
+    this.showMtfAnswers()
+    this.showFitbAnswers()
+    this.viewState = 'answer'
+  }
+
+  showMtfAnswers() {
+    // if (this.questionsReference) {
+    //   this.questionsReference.forEach(questionReference => {
+    //     questionReference.matchShowAnswer()
+    //   })
+    // }
+  }
+
+  showFitbAnswers() {
+    if (this.questionsReference) {
+      // this.questionsReference.forEach(questionReference => {
+      //   questionReference.functionChangeBlankBorder()
+      // })
+    }
+  }
+
+  calculateResults() {
+    const correctAnswers = this.quizJson.questions.map(
+      // tslint:disable-next-line
+      question => {
+        return {
+          questionType: question.questionType,
+          questionId: question.questionId,
+          correctOptions: question.options
+            .filter(option => option.isCorrect)
+            .map(option =>
+              question.questionType === 'fitb' ? option.text : option.optionId,
+            ),
+          correctMtfOptions: question.options
+            .filter(option => option.isCorrect)
+            .map(option =>
+              question.questionType === 'mtf' ? option : undefined,
+            ),
+        }
+      },
+    )
+    // logger.log(correctAnswers);
+    this.numCorrectAnswers = 0
+    this.numIncorrectAnswers = 0
+    correctAnswers.forEach(answer => {
+      const correctOptions = answer.correctOptions
+      const correctMtfOptions = answer.correctMtfOptions
+      let selectedOptions: any =
+        this.questionAnswerHash[answer.questionId] || []
+      if (
+        answer.questionType &&
+        answer.questionType === 'fitb' &&
+        this.questionAnswerHash[answer.questionId] &&
+        this.questionAnswerHash[answer.questionId][0]
+      ) {
+        selectedOptions =
+          this.questionAnswerHash[answer.questionId][0].split(',') || []
+        let correctFlag = true
+        let unTouched = false
+        if (selectedOptions.length < 1) {
+          unTouched = true
+        }
+        if (correctOptions.length !== selectedOptions.length) {
+          correctFlag = false
+        }
+        if (correctFlag && !unTouched) {
+          for (let i = 0; i < correctOptions.length; i += 1) {
+            if (
+              correctOptions[i].trim().toLowerCase() !==
+              selectedOptions[i].trim().toLowerCase()
+            ) {
+              correctFlag = false
+            }
+          }
+        }
+        if (correctFlag && !unTouched) {
+          this.numCorrectAnswers += 1
+        } else if (!unTouched) {
+          this.numIncorrectAnswers += 1
+        }
+        this.showFitbAnswers()
+      } else if (answer.questionType === 'mtf') {
+        let unTouched = false
+        let correctFlag = true
+        if (selectedOptions.length < 1 || selectedOptions[0].length < 1) {
+          unTouched = true
+        } else if (selectedOptions[0].length < correctMtfOptions.length) {
+          correctFlag = false
+        }
+        if (selectedOptions && selectedOptions[0]) {
+          // logger.log(selectedOptions)
+          // logger.log(correctOptions)
+          (selectedOptions[0] as any[]).forEach(element => {
+            const b = element.sourceId
+            if (correctMtfOptions) {
+              const option = correctMtfOptions[(b.slice(-1) as number) - 1] || { match: '' }
+              const match = _.get(option, 'match')
+              if (match && match.trim() === element.target.innerHTML.trim()
+              ) {
+                element.setPaintStyle({
+                  stroke: '#357a38',
+                })
+                this.setBorderColor(element, '#357a38')
+              } else {
+                element.setPaintStyle({
+                  stroke: '#f44336',
+                })
+                correctFlag = false
+                this.setBorderColor(element, '#f44336')
+              }
+            }
+          })
+        }
+        if (correctFlag && !unTouched) {
+          this.numCorrectAnswers += 1
+        } else if (!unTouched) {
+          this.numIncorrectAnswers += 1
+        }
+      } else {
+        if (
+          correctOptions.sort().join(',') === selectedOptions.sort().join(',')
+        ) {
+          this.numCorrectAnswers += 1
+        } else if (selectedOptions.length > 0) {
+          this.numIncorrectAnswers += 1
+        }
+      }
+    })
+    this.numUnanswered =
+      this.quizJson.questions.length -
+      this.numCorrectAnswers -
+      this.numIncorrectAnswers
+  }
+
+  setBorderColor(connection: OnConnectionBindInfo, color: string) {
+    const connectionSourceId = document.getElementById(connection.sourceId)
+    const connectionTargetId = document.getElementById(connection.targetId)
+    if (connectionSourceId) {
+      connectionSourceId.style.borderColor = color
+    }
+    if (connectionTargetId) {
+      connectionTargetId.style.borderColor = color
+    }
+  }
+
+  isQuestionAttempted(questionId: string): boolean {
+    return !(Object.keys(this.questionAnswerHash).indexOf(questionId) === -1)
+  }
+
+  isQuestionMarked(questionId: string) {
+    return this.markedQuestions.has(questionId as unknown as never)
+  }
+
+  isQuestionVisited(questionId: string) {
+    return (this.questionVisitedData.indexOf(questionId) > -1)
+  }
+
+  markQuestion(questionId: string) {
+    if (this.markedQuestions.has(questionId as unknown as never)) {
+      this.markedQuestions.delete(questionId as unknown as never)
+    } else {
+      this.markedQuestions.add(questionId as unknown as never)
+    }
+  }
+  action($event: string) {
+    switch ($event) {
+      case 'retake':
+        this.raiseInteractTelemetry()
+        this.raiseEvent(WsEvents.EnumTelemetrySubType.Unloaded, this.quizData)
+        this.raiseEvent(WsEvents.EnumTelemetrySubType.Loaded, this.quizData)
+        this.clearStoragePartial()
+        this.clearStorage()
+        this.retake = true
+        this.isSubmitted = false
+
+        // this.init()
+        if (!this.forPreview) {
+          if (this.selectedAssessmentCompatibilityLevel < 7) {
+            // this.init()
+            if (this.ePrimaryCategory.FINAL_ASSESSMENT == this.primaryCategory) {
+              this.quizSvc.canAttend(this.identifier).subscribe(response => {
+                if (response) {
+                  this.canAttempt = response
+                  //  this.canAttempt = {
+                  //   attemptsAllowed: 1,
+                  //   attemptsMade: 0,
+                  // }
+                }
+              })
+            }
+            this.retakeAssessment()
+          } else {
+            if (this.ePrimaryCategory.FINAL_ASSESSMENT == this.primaryCategory && !this.forPreview) {
+              this.quizSvc.canAttendV5(this.identifier).subscribe(response => {
+                if (response) {
+                  this.canAttempt = response
+                  //  this.canAttempt = {
+                  //   attemptsAllowed: 1,
+                  //   attemptsMade: 0,
+                  // }
+                }
+              })
+            }
+            this.retakeAssessment()
+          }
+        }
+
+
+        break
+    }
+  }
+  raiseTelemetry(action: string, optionId: string | null, event: string) {
+    if (optionId) {
+      this.events.raiseInteractTelemetry(
+        {
+          type: action,
+          subType: event,
+          id: optionId,
+        },
+        {
+          id: optionId,
+        },
+      )
+    } else {
+      this.events.raiseInteractTelemetry(
+        {
+          type: action,
+          subType: event,
+          id: this.identifier,
+        },
+        {
+          id: this.identifier,
+        },
+        {
+          pageIdExt: `quiz`,
+          module: WsEvents.EnumTelemetrymodules.LEARN,
+        })
+    }
+  }
+  checkAns(quesIdx: number) {
+    if (quesIdx > 0 && quesIdx <= this.totalQCount && this.current_Question.editorState && this.current_Question.editorState.options) {
+      this.showAnswer = true
+      this.quizSvc.shCorrectAnswer(true)
+    }
+  }
+  updateVisivility() {
+    this.quizSvc.displayCorrectAnswer.subscribe(displayAns => {
+      this.showAnswer = displayAns
+    })
+  }
+  clearStorage() {
+    this.quizSvc.paperSections.next(null)
+    this.quizSvc.questionAnswerHash.next({})
+    this.quizSvc.qAnsHash({})
+    this.quizSvc.secAttempted.next([])
+    // this.markedQuestions = new Set([])
+    // this.questionAnswerHash = {}
+    this.attemptSubData = []
+    this.viewState = 'initial'
+    this.currentQuestion = null
+    this.currentQuestionIndex = 0
+    // this.isSubmitted = true
+  }
+  clearStoragePartial() {
+    this.quizSvc.paperSections.next(null)
+    this.quizSvc.questionAnswerHash.next({})
+    this.quizSvc.qAnsHash({})
+    this.quizSvc.secAttempted.next([])
+    // this.markedQuestions = new Set([])
+    // this.questionAnswerHash = {}
+    this.attemptSubData = []
+    this.currentQuestionIndex = 0
+    this.currentQuestion = null
+
+    // this.viewState = 'initial'
+    // this.isSubmitted = true
+  }
+  clearQuizJson() {
+    this.quizJson = {
+      isAssessment: false,
+      questions: [],
+      timeLimit: 0,
+      allowSkip: 'No',
+      maxQuestions: 0,
+      requiresSubmit: 'Yes',
+      showTimer: 'Yes',
+      primaryCategory: NsContent.EPrimaryCategory.PRACTICE_RESOURCE,
+    }
+  }
+  toggleExpandforMobile() {
+    this.expandFalse = !this.expandFalse
+  }
+
+  ngOnDestroy() {
+    this.clearStorage()
+    if (this.attemptSubscription) {
+      this.attemptSubscription.unsubscribe()
+    }
+    if (this.timerSubscription) {
+      this.timerSubscription.unsubscribe()
+    }
+    if (this.telemetrySubscription) {
+      this.telemetrySubscription.unsubscribe()
+    }
+    if (this.viewerDataTocSubscription) {
+      this.viewerDataTocSubscription.unsubscribe()
+    }
+  }
+
+  async getQuizResult() {
+    const req: any = {
+      request: {
+        assessmentId: this.generateRequest.identifier,
+        batchId: this.generateRequest.batchId,
+        courseId: this.generateRequest.courseId,
+      },
+    }
+    if (this.forPreview) {
+      req.request['email'] = this.viewerSvc.publicUserDetails.email
+      req.request['assessmentIdentifier'] = this.generateRequest.identifier
+      req.request['contextId'] = this.generateRequest.courseId
+    }
+    if (this.selectedAssessmentCompatibilityLevel < 7) {
+      let resultRes: any = {}
+      resultRes = await this.quizSvc.quizResult(req, this.forPreview).toPromise().catch(_error => { })
+      if (resultRes && resultRes.params && resultRes.params.status.toLowerCase() === 'success') {
+        if (resultRes.result) {
+          this.fetchingResultsStatus = (resultRes.result.isInProgress) ? 'fetching' : 'done'
+          this.assignQuizResult(resultRes.result)
+        }
+        if ((this.forPreview && !this.forCreatorMode) && resultRes.result) {
+          this.showPublicUserPopUp(resultRes.result.pass ? 'pass' : 'fail')
+        }
+      } else if (resultRes && resultRes.params && resultRes.params.status.toLowerCase() === 'failed') {
+        this.finalResponse = resultRes.responseCode
+      }
+    } else {
+      if (this.forPreview) {
+        req.request['email'] = this.viewerSvc.publicUserDetails.email
+        req.request['assessmentIdentifier'] = this.generateRequest.identifier
+        req.request['contextId'] = this.generateRequest.courseId
+      }
+      let resultRes: any = {}
+      resultRes = await this.quizSvc.quizResultV5(req, this.forPreview).toPromise().catch(_error => { })
+      if (resultRes && resultRes.params && resultRes.params.status.toLowerCase() === 'success') {
+        if (resultRes.result) {
+          this.fetchingResultsStatus = (resultRes.result.isInProgress) ? 'fetching' : 'done'
+          this.assignQuizResult(resultRes.result)
+        }
+        if ((this.forPreview && !this.forCreatorMode) && resultRes.result) {
+          this.showPublicUserPopUp(resultRes.result.pass ? 'pass' : 'fail')
+        }
+      } else if (resultRes && resultRes.params && resultRes.params.status.toLowerCase() === 'failed') {
+        this.finalResponse = resultRes.responseCode
+      }
+    }
+
+  }
+
+  assignQuizResult(res: NSPractice.IQuizSubmitResponseV2) {
+    const isPreAssessment = this.activatedRoute.snapshot.queryParams.preAssessment
+    if (isPreAssessment) {
+      this.updatePreEnrollmentProgress(2)
+    }
+
+    if (!(this.quizJson.primaryCategory === 'Course Assessment' || this.quizJson.primaryCategory === 'Practice Question Set')) {
+      this.updateProgress(2)
+    } else {
+      // For Course Assessment: Do NOT set hardcoded completion values here
+      // Instead, fetchProgressOfAssessment() will read actual progress from API
+      // and updateContentHashMapForAssesstent() will update hashmap with real values
+      console.log('📊 [ASSESSMENT] Course Assessment submitted - will fetch actual progress from API')
+    }
+    this.finalResponse = res
+    if (this.quizJson.isAssessment) {
+      this.isIdeal = true
+    }
+    this.clearQuizJson()
+    this.fetchingResultsStatus = 'done'
+    this.numCorrectAnswers = res.correct
+    this.numIncorrectAnswers = res.incorrect
+    this.numUnanswered = res.blank
+    this.passPercentage = res.passPercentage
+    this.result = typeof res.overallResult === 'number' ? res.overallResult : 0
+    if (this.result >= this.passPercentage) {
+      this.isCompleted = true
+    }
+    const top = document.getElementById('quiz-end')
+    if (top !== null) {
+      top.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }
+    this.clearStoragePartial()
+    if (!this.forPreview) {
+      this.fetchProgressOfAssessment()
+    }
+  }
+
+  /**
+   * Recalculates parent (course/module/milestone) progress after child content completes
+   * This ensures that when assessments inside courses complete, the parent course progress updates
+   * which then triggers milestone lock recalculation
+   *
+   * For MILESTONES: Only mandatory courses + milestone assessment count toward completion
+   * For COURSES/MODULES: All children count toward completion
+   */
+  recalculateParentProgress(parentId: string) {
+    const parentData = this.tocSvc.hashmap[parentId]
+    if (!parentData) {
+      console.log('⚠️ [PARENT PROGRESS] Parent not found in hashmap:', parentId)
+      return
+    }
+
+    console.log('📊 [PARENT PROGRESS] Recalculating progress for parent:', {
+      name: parentData.name,
+      id: parentId,
+      primaryCategory: parentData.primaryCategory,
+      currentCompletionPercentage: parentData.completionPercentage,
+      currentCompletionStatus: parentData.completionStatus,
+      currentStatus: parentData.status
+    })
+
+    // Get all children of this parent
+    let allChildren = Object.keys(this.tocSvc.hashmap)
+      .filter(key => this.tocSvc.hashmap[key].parent === parentId)
+      .map(key => ({
+        ...this.tocSvc.hashmap[key],
+        identifier: key
+      }))
+
+    if (allChildren.length === 0) {
+      console.log('⚠️ [PARENT PROGRESS] No children found for parent')
+      return
+    }
+
+    console.log('📊 [PARENT PROGRESS] Found', allChildren.length, 'total children')
+
+    // CRITICAL: For milestones, only count mandatory courses and milestone assessments
+    // Non-mandatory courses should NOT block milestone completion
+    let children = allChildren
+    if (parentData.primaryCategory === 'Milestone') {
+      children = allChildren.filter(child => {
+        // Include if:
+        // 1. It's a mandatory course (isMandatory === true)
+        // 2. It's a milestone assessment (Course Assessment with parent=milestone)
+        const isMandatory = child.isMandatory === true
+        const isMilestoneAssessment = child.primaryCategory === 'Course Assessment'
+        return isMandatory || isMilestoneAssessment
+      })
+      console.log('📊 [PARENT PROGRESS] Milestone: Filtering to mandatory + assessments only:', children.length, 'items')
+    }
+
+    // Calculate how many children are complete
+    let completedCount = 0
+    let totalCount = children.length
+
+    children.forEach((child, index) => {
+      const isComplete = (child.completionStatus === 2 || child.status === 2 || child.completionPercentage === 100)
+      console.log(`   ${index + 1}. ${child.name || child.identifier}:`, {
+        primaryCategory: child.primaryCategory,
+        isMandatory: child.isMandatory,
+        completionStatus: child.completionStatus,
+        status: child.status,
+        completionPercentage: child.completionPercentage,
+        isComplete: isComplete ? '✅' : '❌'
+      })
+
+      if (isComplete) {
+        completedCount++
+      }
+    })
+
+    // Calculate parent's completion percentage
+    const newCompletionPercentage = Math.round((completedCount / totalCount) * 100)
+    const newCompletionStatus = newCompletionPercentage === 100 ? 2 : (newCompletionPercentage > 0 ? 1 : 0)
+
+    console.log('📊 [PARENT PROGRESS] Result:', {
+      parent: parentData.name,
+      completedCount,
+      totalCount,
+      newPercentage: newCompletionPercentage,
+      oldPercentage: parentData.completionPercentage,
+      newStatus: newCompletionStatus,
+      oldStatus: parentData.completionStatus
+    })
+
+    // Update parent's progress if it changed
+    if (parentData.completionPercentage !== newCompletionPercentage ||
+      parentData.completionStatus !== newCompletionStatus) {
+
+      parentData.completionPercentage = newCompletionPercentage
+      parentData.completionStatus = newCompletionStatus
+      parentData.status = newCompletionStatus
+
+      console.log('✅ [PARENT PROGRESS] Updated parent progress:', {
+        name: parentData.name,
+        newPercentage: newCompletionPercentage + '%',
+        newStatus: newCompletionStatus
+      })
+
+      // Recursively update grandparent (milestone) if parent changed
+      if (parentData.parent && this.tocSvc.hashmap[parentData.parent]) {
+        console.log('📊 [PARENT PROGRESS] Recursively updating grandparent:', this.tocSvc.hashmap[parentData.parent]?.name)
+        this.recalculateParentProgress(parentData.parent)
+      }
+    } else {
+      console.log('ℹ️ [PARENT PROGRESS] No change in parent progress, skipping update')
+    }
+  }
+
+  formate(text: string): SafeHtml {
+    let newText = '<ul>'
+    if (text) {
+      const splitTest = text.split('\n')
+      for (let index = 0; index < text.split('\n').length; index += 1) {
+        const text1 = splitTest[index]
+        if (text1 && text1.trim()) {
+          newText += `<li>${text1.trim()}</li>`
+        }
+      }
+    }
+    newText += `</ul>`
+    return this.sanitized.bypassSecurityTrustHtml(newText)
+  }
+
+  raiseEvent(state: WsEvents.EnumTelemetrySubType, data: NsContent.IContent) {
+    const event = {
+      eventType: WsEvents.WsEventType.Telemetry,
+      eventLogLevel: WsEvents.WsEventLogLevel.Info,
+      from: 'test',
+      to: '',
+      data: {
+        state,
+        type: WsEvents.WsTimeSpentType.Player,
+        mode: WsEvents.WsTimeSpentMode.Play,
+        content: data,
+        identifier: data ? data.identifier : null,
+        mimeType: NsContent.EMimeTypes.QUESTION_SET,
+        url: data ? data.artifactUrl : null,
+        object: {
+          id: data ? data.identifier : null,
+          type: data ? data.primaryCategory : '',
+          rollup: {
+            l1: this.activatedRoute.snapshot.queryParams.collectionId || '',
+          },
+        },
+      },
+    }
+    this.events.dispatchEvent(event)
+  }
+
+  /**
+   * Check if completing this assessment completes a milestone
+   * Show congratulations popup with option to continue to next milestone
+   */
+  checkAndShowMilestoneCompletion() {
+    try {
+      console.log('🎯 [MILESTONE CHECK] Starting milestone completion check for:', this.identifier)
+
+      // Get assessment data from hashmap (quizJson is already cleared at this point)
+      const assessmentData = this.tocSvc.hashmap[this.identifier]
+      if (!assessmentData) {
+        console.log('❌ [MILESTONE CHECK] No assessment data found in hashmap')
+        return
+      }
+
+      // Check if this is a Course Assessment using hashmap data or contextCategory
+      const primaryCategory = this.viewerDataSvc.resource?.primaryCategory
+      const contextCategory = this.viewerDataSvc.resource?.contextCategory
+
+      console.log('🎯 [MILESTONE CHECK] Assessment info:', {
+        primaryCategory,
+        contextCategory,
+        name: assessmentData.name
+      })
+
+      // Check if this is a milestone assessment (Course Assessment with parent=Milestone)
+      // Also check contextCategory for 'Final Milestone Assessment'
+      const isCourseAssessment = primaryCategory === 'Course Assessment'
+      const isFinalMilestoneAssessment = contextCategory === 'Final Milestone Assessment'
+
+      if (!isCourseAssessment && !isFinalMilestoneAssessment) {
+        console.log('❌ [MILESTONE CHECK] Not a Course Assessment or Final Milestone Assessment, skipping')
+        return
+      }
+
+      if (!assessmentData.parent) {
+        console.log('❌ [MILESTONE CHECK] No parent found for assessment')
+        return
+      }
+
+      // Check if parent is a milestone
+      const parentData = this.tocSvc.hashmap[assessmentData.parent]
+      if (!parentData || parentData.primaryCategory !== 'Milestone') {
+        console.log('❌ [MILESTONE CHECK] Parent is not a milestone:', parentData?.primaryCategory)
+        return
+      }
+
+      console.log('✅ [MILESTONE CHECK] This is a milestone assessment. Parent milestone:', parentData.name)
+
+      // CRITICAL: Wait for milestone lock recomputation to complete before checking
+      // The milestone lock status AND progress are computed asynchronously, so we need to wait
+      // for them to finish before determining if the milestone is complete
+      setTimeout(() => {
+        this.checkMilestoneCompletionAfterLockUpdate(parentData)
+      }, 2000) // Wait 2 seconds for lock and progress computation to complete
+
+    } catch (error) {
+      console.error('❌ [MILESTONE CHECK] Error checking milestone completion:', error)
+    }
+  }
+
+  /**
+   * Check milestone completion after lock recomputation is done
+   */
+  checkMilestoneCompletionAfterLockUpdate(parentData: any) {
+    const milestoneId = parentData.identifier
+    const milestoneName = parentData.name || 'Milestone'
+
+    console.log('🔍 [MILESTONE CHECK] Checking if milestone is complete:', milestoneName)
+
+    // Check if milestone is now complete (all mandatory courses + assessments done)
+    const isMilestoneComplete = this.checkMilestoneComplete(milestoneId)
+
+    if (!isMilestoneComplete) {
+      console.log('❌ [MILESTONE CHECK] Milestone not complete yet - mandatory content incomplete')
+      return
+    }
+
+    console.log('✅ [MILESTONE CHECK] Milestone IS complete! Showing popup')
+
+    // Get milestone information
+    const milestoneNumber = this.getMilestoneNumber(milestoneId)
+
+    // Check if there's a next milestone
+    const hasNextMilestone = this.hasNextMilestone(milestoneNumber)
+
+    console.log('📊 [MILESTONE CHECK] Details:', {
+      milestoneName,
+      milestoneNumber,
+      hasNextMilestone
+    })
+
+    // Subscribe to TOC changes to get the next resource URL
+    // This ensures we have the latest navigation data before showing the popup
+    this.subscribeToTocChanges()
+
+    // Show congratulations popup
+    this.showMilestoneCompletionPopup(milestoneName, milestoneNumber, hasNextMilestone)
+  }
+
+  /**
+   * Check if a milestone is complete (all mandatory courses + all assessments done)
+   * Uses the same logic as the TOC service milestone locking computation
+   */
+  checkMilestoneComplete(milestoneId: string): boolean {
+    console.log('🔍 [MILESTONE COMPLETE CHECK] Checking milestone:', milestoneId)
+
+    const milestoneData = this.tocSvc.hashmap[milestoneId]
+    if (!milestoneData) {
+      console.log('❌ [MILESTONE COMPLETE CHECK] Milestone not found in hashmap')
+      return false
+    }
+
+    console.log('📊 [MILESTONE COMPLETE CHECK] Milestone data:', {
+      name: milestoneData.name,
+      completionPercentage: milestoneData.completionPercentage,
+      completionStatus: milestoneData.completionStatus,
+      progress: milestoneData.progress,
+      status: milestoneData.status
+    })
+
+    // Check if all mandatory content AND milestone assessment are completed
+    let hasMandatoryContent = false
+    let allMandatoryComplete = true
+    let hasMilestoneAssessment = false
+    let milestoneAssessmentComplete = false
+
+    // Debug: Show all children of this milestone
+    console.log('👶 [MILESTONE COMPLETE CHECK] Children of this milestone:')
+
+    // Check all direct children of the milestone
+    for (const key of Object.keys(this.tocSvc.hashmap)) {
+      const item = this.tocSvc.hashmap[key]
+
+      // Only check direct children
+      if (item.parent !== milestoneId) continue
+
+      console.log(`  - ${item.name}:`, {
+        primaryCategory: item.primaryCategory,
+        isMandatory: item.isMandatory,
+        completionPercentage: item.completionPercentage || 0,
+        completionStatus: item.completionStatus || 0,
+        status: item.status || 0,
+        isComplete: (item.completionStatus === 2 || item.status === 2 || item.completionPercentage === 100) ? '✅' : '❌'
+      })
+
+      // Check if this is the milestone assessment
+      const isAssessment =
+        item.primaryCategory === 'Course Assessment' ||
+        item.primaryCategory === 'Final Assessment' ||
+        item.primaryCategory === 'Standalone Assessment'
+
+      if (isAssessment) {
+        hasMilestoneAssessment = true
+        const isCompleted = item.completionStatus === 2 || item.status === 2 ||
+          item.completionPercentage >= 100 || item.progress >= 100
+        if (isCompleted) {
+          milestoneAssessmentComplete = true
+        }
+        continue // Skip to next item
+      }
+
+      // Check if this is mandatory content (courses/collections)
+      if (item.primaryCategory === 'Course' || item.isCollection) {
+        const isMandatory = item.isMandatory !== false // Default is mandatory
+
+        if (isMandatory) {
+          hasMandatoryContent = true
+          const isCompleted = item.completionStatus === 2 || item.status === 2 ||
+            item.completionPercentage >= 100 || item.progress >= 100
+          if (!isCompleted) {
+            allMandatoryComplete = false
+          }
+        }
+      }
+    }
+
+    // Milestone is complete when:
+    // 1. All mandatory content is completed (or no mandatory content exists)
+    // 2. Milestone assessment is completed (or no assessment exists)
+    const mandatoryCheck = !hasMandatoryContent || allMandatoryComplete
+    const assessmentCheck = !hasMilestoneAssessment || milestoneAssessmentComplete
+    const isComplete = mandatoryCheck && assessmentCheck
+
+    console.log('📊 [MILESTONE COMPLETE CHECK] Completion checks:', {
+      hasMandatoryContent,
+      allMandatoryComplete,
+      mandatoryCheck,
+      hasMilestoneAssessment,
+      milestoneAssessmentComplete,
+      assessmentCheck
+    })
+
+    console.log('✅ [MILESTONE COMPLETE CHECK] Result:', isComplete ? 'COMPLETE' : 'INCOMPLETE')
+
+    return isComplete
+  }
+
+  /**
+   * Get milestone number from milestone ID or hashmap data
+   */
+  getMilestoneNumber(milestoneId: string): number {
+    const milestoneData = this.tocSvc.hashmap[milestoneId]
+    if (milestoneData && milestoneData.milestoneIndex !== undefined) {
+      return milestoneData.milestoneIndex + 1 // milestoneIndex is 0-based
+    }
+    // Fallback: try to extract from ID (M1, M2, etc.)
+    const match = milestoneId.match(/(\d+)/)
+    return match ? parseInt(match[1], 10) : 1
+  }
+
+  /**
+   * Check if there's a next milestone after the current one
+   */
+  hasNextMilestone(currentMilestoneNumber: number): boolean {
+    // Count total milestones
+    let totalMilestones = 0
+    for (const key of Object.keys(this.tocSvc.hashmap)) {
+      const item = this.tocSvc.hashmap[key]
+      if (item.primaryCategory === 'Milestone') {
+        totalMilestones++
+      }
+    }
+    return currentMilestoneNumber < totalMilestones
+  }
+
+  /**
+   * Show milestone completion congratulations popup
+   */
+  showMilestoneCompletionPopup(milestoneName: string, milestoneNumber: number, hasNextMilestone: boolean) {
+    console.log('🎉 [MILESTONE POPUP] Showing completion popup:', { milestoneName, milestoneNumber, hasNextMilestone })
+
+    const popupData: any = {
+      assessmentType: 'milestoneComplete',
+      headerText: `🎉 Great job! You've completed ${milestoneName}`,
+      message: hasNextMilestone
+        ? `You can now continue to Milestone ${milestoneNumber + 1}.`
+        : 'Congratulations on completing all milestones!',
+      buttonsList: [],
+      autoRedirect: false,
+      redirectSeconds: 0
+    }
+
+    if (hasNextMilestone) {
+      popupData.buttonsList.push({
+        response: 'continue-milestone',
+        text: `Continue to Milestone ${milestoneNumber + 1}`,
+        classes: 'blue-full',
+      })
+      popupData.buttonsList.push({
+        response: 'stay',
+        text: 'Stay Here',
+        classes: 'blue-outline',
+      })
+    } else {
+      popupData.buttonsList.push({
+        response: 'close',
+        text: 'Close',
+        classes: 'blue-full',
+      })
+    }
+
+    const dialogRef = this.dialog.open(FinalAssessmentPopupComponent, {
+      data: popupData,
+      width: '600px',
+      maxWidth: '90vw',
+      height: 'auto',
+      maxHeight: '90vh',
+      panelClass: 'milestone-completion-popup',
+      disableClose: false,
+    })
+
+    dialogRef.afterClosed().subscribe((result: any) => {
+      console.log('🎉 [MILESTONE POPUP] User response:', result)
+
+      if (result === 'continue-milestone') {
+        // Use pre-computed next resource URL from TOC service subscription
+        console.log('🎉 [MILESTONE POPUP] Navigating to next milestone content')
+
+        if (this.nextResourceUrl && this.nextResourceUrlParams) {
+          console.log('🎉 [MILESTONE POPUP] Using pre-computed URL:', {
+            url: this.nextResourceUrl,
+            params: this.nextResourceUrlParams
+          })
+          this.router.navigate([this.nextResourceUrl], this.nextResourceUrlParams)
+        } else {
+          // Fallback: navigate to TOC if no next resource URL is available
+          console.log('🎉 [MILESTONE POPUP] No next resource URL, navigating to TOC')
+          this.router.navigate(['/app/toc', this.collectionId], {
+            queryParams: this.activatedRoute.snapshot.queryParams
+          })
+        }
+      } else if (result === 'stay') {
+        console.log('🎉 [MILESTONE POPUP] User chose to stay on current page')
+        // Do nothing, user stays on result page
+      }
+    })
+  }
+
+  /**
+   * Get the ID of the next milestone
+   */
+  getNextMilestoneId(currentMilestoneNumber: number): string | null {
+
+    // Find all milestones
+    const milestones: any[] = []
+    for (const key of Object.keys(this.tocSvc.hashmap)) {
+      const item = this.tocSvc.hashmap[key]
+      if (item.primaryCategory === 'Milestone') {
+        milestones.push({
+          id: key,
+          number: this.getMilestoneNumber(key),
+          name: item.name
+        })
+      }
+    }
+
+    // Sort by milestone number
+    milestones.sort((a, b) => a.number - b.number)
+
+    // Find next milestone
+    const nextMilestone = milestones.find(m => m.number === currentMilestoneNumber + 1)
+
+    console.log('🔍 [NEXT MILESTONE] All milestones:', milestones)
+    console.log('🔍 [NEXT MILESTONE] Current milestone number:', currentMilestoneNumber)
+    console.log('🔍 [NEXT MILESTONE] Next milestone:', nextMilestone)
+
+    return nextMilestone ? nextMilestone.id : null
+  }
+
+  /**
+   * Subscribe to TOC changes to get pre-computed next resource URL
+   * This is called after milestone completion to ensure we have the latest navigation data
+   */
+  subscribeToTocChanges() {
+    // Clean up existing subscription if any
+    if (this.viewerDataTocSubscription) {
+      this.viewerDataTocSubscription.unsubscribe()
+    }
+
+    // Subscribe to TOC changes to get next resource URL
+    this.viewerDataTocSubscription = this.viewerDataSvc.tocChangeSubject.subscribe((data: any) => {
+      console.log('📡 [TOC SUBSCRIPTION] Received TOC change data:', {
+        hasNextResource: !!data.nextResource,
+        nextResourceId: data.nextResource?.identifier
+      })
+
+      if (data.nextResource) {
+        // Build viewer URL if not already present
+        if (data.nextResource && !data.nextResource.viewerUrl) {
+          data.nextResource['viewerUrl'] = `/viewer/${VIEWER_ROUTE_FROM_MIME(
+            data.nextResource.mimeType,
+          )}/${data.nextResource.identifier}`
+          this.nextResourceUrl = data.nextResource.viewerUrl
+        } else {
+          this.nextResourceUrl = data.nextResource.viewerUrl
+        }
+
+        // Store query params
+        this.nextResourceUrlParams = {
+          queryParams: {
+            primaryCategory: data.nextResource.primaryCategory,
+            collectionId: data.nextResource.collectionId,
+            collectionType: data.nextResource.collectionType,
+            batchId: data.nextResource.batchId,
+            viewMode: data.nextResource.viewMode,
+            courseName: this.activatedRoute.snapshot.queryParams.courseName,
+            ...(data.queryMLParams ? data.queryMLParams : null),
+            ...(window.location.href.includes('editMode=true') ? { editMode: true } : {}),
+            ...(window.location.href.includes('preAssessment=true') ? { preAssessment: true } : {}),
+          },
+          fragment: '',
+        }
+
+        console.log('✅ [TOC SUBSCRIPTION] Stored next resource URL:', {
+          url: this.nextResourceUrl,
+          params: this.nextResourceUrlParams.queryParams
+        })
+      } else {
+        this.nextResourceUrl = null
+        this.nextResourceUrlParams = null
+        console.log('ℹ️ [TOC SUBSCRIPTION] No next resource available')
+      }
+    })
+  }
+
+  raiseInteractTelemetry() {
+    this.events.raiseInteractTelemetry(
+      {
+        type: WsEvents.EnumInteractTypes.CLICK,
+        id: 'reattempt-test',
+        subType: this.primaryCategory,
+      },
+      {
+        id: this.quizData.identifier,
+        type: this.assessmentType,
+        rollup: {
+          l1: this.activatedRoute.snapshot.queryParams.collectionId || '',
+        },
+      }
+    )
+  }
+
+  openSectionPopup(submitAssessment = false, getTime = true) {
+    const currentQuestionId = this.currentQuestion ? this.currentQuestion.questionId : ''
+    if (currentQuestionId && this.secQuestions && this.currentQuestion.section === this.secQuestions[0]['section'] && getTime) {
+      this.calculateTimeSpentOnQuestion(currentQuestionId)
+    } else {
+      this.setQuestionStartTime()
+    }
+    const tableColumns: any[] = [
+      { header: 'practiceoverview.section', key: 'section' },
+      { header: 'practiceoverview.noOfQuestions', key: 'NoOfQuestions' },
+      { header: 'practiceoverview.answered', key: 'answered' },
+      { header: 'practiceoverview.notAnswered', key: 'notAnswered' },
+      { header: 'practiceoverview.markedForReview', key: 'markedForReview' },
+      { header: 'practiceoverview.notVisited', key: 'notVisited' },
+    ]
+    const tableData: any = []
+    /* tslint:disable */
+    for (let i = 0; i < this.questionSectionTableData.length; i++) {
+      if (submitAssessment) {
+        const sectionChildNodes = this.getSectionTableDataCounts(this.questionSectionTableData[i]['childNodes'])
+        const tableObj = {
+          section: this.questionSectionTableData[i]['name'],
+          // NoOfQuestions: this.questionSectionTableData[i]['maxQuestions'],
+          NoOfQuestions: this.questionSectionTableData[i]['childNodes'].length,
+          answered: sectionChildNodes.answeredCount,
+          notAnswered: sectionChildNodes.notAnsweredCount,
+          markedForReview: sectionChildNodes.markedForReviewCount,
+          notVisited: sectionChildNodes.notVisitedCount,
+        }
+        tableData.push(tableObj)
+      } else {
+        if (this.questionSectionTableData[i]['identifier'] === this.selectedSectionIdentifier) {
+          const sectionChildNodes = this.getSectionTableDataCounts(this.questionSectionTableData[i]['childNodes'])
+          const tableObj = {
+            section: this.questionSectionTableData[i]['name'],
+            // NoOfQuestions: this.questionSectionTableData[i]['maxQuestions'],
+            NoOfQuestions: this.questionSectionTableData[i]['childNodes'].length,
+            answered: sectionChildNodes.answeredCount,
+            notAnswered: sectionChildNodes.notAnsweredCount,
+            markedForReview: sectionChildNodes.markedForReviewCount,
+            notVisited: sectionChildNodes.notVisitedCount,
+          }
+          tableData.push(tableObj)
+        }
+      }
+
+    }
+    let popupData: any = {
+      headerText: this.resourceName,
+      assessmentType: this.assessmentType,
+      primaryCategory: this.primaryCategory,
+      tableDetails: {
+        tableColumns,
+        tableData,
+      }
+
+    }
+
+    if (submitAssessment) {
+      popupData['warningNote'] = 'practiceoverview.warningNoteForAssessmentSubmit',
+        popupData['buttonsList'] = [
+          {
+            response: 'yes',
+            text: 'practiceoverview.submitYes',
+            classes: 'blue-outline',
+          },
+          {
+            response: 'no',
+            text: 'practiceoverview.submitNo',
+            classes: 'blue-full',
+          },
+          // {
+          //   response: 'Back',
+          //   text: 'back',
+          //   classes: 'gray-full'
+          // },
+        ]
+    } else if (this.allSecAttempted.full) {
+      popupData['buttonsList'] = [
+        {
+          response: 'back',
+          text: 'practiceoverview.back',
+          classes: 'gray-full',
+        },
+        {
+          response: 'submitAssessment',
+          text: 'practiceoverview.submitTest',
+          classes: 'blue-full',
+        }
+      ]
+    }
+    else if (this.allSecAttempted.next) {
+      popupData['buttonsList'] = [
+        {
+          response: 'next-section',
+          text: 'practiceoverview.nextSection',
+          classes: 'blue-full',
+        },
+        {
+          response: 'no',
+          text: 'practiceoverview.backToAssessment',
+          classes: 'gray-full',
+        }
+      ]
+    }
+
+    if (this.assessmentType === 'optionalWeightage') {
+      if (this.secQuestions.length !== Object.keys(this.questionAnswerHash).length) {
+        this.openSnackbar('Please attempt the current question to move on next question.')
+      } else {
+        this.submitQuiz()
+        this.showOverlay = true
+        setTimeout(() => {
+          this.showOverlay = false
+          this.showAssessmentPopup(popupData)
+        }, 5000)
+      }
+
+
+
+    } else {
+      this.showAssessmentPopup(popupData)
+    }
+
+  }
+
+  showAssessmentPopup(popupData: any) {
+    popupData['canAttempt'] = this.canAttempt
+    const dialogRef = this.dialog.open(FinalAssessmentPopupComponent, {
+      data: popupData,
+      width: popupData.assessmentType === 'optionalWeightage' ? '300px' : '1000px',
+      maxWidth: '90vw',
+      height: 'auto',
+      maxHeight: '90vh',
+      panelClass: 'final-assessment',
+    })
+    // dialogRef.componentInstance.xyz = this.configSvc
+    dialogRef.afterClosed().subscribe((result: any) => {
+      if (result) {
+        switch (result) {
+          case 'yes':
+            this.submitQuiz()
+            break
+          case 'next-section':
+            if (this.allSecAttempted.next) {
+              this.nextSection(this.allSecAttempted.next)
+            }
+
+            break
+          case 'retake':
+            if (this.assessmentType === 'optionalWeightage') {
+              setTimeout(() => {
+                this.showOverlay = false
+                this.viewerHeaderSideBarToggleService.visibilityStatus.next(true)
+              }, 100)
+            }
+
+            this.action('retake')
+            break
+          case 'submitAssessment':
+            const submitAssessment = true
+            const getTime = false
+            this.openSectionPopup(submitAssessment, getTime)
+            break
+          case 'initial':
+            this.isSubmitted = false
+            this.clearStorage()
+            this.viewerHeaderSideBarToggleService.visibilityStatus.next(true)
+            break
+          default:
+            this.setQuestionStartTime()
+        }
+
+      }
+    })
+  }
+
+  getSectionTableDataCounts(quesArray: any) {
+    const obj = {
+      answeredCount: 0,
+      notAnsweredCount: 0,
+      markedForReviewCount: 0,
+      notVisitedCount: 0,
+    }
+    const markedQuestionArray: any = [...this.markedQuestions]
+    /* tslint:disable */
+    const questionAnswerHashKeys: string[] = Object.keys(this.questionAnswerHash)
+    for (let i = 0; i < questionAnswerHashKeys.length; i++) {
+      if (quesArray.indexOf(questionAnswerHashKeys[i]) > -1
+        && markedQuestionArray.indexOf(questionAnswerHashKeys[i]) < 0) {
+        obj['answeredCount'] = obj['answeredCount'] + 1
+      }
+
+    }
+    /* tslint:disable */
+    for (let i = 0; i < markedQuestionArray.length; i++) {
+      if (quesArray.indexOf(markedQuestionArray[i]) > -1) {
+        obj['markedForReviewCount'] = obj['markedForReviewCount'] + 1
+      }
+
+    }
+    /* tslint:disable */
+    for (let i = 0; i < this.questionVisitedData.length; i++) {
+      if (quesArray.indexOf(this.questionVisitedData[i]) > -1) {
+        obj['notVisitedCount'] = obj['notVisitedCount'] + 1
+      }
+    }
+    obj['notVisitedCount'] = quesArray.length - obj['notVisitedCount']
+    obj['notAnsweredCount'] = (quesArray.length - obj['answeredCount'] - obj['markedForReviewCount'] - obj['notVisitedCount'])
+
+    return obj
+  }
+
+  getQuestionIndex(index: number): number {
+    return (this.noOfQuestionsPerSet * this.currentSetNumber) + index + 1
+  }
+
+  getSelectedQuestionNumber(index?: number): number {
+    if (!this.currentQuestion || !this.secQuestions) {
+      return 0
+    }
+
+    // Return cached result if current question hasn't changed
+    if (this.currentQuestion['questionId'] === this.cachedQuestionId) {
+      return this.cachedSelectedQuestionNumber
+    }
+
+    let questionIndex = index
+    if (questionIndex === undefined || questionIndex === null) {
+      questionIndex = this.secQuestions.findIndex(q => q.questionId === this.currentQuestion['questionId'])
+    }
+
+    if (questionIndex > -1) {
+      this.cachedSelectedQuestionNumber = (this.noOfQuestionsPerSet * this.currentSetNumber) + questionIndex + 1
+      this.cachedQuestionId = this.currentQuestion['questionId']
+      return this.cachedSelectedQuestionNumber
+    }
+    return 0
+  }
+
+  getSectionTotalQuestionAndAnswerCount() {
+    let obj: any = { totalCount: 0, answered: 0, notAnswered: 0, markedForReview: 0, notVisited: 0 }
+    if (this.questionSectionTableData && this.questionSectionTableData.length) {
+      for (let i = 0; i < this.questionSectionTableData.length; i++) {
+        if (this.questionSectionTableData[i]['identifier'] === this.selectedSectionIdentifier) {
+          const sectionChildNodes: any = this.getSectionTableDataCounts(this.questionSectionTableData[i]['childNodes'])
+          obj = {
+            section: this.questionSectionTableData[i]['name'],
+            totalCount: this.questionSectionTableData[i]['childNodes'].length,
+            answered: sectionChildNodes.answeredCount,
+            notAnswered: sectionChildNodes.notAnsweredCount,
+            markedForReview: sectionChildNodes.markedForReviewCount,
+            notVisited: sectionChildNodes.notVisitedCount,
+            minimumPassPercentage: this.questionSectionTableData[i]['minimumPassPercentage'] || 0
+          }
+          break
+        }
+      }
+    }
+    return obj
+  }
+
+  private openSnackbar(primaryMsg: string, duration: number = 5000) {
+    if (window.innerWidth <= 1200) {
+      const config = new MatSnackBarConfig()
+      config.panelClass = ['show-answer-alert-class']
+      config.duration = duration
+      config.verticalPosition = 'top'
+      config.horizontalPosition = 'center',
+        this.snackbar.open(primaryMsg, '', config)
+    } else {
+      const config = new MatSnackBarConfig()
+      config.panelClass = ['show-answer-alert-class']
+      config.duration = duration
+      this.snackbar.open(primaryMsg, '', config)
+    }
+  }
+
+  getAllQuestionAnswer() {
+    // let count = 0;
+    // if(this.generateRequest.children && this.generateRequest.children.length) {
+    //   for(let i=0; i<this.generateRequest.children[0].children.length;i++) {
+    //     if(this.generateRequest.children[0].children[i] &&
+    //       this.generateRequest.children[0].children[i]['editorState'] &&
+    //       this.generateRequest.children[0].children[i]['editorState']['options']
+    //       ) {
+    //         let optionLength:any = this.generateRequest.children[0].children[i]['editorState']['options'];
+    //         if(optionLength.length) {
+    //           count++;
+    //         }
+    //       }
+    //   }
+    // }
+    // return count
+    return Object.keys(this.questionAnswerHash).length
+  }
+
+  calculateTimeSpentOnQuestion(currentQuestionId: string) {
+    if (currentQuestionId) {
+      if (this.timeSpentOnQuestions && this.timeSpentOnQuestions[currentQuestionId]) {
+        this.timeSpentOnQuestions[currentQuestionId] = this.timeSpentOnQuestions[currentQuestionId] + this.timeSpent
+      } else {
+        this.timeSpentOnQuestions[currentQuestionId] = this.timeSpent
+      }
+    }
+    this.setQuestionStartTime()
+  }
+
+  get timeSpent(): number {
+    const timeSpentNow = Date.now() - this.questionStartTime
+    return timeSpentNow
+  }
+
+  setQuestionStartTime() {
+    this.questionStartTime = Date.now()
+  }
+
+  get getTimeZone(): string {
+    if (this.selectedSection) {
+      if (this.timeLeft < (this.selectedSection!.expectedDuration * 0.2)) {
+        return 'countDownTimerReg'
+      } else if (this.timeLeft < (this.selectedSection!.expectedDuration * 0.5)) {
+        return 'countDownTimerOrange'
+      }
+    } else if (this.quizJson.timeLimit) {
+      if (this.timeLeft < (this.quizJson.timeLimit * 0.2)) {
+        return 'countDownTimerReg'
+      } else if (this.timeLeft < (this.quizJson.timeLimit * 0.5)) {
+        return 'countDownTimerOrange'
+      }
+    }
+    return 'countDownTimerGreen'
+  }
+
+  emailVerification(emailId: string) {
+    this.emailLengthVal = false
+    if (emailId && emailId.length > 0) {
+      const email = emailId.split('@')
+      if (email && email.length === 2) {
+        if ((email[0] && email[0].length > 64) || (email[1] && email[1].length > 255)) {
+          this.emailLengthVal = true
+        }
+      } else {
+        this.emailLengthVal = false
+      }
+    }
+  }
+  submitpublicUserInfo() {
+    this.viewerSvc.publicUserDetails = this.publicUserInfoForm.value
+    this.dialog.closeAll()
+  }
+
+  getPublicContentRequestData() {
+    let assessmentReadReqData = {}
+
+    if (this.forPreview) {
+      assessmentReadReqData = {
+        "assessmentIdentifier": this.identifier,
+        "contextId": this.collectionId,
+        ...this.viewerSvc.publicUserDetails
+      }
+    }
+    return assessmentReadReqData
+  }
+  showPublicUserPopUp(ontype: string) {
+    let msg: any = ''
+    switch (ontype) {
+      case 'pass':
+        msg = 'Congratulations! Your certificate will be sent to your email soon.'
+        break
+      case 'noAtempt':
+        msg = 'You have successfully completed the assessment! If you have not received your certificate yet, don’t worry—we will resend them shortly.'
+        break
+      case 'fail':
+        msg = 'Unfortunately, you did not pass. Please retake the assessment.'
+        break
+      default:
+        msg = 'Your certificate has been successfully resent to your email.'
+        break
+    }
+    const dialogRef = this.dialog.open(FinalAssessmentPopupComponent, {
+      data: {
+        assessmentType: 'publicUserSuccess',
+        message: msg,
+        popUpType: ontype
+      },
+      width: '320px',
+      maxWidth: '90vw',
+      height: 'auto',
+      maxHeight: '90vh',
+      panelClass: 'final-assessment',
+    })
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        if (ontype === 'noAtempt') {
+          this.router.navigateByUrl(`public/toc/${this.collectionId}/overview`)
+        } else if (ontype === 'pass') {
+          this.router.navigateByUrl(`public/toc/${this.collectionId}/overview`)
+        }
+      } else {
+        if (ontype !== 'fail') {
+          this.router.navigateByUrl(`public/toc/${this.collectionId}/overview`)
+        }
+      }
+    })
+  }
+
+  checkCuratedProgramAssessment() {
+    return (this.widgetContentService.currentMetaData &&
+      this.widgetContentService.currentMetaData.courseCategory === this.eCourseCategory.CURATED_PROGRAM &&
+      this.widgetContentService.currentMetaData.compatibilityLevel > 4)
+  }
+
+  fetchProgressOfAssessment() {
+    const isPreAssessment = this.activatedRoute.snapshot.queryParams.preAssessment
+    console.log('📡 [FETCH PROGRESS] Starting fetchProgressOfAssessment for:', {
+      identifier: this.identifier,
+      isPreAssessment,
+      primaryCategory: this.quizJson?.primaryCategory
+    })
+
+    if (!isPreAssessment) {
+      let userId = ''
+      if (this.configSvc.userProfile) {
+        userId = this.configSvc.userProfile.userId || ''
+      }
+      const requestCourse = this.viewerSvc.getBatchIdAndCourseId(
+        this.activatedRoute.snapshot.queryParams.collectionId,
+        this.activatedRoute.snapshot.queryParams.batchId,
+        this.identifier)
+      const language = this.viewerSvc.getResourceContentLanguage(this.identifier)
+      const req: any = {
+        request: {
+          userId,
+          language,
+          batchId: requestCourse.batchId,
+          courseId: requestCourse.courseId || '',
+          contentIds: [],
+          fields: ['progressdetails'],
+        },
+      }
+
+      console.log('📡 [FETCH PROGRESS] Calling fetchContentHistoryV2 API with request:', req)
+
+      this.widgetContentService.fetchContentHistoryV2(req).subscribe(
+        data => {
+          console.log('📡 [FETCH PROGRESS] API response received:', {
+            hasData: !!data,
+            hasResult: !!(data && data.result),
+            contentListLength: data?.result?.contentList?.length || 0
+          })
+
+          if (data && data.result && data.result.contentList.length) {
+            this.widgetContentService.setProgramChildResumeData(data.result.contentList, requestCourse.courseId)
+            let contentProgressData = data.result.contentList && data.result.contentList.length && data.result.contentList.filter((content: any) => {
+              return content.contentId === this.identifier
+            })
+
+            console.log('📡 [FETCH PROGRESS] Found progress data for this assessment:', {
+              found: !!(contentProgressData && contentProgressData.length),
+              progressData: contentProgressData && contentProgressData.length ? contentProgressData[0] : null
+            })
+
+            if (contentProgressData && contentProgressData.length && contentProgressData[0]?.status === 2) {
+              console.log('✅ [FETCH PROGRESS] Assessment is COMPLETE (status=2), updating hashmap')
+              this.viewerSvc.updateContentHashMapForAssesstent(this.identifier, contentProgressData[0])
+              // Manually trigger change detection to update UI
+              this.cdr.detectChanges()
+              // Check if this completes a milestone and show congratulations popup
+              const contextCategory = this.viewerDataSvc.resource?.contextCategory
+              if (contextCategory === 'Final Milestone Assessment') {
+                this.checkAndShowMilestoneCompletion()
+              }
+            } else if (contentProgressData && contentProgressData.length && contentProgressData[0]) {
+              console.log('⏳ [FETCH PROGRESS] Assessment in progress (status=' + contentProgressData[0].status + '), updating hashmap')
+              this.viewerSvc.updateContentHashMapForAssesstent(this.identifier, contentProgressData[0])
+              // Manually trigger change detection to update UI
+              this.cdr.detectChanges()
+            } else {
+              console.log('⚠️ [FETCH PROGRESS] No progress data found, using mock data with status=1')
+              let mockProgressData = {
+                "lastAccessTime": "2026-01-28 18:17:42:997+0530",
+                "contentId": this.identifier,
+                "language": "english",
+                "batchId": requestCourse.batchId,
+                "completedCount": null,
+                "progressdetails": null,
+                "completionPercentage": 0,
+                "progress": 1,
+                "viewCount": null,
+                "courseId": requestCourse.courseId || '',
+                "collectionId": requestCourse.courseId || '',
+                "lastCompletedTime": "2026-01-28 18:17:43:007+0530",
+                "status": 1
+              }
+              this.viewerSvc.updateContentHashMapForAssesstent(this.identifier, mockProgressData)
+              // Manually trigger change detection to update UI
+              this.cdr.detectChanges()
+            }
+          } else {
+            console.log('⚠️ [FETCH PROGRESS] No content list in API response')
+          }
+        },
+        error => {
+          console.error('❌ [FETCH PROGRESS] API error:', error)
+        }
+      )
+    } else {
+      console.log('ℹ️ [FETCH PROGRESS] Skipping - this is a pre-assessment')
+    }
+
+  }
+}
