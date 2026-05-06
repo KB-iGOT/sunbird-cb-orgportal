@@ -72,7 +72,7 @@ export class NewExternalTrainingComponent implements OnInit {
         try {
           const valueObj = JSON.parse(valueStr)
           let templateUrl = _.get(valueObj, 'template', '')
-          if (templateUrl && templateUrl.includes('static.') && !templateUrl.includes('content-store')) {
+          if (templateUrl && (templateUrl.includes('static.') || templateUrl.includes('storage.googleapis.com')) && !templateUrl.includes('content-store')) {
             const splitURL = templateUrl.split('content')
             templateUrl = `${environment.mdoPath}/content-store/content${splitURL[1]}`
           }
