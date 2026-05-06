@@ -72,6 +72,10 @@ export class NewExternalTrainingComponent implements OnInit {
         try {
           const valueObj = JSON.parse(valueStr)
           let templateUrl = _.get(valueObj, 'template', '')
+          if (templateUrl && templateUrl.includes('static.') && !templateUrl.includes('content-store')) {
+            const splitURL = templateUrl.split('content')
+            templateUrl = `${environment.mdoPath}/content-store/content${splitURL[1]}`
+          }
           this.templateId = _.get(valueObj, 'identifier', '')
           let splitURL = templateUrl.split('/content-store')
           templateUrl = environment.portalsForNotifications.mdo + '/content-store/' + splitURL[1]
