@@ -103,9 +103,6 @@
                           && trainingForm.get('learningMinutes')?.touched
                           && !(trainingForm.get('learningHours')?.invalid || trainingForm.get('learningMinutes')?.invalid)
                           ">
-            <mat-error *ngIf="trainingForm.hasError('bothZero')" class="additionalValidators">
-              Hours and minutes cannot both be zero.
-            </mat-error>
             <mat-error *ngIf="trainingForm.hasError('invalidHundredHours')" class="additionalValidators">
               When hours is 100, minutes must be 0.
             </mat-error>
