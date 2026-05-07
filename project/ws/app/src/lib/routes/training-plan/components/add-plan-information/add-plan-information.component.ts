@@ -33,7 +33,7 @@ export class AddPlanInformationComponent implements OnInit, OnDestroy {
         new UntypedFormControl('', [Validators.required, Validators.pattern(noSpecialChar), Validators.minLength(10)]),
     })
 
-    this.subscr = this.subscr.add(this.contentForm.controls['name'].valueChanges.pipe(debounceTime(500)).subscribe((_ele: any) => {
+    this.subscr.add(this.contentForm.controls['name'].valueChanges.pipe(debounceTime(500)).subscribe((_ele: any) => {
       if (!this.contentForm.invalid) {
         this.tpdsSvc.trainingPlanTitle = _ele
         this.tpdsSvc.trainingPlanStepperData.name = _ele

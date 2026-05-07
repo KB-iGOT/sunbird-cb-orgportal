@@ -617,7 +617,7 @@ export class ViewerTocComponent implements OnInit, OnDestroy, OnChanges, AfterVi
         .fetchCollectionHierarchy('playlist', collectionId, 0, 1000)
         .toPromise()
 
-      const content: any = playlistFetchResponse.data
+      const content: any = playlistFetchResponse!.data
       this.collectionCard = this.createCollectionCard(content)
       const viewerTocCardContent = this.convertContentToIViewerTocCard(content)
       console.log('viewerTocCardContent--', viewerTocCardContent)

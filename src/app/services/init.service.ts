@@ -328,9 +328,9 @@ export class InitService {
   // }
 
   private async fetchDefaultConfig(): Promise<NsInstanceConfig.IConfig> {
-    const publicConfig: NsInstanceConfig.IConfig | any = await this.http
+    const publicConfig = (await this.http
       .get<NsInstanceConfig.IConfig>(`${this.baseUrl}/host.config.json`)
-      .toPromise()
+      .toPromise())!
     this.configSvc.instanceConfig = publicConfig
     this.configSvc.rootOrg = publicConfig.rootOrg
     this.configSvc.org = publicConfig.org
@@ -348,10 +348,10 @@ export class InitService {
       : 'en'
   }
 
-  private async fetchAppsConfig(): Promise<NsAppsConfig.IAppsConfig | any> {
-    const appsConfig = await this.http
+  private async fetchAppsConfig(): Promise<NsAppsConfig.IAppsConfig> {
+    const appsConfig = (await this.http
       .get<NsAppsConfig.IAppsConfig>(`${this.baseUrl}/feature/apps.json`)
-      .toPromise()
+      .toPromise())!
     return appsConfig
   }
 
@@ -597,9 +597,9 @@ export class InitService {
 
   private async fetchInstanceConfig(): Promise<NsInstanceConfig.IConfig | any> {
     // TODO: use the rootOrg and org to fetch the instance
-    const publicConfig: any = await this.http
+    const publicConfig = (await this.http
       .get<NsInstanceConfig.IConfig>(`${this.configSvc.sitePath}/site.config.json`)
-      .toPromise()
+      .toPromise())!
     this.configSvc.instanceConfig = publicConfig
     this.configSvc.rootOrg = publicConfig.rootOrg
     this.configSvc.org = publicConfig.org
@@ -610,9 +610,9 @@ export class InitService {
 
   private async fetchFeaturesStatus(): Promise<Set<string>> {
     // TODO: use the rootOrg and org to fetch the features
-    const featureConfigs: any = await this.http
+    const featureConfigs = (await this.http
       .get<IFeaturePermissionConfigs>(`${this.baseUrl}/features.config.json`)
-      .toPromise()
+      .toPromise())!
     this.configSvc.restrictedFeatures = new Set(
       Object.entries((featureConfigs || {}) as Record<string, any>)
         .filter(
@@ -622,10 +622,10 @@ export class InitService {
     )
     return this.configSvc.restrictedFeatures
   }
-  private async fetchWidgetStatus(): Promise<NsWidgetResolver.IRegistrationsPermissionConfig[] | any> {
-    const widgetConfigs = await this.http
+  private async fetchWidgetStatus(): Promise<NsWidgetResolver.IRegistrationsPermissionConfig[]> {
+    const widgetConfigs = (await this.http
       .get<NsWidgetResolver.IRegistrationsPermissionConfig[]>(`${this.baseUrl}/widgets.config.json`)
-      .toPromise()
+      .toPromise())!
     return widgetConfigs
   }
 
