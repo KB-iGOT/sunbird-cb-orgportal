@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core'
-import { FormBuilder, FormGroup, Validators } from '@angular/forms'
+import { FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors } from '@angular/forms'
 import { ActivatedRoute, Router } from '@angular/router'
 import { ExternalTrainingsService } from '../../../services/external-trainings.service'
 import { deliveryModeList as deliveryModes } from '../models/external-trainings.model'
@@ -115,10 +115,11 @@ export class NewExternalTrainingComponent implements OnInit {
       trainingTitle: ['', [Validators.required, Validators.minLength(10), Validators.maxLength(70), Validators.pattern(this.noSpecialChar)]],
       learningObjective: ['', [Validators.maxLength(500), Validators.pattern(this.noSpecialCharMultiline)]],
       deliveryMode: [''],
-      learningHours: ['', [Validators.min(1), Validators.max(100), Validators.pattern(/^[1-9]\d*$/)]],
+      learningHours: [0, [Validators.min(0), Validators.max(100)]],
+      learningMinutes: [0, [Validators.min(0), Validators.max(59)]],
       trainingType: ['', Validators.required],
       partnerName: ['', [Validators.maxLength(70), Validators.pattern(this.noSpecialChar)]]
-    })
+    }, { validators: [this.bothZeroValidator, this.hundredHoursValidator] })
   }
 
   onFileSelected(event: any): void {
@@ -318,6 +319,8 @@ export class NewExternalTrainingComponent implements OnInit {
     const form = this.trainingForm.value
     const eventType = _.get(form, 'deliveryMode') || ''
     const learningHours = _.get(form, 'learningHours') || 0
+    const learningMinutes = _.get(form, 'learningMinutes') || 0
+    const totalMinutes = (learningHours * 60) + learningMinutes
     const logoUrl = this.mergedLogoUrl || this.defaultCertificateTemplateUrl
     return {
       request: {
@@ -328,7 +331,7 @@ export class NewExternalTrainingComponent implements OnInit {
           description: _.get(form, 'learningObjective'),
           category: 'externalTraining',
           resourceType: 'externalTraining',
-          duration: learningHours * 3600,
+          duration: totalMinutes * 60,
           createdBy: _.get(this.configSvc, 'userProfile.userId'),
           categoryType: _.get(form, 'trainingType'),
           sourceName: _.get(this.configSvc, 'unMappedUser.rootOrg.orgName'),
@@ -483,5 +486,18 @@ export class NewExternalTrainingComponent implements OnInit {
     this.matSnackBar.open(message, action, {
       duration: 3000,
     })
+  }
+
+  // Custom validators
+  bothZeroValidator = (form: AbstractControl): ValidationErrors | null => {
+    const hours = form.get('learningHours')?.value || 0
+    const minutes = form.get('learningMinutes')?.value || 0
+    return (hours === 0 && minutes === 0) ? { bothZero: true } : null
+  }
+
+  hundredHoursValidator = (form: AbstractControl): ValidationErrors | null => {
+    const hours = form.get('learningHours')?.value || 0
+    const minutes = form.get('learningMinutes')?.value || 0
+    return (hours === 100 && minutes > 0) ? { invalidHundredHours: true } : null
   }
 }
