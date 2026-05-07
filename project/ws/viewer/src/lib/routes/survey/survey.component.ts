@@ -158,7 +158,7 @@ export class SurveyComponent implements OnInit, OnDestroy {
   }
 
   async fetchContent() {
-    const content = await this.contentSvc
+    const content: any = await this.contentSvc
       .fetchContent(this.widgetResolverSurveyData.widgetData.collectionId || '', 'minimal')
       .toPromise()
     this.widgetResolverSurveyData.widgetData.courseName = content.result.content.name

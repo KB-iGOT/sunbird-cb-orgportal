@@ -4,7 +4,8 @@ import { ComponentPortal } from '@angular/cdk/portal'
 import { LangToolTipComponent } from '../routes/lang-tool-tip/lang-tool-tip.component'
 
 @Directive({
-  selector: '[wsAuthWsCustomTooltip]'
+  selector: '[wsAuthWsCustomTooltip]',
+  standalone: false
 })
 export class WsCustomTooltipDirective implements OnDestroy {
   @Input('wsAuthWsCustomTooltip') tooltipData: any

@@ -613,7 +613,7 @@ export class ViewerTocComponent implements OnInit, OnDestroy, OnChanges, AfterVi
     _collectionType: string,
   ): Promise<IViewerTocCard | null> {
     try {
-      const playlistFetchResponse = await this.contentSvc
+      const playlistFetchResponse: any = await this.contentSvc
         .fetchCollectionHierarchy('playlist', collectionId, 0, 1000)
         .toPromise()
 

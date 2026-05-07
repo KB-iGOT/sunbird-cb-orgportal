@@ -11,6 +11,7 @@ import { LoaderService } from '../../../../../../../../../src/app/services/loade
   selector: 'ws-app-explore-content',
   templateUrl: './explore-content.component.html',
   styleUrls: ['./explore-content.component.scss'],
+  standalone: false,
   animations: [
     trigger('detailExpand', [
       state('collapsed, void', style({ height: '0px', minHeight: '0' })), // Removed display: 'none'

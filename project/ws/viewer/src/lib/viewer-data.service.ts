@@ -44,7 +44,7 @@ export class ViewerDataService {
     this.resource = null
     this.error = null
     this.status = status
-    this.changedSubject.next()
+    this.changedSubject.next({})
   }
   updateResource(resource: NsContent.IContent | null = null, error: any | null = null) {
     if (resource) {
@@ -59,7 +59,7 @@ export class ViewerDataService {
       this.error = error
       this.status = 'error'
     }
-    this.changedSubject.next()
+    this.changedSubject.next({})
   }
   updateNextPrevResource(isValid = true, prev: IViewerTocCard | null = null, next: IViewerTocCard | null = null) {
     this.tocChangeSubject.next(

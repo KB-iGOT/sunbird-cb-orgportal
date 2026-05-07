@@ -5,17 +5,17 @@ import { TrainingPlanDataSharingService } from '../../services/training-plan-dat
 import { Subscription } from 'rxjs'
 
 @Component({
-    selector: 'ws-app-add-plan-information',
-    templateUrl: './add-plan-information.component.html',
-    styleUrls: ['./add-plan-information.component.scss'],
-    standalone: false
+  selector: 'ws-app-add-plan-information',
+  templateUrl: './add-plan-information.component.html',
+  styleUrls: ['./add-plan-information.component.scss'],
+  standalone: false
 })
 export class AddPlanInformationComponent implements OnInit, OnDestroy {
 
   @Output() planTitleInvalid = new EventEmitter<any>()
 
   contentForm!: UntypedFormGroup
-  private subscr: Subscription = new Subscription()
+  private subscr: Subscription | any = new Subscription()
   specialCharList = `( a-z/A-Z , 0-9 . _ - $ / \ : [ ]' ' !)`
   constructor(
     private formBuilder: UntypedFormBuilder,

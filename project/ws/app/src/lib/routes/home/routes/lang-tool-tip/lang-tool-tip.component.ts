@@ -3,7 +3,8 @@ import { Component, Input, TemplateRef } from '@angular/core'
 @Component({
   selector: 'ws-auth-lang-tool-tip',
   templateUrl: './lang-tool-tip.component.html',
-  styleUrls: ['./lang-tool-tip.component.scss']
+  styleUrls: ['./lang-tool-tip.component.scss'],
+  standalone: false
 })
 export class LangToolTipComponent {
 

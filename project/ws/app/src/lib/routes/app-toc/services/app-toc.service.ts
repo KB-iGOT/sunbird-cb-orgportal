@@ -82,7 +82,7 @@ export class AppTocService {
   }
 
   updateBatchData() {
-    this.batchReplaySubject.next()
+    this.batchReplaySubject.next({})
   }
 
   setBatchData(data: NsContent.IBatchListResponse) {

@@ -328,7 +328,7 @@ export class InitService {
   // }
 
   private async fetchDefaultConfig(): Promise<NsInstanceConfig.IConfig> {
-    const publicConfig: NsInstanceConfig.IConfig = await this.http
+    const publicConfig: NsInstanceConfig.IConfig | any = await this.http
       .get<NsInstanceConfig.IConfig>(`${this.baseUrl}/host.config.json`)
       .toPromise()
     this.configSvc.instanceConfig = publicConfig
@@ -348,7 +348,7 @@ export class InitService {
       : 'en'
   }
 
-  private async fetchAppsConfig(): Promise<NsAppsConfig.IAppsConfig> {
+  private async fetchAppsConfig(): Promise<NsAppsConfig.IAppsConfig | any> {
     const appsConfig = await this.http
       .get<NsAppsConfig.IAppsConfig>(`${this.baseUrl}/feature/apps.json`)
       .toPromise()
@@ -595,9 +595,9 @@ export class InitService {
     }
   }
 
-  private async fetchInstanceConfig(): Promise<NsInstanceConfig.IConfig> {
+  private async fetchInstanceConfig(): Promise<NsInstanceConfig.IConfig | any> {
     // TODO: use the rootOrg and org to fetch the instance
-    const publicConfig = await this.http
+    const publicConfig: any = await this.http
       .get<NsInstanceConfig.IConfig>(`${this.configSvc.sitePath}/site.config.json`)
       .toPromise()
     this.configSvc.instanceConfig = publicConfig
@@ -610,11 +610,11 @@ export class InitService {
 
   private async fetchFeaturesStatus(): Promise<Set<string>> {
     // TODO: use the rootOrg and org to fetch the features
-    const featureConfigs = await this.http
+    const featureConfigs: any = await this.http
       .get<IFeaturePermissionConfigs>(`${this.baseUrl}/features.config.json`)
       .toPromise()
     this.configSvc.restrictedFeatures = new Set(
-      Object.entries(featureConfigs)
+      Object.entries((featureConfigs || {}) as Record<string, any>)
         .filter(
           ([_k, v]) => !hasPermissions(v, this.configSvc.userRoles, this.configSvc.userGroups),
         )
@@ -622,7 +622,7 @@ export class InitService {
     )
     return this.configSvc.restrictedFeatures
   }
-  private async fetchWidgetStatus(): Promise<NsWidgetResolver.IRegistrationsPermissionConfig[]> {
+  private async fetchWidgetStatus(): Promise<NsWidgetResolver.IRegistrationsPermissionConfig[] | any> {
     const widgetConfigs = await this.http
       .get<NsWidgetResolver.IRegistrationsPermissionConfig[]>(`${this.baseUrl}/widgets.config.json`)
       .toPromise()
