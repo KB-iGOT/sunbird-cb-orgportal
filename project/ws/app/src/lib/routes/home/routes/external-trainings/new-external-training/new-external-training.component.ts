@@ -119,7 +119,7 @@ export class NewExternalTrainingComponent implements OnInit {
       learningMinutes: [0, [Validators.min(0), Validators.max(59)]],
       trainingType: ['', Validators.required],
       partnerName: ['', [Validators.maxLength(70), Validators.pattern(this.noSpecialChar)]]
-    }, { validators: [this.bothZeroValidator, this.hundredHoursValidator] })
+    }, { validators: [this.hundredHoursValidator] })
   }
 
   onFileSelected(event: any): void {
@@ -488,12 +488,7 @@ export class NewExternalTrainingComponent implements OnInit {
     })
   }
 
-  // Custom validators
-  bothZeroValidator = (form: AbstractControl): ValidationErrors | null => {
-    const hours = form.get('learningHours')?.value || 0
-    const minutes = form.get('learningMinutes')?.value || 0
-    return (hours === 0 && minutes === 0) ? { bothZero: true } : null
-  }
+
 
   hundredHoursValidator = (form: AbstractControl): ValidationErrors | null => {
     const hours = form.get('learningHours')?.value || 0
