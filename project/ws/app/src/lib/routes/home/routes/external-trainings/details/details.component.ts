@@ -40,7 +40,7 @@ export class DetailsComponent implements OnInit {
         const hours = Math.floor(durationInSeconds / 3600)
         const minutes = Math.floor((durationInSeconds % 3600) / 60)
         const learningHours = durationInSeconds > 0
-          ? `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')} Hours`
+          ? `${hours}h ${minutes}m`
           : ''
 
         this.training = {
