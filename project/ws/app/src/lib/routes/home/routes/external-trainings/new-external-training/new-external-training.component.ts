@@ -122,6 +122,15 @@ export class NewExternalTrainingComponent implements OnInit {
     }, { validators: [this.hundredHoursValidator] })
   }
 
+  onNumberPaste(event: ClipboardEvent, controlName: string): void {
+    event.preventDefault()
+    const pasted = event.clipboardData?.getData('text') || ''
+    const numeric = pasted.replace(/[^0-9]/g, '')
+    if (numeric) {
+      this.trainingForm.get(controlName)?.setValue(+numeric)
+    }
+  }
+
   onFileSelected(event: any): void {
     const input = event.target as HTMLInputElement
     if (input?.files?.[0]) {

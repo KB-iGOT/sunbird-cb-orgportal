@@ -77,7 +77,8 @@
             <mat-form-field appearance="outline" class="flex-1 learning-duration-control">
               <input matInput type="number" placeholder="Hours (0 - 100)" formControlName="learningHours" min="0"
                 max="100" step="1"
-                (keydown)="$event.key === '.' || $event.key === '-' || $event.key === 'e' || $event.key === '+' ? $event.preventDefault() : null" />
+                (keydown)="$event.key === '.' || $event.key === '-' || $event.key === 'e' || $event.key === '+' ? $event.preventDefault() : null"
+                (paste)="onNumberPaste($event, 'learningHours')" />
               <mat-error *ngIf="trainingForm.get('learningHours')?.hasError('min')">
                 Hours cannot be negative.
               </mat-error>
@@ -88,7 +89,8 @@
             <mat-form-field appearance="outline" class="flex-1 learning-duration-control">
               <input matInput type="number" placeholder="Minutes (0 - 59)" formControlName="learningMinutes" min="0"
                 max="59" step="1"
-                (keydown)="$event.key === '.' || $event.key === '-' || $event.key === 'e' || $event.key === '+' ? $event.preventDefault() : null" />
+                (keydown)="$event.key === '.' || $event.key === '-' || $event.key === 'e' || $event.key === '+' ? $event.preventDefault() : null"
+                (paste)="onNumberPaste($event, 'learningMinutes')" />
               <mat-error *ngIf="trainingForm.get('learningMinutes')?.hasError('min')">
                 Minutes cannot be negative.
               </mat-error>
@@ -197,8 +199,6 @@
           <img class="certificate-img" [src]="previewLogoUrl || defaultLogoUrl" alt="Certificate Preview" />
         </div>
       </div>
-
-
     </form>
 
     <div class="flex pb-4 flex-col form-field">
