@@ -115,8 +115,8 @@ export class NewExternalTrainingComponent implements OnInit {
       trainingTitle: ['', [Validators.required, Validators.minLength(10), Validators.maxLength(70), Validators.pattern(this.noSpecialChar)]],
       learningObjective: ['', [Validators.maxLength(500), Validators.pattern(this.noSpecialCharMultiline)]],
       deliveryMode: [''],
-      learningHours: [0, [Validators.min(0), Validators.max(100)]],
-      learningMinutes: [0, [Validators.min(0), Validators.max(59)]],
+      learningHours: ['', [Validators.min(0), Validators.max(100)]],
+      learningMinutes: ['', [Validators.min(0), Validators.max(59)]],
       trainingType: ['', Validators.required],
       partnerName: ['', [Validators.maxLength(70), Validators.pattern(this.noSpecialChar)]]
     }, { validators: [this.hundredHoursValidator] })
