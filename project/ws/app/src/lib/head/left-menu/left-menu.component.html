@@ -36,7 +36,7 @@
             <ng-container>
               <a *ngIf="isAllowed(tab)" mat-list-item disableRipple class="flex outline-1 menu-item-a"
                 [attr.data-index]="i" [routerLink]="[tab.routerLink]" [queryParamsHandling]="preserve"
-                routerLinkActive="ws-active-route-men">
+                routerLinkActive="ws-active-route-men" (click)="raiseTelemetry(tab)">
                 <span class="padding-left-xs">{{tab?.name}}</span>
               </a>
             </ng-container>
