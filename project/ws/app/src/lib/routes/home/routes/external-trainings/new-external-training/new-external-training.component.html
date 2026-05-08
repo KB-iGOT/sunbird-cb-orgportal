@@ -71,10 +71,10 @@
         </div>
 
         <!-- Learning Hours -->
-        <div class="flex flex-column gap-2 event-form round-control">
-          <div class="form-lable">Learning Hours</div>
+        <div class="flex flex-column gap-2 event-form round-control learning-duration">
+          <div class="form-lable">Learning Duration (hh:mm)</div>
           <div class="flex gap-2">
-            <mat-form-field appearance="outline" class="flex-1">
+            <mat-form-field appearance="outline" class="flex-1 learning-duration-control">
               <input matInput type="number" placeholder="Hours (0 - 100)" formControlName="learningHours" min="0"
                 max="100" step="1"
                 (keydown)="$event.key === '.' || $event.key === '-' || $event.key === 'e' || $event.key === '+' ? $event.preventDefault() : null" />
@@ -82,10 +82,10 @@
                 Hours cannot be negative.
               </mat-error>
               <mat-error *ngIf="trainingForm.get('learningHours')?.hasError('max')">
-                Hours should not exceed 100.
+                Maximum allowed duration is 100 hours.
               </mat-error>
             </mat-form-field>
-            <mat-form-field appearance="outline" class="flex-1">
+            <mat-form-field appearance="outline" class="flex-1 learning-duration-control">
               <input matInput type="number" placeholder="Minutes (0 - 59)" formControlName="learningMinutes" min="0"
                 max="59" step="1"
                 (keydown)="$event.key === '.' || $event.key === '-' || $event.key === 'e' || $event.key === '+' ? $event.preventDefault() : null" />
@@ -104,7 +104,7 @@
                           && !(trainingForm.get('learningHours')?.invalid || trainingForm.get('learningMinutes')?.invalid)
                           ">
             <mat-error *ngIf="trainingForm.hasError('invalidHundredHours')" class="additionalValidators">
-              When hours is 100, minutes must be 0.
+              Maximum allowed duration is 100 hours.
             </mat-error>
           </ng-container>
         </div>

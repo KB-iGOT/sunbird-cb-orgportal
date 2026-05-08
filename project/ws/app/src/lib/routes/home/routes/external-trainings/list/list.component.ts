@@ -92,7 +92,7 @@ export class ListComponent implements OnInit, AfterViewInit {
           const hours = Math.floor(durationSec / 3600)
           const minutes = Math.floor((durationSec % 3600) / 60)
           const formattedTime = durationSec ?
-            `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')} Hours` : ''
+            `${hours}h ${minutes}m` : ''
           return {
             ...item,
             eventType: deliveryModeList[item.eventType] || item.eventType || '',

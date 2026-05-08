@@ -194,6 +194,13 @@
   margin-top: -10px;
 }
 
+.learning-duration {
+  max-width: 266px;
+  .learning-duration-control {
+    max-width: 130px;
+  }
+}
+
 // Responsive adjustments
 @media (max-width: 768px) {
   .form-row {
