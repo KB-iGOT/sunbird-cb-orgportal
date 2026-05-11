@@ -37,6 +37,7 @@ import { DirectoryComponent } from './routes/directory/directory.component'
 import { OrganisationUsersComponent } from './routes/directory/organisation-users/organisation-users.component'
 import { ExploreContentComponent } from './routes/explore-content/explore-content.component'
 import { PreviewComponent } from './routes/explore-content/preview/preview.component'
+import { GeneralGuard } from '../../../../../../../src/app/guards/general.guard'
 const routes: Routes = [
   {
     path: '',
@@ -362,6 +363,10 @@ const routes: Routes = [
         loadChildren: () => import('./routes/community/community.module').then(m => m.CommunityModule),
         resolve: {
           configService: ConfigResolveService,
+        },
+        canActivate: [GeneralGuard],
+        data: {
+          requiredRoles: ['mdo_leader', 'community_moderator'],  // user needs at least one of these
         },
       },
 
