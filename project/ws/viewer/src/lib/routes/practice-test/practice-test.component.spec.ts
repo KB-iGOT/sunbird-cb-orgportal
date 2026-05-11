@@ -1,219 +1,371 @@
+// ── Mock problematic imports before loading the module ────────────────────
+jest.mock('../../viewer-preview-popup/viewer-preview-popup.component', () => ({
+  ViewerPreviewPopupComponent: class { },
+}))
+
+jest.mock('@sunbird-cb/collection', () => ({
+  NsContent: {
+    EMimeTypes: { PDF: 'application/pdf' },
+    EPrimaryCategory: { PRACTICE_RESOURCE: 'Practice Resource' },
+  },
+}))
+
+jest.mock('@sunbird-cb/toc', () => ({
+  ViewerUtilService: jest.fn(),
+  AccessControlService: jest.fn(),
+  WidgetContentService: jest.fn(),
+}))
+
+jest.mock('@sunbird-cb/utils', () => ({
+  EventService: jest.fn(),
+  LoggerService: jest.fn(),
+  WsEvents: {
+    EnumTelemetrySubType: { Loaded: 'LOADED', Unloaded: 'UNLOADED' },
+    WsEventType: { Telemetry: 'TELEMETRY' },
+    WsEventLogLevel: { Info: 'INFO' },
+    WsTimeSpentType: { Player: 'PLAYER' },
+    WsTimeSpentMode: { Play: 'PLAY' },
+  },
+}))
+
+jest.mock('../../viewer-util.service', () => ({
+  ViewerUtilService: jest.fn(),
+}))
+
+import { of, Subject } from 'rxjs'
 import { PracticeTestComponent } from './practice-test.component'
-import { ActivatedRoute, ActivatedRouteSnapshot, convertToParamMap } from '@angular/router'
-import { EventService, LoggerService, WsEvents } from '@sunbird-cb/utils'
-import { ViewerUtilService } from '../../viewer-util.service'
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog'
-import { of } from 'rxjs'
-import { NsContent } from '@sunbird-cb/collection'
-import { ViewerPreviewPopupComponent } from '../../viewer-preview-popup/viewer-preview-popup.component'
-import { AccessControlService } from '@sunbird-cb/toc'
+import { WsEvents } from '@sunbird-cb/utils'
 
 describe('PracticeTestComponent', () => {
   let component: PracticeTestComponent
-  let mockActivatedRoute: Partial<ActivatedRoute>
-  let mockAccessControlService: jest.Mocked<AccessControlService>
-  let mockViewerUtilService: jest.Mocked<ViewerUtilService>
-  let mockEventService: jest.Mocked<EventService>
-  let mockLoggerService: jest.Mocked<LoggerService>
-  let mockMatDialog: jest.Mocked<MatDialog>
+  let mockActivatedRoute: any
+  let mockAccessControlService: any
+  let mockViewerUtilService: any
+  let mockEventService: any
+  let mockContentSvc: any
+  let mockLoggerService: any
+  let mockMatDialog: any
+  let mockRouter: any
 
-  const mockTestData: NsContent.IContent = {
+  const mockTestData: any = {
     identifier: 'test-id',
     maxQuestions: 10,
     allowSkip: 'Yes',
     requiresSubmit: 'Yes',
     expectedDuration: 300,
     artifactUrl: 'test-url',
-    mimeType: NsContent.EMimeTypes.PDF,
-  } as unknown as NsContent.IContent
+    mimeType: 'application/pdf',
+  }
+
+  const routerEvents = new Subject<any>()
+
+  function buildComponent(): PracticeTestComponent {
+    return new PracticeTestComponent(
+      mockMatDialog,
+      mockActivatedRoute,
+      mockAccessControlService,
+      mockViewerUtilService,
+      mockEventService,
+      mockContentSvc,
+      mockLoggerService,
+      mockRouter,
+    )
+  }
 
   beforeEach(() => {
-    // Setup mocks with proper param maps
     mockActivatedRoute = {
       snapshot: {
-        paramMap: convertToParamMap({ resourceId: 'test-resource' }),
-        queryParamMap: convertToParamMap({
-          preview: 'false',
-          batchId: 'test-batch'
-        }),
-        url: [],
+        paramMap: { get: jest.fn().mockReturnValue('test-resource') },
+        queryParamMap: { get: jest.fn().mockImplementation((key: string) => key === 'batchId' ? 'test-batch' : null) },
+        queryParams: { batchId: 'test-batch' },
         params: {},
-        queryParams: {},
-        fragment: '',
         data: {},
-        outlet: '',
-        component: '',
-        routeConfig: undefined,
-        root: new ActivatedRouteSnapshot,
-        parent: new ActivatedRouteSnapshot,
-        firstChild: new ActivatedRouteSnapshot,
-        children: [],
-        pathFromRoot: []
       },
       data: of({ content: { data: mockTestData } }),
     }
 
     mockAccessControlService = {
-      authoringConfig: {
-        newDesign: false,
-      },
-    } as any
+      authoringConfig: { newDesign: false },
+    }
 
     mockViewerUtilService = {
       getContent: jest.fn().mockReturnValue(of(mockTestData)),
-    } as any
+    }
 
     mockEventService = {
       dispatchEvent: jest.fn(),
-    } as any
+    }
+
+    mockContentSvc = {
+      currentMetaData: null,
+    }
 
     mockLoggerService = {
       error: jest.fn(),
-    } as any
+    }
 
     mockMatDialog = {
       open: jest.fn(),
-    } as any
+    }
 
-    // Create component instance
-    component = new PracticeTestComponent(
-      mockMatDialog,
-      mockActivatedRoute as ActivatedRoute,
-      mockAccessControlService,
-      mockViewerUtilService,
-      mockEventService,
-      mockLoggerService
-    )
+    mockRouter = {
+      events: routerEvents,
+      navigate: jest.fn(),
+    }
 
-    // Mock window.location for preview mode detection
-    delete (window as any).location
     Object.defineProperty(window, 'location', {
-      value: {
-        href: 'http://test.com',
-      },
+      value: { href: 'http://test.com' },
       writable: true,
-      configurable: true
+      configurable: true,
     })
 
-    // Mock setTimeout
     jest.useFakeTimers()
+    component = buildComponent()
+    component.forPreview = false
   })
 
   afterEach(() => {
     jest.clearAllTimers()
+    jest.clearAllMocks()
   })
 
-  describe('initialization', () => {
-    it('should create component', () => {
-      expect(component).toBeTruthy()
-    })
+  // ─── Creation ─────────────────────────────────────────────────────────────
 
-    it('should initialize with default values', () => {
-      expect(component.isPreviewMode).toBeFalsy()
-      expect(component.isFetchingDataComplete).toBeFalsy()
-      expect(component.testData).toBeNull()
-      // batchId is now properly initialized from queryParamMap
-      expect(component.batchId).toBe('test-batch')
-    })
+  it('should create', () => {
+    expect(component).toBeTruthy()
+  })
 
-    it('should initialize quiz JSON with default values', () => {
-      expect(component.quizJson).toEqual({
-        timeLimit: 300,
-        questions: [],
-        isAssessment: false,
-        allowSkip: 'No',
-        maxQuestions: 0,
-        requiresSubmit: 'Yes',
-        showTimer: 'Yes',
-      })
+  it('should have isPreviewMode false by default', () => {
+    expect(component.isPreviewMode).toBeFalsy()
+  })
+
+  it('should have isFetchingDataComplete false by default', () => {
+    expect(component.isFetchingDataComplete).toBeFalsy()
+  })
+
+  it('should have testData null by default', () => {
+    expect(component.testData).toBeNull()
+  })
+
+  it('should initialize quizJson with correct defaults', () => {
+    expect(component.quizJson).toEqual({
+      timeLimit: 300,
+      questions: [],
+      isAssessment: false,
+      allowSkip: 'No',
+      maxQuestions: 0,
+      requiresSubmit: 'Yes',
+      showTimer: 'Yes',
     })
   })
 
-  describe('ngOnInit', () => {
-    it('should handle preview mode initialization', () => {
-      // Set preview mode query param
-      const previewRoute = {
-        ...mockActivatedRoute,
-        snapshot: {
-          ...mockActivatedRoute.snapshot,
-          queryParamMap: convertToParamMap({ preview: 'true' })
-        }
-      }
+  // ─── batchId ──────────────────────────────────────────────────────────────
 
-      component = new PracticeTestComponent(
-        mockMatDialog,
-        previewRoute as ActivatedRoute,
-        mockAccessControlService,
-        mockViewerUtilService,
-        mockEventService,
-        mockLoggerService
-      )
+  it('should initialize batchId from queryParamMap', () => {
+    expect(component.batchId).toBe('test-batch')
+  })
 
+  // ─── ngOnInit — normal mode ───────────────────────────────────────────────
+
+  describe('ngOnInit — normal mode', () => {
+    it('should set testData from route data', () => {
       component.ngOnInit()
-      expect(component.isPreviewMode).toBeTruthy()
+      expect(component.testData).toEqual(mockTestData)
+    })
+
+    it('should call init after setting testData', () => {
+      const spy = jest.spyOn(component, 'init')
+      component.ngOnInit()
+      expect(spy).toHaveBeenCalled()
+    })
+
+    it('should set isFetchingDataComplete to true after timeout', () => {
+      component.ngOnInit()
+      jest.runAllTimers()
+      expect(component.isFetchingDataComplete).toBe(true)
+    })
+  })
+
+  // ─── ngOnInit — preview mode ──────────────────────────────────────────────
+
+  describe('ngOnInit — preview mode', () => {
+    it('should set isPreviewMode to true when preview param is set', () => {
+      mockActivatedRoute.snapshot.queryParamMap.get = jest.fn().mockReturnValue('true')
+      component = buildComponent()
+      component.ngOnInit()
+      expect(component.isPreviewMode).toBe(true)
+    })
+
+    it('should call viewerSvc.getContent in preview mode', () => {
+      mockActivatedRoute.snapshot.queryParamMap.get = jest.fn().mockReturnValue('true')
+      component = buildComponent()
+      component.ngOnInit()
       expect(mockViewerUtilService.getContent).toHaveBeenCalledWith('test-resource')
     })
 
-    it('should handle normal mode initialization', () => {
+    it('should NOT use preview mode when newDesign is true', () => {
+      mockActivatedRoute.snapshot.queryParamMap.get = jest.fn().mockReturnValue('true')
+      mockAccessControlService.authoringConfig.newDesign = true
+      component = buildComponent()
       component.ngOnInit()
-      expect(component.isPreviewMode).toBeTruthy()
+      expect(component.isPreviewMode).toBe(false)
+    })
+  })
+
+  // ─── preAssessment mode ───────────────────────────────────────────────────
+
+  describe('ngOnInit — preAssessment mode', () => {
+    it('should subscribe via dataSubscription for preAssessment URLs', () => {
+      Object.defineProperty(window, 'location', {
+        value: { href: 'http://test.com/preAssessment/something' },
+        writable: true,
+        configurable: true,
+      })
+      component = buildComponent()
+      component.ngOnInit()
       expect(component.testData).toEqual(mockTestData)
     })
   })
 
+  // ─── init ─────────────────────────────────────────────────────────────────
+
   describe('init', () => {
-    it('should initialize quiz data from test data', () => {
+    it('should set quizJson values from testData', () => {
       component.testData = mockTestData
       component.init()
-
-      expect(component.quizJson.maxQuestions).toBe(mockTestData.maxQuestions)
-      expect(component.quizJson.allowSkip).toBe(mockTestData.allowSkip)
-      expect(component.quizJson.requiresSubmit).toBe(mockTestData.requiresSubmit)
-      expect(component.quizJson.timeLimit).toBe(mockTestData.expectedDuration)
+      expect(component.quizJson.maxQuestions).toBe(10)
+      expect(component.quizJson.allowSkip).toBe('Yes')
+      expect(component.quizJson.requiresSubmit).toBe('Yes')
+      expect(component.quizJson.timeLimit).toBe(300)
     })
 
-    it('should set fetchingDataComplete after timeout', () => {
+    it('should set alreadyRaised to true', () => {
       component.testData = mockTestData
       component.init()
+      expect(component.alreadyRaised).toBe(true)
+    })
 
+    it('should set isFetchingDataComplete to true after setTimeout', () => {
+      component.testData = mockTestData
+      component.init()
       jest.runAllTimers()
+      expect(component.isFetchingDataComplete).toBe(true)
+    })
 
-      expect(component.isFetchingDataComplete).toBeTruthy()
-      expect(mockMatDialog.open).toHaveBeenCalledWith(
-        ViewerPreviewPopupComponent,
-        expect.any(Object)
-      )
+    it('should not throw when testData is null', () => {
+      component.testData = null
+      expect(() => component.init()).not.toThrow()
+      jest.runAllTimers()
+    })
+
+    it('should not call raiseEvent when testData is null', () => {
+      component.testData = null
+      const spy = jest.spyOn(component, 'raiseEvent')
+      component.init()
+      expect(spy).not.toHaveBeenCalled()
     })
   })
 
+  // ─── openPreviewPopup ─────────────────────────────────────────────────────
 
+  describe('openPreviewPopup', () => {
+    it('should call dialog.open', () => {
+      component.openPreviewPopup()
+      expect(mockMatDialog.open).toHaveBeenCalled()
+    })
+
+    it('should pass quizJson and testData to dialog', () => {
+      component.testData = mockTestData
+      component.openPreviewPopup()
+      const arg = mockMatDialog.open.mock.calls[0][1]
+      expect(arg.data.testData).toBe(mockTestData)
+      expect(arg.data.quizJson).toBe(component.quizJson)
+    })
+  })
+
+  // ─── isErrorOccured ───────────────────────────────────────────────────────
+
+  describe('isErrorOccured', () => {
+    it('should call log.error with the event', () => {
+      component.isErrorOccured({ message: 'error' })
+      expect(mockLoggerService.error).toHaveBeenCalledWith({ message: 'error' })
+    })
+  })
+
+  // ─── raiseEvent ───────────────────────────────────────────────────────────
+
+  describe('raiseEvent', () => {
+    it('should call eventSvc.dispatchEvent when not forPreview', () => {
+      component.forPreview = false
+      component.raiseEvent(WsEvents.EnumTelemetrySubType.Loaded, mockTestData)
+      expect(mockEventService.dispatchEvent).toHaveBeenCalled()
+    })
+
+    it('should not call eventSvc.dispatchEvent when forPreview', () => {
+      component.forPreview = true
+      component.raiseEvent(WsEvents.EnumTelemetrySubType.Loaded, mockTestData)
+      expect(mockEventService.dispatchEvent).not.toHaveBeenCalled()
+    })
+
+    it('should dispatch event with correct state', () => {
+      component.forPreview = false
+      component.raiseEvent(WsEvents.EnumTelemetrySubType.Loaded, mockTestData)
+      const event = mockEventService.dispatchEvent.mock.calls[0][0]
+      expect(event.data.state).toBe(WsEvents.EnumTelemetrySubType.Loaded)
+    })
+
+    it('should include identifier in the event', () => {
+      component.forPreview = false
+      component.raiseEvent(WsEvents.EnumTelemetrySubType.Loaded, mockTestData)
+      const event = mockEventService.dispatchEvent.mock.calls[0][0]
+      expect(event.data.identifier).toBe('test-id')
+    })
+  })
+
+  // ─── ngOnDestroy ──────────────────────────────────────────────────────────
 
   describe('ngOnDestroy', () => {
-    it('should raise unload event if test data exists', () => {
+    it('should call raiseEvent(Unloaded) when testData exists', () => {
       component.testData = mockTestData
+      component.forPreview = false
+      const spy = jest.spyOn(component, 'raiseEvent')
       component.ngOnDestroy()
-
-      expect(mockEventService.dispatchEvent).toHaveBeenCalledWith(
-        expect.objectContaining({
-          data: expect.objectContaining({
-            state: WsEvents.EnumTelemetrySubType.Unloaded,
-          }),
-        })
+      expect(spy).toHaveBeenCalledWith(
+        WsEvents.EnumTelemetrySubType.Unloaded,
+        expect.any(Object),
       )
     })
 
-    it('should unsubscribe from all subscriptions', () => {
-      const mockSubscription = {
-        unsubscribe: jest.fn(),
-      }
-
-      component['dataSubscription'] = mockSubscription as any
-      component['viewerDataSubscription'] = mockSubscription as any
-      component['telemetryIntervalSubscription'] = mockSubscription as any
-
+    it('should not call raiseEvent when testData is null', () => {
+      component.testData = null
+      const spy = jest.spyOn(component, 'raiseEvent')
       component.ngOnDestroy()
+      expect(spy).not.toHaveBeenCalled()
+    })
 
-      expect(mockSubscription.unsubscribe).toHaveBeenCalledTimes(3)
+    it('should unsubscribe dataSubscription', () => {
+      const unsub = jest.fn()
+        ; (component as any).dataSubscription = { unsubscribe: unsub }
+      component.ngOnDestroy()
+      expect(unsub).toHaveBeenCalled()
+    })
+
+    it('should unsubscribe viewerDataSubscription', () => {
+      const unsub = jest.fn()
+        ; (component as any).viewerDataSubscription = { unsubscribe: unsub }
+      component.ngOnDestroy()
+      expect(unsub).toHaveBeenCalled()
+    })
+
+    it('should unsubscribe telemetryIntervalSubscription', () => {
+      const unsub = jest.fn()
+        ; (component as any).telemetryIntervalSubscription = { unsubscribe: unsub }
+      component.ngOnDestroy()
+      expect(unsub).toHaveBeenCalled()
+    })
+
+    it('should not throw when subscriptions are null', () => {
+      expect(() => component.ngOnDestroy()).not.toThrow()
     })
   })
 })
