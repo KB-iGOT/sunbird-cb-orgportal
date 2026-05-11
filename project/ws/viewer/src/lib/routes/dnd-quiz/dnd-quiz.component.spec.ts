@@ -1,3 +1,26 @@
+jest.mock('src/app/services/init.service', () => ({
+  InitService: class InitService {
+    configSvc = { compentency: { undefined: { vKey: 'v1', vCompetencyArea: 'area', vCompetencyTheme: 'theme', vCompetencySubTheme: 'subtheme' } } }
+  }
+}), { virtual: true })
+jest.mock('@sunbird-cb/collection', () => ({
+  NsContent: {
+    EMimeTypes: {
+      CLASS_DIAGRAM: 'application/json',
+      PDF: 'application/pdf',
+      HANDS_ON: 'application/vnd.ekstep.h5p-archive',
+    }
+  },
+  WidgetContentService: class WidgetContentService {
+    continueLearning = jest.fn()
+    setS3Cookie = jest.fn()
+  }
+}))
+jest.mock('../../viewer-util.service', () => ({
+  ViewerUtilService: class ViewerUtilService {
+    getAuthoringUrl = jest.fn().mockReturnValue('test-author-url')
+  }
+}))
 import { DndQuizComponent } from './dnd-quiz.component'
 import { Subject, of } from 'rxjs'
 import { NsContent } from '@sunbird-cb/collection'

@@ -1,3 +1,12 @@
+jest.mock('@sunbird-cb/collection', () => ({
+    NsContent: {},
+    NsDiscussionForum: { EDiscussionType: { LEARNING: 'learning' } },
+    WidgetContentService: jest.fn(),
+}))
+jest.mock('@sunbird-cb/toc', () => ({
+    WidgetContentService: jest.fn(),
+}))
+
 import { of } from 'rxjs'
 import { AudioNativeComponent } from './audio-native.component'
 

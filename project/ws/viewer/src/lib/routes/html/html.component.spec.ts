@@ -1,3 +1,17 @@
+jest.mock('@sunbird-cb/collection', () => ({
+  NsDiscussionForum: { EDiscussionType: { LEARNING: 'learning' } },
+  WidgetContentService: jest.fn(),
+}))
+
+jest.mock('@sunbird-cb/toc', () => ({
+  AccessControlService: jest.fn(),
+  WidgetContentService: jest.fn(),
+}))
+
+jest.mock('@sunbird-cb/utils', () => ({
+  ConfigurationsService: jest.fn(),
+}))
+
 import { of } from 'rxjs'
 import { HtmlComponent } from './html.component'
 import { WsEvents } from '@sunbird-cb/utils-v2'

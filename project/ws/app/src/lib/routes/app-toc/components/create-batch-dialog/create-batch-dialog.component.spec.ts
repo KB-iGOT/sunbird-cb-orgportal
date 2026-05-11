@@ -4,6 +4,11 @@
   karmYogiPath: '/test-karm-yogi-path',
   cbpPath: '/test-cbp-path'
 }
+jest.mock('@ws/app', () => ({
+  AppDateAdapter: class AppDateAdapter {},
+  APP_DATE_FORMATS: { parse: { dateInput: 'input' }, display: { dateInput: 'input' } },
+  startWithYearformat: jest.fn().mockReturnValue('2024-01-01'),
+}), { virtual: true })
 import '@angular/compiler'
 import { of, throwError } from 'rxjs'
 import { CreateBatchDialogComponent } from './create-batch-dialog.component'

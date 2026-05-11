@@ -1,3 +1,18 @@
+// Mock @sunbird-cb/collection to prevent pdfjs worker-loader error
+jest.mock('@sunbird-cb/collection', () => ({
+    NsError: { IWidgetErrorResolver: {} },
+    ROOT_WIDGET_CONFIG: { errorResolver: { _type: 'errorResolver', errorResolver: 'errorResolver' } },
+    NsContent: { EMimeTypes: {} },
+    WidgetContentService: jest.fn(),
+}))
+jest.mock('@sunbird-cb/utils-v2', () => ({
+    ValueService: jest.fn(),
+    ConfigurationsService: jest.fn(),
+}))
+jest.mock('@sunbird-cb/resolver-v2', () => ({
+    NsWidgetResolver: { IRenderConfigWithTypedData: {} },
+}))
+
 import { KnowledgeComponent } from './knowledge.component'
 import { of } from 'rxjs'
 

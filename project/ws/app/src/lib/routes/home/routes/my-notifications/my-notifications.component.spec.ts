@@ -1,8 +1,10 @@
+// Mock @sunbird-cb/utils to avoid pdfjs and private-property type issues
+jest.mock('@sunbird-cb/utils', () => ({
+  ConfigurationsService: jest.fn(),
+  EventService: jest.fn(),
+}))
+
 import { MyNotificationsComponent } from './my-notifications.component'
-import { Router } from '@angular/router'
-import { ConfigurationsService, EventService } from '@sunbird-cb/utils'
-import { NotificationsService } from '../../../../../../../../../src/app/services/notifications.service'
-import { MatSnackBar } from '@angular/material/snack-bar'
 import { environment } from '../../../../../../../../../src/environments/environment'
 
 // Mock the environment import
@@ -15,11 +17,11 @@ jest.mock('../../../../../../../../../src/environments/environment', () => ({
 
 describe('MyNotificationsComponent', () => {
   let component: MyNotificationsComponent
-  let mockRouter: jest.Mocked<Router>
-  let mockEventService: jest.Mocked<EventService>
-  let mockConfigService: jest.Mocked<ConfigurationsService>
-  let mockNotificationsService: jest.Mocked<NotificationsService>
-  let mockSnackBar: jest.Mocked<MatSnackBar>
+  let mockRouter: any
+  let mockEventService: any
+  let mockConfigService: any
+  let mockNotificationsService: any
+  let mockSnackBar: any
 
   beforeEach(() => {
     // Create mocks for all dependencies

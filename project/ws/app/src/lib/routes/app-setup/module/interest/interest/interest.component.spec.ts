@@ -1,3 +1,16 @@
+// Mock @sunbird-cb/collection before any imports to prevent pdfjs worker-loader error
+jest.mock('@sunbird-cb/collection', () => ({
+  WidgetContentService: jest.fn(),
+  BtnPlaylistService: jest.fn(),
+  NsContent: { EMimeTypes: {} },
+  NsPlaylist: { EPlaylistTypes: { PENDING: 'pending' }, EPlaylistVisibilityTypes: { PRIVATE: 'private' } },
+}))
+jest.mock('@sunbird-cb/utils-v2', () => ({
+  ConfigurationsService: jest.fn(),
+  TFetchStatus: {},
+  NsPage: {},
+}))
+
 import { InterestComponent } from './interest.component'
 import { of, throwError } from 'rxjs'
 // import { ActivatedRoute, Router } from '@angular/router'

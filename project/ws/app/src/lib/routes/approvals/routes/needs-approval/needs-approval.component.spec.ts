@@ -1,3 +1,8 @@
+// Mock @sunbird-cb/utils-v2 to avoid pdfjs and private-property type issues
+jest.mock('@sunbird-cb/utils-v2', () => ({
+    EventService: jest.fn(),
+}))
+
 import { NeedsApprovalComponent } from './needs-approval.component'
 import { NeedApprovalsService } from '../../services/need-approvals.service'
 import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog'
@@ -5,21 +10,18 @@ import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack
 import { NavigationEnd } from '@angular/router'
 import { TelemetryEvents } from '../../../../head/_services/telemetry.event.model'
 import { of, Subject } from 'rxjs'
-import { EventService } from '@sunbird-cb/utils-v2'
-import * as _ from 'lodash'
 
 jest.mock('../../services/need-approvals.service')
 jest.mock('@angular/material/legacy-dialog')
 jest.mock('@angular/material/legacy-snack-bar')
 jest.mock('@sunbird-cb/utils-v2')
-jest.mock('lodash')
 
 describe('NeedsApprovalComponent', () => {
     let component: NeedsApprovalComponent
     let mockNeedApprovalsService: jest.Mocked<NeedApprovalsService>
     let mockActivatedRoute: any
     let mockRouter: any
-    let mockEventService: jest.Mocked<EventService>
+    let mockEventService: any
     let mockDialog: jest.Mocked<MatDialog>
     let mockMatSnackBar: jest.Mocked<MatSnackBar>
     let routerEventsSubject: Subject<any>
@@ -163,6 +165,7 @@ describe('NeedsApprovalComponent', () => {
     describe('onClickHandleWorkflow', () => {
         let mockField: any
         let mockDialogRef: any
+        let afterClosedSubject: Subject<any>
 
         beforeEach(() => {
             mockField = {
@@ -174,8 +177,9 @@ describe('NeedsApprovalComponent', () => {
                 }
             }
 
+            afterClosedSubject = new Subject()
             mockDialogRef = {
-                afterClosed: jest.fn().mockReturnValue(of(true)),
+                afterClosed: jest.fn().mockReturnValue(afterClosedSubject.asObservable()),
                 close: jest.fn()
             }
 
@@ -187,6 +191,8 @@ describe('NeedsApprovalComponent', () => {
             const spy = jest.spyOn(component, 'onApproveOrRejectClick').mockImplementation()
 
             component.onClickHandleWorkflow(mockField, 'APPROVE')
+            // trigger afterClosed AFTER req is initialized in the component
+            afterClosedSubject.next(true)
 
             expect(mockDialog.open).toHaveBeenCalledWith(component.approveDialog, { width: '770px' })
             expect(spy).toHaveBeenCalledWith({
@@ -205,6 +211,7 @@ describe('NeedsApprovalComponent', () => {
             const spy = jest.spyOn(component, 'onApproveOrRejectClick').mockImplementation()
 
             component.onClickHandleWorkflow(mockField, 'REJECT')
+            afterClosedSubject.next(true)
 
             expect(mockDialog.open).toHaveBeenCalledWith(component.rejectDialog, { width: '770px' })
             expect(spy).toHaveBeenCalledWith({
@@ -220,10 +227,10 @@ describe('NeedsApprovalComponent', () => {
         })
 
         it('should close dialog when result is false', () => {
-            mockDialogRef.afterClosed.mockReturnValue(of(false))
             const spy = jest.spyOn(component, 'onApproveOrRejectClick').mockImplementation()
 
             component.onClickHandleWorkflow(mockField, 'APPROVE')
+            afterClosedSubject.next(false)
 
             expect(mockDialogRef.close).toHaveBeenCalled()
             expect(spy).not.toHaveBeenCalled()

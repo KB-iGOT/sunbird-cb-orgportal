@@ -1,9 +1,20 @@
-; (window as any)['env'] = {
-  name: 'test-environment',
-  sitePath: '/test-site-path',
-  karmYogiPath: '/test-karm-yogi-path',
-  cbpPath: '/test-cbp-path',
-}
+jest.mock('@sunbird-cb/collection', () => ({
+  WidgetContentService: class MockWidgetContentService {
+    getFirstChildInHierarchy = jest.fn()
+    fetchContent = jest.fn()
+  },
+  NsContentConstants: {
+    VALID_PRACTICE_RESOURCES: new Set(['Practice Resource', 'PracticeResource']),
+    VALID_ASSESSMENT_RESOURCES: new Set(['Assessment', 'FinalAssessment']),
+  },
+}))
+
+  ; (window as any)['env'] = {
+    name: 'test-environment',
+    sitePath: '/test-site-path',
+    karmYogiPath: '/test-karm-yogi-path',
+    cbpPath: '/test-cbp-path',
+  }
 
 import { AppTocService } from './app-toc.service'
 import { of, throwError } from 'rxjs'

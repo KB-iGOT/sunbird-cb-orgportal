@@ -1,3 +1,13 @@
+jest.mock('@sunbird-cb/collection', () => ({
+  NsContent: {},
+  NsDiscussionForum: { EDiscussionType: { LEARNING: 'learning' } },
+  WidgetContentService: jest.fn(),
+  IWidgetsPlayerMediaData: {},
+}))
+jest.mock('@sunbird-cb/toc', () => ({
+  AccessControlService: jest.fn(),
+}))
+
 import { of, throwError } from 'rxjs'
 import { AudioComponent } from './audio.component'
 
