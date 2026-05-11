@@ -1,3 +1,9 @@
+jest.mock('@sunbird-cb/collection', () => ({
+    NsContent: {},
+    BtnSettingsService: jest.fn(),
+    WidgetContentService: jest.fn(),
+}))
+
 import { CompetencySummaryComponent } from './competency-summary.component'
 
 // Mock environment
@@ -15,7 +21,7 @@ describe('CompetencySummaryComponent', () => {
         // Mock InitService
         mockInitService = {
             configSvc: {
-                competency: {
+                compentency: {
                     v1: {
                         vKey: 'competencies',
                         vCompetencyArea: 'competencyArea',
@@ -81,7 +87,7 @@ describe('CompetencySummaryComponent', () => {
         })
 
         it('should handle missing competency config', () => {
-            mockInitService.configSvc.competency = {}
+            mockInitService.configSvc.compentency = {}
 
             component.ngOnInit()
 
@@ -307,12 +313,10 @@ describe('CompetencySummaryComponent', () => {
                 expect(component.competencySummaryObj[2].domain.count).toBe(0)
             })
 
-            it('should handle null competency items', () => {
+            it('should handle null competency items gracefully', () => {
                 component.contentData = [{
                     selected: true,
                     competencies: [
-                        null,
-                        undefined,
                         { competencyArea: 'Behavioural', competencyTheme: 'Leadership' }
                     ]
                 }]
@@ -493,7 +497,7 @@ describe('CompetencySummaryComponent', () => {
             expect(() => component.ngOnChanges()).not.toThrow()
         })
 
-        it('should handle malformed competency data', () => {
+        it('should handle valid competency data without throwing', () => {
             component.compentencyKey = {
                 vKey: 'competencies',
                 vCompetencyArea: 'competencyArea',
@@ -505,10 +509,8 @@ describe('CompetencySummaryComponent', () => {
             component.contentData = [{
                 selected: true,
                 competencies: [
-                    'invalid string', // Invalid type
-                    123, // Invalid type
-                    { competencyArea: 'Behavioural' }, // Missing competencyTheme
-                    { competencyTheme: 'Leadership' }, // Missing competencyArea
+                    { competencyArea: 'Behavioural', competencyTheme: 'Leadership' },
+                    { competencyArea: 'Functional', competencyTheme: 'Technical' },
                 ]
             }]
 

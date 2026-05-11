@@ -2,6 +2,19 @@
 jest.mock('../../viewer-util.service', () => ({
   ViewerUtilService: jest.fn(),
 }))
+jest.mock('pdfjs-dist', () => ({ GlobalWorkerOptions: { workerSrc: '' }, getDocument: jest.fn() }))
+jest.mock('pdfjs-dist/webpack', () => ({}))
+jest.mock('worker-loader?esModule=false&filename=[name].[contenthash].js!pdfjs-dist/build/pdf.worker.js', () => ({}), { virtual: true })
+jest.mock('@sunbird-cb/collection', () => ({
+  NsContent: {
+    EMimeTypes: { COLLECTION_RESOURCE: 'resource/collection' },
+    EPrimaryCategory: {},
+  },
+  NsDiscussionForum: {
+    EDiscussionType: { LEARNING: 'Learning' },
+  },
+  WidgetContentService: jest.fn(),
+}))
 
 import { Subject, of } from 'rxjs'
 import { ResourceCollectionComponent } from './resource-collection.component'

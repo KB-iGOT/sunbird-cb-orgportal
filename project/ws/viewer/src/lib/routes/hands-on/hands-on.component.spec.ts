@@ -1,3 +1,20 @@
+jest.mock('@sunbird-cb/collection', () => ({
+  NsContent: {
+    EMimeTypes: {
+      HANDS_ON: 'application/vnd.ekstep.h5p-archive',
+      PDF: 'application/pdf'
+    }
+  },
+  WidgetContentService: class WidgetContentService {
+    continueLearning = jest.fn()
+    setS3Cookie = jest.fn()
+  }
+}))
+jest.mock('../../viewer-util.service', () => ({
+  ViewerUtilService: class ViewerUtilService {
+    getAuthoringUrl = jest.fn().mockReturnValue('test-author-url')
+  }
+}))
 import { HttpClient } from '@angular/common/http'
 import { EventService, WsEvents } from '@sunbird-cb/utils'
 import { NsContent, WidgetContentService } from '@sunbird-cb/collection'
@@ -13,7 +30,7 @@ describe('HandsOnComponent', () => {
         dispatchEvent: jest.fn(),
     }
 
-    const mockActivatedRoute: Partial<ActivatedRoute> = {
+    const mockActivatedRoute: any = {
         data: of({
             content: {
                 data: {

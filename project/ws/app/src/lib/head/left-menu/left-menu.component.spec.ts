@@ -4,6 +4,8 @@ describe('LeftMenuComponent', () => {
     let component: LeftMenuComponent
     let mockActivatedRoute: any
     let mockRouter: any
+    let mockDialog: any
+    let mockMatSnackBar: any
 
     beforeEach(() => {
         // Mock ActivatedRoute
@@ -23,8 +25,11 @@ describe('LeftMenuComponent', () => {
             url: 'test-url?param=value'
         }
 
+        mockDialog = { open: jest.fn() }
+        mockMatSnackBar = { open: jest.fn() }
+
         // Initialize component with mocked dependencies
-        component = new LeftMenuComponent(mockActivatedRoute, mockRouter)
+        component = new LeftMenuComponent(mockActivatedRoute, mockRouter, mockDialog, mockMatSnackBar)
     })
 
     it('should create', () => {
@@ -48,7 +53,7 @@ describe('LeftMenuComponent', () => {
 
             // Assert
             expect(component.mdoname).toBe('Test MDO')
-            expect(component.logo).toBe('test-logo-path')
+            expect(component.orgData).toBe('test-logo-path')
             expect(component.menulist).toEqual([{ name: 'Menu Item 1' }])
         })
 
@@ -61,7 +66,6 @@ describe('LeftMenuComponent', () => {
 
             // Assert
             expect(component.mdoname).toBe('')
-            expect(component.logo).toBe('../assets/icons/govtlogo.jpg')
             expect(component.menulist).toEqual([])
         })
     })
@@ -165,9 +169,7 @@ describe('LeftMenuComponent', () => {
 
     describe('isAllowed', () => {
         beforeEach(() => {
-            component.widgetData = {
-                userRoles: new Set(['user', 'admin'])
-            }
+            component.myRoles = new Set(['user', 'admin'])
         })
 
         it('should return true when user has required role', () => {

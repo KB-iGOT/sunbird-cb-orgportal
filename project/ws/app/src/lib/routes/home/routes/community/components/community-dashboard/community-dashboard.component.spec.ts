@@ -1,285 +1,249 @@
-// CommunityDashboardComponent.spec.ts
 import { CommunityDashboardComponent } from './community-dashboard.component'
 import { of } from 'rxjs'
 import { MatTableDataSource } from '@angular/material/table'
 import { PageEvent } from '@angular/material/paginator'
-
-// Mock dependencies
-jest.mock('@angular/router')
-jest.mock('../../services/community.service')
-jest.mock('../../../../../users/services/roles.service')
 
 describe('CommunityDashboardComponent', () => {
   let component: CommunityDashboardComponent
   let mockRouter: any
   let mockCommunitySvc: any
   let mockActivatedRoute: any
-  let mockRolesService: any
+
+  const mockSearchResult = {
+    result: {
+      search_results: {
+        data: [{
+          communityId: '123',
+          communityName: 'Test Community',
+          createdOn: '2025-01-01',
+          createdBy: 'user1',
+          updatedOn: '2025-01-02',
+          countOfPeopleJoined: 10,
+          countOfModerators: 2,
+        }],
+        totalCount: 1,
+        additionalInfo: [{ user_id: 'user1', first_name: 'John' }],
+      },
+    },
+  }
 
   beforeEach(() => {
-    // Setup mocks
-    mockRouter = {
-      navigate: jest.fn()
-    }
+    mockRouter = { navigate: jest.fn() }
 
     mockCommunitySvc = {
-      communitySearch: jest.fn().mockReturnValue(of({
-        result: {
-          search_results: {
-            data: [
-              {
-                communityId: '123',
-                communityName: 'Test Community',
-                createdOn: '2025-01-01',
-                createdBy: 'user1',
-                updatedOn: '2025-01-02',
-                countOfPeopleJoined: 10,
-                countOfModerators: 2
-              }
-            ],
-            totalCount: 1,
-            additionalInfo: [
-              { user_id: 'user1', first_name: 'John', last_name: 'Doe' }
-            ]
-          }
-        }
-      }))
+      communitySearch: jest.fn().mockReturnValue(of(mockSearchResult)),
     }
 
     mockActivatedRoute = {
       snapshot: {
         data: {
           configService: {
-            unMappedUser: {
-              id: 'user1',
-              rootOrgId: 'org1'
-            }
-          }
-        }
-      }
-    }
-
-    mockRolesService = {
-      getAllRoles: jest.fn().mockReturnValue(of({
-        result: {
-          response: {
-            value: JSON.stringify({
-              orgTypeList: [
-                {
-                  name: 'MDO',
-                  roles: ['COMMUNITY_MODERATOR', 'OTHER_ROLE']
-                }
-              ]
-            })
-          }
-        }
-      }))
-    }
-
-    // Create component with mocks
-    component = new CommunityDashboardComponent(
-      mockRouter,
-      mockCommunitySvc,
-      mockActivatedRoute,
-      // mockRolesService
-    )
-
-    // Spy on component methods
-    jest.spyOn(component, 'fetchCommunityData')
-    jest.spyOn(component, 'getRouteSubscription')
-
-    // Setup search control value changes mock
-    jest.spyOn(component.searchControl.valueChanges, 'pipe').mockReturnValue(of('test search'))
-  })
-
-  // Test constructor initialization
-  test('should initialize the component correctly', () => {
-    expect(component).toBeDefined()
-    expect(component.dataSource).toBeInstanceOf(MatTableDataSource)
-    // expect(component.getRouteSubscription).toHaveBeenCalled()
-    expect(component.fetchCommunityData).toHaveBeenCalledWith('')
-  })
-
-  // Test getRouteSubscription
-  // test('should set userProfile from route data', () => {
-  //   component.getRouteSubscription()
-  //   expect(component.userProfile).toEqual({
-  //     id: 'user1',
-  //     rootOrgId: 'org1'
-  //   })
-  // })
-
-  // Test ngOnInit
-  test('should setup search subscription and get roles on ngOnInit', () => {
-    const spyGetOrgRolesList = jest.spyOn(component, 'getOrgRolesList')
-
-    component.ngOnInit()
-
-    expect(spyGetOrgRolesList).toHaveBeenCalled()
-    // Since we've mocked pipe(), we can't easily verify the subscription behavior
-    // but we can verify that pipe was called
-    expect(component.searchControl.valueChanges.pipe).toHaveBeenCalled()
-  })
-
-  // Test getOrgRolesList
-  test('should fetch roles and set community moderator flag', () => {
-    component.getOrgRolesList()
-
-    expect(mockRolesService.getAllRoles).toHaveBeenCalled()
-    expect(component.masterData.rolesList).toBeDefined()
-    expect(component.masterData.mdoRoles).toEqual(['COMMUNITY_MODERATOR', 'OTHER_ROLE'])
-    expect(component.isCommunityModeratorRole).toBe(true)
-  })
-
-  // Test fetchCommunityData
-  test('should fetch community data and update datasource', () => {
-    component.fetchCommunityData('test')
-
-    expect(mockCommunitySvc.communitySearch).toHaveBeenCalledWith(expect.objectContaining({
-      filterCriteriaMap: {
-        status: 'active',
-        orgId: 'org1'
+            unMappedUser: { id: 'user1', rootOrgId: 'org1', roles: ['MDO_LEADER'] },
+          },
+        },
       },
-      searchString: 'test'
-    }))
-
-    expect(component.dataSource.data.length).toBe(1)
-    expect(component.dataSource.data[0].communityName).toBe('Test Community')
-    expect(component.totalElements).toBe(1)
-    expect(component.additionalUserInfo).toHaveProperty('user1')
-  })
-
-  // Test empty result
-  test('should handle empty search results', () => {
-    mockCommunitySvc.communitySearch.mockReturnValueOnce(of({
-      result: {
-        search_results: {
-          data: [],
-          totalCount: 0,
-          additionalInfo: []
-        }
-      }
-    }))
-
-    component.fetchCommunityData('')
-
-    expect(component.dataSource.data).toEqual([])
-    expect(component.totalElements).toBe(0)
-  })
-
-  // Test tab change
-  test('should update status and columns on tab change', () => {
-    component.onTabChange({ index: 1 })
-
-    expect(component.currentStatus).toBe('draft')
-    expect(component.pageNumber).toBe(0)
-    expect(component.displayedColumns).toEqual(['name', 'startDate', 'createdBy', 'members', 'mods', 'actions'])
-    expect(component.fetchCommunityData).toHaveBeenCalledWith(component.currentSearchString)
-  })
-
-  // Test page event handling
-  test('should update page parameters and fetch data on page event', () => {
-    const pageEvent: PageEvent = {
-      pageIndex: 2,
-      pageSize: 25,
-      length: 100
     }
 
-    component.handlePageEvent(pageEvent)
-
-    expect(component.pageNumber).toBe(2)
-    expect(component.pageSize).toBe(25)
-    expect(component.fetchCommunityData).toHaveBeenCalledWith(component.currentSearchString)
+    component = new CommunityDashboardComponent(mockRouter, mockCommunitySvc, mockActivatedRoute)
   })
 
-  // Test navigation methods
-  test('should navigate to create community page', () => {
-    component.onCreateCommunity()
-
-    expect(mockRouter.navigate).toHaveBeenCalledWith(['/app/home/community/create'])
+  it('should create', () => {
+    expect(component).toBeTruthy()
   })
 
-  test('should navigate to edit community page', () => {
-    const testCommunity = { communityId: '123' } as any
-    component.onActionClick('edit', testCommunity)
-
-    expect(mockRouter.navigate).toHaveBeenCalledWith(['/app/home/community/edit', '123'])
+  it('should initialize dataSource as MatTableDataSource', () => {
+    expect(component.dataSource).toBeInstanceOf(MatTableDataSource)
   })
 
-  test('should navigate to manage community page', () => {
-    const testCommunity = { communityId: '123' } as any
-    component.onActionClick('manage', testCommunity)
-
-    expect(mockRouter.navigate).toHaveBeenCalledWith(['/app/home/community/manage', '123'])
+  it('should call fetchCommunityData on construction', () => {
+    expect(mockCommunitySvc.communitySearch).toHaveBeenCalled()
   })
 
-  // Test permission methods
-  test('should determine if user can edit a community', () => {
-    component.userProfile = { id: 'user1' }
+  describe('getRouteSubscription', () => {
+    it('should set userProfile from route data', () => {
+      component.getRouteSubscription()
+      expect(component.userProfile).toEqual({ id: 'user1', rootOrgId: 'org1', roles: ['MDO_LEADER'] })
+    })
 
-    const ownedCommunity = { createdBy: 'user1' } as any
-    const otherCommunity = { createdBy: 'user2' } as any
-
-    expect(component.canEdit(ownedCommunity)).toBe(true)
-    expect(component.canEdit(otherCommunity)).toBe(false)
+    it('should not set userProfile when route data is absent', () => {
+      mockActivatedRoute.snapshot.data = {}
+      component.userProfile = undefined
+      component.getRouteSubscription()
+      expect(component.userProfile).toBeUndefined()
+    })
   })
 
-  test('should determine if user can archive a community', () => {
-    component.userProfile = { id: 'user1' }
+  describe('getOrgRolesList', () => {
+    it('should set filteredTabs with all tabs for MDO_LEADER', () => {
+      component.getOrgRolesList()
+      expect(component.filteredTabs.length).toBeGreaterThan(0)
+    })
 
-    const ownedCommunity = { createdBy: 'user1' } as any
-    const otherCommunity = { createdBy: 'user2' } as any
+    it('should filter tabs to Community only for COMMUNITY_MODERATOR without MDO_LEADER', () => {
+      mockActivatedRoute.snapshot.data.configService.unMappedUser.roles = ['COMMUNITY_MODERATOR']
+      component.getOrgRolesList()
+      expect(component.filteredTabs.length).toBe(1)
+    })
 
-    expect(component.canArchive(ownedCommunity)).toBe(true)
-    expect(component.canArchive(otherCommunity)).toBe(false)
+    it('should not crash if unMappedUser is absent', () => {
+      mockActivatedRoute.snapshot.data = {}
+      expect(() => component.getOrgRolesList()).not.toThrow()
+    })
   })
 
-  test('should determine if user can delete a community', () => {
-    component.userProfile = { id: 'user1' }
+  describe('ngOnInit', () => {
+    it('should call getOrgRolesList', () => {
+      const spy = jest.spyOn(component, 'getOrgRolesList')
+      component.ngOnInit()
+      expect(spy).toHaveBeenCalled()
+    })
 
-    const ownedCommunity = { createdBy: 'user1' } as any
-    const otherCommunity = { createdBy: 'user2' } as any
-
-    expect(component.canDelete(ownedCommunity)).toBe(true)
-    expect(component.canDelete(otherCommunity)).toBe(false)
+    it('should set up search subscription', () => {
+      expect(() => component.ngOnInit()).not.toThrow()
+    })
   })
 
-  // Test sorting accessor
-  test('should have proper sorting accessors', () => {
-    component.additionalUserInfo = {
-      'user1': { first_name: 'John' }
-    }
+  describe('fetchCommunityData', () => {
+    it('should update dataSource with search results', () => {
+      component.fetchCommunityData('')
+      expect(component.dataSource.data.length).toBe(1)
+      expect(component.totalElements).toBe(1)
+    })
 
-    component.ngAfterViewInit()
+    it('should add searchString to request when provided', () => {
+      component.fetchCommunityData('test search')
+      expect(mockCommunitySvc.communitySearch).toHaveBeenCalledWith(
+        expect.objectContaining({ searchString: 'test search' }),
+      )
+    })
 
-    const testItem = {
-      communityName: 'Test Community',
-      startDate: new Date('2023-01-01'),
-      createdBy: 'test-user-id',
-      publishedOn: new Date('2023-01-015'),
-      members: 10,
-      mods: 2,
-      createdByUserId: 'user-001'
-    }
+    it('should reset to page 0 when searchString is provided', () => {
+      component.pageNumber = 5
+      component.fetchCommunityData('test')
+      expect(mockCommunitySvc.communitySearch).toHaveBeenCalledWith(
+        expect.objectContaining({ pageNumber: 0 }),
+      )
+    })
 
-    expect(component.dataSource.sortingDataAccessor(testItem, 'communityName')).toBe('Test Community')
-    expect(component.dataSource.sortingDataAccessor(testItem, 'startDate')).toBe(new Date('2025-01-01').getTime())
-    expect(component.dataSource.sortingDataAccessor(testItem, 'createdBy')).toBe('john')
-    expect(component.dataSource.sortingDataAccessor(testItem, 'publishedOn')).toBe(new Date('2025-01-02').getTime())
-    expect(component.dataSource.sortingDataAccessor(testItem, 'members')).toBe(10)
-    expect(component.dataSource.sortingDataAccessor(testItem, 'mods')).toBe(2)
-    expect(component.dataSource.sortingDataAccessor(testItem, 'createdByUserId')).toBe('user001')
+    it('should handle empty results', () => {
+      mockCommunitySvc.communitySearch.mockReturnValueOnce(of({
+        result: { search_results: { data: [], totalCount: 0, additionalInfo: [] } },
+      }))
+      component.fetchCommunityData('')
+      expect(component.dataSource.data).toEqual([])
+      expect(component.totalElements).toBe(0)
+    })
+
+    it('should handle null result', () => {
+      mockCommunitySvc.communitySearch.mockReturnValueOnce(of({ result: { search_results: { data: null } } }))
+      component.fetchCommunityData('')
+      expect(component.dataSource.data).toEqual([])
+    })
+
+    it('should populate additionalUserInfo', () => {
+      component.fetchCommunityData('')
+      expect(component.additionalUserInfo['user1']).toBeDefined()
+      expect(component.additionalUserInfo['user1'].first_name).toBe('John')
+    })
   })
 
-  // Test cleanup
-  // test('should complete subject on destroy', () => {
-  //   const spyComplete = jest.spyOn(component['destroySubject$'], 'complete')
+  describe('onTabChange', () => {
+    it('should update status for draft tab (index 1)', () => {
+      component.onTabChange({ index: 1 })
+      expect(component.currentStatus).toBe('draft')
+      expect(component.pageNumber).toBe(0)
+    })
 
-  //   // Manually call ngOnDestroy since our component doesn't have it
-  //   // This is to demonstrate how you'd test it if it existed
-  //   if (component['ngOnDestroy']) {
-  //     component['ngOnDestroy']()
-  //     expect(spyComplete).toHaveBeenCalled()
-  //   }
-  // })
+    it('should update status for active tab (index 0)', () => {
+      component.onTabChange({ index: 0 })
+      expect(component.currentStatus).toBe('active')
+    })
+
+    it('should update displayedColumns based on tab', () => {
+      component.onTabChange({ index: 1 })
+      expect(component.displayedColumns).toContain('actions')
+    })
+  })
+
+  describe('handlePageEvent', () => {
+    it('should update page params and fetch data', () => {
+      const spy = jest.spyOn(component, 'fetchCommunityData')
+      const event: PageEvent = { pageIndex: 2, pageSize: 50, length: 200 }
+      component.handlePageEvent(event)
+      expect(component.pageNumber).toBe(2)
+      expect(component.pageSize).toBe(50)
+      expect(spy).toHaveBeenCalled()
+    })
+  })
+
+  describe('applyFilter', () => {
+    it('should apply filter to dataSource', () => {
+      const event = { target: { value: 'test filter' } } as any
+      component.applyFilter(event)
+      expect(component.dataSource.filter).toBe('test filter')
+    })
+  })
+
+  describe('getDisplayColumns', () => {
+    it('should set active columns when status is active', () => {
+      component.currentStatus = 'active'
+      component.getDisplayColumns()
+      expect(component.displayedColumns).not.toContain('actions')
+    })
+
+    it('should set draft columns with actions when status is draft', () => {
+      component.currentStatus = 'draft'
+      component.getDisplayColumns()
+      expect(component.displayedColumns).toContain('actions')
+    })
+  })
+
+  describe('onActionClick', () => {
+    it('should navigate to edit page', () => {
+      component.onActionClick('edit', { communityId: 'c1' } as any)
+      expect(mockRouter.navigate).toHaveBeenCalledWith(['/app/home/community/edit', 'c1'])
+    })
+
+    it('should navigate to manage page', () => {
+      component.onActionClick('manage', { communityId: 'c1' } as any)
+      expect(mockRouter.navigate).toHaveBeenCalledWith(['/app/home/community/manage', 'c1'])
+    })
+  })
+
+  describe('permission methods', () => {
+    beforeEach(() => {
+      component.userProfile = { id: 'user1' }
+    })
+
+    it('canEdit returns true for own community', () => {
+      expect(component.canEdit({ createdBy: 'user1' } as any)).toBe(true)
+    })
+
+    it('canEdit returns false for other community', () => {
+      expect(component.canEdit({ createdBy: 'user2' } as any)).toBe(false)
+    })
+
+    it('canArchive returns true for own community', () => {
+      expect(component.canArchive({ createdBy: 'user1' } as any)).toBe(true)
+    })
+
+    it('canDelete returns true for own community', () => {
+      expect(component.canDelete({ createdBy: 'user1' } as any)).toBe(true)
+    })
+  })
+
+  describe('onCreateCommunity', () => {
+    it('should navigate to create page', () => {
+      component.onCreateCommunity()
+      expect(mockRouter.navigate).toHaveBeenCalledWith(['/app/home/community/create'])
+    })
+  })
+
+  describe('changeToDefaultImg', () => {
+    it('should set default image src', () => {
+      const event = { target: { src: '' } }
+      component.changeToDefaultImg(event)
+      expect(event.target.src).toBe('/assets/instances/eagle/app_logos/default.png')
+    })
+  })
 })

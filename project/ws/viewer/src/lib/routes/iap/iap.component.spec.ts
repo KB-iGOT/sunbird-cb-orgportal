@@ -1,3 +1,27 @@
+jest.mock('@sunbird-cb/collection', () => ({
+  NsContent: {
+    EMimeTypes: {},
+  },
+  NsDiscussionForum: { EDiscussionType: { LEARNING: 'learning' } },
+  WidgetContentService: jest.fn(),
+}))
+
+jest.mock('@sunbird-cb/toc', () => ({
+  WidgetContentService: jest.fn(),
+}))
+
+jest.mock('@sunbird-cb/utils', () => ({
+  ConfigurationsService: jest.fn(),
+  EventService: jest.fn(),
+  WsEvents: {
+    EnumTelemetrySubType: { Loaded: 'Loaded', Unloaded: 'Unloaded' },
+    WsEventType: { Telemetry: 'Telemetry' },
+    WsEventLogLevel: { Info: 'Info' },
+    WsTimeSpentType: { Player: 'Player' },
+    WsTimeSpentMode: { Play: 'Play' },
+  },
+}))
+
 import { of } from 'rxjs'
 import { IapComponent } from './iap.component'
 
@@ -215,7 +239,7 @@ describe('IapComponent', () => {
 
     it('should handle error callback silently', () => {
       mockActivatedRoute.data = {
-        subscribe: jest.fn((success: any, error: any) => error && error()),
+        subscribe: jest.fn((_success: any, error: any) => error && error()),
       }
       expect(() => component.ngOnInit()).not.toThrow()
     })

@@ -1,3 +1,20 @@
+// Mock @sunbird-cb/collection to prevent pdfjs worker-loader error
+jest.mock('@sunbird-cb/collection', () => ({
+    NsContent: { EMimeTypes: {} },
+    NsError: { IWidgetErrorResolver: {} },
+    NSSearch: {},
+    ROOT_WIDGET_CONFIG: { errorResolver: { _type: 'errorResolver', errorResolver: 'errorResolver' } },
+    WidgetContentService: jest.fn(),
+}))
+jest.mock('@sunbird-cb/utils-v2', () => ({
+    ValueService: jest.fn(),
+    ConfigurationsService: jest.fn(),
+    UtilityService: jest.fn(),
+}))
+jest.mock('@sunbird-cb/resolver-v2', () => ({
+    NsWidgetResolver: { IRenderConfigWithTypedData: {} },
+}))
+
 import { of, BehaviorSubject } from 'rxjs'
 import { LearningComponent } from './learning.component'
 // import { fakeAsync, tick } from '@angular/core/testing'
@@ -291,7 +308,7 @@ describe('LearningComponent', () => {
 
             expect(mockSearchServService.searchConfig).toBe(mockActivatedRoute.snapshot.data.pageData.data)
             expect(mockSearchServService.translateSearchFilters).toHaveBeenCalledWith('en')
-            expect(component.searchRequestObject.query).toBe("\"test query\"")
+            expect(component.searchRequestObject.query).toBe('test query')
         })
 
         it('should navigate with default filters when none are present', () => {

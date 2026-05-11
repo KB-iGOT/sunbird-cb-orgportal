@@ -1,3 +1,26 @@
+jest.mock('@sunbird-cb/collection', () => ({
+  NsContent: {
+    EMimeTypes: { HTML_PICKER: 'application/htmlpicker' },
+  },
+  WidgetContentService: jest.fn(),
+}))
+
+jest.mock('@sunbird-cb/toc', () => ({
+  WidgetContentService: jest.fn(),
+}))
+
+jest.mock('@sunbird-cb/utils', () => ({
+  ConfigurationsService: jest.fn(),
+  EventService: jest.fn(),
+  WsEvents: {
+    EnumTelemetrySubType: { Loaded: 'Loaded', Unloaded: 'Unloaded' },
+    WsEventType: { Telemetry: 'Telemetry' },
+    WsEventLogLevel: { Info: 'Info' },
+    WsTimeSpentType: { Player: 'Player' },
+    WsTimeSpentMode: { Play: 'Play' },
+  },
+}))
+
 import { of } from 'rxjs'
 import { HtmlPickerComponent } from './html-picker.component'
 
@@ -222,7 +245,7 @@ describe('HtmlPickerComponent', () => {
   describe('ngOnInit - error callback', () => {
     it('should not throw when data subscription errors', () => {
       mockActivatedRoute.data = {
-        subscribe: jest.fn((success: any, error: any) => error && error()),
+        subscribe: jest.fn((_success: any, error: any) => error && error()),
       }
       expect(() => component.ngOnInit()).not.toThrow()
     })

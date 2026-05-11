@@ -1,3 +1,8 @@
+jest.mock('@sunbird-cb/collection', () => ({
+  LeftMenuService: class LeftMenuService {
+    getLeftMenuData = jest.fn()
+  }
+}))
 import '@angular/compiler'
 import { Router, ActivatedRoute, NavigationEnd } from '@angular/router'
 import { ConfigurationsService, EventService, ValueService } from '@sunbird-cb/utils-v2'
@@ -68,7 +73,7 @@ describe('HomeComponent', () => {
         // Mock ConfigService
         mockConfigService = {
             userProfile: {
-                departmentName: '',
+                departmentName: 'initial',
                 userId: ''
             }
         }
@@ -185,7 +190,7 @@ describe('HomeComponent', () => {
         expect(mockEventService.raiseInteractTelemetry).toHaveBeenCalledWith(
             {
                 type: 'click',
-                subType: 'side-nav',
+                subType: 'side-nav-content',
                 id: 'dashboard-menu',
             },
             {}

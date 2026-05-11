@@ -1,3 +1,16 @@
+// Mock InitService chain that pulls in pdfjs-dist/webpack.js (incompatible with Jest)
+jest.mock('../../../../../../../../../src/app/services/init.service', () => ({
+    InitService: class {
+        // Note: source uses 'compentency' (typo), key is env.compentencyVersionKey (undefined in tests → 'undefined')
+        configSvc = {
+            compentency: {
+                'undefined': { vKey: 'competencies_v5', vCompetencyArea: 'compArea', vCompetencyTheme: 'theme', vCompetencySubTheme: 'subTheme', vCompetencyAreaDescription: '' },
+                'competencies_v5': { vKey: 'competencies_v5', vCompetencyArea: 'compArea', vCompetencyTheme: 'theme', vCompetencySubTheme: 'subTheme', vCompetencyAreaDescription: '' },
+                'v1': { vKey: 'v1', vCompetencyArea: 'competencyArea', vCompetencyTheme: 'competencyTheme', vCompetencySubTheme: 'competencySubTheme', vCompetencyAreaDescription: '' },
+            }
+        }
+    },
+}))
 import { FilterComponent } from './filter.component'
 import { ChangeDetectorRef } from '@angular/core'
 import { UntypedFormControl } from '@angular/forms'
@@ -53,7 +66,15 @@ describe('FilterComponent', () => {
         // Mock InitService
         mockInitService = {
             configSvc: {
-                competency: {
+                // Source uses 'compentency' (typo). environment.compentencyVersionKey = undefined in tests → key is 'undefined'
+                compentency: {
+                    'undefined': {
+                        vKey: 'v1',
+                        vCompetencyArea: 'competencyArea',
+                        vCompetencyAreaDescription: 'competencyAreaDescription',
+                        vCompetencyTheme: 'competencyTheme',
+                        vCompetencySubTheme: 'competencySubTheme'
+                    },
                     'v1': {
                         vKey: 'v1',
                         vCompetencyArea: 'competencyArea',
