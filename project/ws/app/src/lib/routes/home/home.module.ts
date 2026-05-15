@@ -123,6 +123,8 @@ import { UserOnboardingComponent } from './routes/directory/user-onbarding/user-
 import { UserBulkTransferComponent } from './routes/directory/user-bulk-transfer/user-bulk-transfer.component'
 import { HorizontalDynamicStepperModule, UserUpdateModule } from '@sunbird-cb/consumption'
 import { OnboardingModule } from './routes/onboarding/onboarding.module'
+import { AICBPRequestModule } from './ai-cbp-request/ai-cbp-request.module'
+
 import { ExploreContentComponent } from './routes/explore-content/explore-content.component'
 import { ExploreContentService } from './services/explore-content.service'
 import { WsCustomTooltipDirective } from './directives/ws-auth-ws-custom-tooltip.directive'
@@ -269,6 +271,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     UserUpdateModule,
     OnboardingModule,
     HorizontalDynamicStepperModule,
+    AICBPRequestModule,
     AppTocLibModule,
     WidgetCommunityHomeModule,
     SbUiResolverModule,

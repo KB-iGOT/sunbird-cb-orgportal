@@ -529,6 +529,10 @@ const routes: Routes = [
         }
       },
       {
+        path: 'ai-cbp-requests',
+        loadChildren: () => import('./ai-cbp-request/ai-cbp-request.module').then(m => m.AICBPRequestModule),
+      },
+      {
         path: 'peer-validation',
         loadChildren: () => import('./routes/peer-validation/peer-validation.module').then(m => m.PeerValidationModule),
         data: {
@@ -600,7 +604,8 @@ const routes: Routes = [
       pageData: PageResolve,
       configService: ConfigResolveService,
     },
-  },
+  }
+
 
 ]
 
