@@ -1,11 +1,11 @@
 <div class="request-container">
   <h2>Approval Requests</h2>
-  <mat-card class="mb-8">
+  <mat-card>
     <mat-card-content class="flex gap-10">
-      <div class="section-1">
+      <!-- <div class="section-1">
         <div class="flex-4 mobile-margin text-capitalize mat-h2">Note:</div>
 
-      </div>
+      </div> -->
       <!-- <div class="reportsDemo flex justify-end section-2">
         <div class="reportsDemoVideo flex flex-column flex-middle justify-center margin-top-m"
           (click)="openVideoPopup()">
@@ -18,8 +18,9 @@
     </mat-card-content>
   </mat-card>
   <div class="create-action">
-    <button mat-button type="button" class="search-btn" [routerLink]="['/app/home/create-request-form']">Request
-      Content</button>
+    <button mat-button type="button" class="search-btn" (click)="viewNonMatchingDesignation()">
+      View Non Matching Designation
+    </button>
   </div>
 
   <div class="nav-container">
@@ -39,7 +40,7 @@
 
             <!-- Title -->
             <ng-container matColumnDef="title">
-              <th mat-header-cell *matHeaderCellDef class="row-heading">Title</th>
+              <th mat-header-cell *matHeaderCellDef class="row-heading">Request Name</th>
               <td mat-cell class="title-class" *matCellDef="let element">
                 {{ element?.title }}
               </td>
@@ -50,14 +51,6 @@
               <th mat-header-cell *matHeaderCellDef class="row-heading">Requestor</th>
               <td mat-cell class="title-class" *matCellDef="let element">
                 {{ element?.ownerName }}
-              </td>
-            </ng-container>
-
-            <!-- Request Type -->
-            <ng-container matColumnDef="requestType">
-              <th mat-header-cell *matHeaderCellDef class="row-heading">Request Type</th>
-              <td mat-cell class="title-class" *matCellDef="let element">
-                {{ element?.requestType }}
               </td>
             </ng-container>
 
@@ -81,15 +74,15 @@
 
             <!-- Requested On -->
             <ng-container matColumnDef="requestedOn">
-              <th mat-header-cell *matHeaderCellDef class="row-heading">Requested On</th>
+              <th mat-header-cell *matHeaderCellDef class="row-heading">Date and Time</th>
               <td mat-cell class="title-class" *matCellDef="let element">
-                {{ element?.createdOn }}
+                {{ element?.createdOn | date:'dd MMM yyyy, hh:mm a' }}
               </td>
             </ng-container>
 
             <!-- Interests -->
             <ng-container matColumnDef="interests">
-              <th mat-header-cell *matHeaderCellDef class="row-heading">Interests</th>
+              <th mat-header-cell *matHeaderCellDef class="row-heading">No of Designations</th>
               <td mat-cell class="title-class" *matCellDef="let element">
                 <a *ngIf="element?.interestCount !== 0" href="javascript:void(0)" class="action-btn-view">
                   <span (click)="handleClick(element)">
@@ -97,9 +90,7 @@
                   </span>
                 </a>
 
-                <span *ngIf="element?.interestCount === 0">
-                  {{ element?.requestType === 'Single' ? 'N/A' : element?.interestCount }}
-                </span>
+
               </td>
             </ng-container>
 
@@ -112,8 +103,8 @@
                 </button>
 
                 <mat-menu #menu="matMenu">
-                  <button mat-menu-item (click)="viewACBPRoleMapping()">
-                    <span>View</span>
+                  <button mat-menu-item (click)="viewACBPRoleMapping(element)">
+                    <span>View/Review Request</span>
                   </button>
 
 
@@ -133,11 +124,7 @@
             <img src="/mdo-assets/images/no-content-data.svg" alt="no-content" />
           </div>
           <div>No Request yet made</div>
-          <div class="margin-top-m no-content-create">
-            <button mat-button type="button" class="search-btns" [routerLink]="['/app/home/create-request-form']">
-              Request Content
-            </button>
-          </div>
+
         </div>
 
         <!-- Paginator -->

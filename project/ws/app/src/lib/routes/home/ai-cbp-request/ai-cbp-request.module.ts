@@ -14,10 +14,11 @@ import { AiCbpModule } from '@sunbird-cb/cbp-ai'
 import { RouterModule } from '@angular/router'
 import { AICBPRequestListComponent } from './components/ai-cbp-request-list/ai-cbp-request-list.component'
 import { AICBPRequestComponent } from './ai-cbp-request.component'
+import { ViewNonMappingDesignationComponent } from './components/view-non-mapping-designation/view-non-mapping-designation.component'
 
 
 @NgModule({
-  declarations: [AICBPRequestComponent, AICBPRequestListComponent],
+  declarations: [AICBPRequestComponent, AICBPRequestListComponent, ViewNonMappingDesignationComponent],
   imports: [CommonModule, AICBPRequestRoutingModule, RouterModule, AiCbpModule, MatTableModule,
     MatPaginatorModule,
     MatCardModule,

@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
-import { ITableData } from '@sunbird-cb/collection/lib/ui-org-table/interface/interfaces'
 import moment from 'moment'
 import { BlendedService } from '../../services/blended.service'
 
@@ -15,7 +14,7 @@ export class BlendedApprovalsComponent implements OnInit {
   discussionList!: any
   discussProfileData!: any
   departName = ''
-  tabledata: ITableData = {
+  tabledata: any = {
     actions: [],
     columns: [
       { displayName: 'CBP name', key: 'name', imageUrl: true },

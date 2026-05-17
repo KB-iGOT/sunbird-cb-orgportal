@@ -1,0 +1,80 @@
+<div class="request-container">
+  <div class="flex flex-row justify-between">
+    <div>
+      <h2 class="pt-5 pl-5">Non Matching Designations</h2>
+    </div>
+    <div class="cursor-pointer mt-10 mr-5" (click)="close()">
+      <mat-icon>close</mat-icon>
+    </div>
+
+  </div>
+
+
+
+  <div class="nav-container">
+    <div class="sidenav-content">
+      <div class="table-class">
+
+        <ng-container *ngIf="dataSource?.filteredData?.length > 0">
+          <table mat-table [dataSource]="dataSource">
+
+            <!-- Request ID -->
+            <ng-container matColumnDef="designation_name">
+              <th mat-header-cell *matHeaderCellDef class="row-heading">Designation Name</th>
+              <td mat-cell class="title-class" *matCellDef="let element">
+                {{ element?.designation_name }}
+              </td>
+            </ng-container>
+
+            <!-- Title -->
+            <ng-container matColumnDef="organisation">
+              <th mat-header-cell *matHeaderCellDef class="row-heading">Organization</th>
+              <td mat-cell class="title-class" *matCellDef="let element">
+                {{ element?.organisation }}
+              </td>
+            </ng-container>
+
+            <!-- Requestor -->
+            <ng-container matColumnDef="created_at">
+              <th mat-header-cell *matHeaderCellDef class="row-heading">Submitted On</th>
+              <td mat-cell class="title-class" *matCellDef="let element">
+                {{ element?.created_at | date:'dd MMM yyyy, hh:mm a'}}
+              </td>
+            </ng-container>
+
+            <!-- Request Type -->
+            <ng-container matColumnDef="status">
+              <th mat-header-cell *matHeaderCellDef class="row-heading">Approval Status</th>
+              <td mat-cell class="title-class" *matCellDef="let element">
+                {{ element?.status }}
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+
+          </table>
+        </ng-container>
+
+        <!-- No Data -->
+        <div class="no-cbp-data" *ngIf="dataSource?.filteredData?.length === 0">
+          <div>
+            <img src="/mdo-assets/images/no-content-data.svg" alt="no-content" />
+          </div>
+          <div>No Request yet made</div>
+
+        </div>
+
+        <!-- Paginator -->
+        <mat-paginator *ngIf="dataSource?.filteredData?.length > 0" [pageSize]="pageSize" [length]="requestCount"
+          [pageSizeOptions]="defaultPageSizeOptions" (page)="onChangePage($event)">
+        </mat-paginator>
+
+      </div>
+
+
+
+    </div>
+  </div>
+
+</div>

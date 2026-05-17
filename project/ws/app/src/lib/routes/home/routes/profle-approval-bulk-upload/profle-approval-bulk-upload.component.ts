@@ -12,7 +12,6 @@ import { MatTableDataSource } from '@angular/material/table'
 import { environment } from '../../../../../../../../../src/environments/environment'
 import { FileService } from '../../../users/services/upload.service'
 import { UsersService } from '../../../users/services/users.service'
-import { ITableData } from '@sunbird-cb/collection/lib/ui-org-table/interface/interfaces'
 import * as _ from 'lodash'
 
 @Component({
@@ -38,7 +37,7 @@ export class ProfleApprovalBulkUploadComponent implements OnInit, OnDestroy, Aft
   dataSource: MatTableDataSource<any>
   // tslint:disable-next-line:max-line-length
   displayedColumns: string[] = ['fileName', 'status', 'failedRecordsCount', 'successfulRecordsCount', 'totalRecords', 'dateCreatedOn', 'dateUpdatedOn']
-  tabledata!: ITableData
+  tabledata!: any
   departments: string[] = []
   contactUsUrl = ''
   fileSelected!: any
