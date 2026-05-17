@@ -5,7 +5,8 @@
     "types": ["node", "@types/zip.js"]
   },
   "angularCompilerOptions": {
-    "enableIvy": false
+    "enableIvy": false,
+    "strictTemplates": false
   },
   "files": [
     "src/main.ts",

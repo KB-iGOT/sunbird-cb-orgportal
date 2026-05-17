@@ -5,7 +5,7 @@ import { Observable, of } from 'rxjs'
 import { catchError, map } from 'rxjs/operators'
 import { NsContent } from './widget-content.model'
 import { NSSearch } from './widget-search.model'
-import { NsContentStripMultiple } from '@sunbird-cb/collection/lib/content-strip-multiple/content-strip-multiple.model'
+import { NsContentStripMultiple } from '@sunbird-cb/collection'
 
 // TODO: move this in some common place
 const PROTECTED_SLAG_V8 = '/apis/protected/v8'

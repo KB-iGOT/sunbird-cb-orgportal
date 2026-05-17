@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core'
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser'
-import { ITableData } from '@sunbird-cb/collection/lib/ui-org-table/interface/interfaces'
 import { ProfileV2Service } from '../../services/home.servive'
 import { DatePipe } from '@angular/common'
 import { ActivatedRoute, Router } from '@angular/router'
@@ -27,7 +26,7 @@ export enum statusValue {
   styleUrls: ['./request-list.component.scss'],
 })
 export class RequestListComponent implements OnInit {
-  tabledata: ITableData = {
+  tabledata: any = {
     columns: [
       { displayName: 'Request Id', key: 'demand_id' },
       { displayName: 'Title', key: 'title' },
@@ -68,13 +67,13 @@ export class RequestListComponent implements OnInit {
   defaultPageSizeOptions = [20, 50, 100]
 
   constructor(private sanitizer: DomSanitizer,
-              private homeService: ProfileV2Service,
-              private datePipe: DatePipe,
-              private activeRoute: ActivatedRoute,
-              private dialog: MatDialog,
-              private router: Router,
-              private snackBar: MatSnackBar,
-              private loaderService: LoaderService,
+    private homeService: ProfileV2Service,
+    private datePipe: DatePipe,
+    private activeRoute: ActivatedRoute,
+    private dialog: MatDialog,
+    private router: Router,
+    private snackBar: MatSnackBar,
+    private loaderService: LoaderService,
   ) { }
   requestList: any[] = [
     `You can request new content by filling out the request form. You will have the option to choose your content provider and
@@ -246,7 +245,7 @@ export class RequestListComponent implements OnInit {
       if (res) {
         setTimeout(() => {
           this.getRequestList()
-        },         1000)
+        }, 1000)
       }
 
       this.snackBar.open('Marked as Invalid')
@@ -268,7 +267,7 @@ export class RequestListComponent implements OnInit {
       if (_res && _res.data === 'confirmed') {
         setTimeout(() => {
           this.getRequestList()
-        },         1000)
+        }, 1000)
         this.snackBar.open('Assigned submitted Successfully')
       } else {
         // this.snackBar.open('error')
@@ -289,7 +288,7 @@ export class RequestListComponent implements OnInit {
       if (_res && _res.data === 'confirmed') {
         setTimeout(() => {
           this.getRequestList()
-        },         1000)
+        }, 1000)
 
         this.snackBar.open('Re-assign submitted Successfully')
       } else {

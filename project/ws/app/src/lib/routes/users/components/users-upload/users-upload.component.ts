@@ -12,7 +12,6 @@ import { environment } from 'src/environments/environment'
 import { ActivatedRoute } from '@angular/router'
 // tslint:disable-next-line
 import * as _ from 'lodash'
-import { ITableData } from '@sunbird-cb/collection/lib/ui-org-table/interface/interfaces'
 import { DatePipe } from '@angular/common'
 import { UsersService } from '../../services/users.service'
 
@@ -38,7 +37,7 @@ export class UsersUploadComponent implements OnInit, AfterViewInit, OnDestroy {
   dataSource: MatTableDataSource<any>
   // tslint:disable-next-line:max-line-length
   displayedColumns: string[] = ['fileName', 'status', 'failedRecordsCount', 'successfulRecordsCount', 'totalRecords', 'dateCreatedOn', 'dateUpdatedOn']
-  tabledata!: ITableData
+  tabledata!: any
   departments: string[] = []
   contactUsUrl = ''
   fileSelected!: any

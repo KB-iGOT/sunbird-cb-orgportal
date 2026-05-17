@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core'
 import * as _ from 'lodash'
-import { ITableData } from '@sunbird-cb/collection/lib/ui-org-table/interface/interfaces'
 import { DesignationsService } from '../../services/designations.service'
 import { UntypedFormControl } from '@angular/forms'
 import { delay } from 'rxjs/operators'
@@ -29,7 +28,7 @@ export class DesignationsComponent implements OnInit {
   selectedOrganisation = ''
   designationsList: any = []
   filteredDesignationsList: any = []
-  tableData!: ITableData
+  tableData!: any
   showLoader = false
   actionMenuItem: {
     name: string,

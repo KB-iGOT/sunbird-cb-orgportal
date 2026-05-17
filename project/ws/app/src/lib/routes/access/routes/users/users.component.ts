@@ -6,7 +6,6 @@ import { UsersService as UsersService2 } from '../../../users/services/users.ser
 
 /* tslint:disable */
 import _ from 'lodash'
-import { ITableData } from '@sunbird-cb/collection/lib/ui-org-table/interface/interfaces'
 import { ProfileV2UtillService } from '../../../home/services/home-utill.service'
 
 /* tslint:enable */
@@ -21,7 +20,7 @@ export class UsersComponent implements OnInit, AfterViewInit, AfterContentChecke
   @Input() selectedOrgData: any
   @Input() selectedRole: any
 
-  tabledata!: ITableData
+  tabledata!: any
   configSvc: any
   data: any = []
   usersData: any
