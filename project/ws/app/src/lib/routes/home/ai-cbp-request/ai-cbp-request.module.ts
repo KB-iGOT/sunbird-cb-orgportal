@@ -15,6 +15,11 @@ import { RouterModule } from '@angular/router'
 import { AICBPRequestListComponent } from './components/ai-cbp-request-list/ai-cbp-request-list.component'
 import { AICBPRequestComponent } from './ai-cbp-request.component'
 import { ViewNonMappingDesignationComponent } from './components/view-non-mapping-designation/view-non-mapping-designation.component'
+import { FormsModule } from '@angular/forms'
+
+import { MatFormFieldModule } from '@angular/material/form-field'
+import { MatSelectModule } from '@angular/material/select'
+import { MatInputModule } from '@angular/material/input'
 
 
 @NgModule({
@@ -24,7 +29,12 @@ import { ViewNonMappingDesignationComponent } from './components/view-non-mappin
     MatCardModule,
     MatButtonModule,
     MatIconModule,
-    MatMenuModule],
+    MatMenuModule,
+    FormsModule, FormsModule,
+    MatFormFieldModule,
+    MatSelectModule,
+    MatInputModule
+  ],
   exports: [AiCbpModule]
 })
 export class AICBPRequestModule { }

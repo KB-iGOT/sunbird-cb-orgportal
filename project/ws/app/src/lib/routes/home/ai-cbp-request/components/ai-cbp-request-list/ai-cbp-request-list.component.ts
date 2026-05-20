@@ -24,6 +24,15 @@ export enum statusValue {
   styleUrls: ['./ai-cbp-request-list.component.scss'],
 })
 export class AICBPRequestListComponent implements OnInit {
+  searchText = '';
+  selectedStatus = '';
+  selectedAssignee = '';
+  selectedTime = '';
+
+  statusList: string[] = [];
+  assigneeList: string[] = [];
+
+  originalData: any[] = [];
   constructor(public aicbpRequestSvc: AICBPRequestService, public dialog: MatDialog,
     private router: Router,
     private configSvc: ConfigurationsService
@@ -66,15 +75,20 @@ export class AICBPRequestListComponent implements OnInit {
           ownerName: request.state_center_name || 'N/A',
           requestType: 'N/A',
           status: request.status || 'N/A',
-          assignedProvider: 'N/A',
-          createdOn: new Date(request.created_at) || 'N/A',
+          assignedProvider: request.assignedProvider || 'Unassigned',
+          createdOn: new Date(request.created_at),
           interestCount: request.designation_count || 0,
         })
       })
 
-      this.dataSource = new MatTableDataSource(this.staticRequestList)
+      // IMPORTANT
+      this.originalData = [...this.staticRequestList]
 
-      this.requestCount = this.staticRequestList.length
+      this.prepareFilters(this.originalData)
+
+      this.dataSource = new MatTableDataSource(this.originalData)
+
+      this.requestCount = this.originalData.length
 
       console.log('requestCount =>', this.requestCount)
     })
@@ -104,6 +118,86 @@ export class AICBPRequestListComponent implements OnInit {
         },
       },
     })
+  }
+
+  prepareFilters(data: any[]) {
+
+    this.statusList = [
+      ...new Set(
+        data
+          .map(item => item?.status)
+          .filter(Boolean)
+      )
+    ]
+
+    this.assigneeList = [
+      ...new Set(
+        data
+          .map(item => item?.assignedProvider)
+          .filter(Boolean)
+      )
+    ]
+  }
+
+  applyFilters() {
+
+    let filtered = [...this.originalData]
+
+    // Search
+    if (this.searchText?.trim()) {
+
+      const search = this.searchText.toLowerCase()
+
+      filtered = filtered.filter(item =>
+        item?.title?.toLowerCase()?.includes(search) ||
+        item?.demand_id?.toLowerCase()?.includes(search)
+      )
+    }
+
+    // Status
+    if (this.selectedStatus) {
+
+      filtered = filtered.filter(item =>
+        item?.status === this.selectedStatus
+      )
+    }
+
+    // Time Filter
+    if (this.selectedTime) {
+
+      const now = new Date()
+
+      filtered = filtered.filter(item => {
+
+        const createdDate = new Date(item.createdOn)
+
+        const diffDays =
+          (now.getTime() - createdDate.getTime()) /
+          (1000 * 60 * 60 * 24)
+
+        switch (this.selectedTime) {
+
+          case 'today':
+            return diffDays <= 1
+
+          case '7days':
+            return diffDays <= 7
+
+          case '30days':
+            return diffDays <= 30
+
+          default:
+            return true
+        }
+      })
+    }
+
+    this.dataSource.data = filtered
+  }
+
+  clearSearch() {
+    this.searchText = ''
+    this.applyFilters()
   }
 
 
