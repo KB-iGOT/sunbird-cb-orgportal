@@ -22,7 +22,66 @@
       View Non Matching Designation
     </button>
   </div>
+  <div class="filter-toolbar">
 
+    <!-- Filter Label -->
+    <div class="filter-label">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+        class="lucide lucide-filter h-4 w-4">
+        <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+      </svg>
+      <span>Filters</span>
+    </div>
+
+    <!-- Search -->
+    <div class="search-box">
+
+      <mat-icon class="search-icon">search</mat-icon>
+
+      <input type="text" placeholder="Search by Request name or Request ID" [(ngModel)]="searchText"
+        (input)="applyFilters()" />
+
+      <button *ngIf="searchText" mat-icon-button class="clear-btn" (click)="clearSearch()">
+
+        <mat-icon>close</mat-icon>
+
+      </button>
+
+    </div>
+
+    <!-- Status Filter -->
+    <mat-form-field appearance="outline" class="filter-select">
+
+      <mat-select [(value)]="selectedStatus" (selectionChange)="applyFilters()">
+
+        <mat-option value="">All Status</mat-option>
+
+        <mat-option *ngFor="let status of statusList" [value]="status">
+
+          {{ status }}
+
+        </mat-option>
+
+      </mat-select>
+
+    </mat-form-field>
+
+    <!-- Time Filter -->
+    <mat-form-field appearance="outline" class="filter-select">
+
+      <mat-select [(value)]="selectedTime" (selectionChange)="applyFilters()">
+
+        <mat-option value="">All Time</mat-option>
+        <mat-option value="today">Today</mat-option>
+        <mat-option value="7days">Last 7 Days</mat-option>
+        <mat-option value="30days">Last 30 Days</mat-option>
+
+      </mat-select>
+
+    </mat-form-field>
+
+  </div>
   <div class="nav-container">
     <div class="sidenav-content">
       <div class="table-class">
@@ -84,11 +143,7 @@
             <ng-container matColumnDef="interests">
               <th mat-header-cell *matHeaderCellDef class="row-heading">No of Designations</th>
               <td mat-cell class="title-class" *matCellDef="let element">
-                <a *ngIf="element?.interestCount !== 0" href="javascript:void(0)" class="action-btn-view">
-                  <span (click)="handleClick(element)">
-                    {{ element?.interestCount }}
-                  </span>
-                </a>
+                {{ element?.interestCount }}
 
 
               </td>
