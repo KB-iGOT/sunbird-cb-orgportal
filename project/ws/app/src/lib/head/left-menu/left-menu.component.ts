@@ -4,6 +4,7 @@ import { UploadLogoDialogComponent } from './upload-logo-dialog/upload-logo-dial
 import { MatDialog } from '@angular/material/dialog'
 import { MatSnackBar } from '@angular/material/snack-bar'
 import _ from 'lodash'
+import { EventService, WsEvents } from '@sunbird-cb/utils-v2'
 // import { ConfigurationsService } from '@sunbird-cb/utils'
 // import { NsWidgetResolver, WidgetBaseComponent } from '@ws-widget/resolver'
 // import { ILeftMenu, IMenu } from './left-menu-v1.model'
@@ -29,8 +30,12 @@ export class LeftMenuComponent implements OnInit, OnDestroy {
   rootOrgId = ''
   channelName = ''
   expandedParentMenuKey: string | null = null;
-  constructor(private activatedRoute: ActivatedRoute, private router: Router, public dialog: MatDialog,
+  constructor(
+    private activatedRoute: ActivatedRoute,
+    private router: Router,
+    public dialog: MatDialog,
     private matSnackBar: MatSnackBar,
+    private events: EventService,
 
     // private configSvc: ConfigurationsService,
   ) { }
@@ -175,6 +180,21 @@ export class LeftMenuComponent implements OnInit, OnDestroy {
   // Determine whether to expand a menu based on the current route
   shouldMenuExpand(menu: any): boolean {
     return menu.defaultExpanded || this.expandedParentMenuKey === menu.key
+  }
+
+  raiseTelemetry(tab: any) {
+    if (tab && tab.key === 'external-trainings') {
+      this.events.raiseInteractTelemetry(
+        {
+          type: WsEvents.EnumInteractTypes.CLICK,
+          id: `${tab.key}`,
+        },
+        {},
+        {
+          module: WsEvents.EnumTelemetrymodules.HOME,
+        }
+      )
+    }
   }
 
 }

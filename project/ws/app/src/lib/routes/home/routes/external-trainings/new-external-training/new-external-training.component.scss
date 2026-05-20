@@ -188,6 +188,19 @@
   }
 }
 
+.additionalValidators {
+  color: #f44336;
+  font-size: 75% !important;
+  margin-top: -10px;
+}
+
+.learning-duration {
+  max-width: 305px;
+  .learning-duration-control {
+    max-width: 150px;
+  }
+}
+
 // Responsive adjustments
 @media (max-width: 768px) {
   .form-row {

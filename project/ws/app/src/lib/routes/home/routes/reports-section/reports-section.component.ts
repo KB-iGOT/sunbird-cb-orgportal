@@ -575,6 +575,8 @@ export class ReportsSectionComponent implements OnInit {
             }
           } else {
             selectedItem.status = 'Failed'
+            const errorMessage = response.body ? _.get(response.body, 'message', 'Download failed') : 'Report not found for the requested organization'
+            this.openSnackbar(`${selectedItem.orgName}: ${errorMessage}`)
             failedItems.push(selectedItem)
           }
         })
@@ -582,7 +584,7 @@ export class ReportsSectionComponent implements OnInit {
         this.raiseTelemetry()
         this.updateDataSource(failedItems)
         this.changeDetector.detectChanges()
-      },
+      }
     })
   }
 
