@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core'
-import { HttpClient, HttpHeaders } from '@angular/common/http'
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http'
 // import { Observable } from 'rxjs'
 
 const API_END_POINTS = {
@@ -22,8 +22,11 @@ export class AICBPRequestService {
   //   return this.http.post<any>(API_END_POINTS.GET_BLENDED_PROGRAMS, request)
   // }
 
-  getApprovalRequests() {
-    return this.http.get<any>(`${API_END_POINTS.GET_APPROVAL_REQUESTS}`)
+  getApprovalRequests(page: number, pageSize: number) {
+    let params = new HttpParams()
+      .set('page', page.toString())
+      .set('page_size', pageSize.toString())
+    return this.http.get<any>(`${API_END_POINTS.GET_APPROVAL_REQUESTS}`, { params })
   }
 
   getApprovalRequestDetails(req: any) {
@@ -42,13 +45,24 @@ export class AICBPRequestService {
     return this.http.post<any>(`${API_END_POINTS.REJECT_SINGLE_ITEM_APPROVAL_REQUEST}`, req)
   }
 
-  getNonMappingDesignationList() {
+  getNonMappingDesignationList(page: number, pageSize: number, orgId: string) {
     const headers = new HttpHeaders({
       'Cache-Control': 'no-cache, no-store, must-revalidate, post-check=0, pre-check=0',
       Pragma: 'no-cache',
       Expires: '0',
     })
 
-    return this.http.get<any>(`${API_END_POINTS.DESIGNATION_APPROVAL_REQUESTS}`, { headers })
+    let params = new HttpParams()
+      .set('page', page.toString())
+      .set('page_size', pageSize.toString())
+      .set('org_id', orgId)
+
+    return this.http.get<any>(
+      `${API_END_POINTS.DESIGNATION_APPROVAL_REQUESTS}`,
+      {
+        headers,
+        params,
+      }
+    )
   }
 }

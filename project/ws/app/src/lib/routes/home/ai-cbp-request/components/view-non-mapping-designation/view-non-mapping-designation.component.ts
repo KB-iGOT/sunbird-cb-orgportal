@@ -4,6 +4,7 @@ import { MatTableDataSource } from '@angular/material/table'
 import * as _ from 'lodash'
 import { AICBPRequestService } from '../../../services/ai-cbp-request.service'
 import { MatDialog } from '@angular/material/dialog'
+import { ConfigurationsService } from '@sunbird-cb/utils-v2'
 /* tslint:enable */
 export enum statusValue {
   Assigned = 'Assigned',
@@ -18,7 +19,11 @@ export enum statusValue {
   styleUrls: ['./view-non-mapping-designation.component.scss'],
 })
 export class ViewNonMappingDesignationComponent implements OnInit {
-  constructor(public aicbpRequestSvc: AICBPRequestService, public dialog: MatDialog) {
+  pageNo = 1
+  pageSize = 20
+
+  defaultPageSizeOptions = [10, 20, 25, 50, 100]
+  constructor(public aicbpRequestSvc: AICBPRequestService, public dialog: MatDialog, public configSvc: ConfigurationsService) {
 
   }
 
@@ -33,7 +38,7 @@ export class ViewNonMappingDesignationComponent implements OnInit {
   ]
   dataSource!: MatTableDataSource<any>
   requestCount: number = 0
-
+  rootOrgId: any
 
 
   ngOnInit() {
@@ -44,7 +49,13 @@ export class ViewNonMappingDesignationComponent implements OnInit {
 
     this.staticRequestList = []
 
-    this.aicbpRequestSvc.getNonMappingDesignationList()
+
+    this.rootOrgId = this.configSvc?.unMappedUser?.rootOrg?.rootOrgId
+
+
+    this.aicbpRequestSvc.getNonMappingDesignationList(this.pageNo,
+      this.pageSize,
+      this.rootOrgId)
       .subscribe((approvalRequest: any) => {
 
         console.log('approvalRequest', approvalRequest)
@@ -65,7 +76,7 @@ export class ViewNonMappingDesignationComponent implements OnInit {
 
         this.dataSource = new MatTableDataSource(this.staticRequestList)
 
-        this.requestCount = this.staticRequestList.length
+        this.requestCount = approvalRequest?.pagination?.total_items || 0
 
         console.log('requestCount =>', this.requestCount)
       })
@@ -77,6 +88,13 @@ export class ViewNonMappingDesignationComponent implements OnInit {
 
   close() {
     this.dialog.closeAll()
+  }
+
+  onChangePage(event: any) {
+    this.pageNo = event.pageIndex + 1
+    this.pageSize = event.pageSize
+
+    this.loadStaticTableData()
   }
 
 }
