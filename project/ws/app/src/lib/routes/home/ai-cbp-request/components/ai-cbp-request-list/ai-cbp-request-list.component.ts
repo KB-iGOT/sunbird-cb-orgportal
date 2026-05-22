@@ -33,6 +33,10 @@ export class AICBPRequestListComponent implements OnInit {
   assigneeList: string[] = [];
 
   originalData: any[] = [];
+  pageNo = 1
+  pageSize = 20
+
+  defaultPageSizeOptions = [10, 20, 25, 50, 100]
   constructor(public aicbpRequestSvc: AICBPRequestService, public dialog: MatDialog,
     private router: Router,
     private configSvc: ConfigurationsService
@@ -64,34 +68,35 @@ export class AICBPRequestListComponent implements OnInit {
   loadStaticTableData() {
     this.staticRequestList = []
 
-    this.aicbpRequestSvc.getApprovalRequests().subscribe((requests: any) => {
+    this.aicbpRequestSvc.getApprovalRequests(this.pageNo,
+      this.pageSize,).subscribe((requests: any) => {
 
-      console.log('API Response:', requests)
+        console.log('API Response:', requests)
 
-      requests?.items?.forEach((request: any) => {
-        this.staticRequestList.push({
-          demand_id: request.id,
-          title: request.request_name,
-          ownerName: request.state_center_name || 'N/A',
-          requestType: 'N/A',
-          status: request.status || 'N/A',
-          assignedProvider: request.assignedProvider || 'Unassigned',
-          createdOn: new Date(request.created_at),
-          interestCount: request.designation_count || 0,
+        requests?.items?.forEach((request: any) => {
+          this.staticRequestList.push({
+            demand_id: request.id,
+            title: request.request_name,
+            ownerName: request.state_center_name || 'N/A',
+            requestType: 'N/A',
+            status: request.status || 'N/A',
+            assignedProvider: request.assignedProvider || 'Unassigned',
+            createdOn: new Date(request.created_at),
+            interestCount: request.designation_count || 0,
+          })
         })
+
+        // IMPORTANT
+        this.originalData = [...this.staticRequestList]
+
+        this.prepareFilters(this.originalData)
+
+        this.dataSource = new MatTableDataSource(this.originalData)
+
+        this.requestCount = requests?.pagination?.total_items || 0
+
+        console.log('requestCount =>', this.requestCount)
       })
-
-      // IMPORTANT
-      this.originalData = [...this.staticRequestList]
-
-      this.prepareFilters(this.originalData)
-
-      this.dataSource = new MatTableDataSource(this.originalData)
-
-      this.requestCount = this.originalData.length
-
-      console.log('requestCount =>', this.requestCount)
-    })
   }
 
   viewNonMatchingDesignation() {
@@ -198,6 +203,13 @@ export class AICBPRequestListComponent implements OnInit {
   clearSearch() {
     this.searchText = ''
     this.applyFilters()
+  }
+
+  onChangePage(event: any) {
+    this.pageNo = event.pageIndex + 1
+    this.pageSize = event.pageSize
+
+    this.loadStaticTableData()
   }
 
 
