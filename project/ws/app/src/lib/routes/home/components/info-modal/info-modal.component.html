@@ -62,3 +62,35 @@
     </div>
   </div>
 </ng-container>
+
+<ng-container *ngIf="data.type === 'download-file-with-progress'">
+  <div class="info-dialog-wrapper">
+    <div class="text-center mt-8">
+      <img src="/assets/icons/i-icon-large.svg" alt="success-icon" class="mb-4">
+        <ng-container>
+          <div *ngIf="isDownloading">
+            <mat-progress-bar mode="determinate" [value]="progress"></mat-progress-bar>
+            <div class="mb-4 mt-4 downloading-text">Downloading: {{items[currentIndex]?.orgName || items[currentIndex]?.downloadUrl || 'file'}}</div>
+            <div class="mt-2">{{progress}}% &middot; {{formatBytes(downloaded)}} / {{formatBytes(total)}}</div>
+          </div>
+          <div *ngIf="!isDownloading && progress > 0 && !hasErrors">
+            <div class="mb-4">Completed: {{items[currentIndex - 1]?.orgName || 'file'}}</div>
+          </div>
+          <div *ngIf="results && results.length > 0" class="errors-list mt-4">
+            <ng-container *ngFor="let result of results">
+              <div *ngIf="result.status === 'Failed'" class="error-section mt-2">
+                <div class="error-title">Failed: {{result.item.orgName || 'Download'}}</div>
+                <div class="error-message">{{result.message}}</div>
+              </div>
+            </ng-container>
+          </div>
+        </ng-container>
+    </div>
+    <div class="actions flex justify-center items-center gap-4 my-6">
+      <ng-container>
+        <button *ngIf="!isComplete" mat-flat-button (click)="cancel()" class="new-bg-color text-white" i18n> Cancel</button>
+        <button *ngIf="isComplete" mat-flat-button (click)="closeDialog()" class="new-bg-color text-white" i18n> Done</button>
+      </ng-container>
+    </div>
+  </div>
+</ng-container>
