@@ -64,7 +64,7 @@
     "@sunbird-cb/toc": "0.0.34",
     "@sunbird-cb/tree-hierarchy": "0.0.1-cbrelease-4.8.32",
     "@sunbird-cb/utils": "1.0.21-ang-13-16",
-    "@sunbird-cb/utils-v2": "0.0.2-cbrelease-4.8.31",
+    "@sunbird-cb/utils-v2": "0.0.1-cbrelease-4.8.36",
     "@types/file-saver": "^2.0.1",
     "@types/jest": "^29.5.13",
     "chart.js": "^4.1.1 ",
