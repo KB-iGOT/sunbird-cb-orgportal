@@ -505,6 +505,8 @@ export class ReportsSectionComponent implements OnInit {
   }
 
   updateDataSource(failedItems?: any[]) {
+    const selectedIds = new Set(this.selection.selected.map((row: any) => row.sbOrgId))
+
     this.dataSource.data = [...this.orgListData]
     if (this.l1orgListData && this.l1orgListData.length > 0) {
       this.dataSource.data.push(...this.l1orgListData)
@@ -531,6 +533,14 @@ export class ReportsSectionComponent implements OnInit {
       })
     }
 
+    if (selectedIds.size > 0) {
+      this.selection.clear()
+      this.dataSource.data.forEach((row: any) => {
+        if (selectedIds.has(row.sbOrgId)) {
+          this.selection.select(row)
+        }
+      })
+    }
   }
 
   downloadReportsForEach(event: MouseEvent, retryItem?: any) {
