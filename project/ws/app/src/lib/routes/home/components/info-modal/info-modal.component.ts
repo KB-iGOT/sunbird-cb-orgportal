@@ -4,6 +4,9 @@ import { HttpEventType, HttpResponse } from '@angular/common/http'
 import { Subject, Subscription } from 'rxjs'
 import { takeUntil } from 'rxjs/operators'
 import { DownloadReportService } from '../../services/download-report.service'
+import { MatSnackBar } from '@angular/material/snack-bar'
+import { SnackbarComponent } from '@sunbird-cb/consumption'
+
 
 @Component({
   selector: 'ws-app-info-modal',
@@ -19,6 +22,7 @@ export class InfoModalComponent implements OnInit, OnDestroy {
   currentIndex = 0
   items: any[] = []
   results: any[] = []
+  password = ''
   errorMessage = ''
   lastFailedItem: any = null
   isComplete = false
@@ -32,6 +36,7 @@ export class InfoModalComponent implements OnInit, OnDestroy {
     @Inject(MAT_LEGACY_DIALOG_DATA) public data: any,
     private downloadSvc: DownloadReportService,
     private cdr: ChangeDetectorRef,
+    private snackBar: MatSnackBar,
   ) { }
 
   ngOnInit() {
@@ -94,7 +99,7 @@ export class InfoModalComponent implements OnInit, OnDestroy {
       this.isComplete = true
       // Only auto-close if no errors occurred
       if (!this.hasErrors) {
-        this.dialogRef.close({ completed: true, results: this.results })
+        this.dialogRef.close({ completed: true, results: this.results, password: this.password })
       }
       this.cdr.detectChanges()
       return
@@ -123,25 +128,35 @@ export class InfoModalComponent implements OnInit, OnDestroy {
         } else if (event.type === HttpEventType.Response) {
           const response = event as HttpResponse<Blob>
           if (response && response.body) {
-            const contentDisposition = response.headers ? response.headers.get('content-disposition') : null
-            let filename = item.orgName || 'report'
-            if (contentDisposition) {
-              const match = /filename="?([^";]+)"?/.exec(contentDisposition)
-              if (match && match[1]) {
-                filename = match[1]
+            const passwordHeader = response.headers?.getAll ? response.headers?.getAll('Password') : null
+            if (passwordHeader && passwordHeader.length > 0) {
+              if (!this.password) {
+                this.password = passwordHeader[0]
+              }
+            } else if (response.headers?.get) {
+              const passwordValue = response.headers.get('Password')
+              if (passwordValue && !this.password) {
+                this.password = passwordValue
               }
             }
+            let filename = item.orgName || 'report'
+
             const contentType = response.headers ? response.headers.get('content-type') : null
             const blob = new Blob([response.body], { type: contentType || 'application/octet-stream' })
             const url = window.URL.createObjectURL(blob)
             const a = document.createElement('a')
             a.href = url
-            a.download = filename
+            a.download = filename + '.zip'
             document.body.appendChild(a)
             a.click()
             document.body.removeChild(a)
             window.URL.revokeObjectURL(url)
             this.results.push({ item, status: 'Success' })
+            this.snackBar.openFromComponent(SnackbarComponent, {
+              data: {
+                message: filename + '.zip' + ' Downloaded successfully', type: 'success',
+              }, duration: 3000, panelClass: 'course-success-snackbar',
+            })
           }
 
           this.isDownloading = false
@@ -155,6 +170,12 @@ export class InfoModalComponent implements OnInit, OnDestroy {
         this.errorMessage = message
         this.lastFailedItem = item
         this.results.push({ item, status: 'Failed', error: err, message })
+        this.snackBar.openFromComponent(SnackbarComponent, {
+          data: {
+            message: item.orgName + '.zip' + ' failed to download.', type: 'error',
+          }, duration: 3000, panelClass: 'course-error-snackbar',
+        })
+
         // continue to next item instead of closing immediately
         this.currentIndex++
         setTimeout(() => this.downloadNext(), 200)
@@ -172,7 +193,7 @@ export class InfoModalComponent implements OnInit, OnDestroy {
   }
 
   closeDialog() {
-    this.dialogRef.close({ completed: true, results: this.results })
+    this.dialogRef.close({ completed: true, results: this.results, password: this.password })
   }
 
   ngOnDestroy() {
