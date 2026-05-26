@@ -4,6 +4,9 @@ import { HttpEventType, HttpResponse } from '@angular/common/http'
 import { Subject, Subscription } from 'rxjs'
 import { takeUntil } from 'rxjs/operators'
 import { DownloadReportService } from '../../services/download-report.service'
+import { MatSnackBar } from '@angular/material/snack-bar'
+import { SnackbarComponent } from '@sunbird-cb/consumption'
+
 
 @Component({
   selector: 'ws-app-info-modal',
@@ -33,6 +36,7 @@ export class InfoModalComponent implements OnInit, OnDestroy {
     @Inject(MAT_LEGACY_DIALOG_DATA) public data: any,
     private downloadSvc: DownloadReportService,
     private cdr: ChangeDetectorRef,
+    private snackBar: MatSnackBar,
   ) { }
 
   ngOnInit() {
@@ -148,6 +152,11 @@ export class InfoModalComponent implements OnInit, OnDestroy {
             document.body.removeChild(a)
             window.URL.revokeObjectURL(url)
             this.results.push({ item, status: 'Success' })
+            this.snackBar.openFromComponent(SnackbarComponent, {
+              data: {
+                message: filename + '.zip' + ' Downloaded successfully', type: 'success',
+              }, duration: 3000, panelClass: 'course-success-snackbar',
+            })
           }
 
           this.isDownloading = false
@@ -161,6 +170,12 @@ export class InfoModalComponent implements OnInit, OnDestroy {
         this.errorMessage = message
         this.lastFailedItem = item
         this.results.push({ item, status: 'Failed', error: err, message })
+        this.snackBar.openFromComponent(SnackbarComponent, {
+          data: {
+            message: item.orgName + '.zip' + ' failed to download.', type: 'error',
+          }, duration: 3000, panelClass: 'course-error-snackbar',
+        })
+
         // continue to next item instead of closing immediately
         this.currentIndex++
         setTimeout(() => this.downloadNext(), 200)
