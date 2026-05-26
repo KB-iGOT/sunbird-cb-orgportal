@@ -558,6 +558,9 @@ export class ReportsSectionComponent implements OnInit {
     })
 
     dialogRef.afterClosed().subscribe((result: any) => {
+      if (result && result.password) {
+        this.customReportPwd = result.password
+      }
       if (result && result.results && Array.isArray(result.results)) {
         const failedItems: any[] = []
         result.results.forEach((r: any) => {

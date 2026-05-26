@@ -19,6 +19,7 @@ export class InfoModalComponent implements OnInit, OnDestroy {
   currentIndex = 0
   items: any[] = []
   results: any[] = []
+  password = ''
   errorMessage = ''
   lastFailedItem: any = null
   isComplete = false
@@ -94,7 +95,7 @@ export class InfoModalComponent implements OnInit, OnDestroy {
       this.isComplete = true
       // Only auto-close if no errors occurred
       if (!this.hasErrors) {
-        this.dialogRef.close({ completed: true, results: this.results })
+        this.dialogRef.close({ completed: true, results: this.results, password: this.password })
       }
       this.cdr.detectChanges()
       return
@@ -123,6 +124,17 @@ export class InfoModalComponent implements OnInit, OnDestroy {
         } else if (event.type === HttpEventType.Response) {
           const response = event as HttpResponse<Blob>
           if (response && response.body) {
+            const passwordHeader = response.headers?.getAll ? response.headers?.getAll('Password') : null
+            if (passwordHeader && passwordHeader.length > 0) {
+              if (!this.password) {
+                this.password = passwordHeader[0]
+              }
+            } else if (response.headers?.get) {
+              const passwordValue = response.headers.get('Password')
+              if (passwordValue && !this.password) {
+                this.password = passwordValue
+              }
+            }
             const contentDisposition = response.headers ? response.headers.get('content-disposition') : null
             let filename = item.orgName || 'report'
             if (contentDisposition) {
@@ -172,7 +184,7 @@ export class InfoModalComponent implements OnInit, OnDestroy {
   }
 
   closeDialog() {
-    this.dialogRef.close({ completed: true, results: this.results })
+    this.dialogRef.close({ completed: true, results: this.results, password: this.password })
   }
 
   ngOnDestroy() {
