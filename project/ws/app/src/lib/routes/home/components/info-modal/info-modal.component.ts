@@ -135,20 +135,14 @@ export class InfoModalComponent implements OnInit, OnDestroy {
                 this.password = passwordValue
               }
             }
-            const contentDisposition = response.headers ? response.headers.get('content-disposition') : null
             let filename = item.orgName || 'report'
-            if (contentDisposition) {
-              const match = /filename="?([^";]+)"?/.exec(contentDisposition)
-              if (match && match[1]) {
-                filename = match[1]
-              }
-            }
+
             const contentType = response.headers ? response.headers.get('content-type') : null
             const blob = new Blob([response.body], { type: contentType || 'application/octet-stream' })
             const url = window.URL.createObjectURL(blob)
             const a = document.createElement('a')
             a.href = url
-            a.download = filename
+            a.download = filename + '.zip'
             document.body.appendChild(a)
             a.click()
             document.body.removeChild(a)
