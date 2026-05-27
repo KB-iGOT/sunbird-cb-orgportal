@@ -77,7 +77,7 @@ export class AICBPRequestListComponent implements OnInit {
           this.staticRequestList.push({
             demand_id: request.id,
             title: request.request_name,
-            ownerName: request.state_center_name || 'N/A',
+            ownerName: (request.user && request.user.email) ? request.user.email : 'N/A',
             requestType: 'N/A',
             status: request.status || 'N/A',
             assignedProvider: request.assignedProvider || 'Unassigned',
