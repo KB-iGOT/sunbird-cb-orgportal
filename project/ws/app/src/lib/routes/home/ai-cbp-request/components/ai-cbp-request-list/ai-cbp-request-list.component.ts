@@ -168,6 +168,7 @@ export class AICBPRequestListComponent implements OnInit {
     }
 
     // Time Filter
+    // Time Filter
     if (this.selectedTime) {
 
       const now = new Date()
@@ -176,20 +177,31 @@ export class AICBPRequestListComponent implements OnInit {
 
         const createdDate = new Date(item.createdOn)
 
-        const diffDays =
-          (now.getTime() - createdDate.getTime()) /
-          (1000 * 60 * 60 * 24)
-
         switch (this.selectedTime) {
 
           case 'today':
-            return diffDays <= 1
 
-          case '7days':
-            return diffDays <= 7
+            return (
+              createdDate.getDate() === now.getDate() &&
+              createdDate.getMonth() === now.getMonth() &&
+              createdDate.getFullYear() === now.getFullYear()
+            )
 
-          case '30days':
-            return diffDays <= 30
+          case '7days': {
+
+            const sevenDaysAgo = new Date()
+            sevenDaysAgo.setDate(now.getDate() - 7)
+
+            return createdDate >= sevenDaysAgo
+          }
+
+          case '30days': {
+
+            const thirtyDaysAgo = new Date()
+            thirtyDaysAgo.setDate(now.getDate() - 30)
+
+            return createdDate >= thirtyDaysAgo
+          }
 
           default:
             return true
