@@ -15,28 +15,22 @@
                                             <p class="mat-subheading-1 margin-bottom-l">Declare the budget</p>
                                             <form class="example-container" [formGroup]="budgetdata">
                                                 <div>
-                                                    <div class="margin-bottom-m">
-                                                        <label for="budgetyear"
-                                                            class="custom-label display-block mat-subheading-2 margin-remove-bottom form-label required"
-                                                            aria-label="Budget year label">
+                                                    <div class="field-row">
+                                                        <label class="custom-label">
                                                             Budget for financial year
                                                         </label>
-                                                        <mat-form-field appearance="outline"
-                                                            class="custom-select margin-top-xs">
+
+                                                        <mat-form-field appearance="outline" class="custom-select">
                                                             <mat-label>Select year</mat-label>
-                                                            <mat-select formControlName="budgetyear" #budgetyear
+
+                                                            <mat-select formControlName="budgetyear"
                                                                 [(value)]="selectedYear"
                                                                 (selectionChange)="changeBudgetYear($event)">
                                                                 <mat-option *ngFor="let year of yearsList"
                                                                     [value]="year">
-                                                                    {{year}}
+                                                                    {{ year }}
                                                                 </mat-option>
                                                             </mat-select>
-                                                            <mat-error [hidden]="false"
-                                                                aria-label="Budget year Error|Explains name is required "
-                                                                *ngIf="budgetdata?.controls['budgetyear']?.touched && budgetdata?.controls['budgetyear'].errors?.required">
-                                                                Field is mandatory
-                                                            </mat-error>
                                                         </mat-form-field>
                                                     </div>
                                                 </div>

@@ -4,13 +4,12 @@
     </select>
 </div> -->
 <div class="category-box">
-<mat-form-field appearance="outline">
-    <mat-select 
-        [(ngModel)]="selectedValue" (selectionChange)="showDialogBox($event.value)">
-        <mat-option *ngFor="let item of categoryData"
-            [value]="item?.value">
-            {{item?.name}}
-        </mat-option>
-    </mat-select>
-</mat-form-field>
+    <mat-form-field appearance="outline">
+        <mat-select class="category-dropdown" [(ngModel)]="selectedValue"
+            (selectionChange)="showDialogBox($event.value)">
+            <mat-option *ngFor="let item of categoryData" [value]="item?.value">
+                {{item?.name}}
+            </mat-option>
+        </mat-select>
+    </mat-form-field>
 </div>

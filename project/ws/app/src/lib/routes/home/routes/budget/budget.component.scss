@@ -166,8 +166,16 @@ mat-header-row {
     padding: 6px 10px;
     border-radius: 5px 0 0 5px;
     font-weight: 400 !important;
+    width:200px;
 }
 
 .custom-select {
-    margin-top: -5px !important;font-size: 14px;
+    margin-top: 20px !important;font-size: 14px;
+    width: 30%;
+}
+
+.field-row {
+  display: flex;
+  align-items: center;   // 🔥 key fix
+  gap: 12px;
 }

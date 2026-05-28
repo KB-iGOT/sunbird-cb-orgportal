@@ -615,6 +615,8 @@ $title-line-count: 2;
   display: flex;
   // flex: 1;
   flex-direction: column;
+      z-index: 0;
+    position: relative;
 }
 
 .textclass {
@@ -746,4 +748,8 @@ $title-line-count: 2;
 
 .search-btn-div {
   margin-top: 6px;
+}
+
+.primary-background {
+ background-color:  #1b4ca1 !important;;
 }

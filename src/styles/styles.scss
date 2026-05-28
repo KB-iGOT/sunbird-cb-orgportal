@@ -872,7 +872,7 @@ h3.shepherd-title {
   background-color: black !important;
   box-shadow: 0px 8px 24px 0px #0000003d !important;
   color: white!important;
-  opacity: 0.6!important;
+  opacity: 0.8 !important;
 }
 .course-success-snackbar {
   box-shadow: 0px 8px 24px 0px #0000003D !important;
@@ -1107,8 +1107,8 @@ h3.shepherd-title {
 
   .mdc-evolution-chip__action {
     border-radius: 20px !important;
-    background-color: #ffffff !important;
-    border: 1px solid #d6d6d6 !important;
+    // background-color: #ffffff !important;
+    // border: 1px solid #d6d6d6 !important;
     min-height: 32px;
     padding: 0 12px;
   }
@@ -1361,7 +1361,7 @@ h3.shepherd-title {
 
 .mat-mdc-dialog-container .mdc-dialog__surface {
   display: block;
-  padding: 24px 0 !important;
+  padding: 24px !important;
   border-radius: 4px !important;
   box-sizing: border-box;
   /* remove scrollbars */
@@ -1453,7 +1453,7 @@ h3.shepherd-title {
 }
 
 .mat-mdc-text-field-wrapper {
-  height: 32px !important;
+  height: auto !important;
 }
 
 
@@ -2016,106 +2016,29 @@ mat-list-item {
 .mat-mdc-tab-group.mat-mdc-tab-group-stretch-tabs>.mat-mdc-tab-header .mat-mdc-tab {
   flex-grow: 0 !important;
 }
-/* Full rounded outline for Angular Material MDC */
-.mat-mdc-form-field {
-  width: 100%;
+
+
+.mat-mdc-dialog-container {
+  background: #fff !important;
 }
 
-/* Main wrapper */
+.mat-mdc-header-cell {
+  background-color: #F5F5F5 !important;
+}
+
+.mat-mdc-tab-body-content {
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+}
+
 .mat-mdc-text-field-wrapper {
-  height: 54px !important;
-  border-radius: 30px !important;
-  overflow: hidden !important; // IMPORTANT
-  background: #fff;
+  background-color: #ffffff !important;
 }
 
-/* Flex alignment */
-.mat-mdc-form-field-flex {
-  height: 54px !important;
-  align-items: center !important;
+.search .sinput {
+  background: white !important;
 }
 
-/* Fix outline borders */
-.mdc-notched-outline {
-  border-radius: 30px !important;
-  overflow: hidden !important;
-}
-
-/* Left side */
-.mdc-notched-outline__leading {
-  border-radius: 30px 0 0 30px !important;
-  min-width: 28px !important;
-  border-width: 1px !important;
-}
-
-/* Middle */
-.mdc-notched-outline__notch {
-  border-width: 1px !important;
-}
-
-/* Right side */
-.mdc-notched-outline__trailing {
-  border-radius: 0 30px 30px 0 !important;
-  border-width: 1px !important;
-}
-
-/* Border colors */
-.mdc-notched-outline__leading,
-.mdc-notched-outline__notch,
-.mdc-notched-outline__trailing {
-  border-color: #d1d5db !important;
-}
-
-/* Focus state */
-.mat-mdc-form-field.mat-focused {
-  .mdc-notched-outline__leading,
-  .mdc-notched-outline__notch,
-  .mdc-notched-outline__trailing {
-    border-color: #2563eb !important;
-    border-width: 1.5px !important;
-  }
-}
-
-/* Input spacing */
-.mat-mdc-form-field-infix {
-  min-height: 54px !important;
-  padding-top: 14px !important;
-  padding-bottom: 14px !important;
-}
-
-/* Input text */
-.mat-mdc-input-element {
-  font-size: 14px !important;
-}
-
-/* Datepicker icon fix */
-.mat-datepicker-toggle {
-  color: #6b7280 !important;
-  margin-right: 8px;
-}
-
-/* THIS fixes the dot issue */
-.mat-datepicker-toggle-default-icon {
-  width: 22px !important;
-  height: 22px !important;
-  display: block !important;
-  fill: currentColor !important;
-}
-
-/* MDC icon button fix */
-.mat-mdc-icon-button {
-  width: 40px !important;
-  height: 40px !important;
-  padding: 8px !important;
-  line-height: 40px !important;
-}
-
-/* Material icon font rendering */
-.material-icons,
-.mat-icon {
-  font-family: 'Material Icons' !important;
-  font-size: 22px !important;
-  width: 22px !important;
-  height: 22px !important;
-  overflow: visible !important;
+.mat-mdc-dialog-container .mdc-dialog__surface, .mat-dialog-container {
+  box-shadow: none !important;
 }

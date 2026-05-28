@@ -57,7 +57,7 @@
     "@sunbird-cb/resolver-v2": "0.0.1-ang-17-20",
     "@sunbird-cb/taxonomy-editor": "0.0.1-ang-17-20",
     "@sunbird-cb/utils-v2": "0.0.1-ang-17-20",
-    "@sunbird-cb/tree-hierarchy": "0.0.2-ang-17-20",
+    "@sunbird-cb/tree-hierarchy": "0.0.8-ang-17-20",
     "@sunbird-cb/utils": "0.0.1-ang-17-20",
     "@sunbird-cb/collection": "0.0.9-ang-17-20",
     "@sunbird-cb/discussion-v2": "0.0.3-ang-17-20",

@@ -1,161 +1,176 @@
 @import 'ws-vars';
 @import 'ws-mixins';
 
+/* =========================
+   STEP CONTAINER
+========================= */
+
 .stepper {
-    margin: 20px 0;
+  margin: 20px 0;
 }
 
-.relative {
-    /* min-height: auto; */
-    position: absolute;
-    display: block !important;
-    top: 70px;
-    right: 50px;
-    /* background: red; */
-    /* border: 24px solid black; */
+/* =========================
+   POSITIONING HELPERS
+========================= */
 
+.relative {
+  position: absolute;
+  display: block !important;
+  top: 70px;
+  right: 50px;
 }
 
 .sticky {
-    position: sticky;
-    // top: 50px;
-}
-
-.close-preview {
-    position: fixed;
-    top: 15px;
-    left: 15px;
-    z-index: 1;
-    font-size: 30px;
-    cursor: pointer;
-    /* stylelint-disable */
-    z-index: 1001;
-    /* stylelint-enable */
+  position: sticky;
 }
 
 .hidden {
-    display: none;
+  display: none;
 }
 
 .transitionD {
-    transition: all 0.5s;
-}
-
-.ui {
-    border: 1px solid rgb(26, 25, 25);
-    border-top-left-radius: 0px;
-    border-left-color: white;
-    border-bottom-left-radius: 0px;
-    border-top-right-radius: 50%;
-    border-bottom-right-radius: 50%;
-    box-shadow: 0.1px 2px 8px grey;
-    width: 42px;
-}
-
-.toHide {
-    visibility: hidden;
-}
-
-
-
-::ng-deep .stepper .mat-ink-bar {
-    display: none;
-}
-
-::ng-deep .mat-tab-body-content {
-    overflow: hidden !important;
-}
-
-
-::ng-deep .stepper .mat-tab-label {
-    flex: 1;
-    color: black;
-    opacity: 1 !important;
-    padding: 0 24px 0 46px !important;
-
-    ::ng-deep .mat-tab-label-content {
-        background-color: #F5F5F5;
-        color: black;
-        width: 100%;
-        height: 100%;
-    }
-}
-
-::ng-deep .stepper .mat-tab-label::after {
-    content: " ";
-    position: absolute;
-    width: 0px;
-    height: 0;
-    left: auto;
-    right: -24px;
-    top: 0;
-    border: 24px solid;
-    border-color: transparent transparent transparent #F5F5F5;
-}
-
-::ng-deep .stepper .mat-tab-label::before {
-    content: " ";
-    position: absolute;
-    width: 0px;
-    height: 0;
-    left: -0;
-    top: 0;
-    border: 24px solid;
-    border-color: #F5F5F5 #F5F5F5 #F5F5F5 transparent;
-}
-
-
-::ng-deep .stepper .mat-tab-label-active {
-    flex: 1;
-    opacity: 1 !important;
-
-    .mat-tab-label-content {
-        background-color: #373434;
-        color: white !important;
-        width: 100%;
-        height: 100%;
-        font-size: 14px !important;
-        letter-spacing: 0.25;
-    }
-}
-
-::ng-deep .stepper .mat-tab-label-active::after {
-    content: " ";
-    position: absolute;
-    width: 0px;
-    height: 0;
-    left: auto;
-    right: -24px;
-    top: 0;
-    border: 24px solid;
-    border-color: transparent transparent transparent #373434;
-}
-
-::ng-deep .stepper .mat-tab-label-active::before {
-    content: " ";
-    position: absolute;
-    width: 0px;
-    height: 0;
-    left: -0;
-    top: 0;
-    border: 24px solid;
-    border-color: #373434 #373434 #373434 transparent;
+  transition: all 0.5s;
 }
 
 .overflow-none {
-    overflow: unset !important;
+  overflow: unset !important;
 }
 
 .disable {
-    opacity: 0.3;
-        pointer-events: none;
-        cursor: none;
+  opacity: 0.3;
+  pointer-events: none;
+  cursor: not-allowed;
 }
 
-::ng-deep .stepper .mat-tab-header {
-    border-bottom: none !important;
+/* Close button */
+.close-preview {
+  position: fixed;
+  top: 15px;
+  left: 15px;
+  z-index: 1001;
+  font-size: 30px;
+  cursor: pointer;
 }
+
+/* UI badge */
+.ui {
+  border: 1px solid rgb(26, 25, 25);
+  border-top-left-radius: 0px;
+  border-left-color: white;
+  border-bottom-left-radius: 0px;
+  border-top-right-radius: 50%;
+  border-bottom-right-radius: 50%;
+  box-shadow: 0.1px 2px 8px grey;
+  width: 42px;
+}
+
+.toHide {
+  visibility: hidden;
+}
+
+/* =========================
+   MDC TAB SYSTEM OVERRIDES
+========================= */
+
+/* Hide ink bar (old underline) */
+::ng-deep .stepper .mdc-tab-indicator {
+  display: none !important;
+}
+
+/* Tab header border removal */
+::ng-deep .stepper .mat-mdc-tab-header {
+  border-bottom: none !important;
+}
+
+/* Prevent content scroll issues */
+::ng-deep .mat-mdc-tab-body-content {
+  overflow: hidden !important;
+}
+
+/* =========================
+   TAB BASE STYLE
+========================= */
+
+::ng-deep .stepper .mat-mdc-tab {
+  flex: 1;
+  opacity: 1 !important;
+  padding: 0 24px 0 46px !important;
+  position: relative;
+}
+
+/* Tab content (default state) */
+::ng-deep .stepper .mat-mdc-tab .mdc-tab__content {
+  background-color: #F5F5F5;
+  color: #000;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* =========================
+   ACTIVE TAB STYLE
+========================= */
+
+::ng-deep .stepper .mat-mdc-tab.mdc-tab--active .mdc-tab__content {
+  background-color: #373434;
+  color: #fff !important;
+  font-size: 14px !important;
+  letter-spacing: 0.25px;
+}
+
+/* =========================
+   ARROW (LEFT)
+========================= */
+
+::ng-deep .stepper .mat-mdc-tab::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  border: 24px solid;
+  border-color: #F5F5F5 #F5F5F5 #F5F5F5 transparent;
+}
+
+/* =========================
+   ARROW (RIGHT)
+========================= */
+
+::ng-deep .stepper .mat-mdc-tab::after {
+  content: "";
+  position: absolute;
+  right: -24px;
+  top: 0;
+  border: 24px solid;
+  border-color: transparent transparent transparent #F5F5F5;
+}
+
+/* =========================
+   ACTIVE ARROWS
+========================= */
+
+::ng-deep .stepper .mat-mdc-tab.mdc-tab--active::before {
+  border-color: #373434 #373434 #373434 transparent;
+}
+
+::ng-deep .stepper .mat-mdc-tab.mdc-tab--active::after {
+  border-color: transparent transparent transparent #373434;
+}
+
+/* =========================
+   DIALOG FIX
+========================= */
+
 ::ng-deep .mat-mdc-dialog-container .mdc-dialog__surface,
 .mat-dialog-container {
-    padding: 0 !important;
+  padding: 0 !important;
+}
+
+:host ::ng-deep .mat-mdc-tab-group.mat-mdc-tab-group-stretch-tabs > .mat-mdc-tab-header .mat-mdc-tab {
+    flex-grow: 1 !important;
+}
+
+:host ::ng-deep .mat-mdc-tab.mdc-tab--active .mdc-tab__text-label {
+    color: #fff !important;
 }

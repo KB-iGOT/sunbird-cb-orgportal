@@ -44,7 +44,7 @@
 
       <div class="input-container">
         <div class="label required">Designation</div>
-        <!--<mat-form-field class="profile-form-field required-select" appearance="none">
+        <!--<mat-form-field class="profile-form-field required-select" appearance="fill">
            <div class="flex flex-row auto-complete-row">
             <input type="text" class="input-text" aria-label="Designation" placeholder="Select designation" matInput
               formControlName="designation" [matAutocomplete]="designationAuto" />
@@ -56,7 +56,7 @@
             </mat-option>
           </mat-autocomplete>
         </mat-form-field>-->
-        <mat-form-field appearance="none" class="profile-form-field required-select">
+        <mat-form-field appearance="fill" class="profile-form-field required-select">
           <mat-select #designation formControlName="designation" placeholder="Select designation"
             (closed)="onDesignationDropdownClosed()" panelClass="search-panel"
             (openedChange)="setupScrollListener($event)">
@@ -97,7 +97,7 @@
     <div class="flex flex-row gap-6">
       <div class="input-container">
         <div class="label required">Group</div>
-        <mat-form-field class="profile-form-field required-select" appearance="none">
+        <mat-form-field class="profile-form-field required-select" appearance="fill">
           <mat-select formControlName="group">
             <mat-option value="">Choose a group</mat-option>
             <mat-option *ngFor="let group of masterData.group" value="{{group}}">{{ group }}</mat-option>
@@ -110,7 +110,7 @@
       </div>
       <div class="input-container">
         <div class="label">Date of birth</div>
-        <mat-form-field class="profile-form-field" appearance="none">
+        <mat-form-field class="profile-form-field" appearance="fill">
           <input matInput class="input-text icon-include-input" [matDatepicker]="picker" readonly formControlName="dob"
             [max]="today" placeholder="Choose date of birth" />
           <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
@@ -122,7 +122,7 @@
     <div class="flex flex-row gap-6">
       <div class="input-container">
         <div class="label">Mother tongue</div>
-        <mat-form-field class="profile-form-field" appearance="none">
+        <mat-form-field class="profile-form-field required-select" appearance="fill">
           <div class="flex flex-row auto-complete-row">
             <input type="text" class="input-text" aria-label="Domicile medium" placeholder="Type here" matInput
               formControlName="domicileMedium" [matAutocomplete]="languageAuto" />
@@ -137,7 +137,7 @@
       </div>
       <div class="input-container">
         <div class="label">Gender</div>
-        <mat-form-field class="profile-form-field" appearance="none">
+        <mat-form-field class="profile-form-field" appearance="fill">
           <mat-select formControlName="gender">
             <mat-option value="">Select gender</mat-option>
             <mat-option value="Male">Male</mat-option>
@@ -151,7 +151,7 @@
     <div class="flex flex-row gap-6">
       <div class="input-container">
         <div class="label">Category</div>
-        <mat-form-field class="profile-form-field" appearance="none">
+        <mat-form-field class="profile-form-field" appearance="fill">
           <mat-select formControlName="category">
             <mat-option value="">Select category</mat-option>
             <mat-option value="General">General</mat-option>
