@@ -10,7 +10,7 @@ import { MatMenuModule } from '@angular/material/menu'
 
 
 import { AICBPRequestRoutingModule } from './ai-cbp-request.routing.module'
-import { AiCbpModule } from '@sunbird-cb/cbp-ai'
+// import { AiCbpModule } from '@sunbird-cb/cbp-ai'
 import { RouterModule } from '@angular/router'
 import { AICBPRequestListComponent } from './components/ai-cbp-request-list/ai-cbp-request-list.component'
 import { AICBPRequestComponent } from './ai-cbp-request.component'
@@ -24,7 +24,7 @@ import { MatInputModule } from '@angular/material/input'
 
 @NgModule({
   declarations: [AICBPRequestComponent, AICBPRequestListComponent, ViewNonMappingDesignationComponent],
-  imports: [CommonModule, AICBPRequestRoutingModule, RouterModule, AiCbpModule, MatTableModule,
+  imports: [CommonModule, AICBPRequestRoutingModule, RouterModule, MatTableModule,
     MatPaginatorModule,
     MatCardModule,
     MatButtonModule,
@@ -34,7 +34,7 @@ import { MatInputModule } from '@angular/material/input'
     MatFormFieldModule,
     MatSelectModule,
     MatInputModule
-  ],
-  exports: [AiCbpModule]
+  ], //AiCbpModule
+  exports: [] //AiCbpModule
 })
 export class AICBPRequestModule { }
