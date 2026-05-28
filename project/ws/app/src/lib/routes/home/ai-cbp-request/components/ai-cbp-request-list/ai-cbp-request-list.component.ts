@@ -155,7 +155,9 @@ export class AICBPRequestListComponent implements OnInit {
 
       filtered = filtered.filter(item =>
         item?.title?.toLowerCase()?.includes(search) ||
-        item?.demand_id?.toLowerCase()?.includes(search)
+        item?.demand_id?.toLowerCase()?.includes(search) ||
+        item?.ownerName?.toLowerCase()?.includes(search) ||
+        item?.status?.toLowerCase()?.includes(search)
       )
     }
 
@@ -167,7 +169,6 @@ export class AICBPRequestListComponent implements OnInit {
       )
     }
 
-    // Time Filter
     // Time Filter
     if (this.selectedTime) {
 
@@ -210,6 +211,9 @@ export class AICBPRequestListComponent implements OnInit {
     }
 
     this.dataSource.data = filtered
+
+    // IMPORTANT
+    this.requestCount = filtered.length
   }
 
   clearSearch() {
