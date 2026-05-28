@@ -8,22 +8,22 @@ import { forkJoin, of } from 'rxjs'
 import { ReportsVideoComponent } from '../reports-video/reports-video.component'
 import { EventService } from '@sunbird-cb/utils-v2'
 import { TelemetryEvents } from '../../../../head/_services/telemetry.event.model'
-import { HttpErrorResponse, HttpResponse } from '@angular/common/http'
+import { HttpErrorResponse, } from '@angular/common/http'
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser'
 import { environment } from '../../../../../../../../../src/environments/environment'
 import { SelectionModel } from '@angular/cdk/collections'
-import { LoaderService } from '../../../../../../../../../src/app/services/loader.service'
 import { MatDialog } from '@angular/material/dialog'
 import { MatPaginator } from '@angular/material/paginator'
 import { MatSnackBar } from '@angular/material/snack-bar'
 import { MatSort } from '@angular/material/sort'
 import { MatTableDataSource } from '@angular/material/table'
+import { InfoModalComponent } from '../../components/info-modal/info-modal.component'
 
 @Component({
-    selector: 'ws-app-reports-section',
-    templateUrl: './reports-section.component.html',
-    styleUrls: ['./reports-section.component.scss'],
-    standalone: false
+  selector: 'ws-app-reports-section',
+  templateUrl: './reports-section.component.html',
+  styleUrls: ['./reports-section.component.scss'],
+  standalone: false
 })
 export class ReportsSectionComponent implements OnInit {
   configSvc!: any
@@ -83,7 +83,6 @@ export class ReportsSectionComponent implements OnInit {
     private snackBar: MatSnackBar,
     private sanitizer: DomSanitizer,
     private changeDetector: ChangeDetectorRef,
-    private loaderService: LoaderService
   ) {
     this.configSvc = this.activeRouter.parent && this.activeRouter.parent.snapshot.data.configService
     this.userDetails = this.configSvc.unMappedUser
@@ -507,6 +506,8 @@ export class ReportsSectionComponent implements OnInit {
   }
 
   updateDataSource(failedItems?: any[]) {
+    const selectedIds = new Set(this.selection.selected.map((row: any) => row.sbOrgId))
+
     this.dataSource.data = [...this.orgListData]
     if (this.l1orgListData && this.l1orgListData.length > 0) {
       this.dataSource.data.push(...this.l1orgListData)
@@ -533,56 +534,47 @@ export class ReportsSectionComponent implements OnInit {
       })
     }
 
+    if (selectedIds.size > 0) {
+      this.selection.clear()
+      this.dataSource.data.forEach((row: any) => {
+        if (selectedIds.has(row.sbOrgId)) {
+          this.selection.select(row)
+        }
+      })
+    }
   }
 
   downloadReportsForEach(event: MouseEvent, retryItem?: any) {
     event.stopPropagation()
-    const failedItems: any[] = []
     const rootOrgId = this.configSvc.userProfile.rootOrgId
     const items = retryItem ? retryItem : this.selection.selected
-    this.loaderService.changeLoaderState(true)
-    this.downloadService.downloadReportsForEachOrgId(rootOrgId, items).subscribe({
-      next: (responses: HttpResponse<Blob>[]) => {
+    if (!items || items.length === 0) {
+      return
+    }
 
-        responses.forEach((response: HttpResponse<Blob>, index: number) => {
-          const currentItem: any = items[index]
-          const selectedItem: any = this.selection.selected.find((item: any) =>
-            item.sbOrgId === currentItem.sbOrgId
-          )
+    const dialogRef = this.dialog.open(InfoModalComponent, {
+      panelClass: 'info-dialog-download',
+      data: { type: 'download-file-with-progress', items, rootOrgId },
+      disableClose: true,
+    })
 
-          if (response.status === 200) {
-            const password = response.headers.getAll('Password')
-            this.customReportPwd = password ? password[0] : ''
-            if (response.body) {
-              const contentType = response.headers.get('Content-Type')
-              const blob = new Blob([response.body], {
-                type: contentType ? contentType : 'application/octet-stream',
-              })
-              const blobUrl = window.URL.createObjectURL(blob)
-
-              const fileName = selectedItem.orgName || 'Reports'
-              const a = document.createElement('a')
-              a.href = blobUrl
-              a.download = `${fileName}.zip`
-              document.body.appendChild(a)
-              a.click()
-              document.body.removeChild(a)
-              // Clean up blob URL
-              window.URL.revokeObjectURL(blobUrl)
-              selectedItem.status = 'Success'
-              this.snackBar.open('Download Successfully')
+    dialogRef.afterClosed().subscribe((result: any) => {
+      if (result && result.password) {
+        this.customReportPwd = result.password
+      }
+      if (result && result.results && Array.isArray(result.results)) {
+        const failedItems: any[] = []
+        result.results.forEach((r: any) => {
+          const selectedItem = items.find((it: any) => it.sbOrgId === r.item?.sbOrgId)
+          if (selectedItem) {
+            selectedItem.status = r.status === 'Success' ? 'Success' : 'Failed'
+            if (r.status !== 'Success') {
               failedItems.push(selectedItem)
             }
-          } else {
-            selectedItem.status = 'Failed'
-            const errorMessage = response.body ? _.get(response.body, 'message', 'Download failed') : 'Report not found for the requested organization'
-            this.openSnackbar(`${selectedItem.orgName}: ${errorMessage}`)
-            failedItems.push(selectedItem)
           }
         })
-        this.loaderService.changeLoaderState(false)
-        this.raiseTelemetry()
         this.updateDataSource(failedItems)
+        this.raiseTelemetry()
         this.changeDetector.detectChanges()
       }
     })
