@@ -1659,6 +1659,7 @@ h3.shepherd-title {
 
 .theme-igot.day-mode a[href^="/"][target=_self], .theme-igot.day-mode a[href^=http], .theme-igot.day-mode a[href^=mailto], .theme-igot.day-mode a[target=_blank] {
       color: #1b4ca1 !important;
+      background-color: inherit !important;
 }
 
 
@@ -2042,4 +2043,18 @@ mat-list-item {
 
 .mat-mdc-dialog-container .mdc-dialog__surface, .mat-dialog-container {
   box-shadow: none !important;
+}
+
+.ws-mat-selected-home-menu {
+    color: #1b4ca1 !important;
+    box-shadow: 0 2px 0 0 #1b4ca1 !important;
+}
+
+.ws-mat-accent-border-active {
+    border-bottom: 2px solid #1b4ca1 !important;
+}
+
+.mat-mdc-text-field-wrapper.mdc-text-field--outlined .mdc-text-field__input, .mat-mdc-select {
+  font-size: 14px !important;
+  font-weight: normal !important;
 }
