@@ -135,7 +135,7 @@
             </button>
 
             <button mat-menu-item (click)="onActionClick('manage', row)"
-              *ngIf="filteredTabs.length>1&& currentStatus==='active'">
+              *ngIf="filteredTabs.length >= 1 && currentStatus==='active'">
               <mat-icon>settings</mat-icon>
               <span>Manage</span>
             </button>
@@ -159,8 +159,8 @@
     </table>
 
     <mat-paginator class="community-pagination" [length]="totalElements" [pageSize]="pageSize"
-      [pageSizeOptions]="defaultPageSizeOptions" [pageIndex]="pageNumber" (page)="handlePageEvent($event)" showFirstLastButtons
-      aria-label="Select page">
+      [pageSizeOptions]="defaultPageSizeOptions" [pageIndex]="pageNumber" (page)="handlePageEvent($event)"
+      showFirstLastButtons aria-label="Select page">
     </mat-paginator>
   </div>
 </ng-template>

@@ -14,6 +14,7 @@ const API_END_POINTS = {
   SEARCH_ORG: '/api/org/ext/v2/signup/search',
   GET_ORGS_OF_DEPT: '/apis/public/v8/org/v2/list',
   DOWNLOAD_OPS_REPORTS: '/apis/proxies/v8/operationalreports/v2/download',
+  DOWNLOAD_OPS_REPORTS_v3: '/apis/proxies/v8/operationalreports/v3/download',
   GET_DEPARTMENT_TYPE: 'apis/proxies/v8/data/v1/system/settings/get/orgTypeConfig',
   SEARCH_ORG_BY_HIERARCHY: '/apis/proxies/v8/org/level/hierarchy',
   FORM_READ: '/apis/v1/form/read'
@@ -70,7 +71,7 @@ export class DownloadReportService {
           childId: rootOrgId === item.sbOrgId ? [] : [item.sbOrgId],
         },
       }
-      return this.http.post<Blob>(`${API_END_POINTS.DOWNLOAD_OPS_REPORTS}/${rootOrgId}`, req, {
+      return this.http.post<Blob>(`${API_END_POINTS.DOWNLOAD_OPS_REPORTS_v3}/${rootOrgId}`, req, {
         responseType: 'blob' as 'json',
         observe: 'response',
       }).pipe(
@@ -89,6 +90,19 @@ export class DownloadReportService {
       return forkJoin(apiCalls) as Observable<HttpResponse<Blob>[]>
     }
     return of([] as HttpResponse<Blob>[]) as Observable<HttpResponse<Blob>[]>
+  }
+
+  downloadReportForOrgWithProgress(rootOrgId: any, item: any) {
+    const req = {
+      request: {
+        childId: rootOrgId === item.sbOrgId ? [] : [item.sbOrgId],
+      },
+    }
+    return this.http.post(`${API_END_POINTS.DOWNLOAD_OPS_REPORTS_v3}/${rootOrgId}`, req, {
+      responseType: 'blob' as 'json',
+      reportProgress: true,
+      observe: 'events',
+    })
   }
 
   getDepartmentType(): Observable<any> {

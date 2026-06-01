@@ -67,18 +67,42 @@
         </div>
 
         <!-- Learning Hours -->
-        <div class="flex flex-column gap-2 event-form round-control">
-          <div class="form-lable">Learning Hours</div>
-          <mat-form-field appearance="outline">
-            <input matInput type="number" placeholder="1 - 100" formControlName="learningHours" min="1" max="100" step="1"
-              (keydown)="$event.key === '.' || $event.key === '-' || $event.key === 'e' || $event.key === '+' || ($event.key === '0' && !$event.target.value) ? $event.preventDefault() : null" />
-            <mat-error *ngIf="trainingForm.get('learningHours')?.hasError('min')">
-              Learning hours must be greater than 0.
+        <div class="flex flex-column gap-2 event-form round-control learning-duration">
+          <div class="form-lable">Learning Hours (hh:mm)</div>
+          <div class="flex gap-2">
+            <mat-form-field appearance="outline" class="flex-1 learning-duration-control">
+              <input matInput type="number" placeholder="Hours (0 - 100)" formControlName="learningHours" min="0" max="100" step="1"
+                (keydown)="$event.key === '.' || $event.key === '-' || $event.key === 'e' || $event.key === '+' ? $event.preventDefault() : null"
+                (paste)="onNumberPaste($event, 'learningHours')" />
+              <mat-error *ngIf="trainingForm.get('learningHours')?.hasError('min')">
+                Hours cannot be negative.
+              </mat-error>
+              <mat-error *ngIf="trainingForm.get('learningHours')?.hasError('max')">
+                Maximum allowed duration is 100 hours.
+              </mat-error>
+            </mat-form-field>
+            <mat-form-field appearance="outline" class="flex-1 learning-duration-control">
+              <input matInput type="number" placeholder="Minutes (0 - 59)" formControlName="learningMinutes" min="0" max="59" step="1"
+                (keydown)="$event.key === '.' || $event.key === '-' || $event.key === 'e' || $event.key === '+' ? $event.preventDefault() : null"
+                (paste)="onNumberPaste($event, 'learningMinutes')" />
+              <mat-error *ngIf="trainingForm.get('learningMinutes')?.hasError('min')">
+                Minutes cannot be negative.
+              </mat-error>
+              <mat-error *ngIf="trainingForm.get('learningMinutes')?.hasError('max')">
+                Minutes should not exceed 59.
+              </mat-error>
+            </mat-form-field>
+          </div>
+          <!-- Additional validation errors for combined logic -->
+          <ng-container *ngIf="
+                          trainingForm.get('learningHours')?.touched
+                          && trainingForm.get('learningMinutes')?.touched
+                          && !(trainingForm.get('learningHours')?.invalid || trainingForm.get('learningMinutes')?.invalid)
+                          ">
+            <mat-error *ngIf="trainingForm.hasError('invalidHundredHours')" class="additionalValidators">
+              Maximum allowed duration is 100 hours.
             </mat-error>
-            <mat-error *ngIf="trainingForm.get('learningHours')?.hasError('max')">
-              Learning hours should be less than 100.
-            </mat-error>
-          </mat-form-field>
+          </ng-container>
         </div>
 
         <!-- Training Type -->
@@ -142,7 +166,8 @@
                 <mat-icon class="cancel-icon">close</mat-icon>
               </button>
             </div>
-            <mat-hint class="pl-2" align="start">Only .svg, .png, .jpg, .jpeg files supported (maximum size: 1 MB).</mat-hint>
+            <mat-hint class="pl-2" align="start">Only .svg, .png, .jpg, .jpeg files supported (maximum size: 1
+              MB).</mat-hint>
             <input #fileInput type="file" (change)="onFileSelected($event)" accept=".svg,.png,.jpg,.jpeg,image/svg+xml,image/png,image/jpeg"
               style="display: none;" />
           </mat-form-field>
@@ -162,8 +187,6 @@
           <img class="certificate-img" [src]="previewLogoUrl || defaultLogoUrl" alt="Certificate Preview" />
         </div>
       </div>
-
-
     </form>
 
     <div class="flex pb-4 flex-col form-field">

@@ -22,7 +22,7 @@ export class SurveyFormComponent implements OnInit {
 
   ngOnInit() {
     if (this.activatedRoute.snapshot.data.pageData && this.activatedRoute.snapshot.data.pageData.data) {
-      this.surveyPopupData = this.activatedRoute.snapshot.data.pageData.data.menus.surveyPopup.banners
+      this.surveyPopupData = this.activatedRoute.snapshot.data.pageData.data.menus.surveyPopup?.banners
       this.surveyPopup = this.activatedRoute.snapshot.data.pageData.data.menus.surveyPopup
       this.widgetData = this.activatedRoute.snapshot.data.pageData.data.menus.surveyPopup
     }
