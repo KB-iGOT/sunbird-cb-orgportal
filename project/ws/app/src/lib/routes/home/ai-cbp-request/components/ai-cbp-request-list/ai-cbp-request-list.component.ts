@@ -114,7 +114,7 @@ export class AICBPRequestListComponent implements OnInit {
 
   viewACBPRoleMapping(element: any) {
     console.log('this.configSvc', this.configSvc)
-    this.router.navigateByUrl('app/home/ai-cbp-requests/acbp-list/review-request/' + element.demand_id, {
+    this.router.navigateByUrl('app/home/ai-cbp-requests/acbp-list/review-request/' + element.demand_id + '?source=mdo', {
       state: {
         configData: {
           userData: this.configSvc.unMappedUser,
