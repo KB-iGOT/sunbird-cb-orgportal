@@ -48,6 +48,7 @@ export class AICBPRequestListComponent implements OnInit {
     'RequestId',
     'title',
     'requestor',
+    'department_name',
     'requestStatus',
     'requestedOn',
     'interests',
@@ -78,6 +79,7 @@ export class AICBPRequestListComponent implements OnInit {
             demand_id: request.id,
             title: request.request_name,
             ownerName: (request.user && request.user.email) ? request.user.email : 'N/A',
+            department_name: request.department_name || 'N/A',
             requestType: 'N/A',
             status: request.status || 'N/A',
             assignedProvider: request.assignedProvider || 'Unassigned',
@@ -157,7 +159,8 @@ export class AICBPRequestListComponent implements OnInit {
         item?.title?.toLowerCase()?.includes(search) ||
         item?.demand_id?.toLowerCase()?.includes(search) ||
         item?.ownerName?.toLowerCase()?.includes(search) ||
-        item?.status?.toLowerCase()?.includes(search)
+        item?.status?.toLowerCase()?.includes(search) ||
+        item?.department_name?.toLowerCase()?.includes(search)
       )
     }
 
