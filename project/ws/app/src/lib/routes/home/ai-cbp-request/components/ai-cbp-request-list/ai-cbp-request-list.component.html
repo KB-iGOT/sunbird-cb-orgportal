@@ -39,7 +39,7 @@
 
       <mat-icon class="search-icon">search</mat-icon>
 
-      <input type="text" placeholder="Search by Request name or Request ID" [(ngModel)]="searchText"
+      <input type="text" placeholder="Search by Request name or Request ID or Department" [(ngModel)]="searchText"
         (input)="applyFilters()" />
 
       <button *ngIf="searchText" mat-icon-button class="clear-btn" (click)="clearSearch()">
@@ -110,6 +110,13 @@
               <th mat-header-cell *matHeaderCellDef class="row-heading">Requestor</th>
               <td mat-cell class="title-class" *matCellDef="let element">
                 {{ element?.ownerName }}
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="department_name">
+              <th mat-header-cell *matHeaderCellDef class="row-heading">Department</th>
+              <td mat-cell class="title-class" *matCellDef="let element">
+                {{ element?.department_name }}
               </td>
             </ng-container>
 
