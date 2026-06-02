@@ -70,7 +70,7 @@ export class AICBPRequestListComponent implements OnInit {
     this.staticRequestList = []
 
     this.aicbpRequestSvc.getApprovalRequests(this.pageNo,
-      this.pageSize,).subscribe((requests: any) => {
+      this.pageSize, this.searchText, this.selectedStatus).subscribe((requests: any) => {
 
         console.log('API Response:', requests)
 
@@ -130,11 +130,8 @@ export class AICBPRequestListComponent implements OnInit {
   prepareFilters(data: any[]) {
 
     this.statusList = [
-      ...new Set(
-        data
-          .map(item => item?.status)
-          .filter(Boolean)
-      )
+
+      "Approved", "Rejected", "Pending"
     ]
 
     this.assigneeList = [
