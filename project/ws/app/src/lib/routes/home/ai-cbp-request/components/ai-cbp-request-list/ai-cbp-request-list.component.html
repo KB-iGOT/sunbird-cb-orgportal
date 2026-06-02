@@ -40,7 +40,7 @@
       <mat-icon class="search-icon">search</mat-icon>
 
       <input type="text" placeholder="Search by Request name or Request ID or Department" [(ngModel)]="searchText"
-        (input)="applyFilters()" />
+        (input)="loadStaticTableData()" />
 
       <button *ngIf="searchText" mat-icon-button class="clear-btn" (click)="clearSearch()">
 
@@ -53,7 +53,7 @@
     <!-- Status Filter -->
     <mat-form-field appearance="outline" class="filter-select">
 
-      <mat-select [(value)]="selectedStatus" (selectionChange)="applyFilters()">
+      <mat-select [(value)]="selectedStatus" (selectionChange)="loadStaticTableData()">
 
         <mat-option value="">All Status</mat-option>
 
@@ -78,6 +78,8 @@
         <mat-option value="30days">Last 30 Days</mat-option>
 
       </mat-select>
+
+
 
     </mat-form-field>
 
