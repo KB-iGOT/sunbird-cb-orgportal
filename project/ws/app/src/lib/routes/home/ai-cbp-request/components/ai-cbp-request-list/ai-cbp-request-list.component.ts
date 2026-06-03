@@ -37,6 +37,8 @@ export class AICBPRequestListComponent implements OnInit {
   pageSize = 20
 
   defaultPageSizeOptions = [10, 20, 25, 50, 100]
+  showRejectPopupFlag = false
+  rejectionDetail: any = {}
   constructor(public aicbpRequestSvc: AICBPRequestService, public dialog: MatDialog,
     private router: Router,
     private configSvc: ConfigurationsService
@@ -85,6 +87,7 @@ export class AICBPRequestListComponent implements OnInit {
             assignedProvider: request.assignedProvider || 'Unassigned',
             createdOn: new Date(request.created_at),
             interestCount: request.designation_count || 0,
+            reviewer_comments: request.reviewer_comments || 'No Reason Found',
           })
         })
 
@@ -226,6 +229,16 @@ export class AICBPRequestListComponent implements OnInit {
     this.pageSize = event.pageSize
 
     this.loadStaticTableData()
+  }
+
+  showRejectionSummary(element: any) {
+    this.showRejectPopupFlag = true
+    this.rejectionDetail = element
+    console.log('Rejection Detail =>', this.rejectionDetail)
+  }
+
+  closeRejectPopup() {
+    this.showRejectPopupFlag = false
   }
 
 
