@@ -75,6 +75,11 @@
 
     </mat-form-field>
 
+    <button mat-stroked-button class="clear-filter-btn" (click)="clearAllFilters()"
+      *ngIf="searchText || selectedStatus || selectedTime">
+      Clear Filters
+    </button>
+
   </div>
   <div class="nav-container">
     <div class="sidenav-content">

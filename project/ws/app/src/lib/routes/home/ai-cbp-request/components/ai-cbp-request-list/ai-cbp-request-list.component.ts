@@ -221,7 +221,7 @@ export class AICBPRequestListComponent implements OnInit {
 
   clearSearch() {
     this.searchText = ''
-    this.applyFilters()
+    this.loadStaticTableData()
   }
 
   onChangePage(event: any) {
@@ -239,6 +239,15 @@ export class AICBPRequestListComponent implements OnInit {
 
   closeRejectPopup() {
     this.showRejectPopupFlag = false
+  }
+
+  clearAllFilters() {
+    this.searchText = ''
+    this.selectedStatus = ''
+    this.selectedTime = ''
+    this.pageNo = 1
+
+    this.loadStaticTableData()
   }
 
 
