@@ -42,6 +42,18 @@
 
   <mat-stepper [displayDefaultIndicatorType]="false" labelPosition="bottom" [selectedIndex]="currentStepperIndex"
     (selectionChange)="onSelectionChange($event)" class="mx-10" #stepper><!-- add [linear]="true" -->
+    <!-- Always show numbers -->
+    <ng-template matStepperIcon="number" let-index="index">
+      {{ index + 1 }}
+    </ng-template>
+
+    <ng-template matStepperIcon="edit" let-index="index">
+      {{ index + 1 }}
+    </ng-template>
+
+    <ng-template matStepperIcon="done" let-index="index">
+      {{ index + 1 }}
+    </ng-template>
     <mat-step label="Basic Details">
       <ng-template matStepLabel>Basic Details</ng-template>
       <ws-app-event-basic-details [eventStatus]="eventStatus" [eventDetails]="eventDetailsForm" [openMode]="openMode"

@@ -1367,7 +1367,7 @@ h3.shepherd-title {
   box-sizing: border-box;
   /* remove scrollbars */
   outline: 0;
-  overflow: hidden;
+  overflow: auto;
 
 }
 
@@ -2058,3 +2058,17 @@ mat-list-item {
   font-size: 14px !important;
   font-weight: normal !important;
 }
+
+.search-container-listing {
+  .mdc-list-item__primary-text {
+    display: flex !important;
+  }
+  .mat-mdc-standard-chip:not(.mdc-evolution-chip--disabled) .mdc-evolution-chip__text-label {
+    color: #fff !important;
+  }
+  .search-close-icon.mat-icon {
+    margin-right: 10px;
+  }
+
+}
+

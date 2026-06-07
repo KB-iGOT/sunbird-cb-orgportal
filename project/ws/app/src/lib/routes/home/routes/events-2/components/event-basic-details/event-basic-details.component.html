@@ -182,7 +182,10 @@
       <mat-form-field appearance="outline" class="disable-round">
         <input matInput [matDatepicker]="startDate" [min]="minDate" placeholder="Enter Start Date"
           formControlName="startDate" readonly>
-        <mat-datepicker-toggle matSuffix [for]="startDate"></mat-datepicker-toggle>
+        <!-- <mat-datepicker-toggle matSuffix [for]="startDate"></mat-datepicker-toggle> -->
+        <mat-datepicker-toggle matSuffix [for]="startDate">
+          <mat-icon class="mr-5" matDatepickerToggleIcon>calendar_today</mat-icon>
+        </mat-datepicker-toggle>
         <mat-datepicker #startDate
           [disabled]="openTab === 'upcoming' || openTab === 'past' || openMode === 'view' || eventStatus === 'live'"></mat-datepicker>
         <mat-error *ngIf="showValidationMsg('startDate','required')">
