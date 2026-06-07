@@ -44,9 +44,9 @@
   display: flex;
   align-items: center;
   gap: 4px;
-  padding: 8px 16px;
+  padding: 0px 8px;
   border: 1px solid #ccc;
-  border-radius: 16px;
+  border-radius: 24px;
   /* stylelint-disable */
   font: 400 12px Lato;
   /* stylelint-enable */
@@ -111,4 +111,33 @@
   /* stylelint-disable */
   font: 700 14px Lato;
   /* stylelint-enable */
+}
+
+/* Selected chip */
+.chip-themes.active {
+  background-color: #d6d6d6; // gray chip
+  border-color: #d6d6d6;
+  color: #000;
+}
+:host ::ng-deep .chip-themes.active .mdc-checkbox__native-control:enabled:checked ~ .mdc-checkbox__background,
+:host ::ng-deep .chip-themes.active .mdc-checkbox__native-control:enabled:indeterminate ~ .mdc-checkbox__background {
+  background-color: #808080 !important;
+  border-color: #808080 !important;
+}
+
+:host ::ng-deep .chip-themes.active .mdc-checkbox__native-control:enabled:checked ~ .mdc-checkbox__background .mdc-checkbox__checkmark {
+  color: #ffffff !important;
+}
+
+:host ::ng-deep .chip-themes.active .mdc-checkbox__checkmark-path {
+  stroke: #ffffff !important;
+}
+/* Optional: make label white when selected */
+.chip-themes.active .theme-name {
+  color: #000;
+}
+
+.chip-themes.active {
+  background-color: #d6d6d6;
+  border-color: #d6d6d6;
 }
