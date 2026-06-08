@@ -92,17 +92,13 @@ export class DownloadReportService {
     return of([] as HttpResponse<Blob>[]) as Observable<HttpResponse<Blob>[]>
   }
 
-  downloadReportForOrgWithProgress(rootOrgId: any, item: any) {
+  downloadReportForOrg(rootOrgId: any, item: any): Observable<any> {
     const req = {
       request: {
         childId: rootOrgId === item.sbOrgId ? [] : [item.sbOrgId],
       },
     }
-    return this.http.post(`${API_END_POINTS.DOWNLOAD_OPS_REPORTS_v3}/${rootOrgId}`, req, {
-      responseType: 'blob' as 'json',
-      reportProgress: true,
-      observe: 'events',
-    })
+    return this.http.post(`${API_END_POINTS.DOWNLOAD_OPS_REPORTS_v3}/${rootOrgId}`, req)
   }
 
   getDepartmentType(): Observable<any> {

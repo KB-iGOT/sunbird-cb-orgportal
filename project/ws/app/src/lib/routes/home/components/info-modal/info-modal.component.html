@@ -69,11 +69,10 @@
       <img src="/assets/icons/i-icon-large.svg" alt="success-icon" class="mb-4">
         <ng-container>
           <div *ngIf="isDownloading">
-            <mat-progress-bar mode="determinate" [value]="progress"></mat-progress-bar>
-            <div class="mb-4 mt-4 downloading-text">Downloading report for {{ items[currentIndex]?.orgName || items[currentIndex]?.downloadUrl || 'file' }} ({{ currentIndex + 1 }}/{{ items?.length || 0 }})</div>
-            <div class="mt-2">{{progress}}% &middot; {{formatBytes(downloaded)}} / {{formatBytes(total)}}</div>
+            <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+            <div class="mb-4 mt-4 downloading-text">Downloading report for {{ items[currentIndex]?.orgName || 'file' }} ({{ currentIndex + 1 }}/{{ items?.length || 0 }})</div>
           </div>
-          <div *ngIf="!isDownloading && progress > 0 && !hasErrors">
+          <div *ngIf="!isDownloading && items[currentIndex - 1] && !hasErrors">
             <div class="mb-4">Completed: {{items[currentIndex - 1]?.orgName || 'file'}}</div>
           </div>
           <div *ngIf="results && results.length > 0" class="errors-list mt-4">
