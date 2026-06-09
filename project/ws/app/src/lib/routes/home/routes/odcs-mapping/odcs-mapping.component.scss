@@ -33,3 +33,17 @@
 .importBtn:disabled {
   opacity: 0.6;
 }
+
+// :host {
+//   .mat-mdc-menu-item {
+//     min-height: auto;
+//   padding:0 !important;
+// }
+// }
+
+::ng-deep
+    .mat-mdc-menu-content {
+
+   padding:0 !important;
+
+}

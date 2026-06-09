@@ -28,8 +28,8 @@
             <label class="theme-name mr-2">
               {{ theme.name }}
             </label>
-            <mat-checkbox [checked]="theme?.selected" (click)="$event.preventDefault()"
-              [disabled]="theme?.preSelected"></mat-checkbox>
+            <mat-checkbox [ngClass]="theme?.selected ? 'check-box-selected':''" [checked]="theme?.selected"
+              (click)="$event.preventDefault()" [disabled]="theme?.preSelected"></mat-checkbox>
           </div>
         </ng-container>
         <a (click)="toggleThemes()" class="see-more">{{themesShowMore ? 'See Less' : 'See More'}}</a>

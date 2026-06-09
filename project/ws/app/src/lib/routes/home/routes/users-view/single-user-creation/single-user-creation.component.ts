@@ -36,14 +36,14 @@ const MOBILE_PATTERN = /^[0]?[6789]\d{9}$/
 const PIN_CODE_PATTERN = /^[1-9][0-9]{5}$/
 
 @Component({
-    selector: 'ws-single-user-creation',
-    templateUrl: './single-user-creation.component.html',
-    styleUrls: ['./single-user-creation.component.scss'],
-    providers: [
-        { provide: DateAdapter, useClass: MomentDateAdapter, deps: [MAT_DATE_LOCALE] },
-        { provide: MAT_DATE_FORMATS, useValue: MY_FORMATS },
-    ],
-    standalone: false
+  selector: 'ws-single-user-creation',
+  templateUrl: './single-user-creation.component.html',
+  styleUrls: ['./single-user-creation.component.scss'],
+  providers: [
+    { provide: DateAdapter, useClass: MomentDateAdapter, deps: [MAT_DATE_LOCALE] },
+    { provide: MAT_DATE_FORMATS, useValue: MY_FORMATS },
+  ],
+  standalone: false
 })
 export class SingleUserCreationComponent implements OnInit, AfterViewInit, OnDestroy {
 
@@ -525,6 +525,12 @@ export class SingleUserCreationComponent implements OnInit, AfterViewInit, OnDes
     if (event.input) {
       event.input.value = ''
     }
+
+    // Clear textbox
+    event.value = ''
+
+    // Optional - mark form control update
+    this.userCreationForm.get('tags')?.updateValueAndValidity()
   }
 
   handleValidTags(event: any): any {

@@ -1,6 +1,5 @@
 import { Component, Inject, OnDestroy, OnInit, ChangeDetectorRef } from '@angular/core'
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog'
-import { HttpEventType, HttpResponse } from '@angular/common/http'
 import { Subject, Subscription } from 'rxjs'
 import { takeUntil } from 'rxjs/operators'
 import { DownloadReportService } from '../../services/download-report.service'
@@ -15,10 +14,6 @@ import { SnackbarComponent } from '@sunbird-cb/consumption'
   standalone: false
 })
 export class InfoModalComponent implements OnInit, OnDestroy {
-  progress = 0
-  downloaded = 0
-  total = 0
-  remaining = 0
   isDownloading = false
   currentIndex = 0
   items: any[] = []
@@ -107,67 +102,43 @@ export class InfoModalComponent implements OnInit, OnDestroy {
     }
 
     const item = this.items[this.currentIndex]
-    this.progress = 0
-    this.downloaded = 0
-    this.total = 0
-    this.remaining = 0
     this.isDownloading = true
     this.errorMessage = ''
     this.lastFailedItem = null
 
     const rootOrgId = this.data.rootOrgId
 
-    this.sub = this.downloadSvc.downloadReportForOrgWithProgress(rootOrgId, item)
+    this.sub = this.downloadSvc.downloadReportForOrg(rootOrgId, item)
       .pipe(takeUntil(this.destroy$))
-      .subscribe((event: any) => {
-        if (event.type === HttpEventType.DownloadProgress) {
-          this.downloaded = event.loaded
-          this.total = event.total || this.total
-          this.progress = this.total ? Math.round(100 * this.downloaded / this.total) : 0
-          this.remaining = this.total ? this.total - this.downloaded : 0
-          this.cdr.detectChanges()
-        } else if (event.type === HttpEventType.Response) {
-          const response = event as HttpResponse<Blob>
-          if (response && response.body) {
-            const passwordHeader = response.headers?.getAll ? response.headers?.getAll('Password') : null
-            if (passwordHeader && passwordHeader.length > 0) {
-              if (!this.password) {
-                this.password = passwordHeader[0]
-              }
-            } else if (response.headers?.get) {
-              const passwordValue = response.headers.get('Password')
-              if (passwordValue && !this.password) {
-                this.password = passwordValue
-              }
-            }
-            let filename = item.orgName || 'report'
-
-            const contentType = response.headers ? response.headers.get('content-type') : null
-            const blob = new Blob([response.body], { type: contentType || 'application/octet-stream' })
-            const url = window.URL.createObjectURL(blob)
-            const a = document.createElement('a')
-            a.href = url
-            a.download = filename + '.zip'
-            document.body.appendChild(a)
-            a.click()
-            document.body.removeChild(a)
-            window.URL.revokeObjectURL(url)
-            this.results.push({ item, status: 'Success' })
-            this.snackBar.openFromComponent(SnackbarComponent, {
-              data: {
-                message: filename + '.zip' + ' Downloaded successfully', type: 'success',
-              }, duration: 3000, panelClass: 'course-success-snackbar',
-            })
+      .subscribe((body: any) => {
+        if (body && body.downloadUrl) {
+          if (body.password && !this.password) {
+            this.password = body.password
           }
+          const filename = item.orgName ? item.orgName + '.zip' : (body.fileName || 'report.zip')
 
-          this.isDownloading = false
-          this.currentIndex++
-          setTimeout(() => this.downloadNext(), 200)
+          const a = document.createElement('a')
+          a.href = body.downloadUrl
+          a.download = filename
+          a.target = '_blank'
+          document.body.appendChild(a)
+          a.click()
+          document.body.removeChild(a)
+
+          this.results.push({ item, status: 'Success' })
+          // this.snackBar.openFromComponent(SnackbarComponent, {
+          //   data: {
+          //     message: filename + ' Downloaded successfully', type: 'success',
+          //   }, duration: 3000, panelClass: 'course-success-snackbar',
+          // })
         }
+
+        this.isDownloading = false
+        this.currentIndex++
+        setTimeout(() => this.downloadNext(), 200)
       }, (err: any) => {
         this.isDownloading = false
-        // Extract error message from response or use generic message
-        const message = err?.status === 500 ? 'Report not found for the requested organization' : 'Download failed. Please try again.'
+        const message = err?.status === 404 ? 'Report not found for the requested organization' : 'Download failed. Please try again.'
         this.errorMessage = message
         this.lastFailedItem = item
         this.results.push({ item, status: 'Failed', error: err, message })
@@ -177,7 +148,6 @@ export class InfoModalComponent implements OnInit, OnDestroy {
           }, duration: 3000, panelClass: 'course-error-snackbar',
         })
 
-        // continue to next item instead of closing immediately
         this.currentIndex++
         setTimeout(() => this.downloadNext(), 200)
       })
@@ -205,10 +175,4 @@ export class InfoModalComponent implements OnInit, OnDestroy {
     }
   }
 
-  formatBytes(bytes: number) {
-    if (!bytes) { return '0 B' }
-    const sizes = ['B', 'KB', 'MB', 'GB', 'TB']
-    const i = Math.floor(Math.log(bytes) / Math.log(1024))
-    return `${(bytes / Math.pow(1024, i)).toFixed(2)} ${sizes[i]}`
-  }
 }

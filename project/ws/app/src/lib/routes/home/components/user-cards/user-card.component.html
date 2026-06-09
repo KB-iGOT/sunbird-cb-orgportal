@@ -138,7 +138,9 @@
                     <mat-option [value]="designation?.name" *ngFor="let designation of filterDesignationsMeta">
                       {{designation?.name}}
                     </mat-option>
-                    <mat-option *ngIf="updateUserDataForm.get('designation')?.value" [value]="updateUserDataForm.get('designation')?.value" disabled >{{updateUserDataForm.get('designation')?.value}}</mat-option>
+                    <mat-option *ngIf="updateUserDataForm.get('designation')?.value"
+                      [value]="updateUserDataForm.get('designation')?.value"
+                      disabled>{{updateUserDataForm.get('designation')?.value}}</mat-option>
                     <!-- No results message -->
                     <mat-option *ngIf="(filterDesignationsMeta )?.length === 0" disabled>
                       No matches found
@@ -202,7 +204,7 @@
                   +91
                 </div>
                 <!-- </mat-form-field> -->
-                <mat-form-field appearance="outline" class="flex-expand w-48p">
+                <mat-form-field appearance="outline" class="flex-expand w-48p mnumber">
                   <input id="mobileNumber" #mobile type="text" matInput placeholder="Type here" formControlName="mobile"
                     aria-label="Mobile Number input" maxlength="10" (keypress)="numericOnly($event)"
                     (paste)="numericOnly($event)">
@@ -899,8 +901,7 @@
                     </li>
                   </ul>
                 </div>
-                <p
-                  *ngIf="appData?.user?.organisations && appData?.user?.organisations[0]?.roles &&
+                <p *ngIf="appData?.user?.organisations && appData?.user?.organisations[0]?.roles &&
                     appData?.user?.organisations[0]?.roles?.length === 0">
                   -</p>
               </div>

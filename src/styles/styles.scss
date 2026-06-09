@@ -1004,6 +1004,7 @@ h3.shepherd-title {
   background: transparent;
 }
 
+<<<<<<< HEAD
 // Remove MDC large height
 .mat-mdc-tab-header {
   border-bottom: 1px solid rgba(0, 0, 0, 0.12) !important;
@@ -1326,27 +1327,7 @@ h3.shepherd-title {
   box-sizing: border-box !important;
 }
 
-.mat-mdc-icon-button {
-  -webkit-user-select: none;
-  user-select: none;
-  display: inline-flex !important;
-  align-items: center;
-  justify-content: center;
-  box-sizing: border-box;
-  border: none;
-  outline: none;
-  background-color: transparent;
-  fill: currentColor;
-  color: inherit;
-  text-decoration: none;
-  cursor: pointer;
-  overflow: visible;
-  width: 24px !important;
-  height: 24px !important;
-  padding: 12px;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
+
 
 .mat-mdc-button,
 .mat-mdc-raised-button,
@@ -1849,11 +1830,7 @@ h3.shepherd-title {
 // LIST MDC MIGRATION
 // ===============================
 
-mat-list-item .mat-mdc-icon-button mat-icon {
-  color: $overleyDarkBackground !important;
-  font-size: 16px;
-  margin-top: -8px;
-}
+
 
 mat-list-item {
   height: 42px !important;
@@ -2072,3 +2049,51 @@ mat-list-item {
 
 }
 
+.mdc-switch__icons {
+  opacity: 0 !important;
+}
+
+.mat-mdc-slide-toggle-checked .mdc-switch__track::after {
+  background: rgba(27, 76, 161, 0.54) !important;
+}
+
+.mat-mdc-slide-toggle-checked .mdc-switch__shadow {
+  background: #1b4ca1 !important;
+}
+
+.mat-mdc-paginator .mat-mdc-icon-button {
+  --mat-icon-button-state-layer-color: transparent !important;
+  --mat-icon-button-ripple-color: transparent !important;
+  background: transparent !important;
+}
+
+.mat-mdc-paginator .mdc-icon-button__ripple,
+.mat-mdc-paginator .mat-mdc-button-persistent-ripple {
+  display: none !important;
+}
+
+.mat-mdc-paginator-page-size-label {
+  white-space: nowrap !important;
+}
+
+
+.mat-mdc-select-trigger {
+  align-items: center !important;
+}
+
+.mat-mdc-select-value {
+  display: flex !important;
+  align-items: center !important;
+}
+
+.mat-mdc-menu-item-text {
+    height: auto;
+    padding: 0 6px;
+    font: 400 14px / 21px Lato !important;
+}
+
+=======
+.global-search-content .mat-btn-flat {
+  margin-right: 15px !important;
+}
+>>>>>>> 28fd0b9ae1be35d7bc81a63005b67d38a08ea60b

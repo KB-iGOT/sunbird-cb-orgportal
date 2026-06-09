@@ -44,7 +44,7 @@
 
       <div class="input-container">
         <div class="label required">Designation</div>
-        <!--<mat-form-field class="profile-form-field required-select" appearance="fill">
+        <!--<mat-form-field class="profile-form-field required-select" appearance="outline">
            <div class="flex flex-row auto-complete-row">
             <input type="text" class="input-text" aria-label="Designation" placeholder="Select designation" matInput
               formControlName="designation" [matAutocomplete]="designationAuto" />
@@ -56,7 +56,7 @@
             </mat-option>
           </mat-autocomplete>
         </mat-form-field>-->
-        <mat-form-field appearance="fill" class="profile-form-field required-select">
+        <mat-form-field appearance="outline" class="profile-form-field required-select mt-2">
           <mat-select #designation formControlName="designation" placeholder="Select designation"
             (closed)="onDesignationDropdownClosed()" panelClass="search-panel"
             (openedChange)="setupScrollListener($event)">
@@ -97,7 +97,7 @@
     <div class="flex flex-row gap-6">
       <div class="input-container">
         <div class="label required">Group</div>
-        <mat-form-field class="profile-form-field required-select" appearance="fill">
+        <mat-form-field class="profile-form-field required-select" appearance="outline">
           <mat-select formControlName="group">
             <mat-option value="">Choose a group</mat-option>
             <mat-option *ngFor="let group of masterData.group" value="{{group}}">{{ group }}</mat-option>
@@ -110,7 +110,7 @@
       </div>
       <div class="input-container">
         <div class="label">Date of birth</div>
-        <mat-form-field class="profile-form-field" appearance="fill">
+        <mat-form-field class="profile-form-field" appearance="outline">
           <input matInput class="input-text icon-include-input" [matDatepicker]="picker" readonly formControlName="dob"
             [max]="today" placeholder="Choose date of birth" />
           <mat-datepicker-toggle matSuffix [for]="picker">
@@ -124,7 +124,7 @@
     <div class="flex flex-row gap-6">
       <div class="input-container">
         <div class="label">Mother tongue</div>
-        <mat-form-field class="profile-form-field required-select" appearance="fill">
+        <mat-form-field class="profile-form-field required-select" appearance="outline">
           <div class="flex flex-row auto-complete-row">
             <input type="text" class="input-text" aria-label="Domicile medium" placeholder="Type here" matInput
               formControlName="domicileMedium" [matAutocomplete]="languageAuto" />
@@ -139,7 +139,7 @@
       </div>
       <div class="input-container">
         <div class="label">Gender</div>
-        <mat-form-field class="profile-form-field" appearance="fill">
+        <mat-form-field class="profile-form-field" appearance="outline">
           <mat-select formControlName="gender">
             <mat-option value="">Select gender</mat-option>
             <mat-option value="Male">Male</mat-option>
@@ -153,7 +153,7 @@
     <div class="flex flex-row gap-6">
       <div class="input-container">
         <div class="label">Category</div>
-        <mat-form-field class="profile-form-field" appearance="fill">
+        <mat-form-field class="profile-form-field" appearance="outline">
           <mat-select formControlName="category">
             <mat-option value="">Select category</mat-option>
             <mat-option value="General">General</mat-option>
@@ -179,18 +179,22 @@
     <div class="flex flex-row gap-6">
       <div class="input-container">
         <div class="label">Tags</div>
-        <input type="text" class="input-text" matInput="Type tag here" placeholder="Type tag here and press enter"
-          [matChipInputFor]="chipListTags" autocomplete="off" maxlength="100"
-          [matChipInputSeparatorKeyCodes]="separatorKeysCodes" (keypress)="handleValidTags($event)"
-          (matChipInputTokenEnd)="handleAddTags($event)" />
-        <mat-chip-list #chipListTags>
-          <mat-chip *ngFor="let tag of userCreationForm?.get('tags')?.value" [selectable]="true" [removable]="true"
-            (removed)="handleRemoveTag(tag)">
-            {{ tag }}
-            <mat-icon matChipRemove>cancel</mat-icon>
-          </mat-chip>
-        </mat-chip-list>
+
+        <mat-form-field appearance="outline" class="profile-form-field">
+          <input matInput #tagInput placeholder="Type tag here and press enter" maxlength="100"
+            (keydown.enter)="handleAddTags(tagInput); ">
+        </mat-form-field>
+
+        <div class="tags-container" *ngIf="userCreationForm.get('tags')?.value?.length">
+          <mat-chip-set>
+            <mat-chip-row *ngFor="let tag of userCreationForm.get('tags')?.value" (removed)="handleRemoveTag(tag)">
+              {{ tag }}
+              <mat-icon matChipRemove>cancel</mat-icon>
+            </mat-chip-row>
+          </mat-chip-set>
+        </div>
       </div>
+
       <div class="input-container">
         <ng-container *ngIf="userCreationForm?.get('department')">
           <div class="label required">Department</div>

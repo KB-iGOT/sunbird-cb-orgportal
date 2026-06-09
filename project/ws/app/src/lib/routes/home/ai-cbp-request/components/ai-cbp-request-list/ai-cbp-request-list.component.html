@@ -1,11 +1,19 @@
 <div class="request-container">
-  <h2>Approval Requests</h2>
-
-  <div class="create-action">
-    <button mat-button type="button" class="search-btn" (click)="viewNonMatchingDesignation()">
-      View Non Matching Designation
-    </button>
+  <div class="flex flex-row justify-between mt-10">
+    <div>
+      <h2>Approval Requests</h2>
+    </div>
+    <div>
+      <div class="create-action">
+        <button mat-button type="button" class="search-btn" (click)="viewNonMatchingDesignation()">
+          View Non Matching Designation
+        </button>
+      </div>
+    </div>
   </div>
+
+
+
   <div class="filter-toolbar">
 
     <!-- Filter Label -->
@@ -23,8 +31,8 @@
 
       <mat-icon class="search-icon">search</mat-icon>
 
-      <input type="text" placeholder="Search by Request name or Request ID" [(ngModel)]="searchText"
-        (input)="applyFilters()" />
+      <input type="text" placeholder="Search by Request name or Request ID or Department" [(ngModel)]="searchText"
+        (input)="loadStaticTableData()" />
 
       <button *ngIf="searchText" mat-icon-button class="clear-btn" (click)="clearSearch()">
 
@@ -37,7 +45,7 @@
     <!-- Status Filter -->
     <mat-form-field appearance="outline" class="filter-select">
 
-      <mat-select [(value)]="selectedStatus" (selectionChange)="applyFilters()">
+      <mat-select [(value)]="selectedStatus" (selectionChange)="loadStaticTableData()">
 
         <mat-option value="">All Status</mat-option>
 
@@ -63,7 +71,14 @@
 
       </mat-select>
 
+
+
     </mat-form-field>
+
+    <button mat-stroked-button class="clear-filter-btn" (click)="clearAllFilters()"
+      *ngIf="searchText || selectedStatus || selectedTime">
+      Clear Filters
+    </button>
 
   </div>
   <div class="nav-container">
@@ -97,13 +112,24 @@
               </td>
             </ng-container>
 
+            <ng-container matColumnDef="department_name">
+              <th mat-header-cell *matHeaderCellDef class="row-heading">Department</th>
+              <td mat-cell class="title-class" *matCellDef="let element">
+                {{ element?.department_name }}
+              </td>
+            </ng-container>
+
             <!-- Request Status -->
             <ng-container matColumnDef="requestStatus">
               <th mat-header-cell *matHeaderCellDef class="row-heading">Request Status</th>
               <td mat-cell class="title-class" *matCellDef="let element">
-                <span>
-                  {{ element?.status === statusKey?.fullfill ? 'Fulfilled' : element?.status }}
-                </span>
+                <div class="flex flex-row gap-2 items-center">
+                  <div class="status-pill" [ngClass]="'status-' + element.status?.toLowerCase()">
+                    {{ element.status | titlecase }}
+                  </div>
+                  <div class="cursor-pointer" (click)="showRejectionSummary(element)"
+                    *ngIf="element?.status === 'REJECTED'"><mat-icon class="vertical-middle">visibility</mat-icon></div>
+                </div>
               </td>
             </ng-container>
 
@@ -178,5 +204,27 @@
     </div>
   </div>
 
+</div>
+<!-- Popup Overlay -->
+<div class="popup-overlay" *ngIf="showRejectPopupFlag">
+  <div class="popup-card">
+
+    <!-- Close Button -->
+    <button class="close-btn" (click)="closeRejectPopup()">&times;</button>
+
+    <!-- Title -->
+    <h2>Rejection Reason</h2>
+
+    <!-- Subtitle -->
+    <p class="subtitle">
+      This request was rejected for the following reason:
+    </p>
+
+    <!-- Error Box -->
+    <div class="error-box">
+      {{rejectionDetail?.reviewer_comments}}
+    </div>
+
+  </div>
 </div>
 <router-outlet></router-outlet>
