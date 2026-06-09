@@ -15,14 +15,15 @@ import { VerifyOtpComponent } from '../verify-otp/verify-otp.component'
 import { FileProgressComponent } from '../file-progress/file-progress.component'
 
 @Component({
-    selector: 'ws-bulk-upload',
-    templateUrl: './bulk-upload.component.html',
-    styleUrls: ['./bulk-upload.component.scss'],
-    standalone: false
+  selector: 'ws-bulk-upload',
+  templateUrl: './bulk-upload.component.html',
+  styleUrls: ['./bulk-upload.component.scss'],
+  standalone: false
 })
 export class BulkUploadComponent implements OnInit, AfterViewInit, OnDestroy {
 
   @Input() selectedOrgData: any
+  @Input() isNgo: boolean = false
 
   lastUploadList: any[] = []
   private destroySubject$ = new Subject()

@@ -36,19 +36,20 @@ const MOBILE_PATTERN = /^[0]?[6789]\d{9}$/
 const PIN_CODE_PATTERN = /^[1-9][0-9]{5}$/
 
 @Component({
-    selector: 'ws-single-user-creation',
-    templateUrl: './single-user-creation.component.html',
-    styleUrls: ['./single-user-creation.component.scss'],
-    providers: [
-        { provide: DateAdapter, useClass: MomentDateAdapter, deps: [MAT_DATE_LOCALE] },
-        { provide: MAT_DATE_FORMATS, useValue: MY_FORMATS },
-    ],
-    standalone: false
+  selector: 'ws-single-user-creation',
+  templateUrl: './single-user-creation.component.html',
+  styleUrls: ['./single-user-creation.component.scss'],
+  providers: [
+    { provide: DateAdapter, useClass: MomentDateAdapter, deps: [MAT_DATE_LOCALE] },
+    { provide: MAT_DATE_FORMATS, useValue: MY_FORMATS },
+  ],
+  standalone: false
 })
 export class SingleUserCreationComponent implements OnInit, AfterViewInit, OnDestroy {
 
   @Input() selectedOrgData: any
   @Input() editUserData: any
+  @Input() isNgo: boolean = false
   @Output() userCreated = new EventEmitter<any>()
 
   @ViewChildren('rolesCheckbox') checkboxes!: QueryList<ElementRef>
@@ -161,9 +162,20 @@ export class SingleUserCreationComponent implements OnInit, AfterViewInit, OnDes
         this.assignData()
       }
     }
-    this.checkOrgHasDesignations()
+
+    // Remove validators for designation and group if isNgo is true
+    if (this.isNgo) {
+      this.userCreationForm.get('designation')?.clearValidators()
+      this.userCreationForm.get('designation')?.updateValueAndValidity()
+      this.userCreationForm.get('group')?.clearValidators()
+      this.userCreationForm.get('group')?.updateValueAndValidity()
+    } else {
+      // Only load designation and group data if not NGO
+      this.checkOrgHasDesignations()
+      this.getGroups()
+    }
+
     this.getMasterLanguages()
-    this.getGroups()
     this.getOrgRolesList()
     const fullProfile = _.get(this.activatedRouter?.snapshot, 'data.configService')
     if (fullProfile?.unMappedUser && fullProfile?.unMappedUser?.roles) {
@@ -482,7 +494,9 @@ export class SingleUserCreationComponent implements OnInit, AfterViewInit, OnDes
             const mdoArray = this.masterData.rolesList.orgTypeList.find((elem: any) => elem.name === 'MDO')
             this.masterData['mdoRoles'] = mdoArray.roles || []
             // Filter based on isMdoLeader flag
-            if (this.isMdoLeader) {
+            if (this.isNgo) {
+              this.filteredRoles = this.masterData?.ngoRoles
+            } else if (this.isMdoLeader) {
               this.filteredRoles = this.masterData?.mdoRoles  // show all roles
             } else {
               this.filteredRoles = this.masterData?.mdoRoles.filter((role: any) => role === 'PUBLIC')  // show only PUBLIC
@@ -566,6 +580,9 @@ export class SingleUserCreationComponent implements OnInit, AfterViewInit, OnDes
 
     if (this.selectedOrgData && this.selectedOrgData.roleId) {
       dataToSubmit.channel = this.selectedOrgData.depatName
+    }
+    if (this.isNgo) {
+      dataToSubmit['isNgo'] = true
     }
 
     if (!this.userCreationForm.value.channel) {
