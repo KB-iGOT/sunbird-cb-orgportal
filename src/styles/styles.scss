@@ -1004,6 +1004,7 @@ h3.shepherd-title {
   background: transparent;
 }
 
+<<<<<<< HEAD
 // Remove MDC large height
 .mat-mdc-tab-header {
   border-bottom: 1px solid rgba(0, 0, 0, 0.12) !important;
@@ -2091,3 +2092,8 @@ mat-list-item {
     font: 400 14px / 21px Lato !important;
 }
 
+=======
+.global-search-content .mat-btn-flat {
+  margin-right: 15px !important;
+}
+>>>>>>> 28fd0b9ae1be35d7bc81a63005b67d38a08ea60b
