@@ -98,6 +98,7 @@
   position: relative;
 }
 
+
 /* Tab content (default state) */
 ::ng-deep .stepper .mat-mdc-tab .mdc-tab__content {
   background-color: #F5F5F5;
@@ -173,4 +174,12 @@
 
 :host ::ng-deep .mat-mdc-tab.mdc-tab--active .mdc-tab__text-label {
     color: #fff !important;
+}
+
+::ng-deep .mat-mdc-tab-header-pagination {
+  display: none !important;
+}
+
+::ng-deep .mat-mdc-tab-header {
+  overflow: hidden !important;
 }

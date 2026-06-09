@@ -36,7 +36,7 @@
 }
 
 .auto-complete-row {
-  border: 1px solid $border-color;
+  border: none !important;
   border-radius: 4px;
 
   input {
@@ -131,7 +131,7 @@
     // Search container styling
     .sticky-search-container {
       position: sticky;
-      top: 0;
+      top: -5px;
       z-index: 2;
       background: white;
       padding: 8px;
@@ -211,4 +211,42 @@
 
 .action-button {
   width: auto !important;
+}
+
+:host ::ng-deep .mat-mdc-text-field-wrapper {
+  height: 48px !important;
+}
+
+.input-text {
+  margin: 0 !important;
+}
+
+:host ::ng-deep .mat-mdc-chip-grid {
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+}
+
+:host ::ng-deep .mat-mdc-chip-set {
+  flex-wrap: nowrap !important;
+  overflow-x: auto;
+}
+
+:host ::ng-deep .mat-mdc-chip-row {
+  margin-right: 4px;
+}
+
+.tags-container {
+  display: flex;
+}
+
+.tags-container .mat-mdc-chip-set {
+ display: flex;
+    flex-wrap: wrap !important;
+    gap: 8px;
+    overflow: hidden;
+    justify-content: flex-start;
+    align-items: flex-start;
+    text-align: left;
+    flex-direction: row;
 }
