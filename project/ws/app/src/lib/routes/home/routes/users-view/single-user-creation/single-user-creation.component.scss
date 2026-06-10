@@ -131,7 +131,7 @@
     // Search container styling
     .sticky-search-container {
       position: sticky;
-      top: -5px;
+      top: -10px;
       z-index: 2;
       background: white;
       padding: 8px;
@@ -249,4 +249,15 @@
     align-items: flex-start;
     text-align: left;
     flex-direction: row;
+}
+
+.profile-form-field {
+  .mat-mdc-form-field-infix {
+    padding-left: 0 !important;
+  }
+
+  .mat-mdc-input-element {
+    text-align: left !important;
+    padding-left: 0 !important;
+  }
 }

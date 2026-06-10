@@ -50,8 +50,8 @@
                 <label class="theme-name">
                   {{ subTheme.name }}
                 </label>
-                <mat-checkbox [checked]="subTheme?.selected" (click)="$event.preventDefault()"
-                  [disabled]="subTheme?.preSelected"></mat-checkbox>
+                <mat-checkbox [ngClass]="subTheme?.selected ? 'check-box-selected':''" [checked]="subTheme?.selected"
+                  (click)="$event.preventDefault()" [disabled]="subTheme?.preSelected"></mat-checkbox>
               </div>
             </ng-container>
           </div>
