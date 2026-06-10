@@ -85,10 +85,12 @@
           </div>
         </ng-container>
     </div>
-    <div class="actions flex justify-center items-center gap-4 my-6">
+    <div class="actions flex justify-center items-center gap-4 my-6 relative">
       <ng-container>
         <button *ngIf="!isComplete" mat-flat-button (click)="cancel()" class="new-bg-color text-white" i18n> Cancel</button>
-        <button *ngIf="isComplete" mat-flat-button (click)="closeDialog()" class="new-bg-color text-white" i18n> Done</button>
+        <button *ngIf="isComplete" mat-icon-button (click)="closeDialog()" aria-label="Close" class="close-btn">
+          <mat-icon>close</mat-icon>
+        </button>
       </ng-container>
     </div>
   </div>

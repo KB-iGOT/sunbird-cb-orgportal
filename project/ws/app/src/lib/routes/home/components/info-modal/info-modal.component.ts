@@ -3,8 +3,6 @@ import { MAT_LEGACY_DIALOG_DATA, MatLegacyDialogRef } from '@angular/material/le
 import { Subject, Subscription } from 'rxjs'
 import { takeUntil } from 'rxjs/operators'
 import { DownloadReportService } from '../../services/download-report.service'
-import { MatSnackBar } from '@angular/material/snack-bar'
-import { SnackbarComponent } from '@sunbird-cb/consumption'
 
 
 @Component({
@@ -31,7 +29,6 @@ export class InfoModalComponent implements OnInit, OnDestroy {
     @Inject(MAT_LEGACY_DIALOG_DATA) public data: any,
     private downloadSvc: DownloadReportService,
     private cdr: ChangeDetectorRef,
-    private snackBar: MatSnackBar,
   ) { }
 
   ngOnInit() {
@@ -137,15 +134,10 @@ export class InfoModalComponent implements OnInit, OnDestroy {
         setTimeout(() => this.downloadNext(), 200)
       }, (err: any) => {
         this.isDownloading = false
-        const message = err?.status === 404 ? 'Report not found for the requested organization' : 'Download failed. Please try again.'
+        const message = err?.status === 404 ? err?.error?.message : 'Download failed. Please try again.'
         this.errorMessage = message
         this.lastFailedItem = item
         this.results.push({ item, status: 'Failed', error: err, message })
-        this.snackBar.openFromComponent(SnackbarComponent, {
-          data: {
-            message: item.orgName + '.zip' + ' failed to download.', type: 'error',
-          }, duration: 3000, panelClass: 'course-error-snackbar',
-        })
 
         this.currentIndex++
         setTimeout(() => this.downloadNext(), 200)
