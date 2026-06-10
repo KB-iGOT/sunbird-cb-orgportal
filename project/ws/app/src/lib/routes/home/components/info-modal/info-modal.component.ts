@@ -116,7 +116,7 @@ export class InfoModalComponent implements OnInit, OnDestroy {
           const a = document.createElement('a')
           a.href = body.downloadUrl
           a.download = filename
-          a.target = '_blank'
+          a.style.display = 'none'
           document.body.appendChild(a)
           a.click()
 
