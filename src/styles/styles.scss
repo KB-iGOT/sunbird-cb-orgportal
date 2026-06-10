@@ -2098,3 +2098,12 @@ mat-list-item {
 .search-close-icon {
   right: 77px !important;
 }
+
+.filter-list .filter-pill {
+  height: 36px;
+}
+
+.filter-list .filter-pill mat-icon {
+    font-size: 16px;
+    margin-top: 4px;
+}
