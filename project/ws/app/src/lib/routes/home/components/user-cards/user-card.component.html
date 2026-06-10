@@ -94,7 +94,7 @@
                 user</mat-slide-toggle>
             </p> -->
             <div class="flex flex-row margin-top-m">
-              <div class="md:w-1/3">
+              <div class="md:w-1/2">
                 <label class="margin-remove-bottom form-label required">Group</label>
                 <mat-form-field appearance="outline">
                   <mat-select #group formControlName="group" placeholder="Select group">
@@ -116,7 +116,7 @@
                   cancel</mat-icon> <span *ngIf="user?.profileDetails?.profileGroupStatus === 'NOT-VERIFIED'"
                   class="mat-caption status-text ws-mat-black40-text"> Non-verified</span>
               </div>
-              <div class="md:w-1/3">
+              <div class="md:w-1/2">
                 <label class="margin-remove-bottom form-label">Designation</label>
                 <mat-form-field appearance="outline" class="fixed-height-select">
                   <mat-select #designation formControlName="designation" placeholder="Select designation"
