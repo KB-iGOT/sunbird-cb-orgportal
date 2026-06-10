@@ -119,19 +119,24 @@ export class InfoModalComponent implements OnInit, OnDestroy {
           a.target = '_blank'
           document.body.appendChild(a)
           a.click()
-          document.body.removeChild(a)
+
+          // Delay removal to ensure browser registers the download
+          setTimeout(() => {
+            document.body.removeChild(a)
+          }, 100)
 
           this.results.push({ item, status: 'Success' })
-          // this.snackBar.openFromComponent(SnackbarComponent, {
-          //   data: {
-          //     message: filename + ' Downloaded successfully', type: 'success',
-          //   }, duration: 3000, panelClass: 'course-success-snackbar',
-          // })
+        } else {
+          // API successful but no downloadUrl returned
+          const message = 'Download URL not available. Please try again.'
+          this.errorMessage = message
+          this.lastFailedItem = item
+          this.results.push({ item, status: 'Failed', error: null, message })
         }
 
         this.isDownloading = false
         this.currentIndex++
-        setTimeout(() => this.downloadNext(), 200)
+        setTimeout(() => this.downloadNext(), 300)
       }, (err: any) => {
         this.isDownloading = false
         const message = err?.status === 404 ? err?.error?.message : 'Download failed. Please try again.'
@@ -140,7 +145,7 @@ export class InfoModalComponent implements OnInit, OnDestroy {
         this.results.push({ item, status: 'Failed', error: err, message })
 
         this.currentIndex++
-        setTimeout(() => this.downloadNext(), 200)
+        setTimeout(() => this.downloadNext(), 300)
       })
   }
 
