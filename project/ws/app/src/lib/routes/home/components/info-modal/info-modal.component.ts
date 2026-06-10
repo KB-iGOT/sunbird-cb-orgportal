@@ -3,8 +3,6 @@ import { MAT_LEGACY_DIALOG_DATA, MatLegacyDialogRef } from '@angular/material/le
 import { Subject, Subscription } from 'rxjs'
 import { takeUntil } from 'rxjs/operators'
 import { DownloadReportService } from '../../services/download-report.service'
-import { MatSnackBar } from '@angular/material/snack-bar'
-import { SnackbarComponent } from '@sunbird-cb/consumption'
 
 
 @Component({
@@ -31,7 +29,6 @@ export class InfoModalComponent implements OnInit, OnDestroy {
     @Inject(MAT_LEGACY_DIALOG_DATA) public data: any,
     private downloadSvc: DownloadReportService,
     private cdr: ChangeDetectorRef,
-    private snackBar: MatSnackBar,
   ) { }
 
   ngOnInit() {
@@ -122,33 +119,33 @@ export class InfoModalComponent implements OnInit, OnDestroy {
           a.target = '_blank'
           document.body.appendChild(a)
           a.click()
-          document.body.removeChild(a)
+
+          // Delay removal to ensure browser registers the download
+          setTimeout(() => {
+            document.body.removeChild(a)
+          }, 100)
 
           this.results.push({ item, status: 'Success' })
-          // this.snackBar.openFromComponent(SnackbarComponent, {
-          //   data: {
-          //     message: filename + ' Downloaded successfully', type: 'success',
-          //   }, duration: 3000, panelClass: 'course-success-snackbar',
-          // })
+        } else {
+          // API successful but no downloadUrl returned
+          const message = 'Download URL not available. Please try again.'
+          this.errorMessage = message
+          this.lastFailedItem = item
+          this.results.push({ item, status: 'Failed', error: null, message })
         }
 
         this.isDownloading = false
         this.currentIndex++
-        setTimeout(() => this.downloadNext(), 200)
+        setTimeout(() => this.downloadNext(), 300)
       }, (err: any) => {
         this.isDownloading = false
-        const message = err?.status === 404 ? 'Report not found for the requested organization' : 'Download failed. Please try again.'
+        const message = err?.status === 404 ? err?.error?.message : 'Download failed. Please try again.'
         this.errorMessage = message
         this.lastFailedItem = item
         this.results.push({ item, status: 'Failed', error: err, message })
-        this.snackBar.openFromComponent(SnackbarComponent, {
-          data: {
-            message: item.orgName + '.zip' + ' failed to download.', type: 'error',
-          }, duration: 3000, panelClass: 'course-error-snackbar',
-        })
 
         this.currentIndex++
-        setTimeout(() => this.downloadNext(), 200)
+        setTimeout(() => this.downloadNext(), 300)
       })
   }
 
