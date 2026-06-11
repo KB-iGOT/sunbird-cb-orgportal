@@ -26,7 +26,8 @@
               <label class="theme-name mr-2">
                 {{ theme.name }}
               </label>
-              <mat-checkbox [checked]="theme?.selected" (click)="$event.preventDefault()"
+              <mat-checkbox [ngClass]="theme?.selected ? 'check-box-selected':''" [checked]="theme?.selected"
+                [checked]="theme?.selected" (click)="$event.preventDefault()"
                 [disabled]="theme?.preSelected"></mat-checkbox>
             </div>
           </ng-container>
@@ -47,7 +48,8 @@
                 <label class="theme-name">
                   {{ subTheme.name }}
                 </label>
-                <mat-checkbox [checked]="subTheme?.selected" (click)="$event.preventDefault()"
+                <mat-checkbox [ngClass]="subTheme?.selected ? 'check-box-selected':''" [checked]="subTheme?.selected"
+                  [checked]="subTheme?.selected" (click)="$event.preventDefault()"
                   [disabled]="subTheme?.preSelected"></mat-checkbox>
               </div>
             </ng-container>
