@@ -71,7 +71,7 @@ export class DownloadReportService {
           childId: rootOrgId === item.sbOrgId ? [] : [item.sbOrgId],
         },
       }
-      return this.http.post<Blob>(`${API_END_POINTS.DOWNLOAD_OPS_REPORTS_v3}/${rootOrgId}`, req, {
+      return this.http.post<Blob>(`${API_END_POINTS.DOWNLOAD_OPS_REPORTS}/${rootOrgId}`, req, {
         responseType: 'blob' as 'json',
         observe: 'response',
       }).pipe(
