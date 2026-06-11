@@ -2107,3 +2107,13 @@ mat-list-item {
     font-size: 16px;
     margin-top: 4px;
 }
+
+.search-container-listing {
+  .search-results,
+.search-item,
+.search-text {
+  white-space: normal !important;
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+}

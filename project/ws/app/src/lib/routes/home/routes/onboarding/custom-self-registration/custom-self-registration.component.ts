@@ -10,12 +10,13 @@ import { OnboardingService } from '../../../services/onboarding.service'
 import { DesignationsService } from '../../designation/services/designations.service'
 import _ from 'lodash'
 import { EventService } from '@sunbird-cb/utils-v2'
+import { LoaderService } from '../../../../../../../../../../src/app/services/loader.service'
 
 @Component({
-    selector: 'ws-app-custom-self-registration',
-    templateUrl: './custom-self-registration.component.html',
-    styleUrls: ['./custom-self-registration.component.scss'],
-    standalone: false
+  selector: 'ws-app-custom-self-registration',
+  templateUrl: './custom-self-registration.component.html',
+  styleUrls: ['./custom-self-registration.component.scss'],
+  standalone: false
 })
 export class CustomSelfRegistrationComponent implements OnInit {
 
@@ -44,7 +45,8 @@ export class CustomSelfRegistrationComponent implements OnInit {
     private clipboard: Clipboard,
     private onboardingService: OnboardingService,
     private designationsService: DesignationsService,
-    private eventService: EventService
+    private eventService: EventService,
+    public loader: LoaderService
 
   ) { }
 
@@ -78,6 +80,7 @@ export class CustomSelfRegistrationComponent implements OnInit {
         } else {
           this.customRegistrationLinks = undefined
         }
+        this.loader.changeLoad.next(false)
         this.isLoading = false
       },
       error: () => {
