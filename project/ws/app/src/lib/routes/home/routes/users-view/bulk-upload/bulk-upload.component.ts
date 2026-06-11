@@ -13,6 +13,7 @@ import { FileService } from '../../../../users/services/upload.service'
 import { UsersService } from '../../../../users/services/users.service'
 import { VerifyOtpComponent } from '../verify-otp/verify-otp.component'
 import { FileProgressComponent } from '../file-progress/file-progress.component'
+import { LoaderService } from '../../../../../../../../../../src/app/services/loader.service'
 
 @Component({
   selector: 'ws-bulk-upload',
@@ -47,7 +48,8 @@ export class BulkUploadComponent implements OnInit, AfterViewInit, OnDestroy {
     private matSnackBar: MatSnackBar,
     private router: ActivatedRoute,
     public dialog: MatDialog,
-    private usersService: UsersService
+    private usersService: UsersService,
+    public loader: LoaderService,
   ) {
 
 
@@ -89,6 +91,7 @@ export class BulkUploadComponent implements OnInit, AfterViewInit, OnDestroy {
       .subscribe((res: any) => {
         this.lastUploadList = res.result.content.sort((a: any, b: any) =>
           new Date(b.dateCreatedOn).getTime() - new Date(a.dateCreatedOn).getTime())
+        this.loader.changeLoad.next(false)
         // tslint:disable-next-line
       }, (error: HttpErrorResponse) => {
         if (!error.ok) {

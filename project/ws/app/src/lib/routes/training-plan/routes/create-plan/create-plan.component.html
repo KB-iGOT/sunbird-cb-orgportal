@@ -3,7 +3,8 @@
         (changeToNextTab)="changeTab($event)"></ws-app-breadcrumb>
     <ws-app-stepper (selectedTabType)="selectedTabAction($event)" [changeTabOnNext]="nextTab"
         (titleInvalid)="isPlanTitleInvalid($event)" (addContentIsInvalid)="isAddContentInvalid($event)"
-        (addAssigneeIsInvalid)="isAddAssigneeInvalid($event)" (addAccessSettingsIsInvalid)="isAddAccessSettingsInvalid($event)"></ws-app-stepper>
+        (addAssigneeIsInvalid)="isAddAssigneeInvalid($event)"
+        (addAccessSettingsIsInvalid)="isAddAccessSettingsInvalid($event)"></ws-app-stepper>
 </div>
 <div [hidden]="!filterVisibilityFlag">
     <ws-app-filter [from]="from"></ws-app-filter>

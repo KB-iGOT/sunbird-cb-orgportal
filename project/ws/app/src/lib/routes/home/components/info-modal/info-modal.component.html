@@ -64,16 +64,15 @@
 </ng-container>
 
 <ng-container *ngIf="data.type === 'download-file-with-progress'">
-  <div class="info-dialog-wrapper">
+  <div class="info-dialog-wrapper relative">
     <div class="text-center mt-8">
       <img src="/assets/icons/i-icon-large.svg" alt="success-icon" class="mb-4">
         <ng-container>
           <div *ngIf="isDownloading">
-            <mat-progress-bar mode="determinate" [value]="progress"></mat-progress-bar>
-            <div class="mb-4 mt-4 downloading-text">Downloading report for {{ items[currentIndex]?.orgName || items[currentIndex]?.downloadUrl || 'file' }} ({{ currentIndex + 1 }}/{{ items?.length || 0 }})</div>
-            <div class="mt-2">{{progress}}% &middot; {{formatBytes(downloaded)}} / {{formatBytes(total)}}</div>
+            <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+            <div class="mb-4 mt-4 downloading-text">Downloading report for {{ items[currentIndex]?.orgName || 'file' }} ({{ currentIndex + 1 }}/{{ items?.length || 0 }})</div>
           </div>
-          <div *ngIf="!isDownloading && progress > 0 && !hasErrors">
+          <div *ngIf="!isDownloading && items[currentIndex - 1] && !hasErrors">
             <div class="mb-4">Completed: {{items[currentIndex - 1]?.orgName || 'file'}}</div>
           </div>
           <div *ngIf="results && results.length > 0" class="errors-list mt-4">
@@ -86,10 +85,12 @@
           </div>
         </ng-container>
     </div>
-    <div class="actions flex justify-center items-center gap-4 my-6">
+    <div class="actions flex justify-center items-center gap-4 my-6 ">
       <ng-container>
         <button *ngIf="!isComplete" mat-flat-button (click)="cancel()" class="new-bg-color text-white" i18n> Cancel</button>
-        <button *ngIf="isComplete" mat-flat-button (click)="closeDialog()" class="new-bg-color text-white" i18n> Done</button>
+        <button *ngIf="isComplete" mat-icon-button (click)="closeDialog()" aria-label="Close" class="close-btn">
+          <mat-icon>close</mat-icon>
+        </button>
       </ng-container>
     </div>
   </div>

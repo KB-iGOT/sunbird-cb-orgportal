@@ -467,7 +467,7 @@ label {
     // Search container styling
     .sticky-search-container {
       position: sticky;
-      top: 0;
+      top: -10px;
       z-index: 2;
       background: white;
       padding: 8px;
@@ -538,7 +538,7 @@ label {
   }
 
   :host ::ng-deep  .mat-mdc-form-field {
-    width: 50% !important;
+    width: 75% !important;
   }
 
  .roles-list {
@@ -561,4 +561,19 @@ label {
   width: auto !important;
   flex: 0 0 auto !important;
   border: 1px solid #dedede;
+}
+
+:host ::ng-deep  .mat-mdc-select-value-text {
+  margin-top: 8px !important;
+}
+
+
+:host ::ng-deep .mnumber .mdc-text-field--outlined .mdc-notched-outline {
+  margin-top: -6px !important;
+}
+
+
+:host ::ng-deep .mat-mdc-select-arrow {
+  margin-top: 5px !important;
+  margin-left: 10px !important;
 }

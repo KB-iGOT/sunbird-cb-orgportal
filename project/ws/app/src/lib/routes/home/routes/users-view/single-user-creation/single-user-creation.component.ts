@@ -539,6 +539,12 @@ export class SingleUserCreationComponent implements OnInit, AfterViewInit, OnDes
     if (event.input) {
       event.input.value = ''
     }
+
+    // Clear textbox
+    event.value = ''
+
+    // Optional - mark form control update
+    this.userCreationForm.get('tags')?.updateValueAndValidity()
   }
 
   handleValidTags(event: any): any {

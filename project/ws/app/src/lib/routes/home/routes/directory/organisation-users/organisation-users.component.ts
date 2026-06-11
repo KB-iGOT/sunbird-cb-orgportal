@@ -79,6 +79,7 @@ export class OrganisationUsersComponent implements OnInit {
 
   onTabChange(tabIndex: number): void {
     this.selectedTabIndex = tabIndex
+    this.loaderService.changeLoaderState(false)
     const selectedTab = this.tabs[tabIndex]
     if (selectedTab && selectedTab.value) {
       this.router.navigate([], {

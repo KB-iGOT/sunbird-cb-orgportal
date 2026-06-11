@@ -94,7 +94,7 @@
                 user</mat-slide-toggle>
             </p> -->
             <div class="flex flex-row margin-top-m">
-              <div class="md:w-1/3">
+              <div class="md:w-1/2">
                 <label class="margin-remove-bottom form-label required">Group</label>
                 <mat-form-field appearance="outline">
                   <mat-select #group formControlName="group" placeholder="Select group">
@@ -116,7 +116,7 @@
                   cancel</mat-icon> <span *ngIf="user?.profileDetails?.profileGroupStatus === 'NOT-VERIFIED'"
                   class="mat-caption status-text ws-mat-black40-text"> Non-verified</span>
               </div>
-              <div class="md:w-1/3">
+              <div class="md:w-1/2">
                 <label class="margin-remove-bottom form-label">Designation</label>
                 <mat-form-field appearance="outline" class="fixed-height-select">
                   <mat-select #designation formControlName="designation" placeholder="Select designation"
@@ -138,7 +138,9 @@
                     <mat-option [value]="designation?.name" *ngFor="let designation of filterDesignationsMeta">
                       {{designation?.name}}
                     </mat-option>
-                    <mat-option *ngIf="updateUserDataForm.get('designation')?.value" [value]="updateUserDataForm.get('designation')?.value" disabled >{{updateUserDataForm.get('designation')?.value}}</mat-option>
+                    <mat-option *ngIf="updateUserDataForm.get('designation')?.value"
+                      [value]="updateUserDataForm.get('designation')?.value"
+                      disabled>{{updateUserDataForm.get('designation')?.value}}</mat-option>
                     <!-- No results message -->
                     <mat-option *ngIf="(filterDesignationsMeta )?.length === 0" disabled>
                       No matches found
@@ -202,7 +204,7 @@
                   +91
                 </div>
                 <!-- </mat-form-field> -->
-                <mat-form-field appearance="outline" class="flex-expand w-48p">
+                <mat-form-field appearance="outline" class="flex-expand w-48p mnumber">
                   <input id="mobileNumber" #mobile type="text" matInput placeholder="Type here" formControlName="mobile"
                     aria-label="Mobile Number input" maxlength="10" (keypress)="numericOnly($event)"
                     (paste)="numericOnly($event)">
@@ -899,8 +901,7 @@
                     </li>
                   </ul>
                 </div>
-                <p
-                  *ngIf="appData?.user?.organisations && appData?.user?.organisations[0]?.roles &&
+                <p *ngIf="appData?.user?.organisations && appData?.user?.organisations[0]?.roles &&
                     appData?.user?.organisations[0]?.roles?.length === 0">
                   -</p>
               </div>

@@ -587,7 +587,12 @@ $title-line-count: 2;
 .card-select-check {
     height: 20px;
     width: 17px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
+
+
 
 .card-cross-icon {
   position: absolute;

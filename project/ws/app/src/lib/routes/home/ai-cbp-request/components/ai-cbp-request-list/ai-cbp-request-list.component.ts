@@ -38,6 +38,8 @@ export class AICBPRequestListComponent implements OnInit {
   pageSize = 20
 
   defaultPageSizeOptions = [10, 20, 25, 50, 100]
+  showRejectPopupFlag = false
+  rejectionDetail: any = {}
   constructor(public aicbpRequestSvc: AICBPRequestService, public dialog: MatDialog,
     private router: Router,
     private configSvc: ConfigurationsService
@@ -49,6 +51,7 @@ export class AICBPRequestListComponent implements OnInit {
     'RequestId',
     'title',
     'requestor',
+    'department_name',
     'requestStatus',
     'requestedOn',
     'interests',
@@ -70,7 +73,7 @@ export class AICBPRequestListComponent implements OnInit {
     this.staticRequestList = []
 
     this.aicbpRequestSvc.getApprovalRequests(this.pageNo,
-      this.pageSize,).subscribe((requests: any) => {
+      this.pageSize, this.searchText, this.selectedStatus).subscribe((requests: any) => {
 
         console.log('API Response:', requests)
 
@@ -79,11 +82,13 @@ export class AICBPRequestListComponent implements OnInit {
             demand_id: request.id,
             title: request.request_name,
             ownerName: (request.user && request.user.email) ? request.user.email : 'N/A',
+            department_name: request.department_name || 'N/A',
             requestType: 'N/A',
             status: request.status || 'N/A',
             assignedProvider: request.assignedProvider || 'Unassigned',
             createdOn: new Date(request.created_at),
             interestCount: request.designation_count || 0,
+            reviewer_comments: request.reviewer_comments || 'No Reason Found',
           })
         })
 
@@ -115,7 +120,7 @@ export class AICBPRequestListComponent implements OnInit {
 
   viewACBPRoleMapping(element: any) {
     console.log('this.configSvc', this.configSvc)
-    this.router.navigateByUrl('app/home/ai-cbp-requests/acbp-list/review-request/' + element.demand_id, {
+    this.router.navigateByUrl('app/home/ai-cbp-requests/acbp-list/review-request/' + element.demand_id + '?source=mdo', {
       state: {
         configData: {
           userData: this.configSvc.unMappedUser,
@@ -129,11 +134,8 @@ export class AICBPRequestListComponent implements OnInit {
   prepareFilters(data: any[]) {
 
     this.statusList = [
-      ...new Set(
-        data
-          .map(item => item?.status)
-          .filter(Boolean)
-      )
+
+      "Approved", "Rejected", "Pending"
     ]
 
     this.assigneeList = [
@@ -158,7 +160,8 @@ export class AICBPRequestListComponent implements OnInit {
         item?.title?.toLowerCase()?.includes(search) ||
         item?.demand_id?.toLowerCase()?.includes(search) ||
         item?.ownerName?.toLowerCase()?.includes(search) ||
-        item?.status?.toLowerCase()?.includes(search)
+        item?.status?.toLowerCase()?.includes(search) ||
+        item?.department_name?.toLowerCase()?.includes(search)
       )
     }
 
@@ -219,12 +222,31 @@ export class AICBPRequestListComponent implements OnInit {
 
   clearSearch() {
     this.searchText = ''
-    this.applyFilters()
+    this.loadStaticTableData()
   }
 
   onChangePage(event: any) {
     this.pageNo = event.pageIndex + 1
     this.pageSize = event.pageSize
+
+    this.loadStaticTableData()
+  }
+
+  showRejectionSummary(element: any) {
+    this.showRejectPopupFlag = true
+    this.rejectionDetail = element
+    console.log('Rejection Detail =>', this.rejectionDetail)
+  }
+
+  closeRejectPopup() {
+    this.showRejectPopupFlag = false
+  }
+
+  clearAllFilters() {
+    this.searchText = ''
+    this.selectedStatus = ''
+    this.selectedTime = ''
+    this.pageNo = 1
 
     this.loadStaticTableData()
   }
