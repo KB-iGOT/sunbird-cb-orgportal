@@ -22,10 +22,12 @@ export class AICBPRequestService {
   //   return this.http.post<any>(API_END_POINTS.GET_BLENDED_PROGRAMS, request)
   // }
 
-  getApprovalRequests(page: number, pageSize: number) {
+  getApprovalRequests(page: number, pageSize: number, searchText: string, selected_status: string) {
     let params = new HttpParams()
       .set('page', page.toString())
       .set('page_size', pageSize.toString())
+      .set('search', searchText)
+      .set('status_filter', selected_status?.toLowerCase())
     return this.http.get<any>(`${API_END_POINTS.GET_APPROVAL_REQUESTS}`, { params })
   }
 
