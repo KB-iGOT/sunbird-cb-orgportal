@@ -68,12 +68,9 @@
     <div class="text-center mt-8">
       <img src="/assets/icons/i-icon-large.svg" alt="success-icon" class="mb-4">
         <ng-container>
-          <div *ngIf="isDownloading">
+          <div *ngIf="!isComplete">
             <mat-progress-bar mode="indeterminate"></mat-progress-bar>
             <div class="mb-4 mt-4 downloading-text">Downloading report for {{ items[currentIndex]?.orgName || 'file' }} ({{ currentIndex + 1 }}/{{ items?.length || 0 }})</div>
-          </div>
-          <div *ngIf="!isDownloading && items[currentIndex - 1] && !hasErrors">
-            <div class="mb-4">Completed: {{items[currentIndex - 1]?.orgName || 'file'}}</div>
           </div>
           <div *ngIf="results && results.length > 0" class="errors-list mt-4">
             <ng-container *ngFor="let result of results">

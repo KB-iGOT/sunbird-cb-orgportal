@@ -23,6 +23,8 @@ export class InfoModalComponent implements OnInit, OnDestroy {
 
   private destroy$ = new Subject<void>()
   private sub: Subscription | null = null
+  private isCancelled = false
+  private timerId: any = null
 
   constructor(
     public dialogRef: MatLegacyDialogRef<InfoModalComponent>,
@@ -81,13 +83,19 @@ export class InfoModalComponent implements OnInit, OnDestroy {
 
   startSequentialDownload() {
     this.currentIndex = 0
+    this.isCancelled = false
+    this.isDownloading = true
     this.downloadNext()
   }
 
   private downloadNext() {
+    if (this.isCancelled) {
+      return
+    }
     if (this.currentIndex >= this.items.length) {
       // Check if there were any failures
       this.hasErrors = this.results.some(r => r.status === 'Failed')
+      this.isDownloading = false
       this.isComplete = true
       // Only auto-close if no errors occurred
       if (!this.hasErrors) {
@@ -98,7 +106,6 @@ export class InfoModalComponent implements OnInit, OnDestroy {
     }
 
     const item = this.items[this.currentIndex]
-    this.isDownloading = true
     this.errorMessage = ''
     this.lastFailedItem = null
 
@@ -116,7 +123,7 @@ export class InfoModalComponent implements OnInit, OnDestroy {
           const a = document.createElement('a')
           a.href = body.downloadUrl
           a.download = filename
-          a.target = '_blank'
+          a.style.display = 'none'
           document.body.appendChild(a)
           a.click()
 
@@ -134,22 +141,24 @@ export class InfoModalComponent implements OnInit, OnDestroy {
           this.results.push({ item, status: 'Failed', error: null, message })
         }
 
-        this.isDownloading = false
         this.currentIndex++
-        setTimeout(() => this.downloadNext(), 300)
+        this.timerId = setTimeout(() => this.downloadNext(), 300)
       }, (err: any) => {
-        this.isDownloading = false
         const message = err?.status === 404 ? err?.error?.message : 'Download failed. Please try again.'
         this.errorMessage = message
         this.lastFailedItem = item
         this.results.push({ item, status: 'Failed', error: err, message })
 
         this.currentIndex++
-        setTimeout(() => this.downloadNext(), 300)
+        this.timerId = setTimeout(() => this.downloadNext(), 300)
       })
   }
 
   cancel() {
+    this.isCancelled = true
+    this.isDownloading = false
+    clearTimeout(this.timerId)
+    this.timerId = null
     this.destroy$.next()
     this.destroy$.complete()
     if (this.sub) {
@@ -164,6 +173,9 @@ export class InfoModalComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    this.isCancelled = true
+    clearTimeout(this.timerId)
+    this.timerId = null
     this.destroy$.next()
     this.destroy$.complete()
     if (this.sub) {
