@@ -336,7 +336,7 @@ export class CreateEventComponent implements OnInit, AfterViewInit {
 
       const dialogRef = this.dialog.open(ConfirmDialogComponent, {
         width: '500px',
-        height: '210px',
+        height: 'auto',
         data: dialgData,
         autoFocus: false,
         disableClose: true

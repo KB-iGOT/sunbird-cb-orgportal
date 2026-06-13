@@ -2091,6 +2091,20 @@ mat-list-item {
     font: 400 14px / 21px Lato !important;
 }
 
+// .search-categories {
+//   width: 100%;
+
+//   mat-chip-list,
+//   .mat-mdc-chip-set,
+//   .mdc-evolution-chip-set {
+//     display: flex !important;
+//     justify-content: flex-start !important;
+//     align-items: center;
+//     flex-wrap: wrap;
+//     width: 100%;
+//   }
+// }
+
 .search-container-listing {
   display: flex;
 }
@@ -2100,7 +2114,7 @@ mat-list-item {
 }
 
 .filter-list .filter-pill {
-  height: 36px;
+  height: 32px;
 }
 
 .filter-list .filter-pill mat-icon {
@@ -2116,4 +2130,62 @@ mat-list-item {
   word-break: break-word;
   overflow-wrap: break-word;
 }
+}
+/* Remove icon button ripple/state layer */
+.mat-mdc-menu-item .mdc-icon-button__ripple,
+.mat-mdc-menu-item .mat-mdc-button-persistent-ripple {
+  display: none !important;
+}
+
+/* Remove button ripple */
+.mat-mdc-menu-item .mat-mdc-button-ripple,
+.mat-mdc-menu-item .mat-ripple {
+  display: none !important;
+}
+
+/* Remove hover/focus background on nested button */
+.mat-mdc-menu-item .mat-mdc-icon-button:hover,
+.mat-mdc-menu-item .mat-mdc-icon-button:focus {
+  background: transparent !important;
+}
+
+.search-categories {
+  opacity: 1 !important;
+
+  .selected-search-category {
+    .mdc-evolution-chip__text-label {
+      color: #fff !important;
+    }
+  }
+
+  .mat-mdc-chip:not(.selected-search-category) {
+    .mdc-evolution-chip__text-label {
+      color: #1b4ca1 !important;
+    }
+  }
+}
+
+.search-categories {
+  .selected-search-category {
+
+    /* Remove MDC hover/focus overlay */
+    --mdc-chip-hover-state-layer-opacity: 0;
+    --mdc-chip-focus-state-layer-opacity: 0;
+    --mdc-chip-pressed-state-layer-opacity: 0;
+
+    .mdc-evolution-chip__action,
+    .mdc-evolution-chip__cell,
+    .mdc-evolution-chip__action:hover,
+    .mdc-evolution-chip__cell:hover {
+      background: transparent !important;
+    }
+
+    &::before,
+    &::after,
+    .mdc-evolution-chip__action::before,
+    .mdc-evolution-chip__action::after {
+      opacity: 0 !important;
+      background: transparent !important;
+    }
+  }
 }
