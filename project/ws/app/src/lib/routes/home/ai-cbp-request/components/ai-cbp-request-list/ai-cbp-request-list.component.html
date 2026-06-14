@@ -31,7 +31,7 @@
 
       <mat-icon class="search-icon">search</mat-icon>
 
-      <input type="text" placeholder="Search by Request name or Request ID or Department" [(ngModel)]="searchText"
+      <input type="text" placeholder="Search by Request ID or Request Name or Requestor" [(ngModel)]="searchText"
         (input)="loadStaticTableData()" />
 
       <button *ngIf="searchText" mat-icon-button class="clear-btn" (click)="clearSearch()">
@@ -193,8 +193,8 @@
         </div>
 
         <!-- Paginator -->
-        <mat-paginator *ngIf="dataSource?.filteredData?.length > 0" [pageSize]="pageSize" [length]="requestCount"
-          [pageSizeOptions]="defaultPageSizeOptions" (page)="onChangePage($event)">
+        <mat-paginator #paginator [hidden]="dataSource?.filteredData?.length === 0" [pageSize]="pageSize"
+          [length]="requestCount" [pageSizeOptions]="defaultPageSizeOptions" (page)="onChangePage($event)">
         </mat-paginator>
 
       </div>

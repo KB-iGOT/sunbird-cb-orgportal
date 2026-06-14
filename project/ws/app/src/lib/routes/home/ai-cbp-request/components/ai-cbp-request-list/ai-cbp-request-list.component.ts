@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core'
+import { Component, OnInit, ViewChild } from '@angular/core'
 import { MatTableDataSource } from '@angular/material/table'
 /* tslint:disable */
 import * as _ from 'lodash'
@@ -6,6 +6,7 @@ import { AICBPRequestService } from '../../../services/ai-cbp-request.service'
 import { ViewNonMappingDesignationComponent } from '../view-non-mapping-designation/view-non-mapping-designation.component'
 import { MatDialog } from '@angular/material/dialog'
 import { Router } from '@angular/router'
+import { MatPaginator } from '@angular/material/paginator'
 import {
   ConfigurationsService
 } from '@sunbird-cb/utils-v2'
@@ -35,11 +36,12 @@ export class AICBPRequestListComponent implements OnInit {
 
   originalData: any[] = [];
   pageNo = 1
-  pageSize = 20
+  pageSize = 5
 
-  defaultPageSizeOptions = [10, 20, 25, 50, 100]
+  defaultPageSizeOptions = [5, 10, 20, 25, 50, 100]
   showRejectPopupFlag = false
   rejectionDetail: any = {}
+  @ViewChild(MatPaginator) paginator!: MatPaginator
   constructor(public aicbpRequestSvc: AICBPRequestService, public dialog: MatDialog,
     private router: Router,
     private configSvc: ConfigurationsService
@@ -71,6 +73,10 @@ export class AICBPRequestListComponent implements OnInit {
   }
   loadStaticTableData() {
     this.staticRequestList = []
+    if (this.searchText) {
+      this.pageNo = 1
+    }
+
 
     this.aicbpRequestSvc.getApprovalRequests(this.pageNo,
       this.pageSize, this.searchText, this.selectedStatus).subscribe((requests: any) => {
@@ -101,7 +107,27 @@ export class AICBPRequestListComponent implements OnInit {
 
         this.requestCount = requests?.pagination?.total_items || 0
 
-        console.log('requestCount =>', this.requestCount)
+        console.log({
+          pageNo: this.pageNo,
+          pageSize: this.pageSize,
+          requestCount: this.requestCount,
+          itemsLength: requests?.items?.length,
+          paginatorIndex: this.paginator?.pageIndex
+        })
+        this.dataSource =
+          new MatTableDataSource(this.staticRequestList)
+
+        if (this.paginator) {
+          const maxPage = Math.max(
+            0,
+            Math.ceil(this.requestCount / this.pageSize) - 1
+          )
+
+          if (this.paginator.pageIndex > maxPage) {
+            this.paginator.firstPage()
+            this.pageNo = 1
+          }
+        }
       })
   }
 
@@ -247,7 +273,9 @@ export class AICBPRequestListComponent implements OnInit {
     this.selectedStatus = ''
     this.selectedTime = ''
     this.pageNo = 1
-
+    if (this.paginator) {
+      this.paginator.firstPage()
+    }
     this.loadStaticTableData()
   }
 
