@@ -133,7 +133,7 @@ export class InfoModalComponent implements OnInit, OnDestroy {
           this.results.push({ item, status: 'Failed', error: null, message })
         }
 
-        const isLastItem = this.currentIndex + 1 >= this.items.length
+        const isLastItem = this.currentIndex + 1 >= this.items?.length
         if (isLastItem) {
           this.completeDownload()
           return
@@ -146,7 +146,7 @@ export class InfoModalComponent implements OnInit, OnDestroy {
         this.lastFailedItem = item
         this.results.push({ item, status: 'Failed', error: err, message })
 
-        const isLastItem = this.currentIndex + 1 >= this.items.length
+        const isLastItem = this.currentIndex + 1 >= this.items?.length
         if (isLastItem) {
           this.completeDownload()
           return
