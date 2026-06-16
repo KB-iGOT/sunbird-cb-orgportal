@@ -94,15 +94,7 @@ export class InfoModalComponent implements OnInit, OnDestroy {
       return
     }
     if (this.currentIndex >= this.items.length) {
-      // Check if there were any failures
-      this.hasErrors = this.results.some(r => r.status === 'Failed')
-      this.isDownloading = false
-      this.isComplete = true
-      // Only auto-close if no errors occurred
-      if (!this.hasErrors) {
-        this.dialogRef.close({ completed: true, results: this.results, password: this.password })
-      }
-      this.cdr.detectChanges()
+      this.completeDownload()
       return
     }
 
@@ -142,6 +134,11 @@ export class InfoModalComponent implements OnInit, OnDestroy {
           this.results.push({ item, status: 'Failed', error: null, message })
         }
 
+        const isLastItem = this.currentIndex + 1 >= this.items?.length
+        if (isLastItem) {
+          this.completeDownload()
+          return
+        }
         this.currentIndex++
         this.timerId = setTimeout(() => this.downloadNext(), 300)
       }, (err: any) => {
@@ -150,9 +147,24 @@ export class InfoModalComponent implements OnInit, OnDestroy {
         this.lastFailedItem = item
         this.results.push({ item, status: 'Failed', error: err, message })
 
+        const isLastItem = this.currentIndex + 1 >= this.items?.length
+        if (isLastItem) {
+          this.completeDownload()
+          return
+        }
         this.currentIndex++
         this.timerId = setTimeout(() => this.downloadNext(), 300)
       })
+  }
+
+  private completeDownload() {
+    this.hasErrors = this.results.some(r => r.status === 'Failed')
+    this.isDownloading = false
+    this.isComplete = true
+    if (!this.hasErrors) {
+      this.dialogRef.close({ completed: true, results: this.results, password: this.password })
+    }
+    this.cdr.detectChanges()
   }
 
   cancel() {
@@ -166,7 +178,7 @@ export class InfoModalComponent implements OnInit, OnDestroy {
       this.sub.unsubscribe()
       this.sub = null
     }
-    this.dialogRef.close({ cancelled: true, results: this.results })
+    this.closeDialog()
   }
 
   closeDialog() {
