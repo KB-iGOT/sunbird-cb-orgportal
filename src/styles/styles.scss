@@ -2166,6 +2166,10 @@ mat-list-item {
 }
 
 .search-categories {
+  mat-chip-list {
+        display: flex;
+    flex-wrap: wrap;
+  }
   .selected-search-category {
 
     /* Remove MDC hover/focus overlay */
@@ -2188,4 +2192,16 @@ mat-list-item {
       background: transparent !important;
     }
   }
+}
+
+.search-people-card {
+  overflow: hidden !important;
+}
+
+.search-event-card {
+   overflow: hidden !important;
+}
+
+.search-community-card {
+   overflow: hidden !important;
 }

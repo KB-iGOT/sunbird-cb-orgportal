@@ -121,8 +121,8 @@
 }
 :host ::ng-deep .chip-themes.active .mdc-checkbox__native-control:enabled:checked ~ .mdc-checkbox__background,
 :host ::ng-deep .chip-themes.active .mdc-checkbox__native-control:enabled:indeterminate ~ .mdc-checkbox__background {
-  background-color: #808080 !important;
-  border-color: #808080 !important;
+  background-color: rgba(27, 76, 161, 1) !important;
+  border-color: rgba(27, 76, 161, 1) !important;
 }
 
 :host ::ng-deep .chip-themes.active .mdc-checkbox__native-control:enabled:checked ~ .mdc-checkbox__background .mdc-checkbox__checkmark {
