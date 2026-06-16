@@ -6,10 +6,10 @@ import { debounceTime } from 'rxjs/operators'
 import * as _ from 'lodash'
 
 @Component({
-    selector: 'ws-app-competency-add',
-    templateUrl: './competency-add.component.html',
-    styleUrls: ['./competency-add.component.scss'],
-    standalone: false
+  selector: 'ws-app-competency-add',
+  templateUrl: './competency-add.component.html',
+  styleUrls: ['./competency-add.component.scss'],
+  standalone: false
 })
 
 export class CompetencyAddComponent implements OnInit {

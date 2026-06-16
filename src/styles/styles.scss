@@ -2041,6 +2041,7 @@ mat-list-item {
   }
   .mat-mdc-standard-chip:not(.mdc-evolution-chip--disabled) .mdc-evolution-chip__text-label {
     color: #fff !important;
+    font-size: 14px !important;
   }
   .search-close-icon.mat-icon {
     margin-right: 10px;
@@ -2107,6 +2108,7 @@ mat-list-item {
 
 .search-container-listing {
   display: flex;
+  min-width: 415px !important;
 }
 
 .search-close-icon {
@@ -2155,6 +2157,7 @@ mat-list-item {
   .selected-search-category {
     .mdc-evolution-chip__text-label {
       color: #fff !important;
+      font-size: 14px !important;
     }
   }
 
