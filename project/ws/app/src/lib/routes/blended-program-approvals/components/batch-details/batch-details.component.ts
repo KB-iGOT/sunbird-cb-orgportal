@@ -42,8 +42,14 @@ export class BatchDetailsComponent implements OnInit {
   showUserDetails = false
   selectedUser: any
   fetchStatus = true
-  checkSurveyLink = false
+  checkSurveyLink = true
   reportStatusList: any[] = []
+  reportOptions: any[] = [
+    { label: 'Enrollment Report', value: 'enrollment' },
+    { label: 'Consumption Report', value: 'consumption' }
+  ]
+  lastGeneratedAt: any = null
+  selectedReportType = ''
   enroleTypeList = Object.values(IRequestLearnerType)
   tabledata: any = {
     actions: [],
@@ -122,7 +128,7 @@ export class BatchDetailsComponent implements OnInit {
         break
       case 'reportStatus':
         this.currentFilter = 'reportStatus'
-        this.getBpReportStatus()
+        this.listReports()
         break
       case 'nominate-learner':
         this.currentFilter = 'nominate-learner'
@@ -560,7 +566,7 @@ export class BatchDetailsComponent implements OnInit {
     }
   }
 
-  async getBpReportStatus() {
+  async listReports() {
     const batchDetails = this.batchData
     const roleName = this.userDetails.roles.includes('MDO_LEADER') ? 'MDO_LEADER' :
       this.userDetails.roles.includes('MDO_ADMIN') ? 'MDO_ADMIN' : ''
@@ -572,7 +578,57 @@ export class BatchDetailsComponent implements OnInit {
         reportRequester: roleName,
       },
     }
-    const resData: any = await this.bpService.getBpReportStatusApi(req).toPromise().catch(_error => { })
+    const resData: any = await this.bpService.listBpReports(req).toPromise().catch(_error => { })
+    if (!resData) {
+      this.fetchStatus = false
+      this.snackBar.open('Something went wrong while fetching the report status. Please try again after sometime.')
+      this.reportStatusList = []
+    } else if (Object.keys(resData.result).length <= 0) {
+      this.reportStatusList = []
+    } else {
+      this.reportStatusList = resData.result.content
+      this.lastGeneratedAt = this.findLastGeneratedReportDate()
+    }
+  }
+
+  onReportTypeChange(reportType: string) {
+    this.selectedReportType = reportType
+    console.log('selectedReportType', this.selectedReportType)
+  }
+
+  findLastGeneratedReportDate() {
+    const validReports = this.reportStatusList.filter(
+      (item: any) => item.lastReportGeneratedOn !== null
+    )
+    if (validReports.length === 0) {
+      return ''
+    }
+    const latest = validReports.reduce((prev: any, curr: any) => {
+      return new Date(curr.lastReportGeneratedOn) > new Date(prev.lastReportGeneratedOn) ? curr : prev
+    })
+    return latest.lastReportGeneratedOn
+  }
+
+  async getBpReportStatus() {
+    const batchDetails = this.batchData
+    const roleName = this.userDetails.roles.includes('MDO_LEADER') ? 'MDO_LEADER' :
+      this.userDetails.roles.includes('MDO_ADMIN') ? 'MDO_ADMIN' : ''
+    const req = {
+      request: {
+        orgId: this.userDetails.rootOrgId || '',
+        courseId: this.programData.identifier || '',
+        batchId: batchDetails.batchId || '',
+        reportRequester: roleName,
+        surveyId: this.programData.wfSurveyLink ? this.programData.wfSurveyLink.split('/')[this.programData.wfSurveyLink.split('/').length - 1] : '',
+      },
+    }
+
+    let resData: any
+    if (this.selectedReportType === 'enrollment') {
+      resData = await this.bpService.getBpReportStatusApi(req).toPromise().catch(_error => { })
+    } else if (this.selectedReportType === 'consumption') {
+      resData = await this.bpService.getBpConsumptionReportStatusApi(req).toPromise().catch(_error => { })
+    }
     if (!resData) {
       this.fetchStatus = false
       this.snackBar.open('Something went wrong while fetching the report status. Please try again after sometime.')
@@ -602,13 +658,18 @@ export class BatchDetailsComponent implements OnInit {
         courseId: this.programData.identifier || '',
         batchId: batchDetails.batchId || '',
         reportRequester: roleName,
-        surveyId: this.programData.wfSurveyLink.split('/')[this.programData.wfSurveyLink.split('/').length - 1] || '',
+        surveyId: this.programData.wfSurveyLink ? this.programData.wfSurveyLink.split('/')[this.programData.wfSurveyLink.split('/').length - 1] : '',
       },
     }
-    const resData: any = await this.bpService.generateBpReport(reqBody).toPromise().catch(_error => { })
+    let resData: any
+    if (this.selectedReportType === 'enrollment') {
+      resData = await this.bpService.generateBpReport(reqBody).toPromise().catch(_error => { })
+    } else {
+      resData = await this.bpService.generateBpConsumptionReport(reqBody).toPromise().catch(_error => { })
+    }
     if (resData && resData.params && resData.params.status.toLowerCase() === 'success') {
       this.reportStatusList = []
-      this.getBpReportStatus()
+      this.listReports()
     } else {
       this.snackBar.open('Something went wrong while generating the report. Please try again after sometime.')
       this.reportStatusList = []
