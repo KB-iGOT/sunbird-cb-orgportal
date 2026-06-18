@@ -31,7 +31,7 @@
 
       <mat-icon class="search-icon">search</mat-icon>
 
-      <input type="text" placeholder="Search by Request name or Request ID or Department" [(ngModel)]="searchText"
+      <input type="text" placeholder="Search by Request name or Request ID or Requester" [(ngModel)]="searchText"
         (input)="loadStaticTableData()" />
 
       <button *ngIf="searchText" mat-icon-button class="clear-btn" (click)="clearSearch()">
@@ -178,7 +178,7 @@
             </ng-container>
 
             <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-            <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns" (click)="viewACBPRoleMapping(row)"></tr>
 
           </table>
         </ng-container>
@@ -188,7 +188,7 @@
           <div>
             <img src="/mdo-assets/images/no-content-data.svg" alt="no-content" />
           </div>
-          <div>No pending request</div>
+          <div>No Data found</div>
 
         </div>
 

@@ -22,12 +22,20 @@ export class AICBPRequestService {
   //   return this.http.post<any>(API_END_POINTS.GET_BLENDED_PROGRAMS, request)
   // }
 
-  getApprovalRequests(page: number, pageSize: number, searchText: string, selected_status: string) {
+  getApprovalRequests(page: number, pageSize: number, searchText: string, selected_status: string, from_date?: string, to_date?: string) {
     let params = new HttpParams()
       .set('page', page.toString())
       .set('page_size', pageSize.toString())
       .set('search', searchText)
       .set('status_filter', selected_status?.toLowerCase())
+
+    if (from_date) {
+      params = params.set('from_date', from_date)
+    }
+    if (to_date) {
+      params = params.set('to_date', to_date)
+    }
+
     return this.http.get<any>(`${API_END_POINTS.GET_APPROVAL_REQUESTS}`, { params })
   }
 
