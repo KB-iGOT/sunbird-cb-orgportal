@@ -131,3 +131,21 @@
   height: 20px;
   font-size: 20px;
 }
+
+.start-time-field {
+  .mat-mdc-text-field-wrapper {
+    min-height: 48px !important;
+  }
+}
+
+.end-time-field {
+  .mat-mdc-text-field-wrapper {
+    min-height: 48px !important;
+  }
+}
+
+.start-date {
+  .mat-mdc-text-field-wrapper {
+    min-height: 48px !important;
+  }
+}

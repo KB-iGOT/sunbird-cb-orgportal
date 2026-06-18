@@ -9,7 +9,7 @@
             </div>
             <div class="example-container margin-top-m">
                 <form class="staffform-form" [formGroup]="staffform">
-                    <div class="display-block">
+                    <div class="staff-grid">
                         <div class="display-inline-block formgroup margin-right-xl margin-bottom-s">
                             <label for="designation"
                                 class="display-block mat-subheading-2 margin-remove-bottom form-label required"
@@ -96,10 +96,11 @@
             <div class="display-inline-block float-right">
                 <button mat-raised-button type="button" [mat-dialog-close]="true"
                     class="flex-auto-display margin-right-s">
-                    <span class="ws-mat-default-text">Cancel</span>
+                    <span class="ws-mat-default-text-popup">Cancel</span>
                 </button>
                 <button mat-raised-button type="submit" [disabled]="staffform?.invalid"
-                    class="next-btn ws-mat-primary-background flex-auto-display" (click)="addstaffdetails(staffform)">
+                    class="next-btn ws-mat-primary-background-popup flex-auto-display"
+                    (click)="addstaffdetails(staffform)">
                     <span class="text-white" *ngIf="!formInputData.id">Add</span>
                     <span class="text-white" *ngIf="formInputData.id">Update</span>
                 </button>

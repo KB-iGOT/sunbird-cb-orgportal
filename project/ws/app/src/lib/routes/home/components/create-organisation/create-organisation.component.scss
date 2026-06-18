@@ -204,3 +204,7 @@
 
   }
 }
+
+:host ::ng-deep .nav-container {
+  z-index: 10 !important;
+}

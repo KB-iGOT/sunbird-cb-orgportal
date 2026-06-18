@@ -11,10 +11,10 @@ import { RejectionReasonComponent } from '../../dialogs/rejection-reason/rejecti
 import { ConfirmDialogComponent } from '../../../../../workallocation-v2/components/confirm-dialog/confirm-dialog.component'
 
 @Component({
-    selector: 'ws-app-events-list',
-    templateUrl: './events-list.component.html',
-    styleUrls: ['./events-list.component.scss'],
-    standalone: false
+  selector: 'ws-app-events-list',
+  templateUrl: './events-list.component.html',
+  styleUrls: ['./events-list.component.scss'],
+  standalone: false
 })
 export class EventsListComponent implements OnInit, OnDestroy {
   //#region (global variables)
@@ -365,7 +365,8 @@ export class EventsListComponent implements OnInit, OnDestroy {
 
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
       width: '500px',
-      height: '210px',
+      minHeight: '210px',
+      height: 'auto',
       data: dialgData,
       autoFocus: false
     })
