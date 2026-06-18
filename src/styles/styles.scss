@@ -1940,7 +1940,12 @@ mat-list-item {
   position: absolute !important;
   right: 3px;
   top: 3px;
+   margin-right: 20px;
+    margin-top: 5px;
 }
+
+
+
 
 .disabled-search-btn {
   background-color: $white !important;
@@ -2017,7 +2022,7 @@ mat-list-item {
 }
 
 .mat-mdc-text-field-wrapper {
-  background-color: #ffffff !important;
+  background-color: #ffffff;
 }
 
 .search .sinput {
