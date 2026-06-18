@@ -30,7 +30,7 @@ export class AddPlanInformationComponent implements OnInit, OnDestroy {
     }
     this.contentForm = this.formBuilder.group({
       name:
-        new UntypedFormControl('', [Validators.required, Validators.pattern(noSpecialChar), Validators.minLength(10)]),
+        new UntypedFormControl('', [Validators.required, Validators.pattern(noSpecialChar), Validators.minLength(10), Validators.maxLength(70)]),
     })
 
     this.subscr.add(this.contentForm.controls['name'].valueChanges.pipe(debounceTime(500)).subscribe((_ele: any) => {
