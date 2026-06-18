@@ -8,7 +8,8 @@ import { LoaderService } from '../../../../../../../../../../src/app/services/lo
 @Component({
   selector: 'ws-app-details',
   templateUrl: './details.component.html',
-  styleUrls: ['./details.component.scss']
+  styleUrls: ['./details.component.scss'],
+  standalone: false
 })
 export class DetailsComponent implements OnInit {
   training: any = {}

@@ -5,8 +5,8 @@
     <div class="form-element mb-3">
         <div class="fonm-element-label">Timeline <span class="required"></span></div>
         <div class="calender">
-            <mat-form-field color="accent" appearance="outline">
-                <mat-label>Select date</mat-label>
+            <mat-form-field appearance="outline">
+                <mat-label class="timeline-date">Select date</mat-label>
                 <input matInput #ref [matDatepicker]="picker" [min]="minDate" [(ngModel)]="todayDate"
                     (dateChange)="changeTimeline(ref.value)" readonly>
                 <mat-datepicker-toggle matSuffix [for]="picker">
