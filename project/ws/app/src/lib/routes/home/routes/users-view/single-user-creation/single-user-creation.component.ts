@@ -492,7 +492,9 @@ export class SingleUserCreationComponent implements OnInit, AfterViewInit, OnDes
           this.masterData['rolesList'] = JSON.parse(res.result.response.value)
           if (Array.isArray(this.masterData.rolesList.orgTypeList)) {
             const mdoArray = this.masterData.rolesList.orgTypeList.find((elem: any) => elem.name === 'MDO')
+            const ngoArray = this.masterData.rolesList.orgTypeList.find((elem: any) => elem.name === 'NGO')
             this.masterData['mdoRoles'] = mdoArray.roles || []
+            this.masterData['ngoRoles'] = ngoArray.roles || []
             // Filter based on isMdoLeader flag
             if (this.isNgo) {
               this.filteredRoles = this.masterData?.ngoRoles
@@ -520,7 +522,11 @@ export class SingleUserCreationComponent implements OnInit, AfterViewInit, OnDes
       }
     }
     // tslint:disable-next-line
-    this.userCreationForm.get('roles')!.patchValue([...this.defaultRole, ...this.rolesArr])
+    if (this.isNgo) {
+      this.userCreationForm.get('roles')!.patchValue(this.rolesArr)
+    } else {
+      this.userCreationForm.get('roles')!.patchValue([...this.defaultRole, ...this.rolesArr])
+    }
   }
 
   handleAddTags(event: MatChipInputEvent): void {

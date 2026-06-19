@@ -75,6 +75,11 @@ export class DirectoryService {
         ...filters,
         isNgo: true
       }
+    } else {
+      filters = {
+        ...filters,
+        isMdo: true
+      }
     }
 
     if (queryText) {

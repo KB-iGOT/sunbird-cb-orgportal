@@ -16,16 +16,17 @@ interface UserData {
 }
 
 @Component({
-    selector: 'ws-app-create-user',
-    templateUrl: './create-user.component.html',
-    styleUrls: ['./create-user.component.scss'],
-    standalone: false
+  selector: 'ws-app-create-user',
+  templateUrl: './create-user.component.html',
+  styleUrls: ['./create-user.component.scss'],
+  standalone: false
 })
 export class CreateUserComponent implements OnInit {
   displayedColumns: string[] = ['fullName', 'email', 'roles', 'actions'];
   dataSource = new MatTableDataSource<UserData>([]);
   orgData: any = {};
   editUser: boolean = false
+  isNgo: boolean = false
 
   @ViewChild(MatPaginator) paginator!: MatPaginator
   @ViewChild(MatSort) sort!: MatSort
@@ -46,6 +47,8 @@ export class CreateUserComponent implements OnInit {
     }
     this.orgSvc.setConfigService(_.get(this.activeRouter, 'snapshot.data.configService'))
     this.getUserList('')
+    const parentOrgData = this.orgSvc.getParentOrgData()
+    this.isNgo = parentOrgData?.isNgo || false
   }
 
   ngAfterViewInit() {

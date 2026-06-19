@@ -73,5 +73,6 @@
   </div>
 </ng-container>
 <ng-container *ngIf="editUser">
-  <ws-app-user-update [userId]="selectedUserData?.userId" (updateEvent)="updateUserStatus($event)"></ws-app-user-update>
+  <ws-app-user-update [userId]="selectedUserData?.userId" [isNgo]="isNgo"
+    (updateEvent)="updateUserStatus($event)"></ws-app-user-update>
 </ng-container>

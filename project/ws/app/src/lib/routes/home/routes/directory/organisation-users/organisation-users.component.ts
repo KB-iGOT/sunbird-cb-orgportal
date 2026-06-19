@@ -35,7 +35,6 @@ export class OrganisationUsersComponent implements OnInit {
       this.orgDataLoaded = true
     }
 
-    console.log('pare', this.orgHieService.getParentOrgData())
     const parentOrgData = this.orgHieService.getParentOrgData()
     if (parentOrgData && parentOrgData.isNgo) {
       this.tabs = [
