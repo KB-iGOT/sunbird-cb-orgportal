@@ -77,12 +77,14 @@
           <ng-container class="margin-top-l">
             <div class="table-container">
               <div class="flex flex-row flex-1 password">
-                <mat-form-field appearance="outline" class="margin-top-xs password-input">
-                  <mat-icon class="search">
-                    search
-                  </mat-icon>
-                  <input [type]="text" placeholder="Search Organisation" [(ngModel)]="searchTerm"
-                    (keyup)="applyFilter()" matInput>
+                <mat-form-field appearance="outline" class="margin-top-xs password-input search-field">
+                  <div class="flex">
+                    <mat-icon class="search mt-4">
+                      search
+                    </mat-icon>
+                    <input class="ml-5 mt-2" [type]="text" placeholder="Search Organisation" [(ngModel)]="searchTerm"
+                      (keyup)="applyFilter()" matInput>
+                  </div>
 
                 </mat-form-field>
 

@@ -577,3 +577,45 @@ label {
   margin-top: 5px !important;
   margin-left: 10px !important;
 }
+
+::ng-deep .mat-mdc-form-field-infix {
+    min-height: 48px;
+    display: flex;
+    align-items: center;
+}
+
+::ng-deep .mat-mdc-input-element {
+    height: 100%;
+}
+
+/* Date input vertically centered */
+::ng-deep .customdob .mat-mdc-input-element {
+    height: 100%;
+    line-height: normal;
+    display: flex;
+    align-items: center;
+}
+
+/* Infix alignment */
+::ng-deep .customdob .mat-mdc-form-field-infix {
+    min-height: 48px;
+    display: flex;
+    align-items: center;
+    margin-top: 5px;
+}
+
+/* Datepicker toggle alignment */
+::ng-deep .customdob .mat-datepicker-toggle {
+    align-self: center;
+}
+
+/* Calendar icon alignment */
+::ng-deep .customdob .mat-datepicker-toggle-default-icon {
+    vertical-align: middle;
+}
+
+/* Suffix container alignment */
+::ng-deep .customdob .mat-mdc-form-field-icon-suffix {
+    display: flex;
+    align-items: center;
+}

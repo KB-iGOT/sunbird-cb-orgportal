@@ -119,19 +119,19 @@
   border-color: #d6d6d6;
   color: #000;
 }
-:host ::ng-deep .chip-themes.active .mdc-checkbox__native-control:enabled:checked ~ .mdc-checkbox__background,
-:host ::ng-deep .chip-themes.active .mdc-checkbox__native-control:enabled:indeterminate ~ .mdc-checkbox__background {
-  background-color: rgba(27, 76, 161, 1) !important;
-  border-color: rgba(27, 76, 161, 1) !important;
-}
+// :host ::ng-deep .chip-themes.active .mdc-checkbox__native-control:enabled:checked ~ .mdc-checkbox__background,
+// :host ::ng-deep .chip-themes.active .mdc-checkbox__native-control:enabled:indeterminate ~ .mdc-checkbox__background {
+//   background-color: rgba(27, 76, 161, 1) !important;
+//   border-color: rgba(27, 76, 161, 1) !important;
+// }
 
-:host ::ng-deep .chip-themes.active .mdc-checkbox__native-control:enabled:checked ~ .mdc-checkbox__background .mdc-checkbox__checkmark {
-  color: #ffffff !important;
-}
+// :host ::ng-deep .chip-themes.active .mdc-checkbox__native-control:enabled:checked ~ .mdc-checkbox__background .mdc-checkbox__checkmark {
+//   color: #ffffff !important;
+// }
 
-:host ::ng-deep .chip-themes.active .mdc-checkbox__checkmark-path {
-  stroke: #ffffff !important;
-}
+// :host ::ng-deep .chip-themes.active .mdc-checkbox__checkmark-path {
+//   stroke: #ffffff !important;
+// }
 /* Optional: make label white when selected */
 .chip-themes.active .theme-name {
   color: #000;
@@ -168,4 +168,10 @@
 
 :host ::ng-deep .check-box-selected {
   --mdc-checkbox-selected-checkmark-color: #fff;
+}
+
+
+:host ::ng-deep .mat-mdc-checkbox-ripple,
+:host ::ng-deep .mdc-checkbox__ripple {
+  display: none !important;
 }

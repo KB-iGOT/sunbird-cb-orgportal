@@ -170,3 +170,8 @@
 :host ::ng-deep .check-box-selected {
   --mdc-checkbox-selected-checkmark-color: #fff;
 }
+
+:host ::ng-deep .mat-mdc-checkbox-ripple,
+:host ::ng-deep .mdc-checkbox__ripple {
+  display: none !important;
+}
