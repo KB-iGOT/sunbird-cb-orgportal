@@ -24,6 +24,8 @@ export class InfoModalComponent implements OnInit, OnDestroy {
 
   private destroy$ = new Subject<void>()
   private sub: Subscription | null = null
+  private isCancelled = false
+  private timerId: any = null
 
   constructor(
     public dialogRef: MatDialogRef<InfoModalComponent>,
@@ -82,24 +84,21 @@ export class InfoModalComponent implements OnInit, OnDestroy {
 
   startSequentialDownload() {
     this.currentIndex = 0
+    this.isCancelled = false
+    this.isDownloading = true
     this.downloadNext()
   }
 
   private downloadNext() {
+    if (this.isCancelled) {
+      return
+    }
     if (this.currentIndex >= this.items.length) {
-      // Check if there were any failures
-      this.hasErrors = this.results.some(r => r.status === 'Failed')
-      this.isComplete = true
-      // Only auto-close if no errors occurred
-      if (!this.hasErrors) {
-        this.dialogRef.close({ completed: true, results: this.results, password: this.password })
-      }
-      this.cdr.detectChanges()
+      this.completeDownload()
       return
     }
 
     const item = this.items[this.currentIndex]
-    this.isDownloading = true
     this.errorMessage = ''
     this.lastFailedItem = null
 
@@ -135,29 +134,51 @@ export class InfoModalComponent implements OnInit, OnDestroy {
           this.results.push({ item, status: 'Failed', error: null, message })
         }
 
-        this.isDownloading = false
+        const isLastItem = this.currentIndex + 1 >= this.items?.length
+        if (isLastItem) {
+          this.completeDownload()
+          return
+        }
         this.currentIndex++
-        setTimeout(() => this.downloadNext(), 300)
+        this.timerId = setTimeout(() => this.downloadNext(), 300)
       }, (err: any) => {
-        this.isDownloading = false
         const message = err?.status === 404 ? err?.error?.message : 'Download failed. Please try again.'
         this.errorMessage = message
         this.lastFailedItem = item
         this.results.push({ item, status: 'Failed', error: err, message })
 
+        const isLastItem = this.currentIndex + 1 >= this.items?.length
+        if (isLastItem) {
+          this.completeDownload()
+          return
+        }
         this.currentIndex++
-        setTimeout(() => this.downloadNext(), 300)
+        this.timerId = setTimeout(() => this.downloadNext(), 300)
       })
   }
 
+  private completeDownload() {
+    this.hasErrors = this.results.some(r => r.status === 'Failed')
+    this.isDownloading = false
+    this.isComplete = true
+    if (!this.hasErrors) {
+      this.dialogRef.close({ completed: true, results: this.results, password: this.password })
+    }
+    this.cdr.detectChanges()
+  }
+
   cancel() {
+    this.isCancelled = true
+    this.isDownloading = false
+    clearTimeout(this.timerId)
+    this.timerId = null
     this.destroy$.next()
     this.destroy$.complete()
     if (this.sub) {
       this.sub.unsubscribe()
       this.sub = null
     }
-    this.dialogRef.close({ cancelled: true, results: this.results })
+    this.closeDialog()
   }
 
   closeDialog() {
@@ -165,6 +186,9 @@ export class InfoModalComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    this.isCancelled = true
+    clearTimeout(this.timerId)
+    this.timerId = null
     this.destroy$.next()
     this.destroy$.complete()
     if (this.sub) {

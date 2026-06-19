@@ -22,7 +22,8 @@ export function endDateValidator(): ValidatorFn {
 @Component({
   selector: 'ws-app-create-batch',
   templateUrl: './create-batch.component.html',
-  styleUrls: ['./create-batch.component.scss']
+  styleUrls: ['./create-batch.component.scss'],
+  standalone: false
 })
 export class CreateBatchComponent implements OnInit {
   batchForm!: FormGroup

@@ -10,7 +10,7 @@ import { MatMenuModule } from '@angular/material/menu'
 
 
 import { AICBPRequestRoutingModule } from './ai-cbp-request.routing.module'
-// import { AiCbpModule } from '@sunbird-cb/cbp-ai'
+import { AiCbpModule } from '@sunbird-cb/cbp-ai'
 import { RouterModule } from '@angular/router'
 import { AICBPRequestListComponent } from './components/ai-cbp-request-list/ai-cbp-request-list.component'
 import { AICBPRequestComponent } from './ai-cbp-request.component'
@@ -33,8 +33,9 @@ import { MatInputModule } from '@angular/material/input'
     FormsModule, FormsModule,
     MatFormFieldModule,
     MatSelectModule,
-    MatInputModule
-  ], //AiCbpModule
-  exports: [] //AiCbpModule
+    MatInputModule,
+    AiCbpModule
+  ], //
+  exports: [AiCbpModule] //
 })
 export class AICBPRequestModule { }

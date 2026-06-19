@@ -12,7 +12,8 @@ import { environment } from '../../../../../../../../../../src/environments/envi
 @Component({
   selector: 'ws-app-new-external-training',
   templateUrl: './new-external-training.component.html',
-  styleUrls: ['./new-external-training.component.scss']
+  styleUrls: ['./new-external-training.component.scss'],
+  standalone: false
 })
 export class NewExternalTrainingComponent implements OnInit {
   trainingForm!: FormGroup

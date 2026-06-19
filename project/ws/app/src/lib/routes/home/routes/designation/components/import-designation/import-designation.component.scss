@@ -15,6 +15,7 @@
   font-size: 14px;
   font-weight: 600;
   color: #1B4CA1 !important;
+  width: 100px;
 }
 
 .cancel-btn {
@@ -170,3 +171,33 @@
     }
   }
 }
+
+
+:host ::ng-deep .check-box-selected .mdc-checkbox__checkmark-path {
+  stroke: #fff !important;
+}
+
+:host ::ng-deep .check-box-selected .mdc-checkbox__background {
+  background-color: rgba(27, 76, 161, 1) !important;
+  border-color: rgba(27, 76, 161, 1) !important;
+}
+
+:host ::ng-deep .check-box-selected {
+  --mdc-checkbox-selected-checkmark-color: #fff;
+}
+
+:host ::ng-deep .check-box-selected .mdc-checkbox__checkmark-path {
+  stroke: #fff !important;
+  stroke-width: 3px !important;
+  stroke-dashoffset:0 !important;
+}
+
+:host ::ng-deep .check-box-selected .mdc-checkbox__checkmark {
+  color: #fff !important;
+  opacity: 1 !important;
+}
+
+:host ::ng-deep .check-box-selected {
+  --mdc-checkbox-selected-checkmark-color: #fff;
+}
+

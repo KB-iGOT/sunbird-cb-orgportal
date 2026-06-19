@@ -15,10 +15,10 @@ import { ConfigurationsService } from '@sunbird-cb/utils-v2'
 import { preventHtmlAndJs } from '../../../validators/prevent-html-and-js.validator'
 
 @Component({
-    selector: 'ws-app-staff',
-    templateUrl: './staff.component.html',
-    styleUrls: ['./staff.component.scss'],
-    standalone: false
+  selector: 'ws-app-staff',
+  templateUrl: './staff.component.html',
+  styleUrls: ['./staff.component.scss'],
+  standalone: false
 })
 export class StaffComponent implements OnInit, OnChanges {
   staffdata: UntypedFormGroup
@@ -201,7 +201,7 @@ export class StaffComponent implements OnInit, OnChanges {
     dialogConfig.disableClose = true
     dialogConfig.autoFocus = true
     dialogConfig.width = '50%'
-    dialogConfig.height = '52%'
+    dialogConfig.minHeight = '52%'
     dialogConfig.maxHeight = 'auto'
     if (rowdata) {
       dialogConfig.data = {

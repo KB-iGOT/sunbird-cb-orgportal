@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core'
+import { Component, OnInit, ViewChild } from '@angular/core'
 import { MatTableDataSource } from '@angular/material/table'
 /* tslint:disable */
 import * as _ from 'lodash'
@@ -6,6 +6,7 @@ import { AICBPRequestService } from '../../../services/ai-cbp-request.service'
 import { ViewNonMappingDesignationComponent } from '../view-non-mapping-designation/view-non-mapping-designation.component'
 import { MatDialog } from '@angular/material/dialog'
 import { Router } from '@angular/router'
+import { MatPaginator } from '@angular/material/paginator'
 import {
   ConfigurationsService
 } from '@sunbird-cb/utils-v2'
@@ -35,11 +36,12 @@ export class AICBPRequestListComponent implements OnInit {
 
   originalData: any[] = [];
   pageNo = 1
-  pageSize = 20
+  pageSize = 5
 
-  defaultPageSizeOptions = [10, 20, 25, 50, 100]
+  defaultPageSizeOptions = [5, 10, 20, 25, 50, 100]
   showRejectPopupFlag = false
   rejectionDetail: any = {}
+  @ViewChild(MatPaginator) paginator!: MatPaginator
   constructor(public aicbpRequestSvc: AICBPRequestService, public dialog: MatDialog,
     private router: Router,
     private configSvc: ConfigurationsService
@@ -69,11 +71,40 @@ export class AICBPRequestListComponent implements OnInit {
   ngOnInit() {
     this.loadStaticTableData()
   }
+  getDateRange(): { from_date: string | undefined, to_date: string | undefined } {
+    const now = new Date()
+    const toDate = now.toISOString().split('T')[0]
+
+    switch (this.selectedTime) {
+      case 'today': {
+        return { from_date: toDate, to_date: toDate }
+      }
+      case '7days': {
+        const fromDate = new Date(now)
+        fromDate.setDate(now.getDate() - 7)
+        return { from_date: fromDate.toISOString().split('T')[0], to_date: toDate }
+      }
+      case '30days': {
+        const fromDate = new Date(now)
+        fromDate.setDate(now.getDate() - 30)
+        return { from_date: fromDate.toISOString().split('T')[0], to_date: toDate }
+      }
+      default:
+        return { from_date: undefined, to_date: undefined }
+    }
+  }
+
   loadStaticTableData() {
     this.staticRequestList = []
+    if (this.searchText) {
+      this.pageNo = 1
+    }
+
+
+    const { from_date, to_date } = this.getDateRange()
 
     this.aicbpRequestSvc.getApprovalRequests(this.pageNo,
-      this.pageSize, this.searchText, this.selectedStatus).subscribe((requests: any) => {
+      this.pageSize, this.searchText, this.selectedStatus, from_date, to_date).subscribe((requests: any) => {
 
         console.log('API Response:', requests)
 
@@ -101,7 +132,27 @@ export class AICBPRequestListComponent implements OnInit {
 
         this.requestCount = requests?.pagination?.total_items || 0
 
-        console.log('requestCount =>', this.requestCount)
+        console.log({
+          pageNo: this.pageNo,
+          pageSize: this.pageSize,
+          requestCount: this.requestCount,
+          itemsLength: requests?.items?.length,
+          paginatorIndex: this.paginator?.pageIndex
+        })
+        this.dataSource =
+          new MatTableDataSource(this.staticRequestList)
+
+        if (this.paginator) {
+          const maxPage = Math.max(
+            0,
+            Math.ceil(this.requestCount / this.pageSize) - 1
+          )
+
+          if (this.paginator.pageIndex > maxPage) {
+            this.paginator.firstPage()
+            this.pageNo = 1
+          }
+        }
       })
   }
 
@@ -148,76 +199,7 @@ export class AICBPRequestListComponent implements OnInit {
   }
 
   applyFilters() {
-
-    let filtered = [...this.originalData]
-
-    // Search
-    if (this.searchText?.trim()) {
-
-      const search = this.searchText.toLowerCase()
-
-      filtered = filtered.filter(item =>
-        item?.title?.toLowerCase()?.includes(search) ||
-        item?.demand_id?.toLowerCase()?.includes(search) ||
-        item?.ownerName?.toLowerCase()?.includes(search) ||
-        item?.status?.toLowerCase()?.includes(search) ||
-        item?.department_name?.toLowerCase()?.includes(search)
-      )
-    }
-
-    // Status
-    if (this.selectedStatus) {
-
-      filtered = filtered.filter(item =>
-        item?.status === this.selectedStatus
-      )
-    }
-
-    // Time Filter
-    if (this.selectedTime) {
-
-      const now = new Date()
-
-      filtered = filtered.filter(item => {
-
-        const createdDate = new Date(item.createdOn)
-
-        switch (this.selectedTime) {
-
-          case 'today':
-
-            return (
-              createdDate.getDate() === now.getDate() &&
-              createdDate.getMonth() === now.getMonth() &&
-              createdDate.getFullYear() === now.getFullYear()
-            )
-
-          case '7days': {
-
-            const sevenDaysAgo = new Date()
-            sevenDaysAgo.setDate(now.getDate() - 7)
-
-            return createdDate >= sevenDaysAgo
-          }
-
-          case '30days': {
-
-            const thirtyDaysAgo = new Date()
-            thirtyDaysAgo.setDate(now.getDate() - 30)
-
-            return createdDate >= thirtyDaysAgo
-          }
-
-          default:
-            return true
-        }
-      })
-    }
-
-    this.dataSource.data = filtered
-
-    // IMPORTANT
-    this.requestCount = filtered.length
+    this.loadStaticTableData()
   }
 
   clearSearch() {
@@ -247,7 +229,9 @@ export class AICBPRequestListComponent implements OnInit {
     this.selectedStatus = ''
     this.selectedTime = ''
     this.pageNo = 1
-
+    if (this.paginator) {
+      this.paginator.firstPage()
+    }
     this.loadStaticTableData()
   }
 

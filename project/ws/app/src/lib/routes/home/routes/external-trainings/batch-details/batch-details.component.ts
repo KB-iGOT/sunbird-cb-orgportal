@@ -8,7 +8,8 @@ import * as _ from 'lodash'
 @Component({
   selector: 'ws-app-batch-details',
   templateUrl: './batch-details.component.html',
-  styleUrls: ['./batch-details.component.scss']
+  styleUrls: ['./batch-details.component.scss'],
+  standalone: false
 })
 export class BatchDetailsComponent {
 
