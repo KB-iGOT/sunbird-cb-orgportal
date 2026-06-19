@@ -64,8 +64,8 @@
             </div>
 
             <div class="check-action"
-              [ngClass]="designation?.selected && !(designation?.isOrgDesignation) ? 'check-box-selected':''">
-              <mat-checkbox [checked]="designation?.selected" (click)="$event.preventDefault()"
+              [ngClass]="designation?.selected && !(designation?.isOrgDesignation) ? 'active-card-without-border':''">
+              <mat-checkbox [checked]="designation?.selected" (click)="$event.stopPropagation();selectDesignation(i)"
                 [disabled]="designation?.isOrgDesignation"></mat-checkbox>
             </div>
           </div>
