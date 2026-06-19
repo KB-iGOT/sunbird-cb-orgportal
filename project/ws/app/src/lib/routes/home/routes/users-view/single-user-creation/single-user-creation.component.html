@@ -200,7 +200,7 @@
       </div>
 
       <div class="input-container">
-        <ng-container *ngIf="userCreationForm?.get('department')">
+        <ng-container *ngIf="userCreationForm?.get('department') && !isNgo">
           <div class="label required">Department</div>
           <input type="text" class="input-text" formControlName="department" placeholder="Type here" />
           <mat-error class="text-xs"

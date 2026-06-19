@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
 import { OrgHierarchyService } from '../../../services/org-hierarchy.service'
+import { LoaderService } from '../../../../../../../../../../src/app/services/loader.service'
 
 interface TabDetails {
   name: string
@@ -23,7 +24,7 @@ export class OrganisationUsersComponent implements OnInit {
   constructor(
     private activatedRoute: ActivatedRoute,
     private router: Router,
-    // private loaderService: LoaderService,
+    private loaderService: LoaderService,
     private orgHieService: OrgHierarchyService,
   ) { }
 

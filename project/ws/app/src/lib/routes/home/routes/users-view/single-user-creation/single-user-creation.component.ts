@@ -156,7 +156,7 @@ export class SingleUserCreationComponent implements OnInit, AfterViewInit, OnDes
   }
 
   ngOnInit() {
-    if (this.selectedOrgData && this.selectedOrgData.roleId && !this.userCreationForm.contains('department')) {
+    if (this.selectedOrgData && this.selectedOrgData.roleId && !this.userCreationForm.contains('department') && !this.isNgo) {
       this.userCreationForm.addControl('department', new UntypedFormControl({ value: this.selectedOrgData.depatName, disabled: true }))
       if (this.editUserData) {
         this.assignData()

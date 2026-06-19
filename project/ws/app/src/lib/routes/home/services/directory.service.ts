@@ -60,14 +60,21 @@ export class DirectoryService {
   //   return this.http.get<any>(`${API_END_POINTS.GET_ALL_DEPARTMENTS}`)
   // }
 
-  getAllDepartmentsKong(queryText: any, pagination: { limit: number, offset: number }, _orgData?: any): Observable<any> {
-    let filters = {
+  getAllDepartmentsKong(queryText: any, pagination: { limit: number, offset: number }, _orgData?: any, tabType?: string): Observable<any> {
+    let filters: any = {
       status: 1,
       ministryOrStateType: (_orgData) ?
         _orgData.sbOrgType : '',
       ministryOrStateId: (_orgData) ?
         _orgData.rootOrgId : ''
       // ...(state === 'organisation' ? { isMdo: true } : { isCbp: true }),
+    }
+
+    if (tabType === 'volunteer') {
+      filters = {
+        ...filters,
+        isNgo: true
+      }
     }
 
     if (queryText) {
