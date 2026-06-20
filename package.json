@@ -50,7 +50,7 @@
     "@polyflix/vtt-parser": "^1.4.0",
     "@project-sunbird/telemetry-sdk": "0.0.26",
     "@sunbird-cb/access-settings": "0.0.8-ang-17-20",
-    "@sunbird-cb/cbp-ai": "0.1.28-ang-17-20",
+    "@sunbird-cb/cbp-ai": "0.1.29-ang-17-20",
     "@sunbird-cb/collection": "0.0.10-ang-17-20",
     "@sunbird-cb/consumption": "0.0.38-ang-17-20",
     "@sunbird-cb/design-system": "0.0.10",
