@@ -2330,6 +2330,24 @@ mat-list-item {
 }
 
 .global-search-content .mat-btn-flat {
-  right: 15px;
-    top: 3px;
+  right: 3px;
+  top: 3px;
+}
+
+.global-search-content .mat-form-field {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+
+
+
+.global-search-content {
+  mat-form-field {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+  .mat-form-field {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
 }
