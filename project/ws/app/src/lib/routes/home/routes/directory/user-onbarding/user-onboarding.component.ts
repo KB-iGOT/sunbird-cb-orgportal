@@ -9,10 +9,10 @@ interface TabDetails {
 }
 
 @Component({
-    selector: 'ws-app-user-onboarding',
-    templateUrl: './user-onboarding.component.html',
-    styleUrls: ['./user-onboarding.component.scss'],
-    standalone: false
+  selector: 'ws-app-user-onboarding',
+  templateUrl: './user-onboarding.component.html',
+  styleUrls: ['./user-onboarding.component.scss'],
+  standalone: false
 })
 export class UserOnboardingComponent implements OnInit {
 
@@ -20,6 +20,7 @@ export class UserOnboardingComponent implements OnInit {
   selectedTab: any
   orgData: any
   frameworkOrgData: any
+  isNgo: boolean = false
 
   @Output() userCreated = new EventEmitter<boolean>()
   @Output() showDesignationTab = new EventEmitter<boolean>()
@@ -34,11 +35,20 @@ export class UserOnboardingComponent implements OnInit {
     if (queryParam) {
       this.orgData = queryParam
     }
-    this.createUserTabs = [
-      { name: 'Bulk Creation', value: 'bulkCreation' },
-      { name: 'Custom Registration Link', value: 'customRegLink' },
-      { name: 'Individual Creation', value: 'individualCreation' }
-    ]
+    const parentOrgData = this.orgHieService.getParentOrgData()
+    if (parentOrgData && parentOrgData.isNgo) {
+      this.isNgo = true
+      this.createUserTabs = [
+        { name: 'Bulk Creation', value: 'bulkCreation' },
+        { name: 'Individual Creation', value: 'individualCreation' }
+      ]
+    } else {
+      this.createUserTabs = [
+        { name: 'Bulk Creation', value: 'bulkCreation' },
+        { name: 'Custom Registration Link', value: 'customRegLink' },
+        { name: 'Individual Creation', value: 'individualCreation' }
+      ]
+    }
 
     this.selectedTab = this.createUserTabs.find(tab => tab.value === 'individualCreation')
   }
