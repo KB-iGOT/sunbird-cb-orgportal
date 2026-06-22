@@ -6,7 +6,7 @@ import { ChangeDetectorRef } from '@angular/core'
 import { SelectionModel } from '@angular/cdk/collections'
 import { ITableData } from '../../interfaces/interfaces'
 import * as _ from 'lodash'
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog'
+import { MatDialog } from '@angular/material/dialog'
 
 describe('EventListViewComponent', () => {
     let component: EventListViewComponent

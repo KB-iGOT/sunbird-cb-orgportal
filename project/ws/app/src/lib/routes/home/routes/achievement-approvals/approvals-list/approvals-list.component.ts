@@ -2,7 +2,7 @@ import { Component, OnInit, ViewChild } from '@angular/core'
 import { MatTableDataSource } from '@angular/material/table'
 import { SelectionModel } from '@angular/cdk/collections'
 import { PageEvent, MatPaginator } from '@angular/material/paginator'
-import { MatLegacyDialog } from '@angular/material/legacy-dialog'
+import { MatDialog } from '@angular/material/dialog'
 import { ConfirmationBoxComponent } from '../../../../training-plan/components/confirmation-box/confirmation.box.component'
 import { RejectReasonDialogComponent } from '../reject-reason-dialog/reject-reason-dialog.component'
 import { AchievementsService } from '../../../services/achievements.service'
@@ -14,7 +14,8 @@ import { LoaderService } from '../../../../../../../../../../src/app/services/lo
 @Component({
   selector: 'ws-app-approvals-list',
   templateUrl: './approvals-list.component.html',
-  styleUrls: ['./approvals-list.component.scss']
+  styleUrls: ['./approvals-list.component.scss'],
+  standalone: false
 })
 export class ApprovalsListComponent implements OnInit {
   @ViewChild(MatPaginator) paginator!: MatPaginator
@@ -39,7 +40,7 @@ export class ApprovalsListComponent implements OnInit {
   totalResults = 0
   currentPage = 0
 
-  constructor(private readonly dialog: MatLegacyDialog,
+  constructor(private readonly dialog: MatDialog,
     private achievementsService: AchievementsService,
     private matSnackBar: MatSnackBar,
     private loaderService: LoaderService,

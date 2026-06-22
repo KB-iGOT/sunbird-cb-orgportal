@@ -7,9 +7,10 @@ import * as _ from 'lodash'
 /* tslint:enable */
 
 @Component({
-  selector: 'ws-app-blended-home',
-  templateUrl: './blended-home.component.html',
-  styleUrls: ['./blended-home.component.scss'],
+    selector: 'ws-app-blended-home',
+    templateUrl: './blended-home.component.html',
+    styleUrls: ['./blended-home.component.scss'],
+    standalone: false
 })
 export class BlendedHomeComponent implements OnInit {
   currentRoute = 'blended-approvals'

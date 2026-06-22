@@ -1,11 +1,12 @@
 import { Component, Inject, OnInit } from '@angular/core'
-import { MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA, MatLegacyDialogRef as MatDialogRef } from '@angular/material/legacy-dialog'
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog'
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser'
 
 @Component({
-  selector: 'ws-app-competency-view',
-  templateUrl: './competency-view.component.html',
-  styleUrls: ['./competency-view.component.scss'],
+    selector: 'ws-app-competency-view',
+    templateUrl: './competency-view.component.html',
+    styleUrls: ['./competency-view.component.scss'],
+    standalone: false
 })
 export class CompetencyViewComponent implements OnInit {
 

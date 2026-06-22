@@ -1,7 +1,7 @@
 
 import { MyContentService } from '../../services/content-detail.service'
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog'
-import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar'
+import { MatDialog } from '@angular/material/dialog'
+import { MatSnackBar } from '@angular/material/snack-bar'
 import { UserBulkUploadComponent } from './user-bulk-upload.component'
 
 describe('UserBulkUploadComponent', () => {

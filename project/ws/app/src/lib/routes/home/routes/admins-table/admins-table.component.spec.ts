@@ -1,6 +1,6 @@
 import { AdminsTableComponent, MY_FORMATS } from './admins-table.component'
 import { MatSort } from '@angular/material/sort'
-// import { MatLegacyTableDataSource as MatTableDataSource } from '@angular/material/legacy-table'
+// import {  MatTableDataSource } from '@angular/material/table'
 
 jest.mock('@angular/material/sort', () => ({
     MatSort: jest.fn().mockImplementation(() => ({})),

@@ -1,6 +1,6 @@
 import { of, Subject, throwError } from 'rxjs'
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog'
-import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar'
+import { MatDialog } from '@angular/material/dialog'
+import { MatSnackBar } from '@angular/material/snack-bar'
 import { BudgetCardComponent } from './budget-card.component'
 import { CertificationApiService } from '../../apis/certification-api.service'
 import { RequestCancelDialogComponent } from '../request-cancel-dialog/request-cancel-dialog.component'

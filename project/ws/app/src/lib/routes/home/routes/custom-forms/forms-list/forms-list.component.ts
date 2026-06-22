@@ -10,11 +10,12 @@ import { ReportsVideoComponent } from '../../reports-video/reports-video.compone
 import { environment } from '../../../../../../../../../../src/environments/environment'
 import { ConfirmDeleteComponent } from '../confirm-delete/confirm-delete.component'
 import { CustomFieldsService } from '../../../../users/custom-fields.service'
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog'
+import { MatDialog } from '@angular/material/dialog'
 @Component({
-  selector: 'ws-app-forms-list',
-  templateUrl: './forms-list.component.html',
-  styleUrls: ['./forms-list.component.scss']
+    selector: 'ws-app-forms-list',
+    templateUrl: './forms-list.component.html',
+    styleUrls: ['./forms-list.component.scss'],
+    standalone: false
 })
 
 export class FormsListComponent implements OnInit, AfterViewInit {

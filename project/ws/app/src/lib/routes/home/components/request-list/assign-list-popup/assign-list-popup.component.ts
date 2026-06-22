@@ -1,14 +1,15 @@
 import { Component, Inject, OnInit } from '@angular/core'
 import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms'
 import { ProfileV2Service } from '../../../services/home.servive'
-import { MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA, MatLegacyDialogRef as MatDialogRef } from '@angular/material/legacy-dialog'
-import { MatLegacyTableDataSource as MatTableDataSource } from '@angular/material/legacy-table'
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog'
+import { MatTableDataSource } from '@angular/material/table'
 import { ConfigResolveService } from '../../../resolvers/config-resolve.service'
 
 @Component({
-  selector: 'ws-app-assign-list-popup',
-  templateUrl: './assign-list-popup.component.html',
-  styleUrls: ['./assign-list-popup.component.scss'],
+    selector: 'ws-app-assign-list-popup',
+    templateUrl: './assign-list-popup.component.html',
+    styleUrls: ['./assign-list-popup.component.scss'],
+    standalone: false
 })
 export class AssignListPopupComponent implements OnInit {
   requestForm!: UntypedFormGroup
@@ -24,10 +25,10 @@ export class AssignListPopupComponent implements OnInit {
   submitAssign = ''
 
   constructor(private fb: UntypedFormBuilder,
-              private homeService: ProfileV2Service,
-              @Inject(MAT_DIALOG_DATA) public data: any,
-              private configService: ConfigResolveService,
-              public dialogRef: MatDialogRef<AssignListPopupComponent>,
+    private homeService: ProfileV2Service,
+    @Inject(MAT_DIALOG_DATA) public data: any,
+    private configService: ConfigResolveService,
+    public dialogRef: MatDialogRef<AssignListPopupComponent>,
   ) {
     this.requestForm = this.fb.group({
       assignee: new UntypedFormControl('', Validators.required),
@@ -40,9 +41,9 @@ export class AssignListPopupComponent implements OnInit {
     this.getInterestOrgList()
     if (this.configService['confService'].userProfile || this.configService['confService'].userProfileV2) {
       this.fullProfile = this.configService['confService'].userProfile ?
-      this.configService['confService'].userProfile
-       : this.configService['confService'].userProfileV2
-      this.userId =  this.fullProfile.userId
+        this.configService['confService'].userProfile
+        : this.configService['confService'].userProfileV2
+      this.userId = this.fullProfile.userId
     }
   }
 
@@ -59,8 +60,8 @@ export class AssignListPopupComponent implements OnInit {
 
       // move selected data to first
       const position = this.providerList.indexOf(assignOrgData)
-       // check if the element exists in the array
-       if (position > -1) {
+      // check if the element exists in the array
+      if (position > -1) {
         // Remove the element from its position
         const selectedData = this.providerList.splice(position, 1)[0]
 
@@ -69,7 +70,7 @@ export class AssignListPopupComponent implements OnInit {
       }
 
     }
-   }
+  }
 
   getInterestOrgList() {
     const request = {
@@ -83,14 +84,14 @@ export class AssignListPopupComponent implements OnInit {
       pageSize: this.pageSize,
     }
     this.homeService.getOrgInterestList(request).subscribe(res => {
-     if (res.data) {
-      this.providerList = res.data
-      this.providerCount = res.totalCount
-      this.dataSource = new MatTableDataSource<any>(this.providerList)
-      this.setFormData()
-     }
+      if (res.data) {
+        this.providerList = res.data
+        this.providerCount = res.totalCount
+        this.dataSource = new MatTableDataSource<any>(this.providerList)
+        this.setFormData()
+      }
     }
-  )
+    )
   }
 
   getAssigneeList() {
@@ -101,21 +102,21 @@ export class AssignListPopupComponent implements OnInit {
     this.pageNumber = event.pageIndex
     this.pageSize = event.pageSize
     this.getInterestOrgList()
-    }
+  }
 
-    onSubmitAssign() {
+  onSubmitAssign() {
     const selectedProvider = this.requestForm.value.assignee
     if (selectedProvider) {
       const request = {
-        interestId: selectedProvider.interestId ,
+        interestId: selectedProvider.interestId,
         demandId: selectedProvider.demandId,
-        ownerId: selectedProvider.ownerId ,
+        ownerId: selectedProvider.ownerId,
         orgId: selectedProvider.orgId,
-        description: selectedProvider.description ,
-        turnAroundTime: selectedProvider.turnAroundTime ,
+        description: selectedProvider.description,
+        turnAroundTime: selectedProvider.turnAroundTime,
         orgName: selectedProvider.orgName,
         status: selectedProvider.status,
-        createdOn: selectedProvider.createdOn ,
+        createdOn: selectedProvider.createdOn,
         updatedOn: selectedProvider.updatedOn,
         // assignedBy: this.userId,
       }
@@ -124,11 +125,11 @@ export class AssignListPopupComponent implements OnInit {
           this.dialogRef.close({ data: 'confirmed' })
         }
 
-      },                                              error => {
-       this.dialogRef.close({ error })
+      }, error => {
+        this.dialogRef.close({ error })
 
       }
-    )
+      )
       // Implement your assign logic here
     } else {
     }

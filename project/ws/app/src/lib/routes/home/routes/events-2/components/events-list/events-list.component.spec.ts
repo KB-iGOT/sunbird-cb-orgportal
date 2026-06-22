@@ -1,17 +1,17 @@
 import { EventsListComponent } from './events-list.component'
 import { EventsService } from '../../services/events.service'
-import { MatLegacySnackBar } from '@angular/material/legacy-snack-bar'
+import { MatSnackBar } from '@angular/material/snack-bar'
 import { ActivatedRoute, Router, UrlSegment, ActivatedRouteSnapshot, ParamMap } from '@angular/router'
-import { MatLegacyDialog } from '@angular/material/legacy-dialog'
+import { MatDialog } from '@angular/material/dialog'
 import { of, throwError } from 'rxjs'
 import { HttpErrorResponse } from '@angular/common/http'
 
 describe('EventsListComponent', () => {
   let component: EventsListComponent
   let mockEventService: jest.Mocked<EventsService>
-  let mockSnackBar: jest.Mocked<MatLegacySnackBar>
+  let mockSnackBar: jest.Mocked<MatSnackBar>
   let mockRouter: jest.Mocked<Router>
-  let mockDialog: jest.Mocked<MatLegacyDialog>
+  let mockDialog: jest.Mocked<MatDialog>
   let mockActivatedRoute: Partial<ActivatedRoute>
   let mockActivatedRouteSnapshot: Partial<ActivatedRouteSnapshot>
 

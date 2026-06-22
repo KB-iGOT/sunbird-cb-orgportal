@@ -2,27 +2,27 @@ import { AddSpeakersComponent } from './add-speakers.component'
 import { FormBuilder } from '@angular/forms'
 import { of } from 'rxjs'
 import { EventsService } from '../../services/events.service'
-import { MatLegacyDialogRef } from '@angular/material/legacy-dialog'
-import { MatLegacySnackBar } from '@angular/material/legacy-snack-bar'
+import { MatDialogRef } from '@angular/material/dialog'
+import { MatSnackBar } from '@angular/material/snack-bar'
 import * as _ from 'lodash'
 
 jest.mock('../../services/events.service')
-jest.mock('@angular/material/legacy-dialog')
-jest.mock('@angular/material/legacy-snack-bar')
+jest.mock('@angular/material/dialog')
+jest.mock('@angular/material/snack-bar')
 jest.mock('lodash')
 
 describe('AddSpeakersComponent', () => {
   let component: AddSpeakersComponent
-  let dialogRef: MatLegacyDialogRef<AddSpeakersComponent>
+  let dialogRef: MatDialogRef<AddSpeakersComponent>
   let eventsService: EventsService
-  let matSnackBar: MatLegacySnackBar
+  let matSnackBar: MatSnackBar
   let formBuilder: FormBuilder
 
   beforeEach(() => {
     // Mock dependencies
-    dialogRef = new MatLegacyDialogRef<AddSpeakersComponent>(null as any, null as any, null as any)
+    dialogRef = new MatDialogRef<AddSpeakersComponent>(null as any, null as any, null as any)
     eventsService = new EventsService(null as any, null as any)  // Provide required service dependencies
-    matSnackBar = new MatLegacySnackBar(null as any, null as any, null as any, null as any, null as any, null as any)  // Mock the MatSnackBar service
+    matSnackBar = new MatSnackBar(null as any, null as any, null as any, null as any, null as any, null as any)  // Mock the MatSnackBar service
     formBuilder = new FormBuilder()
 
     component = new AddSpeakersComponent(dialogRef, { speakersList: [], speakerIndex: -1, rootOrgId: '' }, formBuilder, eventsService, matSnackBar)

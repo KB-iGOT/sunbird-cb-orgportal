@@ -6,7 +6,7 @@ import { DomSanitizer } from '@angular/platform-browser'
 import { UsersService } from '../../../users/services/users.service'
 import { LoaderService } from '../../../../../../../../../src/app/services/loader.service'
 import { TelemetryEvents } from '../../../../head/_services/telemetry.event.model'
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog'
+import { MatDialog } from '@angular/material/dialog'
 import { ReportsVideoComponent } from '../reports-video/reports-video.component'
 
 describe('MentorManageComponent', () => {

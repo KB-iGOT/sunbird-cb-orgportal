@@ -1,5 +1,5 @@
 import { EventMaterialsComponent } from './event-materials.component'
-import { MatLegacySnackBar } from '@angular/material/legacy-snack-bar'
+import { MatSnackBar } from '@angular/material/snack-bar'
 import { EventsService } from '../../services/events.service'
 import { ActivatedRoute, ActivatedRouteSnapshot } from '@angular/router'
 import { LoaderService } from '../../../../../../../../../../../src/app/services/loader.service'
@@ -22,7 +22,7 @@ Object.defineProperty(window, 'env', {
   writable: true
 })
 
-jest.mock('@angular/material/legacy-snack-bar')
+jest.mock('@angular/material/snack-bar')
 jest.mock('../../services/events.service')
 jest.mock('../../../../../../../../../../../src/app/services/loader.service')
 jest.mock('../../../../../../../../../../../src/environments/environment', () => ({
@@ -38,7 +38,7 @@ jest.mock('../../../../../../../../../../../src/environments/environment', () =>
 
 describe('EventMaterialsComponent', () => {
   let component: EventMaterialsComponent
-  let mockMatSnackBar: jest.Mocked<MatLegacySnackBar>
+  let mockMatSnackBar: jest.Mocked<MatSnackBar>
   let mockEventsService: jest.Mocked<EventsService>
   let mockActivatedRoute: Partial<ActivatedRoute>
   let mockLoaderService: jest.Mocked<LoaderService>

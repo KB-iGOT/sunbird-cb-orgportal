@@ -1,11 +1,12 @@
 import { Component, Inject, OnInit } from '@angular/core'
-import { MAT_LEGACY_DIALOG_DATA, MatLegacyDialogRef } from '@angular/material/legacy-dialog'
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog'
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser'
 import * as _ from 'lodash'
 @Component({
-  selector: 'ws-app-youtube-player',
-  templateUrl: './youtube-player.component.html',
-  styleUrls: ['./youtube-player.component.scss']
+    selector: 'ws-app-youtube-player',
+    templateUrl: './youtube-player.component.html',
+    styleUrls: ['./youtube-player.component.scss'],
+    standalone: false
 })
 export class YoutubePlayerComponent implements OnInit {
   eventData: any
@@ -14,8 +15,8 @@ export class YoutubePlayerComponent implements OnInit {
   videoLink: SafeResourceUrl = ''
   iframeSrc: SafeResourceUrl = ''
   constructor(
-    private dialogRef: MatLegacyDialogRef<YoutubePlayerComponent>,
-    @Inject(MAT_LEGACY_DIALOG_DATA) public data: any,
+    private dialogRef: MatDialogRef<YoutubePlayerComponent>,
+    @Inject(MAT_DIALOG_DATA) public data: any,
     private domSanitizer: DomSanitizer
   ) { }
 

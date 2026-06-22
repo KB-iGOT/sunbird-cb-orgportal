@@ -5,7 +5,7 @@ import { ExternalTrainingsService } from '../../../services/external-trainings.s
 import { mergeMap } from 'rxjs/operators'
 import { forkJoin } from 'rxjs'
 import * as _ from 'lodash'
-import { MatLegacySnackBar } from '@angular/material/legacy-snack-bar'
+import { MatSnackBar } from '@angular/material/snack-bar'
 import { LoaderService } from '../../../../../../../../../../src/app/services/loader.service'
 
 export function endDateValidator(): ValidatorFn {
@@ -22,7 +22,8 @@ export function endDateValidator(): ValidatorFn {
 @Component({
   selector: 'ws-app-create-batch',
   templateUrl: './create-batch.component.html',
-  styleUrls: ['./create-batch.component.scss']
+  styleUrls: ['./create-batch.component.scss'],
+  standalone: false
 })
 export class CreateBatchComponent implements OnInit {
   batchForm!: FormGroup
@@ -64,7 +65,7 @@ export class CreateBatchComponent implements OnInit {
     private readonly router: Router,
     private readonly route: ActivatedRoute,
     private externalTrainingsSvc: ExternalTrainingsService,
-    private matSnackBar: MatLegacySnackBar,
+    private matSnackBar: MatSnackBar,
     private loaderService: LoaderService,
   ) { }
 

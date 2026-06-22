@@ -1,12 +1,10 @@
 
 import { AfterViewInit, Component, OnDestroy, OnInit } from '@angular/core'
 @Component({
-  selector: 'ws-app-about',
-  templateUrl: './about.component.html',
-  styleUrls: ['./about.component.scss'],
-  /* tslint:disable */
-  // host: { class: 'flex flex-1 margin-top-l' },
-  /* tslint:enable */
+    selector: 'ws-app-about',
+    templateUrl: './about.component.html',
+    styleUrls: ['./about.component.scss'],
+    standalone: false
 })
 export class AboutComponent implements OnInit, AfterViewInit, OnDestroy {
   constructor() {

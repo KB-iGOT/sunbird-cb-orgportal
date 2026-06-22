@@ -1,8 +1,8 @@
 import { NgModule } from '@angular/core'
 import { CommonModule } from '@angular/common'
 import { ContactHomeComponent } from './components/contact-home.component'
-import { MatLegacyButtonModule as MatButtonModule } from '@angular/material/legacy-button'
-import { MatLegacyCardModule as MatCardModule } from '@angular/material/legacy-card'
+import { MatButtonModule } from '@angular/material/button'
+import { MatCardModule } from '@angular/material/card'
 import { MatToolbarModule } from '@angular/material/toolbar'
 import { BreadcrumbsOrgModule } from '@sunbird-cb/collection'
 
@@ -11,4 +11,4 @@ import { BreadcrumbsOrgModule } from '@sunbird-cb/collection'
   imports: [CommonModule, MatToolbarModule, MatCardModule, BreadcrumbsOrgModule, MatButtonModule],
   exports: [ContactHomeComponent],
 })
-export class ContactModule {}
+export class ContactModule { }

@@ -6,7 +6,8 @@ import { LoaderService } from '../../../../../../../../../../src/app/services/lo
 @Component({
   selector: 'ws-app-file-logs',
   templateUrl: './file-logs.component.html',
-  styleUrls: ['./file-logs.component.scss']
+  styleUrls: ['./file-logs.component.scss'],
+  standalone: false
 })
 export class FileLogsComponent {
   lastUploadList: any[] = []

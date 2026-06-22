@@ -1,8 +1,8 @@
 import { Component, OnDestroy, OnInit } from '@angular/core'
 import { DesignationsService } from '../../services/designations.service'
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog'
-import { LegacyPageEvent as PageEvent } from '@angular/material/legacy-paginator'
-import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar'
+import { MatDialog } from '@angular/material/dialog'
+import { PageEvent } from '@angular/material/paginator'
+import { MatSnackBar } from '@angular/material/snack-bar'
 import { UntypedFormControl } from '@angular/forms'
 import { catchError, delay, map } from 'rxjs/operators'
 import { SelectedDesignationPopupComponent } from '../../dialog-boxes/selected-designation-popup/selected-designation-popup.component'
@@ -18,9 +18,10 @@ import { OnboardingService } from '../../../../services/onboarding.service'
 // import { ConformationPopupComponent } from '../../dialog-boxes/conformation-popup/conformation-popup.component'
 
 @Component({
-  selector: 'ws-app-import-designation',
-  templateUrl: './import-designation.component.html',
-  styleUrls: ['./import-designation.component.scss'],
+    selector: 'ws-app-import-designation',
+    templateUrl: './import-designation.component.html',
+    styleUrls: ['./import-designation.component.scss'],
+    standalone: false
 })
 export class ImportDesignationComponent implements OnInit, OnDestroy {
 

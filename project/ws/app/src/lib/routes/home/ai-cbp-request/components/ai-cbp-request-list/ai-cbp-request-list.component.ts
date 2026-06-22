@@ -23,6 +23,7 @@ export enum statusValue {
   selector: 'ws-ai-cbp-request-list',
   templateUrl: './ai-cbp-request-list.component.html',
   styleUrls: ['./ai-cbp-request-list.component.scss'],
+  standalone: false
 })
 export class AICBPRequestListComponent implements OnInit {
   searchText = '';

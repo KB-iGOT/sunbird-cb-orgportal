@@ -7,18 +7,19 @@ import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms'
 import { URL_PATRON, material, noSpecialCharEvent, speaker } from '../../models/events.model'
 import { StepperSelectionEvent } from '@angular/cdk/stepper'
 import { MatStepper } from '@angular/material/stepper'
-import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar'
+import { MatSnackBar } from '@angular/material/snack-bar'
 import { HttpErrorResponse } from '@angular/common/http'
 import { DatePipe } from '@angular/common'
 import { LoaderService } from '../../../../../../../../../../../src/app/services/loader.service'
-import { MatLegacyDialog } from '@angular/material/legacy-dialog'
+import { MatDialog } from '@angular/material/dialog'
 import { ConfirmDialogComponent } from '../../../../../workallocation-v2/components/confirm-dialog/confirm-dialog.component'
 import { CourseListingComponent } from '../course-listing/course-listing.component'
 
 @Component({
   selector: 'ws-app-create-event',
   templateUrl: './create-event.component.html',
-  styleUrls: ['./create-event.component.scss']
+  styleUrls: ['./create-event.component.scss'],
+  standalone: false
 })
 export class CreateEventComponent implements OnInit, AfterViewInit {
   //#region (global varialbles)
@@ -55,7 +56,7 @@ export class CreateEventComponent implements OnInit, AfterViewInit {
     private datePipe: DatePipe,
     private loaderService: LoaderService,
     private cdr: ChangeDetectorRef,
-    private dialog: MatLegacyDialog
+    private dialog: MatDialog
   ) { }
 
   //#region (onInit)
@@ -217,7 +218,7 @@ export class CreateEventComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit() {
     if (this.stepper) {
-      this.stepper._getIndicatorType = () => 'number'
+      //this.stepper.indicatorType = 'number'
       this.cdr.detectChanges()
     }
   }
@@ -335,7 +336,7 @@ export class CreateEventComponent implements OnInit, AfterViewInit {
 
       const dialogRef = this.dialog.open(ConfirmDialogComponent, {
         width: '500px',
-        height: '210px',
+        height: 'auto',
         data: dialgData,
         autoFocus: false,
         disableClose: true

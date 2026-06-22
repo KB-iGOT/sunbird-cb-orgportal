@@ -2,9 +2,10 @@ import { Component, EventEmitter, OnInit, Output } from '@angular/core'
 import { TrainingPlanDataSharingService } from './../../services/training-plan-data-share.service'
 
 @Component({
-  selector: 'ws-app-create-assignee',
-  templateUrl: './create-assignee.component.html',
-  styleUrls: ['./create-assignee.component.scss'],
+    selector: 'ws-app-create-assignee',
+    templateUrl: './create-assignee.component.html',
+    styleUrls: ['./create-assignee.component.scss'],
+    standalone: false
 })
 export class CreateAssigneeComponent implements OnInit {
 

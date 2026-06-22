@@ -1,6 +1,6 @@
 import { UntypedFormGroup } from '@angular/forms'
 import { Router, ActivatedRoute } from '@angular/router'
-import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar'
+import { MatSnackBar } from '@angular/material/snack-bar'
 import { of, throwError } from 'rxjs'
 import { BudgetApprovalComponent } from './budget-approval.component'
 import { CertificationApiService } from '../../apis/certification-api.service'

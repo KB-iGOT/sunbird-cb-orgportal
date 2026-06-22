@@ -1,8 +1,8 @@
 import { DatePipe } from '@angular/common'
 import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core'
 import { Validators, UntypedFormGroup, UntypedFormBuilder, UntypedFormControl } from '@angular/forms'
-import { MatLegacyRadioChange as MatRadioChange } from '@angular/material/legacy-radio'
-import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar'
+import { MatRadioChange } from '@angular/material/radio'
+import { MatSnackBar } from '@angular/material/snack-bar'
 import { MatSort } from '@angular/material/sort'
 import { ActivatedRoute } from '@angular/router'
 import { Observable, Subscription, interval } from 'rxjs'
@@ -18,6 +18,7 @@ import * as _ from 'lodash'
   selector: 'ws-app-profle-approval-bulk-upload',
   templateUrl: './profle-approval-bulk-upload.component.html',
   styleUrls: ['./profle-approval-bulk-upload.component.scss'],
+  standalone: false
 })
 export class ProfleApprovalBulkUploadComponent implements OnInit, OnDestroy, AfterViewInit {
 

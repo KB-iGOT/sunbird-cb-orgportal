@@ -21,7 +21,7 @@ import { CertificationApiService } from '../../apis/certification-api.service'
 import { Router, ActivatedRoute } from '@angular/router'
 import { CertificationService } from '../../services/certification.service'
 import { SnackbarComponent } from '../snackbar/snackbar.component'
-import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar'
+import { MatSnackBar } from '@angular/material/snack-bar'
 
 @Component({
   selector: 'ws-app-budget-approval',
@@ -201,6 +201,6 @@ export class BudgetApprovalComponent implements OnInit, OnDestroy {
             this.validateApproverEmail.bind(this),
           )
         }
-      },         noop)
+      }, noop)
   }
 }

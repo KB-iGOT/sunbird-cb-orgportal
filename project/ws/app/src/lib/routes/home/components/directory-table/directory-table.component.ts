@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core'
+import { Component, Input, OnInit, ViewChild } from '@angular/core'
 import { BehaviorSubject } from 'rxjs'
 import { DirectoryService } from '../../services/directory.service'
 import * as _ from 'lodash'
@@ -7,17 +7,20 @@ import { MatTableDataSource } from '@angular/material/table'
 import { MatPaginator } from '@angular/material/paginator'
 import { MatSort } from '@angular/material/sort'
 import { InfoModalComponent } from '../info-modal/info-modal.component'
-import { MatLegacyDialog } from '@angular/material/legacy-dialog'
+import { MatDialog } from '@angular/material/dialog'
 import { ActivatedRoute, Router } from '@angular/router'
 
 @Component({
   selector: 'ws-app-directory-table',
   templateUrl: './directory-table.component.html',
-  styleUrls: ['./directory-table.component.scss']
+  styleUrls: ['./directory-table.component.scss'],
+  standalone: false
 })
 export class DirectoryTableComponent implements OnInit {
 
   //#region (global variables)
+  @Input() tabType: string = 'organisation'
+
   @ViewChild(MatPaginator) private paginator!: MatPaginator
   @ViewChild(MatSort, { static: true }) sort: MatSort | null = null;
 
@@ -59,7 +62,7 @@ export class DirectoryTableComponent implements OnInit {
   constructor(
     private directoryService: DirectoryService,
     private datePipe: DatePipe,
-    private dialog: MatLegacyDialog,
+    private dialog: MatDialog,
     private router: Router,
     private activatedRoute: ActivatedRoute
   ) {
@@ -98,7 +101,7 @@ export class DirectoryTableComponent implements OnInit {
   async getAllDepartments(queryText: any) {
     this.tableData.loader = true
     const query = queryText ? queryText : ''
-    this.directoryService.getAllDepartmentsKong(query, this.pagination, this.configData?.orgReadData).subscribe(res => {
+    this.directoryService.getAllDepartmentsKong(query, this.pagination, this.configData?.orgReadData, this.tabType).subscribe(res => {
       this.wholeData2 = res.result.response.content
       this.tableData.tableDataCount = res.result.response.count
       this.totalCount = res.result.response.count

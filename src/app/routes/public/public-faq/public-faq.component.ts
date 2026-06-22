@@ -5,9 +5,10 @@ import { Subscription } from 'rxjs'
 import { ValueService, ConfigurationsService, EFeatures, NsPage } from '@sunbird-cb/utils-v2'
 
 @Component({
-  selector: 'ws-public-faq',
-  templateUrl: './public-faq.component.html',
-  styleUrls: ['./public-faq.component.scss'],
+    selector: 'ws-public-faq',
+    templateUrl: './public-faq.component.html',
+    styleUrls: ['./public-faq.component.scss'],
+    standalone: false
 })
 export class PublicFaqComponent implements OnInit, OnDestroy {
   errorMessageCode: 'API_FAILURE' | 'NO_DATA' | 'INVALID_DATA' | 'NONE' = 'NONE'

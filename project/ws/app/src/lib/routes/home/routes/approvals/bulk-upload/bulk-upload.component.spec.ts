@@ -1,12 +1,12 @@
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog'
-import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar'
+import { MatDialog } from '@angular/material/dialog'
+import { MatSnackBar } from '@angular/material/snack-bar'
 import { ActivatedRoute } from '@angular/router'
 import { FileService } from '../../../../users/services/upload.service'
 import { UsersService } from '../../../../users/services/users.service'
 import { BulkUploadApprovalComponent } from './bulk-upload.component'
 import { HttpErrorResponse } from '@angular/common/http'
 import { of, throwError } from 'rxjs'
-import { LegacyPageEvent as PageEvent } from '@angular/material/legacy-paginator'
+import { PageEvent } from '@angular/material/paginator'
 import { FileProgressComponent } from '../../users-view/file-progress/file-progress.component'
 
 describe('BulkUploadApprovalComponent', () => {

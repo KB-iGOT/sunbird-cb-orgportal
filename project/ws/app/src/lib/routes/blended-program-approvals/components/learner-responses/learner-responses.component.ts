@@ -5,14 +5,15 @@ import { NSProfileDataV2 } from '../../../home/models/profile-v2.model'
 /* tslint:disable */
 import _ from 'lodash'
 import { RejectReasonDialogComponent } from '../reject-reason-dialog/reject-reason-dialog.component'
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog'
+import { MatDialog } from '@angular/material/dialog'
 import { DialogConfirmComponent } from '../../../../../../../../../src/app/component/dialog-confirm/dialog-confirm.component'
 import { environment } from '../../../../../../../../../src/environments/environment'
 
 @Component({
-  selector: 'ws-app-learner-responses',
-  templateUrl: './learner-responses.component.html',
-  styleUrls: ['./learner-responses.component.scss']
+    selector: 'ws-app-learner-responses',
+    templateUrl: './learner-responses.component.html',
+    styleUrls: ['./learner-responses.component.scss'],
+    standalone: false
 })
 export class LearnerResponsesComponent implements OnInit {
   @Input() selectedUser: any

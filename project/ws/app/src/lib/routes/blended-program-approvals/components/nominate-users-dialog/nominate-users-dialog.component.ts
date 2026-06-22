@@ -1,18 +1,18 @@
 import { SelectionModel } from '@angular/cdk/collections'
 import { Component, Inject, OnInit, ViewChild } from '@angular/core'
-import { MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA, MatLegacyDialog as MatDialog, MatLegacyDialogRef as MatDialogRef } from '@angular/material/legacy-dialog'
-import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar'
-import { MatLegacyTableDataSource as MatTableDataSource } from '@angular/material/legacy-table'
+import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog'
+import { MatSnackBar } from '@angular/material/snack-bar'
+import { MatTableDataSource } from '@angular/material/table'
 import { UsersService } from '../../../users/services/users.service'
 import { MatSort } from '@angular/material/sort'
 import { BlendedApporvalService } from '../../services/blended-approval.service'
 import { DialogConfirmComponent } from '../../../../../../../../../src/app/component/dialog-confirm/dialog-confirm.component'
 import { ConfigurationsService } from '@sunbird-cb/utils-v2'
 @Component({
-  selector: 'ws-app-nominate-users-dialog',
-  templateUrl: './nominate-users-dialog.component.html',
-  styleUrls: ['./nominate-users-dialog.component.scss'],
-
+    selector: 'ws-app-nominate-users-dialog',
+    templateUrl: './nominate-users-dialog.component.html',
+    styleUrls: ['./nominate-users-dialog.component.scss'],
+    standalone: false
 })
 export class NominateUsersDialogComponent implements OnInit {
 

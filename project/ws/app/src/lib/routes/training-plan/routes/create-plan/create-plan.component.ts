@@ -9,6 +9,7 @@ import _ from 'lodash'
   selector: 'ws-app-create-plan',
   templateUrl: './create-plan.component.html',
   styleUrls: ['./create-plan.component.scss'],
+  standalone: false
 })
 
 export class CreatePlanComponent implements OnInit, OnDestroy {
@@ -19,6 +20,7 @@ export class CreatePlanComponent implements OnInit, OnDestroy {
   planId = ''
   filterVisibilityFlag = false
   from = ''
+
   constructor(
     private route: ActivatedRoute,
     private tpdsSvc: TrainingPlanDataSharingService) {

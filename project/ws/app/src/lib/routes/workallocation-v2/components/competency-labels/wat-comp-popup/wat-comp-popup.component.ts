@@ -1,8 +1,8 @@
 import { Component, Inject, Input, OnInit } from '@angular/core'
 import { UntypedFormArray, UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms'
-import { MatLegacyCheckboxChange as MatCheckboxChange } from '@angular/material/legacy-checkbox'
-import { MatLegacyRadioChange as MatRadioChange } from '@angular/material/legacy-radio'
-import { MatLegacyDialogRef as MatDialogRef, MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA } from '@angular/material/legacy-dialog'
+import { MatCheckboxChange } from '@angular/material/checkbox'
+import { MatRadioChange } from '@angular/material/radio'
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog'
 /* tslint:disable */
 import _ from 'lodash'
 /* tslint:enable */
@@ -35,9 +35,10 @@ export interface IChield {
  * @title Dialog Overview
  */
 @Component({
-  selector: 'ws-app-wat-comp-popup',
-  templateUrl: './wat-comp-popup.component.html',
-  styleUrls: ['./wat-comp-popup.component.scss'],
+    selector: 'ws-app-wat-comp-popup',
+    templateUrl: './wat-comp-popup.component.html',
+    styleUrls: ['./wat-comp-popup.component.scss'],
+    standalone: false
 })
 export class WatCompPopupComponent implements OnInit {
   isChecked = true

@@ -10,9 +10,10 @@ import { EventService, WsEvents } from '@sunbird-cb/utils-v2'
 // import { ILeftMenu, IMenu } from './left-menu-v1.model'
 // import { defaultImg } from './img.json'
 @Component({
-  selector: 'ws-widget-left-menu',
-  templateUrl: './left-menu.component.html',
-  styleUrls: ['./left-menu.component.scss'],
+    selector: 'ws-widget-left-menu',
+    templateUrl: './left-menu.component.html',
+    styleUrls: ['./left-menu.component.scss'],
+    standalone: false
 })
 export class LeftMenuComponent implements OnInit, OnDestroy {
   @Input() widgetData!: any

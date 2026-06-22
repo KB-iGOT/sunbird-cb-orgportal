@@ -52,8 +52,8 @@ import { ContentRatingV2DialogComponent } from '@ws-widget/collection/src/lib/_c
 import { NsCardContent } from '@ws-widget/collection/src/lib/card-content-v2/card-content-v2.model'
 import { environment } from 'src/environments/environment'
 import { TimerService } from '../../services/timer.service'
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog'
-import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar'
+import { MatDialog } from '@angular/material/dialog'
+import { MatSnackBar } from '@angular/material/snack-bar'
 import { EditorContentService } from '../../../../../../../author/src/lib/routing/modules/editor/services/editor-content.service'
 import { MyContentService } from '../../../../../../../author/src/lib/routing/modules/home/components/content-detail/services/content-detail.service'
 

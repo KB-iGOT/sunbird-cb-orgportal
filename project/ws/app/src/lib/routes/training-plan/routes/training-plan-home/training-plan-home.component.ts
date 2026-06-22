@@ -6,12 +6,12 @@ import { TrainingPlanDataSharingService } from '../../services/training-plan-dat
 import { Subscription } from 'rxjs'
 import { ActivatedRoute } from '@angular/router'
 @Component({
-  selector: 'ws-app-training-plan-home',
-  templateUrl: './training-plan-home.component.html',
-  styleUrls: ['./training-plan-home.component.scss'],
-  /* tslint:disable */
-  host: { class: 'margin-top-l' },
-  /* tslint:enable */
+    selector: 'ws-app-training-plan-home',
+    templateUrl: './training-plan-home.component.html',
+    styleUrls: ['./training-plan-home.component.scss'],
+    /* tslint:disable */
+    host: { class: 'margin-top-l' },
+    standalone: false
 })
 export class TrainingPlanHomeComponent implements OnInit, AfterViewInit, OnDestroy {
   showModeratedNotification = false

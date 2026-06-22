@@ -7,10 +7,12 @@ import { TelemetryEvents } from '../../../../head/_services/telemetry.event.mode
 import { RolesService } from '../../../users/services/roles.service'
 import { UsersService } from '../../../users/services/users.service'
 import { map } from 'rxjs/operators'
+import { LoaderService } from '../../../../../../../../../src/app/services/loader.service'
 @Component({
   selector: 'ws-app-roles-access',
   templateUrl: './roles-access.component.html',
   styleUrls: ['./roles-access.component.scss'],
+  standalone: false
 })
 export class RolesAccessComponent implements OnInit, AfterViewInit, OnDestroy {
   tabledata!: any
@@ -28,6 +30,7 @@ export class RolesAccessComponent implements OnInit, AfterViewInit, OnDestroy {
     private activeRouter: ActivatedRoute,
     private usersService: UsersService,
     // private telemetrySvc: TelemetryService,
+    private loaderService: LoaderService,
     private events: EventService,
     private roleservice: RolesService) { }
 
@@ -114,6 +117,7 @@ export class RolesAccessComponent implements OnInit, AfterViewInit, OnDestroy {
       })
       this.data = _.uniq(this.uniqueRoles)
       this.getRolesCount()
+      this.loaderService.changeLoaderState(false)
     })
   }
 

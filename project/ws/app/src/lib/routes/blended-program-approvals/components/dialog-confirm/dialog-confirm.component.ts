@@ -1,10 +1,11 @@
 import { Component, Inject } from '@angular/core'
-import { MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA, MatLegacyDialogRef as MatDialogRef } from '@angular/material/legacy-dialog'
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog'
 // @dynamic
 @Component({
-  selector: 'ws-app-confirm',
-  templateUrl: './dialog-confirm.component.html',
-  styleUrls: ['./dialog-confirm.component.scss'],
+    selector: 'ws-app-confirm',
+    templateUrl: './dialog-confirm.component.html',
+    styleUrls: ['./dialog-confirm.component.scss'],
+    standalone: false
 })
 export class DialogConfirmComponent {
 

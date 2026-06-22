@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy, HostListener, ViewChild, ElementRef } fro
 import { UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms'
 import { ActivatedRoute, Router, Event, NavigationEnd } from '@angular/router'
 import { UsersService } from '../../services/users.service'
-import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar'
+import { MatSnackBar } from '@angular/material/snack-bar'
 import { ILeftMenu } from '@sunbird-cb/collection'
 import { NsWidgetResolver } from '@sunbird-cb/resolver-v2'
 import { ValueService } from '@sunbird-cb/utils-v2'
@@ -11,9 +11,10 @@ import * as _ from 'lodash'
 import { Subscription } from 'rxjs'
 /* tslint:enable */
 @Component({
-  selector: 'ws-app-create-user',
-  templateUrl: './create-user.component.html',
-  styleUrls: ['./create-user.component.scss'],
+    selector: 'ws-app-create-user',
+    templateUrl: './create-user.component.html',
+    styleUrls: ['./create-user.component.scss'],
+    standalone: false
 })
 export class CreateUserComponent implements OnInit, OnDestroy {
   sideNavBarOpened = true

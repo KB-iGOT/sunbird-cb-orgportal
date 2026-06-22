@@ -1,6 +1,6 @@
 import { AppSetupHomeComponent } from './app-setup-home.component'
 import { ConfigurationsService } from '@sunbird-cb/utils-v2'
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog'
+import { MatDialog } from '@angular/material/dialog'
 import { StepperSelectionEvent } from '@angular/cdk/stepper'
 import { of } from 'rxjs'
 

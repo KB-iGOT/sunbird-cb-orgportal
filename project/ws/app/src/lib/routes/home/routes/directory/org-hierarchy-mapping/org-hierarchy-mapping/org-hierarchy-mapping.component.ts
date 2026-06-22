@@ -1,21 +1,22 @@
 import { Component, OnInit, ViewChild, ElementRef, AfterViewInit } from '@angular/core'
 import { FormControl } from '@angular/forms'
 import { MatSelect } from '@angular/material/select'
-import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar'
+import { MatSnackBar } from '@angular/material/snack-bar'
 import { ActivatedRoute, Router } from '@angular/router'
 import _ from 'lodash'
 import { Subject, of } from 'rxjs'
 import { switchMap, finalize } from 'rxjs/operators'
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog'
+import { MatDialog } from '@angular/material/dialog'
 import { BulkUploadOrgComponent } from '../../bulk-upload-org/bulk-upload-org.component'
 import { OrgHierarchyService } from '../../../../services/org-hierarchy.service'
 import { environment } from '../../../../../../../../../../../src/environments/environment'
 import { LoaderService } from '../../../../../../../../../../../src/app/services/loader.service'
 
 @Component({
-  selector: 'ws-app-org-hierarchy-mapping',
-  templateUrl: './org-hierarchy-mapping.component.html',
-  styleUrls: ['./org-hierarchy-mapping.component.scss']
+    selector: 'ws-app-org-hierarchy-mapping',
+    templateUrl: './org-hierarchy-mapping.component.html',
+    styleUrls: ['./org-hierarchy-mapping.component.scss'],
+    standalone: false
 })
 export class OrgHierarchyMappingComponent implements OnInit, AfterViewInit {
   @ViewChild('singleSelect') singleSelect!: MatSelect

@@ -4,13 +4,13 @@ import { ConfigurationsService } from '@sunbird-cb/utils-v2'
 import { CustomTourService } from '@sunbird-cb/collection'
 import { SubapplicationRespondService } from '@sunbird-cb/utils-v2'
 import { ValueService } from '@sunbird-cb/utils-v2'
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog'
+import { MatDialog } from '@angular/material/dialog'
 import { of, Subject } from 'rxjs'
 
 jest.mock('@angular/router')
 jest.mock('@sunbird-cb/utils-v2')
 jest.mock('@sunbird-cb/collection')
-jest.mock('@angular/material/legacy-dialog')
+jest.mock('@angular/material/dialog')
 
 describe('FeaturesComponent', () => {
     let component: FeaturesComponent

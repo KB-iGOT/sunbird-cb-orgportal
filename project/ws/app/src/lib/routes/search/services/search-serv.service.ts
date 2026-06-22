@@ -50,10 +50,10 @@ export class SearchServService {
     return false
   }
 
-  searchAutoComplete(params: ISearchQuery): Promise<ISearchAutoComplete[]> {
+  searchAutoComplete(params: ISearchQuery): Promise<ISearchAutoComplete[] | any> {
     params.q = params.q.toLowerCase()
     if (params.l.split(',').length === 1 && params.l.toLowerCase() !== 'all') {
-      return this.searchApi.getSearchAutoCompleteResults(params).toPromise()
+      return this.searchApi.getSearchAutoCompleteResults(params).toPromise() as Promise<ISearchAutoComplete[]>
     }
     return Promise.resolve([])
   }

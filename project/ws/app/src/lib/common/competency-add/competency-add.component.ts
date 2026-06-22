@@ -1,14 +1,15 @@
 import { Component, Inject, OnInit } from '@angular/core'
 import { FormControl } from '@angular/forms'
 import { CommonService } from './../services/common-service.service'
-import { MAT_LEGACY_DIALOG_DATA, MatLegacyDialogRef } from '@angular/material/legacy-dialog'
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog'
 import { debounceTime } from 'rxjs/operators'
 import * as _ from 'lodash'
 
 @Component({
   selector: 'ws-app-competency-add',
   templateUrl: './competency-add.component.html',
-  styleUrls: ['./competency-add.component.scss']
+  styleUrls: ['./competency-add.component.scss'],
+  standalone: false
 })
 
 export class CompetencyAddComponent implements OnInit {
@@ -22,8 +23,8 @@ export class CompetencyAddComponent implements OnInit {
   selectedThemesList: any[] = []
   preSelectedThemesCount = 0
   constructor(
-    private dialogRef: MatLegacyDialogRef<CompetencyAddComponent>,
-    @Inject(MAT_LEGACY_DIALOG_DATA) private competencies: any[],
+    private dialogRef: MatDialogRef<CompetencyAddComponent>,
+    @Inject(MAT_DIALOG_DATA) private competencies: any[],
     private commonSvc: CommonService
   ) { }
 

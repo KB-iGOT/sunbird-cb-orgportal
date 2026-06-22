@@ -1,9 +1,10 @@
 import { Component, Input } from '@angular/core'
 
 @Component({
-  selector: 'ws-app-profile-avatar',
-  templateUrl: './profile-avatar.component.html',
-  styleUrls: ['./profile-avatar.component.scss']
+    selector: 'ws-app-profile-avatar',
+    templateUrl: './profile-avatar.component.html',
+    styleUrls: ['./profile-avatar.component.scss'],
+    standalone: false
 })
 export class ProfileAvatarComponent {
 

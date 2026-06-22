@@ -1,17 +1,17 @@
 import { SimpleChanges } from '@angular/core'
 import { EventCompetenciesComponent } from './event-competencies.component'
-import { MatLegacySnackBar } from '@angular/material/legacy-snack-bar'
-import { MatLegacyDialog } from '@angular/material/legacy-dialog'
+import { MatSnackBar } from '@angular/material/snack-bar'
+import { MatDialog } from '@angular/material/dialog'
 import { EventsService } from '../../services/events.service'
 
-jest.mock('@angular/material/legacy-snack-bar')
-jest.mock('@angular/material/legacy-dialog')
+jest.mock('@angular/material/snack-bar')
+jest.mock('@angular/material/dialog')
 jest.mock('../../services/events.service')
 
 describe('EventCompetenciesComponent', () => {
   let component: EventCompetenciesComponent
-  let mockMatSnackBar: jest.Mocked<MatLegacySnackBar>
-  let mockDialog: jest.Mocked<MatLegacyDialog>
+  let mockMatSnackBar: jest.Mocked<MatSnackBar>
+  let mockDialog: jest.Mocked<MatDialog>
   let mockEventsService: jest.Mocked<EventsService>
 
   const mockCompetenciesList = [

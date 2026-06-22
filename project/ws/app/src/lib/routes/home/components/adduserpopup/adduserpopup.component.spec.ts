@@ -1,6 +1,6 @@
 import { AdduserpopupComponent, PeriodicElement } from './adduserpopup.component'
-import { MatLegacyDialogRef as MatDialogRef } from '@angular/material/legacy-dialog'
-import { MatLegacyTableDataSource as MatTableDataSource } from '@angular/material/legacy-table'
+import { MatDialogRef } from '@angular/material/dialog'
+import { MatTableDataSource } from '@angular/material/table'
 import { Router } from '@angular/router'
 import { SelectionModel } from '@angular/cdk/collections'
 

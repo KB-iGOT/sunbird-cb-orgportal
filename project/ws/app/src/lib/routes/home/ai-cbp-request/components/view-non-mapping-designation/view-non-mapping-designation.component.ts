@@ -17,6 +17,7 @@ export enum statusValue {
   selector: 'ws-view-non-mapping-designation',
   templateUrl: './view-non-mapping-designation.component.html',
   styleUrls: ['./view-non-mapping-designation.component.scss'],
+  standalone: false
 })
 export class ViewNonMappingDesignationComponent implements OnInit {
   pageNo = 1

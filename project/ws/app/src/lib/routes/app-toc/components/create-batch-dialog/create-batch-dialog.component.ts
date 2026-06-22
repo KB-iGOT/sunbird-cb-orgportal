@@ -5,8 +5,8 @@ import { AppDateAdapter, APP_DATE_FORMATS, startWithYearformat } from '@ws/app'
 import { ConfigurationsService } from '@sunbird-cb/utils-v2'
 import { AppTocService } from '../../services/app-toc.service'
 import { DateAdapter, MAT_DATE_FORMATS } from '@angular/material/core'
-import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar'
-import { MatLegacyDialogRef as MatDialogRef, MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA } from '@angular/material/legacy-dialog'
+import { MatSnackBar } from '@angular/material/snack-bar'
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog'
 
 @Component({
   selector: 'ws-app-create-batch-dialog',

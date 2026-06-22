@@ -8,9 +8,10 @@ import { events } from '../../models/events.model'
 import { MatSort } from '@angular/material/sort'
 
 @Component({
-  selector: 'ws-app-events-table',
-  templateUrl: './events-table.component.html',
-  styleUrls: ['./events-table.component.scss']
+    selector: 'ws-app-events-table',
+    templateUrl: './events-table.component.html',
+    styleUrls: ['./events-table.component.scss'],
+    standalone: false
 })
 export class EventsTableComponent implements OnInit, OnChanges {
   @ViewChild(MatSort, { static: false }) sort!: MatSort

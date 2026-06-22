@@ -1,7 +1,7 @@
 import { Component, OnInit, Inject, ViewChild } from '@angular/core'
 import { UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms'
-import { MatLegacyDialogRef as MatDialogRef, MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA } from '@angular/material/legacy-dialog'
-import { MatLegacyTableDataSource as MatTableDataSource } from '@angular/material/legacy-table'
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog'
+import { MatTableDataSource } from '@angular/material/table'
 import { UploadService } from '../../services/upload.service'
 // import { Observable } from 'rxjs'
 // import { HttpEventType, HttpResponse } from '@angular/common/http'
@@ -19,9 +19,10 @@ export interface PeriodicElement {
 }
 
 @Component({
-  selector: 'ws-app-budgetproofspopup',
-  templateUrl: './budgetproofspopup.component.html',
-  styleUrls: ['./budgetproofspopup.component.scss'],
+    selector: 'ws-app-budgetproofspopup',
+    templateUrl: './budgetproofspopup.component.html',
+    styleUrls: ['./budgetproofspopup.component.scss'],
+    standalone: false
 })
 export class BudgetproofspopupComponent implements OnInit {
   @ViewChild('file') file: any

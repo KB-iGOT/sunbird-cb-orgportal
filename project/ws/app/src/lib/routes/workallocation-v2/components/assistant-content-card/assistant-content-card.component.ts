@@ -1,11 +1,12 @@
 import { Component, Input, OnInit } from '@angular/core'
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog'
+import { MatDialog } from '@angular/material/dialog'
 import { PlayerDialogComponent } from '../player-dialog/player-dialog.component'
 
 @Component({
-  selector: 'ws-app-assistant-content-card',
-  templateUrl: './assistant-content-card.component.html',
-  styleUrls: ['./assistant-content-card.component.scss'],
+    selector: 'ws-app-assistant-content-card',
+    templateUrl: './assistant-content-card.component.html',
+    styleUrls: ['./assistant-content-card.component.scss'],
+    standalone: false
 })
 export class AssistantContentCardComponent implements OnInit {
   @Input() content!: any

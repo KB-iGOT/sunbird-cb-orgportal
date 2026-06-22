@@ -1,9 +1,10 @@
 import { Component, OnInit } from '@angular/core'
 
 @Component({
-  selector: 'ws-app-privileges',
-  templateUrl: './privileges.component.html',
-  styleUrls: ['./privileges.component.scss'],
+    selector: 'ws-app-privileges',
+    templateUrl: './privileges.component.html',
+    styleUrls: ['./privileges.component.scss'],
+    standalone: false
 })
 export class PrivilegesComponent implements OnInit {
   userMgmtData: any = []

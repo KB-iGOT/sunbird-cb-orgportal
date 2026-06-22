@@ -2,10 +2,10 @@ import { AfterViewInit, Component, ElementRef, EventEmitter, Input, OnDestroy, O
 import { UntypedFormBuilder, UntypedFormControl, Validators } from '@angular/forms'
 import { MomentDateAdapter } from '@angular/material-moment-adapter'
 import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE } from '@angular/material/core'
-import { MatLegacyCheckboxChange as MatCheckboxChange } from '@angular/material/legacy-checkbox'
-import { MatLegacyChipInputEvent as MatChipInputEvent } from '@angular/material/legacy-chips'
-import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar'
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog'
+import { MatCheckboxChange } from '@angular/material/checkbox'
+import { MatChipInputEvent } from '@angular/material/chips'
+import { MatSnackBar } from '@angular/material/snack-bar'
+import { MatDialog } from '@angular/material/dialog'
 import { HttpErrorResponse } from '@angular/common/http'
 import { COMMA, ENTER } from '@angular/cdk/keycodes'
 import { Subject } from 'rxjs'
@@ -43,11 +43,13 @@ const PIN_CODE_PATTERN = /^[1-9][0-9]{5}$/
     { provide: DateAdapter, useClass: MomentDateAdapter, deps: [MAT_DATE_LOCALE] },
     { provide: MAT_DATE_FORMATS, useValue: MY_FORMATS },
   ],
+  standalone: false
 })
 export class SingleUserCreationComponent implements OnInit, AfterViewInit, OnDestroy {
 
   @Input() selectedOrgData: any
   @Input() editUserData: any
+  @Input() isNgo: boolean = false
   @Output() userCreated = new EventEmitter<any>()
 
   @ViewChildren('rolesCheckbox') checkboxes!: QueryList<ElementRef>
@@ -154,15 +156,26 @@ export class SingleUserCreationComponent implements OnInit, AfterViewInit, OnDes
   }
 
   ngOnInit() {
-    if (this.selectedOrgData && this.selectedOrgData.roleId && !this.userCreationForm.contains('department')) {
+    if (this.selectedOrgData && this.selectedOrgData.roleId && !this.userCreationForm.contains('department') && !this.isNgo) {
       this.userCreationForm.addControl('department', new UntypedFormControl({ value: this.selectedOrgData.depatName, disabled: true }))
       if (this.editUserData) {
         this.assignData()
       }
     }
-    this.checkOrgHasDesignations()
+
+    // Remove validators for designation and group if isNgo is true
+    if (this.isNgo) {
+      this.userCreationForm.get('designation')?.clearValidators()
+      this.userCreationForm.get('designation')?.updateValueAndValidity()
+      this.userCreationForm.get('group')?.clearValidators()
+      this.userCreationForm.get('group')?.updateValueAndValidity()
+    } else {
+      // Only load designation and group data if not NGO
+      this.checkOrgHasDesignations()
+      this.getGroups()
+    }
+
     this.getMasterLanguages()
-    this.getGroups()
     this.getOrgRolesList()
     const fullProfile = _.get(this.activatedRouter?.snapshot, 'data.configService')
     if (fullProfile?.unMappedUser && fullProfile?.unMappedUser?.roles) {
@@ -479,9 +492,13 @@ export class SingleUserCreationComponent implements OnInit, AfterViewInit, OnDes
           this.masterData['rolesList'] = JSON.parse(res.result.response.value)
           if (Array.isArray(this.masterData.rolesList.orgTypeList)) {
             const mdoArray = this.masterData.rolesList.orgTypeList.find((elem: any) => elem.name === 'MDO')
+            const ngoArray = this.masterData.rolesList.orgTypeList.find((elem: any) => elem.name === 'NGO')
             this.masterData['mdoRoles'] = mdoArray.roles || []
+            this.masterData['ngoRoles'] = ngoArray.roles || []
             // Filter based on isMdoLeader flag
-            if (this.isMdoLeader) {
+            if (this.isNgo) {
+              this.filteredRoles = this.masterData?.ngoRoles
+            } else if (this.isMdoLeader) {
               this.filteredRoles = this.masterData?.mdoRoles  // show all roles
             } else {
               this.filteredRoles = this.masterData?.mdoRoles.filter((role: any) => role === 'PUBLIC')  // show only PUBLIC
@@ -505,7 +522,11 @@ export class SingleUserCreationComponent implements OnInit, AfterViewInit, OnDes
       }
     }
     // tslint:disable-next-line
-    this.userCreationForm.get('roles')!.patchValue([...this.defaultRole, ...this.rolesArr])
+    if (this.isNgo) {
+      this.userCreationForm.get('roles')!.patchValue(this.rolesArr)
+    } else {
+      this.userCreationForm.get('roles')!.patchValue([...this.defaultRole, ...this.rolesArr])
+    }
   }
 
   handleAddTags(event: MatChipInputEvent): void {
@@ -524,6 +545,12 @@ export class SingleUserCreationComponent implements OnInit, AfterViewInit, OnDes
     if (event.input) {
       event.input.value = ''
     }
+
+    // Clear textbox
+    event.value = ''
+
+    // Optional - mark form control update
+    this.userCreationForm.get('tags')?.updateValueAndValidity()
   }
 
   handleValidTags(event: any): any {
@@ -565,6 +592,9 @@ export class SingleUserCreationComponent implements OnInit, AfterViewInit, OnDes
 
     if (this.selectedOrgData && this.selectedOrgData.roleId) {
       dataToSubmit.channel = this.selectedOrgData.depatName
+    }
+    if (this.isNgo) {
+      dataToSubmit['isNgo'] = true
     }
 
     if (!this.userCreationForm.value.channel) {

@@ -15,17 +15,18 @@ export const MY_FORMATS = {
   },
 }
 @Component({
-  selector: 'ws-app-add-timeline-form',
-  templateUrl: './add-timeline-form.component.html',
-  styleUrls: ['./add-timeline-form.component.scss'],
-  providers: [DatePipe,
-    {
-      provide: DateAdapter,
-      useClass: MomentDateAdapter,
-      deps: [MAT_DATE_LOCALE, MAT_MOMENT_DATE_ADAPTER_OPTIONS],
-    },
-    { provide: MAT_DATE_FORMATS, useValue: MY_FORMATS },
-  ],
+    selector: 'ws-app-add-timeline-form',
+    templateUrl: './add-timeline-form.component.html',
+    styleUrls: ['./add-timeline-form.component.scss'],
+    providers: [DatePipe,
+        {
+            provide: DateAdapter,
+            useClass: MomentDateAdapter,
+            deps: [MAT_DATE_LOCALE, MAT_MOMENT_DATE_ADAPTER_OPTIONS],
+        },
+        { provide: MAT_DATE_FORMATS, useValue: MY_FORMATS },
+    ],
+    standalone: false
 })
 
 export class AddTimelineFormComponent implements OnInit {

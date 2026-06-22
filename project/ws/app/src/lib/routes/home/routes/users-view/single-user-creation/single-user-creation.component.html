@@ -32,8 +32,8 @@
       </div>
     </div>
 
-    <div class="flex flex-row gap-6">
-      <div class="input-container">
+    <div class="flex flex-row flex-wrap gap-6">
+      <div class="input-container" style="flex: 0 0 calc(50% - 12px); max-width: calc(50% - 12px);">
         <div class="label required">Mobile number</div>
         <input type="text" class="input-text" formControlName="phone" maxlength="10" placeholder="Type here" />
         <mat-error class="text-xs"
@@ -42,78 +42,84 @@
         </mat-error>
       </div>
 
-      <div class="input-container">
-        <div class="label required">Designation</div>
-        <!--<mat-form-field class="profile-form-field required-select" appearance="none">
-           <div class="flex flex-row auto-complete-row">
-            <input type="text" class="input-text" aria-label="Designation" placeholder="Select designation" matInput
-              formControlName="designation" [matAutocomplete]="designationAuto" />
-            <mat-icon>arrow_drop_down</mat-icon>
-          </div>
-          <mat-autocomplete #designationAuto="matAutocomplete">
-            <mat-option *ngFor="let designation of masterData?.designation" [value]="designation.name">
-              {{ designation.name }}
-            </mat-option>
-          </mat-autocomplete>
-        </mat-form-field>-->
-        <mat-form-field appearance="none" class="profile-form-field required-select">
-          <mat-select #designation formControlName="designation" placeholder="Select designation"
-            (closed)="onDesignationDropdownClosed()" panelClass="search-panel"
-            (openedChange)="setupScrollListener($event)">
+      <ng-container *ngIf="!isNgo">
+        <div class="input-container" style="flex: 0 0 calc(50% - 12px); max-width: calc(50% - 12px);">
+          <div class="label required">Designation</div>
+          <!--<mat-form-field class="profile-form-field required-select" appearance="fill">
+             <div class="flex flex-row auto-complete-row">
+              <input type="text" class="input-text" aria-label="Designation" placeholder="Select designation" matInput
+                formControlName="designation" [matAutocomplete]="designationAuto" />
+              <mat-icon>arrow_drop_down</mat-icon>
+            </div>
+            <mat-autocomplete #designationAuto="matAutocomplete">
+              <mat-option *ngFor="let designation of masterData?.designation" [value]="designation.name">
+                {{ designation.name }}
+              </mat-option>
+            </mat-autocomplete>
+          </mat-form-field>-->
+          <mat-form-field appearance="fill" class="profile-form-field required-select">
+            <mat-select #designation formControlName="designation" placeholder="Select designation"
+              (closed)="onDesignationDropdownClosed()" panelClass="search-panel"
+              (openedChange)="setupScrollListener($event)">
 
-            <!-- Sticky search input container -->
-            <div class="sticky-search-container" (click)="$event.stopPropagation()">
-              <div class="search-input-wrapper">
-                <input type="text" placeholder="Search designation" formControlName="searchDesignation"
-                  class="search-input" (keydown)="$event.stopPropagation()" (keyup)="designationSearch($event)"
-                  autocomplete="off">
-                <button *ngIf="searchDesignation?.value" type="button" class="clear-button"
-                  (click)="searchDesignation?.setValue('')">
-                  ✕
-                </button>
+              <!-- Sticky search input container -->
+              <div class="sticky-search-container" (click)="$event.stopPropagation()">
+                <div class="search-input-wrapper">
+                  <input type="text" placeholder="Search designation" formControlName="searchDesignation"
+                    class="search-input" (keydown)="$event.stopPropagation()" (keyup)="designationSearch($event)"
+                    autocomplete="off">
+                  <button *ngIf="searchDesignation?.value" type="button" class="clear-button"
+                    (click)="searchDesignation?.setValue('')">
+                    ✕
+                  </button>
+                </div>
               </div>
-            </div>
-            <!-- Options list -->
-            <mat-option [value]="designation?.name" *ngFor="let designation of masterData?.designation">
-              {{designation?.name}}
-            </mat-option>
-            <!-- Loading indicator -->
-            <div *ngIf="isLoadingMoreDesignations" class="loading-indicator">
-              Loading more...
-            </div>
-            <!-- No results message -->
-            <mat-option *ngIf="(masterData?.designation )?.length === 0" disabled>
-              No matches found
-            </mat-option>
-          </mat-select>
-          <mat-error class="text-xs"
-            *ngIf="userCreationForm?.get('designation')?.touched && userCreationForm?.get('designation')?.invalid">
-            Please choose a designation
-          </mat-error>
-        </mat-form-field>
-      </div>
-    </div>
+              <!-- Options list -->
+              <mat-option [value]="designation?.name" *ngFor="let designation of masterData?.designation">
+                {{designation?.name}}
+              </mat-option>
+              <!-- Loading indicator -->
+              <div *ngIf="isLoadingMoreDesignations" class="loading-indicator">
+                Loading more...
+              </div>
+              <!-- No results message -->
+              <mat-option *ngIf="(masterData?.designation )?.length === 0" disabled>
+                No matches found
+              </mat-option>
+            </mat-select>
+            <mat-error class="text-xs"
+              *ngIf="userCreationForm?.get('designation')?.touched && userCreationForm?.get('designation')?.invalid">
+              Please choose a designation
+            </mat-error>
+          </mat-form-field>
+        </div>
+      </ng-container>
+      <!-- </div>
 
-    <div class="flex flex-row gap-6">
-      <div class="input-container">
-        <div class="label required">Group</div>
-        <mat-form-field class="profile-form-field required-select" appearance="none">
-          <mat-select formControlName="group">
-            <mat-option value="">Choose a group</mat-option>
-            <mat-option *ngFor="let group of masterData.group" value="{{group}}">{{ group }}</mat-option>
-          </mat-select>
-          <mat-error class="text-xs"
-            *ngIf="userCreationForm?.get('group')?.touched && userCreationForm?.get('group')?.invalid">
-            Please choose a group
-          </mat-error>
-        </mat-form-field>
-      </div>
-      <div class="input-container">
+    <div class="flex flex-row gap-6"> -->
+      <ng-container *ngIf="!isNgo">
+        <div class="input-container" style="flex: 0 0 calc(50% - 12px); max-width: calc(50% - 12px);">
+          <div class="label required">Group</div>
+          <mat-form-field class="profile-form-field required-select" appearance="fill">
+            <mat-select formControlName="group">
+              <mat-option value="">Choose a group</mat-option>
+              <mat-option *ngFor="let group of masterData.group" value="{{group}}">{{ group }}</mat-option>
+            </mat-select>
+            <mat-error class="text-xs"
+              *ngIf="userCreationForm?.get('group')?.touched && userCreationForm?.get('group')?.invalid">
+              Please choose a group
+            </mat-error>
+          </mat-form-field>
+        </div>
+      </ng-container>
+      <div class="input-container" style="flex: 0 0 calc(50% - 12px); max-width: calc(50% - 12px);">
         <div class="label">Date of birth</div>
-        <mat-form-field class="profile-form-field" appearance="none">
+        <mat-form-field class="profile-form-field" appearance="outline">
           <input matInput class="input-text icon-include-input" [matDatepicker]="picker" readonly formControlName="dob"
             [max]="today" placeholder="Choose date of birth" />
-          <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+          <mat-datepicker-toggle matSuffix [for]="picker">
+            <mat-icon class="mr-5" matDatepickerToggleIcon>calendar_today</mat-icon>
+          </mat-datepicker-toggle>
           <mat-datepicker #picker></mat-datepicker>
         </mat-form-field>
       </div>
@@ -122,7 +128,7 @@
     <div class="flex flex-row gap-6">
       <div class="input-container">
         <div class="label">Mother tongue</div>
-        <mat-form-field class="profile-form-field" appearance="none">
+        <mat-form-field class="profile-form-field required-select" appearance="outline">
           <div class="flex flex-row auto-complete-row">
             <input type="text" class="input-text" aria-label="Domicile medium" placeholder="Type here" matInput
               formControlName="domicileMedium" [matAutocomplete]="languageAuto" />
@@ -137,7 +143,7 @@
       </div>
       <div class="input-container">
         <div class="label">Gender</div>
-        <mat-form-field class="profile-form-field" appearance="none">
+        <mat-form-field class="profile-form-field" appearance="outline">
           <mat-select formControlName="gender">
             <mat-option value="">Select gender</mat-option>
             <mat-option value="Male">Male</mat-option>
@@ -151,7 +157,7 @@
     <div class="flex flex-row gap-6">
       <div class="input-container">
         <div class="label">Category</div>
-        <mat-form-field class="profile-form-field" appearance="none">
+        <mat-form-field class="profile-form-field" appearance="outline">
           <mat-select formControlName="category">
             <mat-option value="">Select category</mat-option>
             <mat-option value="General">General</mat-option>
@@ -177,20 +183,24 @@
     <div class="flex flex-row gap-6">
       <div class="input-container">
         <div class="label">Tags</div>
-        <input type="text" class="input-text" matInput="Type tag here" placeholder="Type tag here and press enter"
-          [matChipInputFor]="chipListTags" autocomplete="off" maxlength="100"
-          [matChipInputSeparatorKeyCodes]="separatorKeysCodes" (keypress)="handleValidTags($event)"
-          (matChipInputTokenEnd)="handleAddTags($event)" />
-        <mat-chip-list #chipListTags>
-          <mat-chip *ngFor="let tag of userCreationForm?.get('tags')?.value" [selectable]="true" [removable]="true"
-            (removed)="handleRemoveTag(tag)">
-            {{ tag }}
-            <mat-icon matChipRemove>cancel</mat-icon>
-          </mat-chip>
-        </mat-chip-list>
+
+        <mat-form-field appearance="outline" class="profile-form-field">
+          <input matInput #tagInput placeholder="Type tag here and press enter" maxlength="100"
+            (keydown.enter)="handleAddTags(tagInput); ">
+        </mat-form-field>
+
+        <div class="tags-container" *ngIf="userCreationForm.get('tags')?.value?.length">
+          <mat-chip-set>
+            <mat-chip-row *ngFor="let tag of userCreationForm.get('tags')?.value" (removed)="handleRemoveTag(tag)">
+              {{ tag }}
+              <mat-icon matChipRemove>cancel</mat-icon>
+            </mat-chip-row>
+          </mat-chip-set>
+        </div>
       </div>
+
       <div class="input-container">
-        <ng-container *ngIf="userCreationForm?.get('department')">
+        <ng-container *ngIf="userCreationForm?.get('department') && !isNgo">
           <div class="label required">Department</div>
           <input type="text" class="input-text" formControlName="department" placeholder="Type here" />
           <mat-error class="text-xs"

@@ -1,9 +1,9 @@
 import { Component, OnInit, ViewChild, SimpleChanges, OnChanges } from '@angular/core'
 import { SelectionModel } from '@angular/cdk/collections'
-import { MatLegacyTableDataSource as MatTableDataSource } from '@angular/material/legacy-table'
-import { MatLegacyDialogConfig as MatDialogConfig, MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog'
-import { MatLegacyPaginator as MatPaginator } from '@angular/material/legacy-paginator'
-import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar'
+import { MatTableDataSource } from '@angular/material/table'
+import { MatDialogConfig as MatDialogConfig, MatDialog } from '@angular/material/dialog'
+import { MatPaginator } from '@angular/material/paginator'
+import { MatSnackBar } from '@angular/material/snack-bar'
 import { MatSort } from '@angular/material/sort'
 import { ITableData, IColums } from '../../interface/interfaces'
 import * as _ from 'lodash'
@@ -18,6 +18,7 @@ import { preventHtmlAndJs } from '../../../validators/prevent-html-and-js.valida
   selector: 'ws-app-staff',
   templateUrl: './staff.component.html',
   styleUrls: ['./staff.component.scss'],
+  standalone: false
 })
 export class StaffComponent implements OnInit, OnChanges {
   staffdata: UntypedFormGroup
@@ -200,7 +201,7 @@ export class StaffComponent implements OnInit, OnChanges {
     dialogConfig.disableClose = true
     dialogConfig.autoFocus = true
     dialogConfig.width = '50%'
-    dialogConfig.height = '52%'
+    dialogConfig.minHeight = '52%'
     dialogConfig.maxHeight = 'auto'
     if (rowdata) {
       dialogConfig.data = {

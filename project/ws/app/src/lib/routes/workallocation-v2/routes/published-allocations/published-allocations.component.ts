@@ -1,14 +1,15 @@
 import { Component, OnInit, SimpleChanges } from '@angular/core'
-import { MatLegacyPaginator as MatPaginator } from '@angular/material/legacy-paginator'
+import { MatPaginator } from '@angular/material/paginator'
 import { ExportAsService, ExportAsConfig } from 'ngx-export-as'
 /* tslint:disable */
 import _ from 'lodash'
 import { AllocationService } from '../../services/allocation.service'
 import { ActivatedRoute } from '@angular/router'
 @Component({
-  selector: 'ws-app-published-allocations',
-  templateUrl: './published-allocations.component.html',
-  styleUrls: ['./published-allocations.component.scss'],
+    selector: 'ws-app-published-allocations',
+    templateUrl: './published-allocations.component.html',
+    styleUrls: ['./published-allocations.component.scss'],
+    standalone: false
 })
 export class PublishedAllocationsComponent implements OnInit {
   tabs: any

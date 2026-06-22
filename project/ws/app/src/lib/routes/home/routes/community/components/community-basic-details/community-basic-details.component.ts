@@ -1,6 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core'
 import { FormGroup } from '@angular/forms'
-import { MatLegacySnackBar } from '@angular/material/legacy-snack-bar'
+import { MatSnackBar } from '@angular/material/snack-bar'
 
 import * as _ from 'lodash'
 import {
@@ -42,9 +42,10 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser'
 import { debounceTime, distinctUntilChanged, startWith } from 'rxjs/operators'
 
 @Component({
-  selector: 'ws-app-community-basic-details',
-  templateUrl: './community-basic-details.component.html',
-  styleUrls: ['./community-basic-details.component.scss']
+    selector: 'ws-app-community-basic-details',
+    templateUrl: './community-basic-details.component.html',
+    styleUrls: ['./community-basic-details.component.scss'],
+    standalone: false
 })
 export class CommunityBasicDetailsComponent implements OnInit {
   @Input() communityDetailsForm!: FormGroup
@@ -65,7 +66,7 @@ export class CommunityBasicDetailsComponent implements OnInit {
   }
   tooltipHtml: SafeHtml
 
-  constructor(private sanitizer: DomSanitizer, private matSnackBar: MatLegacySnackBar) {
+  constructor(private sanitizer: DomSanitizer, private matSnackBar: MatSnackBar) {
     const html = `
     <p>Define the rules and expectations for engagement in your community. This ensures a respectful and meaningful discussion space. You can use the sample guidelines below:</p>
     <b>Sample Guidelines:</b>

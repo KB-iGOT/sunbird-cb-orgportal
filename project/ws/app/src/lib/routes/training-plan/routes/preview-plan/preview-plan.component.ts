@@ -2,9 +2,10 @@ import { Component, Input, OnInit } from '@angular/core'
 import { Router, ActivatedRoute } from '@angular/router'
 import { TrainingPlanDataSharingService } from '../../services/training-plan-data-share.service'
 @Component({
-  selector: 'ws-app-preview-plan',
-  templateUrl: './preview-plan.component.html',
-  styleUrls: ['./preview-plan.component.scss'],
+    selector: 'ws-app-preview-plan',
+    templateUrl: './preview-plan.component.html',
+    styleUrls: ['./preview-plan.component.scss'],
+    standalone: false
 })
 export class PreviewPlanComponent implements OnInit {
   @Input() form?: string

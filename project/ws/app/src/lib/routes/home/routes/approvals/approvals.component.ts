@@ -13,9 +13,10 @@ import { Component, OnDestroy, OnInit } from '@angular/core'
 // import { ReportsVideoComponent } from '../reports-video/reports-video.component'
 /* tslint:enable */
 @Component({
-  selector: 'ws-app-approvals',
-  templateUrl: './approvals.component.html',
-  styleUrls: ['./approvals.component.scss'],
+    selector: 'ws-app-approvals',
+    templateUrl: './approvals.component.html',
+    styleUrls: ['./approvals.component.scss'],
+    standalone: false
 })
 export class ApprovalsComponent implements OnInit, OnDestroy {
   // data: any = []

@@ -11,7 +11,7 @@
 </div>
 <div class="divider mb-5"></div>
 <ng-container *ngIf="selectedTab?.value === 'individualCreation'">
-  <ws-single-user-creation [editUserData]="selectedUserData" [selectedOrgData]="orgData"
+  <ws-single-user-creation [editUserData]="selectedUserData" [selectedOrgData]="orgData" [isNgo]="isNgo"
     (userCreated)="onUserCreated($event)"></ws-single-user-creation>
 </ng-container>
 <ng-container *ngIf="selectedTab?.value === 'customRegLink'">
@@ -19,5 +19,5 @@
     (navigatToDesignations)="navigateToDesignation($event)"></ws-app-custom-self-registration>
 </ng-container>
 <ng-container *ngIf="selectedTab?.value === 'bulkCreation'">
-  <ws-bulk-upload [selectedOrgData]="orgData"></ws-bulk-upload>
+  <ws-bulk-upload [selectedOrgData]="orgData" [isNgo]="isNgo"></ws-bulk-upload>
 </ng-container>

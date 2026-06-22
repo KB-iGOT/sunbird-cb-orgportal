@@ -2,7 +2,7 @@
   class="mat-elevation-z3 custom mobile">
   <div class="fix-ww" id="root-tool-bar" title="Home" role="toolbar">
     <ng-container *ngIf="mode === 'top'">
-      <a (click)="routeToHome()" class="logo-dim" role="link" title="Home">
+      <a (click)="routeToHome()" class="logo-dim cursor-pointer" role="link" title="Home">
         <img [src]="appIcon" alt="Application Logo" class="app-logo" />
       </a> <span class="vertical-seperator"></span>
       <div class="flex flex-middle"><span>MDO portal</span></div>
@@ -15,8 +15,9 @@
         <!-- <ws-app-search-input-home placeHolder="Search" class="my-search flex-1" [ref]="'home'">
         </ws-app-search-input-home> -->
         <span class="spacer"></span>
-        <ws-app-search-input-lib-home class="my-search flex-1" placeHolder="{{ 'appnavbar.searchforLearningContentsV2' | translate}}"
-              class="my-search flex-1" [ref]="'home'"></ws-app-search-input-lib-home>
+        <ws-app-search-input-lib-home class="my-search flex-1"
+          placeHolder="{{ 'appnavbar.searchforLearningContentsV2' | translate}}" class="my-search flex-1"
+          [ref]="'home'"></ws-app-search-input-lib-home>
 
         <span class="spacer"></span>
         <div ngClass="search-small-logo">

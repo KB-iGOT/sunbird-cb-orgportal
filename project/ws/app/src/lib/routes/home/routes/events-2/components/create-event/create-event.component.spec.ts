@@ -2,10 +2,10 @@ import { CreateEventComponent } from './create-event.component'
 import { EventsService } from '../../services/events.service'
 import { Router } from '@angular/router'
 import { FormBuilder } from '@angular/forms'
-import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar'
+import { MatSnackBar } from '@angular/material/snack-bar'
 import { DatePipe } from '@angular/common'
 import { LoaderService } from '../../../../../../../../../../../src/app/services/loader.service'
-import { MatLegacyDialog } from '@angular/material/legacy-dialog'
+import { MatDialog } from '@angular/material/dialog'
 import { ChangeDetectorRef } from '@angular/core'
 import { StepperSelectionEvent } from '@angular/cdk/stepper'
 import { of, throwError } from 'rxjs'
@@ -21,7 +21,7 @@ describe('CreateEventComponent', () => {
   let mockDatePipe: jest.Mocked<DatePipe>
   let mockLoaderService: jest.Mocked<LoaderService>
   let mockCdr: jest.Mocked<ChangeDetectorRef>
-  let mockDialog: jest.Mocked<MatLegacyDialog>
+  let mockDialog: jest.Mocked<MatDialog>
 
   beforeEach(() => {
     // Create mocks
@@ -55,7 +55,7 @@ describe('CreateEventComponent', () => {
 
     mockDialog = {
       open: jest.fn()
-    } as unknown as jest.Mocked<MatLegacyDialog>
+    } as unknown as jest.Mocked<MatDialog>
 
     mockFormBuilder = new FormBuilder()
 

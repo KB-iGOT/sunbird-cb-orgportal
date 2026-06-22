@@ -47,3 +47,31 @@
 .calender ::ng-deep .mat-form-field-appearance-outline .mat-form-field-infix {
     padding: 0.5em 0 0.5em 0;
 }
+
+.timeline-date {
+    font-weight: normal !important;
+}
+::ng-deep .calender {
+  // Outline color
+  .mat-mdc-form-field.mat-focused .mdc-notched-outline__leading,
+  .mat-mdc-form-field.mat-focused .mdc-notched-outline__notch,
+  .mat-mdc-form-field.mat-focused .mdc-notched-outline__trailing {
+    border-color: #000 !important;
+  }
+
+  // Floating label color
+  .mat-mdc-form-field.mat-focused .mdc-floating-label {
+    color: #000 !important;
+  }
+
+  // Input text color
+  .mat-mdc-input-element {
+    color: #000 !important;
+  }
+
+  // Datepicker toggle icon color
+  .mat-datepicker-toggle {
+    color: #000 !important;
+  }
+}
+

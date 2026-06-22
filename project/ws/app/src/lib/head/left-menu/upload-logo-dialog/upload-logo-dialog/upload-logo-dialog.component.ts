@@ -5,9 +5,10 @@ import { WidgetContentService } from '../../../_services/widget-content.service'
 import { ImageTransform } from 'ngx-image-cropper'
 
 @Component({
-  selector: 'ws-widget-upload-logo-dialog',
-  templateUrl: './upload-logo-dialog.component.html',
-  styleUrls: ['./upload-logo-dialog.component.scss']
+    selector: 'ws-widget-upload-logo-dialog',
+    templateUrl: './upload-logo-dialog.component.html',
+    styleUrls: ['./upload-logo-dialog.component.scss'],
+    standalone: false
 })
 export class UploadLogoDialogComponent {
   imageChangedEvent: any = null

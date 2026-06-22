@@ -2,14 +2,14 @@ import { LeadershiptableComponent } from './leadershiptable.component'
 import { MdoInfoService } from '../../services/mdoinfo.service'
 import { ConfigurationsService } from '@sunbird-cb/utils-v2'
 import { ProfileV2UtillService } from '../../services/home-utill.service'
-import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar'
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog'
+import { MatSnackBar } from '@angular/material/snack-bar'
+import { MatDialog } from '@angular/material/dialog'
 import { Router } from '@angular/router'
 import { ActivatedRoute } from '@angular/router'
 import { of } from 'rxjs'
 
-jest.mock('@angular/material/legacy-dialog')
-jest.mock('@angular/material/legacy-snack-bar')
+jest.mock('@angular/material/dialog')
+jest.mock('@angular/material/snack-bar')
 jest.mock('@angular/router', () => ({
     Router: jest.fn().mockImplementation(() => ({
         navigate: jest.fn(),

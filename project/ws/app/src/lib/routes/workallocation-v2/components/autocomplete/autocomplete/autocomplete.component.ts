@@ -5,17 +5,18 @@ import { switchMap } from 'rxjs/operators'
 import { merge } from 'rxjs'
 
 @Component({
-  selector: 'ws-app-autocomplete',
-  // templateUrl: './autocomplete.component.html',
-  template: `
+    selector: 'ws-app-autocomplete',
+    // templateUrl: './autocomplete.component.html',
+    template: `
     <ng-template #root>
       <div class="autocomplete">
         <ng-container *ngTemplateOutlet="content.tpl"></ng-container>
       </div>
     </ng-template>
   `,
-  styleUrls: ['./autocomplete.component.scss'],
-  exportAs: 'wsAppAutocomplete',
+    styleUrls: ['./autocomplete.component.scss'],
+    exportAs: 'wsAppAutocomplete',
+    standalone: false
 })
 export class AutocompleteComponent implements OnInit {
   @ViewChild('root') rootTemplate!: TemplateRef<any>

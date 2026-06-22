@@ -1,15 +1,16 @@
 import { Component, Inject, OnInit, ViewChild } from '@angular/core'
 import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms'
-import { MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA, MatLegacyDialogRef as MatDialogRef } from '@angular/material/legacy-dialog'
-import { MatLegacyTableDataSource as MatTableDataSource } from '@angular/material/legacy-table'
-import { MatLegacyPaginator as MatPaginator } from '@angular/material/legacy-paginator'
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog'
+import { MatTableDataSource } from '@angular/material/table'
+import { MatPaginator } from '@angular/material/paginator'
 import { ProfileV2Service } from '../../../services/home.servive'
 import { ConfigResolveService } from '../../../resolvers/config-resolve.service'
 
 @Component({
-  selector: 'ws-app-single-assign-popup',
-  templateUrl: './single-assign-popup.component.html',
-  styleUrls: ['./single-assign-popup.component.scss'],
+    selector: 'ws-app-single-assign-popup',
+    templateUrl: './single-assign-popup.component.html',
+    styleUrls: ['./single-assign-popup.component.scss'],
+    standalone: false
 })
 export class SingleAssignPopupComponent implements OnInit {
 
@@ -38,10 +39,10 @@ export class SingleAssignPopupComponent implements OnInit {
   }
 
   constructor(private fb: UntypedFormBuilder,
-              private homeService: ProfileV2Service,
-              @Inject(MAT_DIALOG_DATA) public data: any,
-              private configService: ConfigResolveService,
-              public dialogRef: MatDialogRef<SingleAssignPopupComponent>,
+    private homeService: ProfileV2Service,
+    @Inject(MAT_DIALOG_DATA) public data: any,
+    private configService: ConfigResolveService,
+    public dialogRef: MatDialogRef<SingleAssignPopupComponent>,
   ) {
     this.requestForm = this.fb.group({
       assignee: new UntypedFormControl('', Validators.required),
@@ -159,7 +160,7 @@ export class SingleAssignPopupComponent implements OnInit {
           this.dialogRef.close({ data: 'confirmed' })
         }
 
-      },                                               (error: any) => {
+      }, (error: any) => {
         this.dialogRef.close({ error })
 
       }

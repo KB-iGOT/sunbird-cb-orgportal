@@ -8,9 +8,9 @@ import { TranslateModule } from '@ngx-translate/core'
 import { ShareTocModule } from '@ws/app/src/lib/routes/app-toc/share-toc/share-toc.module'
 import { MatIconModule } from '@angular/material/icon'
 import { MatToolbarModule } from '@angular/material/toolbar'
-import { MatLegacyButtonModule as MatButtonModule } from '@angular/material/legacy-button'
-import { MatLegacyProgressBarModule as MatProgressBarModule } from '@angular/material/legacy-progress-bar'
-import { MatLegacyTooltipModule as MatTooltipModule } from '@angular/material/legacy-tooltip'
+import { MatButtonModule } from '@angular/material/button'
+import { MatProgressBarModule } from '@angular/material/progress-bar'
+import { MatTooltipModule } from '@angular/material/tooltip'
 import { AppTocService } from '@ws/app/src/lib/routes/app-toc/services/app-toc.service'
 @NgModule({
   declarations: [ViewerSecondaryTopBarComponent],

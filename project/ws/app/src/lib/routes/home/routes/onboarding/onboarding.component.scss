@@ -107,3 +107,8 @@ a:not([href]):not([tabindex]) {
   font-size: 20px;
   line-height: 30px;
 }
+
+:host .mat-mdc-card {
+
+    background: #EFF3F9 !important;
+}

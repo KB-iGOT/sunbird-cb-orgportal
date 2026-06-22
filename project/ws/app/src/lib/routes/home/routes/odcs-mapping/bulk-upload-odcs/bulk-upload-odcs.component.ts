@@ -10,14 +10,15 @@ import { FileService } from '../../../../users/services/upload.service'
 import { UsersService } from '../../../../users/services/users.service'
 import { FileProgressComponent } from '../../users-view/file-progress/file-progress.component'
 import { VerifyOtpComponent } from '../../users-view/verify-otp/verify-otp.component'
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog'
-import { LegacyPageEvent as PageEvent } from '@angular/material/legacy-paginator'
-import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar'
+import { MatDialog } from '@angular/material/dialog'
+import { PageEvent } from '@angular/material/paginator'
+import { MatSnackBar } from '@angular/material/snack-bar'
 
 @Component({
-  selector: 'ws-app-bulk-upload-odcs',
-  templateUrl: './bulk-upload-odcs.component.html',
-  styleUrls: ['./bulk-upload-odcs.component.scss'],
+    selector: 'ws-app-bulk-upload-odcs',
+    templateUrl: './bulk-upload-odcs.component.html',
+    styleUrls: ['./bulk-upload-odcs.component.scss'],
+    standalone: false
 })
 export class BulkUploadOdcsComponent implements OnInit, OnDestroy, AfterViewInit {
 
@@ -214,6 +215,6 @@ export class BulkUploadOdcsComponent implements OnInit, OnDestroy, AfterViewInit
         clearInterval(this.interval)
         this.getBulkStatusList()
       }
-    },                          1000)
+    }, 1000)
   }
 }

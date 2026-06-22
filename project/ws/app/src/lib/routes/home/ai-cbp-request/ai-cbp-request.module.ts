@@ -24,7 +24,7 @@ import { MatInputModule } from '@angular/material/input'
 
 @NgModule({
   declarations: [AICBPRequestComponent, AICBPRequestListComponent, ViewNonMappingDesignationComponent],
-  imports: [CommonModule, AICBPRequestRoutingModule, RouterModule, AiCbpModule, MatTableModule,
+  imports: [CommonModule, AICBPRequestRoutingModule, RouterModule, MatTableModule,
     MatPaginatorModule,
     MatCardModule,
     MatButtonModule,
@@ -33,8 +33,9 @@ import { MatInputModule } from '@angular/material/input'
     FormsModule, FormsModule,
     MatFormFieldModule,
     MatSelectModule,
-    MatInputModule
-  ],
-  exports: [AiCbpModule]
+    MatInputModule,
+    AiCbpModule
+  ], //
+  exports: [AiCbpModule] //
 })
 export class AICBPRequestModule { }

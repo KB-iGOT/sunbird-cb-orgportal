@@ -2,7 +2,7 @@
   <div class="left-overlay" *ngIf="openCreateNavBar"></div>
   <ng-container *ngIf="openCreateNavBar">
     <ws-app-create-organisation [openMode]="openMode" [dropdownList]="dropdownList" [rowData]="rowData"
-      [orgList]="dataSource?.data" (buttonClick)="buttonClickAction()"
+      [orgList]="dataSource?.data" [initialOrgType]="tabType" (buttonClick)="buttonClickAction()"
       (organizationCreated)="organizationCreatedEmit($event)">
     </ws-app-create-organisation>
   </ng-container>
@@ -18,7 +18,7 @@
         <div class="margin-left-xs">
           <button mat-raised-button type="button" (click)="onSearchEnter(searchValue)"
             [ngClass]="{ 'disabled-cls': !moreThanTwoChar }"
-            class="text-white ws-mat-primary-background text-white cstm-height-width mat-btn-flat">
+            class="text-white primary-background text-white cstm-height-width mat-btn-flat">
             <span class="text-white">Search</span>
           </button>
         </div>
@@ -73,12 +73,14 @@
                 <ng-template matMenuContent>
                   <button mat-menu-item (click)="editOrganization(row)">Edit</button>
                   <button mat-menu-item (click)="goToRoute('users', row)">Users</button>
-                  <button mat-menu-item (click)="goToRoute('rolesAndAccess', row)">Roles &
-                    Access</button>
-                  <button mat-menu-item (click)="goToRoute('mentorManagement', row)">Mentor
-                    Management</button>
-                  <button mat-menu-item (click)="goToRoute('designationMaster', row)">Manage
-                    Designations</button>
+                  <ng-container *ngIf="tabType !== 'volunteer'">
+                    <button mat-menu-item (click)="goToRoute('rolesAndAccess', row)">Roles &
+                      Access</button>
+                    <button mat-menu-item (click)="goToRoute('mentorManagement', row)">Mentor
+                      Management</button>
+                    <button mat-menu-item (click)="goToRoute('designationMaster', row)">Manage
+                      Designations</button>
+                  </ng-container>
                 </ng-template>
               </mat-menu>
             </ng-container>

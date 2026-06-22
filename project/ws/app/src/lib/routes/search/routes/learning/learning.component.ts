@@ -11,9 +11,10 @@ interface IThing {
   prop?: string
 }
 @Component({
-  selector: 'ws-app-learning',
-  templateUrl: './learning.component.html',
-  styleUrls: ['./learning.component.scss'],
+    selector: 'ws-app-learning',
+    templateUrl: './learning.component.html',
+    styleUrls: ['./learning.component.scss'],
+    standalone: false
 })
 export class LearningComponent implements OnInit, OnDestroy {
   @ViewChild(FilterDisplayComponent)

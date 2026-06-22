@@ -12,7 +12,8 @@ import { ConfigurationsService } from '@sunbird-cb/utils-v2'
 @Component({
   selector: 'ws-app-create-organisation',
   templateUrl: './create-organisation.component.html',
-  styleUrls: ['./create-organisation.component.scss']
+  styleUrls: ['./create-organisation.component.scss'],
+  standalone: false
 })
 export class CreateOrganisationComponent implements OnInit, OnDestroy {
 
@@ -26,6 +27,7 @@ export class CreateOrganisationComponent implements OnInit, OnDestroy {
       ministriesList: [],
     }
   @Input() openMode: string = ''
+  @Input() initialOrgType: string = 'organisation'
   @Output() buttonClick = new EventEmitter()
   @Output() organizationCreated = new EventEmitter<any>()
 
@@ -131,6 +133,7 @@ export class CreateOrganisationComponent implements OnInit, OnDestroy {
 
     }
     this.organisationForm = this.formBuilder.group({
+      orgType: new FormControl(this.initialOrgType || 'organisation', [Validators.required]),
       organisationName: new FormControl(_.get(this.rowData, 'organisation', ''),
         [
           Validators.required,
@@ -220,6 +223,26 @@ export class CreateOrganisationComponent implements OnInit, OnDestroy {
     return this.organisationForm?.controls?.category?.value
   }
 
+  get getOrgType() {
+    return this.organisationForm?.controls?.orgType?.value
+  }
+
+  onOrgTypeChange() {
+    const orgType = this.organisationForm.controls['orgType'].value
+    this.organisationForm.reset({
+      orgType,
+      category: 'ministry',
+      organisationName: '',
+      state: '',
+      ministry: this.ministriesList.find((ministry: any) => ministry?.sbOrgId === this.loggedInUserOrg) || '',
+      description: ''
+    })
+    this.organisationForm.controls['ministry'].disable()
+    this.selectedLogo = null
+    this.selectedLogoName = ''
+    this.selectedLogoFile = null
+  }
+
   closeNaveBar() {
     const event = {
       action: 'close'
@@ -231,7 +254,7 @@ export class CreateOrganisationComponent implements OnInit, OnDestroy {
     let payload: any = {
       orgName: this.controls['organisationName']?.value || "",
       channel: this.controls['organisationName']?.value || "",
-      organisationType: "mdo",
+      organisationType: this.getOrgType === 'organisation' ? 'mdo' : 'ngo',
       organisationSubType: "board",
       isTenant: true,
       requestedBy: this.loggedInUserId,

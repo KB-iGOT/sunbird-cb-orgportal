@@ -5,14 +5,15 @@ import { ExternalTrainingsService } from '../../../services/external-trainings.s
 import { deliveryModeList as deliveryModes } from '../models/external-trainings.model'
 import { mergeMap } from 'rxjs/operators'
 import * as _ from 'lodash'
-import { MatLegacySnackBar } from '@angular/material/legacy-snack-bar'
+import { MatSnackBar } from '@angular/material/snack-bar'
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser'
 import { environment } from '../../../../../../../../../../src/environments/environment'
 
 @Component({
   selector: 'ws-app-new-external-training',
   templateUrl: './new-external-training.component.html',
-  styleUrls: ['./new-external-training.component.scss']
+  styleUrls: ['./new-external-training.component.scss'],
+  standalone: false
 })
 export class NewExternalTrainingComponent implements OnInit {
   trainingForm!: FormGroup
@@ -54,7 +55,7 @@ export class NewExternalTrainingComponent implements OnInit {
     private readonly router: Router,
     private activeRoute: ActivatedRoute,
     private externalTrainingsSvc: ExternalTrainingsService,
-    private matSnackBar: MatLegacySnackBar,
+    private matSnackBar: MatSnackBar,
     public sanitizer: DomSanitizer,
   ) { }
 

@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common'
 import { ClassDiagramComponent } from './class-diagram.component'
 import { ClassDiagramRoutingModule } from './class-diagram-routing.module'
 import { ClassDiagramModule as ClassDiagramPluginModule } from '../../plugins/class-diagram/class-diagram.module'
-import { MatLegacyCardModule as MatCardModule } from '@angular/material/legacy-card'
+import { MatCardModule } from '@angular/material/card'
 @NgModule({
   declarations: [ClassDiagramComponent],
   imports: [

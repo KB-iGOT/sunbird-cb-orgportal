@@ -1,5 +1,5 @@
 
-import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar'
+import { MatSnackBar } from '@angular/material/snack-bar'
 import { CertificationApiService } from '../../apis/certification-api.service'
 import { CertificationService } from '../../services/certification.service'
 import { ActivatedRoute, Router } from '@angular/router'

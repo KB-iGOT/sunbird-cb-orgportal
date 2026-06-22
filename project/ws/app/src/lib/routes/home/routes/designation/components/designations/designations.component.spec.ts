@@ -1,13 +1,13 @@
 import { DesignationsComponent } from './designations.component'
 import { of, throwError } from 'rxjs'
 import { DesignationsService } from '../../services/designations.service'
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog'
-import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar'
+import { MatDialog } from '@angular/material/dialog'
+import { MatSnackBar } from '@angular/material/snack-bar'
 import { ActivatedRoute } from '@angular/router'
 
 jest.mock('../../services/designations.service')
-jest.mock('@angular/material/legacy-dialog')
-jest.mock('@angular/material/legacy-snack-bar')
+jest.mock('@angular/material/dialog')
+jest.mock('@angular/material/snack-bar')
 jest.mock('@angular/router', () => ({
     //     ActivatedRoute: jest.fn().mockImplementation(() => ({
     //         snapshot: {

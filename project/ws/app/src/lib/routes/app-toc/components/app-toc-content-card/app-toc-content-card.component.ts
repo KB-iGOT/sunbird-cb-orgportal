@@ -5,7 +5,7 @@ import { NsAppToc } from '../../models/app-toc.model'
 /* tslint:disable*/
 import _ from 'lodash'
 import { CertificateDialogComponent } from '@ws-widget/collection/src/lib/_common/certificate-dialog/certificate-dialog.component'
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog'
+import { MatDialog } from '@angular/material/dialog'
 
 
 @Component({

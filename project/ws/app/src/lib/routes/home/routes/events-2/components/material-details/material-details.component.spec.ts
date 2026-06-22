@@ -1,6 +1,6 @@
 import { MaterialDetailsComponent } from './material-details.component'
 // import { FormBuilder } from '@angular/forms'
-// import { MatLegacySnackBar } from '@angular/material/legacy-snack-bar'
+// import { MatSnackBar } from '@angular/material/snack-bar'
 // import { EventsService } from '../../services/events.service'
 // import { LoaderService } from '../../../../../../../../../../../src/app/services/loader.service'
 import { of, throwError } from 'rxjs'

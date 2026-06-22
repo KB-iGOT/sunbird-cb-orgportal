@@ -1,19 +1,19 @@
 import { CustomSelfRegistrationComponent } from './custom-self-registration.component'
 import { OnboardingService } from '../../../services/onboarding.service'
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog'
+import { MatDialog } from '@angular/material/dialog'
 import { Router } from '@angular/router'
 import { ActivatedRoute } from '@angular/router'
 import { FormBuilder, FormGroup } from '@angular/forms'
-import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar'
+import { MatSnackBar } from '@angular/material/snack-bar'
 import { Clipboard } from '@angular/cdk/clipboard'
 import { of, throwError } from 'rxjs'
 
 // Mock dependencies
-jest.mock('@angular/material/legacy-dialog')
+jest.mock('@angular/material/dialog')
 jest.mock('@angular/router')
 jest.mock('../../../services/onboarding.service')
 jest.mock('@angular/cdk/clipboard')
-jest.mock('@angular/material/legacy-snack-bar')
+jest.mock('@angular/material/snack-bar')
 
 describe('CustomSelfRegistrationComponent', () => {
   let component: CustomSelfRegistrationComponent

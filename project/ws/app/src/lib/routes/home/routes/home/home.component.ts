@@ -13,13 +13,15 @@ import { TelemetryEvents } from '../../../../head/_services/telemetry.event.mode
 /* tslint:enable */
 
 @Component({
-  selector: 'ws-app-home',
-  templateUrl: './home.component.html',
-  styleUrls: ['./home.component.scss'],
-  /* tslint:disable */
-  host: { class: 'margin-top-l' },
-  providers: [LeftMenuService]
-  /* tslint:enable */
+    selector: 'ws-app-home',
+    templateUrl: './home.component.html',
+    styleUrls: ['./home.component.scss'],
+    /* tslint:disable */
+    host: { class: 'margin-top-l' },
+    providers: [LeftMenuService]
+    /* tslint:enable */
+    ,
+    standalone: false
 })
 export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   sideNavBarOpened = true

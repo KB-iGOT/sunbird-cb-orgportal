@@ -8,7 +8,8 @@ import { NgControl } from '@angular/forms'
 // import { untilDestroyed } from 'ngx-take-until-destroy'
 
 @Directive({
-  selector: '[wsAppAutocomplete]',
+    selector: '[wsAppAutocomplete]',
+    standalone: false
 })
 export class AutocompleteDirective implements OnInit, OnDestroy {
   @Input() wsAppAutocomplete!: AutocompleteComponent

@@ -25,7 +25,7 @@ import { CertificationApiService } from '../../apis/certification-api.service'
 import { CertificationService } from '../../services/certification.service'
 import { Router, ActivatedRoute } from '@angular/router'
 import { SnackbarComponent } from '../snackbar/snackbar.component'
-import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar'
+import { MatSnackBar } from '@angular/material/snack-bar'
 
 @Component({
   selector: 'ws-app-at-desk-slot-booking',
@@ -249,7 +249,7 @@ export class AtDeskSlotBookingComponent implements OnInit, OnDestroy {
         proctorEmail: this.userPrivileges.manager,
       })
       this.managerFetchStatus = 'done'
-    },                                                        noop)
+    }, noop)
   }
 
   private filterCountries(value: string): ICertificationCountry[] {
@@ -277,7 +277,7 @@ export class AtDeskSlotBookingComponent implements OnInit, OnDestroy {
       .getCertificationMeta(this.route.parent)
       .subscribe(certificationData => {
         this.certification = certificationData
-      },         noop)
+      }, noop)
   }
 
   private subscribeToContentResolve() {
@@ -285,6 +285,6 @@ export class AtDeskSlotBookingComponent implements OnInit, OnDestroy {
       .getContentMeta(this.route.parent)
       .subscribe(content => {
         this.content = content
-      },         noop)
+      }, noop)
   }
 }

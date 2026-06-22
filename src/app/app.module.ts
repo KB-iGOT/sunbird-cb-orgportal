@@ -1,29 +1,29 @@
 import { FullscreenOverlayContainer, OverlayContainer } from '@angular/cdk/overlay'
 import { APP_BASE_HREF, PlatformLocation } from '@angular/common'
-import { HttpClientJsonpModule, HttpClientModule, HTTP_INTERCEPTORS, HttpClient } from '@angular/common/http'
+import { HTTP_INTERCEPTORS, HttpClient, provideHttpClient, withInterceptorsFromDi, withJsonpSupport } from '@angular/common/http'
 // Injectable
 import { APP_INITIALIZER, NgModule, ErrorHandler } from '@angular/core'
-import { MatLegacyButtonModule as MatButtonModule } from '@angular/material/legacy-button'
-import { MatLegacyCardModule as MatCardModule } from '@angular/material/legacy-card'
-import { MatLegacyCheckboxModule as MatCheckboxModule } from '@angular/material/legacy-checkbox'
+import { MatButtonModule } from '@angular/material/button'
+import { MatCardModule } from '@angular/material/card'
+import { MatCheckboxModule } from '@angular/material/checkbox'
 // GestureConfig,
 import { MatRippleModule, MatNativeDateModule } from '@angular/material/core'
 import { MatDatepickerModule } from '@angular/material/datepicker'
-import { MatLegacyDialogModule as MatDialogModule } from '@angular/material/legacy-dialog'
+import { MatDialogModule } from '@angular/material/dialog'
 import { MatDividerModule } from '@angular/material/divider'
 import { MatExpansionModule } from '@angular/material/expansion'
-import { MatLegacyFormFieldModule as MatFormFieldModule } from '@angular/material/legacy-form-field'
+import { MatFormFieldModule } from '@angular/material/form-field'
 import { MatIconModule } from '@angular/material/icon'
-import { MatLegacyInputModule as MatInputModule } from '@angular/material/legacy-input'
-import { MatLegacyMenuModule as MatMenuModule } from '@angular/material/legacy-menu'
-import { MatLegacyProgressBarModule as MatProgressBarModule } from '@angular/material/legacy-progress-bar'
-import { MAT_LEGACY_PROGRESS_SPINNER_DEFAULT_OPTIONS as MAT_PROGRESS_SPINNER_DEFAULT_OPTIONS, MatLegacyProgressSpinnerModule as MatProgressSpinnerModule } from '@angular/material/legacy-progress-spinner'
-import { MatLegacySelectModule as MatSelectModule } from '@angular/material/legacy-select'
-import { MatLegacySliderModule as MatSliderModule } from '@angular/material/legacy-slider'
-import { MAT_LEGACY_SNACK_BAR_DEFAULT_OPTIONS as MAT_SNACK_BAR_DEFAULT_OPTIONS } from '@angular/material/legacy-snack-bar'
+import { MatInputModule } from '@angular/material/input'
+import { MatMenuModule } from '@angular/material/menu'
+import { MatProgressBarModule } from '@angular/material/progress-bar'
+import { MAT_PROGRESS_SPINNER_DEFAULT_OPTIONS, MatProgressSpinnerModule } from '@angular/material/progress-spinner'
+import { MatSelectModule } from '@angular/material/select'
+import { MatSliderModule } from '@angular/material/slider'
+import { MAT_SNACK_BAR_DEFAULT_OPTIONS } from '@angular/material/snack-bar'
 import { MatSortModule } from '@angular/material/sort'
 import { MatToolbarModule } from '@angular/material/toolbar'
-import { MatLegacyTooltipModule as MatTooltipModule } from '@angular/material/legacy-tooltip'
+import { MatTooltipModule } from '@angular/material/tooltip'
 // HAMMER_GESTURE_CONFIG
 import { BrowserModule } from '@angular/platform-browser'
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
@@ -187,12 +187,12 @@ export function HttpLoaderFactory(http: HttpClient) {
     LoginRootDirective,
     ConfirmationBoxComponent,
   ],
-  imports: [
-    FormsModule,
+  exports: [
+    TncComponent,
+  ],
+  bootstrap: [RootComponent], imports: [FormsModule,
     ReactiveFormsModule,
     BrowserModule,
-    HttpClientModule,
-    HttpClientJsonpModule,
     BrowserAnimationsModule,
     // KeycloakAngularModule,
     AppRoutingModule,
@@ -309,10 +309,6 @@ export function HttpLoaderFactory(http: HttpClient) {
     }),
     SbUiResolverModule.forRoot([...WIDGET_REGISTRATION_CONFIG, ...WIDGET_REGISTRATION_LIB_CONFIG, ...WIDGET_REGISTRATION_TOC_LIB_CONFIG]),
   ],
-  exports: [
-    TncComponent,
-  ],
-  bootstrap: [RootComponent],
   providers: [
     { provide: 'environment', useValue: environment },
     {
@@ -320,6 +316,17 @@ export function HttpLoaderFactory(http: HttpClient) {
       multi: true,
       provide: APP_INITIALIZER,
       useFactory: appInitializer,
+    },
+    {
+      provide: MAT_SNACK_BAR_DEFAULT_OPTIONS,
+      useValue: { duration: 5000 },
+    },
+    {
+      provide: MAT_PROGRESS_SPINNER_DEFAULT_OPTIONS,
+      useValue: {
+        diameter: 55,
+        strokeWidth: 4,
+      }
     },
     {
       provide: MAT_SNACK_BAR_DEFAULT_OPTIONS,
@@ -348,7 +355,6 @@ export function HttpLoaderFactory(http: HttpClient) {
       useFactory: HttpLoaderFactory,
       deps: [HttpClient],
     },
-
     { provide: OverlayContainer, useClass: FullscreenOverlayContainer },
     // { provide: HAMMER_GESTURE_CONFIG, useClass: HammerConfig },
     { provide: ErrorHandler, useClass: GlobalErrorHandlingService },
@@ -363,7 +369,8 @@ export function HttpLoaderFactory(http: HttpClient) {
       useFactory: HttpLoaderFactory,
       deps: [HttpClient],
     },
-    GlobalEventsService
+    GlobalEventsService,
+    provideHttpClient(withInterceptorsFromDi(), withJsonpSupport())
   ]
 })
 

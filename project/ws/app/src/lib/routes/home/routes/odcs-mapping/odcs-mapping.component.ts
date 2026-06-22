@@ -3,15 +3,16 @@ import { environment } from '../../../../../../../../../src/environments/environ
 import { ActivatedRoute, Router } from '@angular/router'
 import * as _ from 'lodash'
 import { DesignationsService } from '../designation/services/designations.service'
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog'
-import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar'
+import { MatDialog } from '@angular/material/dialog'
+import { MatSnackBar } from '@angular/material/snack-bar'
 import { ReportsVideoComponent } from '../reports-video/reports-video.component'
 // import { OdcsService } from '../../services/odcs.service'
 
 @Component({
-  selector: 'ws-app-odcs-mapping',
-  templateUrl: './odcs-mapping.component.html',
-  styleUrls: ['./odcs-mapping.component.scss'],
+    selector: 'ws-app-odcs-mapping',
+    templateUrl: './odcs-mapping.component.html',
+    styleUrls: ['./odcs-mapping.component.scss'],
+    standalone: false
 })
 export class OdcsMappingComponent implements OnInit {
   environmentVal: any

@@ -2,7 +2,7 @@
 .schemetable {
     width: 100%;
     display: flex;
-    // flex: 1;
+    flex: 0 0 10% !important;
     flex-direction: column;
 
     .mat-header-cell {
@@ -166,8 +166,30 @@ mat-header-row {
     padding: 6px 10px;
     border-radius: 5px 0 0 5px;
     font-weight: 400 !important;
+    width:200px;
 }
 
-.custom-select {
-    margin-top: -5px !important;font-size: 14px;
+::ng-deep .custom-select {
+    margin-top: 20px !important;font-size: 14px;
+    width: 30%;
+    .mat-mdc-select-value-text {
+        margin-top: 8px !important;
+    }
+}
+
+
+
+.field-row {
+  display: flex;
+  align-items: center;   // 🔥 key fix
+  gap: 12px;
+}
+
+.mat-column-srnumber {
+  width: 60px !important;
+  min-width: 60px !important;
+  max-width: 60px !important;
+
+  white-space: nowrap !important;
+  text-align: center;
 }

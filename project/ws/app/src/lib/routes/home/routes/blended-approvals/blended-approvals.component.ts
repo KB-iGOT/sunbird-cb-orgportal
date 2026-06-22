@@ -7,6 +7,7 @@ import { BlendedService } from '../../services/blended.service'
   selector: 'ws-app-blended-approvals',
   templateUrl: './blended-approvals.component.html',
   styleUrls: ['./blended-approvals.component.scss'],
+  standalone: false
 })
 export class BlendedApprovalsComponent implements OnInit {
   data: any[] = []

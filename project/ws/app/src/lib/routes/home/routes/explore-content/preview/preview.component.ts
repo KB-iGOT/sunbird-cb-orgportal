@@ -6,7 +6,8 @@ import { LoaderService } from '../../../../../../../../../../src/app/services/lo
 @Component({
   selector: 'ws-app-preview',
   templateUrl: './preview.component.html',
-  styleUrls: ['./preview.component.scss']
+  styleUrls: ['./preview.component.scss'],
+  standalone: false
 })
 export class PreviewComponent implements OnInit {
 

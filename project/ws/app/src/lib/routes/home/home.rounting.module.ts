@@ -35,6 +35,7 @@ import { MyNotificationsComponent } from './routes/my-notifications/my-notificat
 import { FormDataResolverService } from './resolvers/form-data-resolver.service'
 import { DirectoryComponent } from './routes/directory/directory.component'
 import { OrganisationUsersComponent } from './routes/directory/organisation-users/organisation-users.component'
+import { OrgUsersResolve } from './resolvers/org-users-resolve.service'
 import { ExploreContentComponent } from './routes/explore-content/explore-content.component'
 import { PreviewComponent } from './routes/explore-content/preview/preview.component'
 import { GeneralGuard } from '../../../../../../../src/app/guards/general.guard'
@@ -603,6 +604,7 @@ const routes: Routes = [
     resolve: {
       pageData: PageResolve,
       configService: ConfigResolveService,
+      orgUsersData: OrgUsersResolve,
     },
   }
 
@@ -617,6 +619,7 @@ const routes: Routes = [
     // DepartmentResolve,
     ConfigResolveService,
     UsersListResolve,
+    OrgUsersResolve,
   ],
 })
 export class HomeRoutingModule { }

@@ -6,7 +6,8 @@ import { LoaderService } from '../../../../../../../../../../src/app/services/lo
 @Component({
   selector: 'ws-app-batches',
   templateUrl: './batches.component.html',
-  styleUrls: ['./batches.component.scss']
+  styleUrls: ['./batches.component.scss'],
+  standalone: false
 })
 export class BatchesComponent implements OnInit {
   batches: any[] = []

@@ -14,13 +14,13 @@ import { MatIconModule } from '@angular/material/icon'
 // import { MatDialogModule } from '@angular/material/dialog'
 
 // Legacy modules
-import { MatLegacySnackBarModule } from '@angular/material/legacy-snack-bar'
-import { MatLegacyFormFieldModule } from '@angular/material/legacy-form-field'
-import { MatLegacyInputModule } from '@angular/material/legacy-input'
-import { MatLegacySelectModule } from '@angular/material/legacy-select'
-import { MatLegacyCheckboxModule } from '@angular/material/legacy-checkbox'
-import { MatLegacyButtonModule } from '@angular/material/legacy-button'
-import { MatLegacyDialogModule } from '@angular/material/legacy-dialog'
+import { MatSnackBarModule } from '@angular/material/snack-bar'
+import { MatFormFieldModule } from '@angular/material/form-field'
+import { MatInputModule } from '@angular/material/input'
+import { MatSelectModule } from '@angular/material/select'
+import { MatCheckboxModule } from '@angular/material/checkbox'
+import { MatButtonModule } from '@angular/material/button'
+import { MatDialogModule } from '@angular/material/dialog'
 
 @NgModule({
   declarations: [CompetencyAddComponent],
@@ -29,16 +29,16 @@ import { MatLegacyDialogModule } from '@angular/material/legacy-dialog'
     ReactiveFormsModule,
 
     // Choose ONE set of modules - either legacy OR non-legacy
-    // Remove the duplicate MatLegacyDialogModule
+    // Remove the duplicate MatDialogModule
     // Example using legacy modules:
     MatIconModule,
-    MatLegacyButtonModule,
-    MatLegacyInputModule,
-    MatLegacySelectModule,
-    MatLegacyCheckboxModule,
-    MatLegacyDialogModule,
-    MatLegacySnackBarModule,
-    MatLegacyFormFieldModule
+    MatButtonModule,
+    MatInputModule,
+    MatSelectModule,
+    MatCheckboxModule,
+    MatDialogModule,
+    MatSnackBarModule,
+    MatFormFieldModule
   ],
   exports: [CompetencyAddComponent],
   providers: [CommonService]

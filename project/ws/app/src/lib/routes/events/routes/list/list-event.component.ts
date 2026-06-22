@@ -2,7 +2,7 @@ import { AfterViewInit, Component, OnInit, OnDestroy } from '@angular/core'
 import { Router, ActivatedRoute } from '@angular/router'
 import { EventsService } from '../../services/events.service'
 import { ConfigurationsService, EventService } from '@sunbird-cb/utils-v2'
-import * as moment from 'moment'
+import moment from 'moment'
 /* tslint:disable */
 import * as _ from 'lodash'
 import { TelemetryEvents } from '../../../../head/_services/telemetry.event.model'
@@ -13,6 +13,7 @@ import { DatePipe } from '@angular/common'
     selector: 'ws-app-list-event',
     templateUrl: './list-event.component.html',
     styleUrls: ['./list-event.component.scss'],
+    standalone: false
 })
 export class ListEventComponent implements OnInit, AfterViewInit, OnDestroy {
     tabledata: any = []

@@ -4,8 +4,8 @@ import { Router } from '@angular/router'
 import { EventService } from '@sunbird-cb/utils-v2'
 import { WatStoreService } from '../../services/wat.store.service'
 import { AllocationService } from '../../services/allocation.service'
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog'
-import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar'
+import { MatDialog } from '@angular/material/dialog'
+import { MatSnackBar } from '@angular/material/snack-bar'
 import { ElementRef } from '@angular/core'
 
 describe('CreateWorkallocationComponent', () => {

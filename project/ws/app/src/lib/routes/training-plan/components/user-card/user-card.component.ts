@@ -1,11 +1,12 @@
 import { Component, EventEmitter, Input, Output, OnInit, ChangeDetectorRef, ViewChild, OnChanges } from '@angular/core'
-import { MatLegacyPaginator as MatPaginator, LegacyPageEvent as PageEvent } from '@angular/material/legacy-paginator'
-import { MatLegacyTableDataSource as MatTableDataSource } from '@angular/material/legacy-table'
+import { MatPaginator, PageEvent } from '@angular/material/paginator'
+import { MatTableDataSource } from '@angular/material/table'
 import { TrainingPlanDataSharingService } from '../../services/training-plan-data-share.service'
 @Component({
-  selector: 'ws-app-user-card',
-  templateUrl: './user-card.component.html',
-  styleUrls: ['./user-card.component.scss'],
+    selector: 'ws-app-user-card',
+    templateUrl: './user-card.component.html',
+    styleUrls: ['./user-card.component.scss'],
+    standalone: false
 })
 export class UserCardComponent implements OnInit, OnChanges {
   @Input() checkboxVisibility = true

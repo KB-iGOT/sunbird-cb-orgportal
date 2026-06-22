@@ -6,8 +6,8 @@ import { ConfigurationsService } from '@sunbird-cb/utils-v2'
 import _ from 'lodash'
 import { Router } from '@angular/router'
 import { DialogConfirmComponent } from '../../../../../../../../../src/app/component/dialog-confirm/dialog-confirm.component'
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
-import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar';
+import { MatDialog } from '@angular/material/dialog'
+import { MatSnackBar } from '@angular/material/snack-bar'
 import { DialogBoxComponent } from '../../components/dialog-box/dialog-box.component'
 
 @Component({
@@ -16,7 +16,7 @@ import { DialogBoxComponent } from '../../components/dialog-box/dialog-box.compo
     styleUrls: ['./consultancy.component.scss'],
     /* tslint:disable */
     host: { class: 'w-full role-card flex flex-1' },
-    /* tslint:enable */
+    standalone: false
 })
 export class ConsultancyComponent implements OnInit {
     consultancyForm!: UntypedFormGroup

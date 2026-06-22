@@ -1,11 +1,11 @@
 import { AssistantContentCardComponent } from './assistant-content-card.component'
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog'
+import { MatDialog } from '@angular/material/dialog'
 import { PlayerDialogComponent } from '../player-dialog/player-dialog.component'
 import { of } from 'rxjs'
 
 // Mocking MatDialog and PlayerDialogComponent
-jest.mock('@angular/material/legacy-dialog', () => ({
-    MatLegacyDialog: jest.fn().mockImplementation(() => ({
+jest.mock('@angular/material/dialog', () => ({
+    MatDialog: jest.fn().mockImplementation(() => ({
         open: jest.fn(),
     })),
 }))

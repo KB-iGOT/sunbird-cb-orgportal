@@ -3,7 +3,7 @@ import { ActivatedRoute } from '@angular/router'
 // import { TranslateService } from '@ngx-translate/core'
 import { ConfigurationsService, EventService, MultilingualTranslationsService, WidgetContentService, WsEvents } from '@sunbird-cb/utils-v2'
 import { LoaderService } from '@ws/author/src/public-api'
-import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar'
+import { MatSnackBar } from '@angular/material/snack-bar'
 
 @Component({
   selector: 'ws-app-app-toc-cios-home',
@@ -51,13 +51,13 @@ export class AppTocCiosHomeComponent implements OnInit, AfterViewInit {
   }
   constructor(private route: ActivatedRoute,
     // private translate: TranslateService,
-              private configSvc: ConfigurationsService,
-              private events: EventService,
-              private langtranslations: MultilingualTranslationsService,
-              private contentSvc: WidgetContentService,
-              public loader: LoaderService,
+    private configSvc: ConfigurationsService,
+    private events: EventService,
+    private langtranslations: MultilingualTranslationsService,
+    private contentSvc: WidgetContentService,
+    public loader: LoaderService,
 
-              public snackBar: MatSnackBar,
+    public snackBar: MatSnackBar,
   ) {
     this.route.data.subscribe((data: any) => {
       if (data && data.extContent && data.extContent.data && data.extContent.data.content) {

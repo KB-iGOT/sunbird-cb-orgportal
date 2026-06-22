@@ -1,10 +1,11 @@
 import { Component, OnInit } from '@angular/core'
-import { MatLegacyTabChangeEvent as MatTabChangeEvent } from '@angular/material/legacy-tabs'
+import { MatTabChangeEvent } from '@angular/material/tabs'
 
 @Component({
-  selector: 'ws-user-creation',
-  templateUrl: './user-creation.component.html',
-  styleUrls: ['./user-creation.component.scss'],
+    selector: 'ws-user-creation',
+    templateUrl: './user-creation.component.html',
+    styleUrls: ['./user-creation.component.scss'],
+    standalone: false
 })
 
 export class UserCreationComponent implements OnInit {

@@ -8,9 +8,10 @@ import { map } from 'rxjs/operators'
 import * as _ from 'lodash'
 /* tslint:enable */
 @Component({
-  selector: 'ws-app-home',
-  templateUrl: './home.component.html',
-  styleUrls: ['./home.component.scss'],
+    selector: 'ws-app-home',
+    templateUrl: './home.component.html',
+    styleUrls: ['./home.component.scss'],
+    standalone: false
 })
 export class HomeComponent implements OnInit, OnDestroy {
   currentRoute = 'roles-access'

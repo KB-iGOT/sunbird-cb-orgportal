@@ -1,5 +1,5 @@
 import { Component, Inject, OnDestroy, OnInit, ChangeDetectorRef } from '@angular/core'
-import { MAT_LEGACY_DIALOG_DATA, MatLegacyDialogRef } from '@angular/material/legacy-dialog'
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog'
 import { Subject, Subscription } from 'rxjs'
 import { takeUntil } from 'rxjs/operators'
 import { DownloadReportService } from '../../services/download-report.service'
@@ -8,7 +8,8 @@ import { DownloadReportService } from '../../services/download-report.service'
 @Component({
   selector: 'ws-app-info-modal',
   templateUrl: './info-modal.component.html',
-  styleUrls: ['./info-modal.component.scss']
+  styleUrls: ['./info-modal.component.scss'],
+  standalone: false
 })
 export class InfoModalComponent implements OnInit, OnDestroy {
   isDownloading = false
@@ -27,8 +28,8 @@ export class InfoModalComponent implements OnInit, OnDestroy {
   private timerId: any = null
 
   constructor(
-    public dialogRef: MatLegacyDialogRef<InfoModalComponent>,
-    @Inject(MAT_LEGACY_DIALOG_DATA) public data: any,
+    public dialogRef: MatDialogRef<InfoModalComponent>,
+    @Inject(MAT_DIALOG_DATA) public data: any,
     private downloadSvc: DownloadReportService,
     private cdr: ChangeDetectorRef,
   ) { }

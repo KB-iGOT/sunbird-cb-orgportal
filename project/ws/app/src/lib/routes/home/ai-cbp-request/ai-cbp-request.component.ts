@@ -14,6 +14,7 @@ export enum statusValue {
   selector: 'ws-ai-cbp-request',
   templateUrl: './ai-cbp-request.component.html',
   styleUrls: ['./ai-cbp-request.component.scss'],
+  standalone: false
 })
 export class AICBPRequestComponent implements OnInit {
   constructor(private router: Router,) {

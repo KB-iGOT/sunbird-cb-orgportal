@@ -1,5 +1,5 @@
 import { SimpleChange, SimpleChanges } from '@angular/core'
-import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar'
+import { MatSnackBar } from '@angular/material/snack-bar'
 import { BehaviorSubject } from 'rxjs'
 import { QuestionComponent } from './question.component'
 import { PracticeService } from '../../practice.service'

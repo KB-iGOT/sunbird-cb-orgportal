@@ -1,10 +1,7 @@
 import { Component, OnInit } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
-import * as _ from 'lodash'
-import { LoaderService } from '../../../../../../../../../../src/app/services/loader.service'
 import { OrgHierarchyService } from '../../../services/org-hierarchy.service'
-import { map, switchMap } from 'rxjs/operators'
-import { of } from 'rxjs'
+import { LoaderService } from '../../../../../../../../../../src/app/services/loader.service'
 
 interface TabDetails {
   name: string
@@ -15,7 +12,8 @@ interface TabDetails {
 @Component({
   selector: 'ws-app-organisation-users',
   templateUrl: './organisation-users.component.html',
-  styleUrls: ['./organisation-users.component.scss']
+  styleUrls: ['./organisation-users.component.scss'],
+  standalone: false
 })
 export class OrganisationUsersComponent implements OnInit {
   selectedTabIndex = 0;
@@ -31,20 +29,29 @@ export class OrganisationUsersComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    const queryParam = _.get(this.activatedRoute, 'snapshot.queryParams')
-    if (queryParam) {
-      this.orgData = queryParam
+    const resolvedData = this.activatedRoute.snapshot.data['orgUsersData']
+    if (resolvedData && !resolvedData.error) {
+      this.orgData = this.activatedRoute.snapshot.queryParams
+      this.orgDataLoaded = true
     }
-    this.tabs = [
-      { name: 'Users', value: 'users' },
-      { name: 'Roles and access', value: 'rolesAndAccess' },
-      { name: 'Mentor Management', value: 'mentorManagement' },
-      { name: 'Designation Master', value: 'designationMaster' },
-      { name: 'User Onboarding', value: 'userOnboarding' },
-      { name: 'User Transfer', value: 'userTransfer' }
-    ]
 
-    this.checkAndGetOrgData()
+    const parentOrgData = this.orgHieService.getParentOrgData()
+    if (parentOrgData && parentOrgData.isNgo) {
+      this.tabs = [
+        { name: 'Users', value: 'users' },
+        { name: 'User Onboarding', value: 'userOnboarding' },
+      ]
+    } else {
+      this.tabs = [
+        { name: 'Users', value: 'users' },
+        { name: 'Roles and access', value: 'rolesAndAccess' },
+        { name: 'Mentor Management', value: 'mentorManagement' },
+        { name: 'Designation Master', value: 'designationMaster' },
+        { name: 'User Onboarding', value: 'userOnboarding' },
+        { name: 'User Transfer', value: 'userTransfer' }
+      ]
+    }
+    // this.checkAndGetOrgData()
 
     this.activatedRoute.queryParams.subscribe(params => {
       if (params['tab']) {
@@ -57,11 +64,11 @@ export class OrganisationUsersComponent implements OnInit {
     })
   }
 
-  async checkAndGetOrgData() {
-    const orgReadPromise: Promise<any>[] = []
-    orgReadPromise.push(this.getOrgData())
-    await Promise.all(orgReadPromise)
-  }
+  // async checkAndGetOrgData() {
+  //   const orgReadPromise: Promise<any>[] = []
+  //   orgReadPromise.push(this.getOrgData())
+  //   await Promise.all(orgReadPromise)
+  // }
 
   getCurrentTabDetails(): TabDetails | null {
     if (this.tabs && this.tabs.length > this.selectedTabIndex) {
@@ -72,6 +79,7 @@ export class OrganisationUsersComponent implements OnInit {
 
   onTabChange(tabIndex: number): void {
     this.selectedTabIndex = tabIndex
+    this.loaderService.changeLoaderState(false)
     const selectedTab = this.tabs[tabIndex]
     if (selectedTab && selectedTab.value) {
       this.router.navigate([], {
@@ -100,40 +108,40 @@ export class OrganisationUsersComponent implements OnInit {
     }
   }
 
-  getOrgData() {
-    return new Promise<boolean>((resolve) => {
-      const requestBody = {
-        request: {
-          organisationId: this.orgData.roleId,
-        }
-      }
-      this.loaderService.changeLoaderState(true)
-      this.orgHieService.getOrgReadData(requestBody).pipe(
-        switchMap((data: any) => {
-          if (data?.result?.response?.ministryOrStateType === 'ministry') {
-            const parentReqBody = {
-              request: {
-                organisationId: data?.result?.response?.ministryOrStateId,
-              }
-            }
-            return this.orgHieService.getOrgReadData(parentReqBody).pipe(
-              map((ministryData: any) => {
-                return {
-                  orgData: data.result.response,
-                  parentOrgData: ministryData.result.response
-                }
-              })
-            )
-          }
-          return of(null)
-        })
-      ).subscribe((_res) => {
-        this.orgHieService.setOrgData(_res?.orgData)
-        this.orgHieService.setParentOrgData(_res?.parentOrgData)
-        this.orgDataLoaded = true
-        resolve(true)
-        this.loaderService.changeLoaderState(false)
-      })
-    })
-  }
+  // getOrgData() {
+  //   return new Promise<boolean>((resolve) => {
+  //     const requestBody = {
+  //       request: {
+  //         organisationId: this.orgData.roleId,
+  //       }
+  //     }
+  //     this.loaderService.changeLoaderState(true)
+  //     this.orgHieService.getOrgReadData(requestBody).pipe(
+  //       switchMap((data: any) => {
+  //         if (data?.result?.response?.ministryOrStateType === 'ministry') {
+  //           const parentReqBody = {
+  //             request: {
+  //               organisationId: data?.result?.response?.ministryOrStateId,
+  //             }
+  //           }
+  //           return this.orgHieService.getOrgReadData(parentReqBody).pipe(
+  //             map((ministryData: any) => {
+  //               return {
+  //                 orgData: data.result.response,
+  //                 parentOrgData: ministryData.result.response
+  //               }
+  //             })
+  //           )
+  //         }
+  //         return of(null)
+  //       })
+  //     ).subscribe((_res) => {
+  //       this.orgHieService.setOrgData(_res?.orgData)
+  //       this.orgHieService.setParentOrgData(_res?.parentOrgData)
+  //       this.orgDataLoaded = true
+  //       resolve(true)
+  //       this.loaderService.changeLoaderState(false)
+  //     })
+  //   })
+  // }
 }

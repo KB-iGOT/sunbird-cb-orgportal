@@ -1,11 +1,11 @@
 import { Component, OnDestroy, OnInit } from '@angular/core'
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog'
+import { MatDialog } from '@angular/material/dialog'
 import { ActivatedRoute, Router } from '@angular/router'
 /* tslint:disable */
 import _ from 'lodash'
 /* tslint:enable */
 // import { environment } from 'src/environments/environment'
-import { LegacyPageEvent as PageEvent } from '@angular/material/legacy-paginator'
+import { PageEvent } from '@angular/material/paginator'
 import { EventService } from '@sunbird-cb/utils-v2'
 import { NsContent } from '@sunbird-cb/collection'
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser'
@@ -19,13 +19,13 @@ import { ReportsVideoComponent } from '../../reports-video/reports-video.compone
 // import * as XLSX from 'xlsx'
 
 @Component({
-  selector: 'ws-all-users',
-  templateUrl: './all-users.component.html',
-  styleUrls: ['./all-users.component.scss'],
-  providers: [LoaderService],
-  /* tslint:disable */
-  host: { class: 'flex flex-1 margin-top-l' },
-  /* tslint:enable */
+    selector: 'ws-all-users',
+    templateUrl: './all-users.component.html',
+    styleUrls: ['./all-users.component.scss'],
+    providers: [LoaderService],
+    /* tslint:disable */
+    host: { class: 'flex flex-1 margin-top-l' },
+    standalone: false
 })
 export class AllUsersComponent implements OnInit, OnDestroy {
   /* tslint:disable */

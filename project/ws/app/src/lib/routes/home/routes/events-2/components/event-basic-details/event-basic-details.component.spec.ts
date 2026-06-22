@@ -1,12 +1,12 @@
 import { EventBasicDetailsComponent } from './event-basic-details.component'
 import { FormGroup, FormControl } from '@angular/forms'
-import { MatLegacySnackBar } from '@angular/material/legacy-snack-bar'
+import { MatSnackBar } from '@angular/material/snack-bar'
 import { EventsService } from '../../services/events.service'
 import { LoaderService } from '../../../../../../../../../../../src/app/services/loader.service'
 import { DatePipe } from '@angular/common'
 import * as _ from 'lodash'
 
-jest.mock('@angular/material/legacy-snack-bar')
+jest.mock('@angular/material/snack-bar')
 jest.mock('../../services/events.service')
 jest.mock('../../../../../../../../../../../src/app/services/loader.service')
 // jest.mock('@angular/common', () => ({
@@ -17,13 +17,13 @@ jest.mock('../../../../../../../../../../../src/app/services/loader.service')
 
 describe('EventBasicDetailsComponent', () => {
   let component: EventBasicDetailsComponent
-  let matSnackBar: MatLegacySnackBar
+  let matSnackBar: MatSnackBar
   let eventSvc: EventsService
   let loaderService: LoaderService
   let datePipe: DatePipe
 
   beforeEach(() => {
-    matSnackBar = new MatLegacySnackBar(null as any, null as any, null as any, null as any, null as any, null as any)
+    matSnackBar = new MatSnackBar(null as any, null as any, null as any, null as any, null as any, null as any)
     eventSvc = new EventsService(null as any, null as any)
     loaderService = new LoaderService()
     datePipe = new DatePipe('en-US')

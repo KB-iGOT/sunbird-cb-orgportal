@@ -1,4 +1,4 @@
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog'
+import { MatDialog } from '@angular/material/dialog'
 import { StepperSelectionEvent, STEPPER_GLOBAL_OPTIONS } from '@angular/cdk/stepper'
 import { AfterViewInit, Component, OnInit } from '@angular/core'
 import { IWidgetsPlayerMediaData } from '@sunbird-cb/collection'
@@ -8,15 +8,16 @@ import { ConfigurationsService } from '@sunbird-cb/utils-v2'
 // import { SettingsComponent } from '../profile/routes/settings/settings.component'
 
 @Component({
-  selector: 'ws-app-app-setup-home',
-  templateUrl: './app-setup-home.component.html',
-  styleUrls: ['./app-setup-home.component.scss'],
-  providers: [
-    {
-      provide: STEPPER_GLOBAL_OPTIONS,
-      useValue: { displayDefaultIndicatorType: false },
-    },
-  ],
+    selector: 'ws-app-app-setup-home',
+    templateUrl: './app-setup-home.component.html',
+    styleUrls: ['./app-setup-home.component.scss'],
+    providers: [
+        {
+            provide: STEPPER_GLOBAL_OPTIONS,
+            useValue: { displayDefaultIndicatorType: false },
+        },
+    ],
+    standalone: false
 })
 export class AppSetupHomeComponent implements OnInit, AfterViewInit {
   currentIndex = 0

@@ -4,9 +4,10 @@ import { Subscription } from 'rxjs'
 import { ActivatedRoute } from '@angular/router'
 
 @Component({
-  selector: 'ws-public-contact',
-  templateUrl: './public-contact.component.html',
-  styleUrls: ['./public-contact.component.scss'],
+    selector: 'ws-public-contact',
+    templateUrl: './public-contact.component.html',
+    styleUrls: ['./public-contact.component.scss'],
+    standalone: false
 })
 export class PublicContactComponent implements OnInit, OnDestroy {
   contactUsMail = ''

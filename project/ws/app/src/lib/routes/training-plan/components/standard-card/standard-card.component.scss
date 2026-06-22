@@ -567,27 +567,38 @@ $title-line-count: 2;
 // }
 
 .card-select-box {
-    position: absolute;
-    background: rgb(255,255,255);
-    border-radius: 4px;
-    height: 32px;
-    width: 32px;
-    margin: 18px;
-    border: 1px solid rgba(0,0,0,0.16);
-    display: flex;
-      align-items: center;
-      justify-content: center;
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  z-index: 5;
+
+  width: 40px;
+  height: 40px;
+
+  background: #fff;
+  border: 1px solid rgba(0,0,0,0.16);
+  border-radius: 6px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .card-select-check {
     height: 20px;
     width: 17px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
+
+
 
 .card-cross-icon {
   position: absolute;
   right: -12px;
   top: -14px;
+  z-index: 1;
 }
 
 .card-cross-icon img {
@@ -622,4 +633,44 @@ $title-line-count: 2;
 
 .font-size-20 {
     font-size: 20px;
+}
+
+::ng-deep .mat-mdc-checkbox {
+  --mdc-checkbox-selected-checkmark-color: #fff;
+  --mdc-checkbox-selected-icon-color: #1B4CA1;
+  --mdc-checkbox-selected-hover-icon-color: #1B4CA1;
+  --mdc-checkbox-selected-focus-icon-color: #1B4CA1;
+  --mdc-checkbox-selected-pressed-icon-color: #1B4CA1;
+}
+
+/* make checkbox visible always */
+::ng-deep .mat-mdc-checkbox .mdc-checkbox {
+  width: 18px;
+  height: 18px;
+}
+
+/* background box */
+::ng-deep .mat-mdc-checkbox .mdc-checkbox__background {
+  border: 2px solid rgba(0,0,0,0.54) !important;
+  border-radius: 2px;
+}
+
+/* checked state */
+::ng-deep .mat-mdc-checkbox .mdc-checkbox--selected .mdc-checkbox__background {
+  background-color: #1B4CA1 !important;
+  border-color: #1B4CA1 !important;
+}
+
+/* checkmark */
+::ng-deep .mat-mdc-checkbox .mdc-checkbox__checkmark {
+  color: #fff !important;
+}
+
+/* ripple fix */
+::ng-deep .mat-mdc-checkbox .mdc-checkbox__ripple {
+  display: none !important;
+}
+
+.card-standard-container {
+  overflow: visible !important;
 }

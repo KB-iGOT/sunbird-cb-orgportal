@@ -13,6 +13,7 @@ import { ProfileV2UtillService } from '../../../home/services/home-utill.service
   selector: 'ws-app-users',
   templateUrl: './users.component.html',
   styleUrls: ['./users.component.scss'],
+  standalone: false
 })
 
 export class UsersComponent implements OnInit, AfterViewInit, AfterContentChecked, OnDestroy {

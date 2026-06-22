@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core'
-import { MatLegacyDialogRef as MatDialogRef } from '@angular/material/legacy-dialog'
+import { MatDialogRef } from '@angular/material/dialog'
 
 export interface IParticipantElement {
   firstname: string,
@@ -8,9 +8,10 @@ export interface IParticipantElement {
 }
 
 @Component({
-  selector: 'ws-app-success',
-  templateUrl: './success.component.html',
-  styleUrls: ['./success.component.scss'],
+    selector: 'ws-app-success',
+    templateUrl: './success.component.html',
+    styleUrls: ['./success.component.scss'],
+    standalone: false
 })
 export class SuccessComponent implements OnInit {
 

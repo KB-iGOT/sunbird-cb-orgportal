@@ -1,10 +1,11 @@
 import { Component, Inject, OnInit } from '@angular/core'
-import { MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA, MatLegacyDialogRef as MatDialogRef } from '@angular/material/legacy-dialog'
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog'
 
 @Component({
-  selector: 'ws-app-conformation-popup',
-  templateUrl: './conformation-popup.component.html',
-  styleUrls: ['./conformation-popup.component.scss'],
+    selector: 'ws-app-conformation-popup',
+    templateUrl: './conformation-popup.component.html',
+    styleUrls: ['./conformation-popup.component.scss'],
+    standalone: false
 })
 export class ConformationPopupComponent implements OnInit {
 

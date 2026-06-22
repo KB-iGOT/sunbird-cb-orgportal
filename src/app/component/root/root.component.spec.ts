@@ -2,7 +2,7 @@ import { RootComponent } from './root.component'
 import { Router, NavigationStart } from '@angular/router'
 import { ActivatedRoute } from '@angular/router'
 import { BreadcrumbsOrgService } from '@sunbird-cb/collection'
-import { MatLegacyDialog } from '@angular/material/legacy-dialog'
+import { MatDialog } from '@angular/material/dialog'
 import { SwUpdate } from '@angular/service-worker'
 import { TelemetryService } from '@sunbird-cb/utils-v2'
 import { LoggerService } from '@sunbird-cb/utils-v2'
@@ -13,7 +13,7 @@ import { ValueService } from '@sunbird-cb/utils-v2' // Ensure ValueService is im
 jest.mock('@angular/router')
 jest.mock('@sunbird-cb/collection')
 jest.mock('@sunbird-cb/utils-v2')
-jest.mock('@angular/material/legacy-dialog')
+jest.mock('@angular/material/dialog')
 jest.mock('@angular/service-worker')
 jest.mock('@angular/core', () => ({
 	...jest.requireActual('@angular/core'),
@@ -29,7 +29,7 @@ describe('RootComponent', () => {
 	let breadcrumbsService: BreadcrumbsOrgService
 	let telemetryService: TelemetryService
 	let swUpdate: SwUpdate
-	let dialog: MatLegacyDialog
+	let dialog: MatDialog
 	let logger: LoggerService
 	let rootService: RootService
 	let valueSvc: ValueService // Declare valueSvc

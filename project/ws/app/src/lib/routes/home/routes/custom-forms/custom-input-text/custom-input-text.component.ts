@@ -2,9 +2,10 @@ import { Component, EventEmitter, Input, Output } from '@angular/core'
 import { UntypedFormGroup } from '@angular/forms'
 
 @Component({
-  selector: 'ws-app-custom-input-text',
-  templateUrl: './custom-input-text.component.html',
-  styleUrls: ['./custom-input-text.component.scss']
+    selector: 'ws-app-custom-input-text',
+    templateUrl: './custom-input-text.component.html',
+    styleUrls: ['./custom-input-text.component.scss'],
+    standalone: false
 })
 export class CustomInputTextComponent {
   @Input() question: UntypedFormGroup | undefined

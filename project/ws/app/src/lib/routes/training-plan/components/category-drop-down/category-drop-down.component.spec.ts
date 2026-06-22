@@ -1,5 +1,5 @@
 import { CategoryDropDownComponent } from './category-drop-down.component'
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog'
+import { MatDialog } from '@angular/material/dialog'
 import { TrainingPlanDataSharingService } from '../../services/training-plan-data-share.service'
 import { of } from 'rxjs'
 

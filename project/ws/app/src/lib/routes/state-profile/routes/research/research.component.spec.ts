@@ -1,14 +1,14 @@
 import { ResearchComponent } from './research.component'
 import { OrgProfileService } from '../../services/org-profile.service'
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog'
-import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar'
+import { MatDialog } from '@angular/material/dialog'
+import { MatSnackBar } from '@angular/material/snack-bar'
 import { ConfigurationsService } from '@sunbird-cb/utils-v2'
 import { Router } from '@angular/router'
 import * as _ from 'lodash'
 
 jest.mock('../../services/org-profile.service')
-jest.mock('@angular/material/legacy-snack-bar')
-jest.mock('@angular/material/legacy-dialog')
+jest.mock('@angular/material/snack-bar')
+jest.mock('@angular/material/dialog')
 jest.mock('@sunbird-cb/utils-v2')
 jest.mock('@angular/router')
 

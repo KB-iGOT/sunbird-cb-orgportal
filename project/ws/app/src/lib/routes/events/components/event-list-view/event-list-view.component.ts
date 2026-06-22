@@ -3,13 +3,13 @@ import {
   AfterViewInit, OnChanges, SimpleChanges, Inject, ChangeDetectorRef, AfterViewChecked,
 } from '@angular/core'
 import { SelectionModel } from '@angular/cdk/collections'
-import { MatLegacyTableDataSource as MatTableDataSource } from '@angular/material/legacy-table'
-import { MatLegacyPaginator as MatPaginator } from '@angular/material/legacy-paginator'
+import { MatTableDataSource } from '@angular/material/table'
+import { MatPaginator } from '@angular/material/paginator'
 import { MatSort } from '@angular/material/sort'
 import * as _ from 'lodash'
 import { ITableData, IColums, IAction } from '../../interfaces/interfaces'
 import { ActivatedRoute, Router } from '@angular/router'
-import { MatLegacyDialog as MatDialog, MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA } from '@angular/material/legacy-dialog'
+import { MatDialog, MAT_DIALOG_DATA } from '@angular/material/dialog'
 import { EventThumbnailComponent } from '../event-thumbnail/event-thumbnail.component'
 import { EventService } from '@sunbird-cb/utils-v2'
 import { NsContent } from '@sunbird-cb/collection'
@@ -20,9 +20,10 @@ export interface IContentShareData {
 }
 
 @Component({
-  selector: 'ws-event-list-view',
-  templateUrl: './event-list-view.component.html',
-  styleUrls: ['./event-list-view.component.scss'],
+    selector: 'ws-event-list-view',
+    templateUrl: './event-list-view.component.html',
+    styleUrls: ['./event-list-view.component.scss'],
+    standalone: false
 })
 export class EventListViewComponent implements OnInit, AfterViewInit, OnChanges, AfterViewChecked {
 

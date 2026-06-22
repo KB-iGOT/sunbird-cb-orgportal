@@ -1,10 +1,10 @@
 import { YoutubePlayerComponent } from './youtube-player.component'
-import { MatLegacyDialogRef } from '@angular/material/legacy-dialog'
+import { MatDialogRef } from '@angular/material/dialog'
 import { DomSanitizer } from '@angular/platform-browser'
 
 describe('YoutubePlayerComponent', () => {
   let component: YoutubePlayerComponent
-  let mockDialogRef: jest.Mocked<MatLegacyDialogRef<YoutubePlayerComponent>>
+  let mockDialogRef: jest.Mocked<MatDialogRef<YoutubePlayerComponent>>
   let mockDomSanitizer: jest.Mocked<DomSanitizer>
   let mockData: any
 

@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit, SimpleChanges } from '@angular/core'
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog'
-import { MatLegacyPaginator as MatPaginator } from '@angular/material/legacy-paginator'
+import { MatDialog } from '@angular/material/dialog'
+import { MatPaginator } from '@angular/material/paginator'
 import { Router, ActivatedRoute } from '@angular/router'
 import { ExportAsService, ExportAsConfig } from 'ngx-export-as'
 /* tslint:disable */
@@ -15,6 +15,7 @@ import { TelemetryEvents } from '../../../../head/_services/telemetry.event.mode
   selector: 'ws-app-workallocation',
   templateUrl: './workallocation.component.html',
   styleUrls: ['./workallocation.component.scss'],
+  standalone: false
 })
 export class WorkallocationComponent implements OnInit, OnDestroy {
   currentFilter = 'Draft'
