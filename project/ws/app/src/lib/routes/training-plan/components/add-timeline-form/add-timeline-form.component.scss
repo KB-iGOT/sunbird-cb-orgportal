@@ -74,4 +74,20 @@
     color: #000 !important;
   }
 }
+.w-half {
+    width: 50%;
+
+}
+::ng-deep .calender {
+    .w-half {
+    width: 50%;
+     .mat-mdc-text-field-wrapper {
+        width: 50%;
+    }
+
+}
+     .mat-mdc-text-field-wrapper {
+        width: 50%;
+    }
+}
 

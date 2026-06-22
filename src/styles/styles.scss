@@ -1653,6 +1653,7 @@ h3.shepherd-title {
   background:
     linear-gradient(#fff, #fff) padding-box,
     linear-gradient(90deg, #f3962f 0%, #266de6 100%) border-box;
+  min-height:36px !important ;
 }
 
 // Remove MDC outline border
@@ -1939,9 +1940,6 @@ mat-list-item {
   height: 30px !important;
   position: absolute !important;
   right: 3px;
-  top: 3px;
-   margin-right: 20px;
-    margin-top: 5px;
 }
 
 
@@ -2320,3 +2318,35 @@ mat-list-item {
 }
 
 
+/* Default arrow color */
+.mat-mdc-select-arrow svg {
+  fill: #666 !important;
+}
+
+/* When select is focused/active */
+.mat-mdc-form-field.mat-focused .mat-mdc-select-arrow svg {
+  fill: #1b4ca1 !important; // your active color
+}
+
+.global-search-content .mat-btn-flat {
+  right: 3px;
+  top: 3px;
+}
+
+.global-search-content .mat-form-field {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+
+
+
+.global-search-content {
+  mat-form-field {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+  .mat-form-field {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+}
