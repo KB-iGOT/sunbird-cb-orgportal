@@ -24,6 +24,7 @@ import { LoaderService } from '../../../../../../../../../../src/app/services/lo
 export class BulkUploadComponent implements OnInit, AfterViewInit, OnDestroy {
 
   @Input() selectedOrgData: any
+  @Input() isNgo: boolean = false
 
   lastUploadList: any[] = []
   private destroySubject$ = new Subject()

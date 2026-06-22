@@ -6,16 +6,17 @@ import { OrgHierarchyService } from '../../services/org-hierarchy.service'
 //#endregion (imports)
 
 @Component({
-    selector: 'ws-app-directory',
-    templateUrl: './directory.component.html',
-    styleUrls: ['./directory.component.scss'],
-    standalone: false
+  selector: 'ws-app-directory',
+  templateUrl: './directory.component.html',
+  styleUrls: ['./directory.component.scss'],
+  standalone: false
 })
 
 export class DirectoryComponent implements OnInit, AfterViewInit {
 
   @ViewChild('organisationTabContent') organisationTabContent!: TemplateRef<any>
   @ViewChild('organisationHierarchiesTabContent') organisationHierarchiesTabContent!: TemplateRef<any>
+  @ViewChild('volunteerTabContent') volunteerTabContent!: TemplateRef<any>
 
   //#region (global variables)
   selectedTabIndex: number = 0;
@@ -23,7 +24,8 @@ export class DirectoryComponent implements OnInit, AfterViewInit {
 
   tabs: any = [
     { name: 'Organisation', value: 'organisation' },
-    { name: 'Organisation Hierarchies', value: 'organisationHierarchies' }
+    { name: 'Organisation Hierarchies', value: 'organisationHierarchies' },
+    { name: 'Volunteer', value: 'volunteer' }
   ]
 
   constructor(
@@ -41,6 +43,8 @@ export class DirectoryComponent implements OnInit, AfterViewInit {
         tab.temp = this.organisationTabContent
       } else if (tab.value === 'organisationHierarchies') {
         tab.temp = this.organisationHierarchiesTabContent
+      } else if (tab.value === 'volunteer') {
+        tab.temp = this.volunteerTabContent
       }
       return tab
     })
