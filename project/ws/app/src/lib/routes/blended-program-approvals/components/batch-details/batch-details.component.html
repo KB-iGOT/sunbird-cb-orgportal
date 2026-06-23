@@ -277,7 +277,7 @@
                         </button>
                         <!-- Download for completed with a link -->
                         <button mat-icon-button *ngIf="item?.status?.toLowerCase() === 'completed' && item?.downloadLink"
-                          (click)="downloadReport(item)" matTooltip="Download" class="report-action-btn">
+                          (click)="downloadReports(item)" matTooltip="Download" class="report-action-btn">
                           <mat-icon>cloud_download</mat-icon>
                         </button>
                         <!-- Refresh when completed but no download link yet -->

@@ -557,15 +557,6 @@ export class BatchDetailsComponent implements OnInit {
     }
   }
 
-  actionsClick(evt: any) {
-    if (evt.action === 'refreshStatus') {
-      this.getBpReportStatus()
-    }
-    if (evt.action === 'downloadReport') {
-      this.downloadReport()
-    }
-  }
-
   async listReports() {
     const batchDetails = this.batchData
     const roleName = this.userDetails.roles.includes('MDO_LEADER') ? 'MDO_LEADER' :
@@ -676,13 +667,17 @@ export class BatchDetailsComponent implements OnInit {
     }
   }
 
-  async downloadReport() {
+  async downloadReports(item: any) {
     const batchDetails = this.batchData
-    const downloadUrl = this.reportStatusList[0].downloadLink.split('gcpbpreports/')
-    [this.reportStatusList[0].downloadLink.split('gcpbpreports/').length - 1]
+    const downloadUrl = item.downloadLink.split('gcpbpreports/')
+    [item.downloadLink.split('gcpbpreports/').length - 1]
     const fileExtension = downloadUrl.split('.').pop()?.toLowerCase()
     // tslint:disable-next-line: max-line-length
-    const fileName = `MDO_${batchDetails.name.split(' ').join('')}_Enrollment_Requests_Report_${this.formatDate(this.reportStatusList[0].lastReportGeneratedOn)}.${fileExtension}`
+    let fileName = `MDO_${batchDetails.name.split(' ').join('')}_Enrollment_Requests_Report_${this.formatDate(item.lastReportGeneratedOn)}.${fileExtension}`
+    if (item?.contextType === 'Blended Program Consumption Report') {
+      // tslint:disable-next-line: max-line-length
+      fileName = `MDO_${batchDetails.name.split(' ').join('')}_Consumption_Report_${this.formatDate(item.lastReportGeneratedOn)}.${fileExtension}`
+    }
     await this.bpService.downloadReport(downloadUrl, fileName)
   }
 
