@@ -42,8 +42,14 @@ export class BatchDetailsComponent implements OnInit {
   showUserDetails = false
   selectedUser: any
   fetchStatus = true
-  checkSurveyLink = false
+  checkSurveyLink = true
   reportStatusList: any[] = []
+  reportOptions: any[] = [
+    { label: 'Enrollment Report', value: 'enrollment' },
+    { label: 'Consumption Report', value: 'consumption' }
+  ]
+  lastGeneratedAt: any = null
+  selectedReportType = ''
   enroleTypeList = Object.values(IRequestLearnerType)
   tabledata: any = {
     actions: [],
@@ -122,7 +128,7 @@ export class BatchDetailsComponent implements OnInit {
         break
       case 'reportStatus':
         this.currentFilter = 'reportStatus'
-        this.getBpReportStatus()
+        this.listReports()
         break
       case 'nominate-learner':
         this.currentFilter = 'nominate-learner'
@@ -551,13 +557,47 @@ export class BatchDetailsComponent implements OnInit {
     }
   }
 
-  actionsClick(evt: any) {
-    if (evt.action === 'refreshStatus') {
-      this.getBpReportStatus()
+  async listReports() {
+    const batchDetails = this.batchData
+    const roleName = this.userDetails.roles.includes('MDO_LEADER') ? 'MDO_LEADER' :
+      this.userDetails.roles.includes('MDO_ADMIN') ? 'MDO_ADMIN' : ''
+    const req = {
+      request: {
+        orgId: this.userDetails.rootOrgId || '',
+        courseId: this.programData.identifier || '',
+        batchId: batchDetails.batchId || '',
+        reportRequester: roleName,
+      },
     }
-    if (evt.action === 'downloadReport') {
-      this.downloadReport()
+    const resData: any = await this.bpService.listBpReports(req).toPromise().catch(_error => { })
+    if (!resData) {
+      this.fetchStatus = false
+      this.snackBar.open('Something went wrong while fetching the report status. Please try again after sometime.')
+      this.reportStatusList = []
+    } else if (Object.keys(resData.result).length <= 0) {
+      this.reportStatusList = []
+    } else {
+      this.reportStatusList = resData.result.content
+      this.lastGeneratedAt = this.findLastGeneratedReportDate()
     }
+  }
+
+  onReportTypeChange(reportType: string) {
+    this.selectedReportType = reportType
+    console.log('selectedReportType', this.selectedReportType)
+  }
+
+  findLastGeneratedReportDate() {
+    const validReports = this.reportStatusList.filter(
+      (item: any) => item.lastReportGeneratedOn !== null
+    )
+    if (validReports.length === 0) {
+      return ''
+    }
+    const latest = validReports.reduce((prev: any, curr: any) => {
+      return new Date(curr.lastReportGeneratedOn) > new Date(prev.lastReportGeneratedOn) ? curr : prev
+    })
+    return latest.lastReportGeneratedOn
   }
 
   async getBpReportStatus() {
@@ -570,9 +610,16 @@ export class BatchDetailsComponent implements OnInit {
         courseId: this.programData.identifier || '',
         batchId: batchDetails.batchId || '',
         reportRequester: roleName,
+        surveyId: this.programData.wfSurveyLink ? this.programData.wfSurveyLink.split('/')[this.programData.wfSurveyLink.split('/').length - 1] : '',
       },
     }
-    const resData: any = await this.bpService.getBpReportStatusApi(req).toPromise().catch(_error => { })
+
+    let resData: any
+    if (this.selectedReportType === 'enrollment') {
+      resData = await this.bpService.getBpReportStatusApi(req).toPromise().catch(_error => { })
+    } else if (this.selectedReportType === 'consumption') {
+      resData = await this.bpService.getBpConsumptionReportStatusApi(req).toPromise().catch(_error => { })
+    }
     if (!resData) {
       this.fetchStatus = false
       this.snackBar.open('Something went wrong while fetching the report status. Please try again after sometime.')
@@ -602,26 +649,35 @@ export class BatchDetailsComponent implements OnInit {
         courseId: this.programData.identifier || '',
         batchId: batchDetails.batchId || '',
         reportRequester: roleName,
-        surveyId: this.programData.wfSurveyLink.split('/')[this.programData.wfSurveyLink.split('/').length - 1] || '',
+        surveyId: this.programData.wfSurveyLink ? this.programData.wfSurveyLink.split('/')[this.programData.wfSurveyLink.split('/').length - 1] : '',
       },
     }
-    const resData: any = await this.bpService.generateBpReport(reqBody).toPromise().catch(_error => { })
+    let resData: any
+    if (this.selectedReportType === 'enrollment') {
+      resData = await this.bpService.generateBpReport(reqBody).toPromise().catch(_error => { })
+    } else {
+      resData = await this.bpService.generateBpConsumptionReport(reqBody).toPromise().catch(_error => { })
+    }
     if (resData && resData.params && resData.params.status.toLowerCase() === 'success') {
       this.reportStatusList = []
-      this.getBpReportStatus()
+      this.listReports()
     } else {
       this.snackBar.open('Something went wrong while generating the report. Please try again after sometime.')
       this.reportStatusList = []
     }
   }
 
-  async downloadReport() {
+  async downloadReports(item: any) {
     const batchDetails = this.batchData
-    const downloadUrl = this.reportStatusList[0].downloadLink.split('gcpbpreports/')
-    [this.reportStatusList[0].downloadLink.split('gcpbpreports/').length - 1]
+    const downloadUrl = item.downloadLink.split('gcpbpreports/')
+    [item.downloadLink.split('gcpbpreports/').length - 1]
     const fileExtension = downloadUrl.split('.').pop()?.toLowerCase()
     // tslint:disable-next-line: max-line-length
-    const fileName = `MDO_${batchDetails.name.split(' ').join('')}_Enrollment_Requests_Report_${this.formatDate(this.reportStatusList[0].lastReportGeneratedOn)}.${fileExtension}`
+    let fileName = `MDO_${batchDetails.name.split(' ').join('')}_Enrollment_Requests_Report_${this.formatDate(item.lastReportGeneratedOn)}.${fileExtension}`
+    if (item?.contextType === 'Blended Program Consumption Report') {
+      // tslint:disable-next-line: max-line-length
+      fileName = `MDO_${batchDetails.name.split(' ').join('')}_Consumption_Report_${this.formatDate(item.lastReportGeneratedOn)}.${fileExtension}`
+    }
     await this.bpService.downloadReport(downloadUrl, fileName)
   }
 

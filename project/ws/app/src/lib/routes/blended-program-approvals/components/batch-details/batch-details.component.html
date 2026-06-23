@@ -23,36 +23,33 @@
         <div class="flex flex-1 flex-row margin-fix">
           <div class="flex flex-1 filter max-height-60">
             <a class="filter-option cursor-pointer" [ngClass]="{'ws-mat-accent-border-active font-bold' : currentFilter === 'pending',
-                                                'ws-mat-accent-border font-medium':currentFilter !== 'pending'}"
-              mat-button (click)="filter('pending')" role="button">New requests
+                                                'ws-mat-accent-border font-medium':currentFilter !== 'pending'}" mat-button
+              (click)="filter('pending')" role="button">New requests
               <!-- <span *ngIf="newUsers" class="ws-mat-black60-text">({{newUsers.length}})</span> -->
             </a>
-            <a class="filter-option cursor-pointer"
-              [ngClass]="{'ws-mat-accent-border-active font-bold' : currentFilter === 'approved',
+            <a class="filter-option cursor-pointer" [ngClass]="{'ws-mat-accent-border-active font-bold' : currentFilter === 'approved',
                                                               'ws-mat-accent-border font-medium':currentFilter !== 'approved'}" mat-button
               (click)="filter('approved')" role="button">Learners
               <!-- <span *ngIf="approvedUsers" class="ws-mat-black60-text">({{approvedUsers.length}})</span> -->
             </a>
-            <a class="filter-option cursor-pointer"
-              [ngClass]="{'ws-mat-accent-border-active font-bold' : currentFilter === 'nominate-learner',
+            <a class="filter-option cursor-pointer" [ngClass]="{'ws-mat-accent-border-active font-bold' : currentFilter === 'nominate-learner',
                                                                           'ws-mat-accent-border font-medium':currentFilter !== 'nominate-learner'}"
               mat-button (click)="filter('nominate-learner')" role="button">Nominate Learner
               <!-- <span *ngIf="approvedUsers" class="ws-mat-black60-text">({{approvedUsers.length}})</span> -->
             </a>
             <a class="filter-option cursor-pointer"
               [ngClass]="{'ws-mat-accent-border-active font-bold' : currentFilter === 'approvalStatus',
-                                                                                    'ws-mat-accent-border font-medium':currentFilter !== 'approvalStatus'}"
-              mat-button (click)="filter('approvalStatus')" role="button">Enroll status
+                                                                                    'ws-mat-accent-border font-medium':currentFilter !== 'approvalStatus'}" mat-button
+              (click)="filter('approvalStatus')" role="button">Enroll status
             </a>
-            <a class="filter-option cursor-pointer" *ngIf="batchData?.batchAttributes?.sessionDetails_v2"
-              [ngClass]="{'ws-mat-accent-border-active font-bold' : currentFilter === 'sessions',
-                                                                                    'ws-mat-accent-border font-medium':currentFilter !== 'sessions'}" mat-button (click)="filter('sessions')" role="button">Session
+            <a class="filter-option cursor-pointer" *ngIf="batchData?.batchAttributes?.sessionDetails_v2" [ngClass]="{'ws-mat-accent-border-active font-bold' : currentFilter === 'sessions',
+                                                                                    'ws-mat-accent-border font-medium':currentFilter !== 'sessions'}"
+              mat-button (click)="filter('sessions')" role="button">Session
               details
               <!-- <span *ngIf="rejectedUsers" class="ws-mat-black60-text">({{rejectedUsers.length}})</span> -->
             </a>
             <a class="filter-option cursor-pointer" [ngClass]="{'ws-mat-accent-border-active font-bold' : currentFilter === 'reportStatus',
-              'ws-mat-accent-border font-medium':currentFilter !== 'reportStatus'}" mat-button
-              (click)="filter('reportStatus')" role="button">Report
+              'ws-mat-accent-border font-medium':currentFilter !== 'reportStatus'}" mat-button (click)="filter('reportStatus')" role="button">Report
               <!-- <span *ngIf="rejectedUsers" class="ws-mat-black60-text">({{rejectedUsers.length}})</span> -->
             </a>
           </div>
@@ -68,9 +65,8 @@
             <div [ngClass]="{ 'mat-form-field-invalid': showError('enroleType') }"> <mat-radio-group name="enroleType"
                 class="flex tgl-group margin-top-s" aria-label="Select an option" formControlName="enroleType">
                 <mat-radio-button [name]="'radio-' + _enroleType" class="flex flex-row itm-center margin-right-s"
-                  *ngFor="let _enroleType of enroleTypeList" [value]="_enroleType"> <span
-                    class="mat-body-2">{{_enroleType}}</span> </mat-radio-button> </mat-radio-group> <mat-error
-                *ngIf="showError('enroleType')" i18n>Enrollment type is mandatory </mat-error>
+                  *ngFor="let _enroleType of enroleTypeList" [value]="_enroleType"> <span class="mat-body-2">{{_enroleType}}</span>
+                </mat-radio-button> </mat-radio-group> <mat-error *ngIf="showError('enroleType')" i18n>Enrollment type is mandatory </mat-error>
             </div>
           </ng-container>
           <ng-container *ngIf="contentForm?.value.enroleType === enroleTypeList[0]">
@@ -89,9 +85,8 @@
               request(s)</p>
             <div class="b-c box" *ngIf="newUsers && newUsers.length > 0">
               <div *ngFor="let user of newUsers">
-                <ws-app-users-card [user]="user" [actions]="true" [programData]="linkData"
-                  (userClick)="onSubmit($event)" [contentData]="programData" [type]="'newRequest'"
-                  (showUser)="onShowUser($event)"></ws-app-users-card>
+                <ws-app-users-card [user]="user" [actions]="true" [programData]="linkData" (userClick)="onSubmit($event)" [contentData]="programData"
+                  [type]="'newRequest'" (showUser)="onShowUser($event)"></ws-app-users-card>
               </div>
             </div>
             <div class="b-c box" *ngIf="newUsers && newUsers.length == 0">
@@ -112,19 +107,17 @@
                     <mat-header-cell class="header-font" *matHeaderCellDef>{{ column | titlecase
                       }}</mat-header-cell>
                     <mat-cell *matCellDef="let row" class="break-word">
-                      <span *ngIf="row[column] === 'Not updated'"
-                        [ngClass]="column === 'statusupdated/Not updated' ? 'not-updated-error': ''">{{ row[column]
+                      <span *ngIf="row[column] === 'Not updated'" [ngClass]="column === 'statusupdated/Not updated' ? 'not-updated-error': ''">{{
+                        row[column]
                         }}</span>
-                      <span *ngIf="!(row[column] === 'Not updated')"
-                        [ngClass]="column === 'statusupdated/Not updated' ? 'success-status': ''">{{ row[column]
+                      <span *ngIf="!(row[column] === 'Not updated')" [ngClass]="column === 'statusupdated/Not updated' ? 'success-status': ''">{{
+                        row[column]
                         }}</span>
                     </mat-cell>
                   </ng-container>
 
-                  <mat-header-row class="header-details"
-                    *matHeaderRowDef="displayedColumnsForBulkRequestResponse"></mat-header-row>
-                  <mat-row class="row-details"
-                    *matRowDef="let row; columns: displayedColumnsForBulkRequestResponse;"></mat-row>
+                  <mat-header-row class="header-details" *matHeaderRowDef="displayedColumnsForBulkRequestResponse"></mat-header-row>
+                  <mat-row class="row-details" *matRowDef="let row; columns: displayedColumnsForBulkRequestResponse;"></mat-row>
 
                 </mat-table>
               </div>
@@ -133,8 +126,8 @@
           </ng-container>
         </ng-container>
         <ng-container *ngIf="currentFilter === 'pending' && showUserDetails">
-          <ws-app-learner-responses [selectedUser]="selectedUser" [contentData]="programData" [batchData]="batchData"
-            (actionClick)="onSubmit($event)" (clickBack)="clickOnBack($event)"></ws-app-learner-responses>
+          <ws-app-learner-responses [selectedUser]="selectedUser" [contentData]="programData" [batchData]="batchData" (actionClick)="onSubmit($event)"
+            (clickBack)="clickOnBack($event)"></ws-app-learner-responses>
         </ng-container>
         <ng-container *ngIf="currentFilter === 'approved'">
           <div class="flex flex-1 flex-row margin-top-l" *ngIf="clonedApprovedUsers && clonedApprovedUsers.length > 0">
@@ -153,8 +146,8 @@
           </p>
           <div class="b-c box" *ngIf="approvedUsers && approvedUsers.length > 0">
             <div *ngFor="let user of approvedUsers">
-              <ws-app-users-card [user]="user" [actions]="false" [remove]="removeLearner(batchData.startDate)"
-                (userClick)="removeUser($event)" [programData]="linkData"></ws-app-users-card>
+              <ws-app-users-card [user]="user" [actions]="false" [remove]="removeLearner(batchData.startDate)" (userClick)="removeUser($event)"
+                [programData]="linkData"></ws-app-users-card>
             </div>
           </div>
           <div class="b-c box" *ngIf="approvedUsers && approvedUsers.length == 0">
@@ -162,8 +155,7 @@
           </div>
         </ng-container>
         <ng-container *ngIf="currentFilter === 'approvalStatus'">
-          <div class="flex flex-1 flex-row margin-top-l"
-            *ngIf="clonedApprovalStatusUsers && clonedApprovalStatusUsers.length > 0">
+          <div class="flex flex-1 flex-row margin-top-l" *ngIf="clonedApprovalStatusUsers && clonedApprovalStatusUsers.length > 0">
             <div class="flex-1">
               <div class="search">
                 <div class="rsearch">
@@ -176,8 +168,7 @@
           </div>
           <div class=" b-c box" *ngIf="approvalStatus && approvalStatus.length > 0">
             <div *ngFor="let user of approvalStatus">
-              <ws-app-users-card [user]="user" [actions]="false" [programData]="linkData"
-                [approvalType]="true"></ws-app-users-card>
+              <ws-app-users-card [user]="user" [actions]="false" [programData]="linkData" [approvalType]="true"></ws-app-users-card>
             </div>
           </div>
           <div class="b-c box" *ngIf="approvalStatus && approvalStatus.length == 0">
@@ -212,28 +203,35 @@
                         <div class="flex gap-3 flex-middle mb-5">
                           <mat-icon class="mat-icon ws-mat-black60-text">error_outline</mat-icon>
                           <p class="mat-body-1 margin-remove">
-                            Click "Generate Report" to view details of all participants requesting enrollment in this
-                            batch of the
+                            Click "Generate Report" to view details of all participants requesting enrollment and consumption of content in this batch
+                            of the
                             blended program.
                           </p>
                         </div>
                         <div class="flex gap-3 flex-middle mb-5">
                           <mat-icon class="mat-icon ws-mat-black60-text">error_outline</mat-icon>
                           <p class="mat-body-1 margin-remove">
-                            Report generation may take some time. Once ready, click "Download". If it's still
-                            processing, use the
-                            "Refresh" button.
+                            Report generation may take some time. Once ready, click "Download". If it's still processing, use the "Refresh" button.
                           </p>
                         </div>
                       </ng-container>
                       <ng-container>
-                        <div>
-                          <button mat-button class="text-white ws-mat-primary-background" type="button"
-                            (click)="generateReport()"
+                        <div class="flex flex-start gap-3 items-start">
+                          <mat-form-field appearance="outline" class="w-90">
+                            <mat-select placeholder="Select Report Type" [(ngModel)]="selectedReportType"
+                              (ngModelChange)="onReportTypeChange($event)">
+                              <mat-option *ngFor="let option of reportOptions" [value]="option.value">
+                                {{option.label}}
+                              </mat-option>
+                            </mat-select>
+                          </mat-form-field>
+                          <button mat-button class="text-white ws-mat-primary-background" type="button" (click)="generateReport()"
                             [ngClass]="{disabled: reportStatusList[0]?.status.toLowerCase() === 'in-progress'}"
-                            [disabled]="reportStatusList[0]?.status.toLowerCase() === 'in-progress'">Generate
+                            [disabled]="!selectedReportType">Generate
                             Report</button>
-                          <p class="mat-small margin-remove-bottom margin-top-xs" *ngIf="reportStatusList?.length > 0">
+                        </div>
+                        <div>
+                          <p class="mat-small margin-remove-bottom" *ngIf="reportStatusList?.length > 0">
                             Last generated on: {{reportStatusList[0]?.lastReportGeneratedOn | date: 'MMM dd, yyyy H:mm'
                             }}</p>
                         </div>
@@ -244,23 +242,65 @@
               </div>
 
               <ng-container *ngIf="reportStatusList?.length > 0">
-                <ws-widget-org-user-table [isSearchBar]="false" [tableData]="tabledata" [data]="reportStatusList"
-                  (actionsClick)="actionsClick($event)">
-                </ws-widget-org-user-table>
+                <table aria-describedby="Report Details" class="report-table" cellspacing="0">
+                  <thead>
+                    <tr class="report-table__header-row">
+                      <th class="report-table__th">Sl.No</th>
+                      <th class="report-table__th">Name</th>
+                      <th class="report-table__th">Requested On</th>
+                      <th class="report-table__th">Status</th>
+                      <th class="report-table__th">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let item of reportStatusList; let i = index" class="report-table__row">
+                      <td class="report-table__td report-table__td--index">{{i + 1}}</td>
+                      <td class="report-table__td">
+                        {{item?.contextType === 'Blended Program Consumption Report' ? 'Consumption Report' : 'Enrollment Request Report'}}
+                      </td>
+                      <td class="report-table__td">
+                        <span *ngIf="item?.lastReportGeneratedOn">
+                          {{item?.lastReportGeneratedOn | date: 'dd MMM yyyy h:mm a'}}
+                        </span>
+                        <span *ngIf="!item?.lastReportGeneratedOn">-</span>
+                      </td>
+                      <td class="report-table__td">
+                        <span class="report-status-badge">
+                          {{item?.status}}
+                        </span>
+                      </td>
+                      <td class="report-table__td">
+                        <!-- Refresh for in-progress or failed -->
+                        <button mat-icon-button *ngIf="item?.status?.toLowerCase() === 'in-progress' || item?.status?.toLowerCase() === 'failed'"
+                          (click)="listReports()" matTooltip="Refresh" class="report-action-btn">
+                          <mat-icon>refresh</mat-icon>
+                        </button>
+                        <!-- Download for completed with a link -->
+                        <button mat-icon-button *ngIf="item?.status?.toLowerCase() === 'completed' && item?.downloadLink"
+                          (click)="downloadReports(item)" matTooltip="Download" class="report-action-btn">
+                          <mat-icon>cloud_download</mat-icon>
+                        </button>
+                        <!-- Refresh when completed but no download link yet -->
+                        <button mat-icon-button *ngIf="item?.status?.toLowerCase() === 'completed' && !item?.downloadLink" (click)="listReports()"
+                          matTooltip="Refresh" class="report-action-btn">
+                          <mat-icon>refresh</mat-icon>
+                        </button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
               </ng-container>
 
               <ng-container *ngIf="!reportStatusList?.length">
                 <div class="text-center margin-m">
-                  <img class="block mx-auto mb-3" src="/assets/instances/eagle/app_logos/allocation_empty.svg"
-                    alt="No Report Generated">
+                  <img class="block mx-auto mb-3" src="/assets/instances/eagle/app_logos/allocation_empty.svg" alt="No Report Generated">
                   <span class="block mat-subheading-2 mt-3">No Report Generated</span>
                 </div>
               </ng-container>
             </ng-container>
             <ng-container *ngIf="!checkSurveyLink">
               <div class="text-center margin-m">
-                <img class="block mx-auto mb-3" src="/assets/instances/eagle/app_logos/allocation_empty.svg"
-                  alt="No Report Generated">
+                <img class="block mx-auto mb-3" src="/assets/instances/eagle/app_logos/allocation_empty.svg" alt="No Report Generated">
                 <span class="block mat-subheading-2 mt-3">No survey link added to this blended program.</span>
               </div>
             </ng-container>
@@ -272,8 +312,7 @@
               alt="No Report Generated">
             <span class="block mat-subheading-2 mt-3">No Nominate Learner</span>
           </div> -->
-          <ws-app-content-nominate-learner [batchData]="batchData"
-            [programID]="programID"></ws-app-content-nominate-learner>
+          <ws-app-content-nominate-learner [batchData]="batchData" [programID]="programID"></ws-app-content-nominate-learner>
         </ng-container>
       </ng-container>
     </mat-card-content>
