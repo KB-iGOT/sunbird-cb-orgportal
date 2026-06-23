@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core'
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core'
 import { MatTableDataSource } from '@angular/material/table'
 /* tslint:disable */
 import * as _ from 'lodash'
@@ -19,10 +19,11 @@ export enum statusValue {
   styleUrls: ['./view-non-mapping-designation.component.scss'],
   standalone: false
 })
+
 export class ViewNonMappingDesignationComponent implements OnInit {
   pageNo = 1
   pageSize = 20
-
+  @ViewChild('dialogContent') dialogContent!: ElementRef
   defaultPageSizeOptions = [10, 20, 25, 50, 100]
   constructor(public aicbpRequestSvc: AICBPRequestService, public dialog: MatDialog, public configSvc: ConfigurationsService) {
 
@@ -80,7 +81,19 @@ export class ViewNonMappingDesignationComponent implements OnInit {
         this.requestCount = approvalRequest?.pagination?.total_items || 0
 
         console.log('requestCount =>', this.requestCount)
+
+        this.scrollToTop()
       })
+
+
+
+  }
+
+  scrollToTop(): void {
+    this.dialogContent.nativeElement.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    })
   }
 
   viewNonMatchingDesignation() {

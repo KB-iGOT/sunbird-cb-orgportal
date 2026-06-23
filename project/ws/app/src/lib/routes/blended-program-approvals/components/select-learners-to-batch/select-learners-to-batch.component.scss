@@ -277,3 +277,7 @@ input:checked+.slider:before {
   letter-spacing: 0em;
   text-align: left;
 }
+
+.mat-mdc-form-field.mat-focused .mat-mdc-select-arrow svg {
+  fill: #1B4CA1 !important; // your active color
+}

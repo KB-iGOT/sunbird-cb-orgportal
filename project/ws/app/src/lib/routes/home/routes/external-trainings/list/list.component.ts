@@ -14,6 +14,7 @@ import { deliveryModeList } from '../models/external-trainings.model'
   selector: 'ws-app-external-trainings-list',
   templateUrl: './list.component.html',
   styleUrls: ['./list.component.scss'],
+  standalone: false,
   providers: [DatePipe],
 })
 export class ListComponent implements OnInit, AfterViewInit {

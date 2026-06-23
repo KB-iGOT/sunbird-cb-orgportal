@@ -63,8 +63,9 @@
                 titlecase}}</p>
             </div>
 
-            <div class="check-action">
-              <mat-checkbox [checked]="designation?.selected" (click)="$event.preventDefault()"
+            <div class="check-action"
+              [ngClass]="designation?.selected && !(designation?.isOrgDesignation) ? 'active-card-without-border':''">
+              <mat-checkbox [checked]="designation?.selected" (click)="$event.stopPropagation();selectDesignation(i)"
                 [disabled]="designation?.isOrgDesignation"></mat-checkbox>
             </div>
           </div>
@@ -77,7 +78,7 @@
           </div>
         </ng-container>
       </div>
-      <div class="flex flex-row justify-center">
+      <div class="flex flex-row justify-center mt-2">
         <mat-paginator [length]="deisgnationsCount" [pageSize]="pageSize" [pageSizeOptions]="[30,40,50]"
           (page)="onChangePage($event)"></mat-paginator>
       </div>

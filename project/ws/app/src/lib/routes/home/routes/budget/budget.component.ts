@@ -17,10 +17,10 @@ import { ActivatedRoute } from '@angular/router'
 import { preventHtmlAndJs } from '../../../validators/prevent-html-and-js.validator'
 
 @Component({
-    selector: 'ws-app-budget',
-    templateUrl: './budget.component.html',
-    styleUrls: ['./budget.component.scss'],
-    standalone: false
+  selector: 'ws-app-budget',
+  templateUrl: './budget.component.html',
+  styleUrls: ['./budget.component.scss'],
+  standalone: false
 })
 export class BudgetComponent implements OnInit, OnChanges {
   budgetdata: UntypedFormGroup
@@ -256,8 +256,8 @@ export class BudgetComponent implements OnInit, OnChanges {
     const dialogConfig = new MatDialogConfig()
     dialogConfig.disableClose = true
     dialogConfig.autoFocus = true
-    dialogConfig.width = '50%'
-    dialogConfig.height = '52%'
+    dialogConfig.minWidth = '55%'
+    dialogConfig.minHeight = '60%'
     dialogConfig.maxHeight = 'auto'
     if (rowdata) {
       dialogConfig.data = {

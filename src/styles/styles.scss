@@ -1434,7 +1434,8 @@ h3.shepherd-title {
 }
 
 .mat-mdc-text-field-wrapper {
-  height: auto !important;
+  min-height: 48px;
+  height: auto;
 }
 
 
@@ -1652,6 +1653,7 @@ h3.shepherd-title {
   background:
     linear-gradient(#fff, #fff) padding-box,
     linear-gradient(90deg, #f3962f 0%, #266de6 100%) border-box;
+  min-height:36px !important ;
 }
 
 // Remove MDC outline border
@@ -1740,6 +1742,11 @@ h3.shepherd-title {
   }
 }
 
+.access-settings-search-container {
+ position: relative !important;
+  top: 0 !important;
+}
+
 // ===============================
 // CHIP MDC MIGRATION
 // ===============================
@@ -1750,6 +1757,7 @@ h3.shepherd-title {
     height: 16px;
     width: 16px;
     font-size: 4px;
+    vertical-align: middle;
   }
 
   .mat-chip-list-content {
@@ -1932,8 +1940,11 @@ mat-list-item {
   height: 30px !important;
   position: absolute !important;
   right: 3px;
-  top: 3px;
+
 }
+
+
+
 
 .disabled-search-btn {
   background-color: $white !important;
@@ -2010,7 +2021,7 @@ mat-list-item {
 }
 
 .mat-mdc-text-field-wrapper {
-  background-color: #ffffff !important;
+  background-color: #ffffff;
 }
 
 .search .sinput {
@@ -2207,4 +2218,136 @@ mat-list-item {
 
 .search-community-card {
    overflow: hidden !important;
+}
+
+.addCardButtonNew {
+      padding: 5px 10px !important;
+    height: auto !important;
+    width: 90px;
+    .mat-icon {
+      margin: 5px 10px !important;
+    vertical-align: middle !important;
+    }
+}
+
+.cra-languages-dropdown {
+  .cra-chips {
+    background: #1b4ca1  !important;
+     .mdc-evolution-chip__text-label {
+      color: #fff !important;
+      font-size: 14px !important;
+    }
+    .mat-icon {
+      color: #fff !important;
+    }
+    .mdc-evolution-chip__action,
+    .mdc-evolution-chip__cell,
+    .mdc-evolution-chip__action:hover,
+    .mdc-evolution-chip__cell:hover {
+      background: transparent !important;
+    }
+
+    &::before,
+    &::after,
+    .mdc-evolution-chip__action::before,
+    .mdc-evolution-chip__action::after {
+      opacity: 0 !important;
+      background: transparent !important;
+    }
+  }
+
+  .mat-mdc-select-value {
+    margin-top: 5px;
+  }
+
+  input {
+    margin-top: 10px;
+  }
+  .placeholder-text {
+    padding-left: 10px;
+  }
+
+}
+
+    .sticky-search-container {
+  top:-10px !important;
+}
+
+
+.round-control {
+    .mat-mdc-form-field-infix {
+       margin-top: 10px;
+    }
+     .mat-icon {
+    padding-top:0 !important;
+    margin-top: 0 !important;
+  }
+  }
+
+
+.user-type-checkboxes {
+  .mat-icon {
+    vertical-align: middle;
+    margin: 0 10px;
+  }
+}
+
+.compbutton {
+  background: #1b4ca1 !important;
+  color:#fff !important;
+  border: 1px solid #1b4ca1 !important;
+}
+.action-manage-selection {
+  button {
+    .mat-icon {
+    vertical-align: middle;
+    margin-top: 10px;
+  }
+  }
+
+}
+.selections-options {
+  mat-select {
+    margin-top: 5px;;
+  }
+}
+
+.date-filter {
+  .mat-mdc-form-field-flex {
+    height: 40px !important;
+  }
+}
+
+
+/* Default arrow color */
+.mat-mdc-select-arrow svg {
+  fill: #666 !important;
+}
+
+/* When select is focused/active */
+.mat-mdc-form-field.mat-focused .mat-mdc-select-arrow svg {
+  fill: #1b4ca1 !important; // your active color
+}
+
+.global-search-content .mat-btn-flat {
+  right: 3px;
+  top: 3px;
+}
+
+.global-search-content .mat-form-field {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+
+
+
+.global-search-content {
+  mat-form-field {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+  .mat-form-field {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
 }
