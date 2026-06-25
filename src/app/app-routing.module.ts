@@ -309,6 +309,7 @@ const routes: Routes = [
     redirectTo: '/',
     pathMatch: 'full',
   },
+  { path: 'page/home', redirectTo: 'app/home', pathMatch: 'full' },
   {
     path: 'page/:id',
     component: PageComponent,
