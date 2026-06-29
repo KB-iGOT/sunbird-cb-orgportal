@@ -217,7 +217,7 @@
                       </ng-container>
                       <ng-container>
                         <div class="flex flex-start gap-3 items-start">
-                          <mat-form-field appearance="outline" class="w-90">
+                          <mat-form-field appearance="outline" class="w-90 report-type-select">
                             <mat-select placeholder="Select Report Type" [(ngModel)]="selectedReportType"
                               (ngModelChange)="onReportTypeChange($event)">
                               <mat-option *ngFor="let option of reportOptions" [value]="option.value">
@@ -225,7 +225,7 @@
                               </mat-option>
                             </mat-select>
                           </mat-form-field>
-                          <button mat-button class="text-white ws-mat-primary-background" type="button" (click)="generateReport()"
+                          <button mat-button class="text-white generate-report-button" type="button" (click)="generateReport()"
                             [ngClass]="{disabled: reportStatusList[0]?.status.toLowerCase() === 'in-progress'}"
                             [disabled]="!selectedReportType">Generate
                             Report</button>
