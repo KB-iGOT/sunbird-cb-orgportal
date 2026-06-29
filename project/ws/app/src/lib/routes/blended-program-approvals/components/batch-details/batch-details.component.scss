@@ -27,6 +27,17 @@
     }
   }
 }
+.generate-report-button {
+  background-color: #1a4b8f !important;
+}
+
+::ng-deep .report-type-select .mat-mdc-select {
+  padding-top: 4px !important;
+}
+
+::ng-deep .report-type-select .mat-mdc-select:not(.mat-mdc-select-empty) .mat-mdc-select-value-text {
+  font-weight: 600;
+}
 
 .w-90 {
   width: 90%;
