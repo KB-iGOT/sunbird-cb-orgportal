@@ -68,8 +68,14 @@ export class BulkUploadComponent implements OnInit, AfterViewInit, OnDestroy {
       this.userProfile = _.get(this.router.snapshot, 'data.configService.userProfileV2')
     }
     if (this.selectedOrgData) {
-      this.downloadSampleFilePath = _.get(this.router.snapshot.data.pageData.data.bulkUploadConfig, 'downloadSampleUserFilePath')
-      this.downloadAsFileName = _.get(this.router.snapshot.data.pageData.data.bulkUploadConfig, 'downloadAsUserFileName')
+      const bulkUploadConfig = _.get(this.router.snapshot.data.pageData.data, 'bulkUploadConfig')
+      if (this.isNgo) {
+        this.downloadSampleFilePath = _.get(bulkUploadConfig, 'downloadSampleNgoUserFilePath') || _.get(bulkUploadConfig, 'downloadSampleUserFilePath')
+        this.downloadAsFileName = _.get(bulkUploadConfig, 'downloadAsNgoUserFileName') || _.get(bulkUploadConfig, 'downloadAsUserFileName')
+      } else {
+        this.downloadSampleFilePath = _.get(bulkUploadConfig, 'downloadSampleUserFilePath')
+        this.downloadAsFileName = _.get(bulkUploadConfig, 'downloadAsUserFileName')
+      }
     }
     this.getBulkStatusList()
   }

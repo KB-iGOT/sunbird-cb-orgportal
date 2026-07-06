@@ -47,7 +47,7 @@ export class CreateUserComponent implements OnInit {
     }
     this.orgSvc.setConfigService(_.get(this.activeRouter, 'snapshot.data.configService'))
     this.getUserList('')
-    const parentOrgData = this.orgSvc.getParentOrgData()
+    const parentOrgData = this.orgSvc.getOrgData()
     this.isNgo = parentOrgData?.isNgo || false
   }
 
