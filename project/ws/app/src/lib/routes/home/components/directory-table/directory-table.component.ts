@@ -86,7 +86,8 @@ export class DirectoryTableComponent implements OnInit {
         { displayName: 'Created On', key: 'createdOn' },
       ],
       actions: [{ name: '', label: '', icon: 'remove_red_eye', type: 'menu' }],
-      link: { name: 'generate_link', generateLabel: 'Generate Link', column: 'Custom Registration', viewLabel: 'View Link' },
+      link: this.tabType === 'volunteer' ? null :
+        { name: 'generate_link', generateLabel: 'Generate Link', column: 'Custom Registration', viewLabel: 'View Link' },
       needCheckBox: false,
       needHash: false,
       sortColumn: '',

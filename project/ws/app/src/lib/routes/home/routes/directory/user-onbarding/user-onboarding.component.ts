@@ -35,8 +35,8 @@ export class UserOnboardingComponent implements OnInit {
     if (queryParam) {
       this.orgData = queryParam
     }
-    const parentOrgData = this.orgHieService.getParentOrgData()
-    if (parentOrgData && parentOrgData.isNgo) {
+    const orgData = this.orgHieService.getOrgData()
+    if (orgData && orgData.isNgo) {
       this.isNgo = true
       this.createUserTabs = [
         { name: 'Bulk Creation', value: 'bulkCreation' },
