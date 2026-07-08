@@ -112,7 +112,8 @@ export class OrganisationUsersComponent implements OnInit {
       this.loaderService.changeLoaderState(true)
       this.orgHieService.getOrgReadData(requestBody).pipe(
         switchMap((data: any) => {
-          if (data?.result?.response?.ministryOrStateType === 'ministry') {
+          // orgHieService OrgData enabling for the state as well, In case of state It was not working even API was returning the framwork.
+          if (data?.result?.response?.ministryOrStateType === 'ministry' || data?.result?.response?.ministryOrStateType === 'state') {
             const parentReqBody = {
               request: {
                 organisationId: data?.result?.response?.ministryOrStateId,
