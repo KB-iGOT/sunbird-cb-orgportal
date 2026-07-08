@@ -68,7 +68,8 @@
         Cancel
       </button>
       <button [ngClass]="{'disableAdd' : !canAddCompetencies, 'enable-btn' : canAddCompetencies}"
-        class="flex items-center cursor-pointer add-btn" (click)="saveCompetencies()" mat-button>
+        class="flex items-center cursor-pointer add-btn" [disabled]="!canAddCompetencies" (click)="saveCompetencies()"
+        mat-button>
         Add
       </button>
     </div>
