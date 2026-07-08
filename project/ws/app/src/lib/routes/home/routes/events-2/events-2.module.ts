@@ -32,6 +32,7 @@ import { MaterialDetailsComponent } from './components/material-details/material
 import { EventsListComponent } from './components/events-list/events-list.component'
 import { MatPaginatorModule } from '@angular/material/paginator'
 import { EventResolverService } from './services/event-resolver'
+import { EventCategoryResolverService } from './services/event-category-resolver'
 import { AddCompetencyComponent } from './dialogs/add-competency/add-competency.component'
 import { MatCheckboxModule } from '@angular/material/checkbox'
 import { MatAutocompleteModule } from '@angular/material/autocomplete'
@@ -108,7 +109,8 @@ import { EventDetailsComponent } from './components/event-details/event-details.
   providers: [
     DatePipe,
     EventsService,
-    EventResolverService
+    EventResolverService,
+    EventCategoryResolverService
   ]
 })
 export class Events2Module { }

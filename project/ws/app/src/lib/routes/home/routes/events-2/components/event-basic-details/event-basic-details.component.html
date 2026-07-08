@@ -235,10 +235,10 @@
       </div>
     </div>
     <mat-radio-group aria-label="Select an option" class="flex" formControlName="typeofEvent">
-      <!-- <mat-radio-button class="mr-5 p-4" value="live" *ngIf="checkIfSCEvent()">
+      <mat-radio-button class="mr-5 p-4" value="live">
         Live Event
-      </mat-radio-button> -->
-      <mat-radio-button class="mr-5 p-4" value="record" *ngIf="edf?.typeofEvent?.value?.toLowerCase() === 'record'">
+      </mat-radio-button>
+      <mat-radio-button class="mr-5 p-4" value="record">
         Recorded Event
       </mat-radio-button>
     </mat-radio-group>
