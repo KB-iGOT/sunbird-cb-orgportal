@@ -281,10 +281,24 @@ export class CreateEventComponent implements OnInit, AfterViewInit {
 
   //#region (ui interactions)
   onSelectionChange(event: StepperSelectionEvent) {
+    const steps = this.stepper?.steps?.toArray() || []
     const selectedStep = this.stepper?.steps.toArray()[event.selectedIndex]
     const previousStep = this.stepper?.steps.toArray()[event.previouslySelectedIndex]
     const selectedLabel = selectedStep?.label
     const previousLabel = previousStep?.label
+
+    if (event?.selectedIndex > event?.previouslySelectedIndex &&
+      !this.canMoveToStep(steps, event.previouslySelectedIndex, event?.selectedIndex)) {
+      this.currentStepperIndex = event.previouslySelectedIndex
+      this.selectedStepperLable = previousLabel || this.selectedStepperLable
+      setTimeout(() => {
+        if (this.stepper) {
+          this.stepper.selectedIndex = event?.previouslySelectedIndex
+        }
+      })
+      return
+    }
+
     if (previousLabel === 'Basic Details') {
       this.eventDetailsForm.markAllAsTouched()
       this.eventDetailsForm.updateValueAndValidity()
@@ -410,6 +424,9 @@ export class CreateEventComponent implements OnInit, AfterViewInit {
     //   this.matSnackBar.open('Please fill mandatory fields')
     //   return
     // }
+    if (!this.canMoveToNext) {
+      return
+    }
     if (this.stepper && this.currentStepperIndex < this.stepper.steps.length - 1) {
       this.currentStepperIndex = this.currentStepperIndex + 1
     }
@@ -461,6 +478,12 @@ export class CreateEventComponent implements OnInit, AfterViewInit {
       } else {
         this.openSnackBar('Please fill mandatory fields')
       }
+    } else if (this.selectedStepperLable === 'Course Linking') {
+      if (!this.courseSelectionForm.invalid) {
+        currentFormIsValid = true
+      } else {
+        this.openSnackBar('Please select one course in course Linking')
+      }
     } else if (this.selectedStepperLable === 'Add Speaker') {
       if (this.speakersList && this.speakersList.length) {
         currentFormIsValid = true
@@ -475,6 +498,55 @@ export class CreateEventComponent implements OnInit, AfterViewInit {
       }
     }
     return currentFormIsValid
+  }
+
+  private canMoveToStep(steps: any[], fromIndex: number, toIndex: number): boolean {
+    if (this.openMode === 'view' || toIndex <= fromIndex) {
+      return true
+    }
+    for (let index = fromIndex; index < toIndex; index += 1) {
+      if (!this.validateStep(steps[index]?.label)) {
+        return false
+      }
+    }
+    return true
+  }
+
+  private validateStep(stepLabel: string): boolean {
+    if (stepLabel === 'Basic Details') {
+      return this.validateBasicDetails()
+    }
+    if (stepLabel === 'Course Linking') {
+      return this.validateCourseLinking()
+    }
+    if (stepLabel === 'Add Material') {
+      if (this.isMaterialsValid) {
+        return true
+      }
+      this.openSnackBar('Please provied valid name and material')
+      return false
+    }
+    return true
+  }
+
+  private validateBasicDetails(): boolean {
+    this.eventDetailsForm.markAllAsTouched()
+    this.eventDetailsForm.updateValueAndValidity()
+    if (this.eventDetailsForm.invalid) {
+      this.openSnackBar('Please fill mandatory fields')
+      return false
+    }
+    return true
+  }
+
+  private validateCourseLinking(): boolean {
+    this.courseSelectionForm.markAllAsTouched()
+    this.courseSelectionForm.updateValueAndValidity()
+    if (this.courseSelectionForm.invalid) {
+      this.openSnackBar('Please select one course in course Linking')
+      return false
+    }
+    return true
   }
 
   get isMaterialsValid(): boolean {

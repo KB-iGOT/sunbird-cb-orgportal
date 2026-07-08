@@ -54,7 +54,7 @@
     <ng-template matStepperIcon="done" let-index="index">
       {{ index + 1 }}
     </ng-template>
-    <mat-step label="Basic Details">
+    <mat-step label="Basic Details" [stepControl]="eventDetailsForm">
       <ng-template matStepLabel>Basic Details</ng-template>
       <ws-app-event-basic-details [eventStatus]="eventStatus" [eventDetails]="eventDetailsForm" [openMode]="openMode"
         [userProfile]="userProfile" [openTab]="pathUrl"
