@@ -57,7 +57,8 @@
     <mat-step label="Basic Details">
       <ng-template matStepLabel>Basic Details</ng-template>
       <ws-app-event-basic-details [eventStatus]="eventStatus" [eventDetails]="eventDetailsForm" [openMode]="openMode"
-        [userProfile]="userProfile" [openTab]="pathUrl"></ws-app-event-basic-details>
+        [userProfile]="userProfile" [openTab]="pathUrl"
+        [eventCategoriesList]="eventCategoriesList"></ws-app-event-basic-details>
     </mat-step>
 
     <!-- <mat-step>
@@ -65,7 +66,7 @@
       <ws-app-speakers [speakersList]="speakersList" [openMode]="openMode"
         [userProfile]="userProfile"></ws-app-speakers>
     </mat-step> -->
-    <ng-container *ngIf="edf?.typeofEvent?.value?.toLowerCase() === 'live' && contentLoaded">
+    <ng-container *ngIf="enableCourseLinking && edf?.typeofEvent?.value?.toLowerCase() === 'live' && contentLoaded">
       <mat-step label="Course Linking" [stepControl]="courseSelectionForm">
         <ng-template matStepLabel>Course Linking</ng-template>
         <ws-app-course-listing [courseDetails]="courseSelectionForm?.value?.selectedCourse"

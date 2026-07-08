@@ -188,7 +188,7 @@ export class CompetencyAddComponent implements OnInit {
   }
 
   get canAddCompetencies(): boolean {
-    if (!this.selectedThemesList || (
+    if (!this.selectedThemesList || this.selectedThemesList?.length === 0 || (
       this.selectedThemesList &&
       this.selectedThemesList.find((selectedThem: any) => (!selectedThem.selectedSubThemes || selectedThem.selectedSubThemes.length === 0)))) {
       return false
