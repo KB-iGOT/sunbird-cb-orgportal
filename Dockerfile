@@ -8,7 +8,6 @@ COPY --chown=node:node . .
 
 USER node
 
-# Build application
 RUN rm -rf node_modules \
     && yarn cache clean \
     && yarn install \
@@ -16,13 +15,17 @@ RUN rm -rf node_modules \
     && yarn add vis-util \
     && npm run build --prod --build-optimizer \
     && npm run compress:brotli \
+    && rm -rf /home/node/.cache \
     && yarn cache clean \
-    && npm cache clean --force \
-    && rm -rf /home/node/.cache
+    && npm cache clean --force
 
-# Copy generated assets
 WORKDIR /app/dist
+
 COPY --chown=node:node assets/MDO/client-assets/dist ./www/en/assets
+
+# Install ONLY the runtime dependencies required by dist/package.json
+RUN npm install --production \
+    && npm cache clean --force
 
 EXPOSE 3004
 
