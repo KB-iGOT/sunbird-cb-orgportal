@@ -16,6 +16,7 @@ RUN rm -rf node_modules \
     && npm run build --prod --build-optimizer \
     && npm run compress:brotli \
     && rm -rf /home/node/.cache \
+    && npm cache clean --force \
     && yarn cache clean
 
 WORKDIR /app/dist
