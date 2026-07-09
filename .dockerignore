@@ -1,0 +1,11 @@
+.git
+.gitignore
+node_modules
+dist
+coverage
+tmp
+.cache
+README.md
+Jenkinsfile
+Dockerfile*
+*.log

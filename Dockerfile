@@ -1,21 +1,50 @@
-FROM node:22.13.0
+###############################################
+# Stage 1 - Build
+###############################################
+FROM node:22.13.0 AS builder
 
-RUN mkdir -p /app && chown -R node:node /app
 WORKDIR /app
 
-COPY --chown=node:node . .
+# Copy dependency files first (better Docker caching)
+COPY package.json yarn.lock ./
 
-USER node
+# Install dependencies
+RUN yarn install --frozen-lockfile
 
-RUN rm -rf node_modules
-RUN yarn cache clean && yarn && yarn add moment && yarn add vis-util && npm run build --prod --build-optimizer
+# Copy application source
+COPY . .
 
-RUN npm run compress:brotli
+# Build application
+RUN yarn add moment vis-util \
+    && npm run build --prod --build-optimizer \
+    && npm run compress:brotli
 
-WORKDIR /app/dist
-COPY --chown=node:node assets/MDO/client-assets/dist www/en/assets
+# Clean caches
+RUN yarn cache clean \
+    && npm cache clean --force \
+    && rm -rf /home/node/.cache
 
-RUN npm install --production
+
+###############################################
+# Stage 2 - Runtime
+###############################################
+FROM node:22-alpine
+
+WORKDIR /app
+
+# Copy only files required to run the application
+COPY package.json ./
+
+# Install only production dependencies
+RUN npm install --omit=dev \
+    && npm cache clean --force
+
+# Copy built Angular application
+COPY --from=builder /app/dist ./dist
+
+# Copy generated assets
+COPY --from=builder /app/assets/MDO/client-assets/dist ./dist/www/en/assets
 
 EXPOSE 3004
+
 CMD ["npm", "run", "serve:prod"]
