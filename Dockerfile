@@ -8,6 +8,7 @@ COPY --chown=node:node . .
 
 USER node
 
+# Build application
 RUN rm -rf node_modules \
     && yarn cache clean \
     && yarn install \
@@ -15,13 +16,13 @@ RUN rm -rf node_modules \
     && yarn add vis-util \
     && npm run build --prod --build-optimizer \
     && npm run compress:brotli \
-    && rm -rf /home/node/.cache \
+    && yarn cache clean \
     && npm cache clean --force \
-    && yarn cache clean
+    && rm -rf /home/node/.cache
 
+# Copy generated assets
 WORKDIR /app/dist
-
-COPY --chown=node:node assets/MDO/client-assets/dist www/en/assets
+COPY --chown=node:node assets/MDO/client-assets/dist ./www/en/assets
 
 EXPOSE 3004
 
