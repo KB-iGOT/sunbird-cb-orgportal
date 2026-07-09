@@ -1,49 +1,26 @@
-###############################################
-# Stage 1 - Build
-###############################################
-FROM node:22.13.0 AS builder
+FROM node:22.13.0
+
+RUN mkdir -p /app && chown -R node:node /app
 
 WORKDIR /app
 
-# Copy dependency files first (better Docker caching)
-COPY package.json yarn.lock ./
+COPY --chown=node:node . .
 
-# Install dependencies
-RUN yarn install --frozen-lockfile
+USER node
 
-# Copy application source
-COPY . .
-
-# Build application
-RUN yarn add moment vis-util \
+RUN rm -rf node_modules \
+    && yarn cache clean \
+    && yarn install \
+    && yarn add moment \
+    && yarn add vis-util \
     && npm run build --prod --build-optimizer \
-    && npm run compress:brotli
+    && npm run compress:brotli \
+    && rm -rf /home/node/.cache \
+    && yarn cache clean
 
-# Clean caches
-RUN yarn cache clean \
-    && npm cache clean --force \
-    && rm -rf /home/node/.cache
+WORKDIR /app/dist
 
-
-###############################################
-# Stage 2 - Runtime
-###############################################
-FROM node:22-alpine
-
-WORKDIR /app
-
-# Copy only files required to run the application
-COPY package.json ./
-
-# Install only production dependencies
-RUN npm install --omit=dev \
-    && npm cache clean --force
-
-# Copy built Angular application
-COPY --from=builder /app/dist ./dist
-
-# Copy generated assets
-COPY --from=builder /app/assets/MDO/client-assets/dist ./dist/www/en/assets
+COPY --chown=node:node assets/MDO/client-assets/dist www/en/assets
 
 EXPOSE 3004
 
