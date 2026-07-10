@@ -200,6 +200,11 @@
       </div>
 
       <div class="input-container">
+        <ng-container *ngIf="isNgo">
+          <div class="label">External id</div>
+          <input type="text" class="input-text" formControlName="externalId" placeholder="Type here"
+            maxlength="100" />
+        </ng-container>
         <ng-container *ngIf="userCreationForm?.get('department') && !isNgo">
           <div class="label required">Department</div>
           <input type="text" class="input-text" formControlName="department" placeholder="Type here" />
