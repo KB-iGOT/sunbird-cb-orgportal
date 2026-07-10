@@ -169,6 +169,12 @@ export class SingleUserCreationComponent implements OnInit, AfterViewInit, OnDes
       this.userCreationForm.get('designation')?.updateValueAndValidity()
       this.userCreationForm.get('group')?.clearValidators()
       this.userCreationForm.get('group')?.updateValueAndValidity()
+      if (!this.userCreationForm.contains('externalId')) {
+        this.userCreationForm.addControl('externalId', new UntypedFormControl(''))
+      }
+      if (this.editUserData) {
+        this.assignData()
+      }
     } else {
       // Only load designation and group data if not NGO
       this.checkOrgHasDesignations()
@@ -197,6 +203,9 @@ export class SingleUserCreationComponent implements OnInit, AfterViewInit, OnDes
           break
         case 'tags':
           this.userCreationForm.get(ele)?.patchValue(this.editUserData?.profileDetails?.additionalProperties?.tag || [])
+          break
+        case 'externalId':
+          this.userCreationForm.get(ele)?.patchValue(this.editUserData?.profileDetails?.additionalProperties?.externalSystemId || '')
           break
         case 'pincode':
           this.userCreationForm.get(ele)?.patchValue(this.editUserData?.profileDetails?.employmentDetails?.pinCode || '')
@@ -595,6 +604,11 @@ export class SingleUserCreationComponent implements OnInit, AfterViewInit, OnDes
     }
     if (this.isNgo) {
       dataToSubmit['isNgo'] = true
+      dataToSubmit['additionalProperties'] = {
+        externalSystemId: (dataToSubmit.externalId || '').trim(),
+        externalSystem: 'eHRMS ID',
+      }
+      delete dataToSubmit.externalId
     }
 
     if (!this.userCreationForm.value.channel) {
@@ -672,7 +686,11 @@ export class SingleUserCreationComponent implements OnInit, AfterViewInit, OnDes
             }
           ],
           additionalProperties: {
-            tag: dataToSubmit.tags
+            tag: dataToSubmit.tags,
+            ...(this.isNgo ? {
+              externalSystemId: (dataToSubmit.externalId || '').trim(),
+              externalSystem: 'eHRMS ID',
+            } : null)
           },
           employmentDetails: {
             pinCode: dataToSubmit.pincode

@@ -25,7 +25,7 @@ export class DirectoryComponent implements OnInit, AfterViewInit {
   tabs: any = [
     { name: 'Organisation', value: 'organisation' },
     { name: 'Organisation Hierarchies', value: 'organisationHierarchies' },
-    { name: 'Volunteer Organisation', value: 'volunteer' }
+    { name: 'Volunteer Organisations', value: 'volunteer' }
   ]
 
   constructor(
@@ -56,12 +56,12 @@ export class DirectoryComponent implements OnInit, AfterViewInit {
     switch (ministryOrStateType?.toLowerCase()) {
       case 'ministry':
       case 'state':
-        this.tabs = this.tabs.filter((tab: any) => tab.value !== 'organisation')
+        this.tabs = this.tabs.filter((tab: any) => tab.value !== 'organisation' && tab.value !== 'volunteer')
         break
       case 'spv':
         const userRoles = this.orgHieService.getUserRoles()
         if (userRoles && userRoles.has('mdo_admin')) {
-          this.tabs = this.tabs.filter((tab: any) => tab.value !== 'organisation')
+          this.tabs = this.tabs.filter((tab: any) => tab.value !== 'organisation' && tab.value !== 'volunteer')
         }
         break
     }
