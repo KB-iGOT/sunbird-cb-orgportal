@@ -25,7 +25,7 @@ export class DirectoryComponent implements OnInit, AfterViewInit {
   tabs: any = [
     { name: 'Organisation', value: 'organisation' },
     { name: 'Organisation Hierarchies', value: 'organisationHierarchies' },
-    { name: 'Volunteer Organisation', value: 'volunteer' }
+    { name: 'Volunteer Organisations', value: 'volunteer' }
   ]
 
   constructor(
