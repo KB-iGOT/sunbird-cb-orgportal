@@ -4,7 +4,7 @@ import { EventsService } from '../../services/events.service'
 import { ActivatedRoute, Router } from '@angular/router'
 import * as _ from 'lodash'
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms'
-import { URL_PATRON, material, noSpecialCharEvent, speaker } from '../../models/events.model'
+import { DEFAULT_EVENT_CATEGORIES, URL_PATRON, material, noSpecialCharEvent, speaker } from '../../models/events.model'
 import { StepperSelectionEvent } from '@angular/cdk/stepper'
 import { MatStepper } from '@angular/material/stepper'
 import { MatSnackBar } from '@angular/material/snack-bar'
@@ -45,6 +45,9 @@ export class CreateEventComponent implements OnInit, AfterViewInit {
   selectedStepperLable = 'Basic Details'
   eventStatus = 'draft'
   contentLoaded = false
+  eventCategoriesList: string[] = DEFAULT_EVENT_CATEGORIES
+  mdoEventCategories: any = {}
+  enableCourseLinking = false // course selection is disabled for live events for now
   //#endregion
 
   constructor(
@@ -98,10 +101,46 @@ export class CreateEventComponent implements OnInit, AfterViewInit {
       }
     })
     this.userProfile = _.get(this.activatedRoute, 'snapshot.data.configService.userProfile')
+    this.mdoEventCategories = _.get(this.activatedRoute, 'snapshot.data.eventForm.mdoEventCategories', {})
+    let previousTypeOfEvent = ''
+    this.eventDetailsForm.controls.typeofEvent.valueChanges.subscribe((type: any) => {
+      const typeOfEvent = (type || '').toString().toLowerCase()
+      this.updateEventCategoriesList()
+      this.updateFlowForEventType(typeOfEvent)
+      if (previousTypeOfEvent && previousTypeOfEvent !== typeOfEvent) {
+        this.eventDetailsForm.controls.eventCategory.patchValue('')
+      }
+      previousTypeOfEvent = typeOfEvent
+    })
+    this.updateEventCategoriesList()
     if (_.get(this.activatedRoute, 'snapshot.data.eventDetails')) {
       this.eventDetails = _.get(this.activatedRoute, 'snapshot.data.eventDetails.data')
       this.patchEventDetails()
     }
+  }
+
+  updateEventCategoriesList() {
+    const typeOfEvent = (this.eventDetailsForm.controls.typeofEvent.value || '').toString().toLowerCase()
+    const categories = typeOfEvent === 'live' ?
+      _.get(this.mdoEventCategories, 'live', []) : _.get(this.mdoEventCategories, 'record', [])
+    this.eventCategoriesList = (categories && categories.length) ? categories : DEFAULT_EVENT_CATEGORIES
+  }
+
+  updateFlowForEventType(typeOfEvent: string) {
+    if (typeOfEvent === 'live' && this.enableCourseLinking) {
+      this.courseSelectionForm.controls.selectedCourse.setValidators([Validators.required])
+      if (!this.courseSelectionForm.controls.selectedCourse.value) {
+        this.courseSelectionForm.controls.selectedCourse.setValue({})
+      }
+      this.contentLoaded = true
+    } else {
+      this.courseSelectionForm.controls.selectedCourse.clearValidators()
+    }
+    this.courseSelectionForm.controls.selectedCourse.updateValueAndValidity()
+  }
+
+  get isLiveEvent(): boolean {
+    return _.get(this.edf, 'typeofEvent.value', '').toString().toLowerCase() === 'live'
   }
 
   async patchEventDetails() {
@@ -155,7 +194,9 @@ export class CreateEventComponent implements OnInit, AfterViewInit {
     this.eventDetailsForm.patchValue(eventBaseDetails)
 
     if (this.eventDetails?.typeofEvent?.toLowerCase() === 'live') {
-      this.courseSelectionForm.controls.selectedCourse.setValidators([Validators.required])
+      if (this.enableCourseLinking) {
+        this.courseSelectionForm.controls.selectedCourse.setValidators([Validators.required])
+      }
       if (this.eventDetails?.courseLinked) {
         const contentData: any = await this.eventSvc.getContentRead(this.eventDetails?.courseLinked).toPromise().catch(_err => { })
         if (contentData?.result) {
@@ -459,7 +500,7 @@ export class CreateEventComponent implements OnInit, AfterViewInit {
         this.openSnackBar('Please provied valid name and matrial in Add Material')
         return false
       }
-      if (!(this.competencies && this.competencies.length)) {
+      if (!(this.competencies && this.competencies.length) && !(this.isLiveEvent && !this.enableCourseLinking)) {
         this.openSnackBar(this.eventDetails.typeofEvent === 'live' ? 'Select course from course linking' : 'Please add atleast one competency in Add Competency')
         return false
       }
@@ -476,7 +517,7 @@ export class CreateEventComponent implements OnInit, AfterViewInit {
           this.openSnackBar('Please fill mandatory fields in Event Setup > Pre Event Setup')
           return false
         }
-        if (this.courseSelectionForm?.invalid) {
+        if (this.enableCourseLinking && this.courseSelectionForm?.invalid) {
           this.openSnackBar('Please select one course in course Linking')
           return false
         }
@@ -700,13 +741,13 @@ export class CreateEventComponent implements OnInit, AfterViewInit {
 
     if (eventBaseDetails?.typeofEvent?.toLowerCase() === 'live') {
       eventDetails['maxEnrolments'] = eventBaseDetails?.maxEnrolments || 0
-      if (this.courseSelectionForm?.value?.selectedCourse) {
+      if (this.enableCourseLinking && this.courseSelectionForm?.value?.selectedCourse) {
         eventDetails['courseLinked'] = this.courseSelectionForm?.value?.selectedCourse?.identifier || ''
       }
-      eventDetails['registrationLink'] = this.preEventForm.controls['meetingLink'].value || ''
-      eventDetails['meetingAgenda'] = this.preEventForm.controls['agenda'].value || ''
-      eventDetails['preEventReads'] = [this.preEventForm.controls['preEventReads'].value || '']
-      eventDetails['speakerDetails'] = JSON.stringify(this.preEventForm.controls['selectedSpeaker'].value) || []
+      eventDetails['registrationLink'] = this.preEventForm?.controls['meetingLink']?.value || ''
+      eventDetails['meetingAgenda'] = this.preEventForm?.controls['agenda']?.value || ''
+      eventDetails['preEventReads'] = [this.preEventForm?.controls['preEventReads']?.value || '']
+      eventDetails['speakerDetails'] = JSON.stringify(this.preEventForm?.controls['selectedSpeaker']?.value || [])
       this.competencies = this.getLatestCompetencies(this.courseSelectionForm?.value?.selectedCourse)
       eventDetails['noOfAttendes'] = this.postEventForm?.controls['noOfAttendes'].value || 0
       eventDetails['eventDuration'] = this.convertDurationToMinutes(this.postEventForm?.controls['eventDuration'].value) || 0
