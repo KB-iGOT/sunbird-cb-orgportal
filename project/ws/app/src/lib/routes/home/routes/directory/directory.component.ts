@@ -53,13 +53,17 @@ export class DirectoryComponent implements OnInit, AfterViewInit {
   setOrganisationTabVisibility() {
     const ministryOrStateType = _.get(this.configSvc, 'orgReadData.ministryOrStateType', '')
     this.orgHieService.setUserRoles(_.get(this.configSvc, 'userRoles', []))
+    const userRoles = this.orgHieService.getUserRoles()
     switch (ministryOrStateType?.toLowerCase()) {
       case 'ministry':
       case 'state':
-        this.tabs = this.tabs.filter((tab: any) => tab.value !== 'organisation' && tab.value !== 'volunteer')
+        if (userRoles && (userRoles.has('mdo_leader') || userRoles.has('mdo_admin'))) {
+          this.tabs = this.tabs.filter((tab: any) => tab.value !== 'organisation')
+        } else {
+          this.tabs = this.tabs.filter((tab: any) => tab.value !== 'organisation' && tab.value !== 'volunteer')
+        }
         break
       case 'spv':
-        const userRoles = this.orgHieService.getUserRoles()
         if (userRoles && userRoles.has('mdo_admin')) {
           this.tabs = this.tabs.filter((tab: any) => tab.value !== 'organisation')
         }
