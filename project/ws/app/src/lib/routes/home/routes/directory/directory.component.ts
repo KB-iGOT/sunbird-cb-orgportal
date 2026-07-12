@@ -61,7 +61,7 @@ export class DirectoryComponent implements OnInit, AfterViewInit {
       case 'spv':
         const userRoles = this.orgHieService.getUserRoles()
         if (userRoles && userRoles.has('mdo_admin')) {
-          this.tabs = this.tabs.filter((tab: any) => tab.value !== 'organisation')
+          this.tabs = this.tabs.filter((tab: any) => tab.value !== 'organisation' && tab.value !== 'volunteer')
         }
         break
     }
