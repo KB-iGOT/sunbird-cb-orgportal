@@ -382,7 +382,7 @@ export class SingleUserCreationComponent implements OnInit, AfterViewInit, OnDes
   }
 
   setDefaultValue(): void {
-    if (!this.userCreationForm.get('roles')?.value || this.userCreationForm.get('roles')?.value.length === 0) {
+    if (!this.isNgo && (!this.userCreationForm.get('roles')?.value || this.userCreationForm.get('roles')?.value.length === 0)) {
       // tslint:disable-next-line
       this.userCreationForm.get('roles')!.patchValue(this.defaultRole)
     }
