@@ -44,8 +44,10 @@
         </div>
       </mat-card>
     </div>
-    <div class="taxonomy-view odcs-taxonomy-view" *ngIf="environmentVal && environmentVal.frameworkName" style="height: calc(76vh - 10vh);">
-      <lib-taxonomy-view #taxonomyElement [environment]="environmentVal" [taxonomyConfig]="taxonomyConfig"></lib-taxonomy-view>
+    <div #odcsTaxonomyView class="taxonomy-view odcs-taxonomy-view"
+      *ngIf="environmentVal && environmentVal.frameworkName" [style.height.px]="taxonomyViewHeight || 500">
+      <lib-taxonomy-view #taxonomyElement [environment]="environmentVal"
+        [taxonomyConfig]="taxonomyConfig"></lib-taxonomy-view>
     </div>
   </div>
 </ng-container>
