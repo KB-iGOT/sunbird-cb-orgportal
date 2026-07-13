@@ -36,36 +36,13 @@
           </ng-container>
           <ng-container *ngIf="openMode !== 'viewMode'; else viewMode">
             <form [formGroup]="organisationForm" class="mb-20">
-              <ng-container *ngIf="openMode === 'createNew'">
-                <mat-radio-group formControlName="orgType" class="flex gap-8 organisation-form mb-7"
-                  (change)="onOrgTypeChange()">
-                  <div [ngClass]="{'active-radio-button': getOrgType === 'organisation'}">
-                    <mat-radio-button color="primary" value="organisation">
-                      <div class="flex flex-column">
-                        <span>Organisation</span>
-                        <span class="radio-sub-label">For Govt. Users</span>
-                      </div>
-                    </mat-radio-button>
-                  </div>
-                  <div [ngClass]="{'active-radio-button': getOrgType === 'volunteer'}">
-                    <mat-radio-button color="primary" value="volunteer">
-                      <div class="flex flex-column">
-                        <span>Volunteer</span>
-                        <span class="radio-sub-label">For Non-Govt. Users</span>
-                      </div>
-                    </mat-radio-button>
-                  </div>
-                </mat-radio-group>
-              </ng-container>
               <ng-container *ngIf="this.openMode !== 'editMode'">
                 <div class="flex flex-column gap-1 organisation-form mat-field-rounded">
                   <div class="flex items-center gap-1 required">
-                    <span class="lable">{{ getOrgType === 'volunteer' ? 'Volunteer Organisation Name' : 'Organisation
-                      Name' }}</span>
+                    <span class="lable">Organisation Name</span>
                   </div>
                   <mat-form-field class="w-full">
-                    <input formControlName="organisationName" matInput
-                      [placeholder]="getOrgType === 'volunteer' ? 'Add volunteer organisation name here' : 'Add organisation name here'"
+                    <input formControlName="organisationName" matInput placeholder="Add organisation name here"
                       maxlength="100">
                     <mat-error
                       *ngIf="controls['organisationName'].touched && controls['organisationName'].errors?.['required']">Organization

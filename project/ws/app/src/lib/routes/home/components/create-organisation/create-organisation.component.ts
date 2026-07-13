@@ -133,7 +133,7 @@ export class CreateOrganisationComponent implements OnInit, OnDestroy {
 
     }
     this.organisationForm = this.formBuilder.group({
-      orgType: new FormControl(this.initialOrgType || 'organisation', [Validators.required]),
+      orgType: new FormControl('organisation', [Validators.required]),
       organisationName: new FormControl(_.get(this.rowData, 'organisation', ''),
         [
           Validators.required,
@@ -225,22 +225,6 @@ export class CreateOrganisationComponent implements OnInit, OnDestroy {
 
   get getOrgType() {
     return this.organisationForm?.controls?.orgType?.value
-  }
-
-  onOrgTypeChange() {
-    const orgType = this.organisationForm.controls['orgType'].value
-    this.organisationForm.reset({
-      orgType,
-      category: 'ministry',
-      organisationName: '',
-      state: '',
-      ministry: this.ministriesList.find((ministry: any) => ministry?.sbOrgId === this.loggedInUserOrg) || '',
-      description: ''
-    })
-    this.organisationForm.controls['ministry'].disable()
-    this.selectedLogo = null
-    this.selectedLogoName = ''
-    this.selectedLogoFile = null
   }
 
   closeNaveBar() {

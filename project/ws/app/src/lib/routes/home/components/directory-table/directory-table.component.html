@@ -24,7 +24,8 @@
         </div>
       </div>
 
-      <button mat-flat-button class="mat-btn-flat margin-right-m" (click)="gotoCreateNew()">
+      <button *ngIf="tabType !== 'volunteer'" mat-flat-button class="mat-btn-flat margin-right-m"
+        (click)="gotoCreateNew()">
         <b class="text-white">Create new</b>
       </button>
     </div>
