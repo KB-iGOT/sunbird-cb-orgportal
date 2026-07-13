@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core'
+import { AfterViewInit, Component, ElementRef, HostListener, OnInit, ViewChild } from '@angular/core'
 import { environment } from '../../../../../../../../../src/environments/environment'
 import { ActivatedRoute, Router } from '@angular/router'
 import * as _ from 'lodash'
@@ -9,14 +9,16 @@ import { ReportsVideoComponent } from '../reports-video/reports-video.component'
 // import { OdcsService } from '../../services/odcs.service'
 
 @Component({
-    selector: 'ws-app-odcs-mapping',
-    templateUrl: './odcs-mapping.component.html',
-    styleUrls: ['./odcs-mapping.component.scss'],
-    standalone: false
+  selector: 'ws-app-odcs-mapping',
+  templateUrl: './odcs-mapping.component.html',
+  styleUrls: ['./odcs-mapping.component.scss'],
+  standalone: false
 })
-export class OdcsMappingComponent implements OnInit {
+export class OdcsMappingComponent implements OnInit, AfterViewInit {
+  @ViewChild('odcsTaxonomyView') odcsTaxonomyView?: ElementRef<HTMLElement>
   environmentVal: any
   taxonomyConfig: any
+  taxonomyViewHeight = 500
   showTopSection = false
   odcConfig: any
   configSvc: any
@@ -57,10 +59,39 @@ export class OdcsMappingComponent implements OnInit {
     }
   }
 
+  ngAfterViewInit() {
+    [0, 300, 800].forEach(delay => setTimeout(() => this.updateTaxonomyViewHeight(), delay))
+  }
+
+  @HostListener('window:resize')
+  onWindowResize() {
+    this.updateTaxonomyViewHeight()
+  }
+
   callResizeEvent(_event: any) {
     setTimeout(() => {
       window.dispatchEvent(new Event('resize'))
     }, 100)
+  }
+
+  private updateTaxonomyViewHeight() {
+    setTimeout(() => {
+      const taxonomyTop = this.odcsTaxonomyView?.nativeElement.getBoundingClientRect().top
+
+      if (taxonomyTop === undefined) {
+        return
+      }
+
+      this.taxonomyViewHeight = Math.max(240, Math.floor(window.innerHeight - taxonomyTop - 72))
+
+      requestAnimationFrame(() => {
+        const pageOverflow = document.documentElement.scrollHeight - document.documentElement.clientHeight
+
+        if (pageOverflow > 0) {
+          this.taxonomyViewHeight = Math?.max(240, this.taxonomyViewHeight - pageOverflow - 8)
+        }
+      })
+    })
   }
 
   createFreamwork() {
