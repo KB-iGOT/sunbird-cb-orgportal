@@ -72,7 +72,7 @@
               </button>
               <mat-menu #actionsMenu="matMenu">
                 <ng-template matMenuContent>
-                  <button mat-menu-item (click)="editOrganization(row)">Edit</button>
+                  <button mat-menu-item *ngIf="tabType !== 'volunteer'" (click)="editOrganization(row)">Edit</button>
                   <button mat-menu-item (click)="goToRoute('users', row)">Users</button>
                   <ng-container *ngIf="tabType !== 'volunteer'">
                     <button mat-menu-item (click)="goToRoute('rolesAndAccess', row)">Roles &
