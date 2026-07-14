@@ -24,7 +24,8 @@
         </div>
       </div>
 
-      <button mat-flat-button class="mat-btn-flat margin-right-m" (click)="gotoCreateNew()">
+      <button *ngIf="tabType !== 'volunteer'" mat-flat-button class="mat-btn-flat margin-right-m"
+        (click)="gotoCreateNew()">
         <b class="text-white">Create new</b>
       </button>
     </div>
@@ -71,7 +72,7 @@
               </button>
               <mat-menu #actionsMenu="matMenu">
                 <ng-template matMenuContent>
-                  <button mat-menu-item (click)="editOrganization(row)">Edit</button>
+                  <button mat-menu-item *ngIf="tabType !== 'volunteer'" (click)="editOrganization(row)">Edit</button>
                   <button mat-menu-item (click)="goToRoute('users', row)">Users</button>
                   <ng-container *ngIf="tabType !== 'volunteer'">
                     <button mat-menu-item (click)="goToRoute('rolesAndAccess', row)">Roles &
