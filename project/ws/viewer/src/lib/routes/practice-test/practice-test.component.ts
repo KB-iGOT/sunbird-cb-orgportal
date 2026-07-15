@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core'
 import { ActivatedRoute, Router, NavigationEnd } from '@angular/router'
-import { EventService, LoggerService, WsEvents } from '@sunbird-cb/utils'
+import { EventService, LoggerService, WsEvents } from '@sunbird-cb/utils-v2'
 import { Subscription } from 'rxjs'
 import { ViewerUtilService } from '../../viewer-util.service'
 import { NsContent } from '@sunbird-cb/collection'

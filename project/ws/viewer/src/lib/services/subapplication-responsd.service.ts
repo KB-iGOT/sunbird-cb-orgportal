@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
 import { WidgetContentService } from '@sunbird-cb/collection'
 // import { AuthKeycloakService } from './auth-keycloak.service'
-import { ConfigurationsService } from '@sunbird-cb/utils'
+import { ConfigurationsService } from '@sunbird-cb/utils-v2'
 @Injectable({
   providedIn: 'root',
 })

@@ -4,7 +4,7 @@ import { Subscription } from 'rxjs'
 import { NsContent } from '@sunbird-cb/collection'
 
 import { NsDiscussionForum, WidgetContentService } from '@sunbird-cb/toc'
-import { NsWidgetResolver } from '@sunbird-cb/resolver'
+import { NsWidgetResolver } from '@sunbird-cb/resolver-v2'
 import { environment } from 'src/environments/environment'
 import { WsEvents, EventService, ConfigurationsService } from '@sunbird-cb/utils-v2'
 import { ViewerUtilService } from '../../viewer-util.service'

@@ -10,10 +10,10 @@ import {
 } from '@angular/core'
 import { Subscription, fromEvent } from 'rxjs'
 import { DomSanitizer, SafeResourceUrl, SafeUrl } from '@angular/platform-browser'
-import { ValueService, ConfigurationsService } from '@sunbird-cb/utils'
+import { ValueService, ConfigurationsService } from '@sunbird-cb/utils-v2'
 import { WidgetContentService, NsContent } from '@sunbird-cb/collection'
 import { ViewerUtilService } from '../../viewer-util.service'
-import { EventService } from '@sunbird-cb/utils'
+import { EventService } from '@sunbird-cb/utils-v2'
 import { ActivatedRoute } from '@angular/router'
 @Component({
   selector: 'viewer-plugin-web-module',

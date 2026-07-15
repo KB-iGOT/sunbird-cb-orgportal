@@ -5,8 +5,8 @@ import {
   NsDiscussionForum,
   WidgetContentService,
 } from '@sunbird-cb/collection'
-import { NsWidgetResolver } from '@sunbird-cb/resolver'
-import { ValueService } from '@sunbird-cb/utils'
+import { NsWidgetResolver } from '@sunbird-cb/resolver-v2'
+import { ValueService } from '@sunbird-cb/utils-v2'
 import { ActivatedRoute } from '@angular/router'
 import { ViewerUtilService } from '../../viewer-util.service'
 import { Platform } from '@angular/cdk/platform'

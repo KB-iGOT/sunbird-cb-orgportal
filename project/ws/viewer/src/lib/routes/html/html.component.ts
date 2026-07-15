@@ -2,7 +2,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
 import { NsDiscussionForum, WidgetContentService } from '@sunbird-cb/collection'
 import { NsContent } from '../../models/constant'
-import { NsWidgetResolver } from '@sunbird-cb/resolver'
+import { NsWidgetResolver } from '@sunbird-cb/resolver-v2'
 import {
   ConfigurationsService,
   EventService,

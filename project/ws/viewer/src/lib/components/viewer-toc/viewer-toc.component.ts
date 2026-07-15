@@ -5,12 +5,12 @@ import { ActivatedRoute, NavigationExtras, Params } from '@angular/router'
 
 
 import { WidgetContentService } from '@sunbird-cb/toc'
-import { NsWidgetResolver } from '@sunbird-cb/resolver'
+import { NsWidgetResolver } from '@sunbird-cb/resolver-v2'
 import {
   // LoggerService,
   ConfigurationsService,
   UtilityService,
-} from '@sunbird-cb/utils'
+} from '@sunbird-cb/utils-v2'
 // tslint:disable-next-line
 import _ from 'lodash'
 import { of, Subscription } from 'rxjs'

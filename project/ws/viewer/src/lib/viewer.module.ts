@@ -11,7 +11,7 @@ import {
   PipeLimitToModule,
   DefaultThumbnailModule,
   PipePartialContentModule,
-} from '@sunbird-cb/utils'
+} from '@sunbird-cb/utils-v2'
 
 import {
   ErrorResolverModule,

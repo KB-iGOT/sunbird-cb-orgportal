@@ -1,6 +1,6 @@
 import { AudioNativeComponent } from './audio-native.component'
 import { ActivatedRoute, ActivatedRouteSnapshot } from '@angular/router'
-import { ConfigurationsService } from '@sunbird-cb/utils'
+import { ConfigurationsService } from '@sunbird-cb/utils-v2'
 import { NsContent } from '@sunbird-cb/collection'
 
 describe('AudioNativeComponent', () => {

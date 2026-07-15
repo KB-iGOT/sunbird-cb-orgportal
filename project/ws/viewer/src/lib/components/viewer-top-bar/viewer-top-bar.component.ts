@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core'
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser'
 import { ActivatedRoute, NavigationExtras } from '@angular/router'
-import { ConfigurationsService, NsPage, ValueService } from '@sunbird-cb/utils'
+import { ConfigurationsService, NsPage, ValueService } from '@sunbird-cb/utils-v2'
 import { Subscription } from 'rxjs'
 import { environment } from '../../../../../../../src/environments/environment'
 import { ViewerDataService } from '../../viewer-data.service'

@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common'
 
 // import { AceEditorModule } from 'ng2-ace-editor'
 
-import { PipeSafeSanitizerModule, PipeDurationTransformModule } from '@sunbird-cb/utils'
+import { PipeSafeSanitizerModule, PipeDurationTransformModule } from '@sunbird-cb/utils-v2'
 import { CompletionSpinnerModule } from '@sunbird-cb/collection'
 
 import { HandsOnComponent } from './hands-on.component'

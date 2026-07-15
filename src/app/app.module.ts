@@ -143,7 +143,6 @@ import { GlobalEventsService } from './services/global-events.service'
 import { SearchListingModule } from '@sunbird-cb/search-listing'
 import { WIDGET_REGISTERED_LIB_MODULES, WIDGET_REGISTRATION_TOC_LIB_CONFIG } from '@sunbird-cb/toc'
 import { WIDGET_REGISTRATION_LIB_CONFIG } from '@sunbird-cb/consumption'
-import { WidgetResolverModule } from '@sunbird-cb/resolver'
 import { WidgetCommunityHomeModule } from '@sunbird-cb/discussion-v2'
 
 
@@ -295,7 +294,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     AuthorCardModule,
     MatSnackBarModule,
     ...WIDGET_REGISTERED_LIB_MODULES,
-    WidgetResolverModule.forRoot([...WIDGET_REGISTRATION_CONFIG, ...WIDGET_REGISTRATION_LIB_CONFIG, ...WIDGET_REGISTRATION_TOC_LIB_CONFIG]),
+    SbUiResolverModule.forRoot([...WIDGET_REGISTRATION_CONFIG, ...WIDGET_REGISTRATION_LIB_CONFIG, ...WIDGET_REGISTRATION_TOC_LIB_CONFIG]),
     WidgetCommunityHomeModule,
     ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production }),
     NotificationDropdownModule,

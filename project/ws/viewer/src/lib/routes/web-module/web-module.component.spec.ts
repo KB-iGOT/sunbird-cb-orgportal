@@ -2,7 +2,7 @@
 import { HttpClient } from '@angular/common/http'
 import { WidgetContentService } from '@sunbird-cb/collection'
 import { ActivatedRoute } from '@angular/router'
-import { EventService } from '@sunbird-cb/utils'
+import { EventService } from '@sunbird-cb/utils-v2'
 import { ViewerUtilService } from '../../viewer-util.service'
 import { WebModuleComponent } from './web-module.component'
 

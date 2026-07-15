@@ -13,20 +13,18 @@
   <form [formGroup]="customForm">
     <div class="flex flex-wrapped">
       <div class="flex-1 items-center ">
-        <span class="mat-subheading-2 margin-remove flex required"
-          i18n="Title label|Label which explains the user to enter title">
+        <span class="mat-subheading-2 margin-remove flex required" i18n="Title label|Label which explains the user to enter title">
           Description
         </span>
         <mat-form-field appearance="outline" class="surveytitle w-full">
-          <input matInput #title formControlName="description" i18n-placeholder placeholder="Enter description"
-            tabindex="1" autocomplete="off" maxlength="50" />
-          <mat-error [hidden]="false" *ngIf="customForm?.controls['description'].errors?.required"
-            i18n="Title Error | Explains title is required">
+          <input matInput #title formControlName="description" i18n-placeholder placeholder="Enter description" tabindex="1" autocomplete="off"
+            maxlength="50" />
+          <mat-error [hidden]="false" *ngIf="customForm?.controls['description'].errors?.required" i18n="Title Error | Explains title is required">
             Title is mandatory
           </mat-error>
           <mat-error [hidden]="false"
-            *ngIf="!customForm?.controls['description'].errors?.required && customForm?.controls['description'].errors?.whitespace"
-            i18n-aria-label aria-label="Title Error | Explains title must be alphanumeric value">
+            *ngIf="!customForm?.controls['description'].errors?.required && customForm?.controls['description'].errors?.whitespace" i18n-aria-label
+            aria-label="Title Error | Explains title must be alphanumeric value">
             Please enter alphanumeric value
           </mat-error>
           <mat-error [hidden]="false" *ngIf="!customForm?.controls['description'].errors?.required && !customForm?.controls['description'].errors?.whitespace &&
@@ -64,15 +62,15 @@
       <ng-container *ngIf="selectedTab === 'masterList'">
         <div class="flex justify-end mt-5 gap-4">
           <div class="flex flex-col items-center" *ngIf="getQuestions?.length > 1">
-            <div class="text-primary cursor-pointer ws-mat-white-background round mat-raised-button mat-button-base"
-              (click)="fileInput.click()" (dblclick)="$event.preventDefault()">
+            <div class="text-primary cursor-pointer ws-mat-white-background round mat-raised-button mat-button-base" (click)="fileInput.click()"
+              (dblclick)="$event.preventDefault()">
               Upload file</div>
-            <input hidden type="file" #fileInput (click)="handleFileClick($event)" (change)="handleOnFileChange($event)"
-              name="file" placeholder="Choose file" (dblclick)="$event.preventDefault();"
+            <input hidden type="file" #fileInput (click)="handleFileClick($event)" (change)="handleOnFileChange($event)" name="file"
+              placeholder="Choose file" (dblclick)="$event.preventDefault();"
               accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" />
           </div>
-          <button mat-button class="ws-mat-white-background round mat-raised-button mat-button-base"
-            (click)="addNewListQuestion()" *ngIf="selectedTab === 'masterList'">Add new list</button>
+          <button mat-button class="ws-mat-white-background round mat-raised-button mat-button-base" (click)="addNewListQuestion()"
+            *ngIf="selectedTab === 'masterList'">Add new list</button>
         </div>
       </ng-container>
 
@@ -85,9 +83,9 @@
             take full
             responsibility of any such data captured using Custom Fields facility on IGOT.
           </div>
+          {{customForm?.invalid}} --- {{validateForm()}}
           <button mat-button class="text-white ws-mat-primary-background round mat-raised-button mat-button-base"
-            [disabled]="customForm.invalid || validateForm()"
-            (click)="customFieldObject?.customFieldId ? onUpdate() : onSave()">
+            [disabled]="customForm.invalid || validateForm()" (click)="customFieldObject?.customFieldId ? onUpdate() : onSave()">
             {{customFieldObject?.customFieldId ? 'Update' : 'Save'}}
           </button>
         </ng-container>
