@@ -548,7 +548,7 @@ export class SingleUserCreationComponent implements OnInit, AfterViewInit, OnDes
 
     if ((value && value.trim()) && this.userCreationForm.get('tags')) {
       // tslint:disable-next-line
-      this.userCreationForm.get('tags')!.value.push(value)
+      this.userCreationForm.get('tags')!.value.push(value.trim())
     }
 
     if (event.input) {
@@ -602,42 +602,24 @@ export class SingleUserCreationComponent implements OnInit, AfterViewInit, OnDes
     if (this.selectedOrgData && this.selectedOrgData.roleId) {
       dataToSubmit.channel = this.selectedOrgData.depatName
     }
+    if (this.isNgo) {
+      dataToSubmit['isNgo'] = true
+      dataToSubmit['additionalProperties'] = {
+        externalSystemId: (dataToSubmit.externalId || '').trim(),
+        externalSystem: 'eHRMS ID',
+      }
+      delete dataToSubmit.externalId
+    }
 
     if (!this.userCreationForm.value.channel) {
       this.matSnackBar.open('Channel info is empty! So unable to create user')
       return
     }
 
-    const postData: any = {
-      personalDetails: {
-        email: dataToSubmit.email,
-        firstName: dataToSubmit.firstName,
-        phone: dataToSubmit.phone,
-        channel: dataToSubmit.channel,
-        dob: dataToSubmit.dob,
-     domicileMedium: dataToSubmit.domicileMedium,
-        gender: dataToSubmit.gender,
-        category: dataToSubmit.category,
-        roles: dataToSubmit.roles,
-        ...(this.isNgo ? { isNgo: true } : null),
-      },
-      professionalDetails: [
-        {
-          designation: dataToSubmit.designation,
-          group: dataToSubmit.group,
-        },
-      ],
-      additionalProperties: {
-        tag: dataToSubmit.tags,
-        ...(this.isNgo ? {
-          externalSystemId: (dataToSubmit.externalId || '').trim(),
-          externalSystem: 'eHRMS ID',
-        } : null),
-      },
-      employmentDetails: {
-        pinCode: dataToSubmit.pincode,
-      },
+    const postData = {
+      personalDetails: '',
     }
+    postData.personalDetails = dataToSubmit
     this.usersService.createUser(postData)
       .pipe(takeUntil(this.destroySubject$))
       .subscribe((_res: any) => {
