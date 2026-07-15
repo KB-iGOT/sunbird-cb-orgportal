@@ -198,6 +198,7 @@ export class BulkUploadComponent implements OnInit, AfterViewInit, OnDestroy {
         let uploadRequest
         if (this.isNgo) {
           formData.append('file', this.fileSelected, this.fileName)
+          formData.append('targetorgid', this.rootOrgId || '')
           uploadRequest = this.fileService.uploadNonGovtUser(this.fileName, formData)
         } else {
           formData.append('data', this.fileSelected, this.fileName)

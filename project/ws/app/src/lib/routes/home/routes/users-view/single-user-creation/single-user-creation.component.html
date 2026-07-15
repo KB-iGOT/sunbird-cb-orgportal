@@ -186,7 +186,8 @@
 
         <mat-form-field appearance="outline" class="profile-form-field">
           <input matInput #tagInput placeholder="Type tag here and press enter" maxlength="100"
-            (keydown.enter)="$event.preventDefault(); handleAddTags(tagInput)">
+            (keydown.enter)="$event.preventDefault(); handleAddTags(tagInput)"
+            (blur)="handleAddTags(tagInput)">
         </mat-form-field>
 
         <div class="tags-container" *ngIf="userCreationForm.get('tags')?.value?.length">
