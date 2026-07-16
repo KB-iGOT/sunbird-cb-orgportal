@@ -55,6 +55,7 @@ export class SingleUserCreationComponent implements OnInit, AfterViewInit, OnDes
   @ViewChildren('rolesCheckbox') checkboxes!: QueryList<ElementRef>
   @ViewChild('updateconfirm') updateConfirmTemplate!: TemplateRef<any>
   defaultRole = ['PUBLIC']
+  defaultNgoDesignation = 'VOLUNTEER'
   private destroySubject$ = new Subject()
   separatorKeysCodes: number[] = [ENTER, COMMA]
   masterData: any = {}
@@ -604,6 +605,7 @@ export class SingleUserCreationComponent implements OnInit, AfterViewInit, OnDes
     }
     if (this.isNgo) {
       dataToSubmit['isNgo'] = true
+      dataToSubmit.designation = this.defaultNgoDesignation
       dataToSubmit['additionalProperties'] = {
         externalSystemId: (dataToSubmit.externalId || '').trim(),
         externalSystem: 'eHRMS ID',
@@ -659,6 +661,10 @@ export class SingleUserCreationComponent implements OnInit, AfterViewInit, OnDes
 
     if (this.selectedOrgData && this.selectedOrgData.roleId) {
       dataToSubmit.channel = this.selectedOrgData.depatName
+    }
+
+    if (this.isNgo) {
+      dataToSubmit.designation = this.defaultNgoDesignation
     }
 
     if (!this.userCreationForm.value.channel) {
