@@ -18,7 +18,7 @@ const API_END_POINTS = {
   CHECK_ISADMIN: '/apis/protected/v8/portal/isAdmin/mdo',
   // GET_MY_DEPARTMENT: '/apis/protected/v8/portal/mdo/mydepartment?allUsers=false',
   GET_MY_DEPARTMENT_ALL: '/apis/protected/v8/portal/mdo/mydepartment?allUsers=true',
-  GET_USER_DETAILS: `/apis/protected/v8/user/details?ts='${Date.now()}`,
+  GET_USER_DETAILS: `/apis/protected/v8/user/details?ts=${Date.now()}`,
   GET_FILTER_ENTITY: 'apis/proxies/v8/competency/v4/search',
   // GET_FILTER_ENTITY_V2: 'apis/proxies/v8/searchBy/v2/competency',
   GET_FILTER_ENTITY_V2: 'apis/proxies/v8/framework/v1/read/kcmfinal_fw',
