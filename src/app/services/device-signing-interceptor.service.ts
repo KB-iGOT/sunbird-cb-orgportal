@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core'
 import { HttpInterceptor, HttpRequest, HttpHandler, HttpEvent } from '@angular/common/http'
-import { Observable, from } from 'rxjs'
+import { Observable, defer } from 'rxjs'
 import { switchMap } from 'rxjs/operators'
 import { DeviceKeyService } from './device-key.service'
 
@@ -20,7 +20,9 @@ export class DeviceSigningInterceptorService implements HttpInterceptor {
     if (!apiPath || !this.deviceKeySvc.isSupported) {
       return next.handle(req)
     }
-    return from(this.deviceKeySvc.buildSignatureHeaders(req.method, apiPath)).pipe(
+    // defer so every subscription — including re-subscriptions from the retry
+    // interceptor — signs with a fresh timestamp and nonce (replayed nonces are rejected)
+    return defer(() => this.deviceKeySvc.buildSignatureHeaders(req.method, apiPath)).pipe(
       switchMap(headers => next.handle(headers ? req.clone({ setHeaders: headers }) : req)),
     )
   }
