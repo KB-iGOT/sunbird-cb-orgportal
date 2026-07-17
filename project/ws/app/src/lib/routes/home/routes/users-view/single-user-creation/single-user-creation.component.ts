@@ -75,6 +75,7 @@ export class SingleUserCreationComponent implements OnInit, AfterViewInit, OnDes
 
   displayLoader = false
   isMdoLeader = false
+  isMoAdmin = false
   orgHasDesignations = false
   designationSearchText = ''
 
@@ -187,6 +188,7 @@ export class SingleUserCreationComponent implements OnInit, AfterViewInit, OnDes
     const fullProfile = _.get(this.activatedRouter?.snapshot, 'data.configService')
     if (fullProfile?.unMappedUser && fullProfile?.unMappedUser?.roles) {
       this.isMdoLeader = fullProfile?.unMappedUser?.roles.includes('MDO_LEADER')
+      this.isMoAdmin = fullProfile?.unMappedUser?.roles.includes('MDO_ADMIN')
     }
   }
 
@@ -510,6 +512,8 @@ export class SingleUserCreationComponent implements OnInit, AfterViewInit, OnDes
               this.filteredRoles = this.masterData?.ngoRoles
             } else if (this.isMdoLeader) {
               this.filteredRoles = this.masterData?.mdoRoles  // show all roles
+            } else if (this.isMoAdmin) {
+              this.filteredRoles = this.masterData?.mdoRoles.filter((role: any) => role !== 'MDO_LEADER'&& role !=='MDO_ADMIN')  // show only PUBLIC
             } else {
               this.filteredRoles = this.masterData?.mdoRoles.filter((role: any) => role === 'PUBLIC')  // show only PUBLIC
             }
