@@ -27,12 +27,13 @@
             <img src="/assets/icons/csv-file.svg" alt="CSV file logo" />
           </div>
           <div *ngIf="showFileError" class="error-msg">Upload csv format file only</div>
+          <div *ngIf="showFileSizeError" class="error-msg">File size should not exceed 10 MB</div>
           <div class="flex flex-col items-center">
             <div class="text-primary cursor-pointer" (click)="fileInput.click()" (dblclick)="$event.preventDefault()">
               Browse files</div>
             <input hidden type="file" #fileInput (click)="handleFileClick($event)" (change)="handleOnFileChange($event)"
               name="file" placeholder="Choose file" (dblclick)="$event.preventDefault();"
-              accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" />
+              accept=".csv" />
             <!-- <div class="flex">or</div>
             <div class="flex">Drag file to upload</div> -->
           </div>
