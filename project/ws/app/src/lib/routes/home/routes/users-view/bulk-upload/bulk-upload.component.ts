@@ -33,6 +33,8 @@ export class BulkUploadComponent implements OnInit, AfterViewInit, OnDestroy {
   rootOrgId: any
 
   showFileError = false
+  showFileSizeError = false
+  maxFileSizeBytes = 10 * 1024 * 1024
   public fileName: any
   fileSelected!: any
   userProfile: any
@@ -154,17 +156,20 @@ export class BulkUploadComponent implements OnInit, AfterViewInit, OnDestroy {
 
   handleOnFileChange(event: any): void {
     this.showFileError = false
+    this.showFileSizeError = false
     const fileList = (<HTMLInputElement>event.target).files
     if (fileList && fileList.length > 0) {
       const file: File = fileList[0]
       this.fileName = file.name
       this.fileSelected = file
-      if (this.fileService.validateFile(this.fileName)) {
+      if (!this.fileService.validateFile(this.fileName, ['csv'])) {
+        this.showFileError = true
+      } else if (file.size > this.maxFileSizeBytes) {
+        this.showFileSizeError = true
+      } else {
         this.sendOTP()
         // this.verifyOTP(this.userProfile.email ? 'email' : 'phone')
         // this.uploadWithOtp() // dont use this function this is for dev purposes only
-      } else {
-        this.showFileError = true
       }
     }
   }
@@ -192,7 +197,12 @@ export class BulkUploadComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   uploadCSVFile(): void {
-    if (this.fileService.validateFile(this.fileName)) {
+    if (this.fileSelected && this.fileSelected.size > this.maxFileSizeBytes) {
+      this.fileUploadDialogInstance?.close()
+      this.showFileSizeError = true
+      return
+    }
+    if (this.fileService.validateFile(this.fileName, ['csv'])) {
       if (this.fileSelected) {
         const formData: FormData = new FormData()
         let uploadRequest
@@ -215,7 +225,9 @@ export class BulkUploadComponent implements OnInit, AfterViewInit, OnDestroy {
             // tslint:disable-next-line
           }, (_err: HttpErrorResponse) => {
             if (!_err.ok) {
-              this.matSnackBar.open('Uploading CSV file failed due to some error, please try again later!')
+              this.fileUploadDialogInstance.close()
+              this.matSnackBar.open(_.get(_err, 'error.params.errmsg')
+                || 'Uploading CSV file failed due to some error, please try again later!')
             }
           })
       }
