@@ -6,10 +6,11 @@
     <div class="searchContainer flex gap-5">
       <div class="sinput flex flex-middle">
         <span class="material-icons"> search </span>
-        <input class="w-full" type="Standard" label="" (input)="applyFilter(searchValue)" placeholder="Search"
+        <input class="w-full" type="Standard" label="" placeholder="Search"
           [(ngModel)]="searchValue" (keydown.enter)="onSearchEnter(searchValue)">
       </div>
-      <button mat-button type="button" class="btn-common btn-primary">Search</button>
+      <button mat-button type="button" class="btn-common btn-primary"
+        (click)="onSearchEnter(searchValue)">Search</button>
     </div>
     <div class="buttonContainer flex ml-auto">
       <button mat-button type="button" class="btn-common btn-primary" (click)="createNewUser()">Create
@@ -69,7 +70,9 @@
       </tr>
     </table>
 
-    <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" aria-label="Select page of users"></mat-paginator>
+    <mat-paginator [length]="totalUsersCount" [pageSize]="pageSize" [pageIndex]="pageIndex"
+      [pageSizeOptions]="[5, 10, 25, 100]" (page)="onPageChange($event)"
+      aria-label="Select page of users"></mat-paginator>
   </div>
 </ng-container>
 <ng-container *ngIf="editUser">
