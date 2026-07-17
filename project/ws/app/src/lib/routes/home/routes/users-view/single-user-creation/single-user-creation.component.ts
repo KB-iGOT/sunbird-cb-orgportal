@@ -202,7 +202,7 @@ export class SingleUserCreationComponent implements OnInit, AfterViewInit, OnDes
       switch (ele) {
         case 'designation':
         case 'group':
-          this.userCreationForm.get(ele)?.patchValue(this.editUserData?.profileDetails?.professionalDetails?.[0][ele] || '')
+          this.userCreationForm.get(ele)?.patchValue(this.editUserData?.profileDetails?.professionalDetails?.[0]?.[ele] || '')
           break
         case 'tags':
           this.userCreationForm.get(ele)?.patchValue(this.editUserData?.profileDetails?.additionalProperties?.tag || [])
@@ -211,7 +211,11 @@ export class SingleUserCreationComponent implements OnInit, AfterViewInit, OnDes
           this.userCreationForm.get(ele)?.patchValue(this.editUserData?.profileDetails?.additionalProperties?.externalSystemId || '')
           break
         case 'pincode':
-          this.userCreationForm.get(ele)?.patchValue(this.editUserData?.profileDetails?.employmentDetails?.pinCode || '')
+          this.userCreationForm.get(ele)?.patchValue(
+            this.isNgo
+              ? (this.editUserData?.profileDetails?.personalDetails?.pinCode
+                || this.editUserData?.profileDetails?.employmentDetails?.pinCode || '')
+              : (this.editUserData?.profileDetails?.employmentDetails?.pinCode || ''))
           break
         case 'roles':
           this.userCreationForm.get(ele)?.patchValue(this.editUserData?.[ele] || [])
@@ -687,14 +691,19 @@ export class SingleUserCreationComponent implements OnInit, AfterViewInit, OnDes
             category: dataToSubmit.category,
             mobile: dataToSubmit.phone,
             primaryEmail: dataToSubmit.email,
-            firstname: dataToSubmit.firstName
+            firstname: dataToSubmit.firstName,
+            // NGO (volunteer org) users carry pin code in personalDetails
+            ...(this.isNgo ? { pinCode: dataToSubmit.pincode } : null)
           },
-          professionalDetails: [
-            {
-              designation: dataToSubmit.designation,
-              group: dataToSubmit.group
-            }
-          ],
+          // NGO (volunteer org) users have no professionalDetails
+          ...(this.isNgo ? null : {
+            professionalDetails: [
+              {
+                designation: dataToSubmit.designation,
+                group: dataToSubmit.group
+              }
+            ]
+          }),
           additionalProperties: {
             tag: dataToSubmit.tags,
             ...(this.isNgo ? {
