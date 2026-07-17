@@ -752,6 +752,17 @@ export class UserCardComponent implements OnInit, OnChanges, AfterViewChecked, A
     }
   }
 
+  canEditRoles(user: any): boolean {
+    if (this.isMdoLeader) {
+      return true
+    }
+    if (this.isMdoAdmin) {
+      const targetUserRoles = _.get(user, 'organisations[0].roles') || _.get(user, 'roles') || []
+      return !targetUserRoles.includes('MDO_LEADER')
+    }
+    return false
+  }
+
   setUserDetails(user: any) {
     if (user && user.profileDetails) {
       this.updateUserDataForm.reset()
@@ -985,7 +996,7 @@ export class UserCardComponent implements OnInit, OnChanges, AfterViewChecked, A
       }
       this.usersSvc.updateUserDetails(this.reqbody).subscribe(dres => {
         if (dres) {
-          if (this.isMdoLeader) {
+          if (this.canEditRoles(user)) {
             if (form.value.roles !== this.orguserRoles) {
               const dreq = {
                 request: {

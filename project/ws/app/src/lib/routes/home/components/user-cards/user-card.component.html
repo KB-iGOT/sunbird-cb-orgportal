@@ -433,7 +433,7 @@
             </div>
 
             <div class="flex flex-row margin-top-m">
-              <div class="md:w-1/1" *ngIf="isMdoLeader || isBoth">
+              <div class="md:w-1/1" *ngIf="canEditRoles(user)">
                 <label for="roles" class="margin-remove-bottom form-label required" aria-label="Roles label">
                   Role
                 </label>
@@ -447,7 +447,7 @@
                 </div>
               </div>
 
-              <div class="md:w-1/1" *ngIf="!isMdoLeader">
+              <div class="md:w-1/1" *ngIf="!canEditRoles(user)">
                 <label class="view-text-label">Roles</label>
                 <div *ngIf="user?.organisations && user?.organisations[0]?.roles?.length > 0">
                   <ul class="roleslist">
