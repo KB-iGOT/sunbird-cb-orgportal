@@ -622,7 +622,7 @@ export class UserCardComponent implements OnInit, OnChanges, AfterViewChecked, A
             if (this.isMdoLeader) {
               u.enableEdit = true
               userval.enableEdit = true
-            } else if (this.isMdoAdmin && userval?.roles?.includes('MDO_ADMIN')) {
+            } else if (this.isMdoAdmin && (userval?.roles?.includes('MDO_ADMIN') || userval?.roles?.includes('MDO_LEADER'))) {
               u.enableEdit = false
               userval.enableEdit = false
               this.snackBar.open('Only MDO Leader Can Update Profile')
@@ -700,11 +700,16 @@ export class UserCardComponent implements OnInit, OnChanges, AfterViewChecked, A
       for (let i = 0; i < this.orgTypeList.length; i += 1) {
         if (this.orgTypeList[i].name === 'MDO') {
           _.each(this.orgTypeList[i].roles, rolesObject => {
-            if (rolesObject !== 'MDO_LEADER') {
-              this.uniqueRoles.push({
-                roleName: rolesObject, description: rolesObject,
-              })
+            if (rolesObject === 'MDO_LEADER') {
+              return
             }
+            // MDO_ADMIN editors (without MDO_LEADER) cannot assign/remove the MDO_ADMIN role
+            if (rolesObject === 'MDO_ADMIN' && !this.isMdoLeader) {
+              return
+            }
+            this.uniqueRoles.push({
+              roleName: rolesObject, description: rolesObject,
+            })
           })
         }
       }
@@ -1340,7 +1345,7 @@ export class UserCardComponent implements OnInit, OnChanges, AfterViewChecked, A
       // }
       if (this.isMdoLeader) {
         showPopup = true
-      } else if (this.isMdoAdmin && data.roles.includes('MDO_ADMIN')) {
+      } else if (this.isMdoAdmin && (data.roles.includes('MDO_ADMIN') || data.roles.includes('MDO_LEADER'))) {
         showPopup = false
         this.snackBar.open('Only MDO Leader Can Update Profile')
       } else {
