@@ -25,9 +25,13 @@
 
         <input type="email" class="input-text" placeholder="Type here" #email formControlName="email"
           aria-label="Primary Email readonly input" maxlength="320">
-        <mat-error [hidden]="false" class="custom-error" *ngIf="userCreationForm?.get('email')?.touched &&
-        userCreationForm?.controls['email'].errors?.pattern" aria-label="Please enter a valid email">
+        <mat-error class="text-xs"
+          *ngIf="userCreationForm?.get('email')?.touched && userCreationForm?.controls['email'].errors?.pattern">
           Please enter a valid email
+        </mat-error>
+        <mat-error class="text-xs"
+          *ngIf="userCreationForm?.get('email')?.touched && userCreationForm?.controls['email'].errors?.required">
+          Email is mandatory
         </mat-error>
       </div>
     </div>

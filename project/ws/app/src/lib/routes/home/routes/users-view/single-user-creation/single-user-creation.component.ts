@@ -55,7 +55,7 @@ export class SingleUserCreationComponent implements OnInit, AfterViewInit, OnDes
   @ViewChildren('rolesCheckbox') checkboxes!: QueryList<ElementRef>
   @ViewChild('updateconfirm') updateConfirmTemplate!: TemplateRef<any>
   defaultRole = ['PUBLIC']
-  defaultNgoDesignation = 'VOLUNTEER'
+  defaultNgoDesignation = 'Volunteer'
   private destroySubject$ = new Subject()
   separatorKeysCodes: number[] = [ENTER, COMMA]
   masterData: any = {}
