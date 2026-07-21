@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http'
 import { Subscription } from 'rxjs'
 import { NsContent, WidgetContentService } from '@sunbird-cb/collection'
 import { ActivatedRoute } from '@angular/router'
-import { EventService, WsEvents } from '@sunbird-cb/utils'
+import { EventService, WsEvents } from '@sunbird-cb/utils-v2'
 import { ViewerUtilService } from '../../viewer-util.service'
 
 @Component({

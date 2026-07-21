@@ -2,7 +2,7 @@ import { AfterViewChecked, ChangeDetectorRef, Component, OnDestroy, OnInit } fro
 import { ActivatedRoute, Router } from '@angular/router'
 import { WidgetContentService } from '@sunbird-cb/toc'
 
-import { NsWidgetResolver } from '@sunbird-cb/resolver'
+import { NsWidgetResolver } from '@sunbird-cb/resolver-v2'
 import { ConfigurationsService, UtilityService, ValueService } from '@sunbird-cb/utils-v2'
 import { Subscription } from 'rxjs'
 import { RootService } from '../../../../../src/app/component/root/root.service'

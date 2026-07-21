@@ -4,7 +4,7 @@ import { HttpBackend, HttpClient } from '@angular/common/http'
 import { NsContent, WidgetContentService } from '@sunbird-cb/collection'
 import { NSQuiz } from '../../plugins/quiz/quiz.model'
 import { ActivatedRoute } from '@angular/router'
-import { WsEvents, EventService } from '@sunbird-cb/utils'
+import { WsEvents, EventService } from '@sunbird-cb/utils-v2'
 import { ViewerUtilService } from '../../viewer-util.service'
 import { environment } from '../../../../../../../src/environments/environment'
 

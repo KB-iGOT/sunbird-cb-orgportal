@@ -1,6 +1,6 @@
 import { PracticeTestComponent } from './practice-test.component'
 import { ActivatedRoute, ActivatedRouteSnapshot, convertToParamMap } from '@angular/router'
-import { EventService, LoggerService, WsEvents } from '@sunbird-cb/utils'
+import { EventService, LoggerService, WsEvents } from '@sunbird-cb/utils-v2'
 import { ViewerUtilService } from '../../viewer-util.service'
 import { MatDialog } from '@angular/material/dialog'
 import { of } from 'rxjs'

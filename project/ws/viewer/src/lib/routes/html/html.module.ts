@@ -20,7 +20,7 @@ import {
   PipeDurationTransformModule,
   PipeLimitToModule,
   PipePartialContentModule,
-} from '@sunbird-cb/utils'
+} from '@sunbird-cb/utils-v2'
 
 import { SbUiResolverModule } from '@sunbird-cb/resolver-v2'
 

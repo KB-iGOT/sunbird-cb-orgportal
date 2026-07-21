@@ -1,10 +1,10 @@
 import { SimpleChanges, SimpleChange } from '@angular/core'
 import { WebModuleComponent } from './web-module.component'
 import { DomSanitizer } from '@angular/platform-browser'
-import { ValueService, ConfigurationsService } from '@sunbird-cb/utils'
+import { ValueService, ConfigurationsService } from '@sunbird-cb/utils-v2'
 import { WidgetContentService } from '@sunbird-cb/toc'
 import { ViewerUtilService } from '../../viewer-util.service'
-import { EventService } from '@sunbird-cb/utils'
+import { EventService } from '@sunbird-cb/utils-v2'
 import { ActivatedRoute } from '@angular/router'
 import { of } from 'rxjs'
 

@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core'
 import { Subscription } from 'rxjs'
-import { ValueService } from '@sunbird-cb/utils'
+import { ValueService } from '@sunbird-cb/utils-v2'
 import { ActivatedRoute } from '@angular/router'
 import {
   IWidgetsPlayerMediaData,
@@ -9,7 +9,7 @@ import {
 } from '@sunbird-cb/collection'
 
 import { ViewerUtilService } from '../../viewer-util.service'
-import { NsWidgetResolver } from '@sunbird-cb/resolver'
+import { NsWidgetResolver } from '@sunbird-cb/resolver-v2'
 import { environment } from '../../../../../../../src/environments/environment'
 import { AccessControlService } from '@sunbird-cb/toc'
 import { NsContent } from '../../models/constant'

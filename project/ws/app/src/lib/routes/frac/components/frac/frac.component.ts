@@ -1,14 +1,14 @@
 import { Component, OnInit, OnDestroy } from '@angular/core'
 import { FracService } from '../../services/frac.service'
-// import { ConfigurationsService } from '@sunbird-cb/utils/src/lib/services/configurations.service'
+// import { ConfigurationsService } from '@sunbird-cb/utils-v2'
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser'
 import { IFrac } from '../../interfaces/frac.model'
 
 @Component({
-    selector: 'ws-app-frac',
-    templateUrl: './frac.component.html',
-    styleUrls: ['./frac.component.scss'],
-    standalone: false
+  selector: 'ws-app-frac',
+  templateUrl: './frac.component.html',
+  styleUrls: ['./frac.component.scss'],
+  standalone: false
 })
 
 export class FracComponent implements

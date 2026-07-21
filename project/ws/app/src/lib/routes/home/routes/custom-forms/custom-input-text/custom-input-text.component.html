@@ -20,8 +20,7 @@
               HTML, JS code, combination of dots and slashes are not allowed.
             </mat-error>
             <mat-error [hidden]="false" *ngIf="question.get('name')?.touched && !question.get('name')?.hasError('required') && !question.get('name')?.hasError('invalidCharacter') &&
-                question.get('name')?.hasError('hasHtml')" i18n-aria-label
-              aria-label="Title Error | Explains title must be alphanumeric value">
+                question.get('name')?.hasError('hasHtml')" i18n-aria-label aria-label="Title Error | Explains title must be alphanumeric value">
               HTML or Js is not allowed
             </mat-error>
           </mat-form-field>
@@ -35,8 +34,7 @@
                 </div>
               </label>
               <mat-form-field appearance="outline" class="w-full">
-                <input type="text" class="input-text" formControlName="attributeName" matInput
-                  placeholder="Type here" />
+                <input type="text" class="input-text" formControlName="attributeName" matInput placeholder="Type here" />
               </mat-form-field>
             </div>
           </div>
@@ -47,9 +45,8 @@
               <span i18n class="mat-subheading-2 margin-remove flex">Field Type</span>
             </div>
           </label>
-          <mat-form-field appearance="none" class="w-full profile-form-field">
-            <mat-select placeholder="Select type" formControlName="validation"
-              (selectionChange)="onFieldValidationChange($event)">
+          <mat-form-field appearance="outline" class="w-full profile-form-field">
+            <mat-select placeholder="Select type" formControlName="validation" (selectionChange)="onFieldValidationChange($event)">
               <mat-option *ngFor="let fType of fieldValidationTypes" [value]="fType.value">
                 {{ fType.key }}</mat-option>
             </mat-select>
@@ -64,8 +61,7 @@
                 </div>
               </label>
               <mat-form-field appearance="outline" class="w-full">
-                <input type="number" class="input-text" formControlName="attributeMaxLength" matInput
-                  placeholder="Type here" />
+                <input type="number" class="input-text" formControlName="attributeMaxLength" matInput placeholder="Type here" />
               </mat-form-field>
             </div>
           </div>
@@ -81,8 +77,7 @@
                 </div>
               </label>
               <mat-form-field appearance="outline" class="w-full">
-                <input type="text" class="input-text" formControlName="customValidation" matInput
-                  placeholder="Type here" />
+                <input type="text" class="input-text" formControlName="customValidation" matInput placeholder="Type here" />
               </mat-form-field>
             </div>
           </div>

@@ -6,7 +6,7 @@ import { CreatePlanComponent } from './routes/create-plan/create-plan.component'
 import { PreviewPlanComponent } from './routes/preview-plan/preview-plan.component'
 import { UpdatePlanResolveService } from './resolvers/update-plan-resolve.service'
 import { ResetDataSharingResolveService } from './resolvers/reset-data-sharing-resolve.service'
-import { PageResolve } from '@sunbird-cb/utils'
+import { PageResolve } from '@sunbird-cb/utils-v2'
 
 const routes: Routes = [
   {
