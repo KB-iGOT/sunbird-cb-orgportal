@@ -83,7 +83,6 @@
             take full
             responsibility of any such data captured using Custom Fields facility on IGOT.
           </div>
-          {{customForm?.invalid}} --- {{validateForm()}}
           <button mat-button class="text-white ws-mat-primary-background round mat-raised-button mat-button-base"
             [disabled]="customForm.invalid || validateForm()" (click)="customFieldObject?.customFieldId ? onUpdate() : onSave()">
             {{customFieldObject?.customFieldId ? 'Update' : 'Save'}}
