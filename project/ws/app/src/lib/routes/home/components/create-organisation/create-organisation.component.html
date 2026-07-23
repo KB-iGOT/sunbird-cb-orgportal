@@ -54,7 +54,8 @@
                       is already in use.</mat-error>
                     <mat-error
                       *ngIf="controls['organisationName'].touched && controls['organisationName'].errors?.['pattern']">
-                      Only ( a-z/A-Z , 0-9 . - &#64; $ / : [ ]' ' !) characters are supported</mat-error>
+                      Please provide a valid value. - Only alphanumeric characters, spaces, and common punctuation
+                      (&amp;.,'()-) are allowed</mat-error>
                     <mat-error
                       *ngIf="controls['organisationName'].touched && controls['organisationName'].errors?.['maxlength']">Maximum
                       character length
