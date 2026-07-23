@@ -50,7 +50,7 @@ export class CreateOrganisationComponent implements OnInit, OnDestroy {
     qrcodepath: string
   }
   organizationNameList: string[] = []
-  ORG_NAME_PATTERN = /^[a-zA-Z0-9 ().,@\-\$\/\\:\[\]!\s]*$/
+  ORG_NAME_PATTERN = /^[a-zA-Z0-9\s&.,'() -]+$/
 
   untilDestroyed$ = new Subject<void>();
   isMatcompleteOpened = false
