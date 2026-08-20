@@ -11,6 +11,7 @@ describe('BreadcrumbComponent', () => {
     let mockTpSvc: any
     let mockSnackBar: any
     let mockDialogRef: any
+    let mockConfigSvc: any
 
     beforeEach(() => {
         mockDialogRef = {
@@ -49,12 +50,21 @@ describe('BreadcrumbComponent', () => {
 
         mockTpSvc = {
             createPlan: jest.fn().mockReturnValue(of({ success: true })),
+            createPlanV3: jest.fn().mockReturnValue(of({ success: true })),
             updatePlan: jest.fn().mockReturnValue(of({ success: true })),
-            publishPlan: jest.fn().mockReturnValue(of({ params: { status: 'success' } }))
+            updatePlanV2: jest.fn().mockReturnValue(of({ success: true })),
+            publishPlan: jest.fn().mockReturnValue(of({ params: { status: 'success' } })),
+            publishPlanV2: jest.fn().mockReturnValue(of({ params: { status: 'success' } }))
         }
 
         mockSnackBar = {
             open: jest.fn()
+        }
+
+        mockConfigSvc = {
+            userProfile: { rootOrgId: 'org-1' },
+            unMappedUser: { rootOrgId: 'org-1' },
+            orgReadData: { isCCA: false }
         }
 
         component = new BreadcrumbComponent(
@@ -63,7 +73,8 @@ describe('BreadcrumbComponent', () => {
             mockDialog,
             mockTpdsSvc,
             mockTpSvc,
-            mockSnackBar
+            mockSnackBar,
+            mockConfigSvc
         )
     })
 
@@ -96,9 +107,15 @@ describe('BreadcrumbComponent', () => {
 
     describe('cancel', () => {
         it('should reset training plan title and navigate to dashboard', () => {
+            jest.useFakeTimers()
+
             component.cancel()
             expect(mockTpdsSvc.trainingPlanTitle).toBe('')
+
+            jest.advanceTimersByTime(500)
             expect(mockRouter.navigateByUrl).toHaveBeenCalledWith('app/home/training-plan-dashboard')
+
+            jest.useRealTimers()
         })
     })
 
@@ -112,17 +129,18 @@ describe('BreadcrumbComponent', () => {
             expect(component.changeToNextTab.emit).toHaveBeenCalledWith(TrainingPlanContent.TTabLabelKey.ADD_CONTENT)
         })
 
-        it('should emit ADD_CONTENT to ADD_ASSIGNEE', () => {
+        it('should emit ADD_CONTENT to ADD_ACCESS_SETTINGS', () => {
             component.selectedTab = TrainingPlanContent.TTabLabelKey.ADD_CONTENT
             component.changeToNextTab = { emit: jest.fn() } as any
 
             component.nextStep()
 
-            expect(component.changeToNextTab.emit).toHaveBeenCalledWith(TrainingPlanContent.TTabLabelKey.ADD_ASSIGNEE)
+            expect(component.changeToNextTab.emit)
+                .toHaveBeenCalledWith(TrainingPlanContent.TTabLabelKey.ADD_ACCESS_SETTINGS)
         })
 
-        it('should emit ADD_ASSIGNEE to ADD_TIMELINE', () => {
-            component.selectedTab = TrainingPlanContent.TTabLabelKey.ADD_ASSIGNEE
+        it('should emit ADD_ACCESS_SETTINGS to ADD_TIMELINE', () => {
+            component.selectedTab = TrainingPlanContent.TTabLabelKey.ADD_ACCESS_SETTINGS
             component.changeToNextTab = { emit: jest.fn() } as any
 
             component.nextStep()
@@ -261,12 +279,12 @@ describe('BreadcrumbComponent', () => {
             component.createPlanDraftView()
 
             expect(component.showDialogBox).toHaveBeenCalledWith('progress')
-            expect(mockTpSvc.createPlan).toHaveBeenCalledWith({
-                request: {
+            expect(mockTpSvc.createPlanV3).toHaveBeenCalledWith({
+                request: expect.objectContaining({
                     name: 'Test Plan',
                     status: 'draft',
-                    assignmentType: 'AllUser'
-                }
+                    orgIdList: ['org-1']
+                })
             })
             expect(mockDialogRef.close).toHaveBeenCalled()
             expect(component.showDialogBox).toHaveBeenCalledWith('progress-completed')
@@ -332,6 +350,64 @@ describe('BreadcrumbComponent', () => {
         })
     })
 
+    describe('generateRequestPayload', () => {
+        const stepperData = (aparYear?: string) => ({
+            name: 'Test Plan',
+            contentList: ['c1'],
+            contentType: 'Course',
+            endDate: '2027-03-31',
+            isApar: true,
+            status: 'draft',
+            accessControl: { userGroups: [], version: 1 },
+            aparYear
+        })
+
+        it('should send the selected year as planYear on create', () => {
+            const payload = component.generateRequestPayload(stepperData('2026-27'), 'create')
+
+            expect(payload.request.planYear).toBe('2026-27')
+            expect(payload.request).toEqual({
+                orgIdList: ['org-1'],
+                comment: 'cbPlanId1 is created',
+                contentList: ['c1'],
+                contentType: 'Course',
+                contextData: { accessControl: { userGroups: [], version: 1 } },
+                endDate: '2027-03-31',
+                isApar: true,
+                name: 'Test Plan',
+                planYear: '2026-27',
+                status: 'draft'
+            })
+        })
+
+        it('should send the selected year as planYear on update', () => {
+            mockActivatedRoute.snapshot.data.contentData = { id: 'plan-123', status: 'draft' }
+
+            const payload = component.generateRequestPayload(stepperData('2025-26'), 'update')
+
+            expect(payload.request.planYear).toBe('2025-26')
+            expect(payload.request.id).toBe('plan-123')
+        })
+
+        it('should carry the year the timeline step last picked', () => {
+            mockTpdsSvc.trainingPlanStepperData = stepperData('2024-25')
+
+            const payload = component.generateRequestPayload(mockTpdsSvc.trainingPlanStepperData, 'create')
+
+            expect(payload.request.planYear).toBe('2024-25')
+        })
+
+        it('should leave planYear unset when no year reached the stepper', () => {
+            const payload = component.generateRequestPayload(stepperData(), 'create')
+
+            expect(payload.request.planYear).toBeUndefined()
+        })
+
+        it('should return null for an unknown payload type', () => {
+            expect(component.generateRequestPayload(stepperData('2026-27'), 'archive')).toBeNull()
+        })
+    })
+
     describe('updatePlan', () => {
         beforeEach(() => {
             component.showDialogBox = jest.fn()
@@ -389,8 +465,10 @@ describe('BreadcrumbComponent', () => {
             expect(mockTpSvc.updatePlan).toHaveBeenCalledWith({
                 request: {
                     name: mockTpdsSvc.trainingPlanTitle,
-                    assignmentType: 'AllUser',
                     assignmentTypeInfo: ['AllUser'],
+                    contentList: [],
+                    contentType: 'course',
+                    endDate: null,
                     id: '123'
                 }
             })

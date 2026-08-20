@@ -612,13 +612,7 @@ export class SingleUserCreationComponent implements OnInit, AfterViewInit, OnDes
       dataToSubmit.channel = this.selectedOrgData.depatName
     }
     if (this.isNgo) {
-      dataToSubmit['isNgo'] = true
       dataToSubmit.designation = this.defaultNgoDesignation
-      dataToSubmit['additionalProperties'] = {
-        externalSystemId: (dataToSubmit.externalId || '').trim(),
-        externalSystem: 'eHRMS ID',
-      }
-      delete dataToSubmit.externalId
     }
 
     if (!this.userCreationForm.value.channel) {
@@ -626,10 +620,55 @@ export class SingleUserCreationComponent implements OnInit, AfterViewInit, OnDes
       return
     }
 
-    const postData = {
-      personalDetails: '',
+    // Account-level fields go under personalDetails (top level), same contract the
+    // legacy create-user flow uses. Profile fields (gender, category, designation,
+    // group, pincode, tags, ehrmsId/externalId) must be nested the same way
+    // updateUser() below sends them, under profileDetails, otherwise they land in
+    // the wrong place in the request.
+    const postData: any = {
+      personalDetails: {
+        email: dataToSubmit.email,
+        firstName: dataToSubmit.firstName,
+        phone: dataToSubmit.phone,
+        channel: dataToSubmit.channel,
+        roles: dataToSubmit.roles,
+      },
+      profileDetails: {
+        personalDetails: {
+          dob: dataToSubmit.dob,
+          domicileMedium: dataToSubmit.domicileMedium,
+          gender: dataToSubmit.gender,
+          category: dataToSubmit.category,
+          mobile: dataToSubmit.phone,
+          primaryEmail: dataToSubmit.email,
+          firstname: dataToSubmit.firstName,
+          // NGO (volunteer org) users carry pin code in personalDetails
+          ...(this.isNgo ? { pinCode: dataToSubmit.pincode } : null)
+        },
+        // NGO (volunteer org) users have no professionalDetails
+        ...(this.isNgo ? null : {
+          professionalDetails: [
+            {
+              designation: dataToSubmit.designation,
+              group: dataToSubmit.group
+            }
+          ]
+        }),
+        additionalProperties: {
+          tag: dataToSubmit.tags,
+          ...(this.isNgo ? {
+            externalSystemId: (dataToSubmit.externalId || '').trim(),
+            externalSystem: 'eHRMS ID',
+          } : null)
+        },
+        employmentDetails: {
+          pinCode: dataToSubmit.pincode
+        }
+      }
     }
-    postData.personalDetails = dataToSubmit
+    if (this.isNgo) {
+      postData.isNgo = true
+    }
     this.usersService.createUser(postData)
       .pipe(takeUntil(this.destroySubject$))
       .subscribe((_res: any) => {

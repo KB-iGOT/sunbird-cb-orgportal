@@ -19,6 +19,7 @@ import { MatProgressBarModule } from '@angular/material/progress-bar'
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner'
 import { MatRadioModule } from '@angular/material/radio'
 import { MatSelectModule } from '@angular/material/select'
+import { AparYearSelectModule } from '../../common/apar-year-select/apar-year-select.module'
 import { MatSidenavModule } from '@angular/material/sidenav'
 import { MatSlideToggleModule } from '@angular/material/slide-toggle'
 import { MatTabsModule } from '@angular/material/tabs'
@@ -226,6 +227,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     MatChipsModule,
     MatListModule,
     MatSelectModule,
+    AparYearSelectModule,
     MatCheckboxModule,
     FormsModule,
     ReactiveFormsModule,

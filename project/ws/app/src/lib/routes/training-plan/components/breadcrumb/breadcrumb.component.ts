@@ -9,10 +9,10 @@ import { TrainingPlanDataSharingService } from '../../services/training-plan-dat
 import { NsAccessControlConfig } from '@sunbird-cb/access-settings'
 import { ConfigurationsService } from '@sunbird-cb/utils-v2'
 @Component({
-    selector: 'ws-app-breadcrumb',
-    templateUrl: './breadcrumb.component.html',
-    styleUrls: ['./breadcrumb.component.scss'],
-    standalone: false
+  selector: 'ws-app-breadcrumb',
+  templateUrl: './breadcrumb.component.html',
+  styleUrls: ['./breadcrumb.component.scss'],
+  standalone: false
 })
 export class BreadcrumbComponent implements OnInit {
 
@@ -149,7 +149,7 @@ export class BreadcrumbComponent implements OnInit {
     const transformedData = this.generateRequestPayload(this.tpdsSvc.trainingPlanStepperData, 'create')
     this.showDialogBox('progress')
 
-    this.tpSvc.createPlanV2(transformedData).subscribe((_data: any) => {
+    this.tpSvc.createPlanV3(transformedData).subscribe((_data: any) => {
       this.dialogRef.close()
       this.showDialogBox('progress-completed')
       setTimeout(() => {
@@ -216,6 +216,7 @@ export class BreadcrumbComponent implements OnInit {
           endDate: trainingPlanStepperData?.endDate,
           isApar: trainingPlanStepperData?.isApar,
           name: trainingPlanStepperData?.name,
+          planYear: trainingPlanStepperData?.aparYear,
           // orgScope: isCCA ? orgScope : 'Single',
           status: trainingPlanStepperData?.status
         }
@@ -236,6 +237,7 @@ export class BreadcrumbComponent implements OnInit {
           endDate: trainingPlanStepperData?.endDate,
           isApar: trainingPlanStepperData?.isApar,
           name: trainingPlanStepperData?.name,
+          planYear: trainingPlanStepperData?.aparYear,
           // orgScope: orgScope,
           id: this.activeRoute.snapshot.data['contentData'].id,
           status: trainingPlanStepperData?.status
@@ -315,7 +317,7 @@ export class BreadcrumbComponent implements OnInit {
     }
     delete obj.request.status
     this.showDialogBox('progress')
-    this.tpSvc.updatePlanV2(obj).subscribe((_data: any) => {
+    this.tpSvc.updatePlanV3(obj).subscribe((_data: any) => {
       this.dialogRef.close()
       if (this.isLiveContent) {
         this.publishPlan()
@@ -349,7 +351,7 @@ export class BreadcrumbComponent implements OnInit {
         comment: 'CBP plan approved',
       },
     }
-    this.tpSvc.publishPlanV2(obj).subscribe((data: any) => {
+    this.tpSvc.publishPlanV3(obj).subscribe((data: any) => {
       if (data && data.params && data.params.status && data.params.status.toLowerCase() === 'success') {
         this.showDialogBox('progress-completed')
         setTimeout(() => {

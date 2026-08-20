@@ -5,6 +5,7 @@ import { Observable } from 'rxjs'
 const API_END_POINTS = {
   CBP_PLAN_LIST: '/apis/proxies/v8/cbplan/v1/list',
   CBP_PLAN_LIST_V2: '/apis/proxies/v8/cbplan/v2/search',
+  CBP_PLAN_LIST_V3: '/apis/proxies/v8/cbplan/v3/search',
 }
 
 @Injectable({
@@ -19,5 +20,9 @@ export class TrainingPlanDashboardService {
 
   getTrainingPlansV2(req: any): Observable<any> {
     return this.http.post<any>(API_END_POINTS.CBP_PLAN_LIST_V2, req)
+  }
+
+  getTrainingPlansV3(req: any): Observable<any> {
+    return this.http.post<any>(API_END_POINTS.CBP_PLAN_LIST_V3, req)
   }
 }

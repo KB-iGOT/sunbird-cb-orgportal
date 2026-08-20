@@ -1,7 +1,12 @@
 <div class="flex flex-4 flex-column">
   <mat-card>
-    <div class="flex flex-between mat-h2 margin-remove">Training Plan
-      <button mat-button type="button" class="create-cbp-btn" (click)="createCbp()">Create CBP</button>
+    <div class="plan-header">
+      <span class="mat-h2 margin-remove plan-title">Training Plan</span>
+      <div class="header-actions">
+        <ws-app-apar-year-select layout="inline" [value]="selectedAparYear"
+          (valueChange)="changeAparYear($event)"></ws-app-apar-year-select>
+        <button mat-button type="button" class="create-cbp-btn" (click)="createCbp()">Create CBP</button>
+      </div>
     </div>
     <mat-card-content>
       <!-- Filter Tabs -->

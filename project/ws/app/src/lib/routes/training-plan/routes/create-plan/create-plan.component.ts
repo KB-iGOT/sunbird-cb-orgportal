@@ -62,11 +62,18 @@ export class CreatePlanComponent implements OnInit, OnDestroy {
       this.tpdsSvc.trainingPlanStepperData['endDate'] = contentData.endDate
       this.tpdsSvc.trainingPlanStepperData['status'] = contentData.status
       this.tpdsSvc.trainingPlanStepperData['isApar'] = contentData.isApar
+      this.tpdsSvc.trainingPlanStepperData['aparYear'] = contentData.planYear
       if (typeof contentData.contextData === 'string') {
         const contextData = JSON.parse(contentData.contextData)
         this.tpdsSvc.trainingPlanStepperData['accessControl'] = contextData.accessControl
       } else {
         this.tpdsSvc.trainingPlanStepperData['accessControl'] = contentData.contextData.accessControl
+      }
+    } else {
+      // The year picked on the dashboard before starting the plan
+      const aparYear = _.get(this.route.snapshot.queryParams, 'aparYear')
+      if (aparYear) {
+        this.tpdsSvc.trainingPlanStepperData['aparYear'] = aparYear
       }
     }
 
