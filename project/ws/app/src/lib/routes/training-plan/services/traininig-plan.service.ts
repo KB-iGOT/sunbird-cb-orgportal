@@ -25,6 +25,13 @@ const API_END_POINTS = {
   READ_PLAN_V2: 'apis/proxies/v8/cbplan/v2/read',
   ARCHIVE_PLAN_V2: 'apis/proxies/v8/cbplan/v2/archive',
 
+
+  CREATE_PLAN_V3: 'apis/proxies/v8/cbplan/v3/create',
+  UPDATE_PLAN_V3: 'apis/proxies/v8/cbplan/v3/update',
+  PUBLISH_PLAN_V3: 'apis/proxies/v8/cbplan/v3/publish',
+  READ_PLAN_V3: 'apis/proxies/v8/cbplan/v3/read',
+  ARCHIVE_PLAN_V3: 'apis/proxies/v8/cbplan/v3/archive',
+
 }
 @Injectable({
   providedIn: 'root',
@@ -109,5 +116,20 @@ export class TrainingPlanService {
     }
     return this.http.delete<any>(`${API_END_POINTS.ARCHIVE_PLAN_V2}`, options)
   }
+  createPlanV3(obj: any) {
+    return this.http.post<any>(`${API_END_POINTS.CREATE_PLAN_V3}`, obj).pipe(map(res => _.get(res, 'result')))
+  }
+  updatePlanV3(obj: any) {
+    return this.http.post<any>(`${API_END_POINTS.UPDATE_PLAN_V3}`, obj).pipe(map(res => _.get(res, 'result')))
+  }
+
+  publishPlanV3(obj: any) {
+    return this.http.post<any>(`${API_END_POINTS.PUBLISH_PLAN_V3}`, obj)
+  }
+
+  readPlanV3(planId: any) {
+    return this.http.get<any>(`${API_END_POINTS.READ_PLAN_V3}/${planId}`)
+  }
+
 
 }

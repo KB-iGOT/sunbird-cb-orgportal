@@ -23,6 +23,8 @@
 
 .create-cbp-btn {
   width: 109px;
+  height: 40px;
+  flex-shrink: 0;
   background: rgb(27, 76, 161) !important;
   color: white !important;
   /* stylelint-disable */
@@ -30,6 +32,40 @@
   /* stylelint-enable */
   font-weight: 700;
   font-size: 14px;
+
+  &:hover {
+    background: rgb(21, 60, 128) !important;
+  }
+}
+
+// Header: title on the left, APAR year selector + create button on the right.
+// Kept to a single 40px row so it does not push the tabs and search below it.
+.plan-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px 16px;
+  margin-bottom: 8px;
+}
+
+.plan-title {
+  flex: 1 1 auto;
+  min-width: 140px;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+@media (max-width: 768px) {
+  .header-actions {
+    width: 100%;
+    flex-wrap: wrap;
+  }
 }
 
 .mat-column-name {
@@ -294,16 +330,6 @@
   .sinput {
     width: 100%;
     max-width: 450px;
-  }
-}
-
-// Create button styling
-.create-cbp-btn {
-  background-color: #1976d2;
-  color: white;
-
-  &:hover {
-    background-color: #1565c0;
   }
 }
 
