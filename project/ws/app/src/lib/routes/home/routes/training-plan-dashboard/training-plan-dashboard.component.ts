@@ -109,6 +109,10 @@ export class TrainingPlanDashboardComponent implements OnInit, AfterViewInit {
   // API Methods
   async getTrainingPlanCBP(type: string, searchString: string) {
     this.loaderService.changeLoaderState(true)
+    this.completeDataRes = []
+    this.trainingPlanData = []
+    this.totalTrainingPlanCount = 0
+    this.dataSource.data = []
 
     const payload: any = {
       filter: {
@@ -134,6 +138,7 @@ export class TrainingPlanDashboardComponent implements OnInit, AfterViewInit {
           this.convertDataAsPerTable()
         } else {
           this.loaderService.changeLoaderState(false)
+          this.fetchContentDone = true
         }
       },
       error: () => {
