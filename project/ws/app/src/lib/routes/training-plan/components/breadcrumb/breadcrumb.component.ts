@@ -144,6 +144,45 @@ export class BreadcrumbComponent implements OnInit {
     this.dialogRef.close()
   }
 
+  /**
+   * The api reports validation failures as a JSON encoded array on params.err, eg.
+   * "[\"Validation Error: Multiple ROOT_ORG_IDs found in criteria but organization is not CCA\"]",
+   * so it is unwrapped here instead of showing the raw brackets and escaped quotes to the user.
+   */
+  private extractApiErrorMessage(error: any, fallback: string): string {
+    const params = error?.error?.params || error?.params || {}
+    const rawMessage = params.errMsg || params.err || error?.error?.message
+
+    if (!rawMessage) {
+      return fallback
+    }
+    if (Array.isArray(rawMessage)) {
+      return rawMessage.length ? rawMessage.join(', ') : fallback
+    }
+    if (typeof rawMessage === 'string' && rawMessage.trim().startsWith('[')) {
+      try {
+        const parsed = JSON.parse(rawMessage)
+        if (Array.isArray(parsed)) {
+          return parsed.length ? parsed.join(', ') : fallback
+        }
+        return rawMessage
+      } catch (_parseError) {
+        return rawMessage
+      }
+    }
+    return rawMessage
+  }
+
+  /** Closes the blocking progress dialog first, then reports the failure. */
+  private handleApiFailure(error: any, fallback: string): void {
+    if (this.dialogRef) {
+      this.dialogRef.close()
+    }
+    this.snackBar.open(this.extractApiErrorMessage(error, fallback), 'X', {
+      duration: 10000,
+    })
+  }
+
   createPlanDraftView() {
     this.tpdsSvc.trainingPlanStepperData.name = this.tpdsSvc.trainingPlanTitle
     const transformedData = this.generateRequestPayload(this.tpdsSvc.trainingPlanStepperData, 'create')
@@ -162,6 +201,8 @@ export class BreadcrumbComponent implements OnInit {
           },
         })
       }, 1000)
+    }, (_err: any) => {
+      this.handleApiFailure(_err, 'Something went wrong while saving the CBP plan. Try again later')
     })
   }
 
@@ -336,11 +377,7 @@ export class BreadcrumbComponent implements OnInit {
         }, 1000)
       }
     }, (_err: any) => {
-      let errorMessage = _err?.error?.params?.err || 'Something went wrong while publishing CBP plan. Try again later'
-      this.snackBar.open(errorMessage, 'X', {
-        duration: 10000,
-      })
-      this.dialogRef.close()
+      this.handleApiFailure(_err, 'Something went wrong while publishing CBP plan. Try again later')
     })
   }
 
@@ -365,12 +402,10 @@ export class BreadcrumbComponent implements OnInit {
           })
         }, 1000)
       } else {
-        this.snackBar.open('Something went wrong while publishing CBP plan. Try again later')
-        this.dialogRef.close()
+        this.handleApiFailure(data, 'Something went wrong while publishing CBP plan. Try again later')
       }
     }, (_error: any) => {
-      this.snackBar.open('Something went wrong while publishing CBP plan. Try again later')
-      this.dialogRef.close()
+      this.handleApiFailure(_error, 'Something went wrong while publishing CBP plan. Try again later')
     })
   }
 
