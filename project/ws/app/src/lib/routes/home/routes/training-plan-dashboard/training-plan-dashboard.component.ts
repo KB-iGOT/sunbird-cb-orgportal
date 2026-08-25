@@ -355,7 +355,7 @@ export class TrainingPlanDashboardComponent implements OnInit, AfterViewInit {
       },
     }
 
-    this.trainingPlanService.archivePlanV2(obj).subscribe({
+    this.trainingPlanService.archivePlanV3(obj).subscribe({
       next: () => {
         this.snackBar.open('CBP plan deleted successfully.')
         this.loaderService.changeLoaderState(false)

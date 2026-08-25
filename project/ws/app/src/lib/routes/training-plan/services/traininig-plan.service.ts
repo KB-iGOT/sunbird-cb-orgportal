@@ -130,6 +130,15 @@ export class TrainingPlanService {
   readPlanV3(planId: any) {
     return this.http.get<any>(`${API_END_POINTS.READ_PLAN_V3}/${planId}`)
   }
+  archivePlanV3(obj: any) {
+    const options = {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json',
+      }),
+      body: obj,
+    }
+    return this.http.delete<any>(`${API_END_POINTS.ARCHIVE_PLAN_V3}`, options)
+  }
 
 
 }
