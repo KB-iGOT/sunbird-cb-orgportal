@@ -3,4 +3,6 @@
     border: 1px solid #1b4ca1;
     border-radius: 4px;
     min-width: 174px;
+    // Keeps the button off the right edge of the dialog
+    margin-right: 16px;
 }
