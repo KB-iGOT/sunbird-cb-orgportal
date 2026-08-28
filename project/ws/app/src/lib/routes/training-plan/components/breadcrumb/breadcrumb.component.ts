@@ -216,8 +216,10 @@ export class BreadcrumbComponent implements OnInit {
     let isCCA = this.configSvc?.orgReadData?.isCCA || false
     for (const group of userGroups) {
       const criteriaList = group.userGroupCriteriaList || []
-      // Check if rootOrgId criteria exists
-      let rootOrgIdCriteria = criteriaList.find((criteria: any) => criteria.criteriaKey === "rootOrgId")
+      // Check if an organisation criteria exists. A L0 MDO covering its whole ministry / state
+      // stores it as ministryOrStateId, that is already an organisation scope
+      let rootOrgIdCriteria = criteriaList.find((criteria: any) =>
+        criteria.criteriaKey === "rootOrgId" || criteria.criteriaKey === "ministryOrStateId")
 
       if (!rootOrgIdCriteria && !isCCA) {
         // If rootOrgId criteria doesn't exist, add it

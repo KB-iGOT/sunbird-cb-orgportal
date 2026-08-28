@@ -36,13 +36,25 @@ export class CompetencySummaryComponent implements OnInit, OnChanges {
   selectedIndex = 0
   compentencyKey!: ICompentencyKeys
 
-  constructor(private initService: InitService) { }
+  // Read here and not in ngOnInit, the first ngOnChanges runs before ngOnInit and would skip the
+  // summary of the content it is given on the very first binding
+  constructor(private initService: InitService) {
+    this.compentencyKey = this.initService.configSvc?.compentency?.[environment.compentencyVersionKey]
+  }
 
   ngOnInit() {
-    this.compentencyKey = this.initService.configSvc.compentency[environment.compentencyVersionKey]
+    if (!this.compentencyKey) {
+      this.compentencyKey = this.initService.configSvc?.compentency?.[environment.compentencyVersionKey]
+    }
+    // The content bound on the first change was summarised before the key was known, do it again
+    this.buildCompetencySummary()
   }
 
   ngOnChanges() {
+    this.buildCompetencySummary()
+  }
+
+  private buildCompetencySummary() {
     this.selectedCardData = []
     this.competencySummaryObj = [{
       title: 'behavioural',

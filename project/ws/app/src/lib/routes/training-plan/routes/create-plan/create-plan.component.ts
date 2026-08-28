@@ -48,12 +48,18 @@ export class CreatePlanComponent implements OnInit, OnDestroy {
         this.tpdsSvc.trainingPlanAssigneeData = { category: contentData.assignmentType, data: [contentData.assignmentTypeInfo] }
       }
       if (contentData.contentList && contentData.contentList.length > 0) {
+        // contentList comes back as content ids, the resolver reads the details of those ids.
+        // A content whose details could not be read still keeps its id selected on the plan.
         contentData.contentList.forEach((ele: any) => {
-          this.tpdsSvc.trainingPlanStepperData['contentList'].push(ele.identifier)
-          ele.selected = true
+          const identifier = (typeof ele === 'string') ? ele : _.get(ele, 'identifier')
+          if (identifier) {
+            this.tpdsSvc.trainingPlanStepperData['contentList'].push(identifier)
+          }
+          if (ele && typeof ele !== 'string') {
+            ele.selected = true
+            this.tpdsSvc.addSelectedContent(ele)
+          }
         })
-        this.tpdsSvc.trainingPlanContentData = { data: { content: contentData.contentList } }
-
       }
 
       this.tpdsSvc.trainingPlanStepperData['contentType'] = contentData.contentType

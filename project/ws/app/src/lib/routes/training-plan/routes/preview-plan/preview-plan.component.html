@@ -1,10 +1,10 @@
 <!-- <ws-app-breadcrumb [showBreadcrumbAction]="false"></ws-app-breadcrumb> -->
-<div class="flex margin-top-l">
-    <button mat-stroked-button type="button" (click)="goBack()" *ngIf="showBackBtn"><mat-icon>arrow_back</mat-icon> Go
+<div class="flex margin-top-l" *ngIf="showBackBtn">
+    <button mat-stroked-button type="button" (click)="goBack()"><mat-icon>arrow_back</mat-icon> Go
         back</button>
 </div>
 <div class="flex flex-col" *ngIf="form==='content'">
-    <div class="mat-subheading-1 margin-remove margin-bottom-m" *ngIf="contentList?.length">Selected Content <span> (
+    <div class="mat-subheading-1 margin-remove margin-bottom-m dialog-heading" *ngIf="contentList?.length">Selected Content <span> (
             {{contentList?.length}} )</span></div>
     <div class="flex flex-row justify-center max-height-400">
         <ws-app-standard-card [checkboxVisibility]="false" [contentData]="contentList" [showDeleteFlag]="true"
@@ -12,14 +12,17 @@
         </ws-app-standard-card>
     </div>
     <div class="no-cbp-data margin-top-xl margin-bottom-xl text-center"
-        *ngIf="!(contentList) || !(contentList?.length)">
+        *ngIf="!isLoadingContent && (!(contentList) || !(contentList?.length))">
         <div><img src="/assets/images/no-content-data.svg" alt="no-content-data"></div>
         <div class="mat-subheading-1 margin-remove">No content avaliable.</div>
         <!-- <div>Create a content in CBP portal to get the contents.</div> -->
     </div>
+    <div class="margin-top-xl margin-bottom-xl text-center" *ngIf="isLoadingContent">
+        <mat-spinner class="margin-auto" [diameter]="40"></mat-spinner>
+    </div>
 </div>
 <div class="flex flex-col" *ngIf="form==='assignee'">
-    <div class="mat-subheading-1 margin-remove" *ngIf="assigneeData?.data?.length">Selected Assignee <span> (
+    <div class="mat-subheading-1 margin-remove dialog-heading" *ngIf="assigneeData?.data?.length">Selected Assignee <span> (
             {{assigneeData?.data?.length}} )</span>
     </div>
     <div class="mt-4 flex flex-row justify-center max-height-400" *ngIf="assigneeData?.data?.length">

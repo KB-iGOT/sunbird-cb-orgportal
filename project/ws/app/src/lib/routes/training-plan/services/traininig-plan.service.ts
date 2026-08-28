@@ -1,10 +1,13 @@
 import { Injectable } from '@angular/core'
 import { HttpClient, HttpHeaders } from '@angular/common/http'
-import { Observable } from 'rxjs'
+import { Observable, forkJoin, of } from 'rxjs'
 import { map } from 'rxjs/operators'
 // tslint:disable
 import _ from 'lodash'
 // tslint:enable
+
+// The content search is called in batches when a plan carries a long content list
+const CONTENT_READ_BATCH_SIZE = 100
 
 const API_END_POINTS = {
   CREATE_PLAN: 'apis/proxies/v8/cbplan/v1/create',
@@ -129,6 +132,43 @@ export class TrainingPlanService {
 
   readPlanV3(planId: any) {
     return this.http.get<any>(`${API_END_POINTS.READ_PLAN_V3}/${planId}`)
+  }
+
+  /**
+   * Content details of the given content ids. The plan read API returns contentList as a plain list
+   * of ids, while the stepper screens (cards, chips, competency summary, preview) work with the
+   * complete content, so the details are read with a search on those ids.
+   */
+  getContentByIds(identifiers: string[], competencyKey?: string, secureSettings = false): Observable<any> {
+    if (!identifiers || !identifiers.length) {
+      return of([])
+    }
+    const batches = _.chunk(identifiers, CONTENT_READ_BATCH_SIZE)
+      .map((batch: string[]) => this.searchContentByIds(batch, competencyKey, secureSettings))
+    return forkJoin(batches).pipe(map((responses: any[]) => _.flatten(responses)))
+  }
+
+  private searchContentByIds(identifiers: string[], competencyKey?: string, secureSettings = false): Observable<any> {
+    const fields = ['name', 'appIcon', 'instructions', 'description', 'purpose', 'mimeType',
+      'gradeLevel', 'identifier', 'medium', 'resourceType',
+      'primaryCategory', 'contentType', 'channel', 'organisation', 'trackable', 'posterImage',
+      'idealScreenSize', 'learningMode', 'creatorLogo', 'duration', 'programDuration',
+      'version', 'avgRating', 'secureSettings', 'courseCategory']
+    if (competencyKey) {
+      fields.push(competencyKey)
+    }
+    const obj = {
+      request: {
+        secureSettings,
+        filters: {
+          identifier: identifiers,
+        },
+        offset: 0,
+        limit: identifiers.length,
+        fields,
+      },
+    }
+    return this.http.post<any>(`${API_END_POINTS.GET_ALL_CONTENT}`, obj).pipe(map(res => _.get(res, 'result.content', [])))
   }
   archivePlanV3(obj: any) {
     const options = {
