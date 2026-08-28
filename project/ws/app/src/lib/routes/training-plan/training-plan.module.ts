@@ -19,6 +19,7 @@ import { MatProgressBarModule } from '@angular/material/progress-bar'
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner'
 import { MatRadioModule } from '@angular/material/radio'
 import { MatSelectModule } from '@angular/material/select'
+import { AparYearSelectModule } from '../../common/apar-year-select/apar-year-select.module'
 import { MatSidenavModule } from '@angular/material/sidenav'
 import { MatTabsModule } from '@angular/material/tabs'
 import { PipePublicURLModule } from '../pipes/pipe-public-URL/pipe-public-URL.module'
@@ -107,6 +108,7 @@ import { AccessControlModule } from '@sunbird-cb/access-settings'
         MatChipsModule,
         MatListModule,
         MatSelectModule,
+        AparYearSelectModule,
         MatCheckboxModule,
         FormsModule,
         ReactiveFormsModule,

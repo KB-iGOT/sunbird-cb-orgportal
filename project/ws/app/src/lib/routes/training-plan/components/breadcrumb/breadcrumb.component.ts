@@ -9,10 +9,10 @@ import { TrainingPlanDataSharingService } from '../../services/training-plan-dat
 import { NsAccessControlConfig } from '@sunbird-cb/access-settings'
 import { ConfigurationsService } from '@sunbird-cb/utils-v2'
 @Component({
-    selector: 'ws-app-breadcrumb',
-    templateUrl: './breadcrumb.component.html',
-    styleUrls: ['./breadcrumb.component.scss'],
-    standalone: false
+  selector: 'ws-app-breadcrumb',
+  templateUrl: './breadcrumb.component.html',
+  styleUrls: ['./breadcrumb.component.scss'],
+  standalone: false
 })
 export class BreadcrumbComponent implements OnInit {
 
@@ -144,12 +144,51 @@ export class BreadcrumbComponent implements OnInit {
     this.dialogRef.close()
   }
 
+  /**
+   * The api reports validation failures as a JSON encoded array on params.err, eg.
+   * "[\"Validation Error: Multiple ROOT_ORG_IDs found in criteria but organization is not CCA\"]",
+   * so it is unwrapped here instead of showing the raw brackets and escaped quotes to the user.
+   */
+  private extractApiErrorMessage(error: any, fallback: string): string {
+    const params = error?.error?.params || error?.params || {}
+    const rawMessage = params.errMsg || params.err || error?.error?.message
+
+    if (!rawMessage) {
+      return fallback
+    }
+    if (Array.isArray(rawMessage)) {
+      return rawMessage.length ? rawMessage.join(', ') : fallback
+    }
+    if (typeof rawMessage === 'string' && rawMessage.trim().startsWith('[')) {
+      try {
+        const parsed = JSON.parse(rawMessage)
+        if (Array.isArray(parsed)) {
+          return parsed.length ? parsed.join(', ') : fallback
+        }
+        return rawMessage
+      } catch (_parseError) {
+        return rawMessage
+      }
+    }
+    return rawMessage
+  }
+
+  /** Closes the blocking progress dialog first, then reports the failure. */
+  private handleApiFailure(error: any, fallback: string): void {
+    if (this.dialogRef) {
+      this.dialogRef.close()
+    }
+    this.snackBar.open(this.extractApiErrorMessage(error, fallback), 'X', {
+      duration: 10000,
+    })
+  }
+
   createPlanDraftView() {
     this.tpdsSvc.trainingPlanStepperData.name = this.tpdsSvc.trainingPlanTitle
     const transformedData = this.generateRequestPayload(this.tpdsSvc.trainingPlanStepperData, 'create')
     this.showDialogBox('progress')
 
-    this.tpSvc.createPlanV2(transformedData).subscribe((_data: any) => {
+    this.tpSvc.createPlanV3(transformedData).subscribe((_data: any) => {
       this.dialogRef.close()
       this.showDialogBox('progress-completed')
       setTimeout(() => {
@@ -162,6 +201,8 @@ export class BreadcrumbComponent implements OnInit {
           },
         })
       }, 1000)
+    }, (_err: any) => {
+      this.handleApiFailure(_err, 'Something went wrong while saving the CBP plan. Try again later')
     })
   }
 
@@ -175,8 +216,10 @@ export class BreadcrumbComponent implements OnInit {
     let isCCA = this.configSvc?.orgReadData?.isCCA || false
     for (const group of userGroups) {
       const criteriaList = group.userGroupCriteriaList || []
-      // Check if rootOrgId criteria exists
-      let rootOrgIdCriteria = criteriaList.find((criteria: any) => criteria.criteriaKey === "rootOrgId")
+      // Check if an organisation criteria exists. A L0 MDO covering its whole ministry / state
+      // stores it as ministryOrStateId, that is already an organisation scope
+      let rootOrgIdCriteria = criteriaList.find((criteria: any) =>
+        criteria.criteriaKey === "rootOrgId" || criteria.criteriaKey === "ministryOrStateId")
 
       if (!rootOrgIdCriteria && !isCCA) {
         // If rootOrgId criteria doesn't exist, add it
@@ -216,6 +259,7 @@ export class BreadcrumbComponent implements OnInit {
           endDate: trainingPlanStepperData?.endDate,
           isApar: trainingPlanStepperData?.isApar,
           name: trainingPlanStepperData?.name,
+          planYear: trainingPlanStepperData?.aparYear,
           // orgScope: isCCA ? orgScope : 'Single',
           status: trainingPlanStepperData?.status
         }
@@ -236,6 +280,7 @@ export class BreadcrumbComponent implements OnInit {
           endDate: trainingPlanStepperData?.endDate,
           isApar: trainingPlanStepperData?.isApar,
           name: trainingPlanStepperData?.name,
+          planYear: trainingPlanStepperData?.aparYear,
           // orgScope: orgScope,
           id: this.activeRoute.snapshot.data['contentData'].id,
           status: trainingPlanStepperData?.status
@@ -315,7 +360,7 @@ export class BreadcrumbComponent implements OnInit {
     }
     delete obj.request.status
     this.showDialogBox('progress')
-    this.tpSvc.updatePlanV2(obj).subscribe((_data: any) => {
+    this.tpSvc.updatePlanV3(obj).subscribe((_data: any) => {
       this.dialogRef.close()
       if (this.isLiveContent) {
         this.publishPlan()
@@ -334,11 +379,7 @@ export class BreadcrumbComponent implements OnInit {
         }, 1000)
       }
     }, (_err: any) => {
-      let errorMessage = _err?.error?.params?.err || 'Something went wrong while publishing CBP plan. Try again later'
-      this.snackBar.open(errorMessage, 'X', {
-        duration: 10000,
-      })
-      this.dialogRef.close()
+      this.handleApiFailure(_err, 'Something went wrong while publishing CBP plan. Try again later')
     })
   }
 
@@ -349,7 +390,7 @@ export class BreadcrumbComponent implements OnInit {
         comment: 'CBP plan approved',
       },
     }
-    this.tpSvc.publishPlanV2(obj).subscribe((data: any) => {
+    this.tpSvc.publishPlanV3(obj).subscribe((data: any) => {
       if (data && data.params && data.params.status && data.params.status.toLowerCase() === 'success') {
         this.showDialogBox('progress-completed')
         setTimeout(() => {
@@ -363,12 +404,10 @@ export class BreadcrumbComponent implements OnInit {
           })
         }, 1000)
       } else {
-        this.snackBar.open('Something went wrong while publishing CBP plan. Try again later')
-        this.dialogRef.close()
+        this.handleApiFailure(data, 'Something went wrong while publishing CBP plan. Try again later')
       }
     }, (_error: any) => {
-      this.snackBar.open('Something went wrong while publishing CBP plan. Try again later')
-      this.dialogRef.close()
+      this.handleApiFailure(_error, 'Something went wrong while publishing CBP plan. Try again later')
     })
   }
 

@@ -44,6 +44,7 @@ interface IFeaturePermissionConfigs {
 const endpoint = {
   profilePid: '/apis/proxies/v8/api/user/v2/read',
   orgRead: '/apis/proxies/v8/org/v1/read',
+  formRead: '/apis/v1/form/read',
   // profileV2: '/apis/protected/v8/user/profileRegistry/getUserRegistryById',
   // details: `/apis/protected/v8/user/details?ts=${Date.now()}`,
   orgProfile: (orgId: string) => `/apis/proxies/v8/org/v1/profile/read?orgId=${orgId}`,
@@ -206,6 +207,7 @@ export class InitService {
       const appsConfigPromise = this.fetchAppsConfig()
       const instanceConfigPromise = this.fetchInstanceConfig() // config: depends only on details
       const widgetStatusPromise = this.fetchWidgetStatus() // widget: depends only on details & feature
+      const globalConfigPromise = this.fetchGlobalConfig() // global config: MDO portal page configuration
       await this.fetchFeaturesStatus() // feature: depends only on details
 
       /**
@@ -233,6 +235,11 @@ export class InitService {
           id => appsConfig.features[id],
         )
       }
+
+      /**
+       * Wait for the global config, components read it during their init
+       */
+      await globalConfigPromise
 
       // Apply the settings using settingsService
       this.settingsSvc.initializePrefChanges(environment.production)
@@ -593,6 +600,32 @@ export class InitService {
         this.configSvc.orgReadData = orgReadData
       }
     }
+  }
+
+  /**
+   * Reads the MDO portal global page configuration (APAR/CBP plan years, etc.)
+   * and keeps it on the config service for the whole app to use.
+   */
+  private async fetchGlobalConfig(): Promise<any> {
+    const request = {
+      request: {
+        type: 'mdo',
+        subType: 'global',
+        action: 'page-configuration',
+        component: 'portal',
+        rootOrgId: '*',
+      },
+    }
+    try {
+      this.configSvc.globalConfig = await this.http
+        .post<any>(endpoint.formRead, request)
+        .pipe(map((res: any) => _.get(res, 'result.form.data')))
+        .toPromise() || null
+    } catch (e) {
+      this.logger.warn('Unable to fetch the global config', e)
+      this.configSvc.globalConfig = null
+    }
+    return this.configSvc.globalConfig
   }
 
   private async fetchInstanceConfig(): Promise<NsInstanceConfig.IConfig | any> {

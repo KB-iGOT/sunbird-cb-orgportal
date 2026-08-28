@@ -164,22 +164,11 @@ export class SearchComponent implements OnInit {
         },
       }
       this.trainingPlanService.getAllContent(filterObj).subscribe((res: any) => {
-        let finResult = []
-        if (this.tpdsSvc.trainingPlanContentData.data && this.tpdsSvc.trainingPlanContentData.data.content) {
-          finResult = this.tpdsSvc.trainingPlanContentData.data.content.filter((sitem: any) => {
-            if (sitem) {
-              return sitem.selected
-            }
-          })
-        }
-        if (res && res.content) {
-          const result = { count: res.count, content: _.uniqBy(_.concat(finResult, res.content), 'identifier') }
-          this.tpdsSvc.trainingPlanContentData = { category: contentType, data: result, count: res.count }
-
-        } else {
-          const result = { count: res.count, content: _.uniqBy(_.concat(finResult, []), 'identifier') }
-          this.tpdsSvc.trainingPlanContentData = { category: contentType, data: result, count: res.count }
-        }
+        // The page shows the search results as they come. The selected content is not pulled on
+        // top of them any more, it is kept on the plan content list and opened from the chip link
+        const content = (res && res.content) ? _.uniqBy(res.content, 'identifier') : []
+        const result = { count: res.count, content }
+        this.tpdsSvc.trainingPlanContentData = { category: contentType, data: result, count: res.count }
         this.handleApiData.emit(true)
         this.loadingService.changeLoaderState(false)
       })

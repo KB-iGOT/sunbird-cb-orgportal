@@ -25,7 +25,26 @@
     cursor: pointer !important;
 }
 
+// Scrolling area of the selection dialog. The height follows the screen so a row of cards is
+// never cut in half, and the padding leaves room for the remove button of a card, which sits
+// outside its top right corner and would otherwise be clipped by the scrolling box.
 .max-height-400 {
-    max-height: 400px;
+    max-height: 60vh;
     overflow: auto;
+    padding: 20px 16px 8px;
+    box-sizing: border-box;
+    width: 100%;
 }
+
+// The cards keep an even gap on both sides, the last one of a row is not stuck to the edge
+.max-height-400 ::ng-deep .course-card {
+    margin-left: 16px;
+    margin-right: 16px !important;
+}
+
+// Keeps the dialog heading off the left edge. Padding and not margin, the heading carries the
+// margin-remove utility which sets margin to 0 with !important and would win over a margin here
+.dialog-heading {
+    padding: 16px;
+    margin-bottom: 0px !important;
+} 

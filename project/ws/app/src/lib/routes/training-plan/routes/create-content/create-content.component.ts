@@ -17,6 +17,9 @@ export class CreateContentComponent implements OnInit, OnChanges {
 
   categoryData: any[] = []
   contentData: any[] = []
+  // Every content selected on the plan, the competency summary is built on the whole selection
+  // and not only on the content of the page being shown
+  selectedContentData: any[] = []
   from = 'content'
   selectedContentChips: any[] = []
   selectContentCount = 0
@@ -82,48 +85,42 @@ export class CreateContentComponent implements OnInit, OnChanges {
       if (this.tpdsSvc.trainingPlanContentData?.data?.content) {
         this.contentData = [...this.tpdsSvc.trainingPlanContentData.data.content]
       }
+      this.handleSelectedChips(true)
     }
   }
 
   handleApiData(event: any) {
     if (event && this.tpdsSvc.trainingPlanContentData) {
-      if (this.tpdsSvc.trainingPlanStepperData &&
-        this.tpdsSvc.trainingPlanStepperData.contentList) {
-        if (this.tpdsSvc.trainingPlanContentData.data.content) {
-          this.tpdsSvc.trainingPlanContentData.data.content.map((sitem: any) => {
-            if (this.tpdsSvc.trainingPlanStepperData.contentList.filter((v: any) => (sitem && v === sitem.identifier)).length > 0) {
-              sitem['selected'] = true
-            }
-          })
-          this.tpdsSvc.trainingPlanContentData.data.content.map((sitem: any, index: any) => {
-            if (sitem && sitem.selected) {
-              this.tpdsSvc.trainingPlanContentData.data.content.splice(index, 1)
-              this.tpdsSvc.trainingPlanContentData.data.content.unshift(sitem)
-            }
-          })
-        }
-        this.contentData = [...this.tpdsSvc.trainingPlanContentData.data.content]
-        this.count = this.tpdsSvc.trainingPlanContentData.data.count
-        this.handleSelectedChips(true)
-      } else {
-        this.contentData = [...this.tpdsSvc.trainingPlanContentData.data.content]
-        this.count = this.tpdsSvc.trainingPlanContentData.data.count
-      }
+      this.markSelectedContent()
+      this.contentData = [...(this.tpdsSvc.trainingPlanContentData.data.content || [])]
+      this.count = this.tpdsSvc.trainingPlanContentData.data.count
+      this.handleSelectedChips(true)
     }
   }
 
-  handleSelectedChips(event: any) {
-    this.selectContentCount = 0
-    if (event) {
-      this.selectedContentChips = [...this.tpdsSvc.trainingPlanContentData.data.content]
-      if (this.selectedContentChips) {
-        this.selectedContentChips.forEach(sitem => {
-          if (sitem && sitem.selected) {
-            this.selectContentCount = this.selectContentCount + 1
-          }
-        })
+  /**
+   * The plan content list holds the ids of every selected content, whichever page they are on.
+   * The content of the page currently shown is ticked from that list, so a content selected on
+   * one page stays ticked when the user comes back to it.
+   */
+  private markSelectedContent() {
+    const contentList = this.tpdsSvc.trainingPlanStepperData?.contentList || []
+    const pageContent = this.tpdsSvc.trainingPlanContentData?.data?.content || []
+    pageContent.forEach((sitem: any) => {
+      if (sitem) {
+        sitem['selected'] = contentList.indexOf(sitem.identifier) > -1
       }
+    })
+  }
+
+  handleSelectedChips(event: any) {
+    if (event) {
+      this.markSelectedContent()
+      this.selectedContentChips = [...(this.tpdsSvc.trainingPlanContentData?.data?.content || [])]
     }
+    this.selectedContentData = [...(this.tpdsSvc.trainingPlanSelectedContent || [])]
+    // Counted from the plan content list, the selection is not limited to the page being shown
+    this.selectContentCount = (this.tpdsSvc.trainingPlanStepperData?.contentList || []).length
     if (this.selectContentCount <= 0) {
       this.addContentInvalid.emit(true)
     } else {

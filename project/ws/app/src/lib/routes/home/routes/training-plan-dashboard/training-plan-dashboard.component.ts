@@ -10,6 +10,7 @@ import { ConfirmationBoxComponent } from '../../../training-plan/components/conf
 import { MatTableDataSource } from '@angular/material/table'
 import { MatSort } from '@angular/material/sort'
 import { MatPaginator } from '@angular/material/paginator'
+import { AparYearService } from '../../../../common/apar-year-select/apar-year.service'
 import _ from 'lodash'
 
 @Component({
@@ -35,6 +36,9 @@ export class TrainingPlanDashboardComponent implements OnInit, AfterViewInit {
   totalTrainingPlanCount = 0
   dataSource = new MatTableDataSource<any>([])
 
+  // APAR Year Properties
+  selectedAparYear = ''
+
   // UI Properties
   displayedColumns: string[] = ['name', 'contentCount', 'contentType', 'endDate', 'planType', 'createdByName', 'createdAt', 'actions']
   cachedActions: { [key: string]: any[] } = {}
@@ -55,11 +59,13 @@ export class TrainingPlanDashboardComponent implements OnInit, AfterViewInit {
     private loaderService: LoaderService,
     private trainingPlanService: TrainingPlanService,
     private snackBar: MatSnackBar,
+    private aparYearSvc: AparYearService,
     public dialog: MatDialog
   ) { }
 
   ngOnInit() {
     this.initializeConfig()
+    this.selectedAparYear = this.aparYearSvc.getCurrentAparYear()
     this.setupRouteSubscription()
     this.hasAccess()
   }
@@ -106,6 +112,14 @@ export class TrainingPlanDashboardComponent implements OnInit, AfterViewInit {
     this.filterData(searchString.trim())
   }
 
+  changeAparYear(aparYear: string) {
+    if (this.selectedAparYear === aparYear) {
+      return
+    }
+    this.selectedAparYear = aparYear
+    this.filterData(this.searchQuery)
+  }
+
   // API Methods
   async getTrainingPlanCBP(type: string, searchString: string) {
     this.loaderService.changeLoaderState(true)
@@ -124,12 +138,16 @@ export class TrainingPlanDashboardComponent implements OnInit, AfterViewInit {
       searchString: searchString
     }
 
+    if (this.selectedAparYear) {
+      payload.filter.planYear = this.selectedAparYear
+    }
+
     if (!searchString) {
       payload.orderBy = "createdAt"
       payload.orderDirection = "desc"
     }
 
-    this.trainingDashboardSvc.getTrainingPlansV2(payload).subscribe({
+    this.trainingDashboardSvc.getTrainingPlansV3(payload).subscribe({
       next: (response: any) => {
         if (response.params?.status === 'success') {
           this.completeDataRes = response?.result?.result?.data || []
@@ -342,7 +360,7 @@ export class TrainingPlanDashboardComponent implements OnInit, AfterViewInit {
       },
     }
 
-    this.trainingPlanService.archivePlanV2(obj).subscribe({
+    this.trainingPlanService.archivePlanV3(obj).subscribe({
       next: () => {
         this.snackBar.open('CBP plan deleted successfully.')
         this.loaderService.changeLoaderState(false)
@@ -363,7 +381,7 @@ export class TrainingPlanDashboardComponent implements OnInit, AfterViewInit {
       },
     }
 
-    this.trainingPlanService.publishPlanV2(obj).subscribe({
+    this.trainingPlanService.publishPlanV3(obj).subscribe({
       next: (data: any) => {
         if (data?.params?.status?.toLowerCase() === 'success') {
           this.snackBar.open('CBP plan published successfully.')
@@ -383,7 +401,13 @@ export class TrainingPlanDashboardComponent implements OnInit, AfterViewInit {
 
   // Navigation and Utility Methods
   createCbp() {
-    this.router.navigate(['app', 'training-plan', 'create-plan'])
+    if (!this.selectedAparYear) {
+      this.snackBar.open('Please select an APAR year to continue.')
+      return
+    }
+    this.router.navigate(['app', 'training-plan', 'create-plan'], {
+      queryParams: { aparYear: this.selectedAparYear }
+    })
   }
 
   tabNavigate(item: any, tabSelected?: any) {

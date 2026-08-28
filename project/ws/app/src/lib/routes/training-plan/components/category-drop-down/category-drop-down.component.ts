@@ -34,6 +34,7 @@ export class CategoryDropDownComponent implements OnInit, OnChanges {
           data.event === 'Moderated Course'
         ) {
           this.tpdsSvc.trainingPlanStepperData.contentList = []
+          this.tpdsSvc.trainingPlanSelectedContent = []
           this.tpdsSvc.trainingPlanContentData.data = []
         } else if (data.event === 'Designation' || data.event === 'AllUser' || data.event === 'CustomUser') {
           this.tpdsSvc.trainingPlanStepperData.assignmentTypeInfo = []
