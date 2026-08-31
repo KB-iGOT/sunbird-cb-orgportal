@@ -20,6 +20,9 @@ export class PreviewPlanComponent implements OnInit {
   selectedTab = ''
   showBackBtn = false
   navUrl: any
+  // The APAR year of the plan being previewed, shown read only. The plan has to be authored to
+  // change it, the stepper is where the year is picked
+  planYear = ''
   constructor(
     private router: Router,
     private route: ActivatedRoute,
@@ -35,6 +38,7 @@ export class PreviewPlanComponent implements OnInit {
     }
     if (contentData) {
       this.showBackBtn = true
+      this.planYear = contentData.planYear || ''
       this.navUrl = {
         url: ['app', 'home', 'training-plan-dashboard'],
         queryParams: {

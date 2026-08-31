@@ -2,6 +2,9 @@ import { Component, OnInit } from '@angular/core'
 import { TrainingPlanDataSharingService } from '../../services/training-plan-data-share.service'
 import { MatDialog } from '@angular/material/dialog'
 import { PreviewDialogBoxComponent } from '../../components/preview-dialog-box/preview-dialog-box.component'
+/* tslint:disable */
+import _ from 'lodash'
+/* tslint:enable */
 @Component({
     selector: 'ws-app-create-timeline',
     templateUrl: './create-timeline.component.html',
@@ -35,18 +38,19 @@ export class CreateTimelineComponent implements OnInit {
     }
   }
 
+  /**
+   * The content selected on the plan, read from the plan selection and not from the search results.
+   * The search is never called when the user lands straight on this step, the selection is read
+   * once when the plan is opened and kept in step with what the user ticks.
+   */
   getContentData() {
-    if (this.tpdsSvc.trainingPlanContentData &&
-      this.tpdsSvc.trainingPlanContentData.data &&
-      this.tpdsSvc.trainingPlanContentData.data.content
-    ) {
-      let contentDataSelected = this.tpdsSvc.trainingPlanContentData.data.content.filter((item: any) => {
-        return item.selected
-      })
-      this.totalContentCount = contentDataSelected.length
-      contentDataSelected = contentDataSelected.slice(0, 4)
-      this.contentData = contentDataSelected
-    }
+    const contentIds = this.tpdsSvc.trainingPlanStepperData?.contentList || []
+    const selectedContent = _.keyBy(this.tpdsSvc.trainingPlanSelectedContent || [], 'identifier')
+    const contentDataSelected = contentIds
+      .map((identifier: string) => selectedContent[identifier])
+      .filter((content: any) => !!content)
+    this.totalContentCount = contentDataSelected.length
+    this.contentData = contentDataSelected.slice(0, 4)
   }
 
   getDesignationData() {
