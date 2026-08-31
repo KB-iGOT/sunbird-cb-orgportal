@@ -18,7 +18,9 @@
                 </mat-form-field>
             </div>
         </div>
-        <ws-app-apar-year-select class="apar-year-field" width="100%" [value]="aparYear"
+        <!-- The plan is being authored, so the year can be changed here, never to a year the config
+             has closed. A plan being previewed shows its year read only instead -->
+        <ws-app-apar-year-select class="apar-year-field" width="100%" [value]="aparYear" [editableOnly]="true"
             (valueChange)="changeAparYear($event)"></ws-app-apar-year-select>
     </div>
 </div>

@@ -12,18 +12,16 @@ describe('CreateTimelineComponent', () => {
             trainingPlanStepperData: {
                 status: 'live',
                 assignmentType: 'Designation',
+                contentList: ['do_1', 'do_2', 'do_3', 'do_4', 'do_5'],
             },
-            trainingPlanContentData: {
-                data: {
-                    content: [
-                        { selected: true },
-                        { selected: true },
-                        { selected: false },
-                        { selected: true },
-                        { selected: true },
-                    ],
-                },
-            },
+            // The whole selection of the plan, whichever page each content was picked from
+            trainingPlanSelectedContent: [
+                { identifier: 'do_1', selected: true },
+                { identifier: 'do_2', selected: true },
+                { identifier: 'do_3', selected: true },
+                { identifier: 'do_4', selected: true },
+                { identifier: 'do_5', selected: true },
+            ],
             trainingPlanAssigneeData: {
                 category: 'Designation',
                 data: [
@@ -53,20 +51,40 @@ describe('CreateTimelineComponent', () => {
 
         expect(component.isContentLive).toBe(true)
         expect(component.contentData.length).toBe(4) // Because we slice to get 4 items
-        expect(component.totalContentCount).toBe(4) // 4 selected items
+        expect(component.totalContentCount).toBe(5) // 5 content on the plan
 
         expect(component.assigneeData.category).toBe('Designation')
         expect(component.assigneeData.data.length).toBe(3) // 3 selected assignees
         expect(component.totalAssigneeCount).toBe(3) // 3 selected assignees
     })
 
-    it('should filter content data correctly', () => {
+    it('should show the content selected on the plan, in the order of the plan', () => {
         component.getContentData()
 
         // Verify content data selection
         expect(component.contentData.length).toBe(4)
-        expect(component.contentData[0].selected).toBe(true)
-        expect(component.contentData[1].selected).toBe(true)
+        expect(component.contentData.map((item: any) => item.identifier))
+            .toEqual(['do_1', 'do_2', 'do_3', 'do_4'])
+        expect(component.totalContentCount).toBe(5)
+    })
+
+    it('should show the selected content without the search having been called', () => {
+        // The search never ran, so there is no page of results to read the selection from
+        tpdsSvcMock.trainingPlanContentData = undefined
+
+        component.getContentData()
+
+        expect(component.totalContentCount).toBe(5)
+        expect(component.contentData.length).toBe(4)
+    })
+
+    it('should drop the content of the plan whose details could not be read', () => {
+        tpdsSvcMock.trainingPlanSelectedContent = [{ identifier: 'do_2', selected: true }]
+
+        component.getContentData()
+
+        expect(component.totalContentCount).toBe(1)
+        expect(component.contentData[0].identifier).toBe('do_2')
     })
 
     it('should filter assignee data correctly for Designation', () => {

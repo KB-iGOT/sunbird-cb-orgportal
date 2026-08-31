@@ -36,6 +36,11 @@
         <!-- <div>Create a content in CBP portal to get the contents.</div> -->
     </div>
 </div>
+<!-- Read only, a previewed plan is not being authored. The year is picked on the plan stepper -->
+<div class="plan-year" *ngIf="form === 'all' && planYear">
+    <ws-app-apar-year-select label="APAR Year" [value]="planYear" [required]="false"
+        [disabled]="true"></ws-app-apar-year-select>
+</div>
 <div class="flex content-container" *ngIf="form === 'all'">
     <mat-chip-list [multiple]="true" [selectable]="true">
         <mat-chip [ngClass]="selectedTab == item?.tab ? 'select-tab ': ''" *ngFor="let item of allContentChips"

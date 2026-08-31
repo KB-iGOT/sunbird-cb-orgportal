@@ -3,7 +3,8 @@
   <mat-form-field appearance="outline" subscriptSizing="dynamic" class="apar-year-select" [style.width]="width">
     <mat-select [id]="fieldId" [value]="value" [required]="required" [disabled]="disabled"
       (selectionChange)="onSelectionChange($event.value)" [attr.aria-label]="label" placeholder="Select APAR Year">
-      <mat-option *ngFor="let year of years" [value]="year.value">{{year.label}}</mat-option>
+      <mat-option *ngFor="let year of years" [value]="year.value"
+        [disabled]="editableOnly && !year.editable">{{year.label}}</mat-option>
     </mat-select>
   </mat-form-field>
 </div>

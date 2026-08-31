@@ -9,8 +9,8 @@ describe('AparYearService', () => {
     cbpPlanYear: {
       currentYear: '2026-27',
       yearList: [
-        { label: '2026-27 (Current A.Y.)', value: '2026-27' },
-        { label: '2025-26', value: '2025-26' },
+        { label: '2026-27 (Current A.Y.)', value: '2026-27', editable: true },
+        { label: '2025-26', value: '2025-26', editable: false },
       ],
     },
   }
@@ -44,7 +44,43 @@ describe('AparYearService', () => {
         cbpPlanYear: { yearList: [{ value: '2024-25' }, { label: 'no value' }, null] },
       }
 
-      expect(service.getAparYears()).toEqual([{ label: '2024-25', value: '2024-25' }])
+      expect(service.getAparYears()).toEqual([{ label: '2024-25', value: '2024-25', editable: true }])
+    })
+
+    it('should close only the years the config marks as closed', () => {
+      const years = service.getAparYears()
+
+      expect(years.map(year => year.editable)).toEqual([true, false])
+    })
+
+    it('should close a past year the config says nothing about, and open the current one', () => {
+      configSvc.globalConfig = {
+        cbpPlanYear: {
+          currentYear: '2026-27',
+          yearList: [{ value: '2026-27' }, { value: '2025-26' }],
+        },
+      }
+
+      expect(service.getAparYears().map(year => year.editable)).toEqual([true, false])
+    })
+
+    it('should open the year the config marks editable even when it is a past one', () => {
+      configSvc.globalConfig = {
+        cbpPlanYear: {
+          currentYear: '2026-27',
+          yearList: [{ value: '2026-27' }, { value: '2025-26', editable: true }],
+        },
+      }
+
+      expect(service.getAparYears().map(year => year.editable)).toEqual([true, true])
+    })
+
+    it('should follow the first year of the list when no current year is set', () => {
+      configSvc.globalConfig = {
+        cbpPlanYear: { yearList: [{ value: '2026-27' }, { value: '2025-26' }] },
+      }
+
+      expect(service.getAparYears().map(year => year.editable)).toEqual([true, false])
     })
 
     it('should fall back to the first configured year when no current year is set', () => {
@@ -55,6 +91,10 @@ describe('AparYearService', () => {
   })
 
   describe('without the global config', () => {
+    it('should open the current cycle only, the years behind it are closed', () => {
+      expect(service.getAparYears(3).map(year => year.editable)).toEqual([true, false, false])
+    })
+
     it('should list the requested number of years, newest first', () => {
       const years = service.getAparYears(5)
 

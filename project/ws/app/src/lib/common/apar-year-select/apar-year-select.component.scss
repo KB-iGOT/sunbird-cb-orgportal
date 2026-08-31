@@ -28,6 +28,11 @@
 .apar-year-select {
   font-size: 14px;
 
+  // A disabled field is a read only display of a year picked elsewhere (the plan stepper reads the
+  // year chosen on the dashboard), so the value is kept legible instead of faded out
+  --mat-select-disabled-trigger-text-color: rgba(0, 0, 0, 0.87);
+  --mat-select-disabled-arrow-color: rgba(0, 0, 0, 0.38);
+
   // Angular Material 20 is MDC based, so these are .mat-mdc-* internals.
   // The default 56px infix is trimmed to 40px so the field lines up with
   // buttons in a toolbar; form hosts can put it back via the custom property.
