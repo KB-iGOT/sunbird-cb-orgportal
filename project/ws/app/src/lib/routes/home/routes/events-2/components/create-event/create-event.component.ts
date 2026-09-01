@@ -766,6 +766,11 @@ export class CreateEventComponent implements OnInit, AfterViewInit {
     eventDetails['name'] = eventBaseDetails.eventName
     eventDetails['description'] = eventBaseDetails.description
     eventDetails['resourceType'] = eventBaseDetails.eventCategory
+    if (eventBaseDetails.eventCategory === 'Bharat Kalp - Talks' || eventBaseDetails.eventCategory === 'Bharat Kalp - Podcast') {
+      delete eventDetails['createdFor']
+    } else {
+      eventDetails['createdFor'] = [_.get(this.userProfile, 'rootOrgId', '')]
+    }
     eventDetails['streamType'] = eventBaseDetails.streamType
     eventDetails['startDate'] = startDate
     eventDetails['endDate'] = startDate

@@ -21,6 +21,7 @@ export class EventMaterialsComponent implements OnInit {
   @Input() materialsList: material[] = []
   @Input() openMode = 'edit'
   @Input() openTab = 'draft'
+  @Input() eventCategory = ''
 
   userProfile: any
   filePath: any
@@ -59,6 +60,10 @@ export class EventMaterialsComponent implements OnInit {
     }
   }
 
+  isBharatKalpCategory(): boolean {
+    return this.eventCategory === 'Bharat Kalp - Talks' || this.eventCategory === 'Bharat Kalp - Podcast'
+  }
+
   saveFile() {
     if (this.filePath) {
       const org = []
@@ -66,7 +71,7 @@ export class EventMaterialsComponent implements OnInit {
       createdforarray.push(_.get(this.userProfile, 'rootOrgId', ''))
       org.push(_.get(this.userProfile, 'departmentName', ''))
 
-      const request = {
+      const request: any = {
         request: {
           content: {
             name: 'image asset',
@@ -78,9 +83,11 @@ export class EventMaterialsComponent implements OnInit {
             contentType: 'Asset',
             primaryCategory: 'Asset',
             organisation: org,
-            createdFor: createdforarray,
           },
         },
+      }
+      if (!this.isBharatKalpCategory()) {
+        request.request.content.createdFor = createdforarray
       }
       this.loaderService.changeLoaderState(true)
       this.eventSvc.createContent(request).pipe(mergeMap((res: any) => {

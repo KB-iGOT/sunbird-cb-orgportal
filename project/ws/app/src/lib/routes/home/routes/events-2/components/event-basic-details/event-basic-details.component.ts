@@ -315,6 +315,11 @@ export class EventBasicDetailsComponent implements OnInit, OnChanges {
     this.saveImage(imagePath)
   }
 
+  isBharatKalpCategory(): boolean {
+    const category = this.edf?.eventCategory?.value
+    return category === 'Bharat Kalp - Talks' || category === 'Bharat Kalp - Podcast'
+  }
+
   saveImage(imagePath: any, mediaType = 'image') {
     if (imagePath) {
       const org = []
@@ -322,7 +327,7 @@ export class EventBasicDetailsComponent implements OnInit, OnChanges {
       createdforarray.push(_.get(this.userProfile, 'rootOrgId', ''))
       org.push(_.get(this.userProfile, 'departmentName', ''))
 
-      const request = {
+      const request: any = {
         request: {
           content: {
             name: 'image asset',
@@ -334,9 +339,11 @@ export class EventBasicDetailsComponent implements OnInit, OnChanges {
             contentType: 'Asset',
             primaryCategory: 'Asset',
             organisation: org,
-            createdFor: createdforarray,
           },
         },
+      }
+      if (!this.isBharatKalpCategory()) {
+        request.request.content.createdFor = createdforarray
       }
       this.loaderService.changeLoaderState(true)
       this.eventSvc.createContent(request).pipe(mergeMap((res: any) => {
