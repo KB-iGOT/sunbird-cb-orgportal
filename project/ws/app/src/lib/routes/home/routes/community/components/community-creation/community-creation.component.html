@@ -21,7 +21,7 @@
     </div>
   </div>
 
-  <mat-stepper [displayDefaultIndicatorType]="false" labelPosition="bottom" [selectedIndex]="currentStepperIndex"
+  <mat-stepper labelPosition="bottom" [selectedIndex]="currentStepperIndex"
     (selectionChange)="onSelectionChange($event)" class="mx-10" #stepper>
     <!-- Always show numbers -->
     <ng-template matStepperIcon="number" let-index="index">

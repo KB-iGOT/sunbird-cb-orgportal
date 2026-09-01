@@ -5,6 +5,7 @@ import { ICertificationEligibility } from '../../models/certification.model'
   selector: 'ws-app-certification-eligibility',
   templateUrl: './certification-eligibility.component.html',
   styleUrls: ['./certification-eligibility.component.scss'],
+  standalone: false,
 })
 export class CertificationEligibilityComponent implements OnInit {
   @Input() eligibility!: ICertificationEligibility

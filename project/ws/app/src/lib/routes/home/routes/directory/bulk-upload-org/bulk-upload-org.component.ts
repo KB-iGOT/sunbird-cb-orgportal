@@ -14,6 +14,9 @@ export class BulkUploadOrgComponent implements OnInit {
 
   bulkUploadConfig!: any
   lastUploadList!: any[]
+  showFileError = false
+  startIndex = 0
+  lastIndex: any
 
   constructor(
     public dialogRef: MatDialogRef<BulkUploadOrgComponent>,

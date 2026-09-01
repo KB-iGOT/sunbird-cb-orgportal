@@ -10,6 +10,7 @@ import { NsWidgetResolver } from '@sunbird-cb/resolver'
   selector: 'viewer-audio-native',
   templateUrl: './audio-native.component.html',
   styleUrls: ['./audio-native.component.scss'],
+  standalone: false,
 })
 export class AudioNativeComponent implements OnInit, OnDestroy {
   private routeDataSubscription: Subscription | null = null

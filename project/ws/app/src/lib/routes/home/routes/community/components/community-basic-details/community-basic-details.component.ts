@@ -66,6 +66,10 @@ export class CommunityBasicDetailsComponent implements OnInit {
   }
   tooltipHtml: SafeHtml
 
+  get searchTopic() {
+    return this.communityDetailsForm.get('searchTopic')
+  }
+
   constructor(private sanitizer: DomSanitizer, private matSnackBar: MatSnackBar) {
     const html = `
     <p>Define the rules and expectations for engagement in your community. This ensures a respectful and meaningful discussion space. You can use the sample guidelines below:</p>

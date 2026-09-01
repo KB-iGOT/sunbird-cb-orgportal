@@ -1,13 +1,17 @@
 
 import { Component, Inject, OnInit } from '@angular/core'
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog'
-import { MatTableDataSource } from '@angular/material/table'
+import { MatTableDataSource, MatTableModule } from '@angular/material/table'
+import { MatFormFieldModule } from '@angular/material/form-field'
+import { MatInputModule } from '@angular/material/input'
+import { MatIconModule } from '@angular/material/icon'
 
 @Component({
     selector: 'ws-auth-selected-user-dialog',
     templateUrl: './selected-user-dialog.component.html',
     styleUrls: ['./selected-user-dialog.component.scss'],
-    standalone: false
+    standalone: true,
+    imports: [MatFormFieldModule, MatInputModule, MatIconModule, MatTableModule],
 })
 
 export class SelectedUserDialogComponent implements OnInit {

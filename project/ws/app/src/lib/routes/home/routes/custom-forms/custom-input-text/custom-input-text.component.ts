@@ -8,9 +8,9 @@ import { UntypedFormGroup } from '@angular/forms'
     standalone: false
 })
 export class CustomInputTextComponent {
-  @Input() question: UntypedFormGroup | undefined
+  @Input() question!: UntypedFormGroup
   @Input() customForm: UntypedFormGroup | undefined
-  @Input() index: UntypedFormGroup | undefined
+  @Input() index = 0
   @Output() removeRow: EventEmitter<any> = new EventEmitter()
   @Output() customRegex: EventEmitter<any> = new EventEmitter()
 

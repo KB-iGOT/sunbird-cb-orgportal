@@ -43,6 +43,7 @@ export type FetchStatus = 'hasMore' | 'fetching' | 'done' | 'error' | 'none'
   selector: 'viewer-plugin-practice',
   templateUrl: './practice.component.html',
   styleUrls: ['./practice.component.scss'],
+  standalone: false,
 })
 // ComponentCanDeactivate
 export class PracticeComponent implements OnInit, OnChanges, OnDestroy {

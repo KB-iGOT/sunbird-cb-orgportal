@@ -3,7 +3,8 @@ import { Component, EventEmitter, Output, Input } from '@angular/core'
 @Component({
   selector: 'ws-app-view-achievement',
   templateUrl: './view-achievement.component.html',
-  styleUrls: ['./view-achievement.component.scss']
+  styleUrls: ['./view-achievement.component.scss'],
+  standalone: false
 })
 export class ViewAchievementComponent {
   @Output() closeSidenav = new EventEmitter<void>()

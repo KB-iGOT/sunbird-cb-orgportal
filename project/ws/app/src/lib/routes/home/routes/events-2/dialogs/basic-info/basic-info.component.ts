@@ -27,7 +27,7 @@ export class BasicInfoComponent implements OnInit {
   orgData: any
 
   constructor(
-    private dialogRef: MatDialogRef<BasicInfoComponent>,
+    public dialogRef: MatDialogRef<BasicInfoComponent>,
     @Inject(MAT_DIALOG_DATA) data: any,
     private formBuilder: FormBuilder,
     private matSnackBar: MatSnackBar,

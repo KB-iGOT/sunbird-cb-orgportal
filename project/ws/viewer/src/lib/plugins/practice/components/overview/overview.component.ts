@@ -11,6 +11,7 @@ import { MatSnackBar } from '@angular/material/snack-bar'
   selector: 'viewer-overview',
   templateUrl: './overview.component.html',
   styleUrls: ['./overview.component.scss'],
+  standalone: false,
 })
 export class OverviewComponent implements OnInit, OnChanges, OnDestroy {
   @Input() learningObjective = ''

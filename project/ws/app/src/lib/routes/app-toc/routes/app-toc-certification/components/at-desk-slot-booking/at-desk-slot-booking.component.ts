@@ -31,6 +31,7 @@ import { MatSnackBar } from '@angular/material/snack-bar'
   selector: 'ws-app-at-desk-slot-booking',
   templateUrl: './at-desk-slot-booking.component.html',
   styleUrls: ['./at-desk-slot-booking.component.scss'],
+  standalone: false,
 })
 export class AtDeskSlotBookingComponent implements OnInit, OnDestroy {
   content!: NsContent.IContent

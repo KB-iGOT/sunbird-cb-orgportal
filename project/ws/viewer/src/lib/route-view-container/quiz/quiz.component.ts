@@ -9,6 +9,7 @@ import { ActivatedRoute } from '@angular/router'
   styleUrls: ['./quiz.component.scss'],
   /* tslint:disable */
   host: { class: 'h-inherit inline-block', style: 'height: inherit !important; overflow-y: scroll;width: 100%;' },
+  standalone: false,
   /* tslint:enable */
 })
 export class QuizComponent implements OnInit, OnDestroy {

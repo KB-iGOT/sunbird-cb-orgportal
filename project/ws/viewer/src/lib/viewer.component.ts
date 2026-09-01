@@ -27,6 +27,7 @@ export enum ErrorType {
   selector: 'viewer-container',
   templateUrl: './viewer.component.html',
   styleUrls: ['./viewer.component.scss'],
+  standalone: false,
 })
 
 export class ViewerComponent implements OnInit, OnDestroy, AfterViewChecked {

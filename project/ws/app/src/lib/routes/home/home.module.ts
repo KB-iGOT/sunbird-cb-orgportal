@@ -211,7 +211,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     FiltersComponent,
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
-  exports: [LeftMenuComponent], imports: [CommonModule,
+  exports: [LeftMenuComponent, UsersComponent], imports: [CommonModule,
     // Ng2SearchPipeModule,
     UIORGTableModule,
     ReactiveFormsModule,

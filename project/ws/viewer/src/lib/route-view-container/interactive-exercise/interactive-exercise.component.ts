@@ -4,6 +4,7 @@ import { Component, OnInit, Input } from '@angular/core'
   selector: 'viewer-interactive-exercise',
   templateUrl: './interactive-exercise.component.html',
   styleUrls: ['./interactive-exercise.component.scss'],
+  standalone: false,
 })
 export class InteractiveExerciseComponent implements OnInit {
   @Input() forPreview = false

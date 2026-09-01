@@ -11,6 +11,7 @@ import { ViewerUtilService } from '../../viewer-util.service'
   selector: 'viewer-resource-collection',
   templateUrl: './resource-collection.component.html',
   styleUrls: ['./resource-collection.component.scss'],
+  standalone: false,
 })
 export class ResourceCollectionComponent implements OnInit, OnDestroy {
   private dataSubscription: Subscription | null = null

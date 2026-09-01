@@ -60,7 +60,6 @@ import { ProfileAvatarComponent } from './components/profile-avatar/profile-avat
     CommunityCompetencyComponent,
     TooltipComponent,
     TooltipDirective,
-    CompTooltipDirective,
     CommunityManageComponent,
     ReportIssueComponent,
     StripHtmlPipe,
@@ -70,6 +69,7 @@ import { ProfileAvatarComponent } from './components/profile-avatar/profile-avat
   ],
   imports: [
     CommonModule,
+    CompTooltipDirective,
     CommunityRoutingModule,
     FormsModule,
     ReactiveFormsModule,

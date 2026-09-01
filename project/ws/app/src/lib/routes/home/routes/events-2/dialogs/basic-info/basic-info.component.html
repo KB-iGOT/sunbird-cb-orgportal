@@ -18,10 +18,10 @@
               eventForm.controls['eventName'].errors?.minlength">
               Minimum characters left to create {{ 10 - eventForm?.controls['eventName'].value.length}}
             </mat-error>
-            <mat-error *ngIf="eventForm?.get('eventName') && eventForm.get('eventName').hasError('required')">
+            <mat-error *ngIf="eventForm?.get('eventName')?.hasError('required')">
               Event name is mandatory
             </mat-error>
-            <mat-error *ngIf="eventForm?.get('eventName') && eventForm.get('eventName').hasError('pattern')">
+            <mat-error *ngIf="eventForm?.get('eventName')?.hasError('pattern')">
               Only ( a-z/A-Z , 0-9 . _ - $ / : [ ]' ' " " !) characters are supported
             </mat-error>
           </mat-form-field>
@@ -94,11 +94,11 @@
               </span>
             </div>
             <div class="input-event mb-4">
-              <ng-container *ngIf="eventForm?.get('eventName') && eventForm.get('eventName').value">
+              <ng-container *ngIf="eventForm?.get('eventName')?.value">
                 <label class="custome-title" #tooltip="matTooltip" [matTooltip]="eventForm.get('eventName').value"
                   matTooltipClass="new-toolTip" matTooltipPosition="above">{{eventForm.get('eventName').value}}</label>
               </ng-container>
-              <ng-container *ngIf="!(eventForm?.get('eventName') && eventForm.get('eventName').value)">
+              <ng-container *ngIf="!(eventForm?.get('eventName')?.value)">
                 <label class="custome-title">Event Name</label>
               </ng-container>
             </div>

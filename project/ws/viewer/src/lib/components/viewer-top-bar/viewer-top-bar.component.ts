@@ -10,6 +10,7 @@ import { ViewerDataService } from '../../viewer-data.service'
   selector: 'viewer-viewer-top-bar',
   templateUrl: './viewer-top-bar.component.html',
   styleUrls: ['./viewer-top-bar.component.scss'],
+  standalone: false,
 })
 export class ViewerTopBarComponent implements OnInit, OnDestroy {
   @Input() frameReference: any

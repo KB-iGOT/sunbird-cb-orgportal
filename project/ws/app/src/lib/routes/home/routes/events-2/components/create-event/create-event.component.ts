@@ -1,4 +1,5 @@
 import { AfterViewInit, ChangeDetectorRef, Component, inject, OnInit, ViewChild } from '@angular/core'
+import { STEPPER_GLOBAL_OPTIONS } from '@angular/cdk/stepper'
 import { Location } from '@angular/common'
 import { EventsService } from '../../services/events.service'
 import { ActivatedRoute, Router } from '@angular/router'
@@ -19,7 +20,8 @@ import { CourseListingComponent } from '../course-listing/course-listing.compone
   selector: 'ws-app-create-event',
   templateUrl: './create-event.component.html',
   styleUrls: ['./create-event.component.scss'],
-  standalone: false
+  standalone: false,
+  providers: [{ provide: STEPPER_GLOBAL_OPTIONS, useValue: { displayDefaultIndicatorType: false } }],
 })
 export class CreateEventComponent implements OnInit, AfterViewInit {
   //#region (global varialbles)
