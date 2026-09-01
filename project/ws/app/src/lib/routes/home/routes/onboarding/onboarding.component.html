@@ -43,13 +43,16 @@
       <div class="flex flex-1 flex-row margin-fix">
         <div class="flex flex-3 filter max-height-60 gap-3">
           <a class="filter-option" [ngClass]="{'ws-mat-accent-border-active' : currentRoute === 'bulk-creation'}"
-            mat-button (click)="routeTo('/bulk-creation')" role="button">Bulk Creation
+            mat-button (click)="routeTo('/bulk-creation')" (keydown)="$event.preventDefault()" role="button">Bulk
+            Creation
           </a>
           <a class="filter-option" [ngClass]="{'ws-mat-accent-border-active' : currentRoute === 'self-registration'}"
-            mat-button (click)="routeTo('/self-registration')" role="button">Custom Registration
+            mat-button (click)="routeTo('/self-registration')" (keydown)="$event.preventDefault()" role="button">Custom
+            Registration
             Link</a>
           <a class="filter-option" [ngClass]="{'ws-mat-accent-border-active' : currentRoute === 'single-user'}"
-            mat-button (click)="routeTo('/single-user')" role="button">Individual Creation
+            mat-button (click)="routeTo('/single-user')" (keydown)="$event.preventDefault()" role="button">Individual
+            Creation
           </a>
         </div>
       </div>

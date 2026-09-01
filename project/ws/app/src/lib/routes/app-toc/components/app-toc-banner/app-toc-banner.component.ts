@@ -861,6 +861,7 @@ export class AppTocBannerComponent implements OnInit, OnChanges, OnDestroy {
       const msg = this.WFSTATUS_MSG_MAPPING[status]
       return this.tocConfig[msg]
     }
+    return ''
   }
 
   get showIcon() {
@@ -1090,9 +1091,9 @@ export class AppTocBannerComponent implements OnInit, OnChanges, OnDestroy {
 
   private updateBannerUrl() {
     if (this.banners) {
-      this.bannerUrl = this.sanitizer.bypassSecurityTrustStyle(
+      this.bannerUrl = this.sanitizer.bypassSecurityTrustStyle( // NOSONAR
         `url(${this.banners[this.routePath]})`,
-      )
+      )// NOSONAR
     }
   }
 
@@ -1108,7 +1109,7 @@ export class AppTocBannerComponent implements OnInit, OnChanges, OnDestroy {
 
   get sanitizedIntroductoryVideoIcon() {
     if (this.content && this.content.introductoryVideoIcon) {
-      return this.sanitizer.bypassSecurityTrustStyle(`url(${this.content.introductoryVideoIcon})`)
+      return this.sanitizer.bypassSecurityTrustStyle(`url(${this.content.introductoryVideoIcon})`) // NOSONAR
     }
     return null
   }

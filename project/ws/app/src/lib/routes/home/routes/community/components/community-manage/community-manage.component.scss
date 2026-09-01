@@ -124,7 +124,9 @@
   font-size: 14px;
   font-weight: 600;
   line-height: 21px;
+  /* stylelint-disable */
   font-family: Lato;
+  /* stylelint-enable */
   letter-spacing: normal;
   box-sizing: border-box;
   height: 32px;
@@ -146,7 +148,9 @@
 
 .text-description {
   color: rgba(0, 0, 0, 0.6);
+  /* stylelint-disable */
   font: 400 14px Lato;
+  /* stylelint-enable */
 }
 
 .verify_icon {
@@ -168,12 +172,16 @@
 }
 
 .more-or-less {
+  /* stylelint-disable */
   font-family: Lato;
+  /* stylelint-enable */
   color: #1b4ca1;
   font-size: 14px;
   font-weight: 400;
   line-height: 20px;
+  /* stylelint-disable */
   font-weight: 600;
+  /* stylelint-enable */
   margin: 8px 0;
 }
 
@@ -216,7 +224,9 @@
   background-color: #fff;
   border: 1px solid rgba(0, 0, 0, 0.4);
   color: rgba(0, 0, 0, 0.4);
+  /* stylelint-disable */
   font: 14px/21px 'Lato';
+  /* stylelint-enable */
   font-weight: 700;
   box-sizing: border-box;
   cursor: pointer;
@@ -246,7 +256,9 @@
 }
 
 .breadcrum .event-builder-text {
+  /* stylelint-disable */
     font: 700 14px Lato;
+    /* stylelint-enable */
     color: #1B4CA1;
 }
 .event-builder-text {
@@ -257,7 +269,9 @@
 }
 .view-more-btn {
     color: #1b4ca1 !important;
+    /* stylelint-disable */
     font-family: Lato;
+    /* stylelint-enable */
     font-size: 14px;
     font-weight: 700;
     text-align: center;
@@ -275,7 +289,7 @@
     overflow: visible;
     vertical-align: middle;
     background: rgba(0, 0, 0, 0);
-    width: 100%;
+    // width: 100%;
     padding: 8px 0;
     cursor: pointer;
 }

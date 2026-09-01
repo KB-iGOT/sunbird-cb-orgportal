@@ -25,7 +25,8 @@
             <h2>{{image.SessionId}}</h2>
           </mat-grid-tile-header>
           <div class="galleryImg">
-            <img (click)="openGallery(true,image.ImageUrl)" [src]="image.ImageUrl[0]" alt="image">
+            <img (click)="openGallery(true,image.ImageUrl)" [src]="image.ImageUrl[0]" alt="image"
+              (keydown)="$event.preventDefault()">
           </div>
           <mat-grid-tile-footer class="ws-mat-primary">Highlights</mat-grid-tile-footer>
         </mat-grid-tile>

@@ -1,31 +1,40 @@
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing'
-
 import { SubmitQuizDialogComponent } from './submit-quiz-dialog.component'
-import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core'
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog'
 
-describe('SubmitQuizDialogComponent', () => {
+describe('SubmitQuizDialogComponent (quiz)', () => {
   let component: SubmitQuizDialogComponent
-  let fixture: ComponentFixture<SubmitQuizDialogComponent>
-
-  beforeEach(waitForAsync(() => {
-    TestBed.configureTestingModule({
-      declarations: [SubmitQuizDialogComponent],
-      imports: [CUSTOM_ELEMENTS_SCHEMA],
-      providers: [{ provide: MAT_DIALOG_DATA, useValue: {} },
-      { provide: MatDialogRef, useValue: {} },
-      ],
-    })
-      .compileComponents()
-  }))
+  let mockDialogRef: any
+  let mockSubmissionState: any
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(SubmitQuizDialogComponent)
-    component = fixture.componentInstance
-    fixture.detectChanges()
+    mockDialogRef = {
+      close: jest.fn(),
+      afterClosed: jest.fn(),
+    }
+    mockSubmissionState = 'initial' as any
+    component = new SubmitQuizDialogComponent(mockDialogRef, mockSubmissionState)
   })
 
   it('should create', () => {
     expect(component).toBeTruthy()
+  })
+
+  it('should expose dialogRef', () => {
+    expect(component.dialogRef).toBe(mockDialogRef)
+  })
+
+  it('should expose submissionState', () => {
+    expect(component.submissionState).toBe(mockSubmissionState)
+  })
+
+  it('should create with different submission states', () => {
+    const states = ['initial', 'pass', 'fail', 'partial']
+    states.forEach(state => {
+      const comp = new SubmitQuizDialogComponent(mockDialogRef, state as any)
+      expect(comp.submissionState).toBe(state)
+    })
+  })
+
+  it('ngOnInit should not throw', () => {
+    expect(() => component.ngOnInit()).not.toThrow()
   })
 })

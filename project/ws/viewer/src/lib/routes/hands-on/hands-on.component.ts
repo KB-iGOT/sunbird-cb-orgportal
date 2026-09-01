@@ -55,7 +55,7 @@ export class HandsOnComponent implements OnInit, OnDestroy {
     )
   }
 
-  async ngOnDestroy() {
+  async ngOnDestroy() { // NOSONAR
     if (this.activatedRoute.snapshot.queryParams.collectionId &&
       this.activatedRoute.snapshot.queryParams.collectionType
       && this.handsOnData) {

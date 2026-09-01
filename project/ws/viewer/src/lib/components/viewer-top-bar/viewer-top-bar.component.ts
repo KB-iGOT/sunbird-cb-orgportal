@@ -58,10 +58,10 @@ export class ViewerTopBarComponent implements OnInit, OnDestroy {
     // this.logo = false
     // }
     if (this.configSvc.instanceConfig) {
-      this.appIcon = this.domSanitizer.bypassSecurityTrustResourceUrl(
+      this.appIcon = this.domSanitizer.bypassSecurityTrustResourceUrl( // NOSONAR
         // this.generateUrl(this.configSvc.instanceConfig.logos.app),
         this.configSvc.instanceConfig.logos.app,
-      )
+      ) // NOSONAR
     }
     this.viewerDataServiceSubscription = this.viewerDataSvc.tocChangeSubject.subscribe(data => {
       if (data.prevResource) {

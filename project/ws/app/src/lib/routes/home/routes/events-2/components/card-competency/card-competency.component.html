@@ -15,11 +15,12 @@
             </div>
           </ng-container>
           <div class="flex items-center ws-mat-default-text underline cursor-pointer text-xs"
-            *ngIf="theme?.subThems?.length > 1 && !isExpanded" (click)="handleToggleSize()">
+            *ngIf="theme?.subThems?.length > 1 && !isExpanded" (click)="handleToggleSize()"
+            (keydown)="$event.preventDefault()">
             View more
           </div>
           <div class="flex items-center ws-mat-default-text underline cursor-pointer text-xs" *ngIf="isExpanded"
-            (click)="handleToggleSize()">
+            (click)="handleToggleSize()" (keydown)="$event.preventDefault()">
             View less
           </div>
         </div>

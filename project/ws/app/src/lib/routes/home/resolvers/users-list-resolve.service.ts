@@ -5,11 +5,10 @@ import { map, catchError } from 'rxjs/operators'
 import { IResolveResponse, ConfigurationsService } from '@sunbird-cb/utils-v2'
 import { UsersService } from '../../users/services/users.service'
 // tslint:disable-next-line
-import _ from 'lodash';
+import * as _ from 'lodash'
 
 @Injectable()
-export class UsersListResolve
-   {
+export class UsersListResolve {
   constructor(private usersService: UsersService, @SkipSelf() private configSvc: ConfigurationsService) { }
 
   resolve(

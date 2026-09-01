@@ -79,8 +79,9 @@
             <ng-container matColumnDef="interests">
               <th mat-header-cell *matHeaderCellDef class="row-heading">Interests</th>
               <td mat-cell class="title-class" *matCellDef="let element">
-                <a class="action-btn-view" *ngIf="element?.interestCount!== 0" href="javascript:void(0)" [ngStyle]="getPointerEventsStyle(element)">
-                  <span (click)="handleClick(element)">
+                <a class="action-btn-view" *ngIf="element?.interestCount!== 0" href="javascript:void(0)"
+                  [ngStyle]="getPointerEventsStyle(element)">
+                  <span (click)="handleClick(element)" (keyup)="handleClick(element)">
                     {{element?.interestCount}}
                   </span></a>
                 <a class="" *ngIf="element?.interestCount === 0" href="javascript:void(0)">{{element?.requestType ==
@@ -91,7 +92,8 @@
             <ng-container matColumnDef="details">
               <th mat-header-cell *matHeaderCellDef class="row-heading">Details</th>
               <td mat-cell *matCellDef="let element">
-                <mat-icon (click)="navigateToDetails(element?.demand_id)" class="cursor-pointer">visibility</mat-icon>
+                <mat-icon (click)="navigateToDetails(element?.demand_id)"
+                  (keyup)="navigateToDetails(element?.demand_id)" class="cursor-pointer">visibility</mat-icon>
               </td>
             </ng-container>
 
@@ -153,7 +155,8 @@
                   [routerLink]="['/app/home/create-request-form']">Request Content</button>
               </div> -->
           <div class=" margin-top-m no-content-create">
-            <button mat-button type="button" class="search-btns" [routerLink]="['/app/home/create-request-form']">Request Content</button>
+            <button mat-button type="button" class="search-btns"
+              [routerLink]="['/app/home/create-request-form']">Request Content</button>
           </div>
 
         </div>

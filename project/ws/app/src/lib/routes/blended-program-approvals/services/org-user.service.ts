@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http'
 import { ConfigurationsService } from '@sunbird-cb/utils-v2'
 import { map } from 'rxjs/operators'
 /* tslint:disable */
-import _ from 'lodash'
+import * as _ from 'lodash'
 import { of } from 'rxjs'
 /* tslint:enable */
 

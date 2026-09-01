@@ -75,10 +75,10 @@ export class LangSelectComponent implements OnInit {
 
   isLocaleAvailable(langPath: string): boolean {
     // this.loggerSvc.log('Locale', this.allowedLangCode[langPath].isAvailable)
-    return this.allowedLangCode[langPath] && this.allowedLangCode[langPath].isAvailable
+    return this.allowedLangCode[langPath] && this.allowedLangCode[langPath]?.isAvailable
   }
   isLocaleEnabled(langPath: string): boolean {
-    return this.allowedLangCode[langPath] && this.allowedLangCode[langPath].isEnabled
+    return this.allowedLangCode[langPath] && this.allowedLangCode[langPath]?.isEnabled
   }
 
   langChanged(path: string) {

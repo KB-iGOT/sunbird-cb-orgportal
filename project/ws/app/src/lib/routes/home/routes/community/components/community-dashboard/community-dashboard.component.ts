@@ -92,9 +92,9 @@ export class CommunityDashboardComponent implements OnInit {
     if (_.get(this.activatedRoute, 'snapshot.data.configService.unMappedUser')) {
       this.userProfile = _.get(this.activatedRoute, 'snapshot.data.configService.unMappedUser')
       const rolesSet = new Set(this.userProfile.roles)
-      this.filteredTabs = rolesSet.has('COMMUNITY_MODERATOR') &&!rolesSet.has('MDO_LEADER')
+      this.filteredTabs = rolesSet.has('COMMUNITY_MODERATOR') && !rolesSet.has('MDO_LEADER')
         ? this.tabs.filter(t => t.label === 'Community')
-        : this.tabs;
+        : this.tabs
     }
 
   }

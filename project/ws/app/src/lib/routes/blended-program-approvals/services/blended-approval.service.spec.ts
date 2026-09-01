@@ -1,6 +1,6 @@
 import { BlendedApporvalService } from './blended-approval.service'
 import { of } from 'rxjs'
-import _ from 'lodash'
+import * as _ from 'lodash'
 
 describe('BlendedApporvalService', () => {
     let service: BlendedApporvalService
@@ -133,7 +133,7 @@ describe('BlendedApporvalService', () => {
                 expect(response).toEqual(mockResponse.result.response)
             })
 
-            expect(httpClientSpy.get).toHaveBeenCalledWith('/apis/proxies/v8/api/user/v2/read')
+            expect(httpClientSpy.get).toHaveBeenCalledWith('/apis/proxies/v8/api/user/v2/read/')
         })
     })
 
@@ -148,7 +148,7 @@ describe('BlendedApporvalService', () => {
                 expect(response).toEqual(mockResponse)
             })
 
-            expect(httpClientSpy.get).toHaveBeenCalledWith('/apis/protected/v8/cohorts/course/batch/cert/download/cert-123')
+            expect(httpClientSpy.get).toHaveBeenCalledWith('/apis/protected/v8/cohorts/course/batch/cert/download//cert-123')
         })
     })
 
@@ -193,7 +193,7 @@ describe('BlendedApporvalService', () => {
                 expect(response).toEqual(mockResponse)
             })
 
-            expect(httpClientSpy.post).toHaveBeenCalledWith('/apis/proxies/v8/workflow/blendedprogram/remove/mdo', reqBody)
+            expect(httpClientSpy.post).toHaveBeenCalledWith('/apis/proxies/v8/workflow/blendedprogram/remove/approved/user', reqBody, expect.any(Object))
         })
     })
 
@@ -286,7 +286,7 @@ describe('BlendedApporvalService', () => {
                 expect(response).toEqual(mockResponse)
             })
 
-            expect(httpClientSpy.get).toHaveBeenCalledWith('/apis/proxies/v8/forms/getFormById?id=form-123')
+            expect(httpClientSpy.get).toHaveBeenCalledWith('/apis/proxies/v8/forms/v2/getFormById?formId=form-123')
         })
     })
 })

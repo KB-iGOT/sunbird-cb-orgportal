@@ -34,9 +34,9 @@ export class EventDetailsComponent implements OnInit, OnChanges {
       return { pattern: true }
     }
 
-    const hoursMatch = value.match(/(\d+)h/)
-    const minutesMatch = value.match(/(\d+)m/)
-    const secondsMatch = value.match(/(\d+)s/)
+    const hoursMatch = value.match(/(\d+)h/) // NOSONAR
+    const minutesMatch = value.match(/(\d+)m/) // NOSONAR
+    const secondsMatch = value.match(/(\d+)s/) // NOSONAR
 
     const hours = hoursMatch ? parseInt(hoursMatch[1], 10) : 0
     const minutes = minutesMatch ? parseInt(minutesMatch[1], 10) : 0
@@ -429,8 +429,8 @@ export class EventDetailsComponent implements OnInit, OnChanges {
 
     if (value) {
       // Validate email or name format
-      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-      const namePattern = /^[a-zA-Z\s.]+$/
+      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/ // NOSONAR
+      const namePattern = /^[a-zA-Z\s.]+$/ // NOSONAR
 
       if (emailPattern.test(value) || namePattern.test(value)) {
         const currentSpeakers = this.preEventForm.get('selectedSpeaker')?.value || []

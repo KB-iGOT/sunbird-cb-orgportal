@@ -10,7 +10,7 @@
         </div>
       </mat-card-header> -->
     <span class="flex">
-      <mat-icon class="arrow-btn" (click)="navigateBack()">arrow_back</mat-icon>
+      <mat-icon class="arrow-btn" (click)="navigateBack()" (keydown)="$event.preventDefault()">arrow_back</mat-icon>
       <mat-card-title class="flex-4 mobile-margin mat-h2 title-request">
         {{isHideData ? 'Go Back':'Request Content'}}
       </mat-card-title>
@@ -141,7 +141,7 @@
                   <span class="display-inline-block complabels mat-caption cursor-pointer" [ngClass]="{active: (seletedCompetencyTheme &&
                     (option?.identifier && option?.identifier === seletedCompetencyTheme?.identifier ||
                      option?.name && option?.name === seletedCompetencyTheme?.name))}"
-                    (click)="compThemeSelected(option)"
+                    (click)="compThemeSelected(option)" (keydown)="$event.preventDefault()"
                     *ngFor="let option of filteredallCompetencyTheme">{{option?.additionalProperties?.displayName ||
                     option?.name}}</span>
                 </div>
@@ -165,7 +165,7 @@
                   <span class="display-inline-block complabels mat-caption cursor-pointer" [ngClass]="{active: (seletedCompetencySubTheme &&
                       (option?.identifier && option?.identifier === seletedCompetencySubTheme?.identifier ||
                      option?.name && option?.name === seletedCompetencySubTheme?.name)
-                    )}" (click)="compSubThemeSelected(option)"
+                    )}" (click)="compSubThemeSelected(option)" (keydown)="$event.preventDefault()"
                     *ngFor="let option of filteredallCompetencySubtheme">{{option?.additionalProperties?.displayName ||
                     option?.name}}</span>
                 </div>
@@ -189,7 +189,8 @@
                       <th class="padding-xs ws-mat-black60-text mat-body-1">Sub theme</th>
                     </tr>
                     <tr *ngFor="let comp of requestForm.controls[this.compentencyKey.vKey]?.value"
-                      [attr.disabled]="isCompetencyHide ? true : null" (click)=view(comp)>
+                      [attr.disabled]="isCompetencyHide ? true : null" (keydown)="$event.preventDefault()"
+                      (click)=view(comp)>
                       <td class="padding-xs mat-body-1 cursor-pointer">{{comp.competencyArea | capitalize}}</td>
                       <td class="padding-xs mat-body-1 cursor-pointer">{{(comp.competencyTheme | capitalize) ||
                         comp.name | capitalize}}</td>

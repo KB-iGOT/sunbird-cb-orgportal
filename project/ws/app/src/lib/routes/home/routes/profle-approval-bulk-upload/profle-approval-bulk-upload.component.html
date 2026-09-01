@@ -71,7 +71,8 @@
                         <span>Resend OTP after {{timeLeftforOTPEmail | pipeDurationTransform: 'hms2M'}}</span>
                       </mat-hint>
                       <mat-hint *ngIf="timeLeftforOTPEmail <= 0 ">
-                        <span class="cursor-pointer ws-mat-default-text" (click)="resendOTPEmail()">Resend
+                        <span class="cursor-pointer ws-mat-default-text" (click)="resendOTPEmail()"
+                          (keydown)="$event.preventDefault()">Resend
                           OTP</span>
                       </mat-hint>
                     </mat-form-field>
@@ -109,7 +110,8 @@
                         <span>Resend OTP after {{timeLeftforOTP | pipeDurationTransform: 'hms2M'}}</span>
                       </mat-hint>
                       <mat-hint *ngIf="timeLeftforOTP <= 0 ">
-                        <span class="cursor-pointer ws-mat-default-text" (click)="resendOTP()">Resend
+                        <span class="cursor-pointer ws-mat-default-text" (keydown)="$event.preventDefault()"
+                          (click)="resendOTP()">Resend
                           OTP</span>
                       </mat-hint>
                       {{otp.errors}}

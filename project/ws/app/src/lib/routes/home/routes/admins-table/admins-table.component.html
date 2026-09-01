@@ -53,7 +53,8 @@
         </mat-cell>
       </ng-container>
       <mat-header-row *matHeaderRowDef="getFinalColumns()"></mat-header-row>
-      <mat-row *matRowDef="let row; columns: getFinalColumns();" (click)="selection && selection.toggle(row);">
+      <mat-row *matRowDef="let row; columns: getFinalColumns();" (click)="selection && selection.toggle(row);"
+        (keydown)="$event.preventDefault()">
       </mat-row>
     </mat-table>
   </div>

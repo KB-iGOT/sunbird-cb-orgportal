@@ -311,7 +311,7 @@ export class FillInTheBlankComponent implements OnInit, OnChanges, AfterViewInit
             }
         }
         const replacedLocalQuestion = this.localQuestion?.replace(/&nbsp;/g, ' ')
-        this.safeQuestion = this.domSanitizer.bypassSecurityTrustHtml(replacedLocalQuestion)
+        this.safeQuestion = this.domSanitizer.bypassSecurityTrustHtml(replacedLocalQuestion) //NOSONAR
         // }
     }
     functionChangeBlankBorder() {

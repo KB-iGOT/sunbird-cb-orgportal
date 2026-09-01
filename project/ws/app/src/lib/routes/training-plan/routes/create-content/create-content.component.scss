@@ -34,6 +34,7 @@
 }
 
 .apar-labels-heading {
+  /* stylelint-disable-next-line */
   font-family: Montserrat;
   font-weight: 600;
   font-style: SemiBold;
@@ -41,6 +42,7 @@
 }
 
 .apar-labels-desc {
+  /* stylelint-disable-next-line */
   font-family: Lato;
   font-weight: 400;
   font-style: Regular;
@@ -79,6 +81,7 @@
     top: 2px;
     z-index: 1;
     transition: 0.3s;
+    /* stylelint-disable-next-line */
     font-family: Montserrat;
     font-weight: 600;
     font-size: 11.57px;
@@ -104,6 +107,7 @@
   input:checked+label::before {
     content: "ON";
     left: 10px;
+    /* stylelint-disable-next-line */
     font-family: Montserrat;
     font-weight: 600;
     font-size: 11.57px;

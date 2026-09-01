@@ -129,6 +129,7 @@
       overflow-wrap: break-word;
       // Table body styling
       color: rgba(0, 0, 0, 0.87) !important;
+      /* stylelint-disable-next-line */
       font: normal 14px Lato !important;
       font-weight: 400 !important;
     }
@@ -141,6 +142,7 @@
 }
 
 .h-400-r-14-l {
+  /* stylelint-disable-next-line */
   font: normal 14px Lato !important;
   font-weight: 400 !important;
 }

@@ -1,25 +1,41 @@
-import { MatDialogRef } from '@angular/material/dialog'
 import { ConformationPopupComponent } from './conformation-popup.component'
 
 describe('ConformationPopupComponent', () => {
     let component: ConformationPopupComponent
-
-    const dialogRef: Partial<MatDialogRef<ConformationPopupComponent>> = {}
-    const data: any = {}
-
-    beforeAll(() => {
-        component = new ConformationPopupComponent(
-            dialogRef as MatDialogRef<ConformationPopupComponent>,
-            data as undefined
-        )
-    })
+    let mockDialogRef: any
 
     beforeEach(() => {
-        jest.clearAllMocks()
-        jest.resetAllMocks()
+        mockDialogRef = { close: jest.fn() }
+        component = new ConformationPopupComponent(mockDialogRef, { title: 'Test', buttons: [] })
     })
 
-    it('should create a instance of component', () => {
+    afterEach(() => jest.clearAllMocks())
+
+    it('should create and set dialogDetails from data', () => {
         expect(component).toBeTruthy()
+        expect(component.dialogDetails).toEqual({ title: 'Test', buttons: [] })
+    })
+
+    describe('ngOnInit', () => {
+        it('should not throw', () => {
+            expect(() => component.ngOnInit()).not.toThrow()
+        })
+    })
+
+    describe('closePopup', () => {
+        it('should close the dialog with the given event value', () => {
+            component.closePopup(true)
+            expect(mockDialogRef.close).toHaveBeenCalledWith(true)
+        })
+
+        it('should close the dialog with the given string event', () => {
+            component.closePopup('ok')
+            expect(mockDialogRef.close).toHaveBeenCalledWith('ok')
+        })
+
+        it('should close the dialog with null', () => {
+            component.closePopup(null)
+            expect(mockDialogRef.close).toHaveBeenCalledWith(null)
+        })
     })
 })

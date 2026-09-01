@@ -1,130 +1,491 @@
-
+import { StaffComponent } from './staff.component'
 import { of, throwError } from 'rxjs'
 import { SelectionModel } from '@angular/cdk/collections'
 import { MatTableDataSource } from '@angular/material/table'
-import * as _ from 'lodash'
-import { StaffComponent } from './staff.component'
-
-// Mock implementations
-const mockMatSnackBar = { open: jest.fn() }
-const mockMatDialog = { open: jest.fn(() => ({ afterClosed: () => of({}) })) }
-const mockMdoInfoService = {
-    getStaffdetails: jest.fn(),
-    addStaffdetails: jest.fn(),
-    updateStaffdetails: jest.fn(),
-    deleteStaffdetails: jest.fn(),
-}
-const mockConfigurationsService = { userProfile: { rootOrgId: 'mockDeptID' } }
-const mockActivatedRoute = { snapshot: { data: { configService: { userProfile: { rootOrgId: 'mockDeptID' } } } } }
+import { SimpleChange, SimpleChanges } from '@angular/core'
+import { UntypedFormControl, UntypedFormGroup } from '@angular/forms'
 
 describe('StaffComponent', () => {
     let component: StaffComponent
+    let snackBarMock: any
+    let dialogMock: any
+    let activeRouteMock: any
+    let configSvcMock: any
+    let mdoinfoSrvcMock: any
 
+    // Mock data
+    const mockStaffDetails = [
+        {
+            id: 'pos1',
+            srnumber: 1,
+            position: 'Deputy Director',
+            totalPositionsFilled: 2,
+            totalPositionsVacant: 2
+        },
+        {
+            id: 'pos2',
+            srnumber: 2,
+            position: 'Assistant Director',
+            totalPositionsFilled: 3,
+            totalPositionsVacant: 1
+        },
+        {
+            id: 'total',
+            srnumber: 3,
+            position: 'all',
+            totalPositionsFilled: 5,
+            totalPositionsVacant: 3
+        }
+    ]
+
+    // Setup before each test
     beforeEach(() => {
+        // Reset all mocks
+        jest.clearAllMocks()
+
+        // Create mocks for all dependencies
+        snackBarMock = {
+            open: jest.fn()
+        }
+
+        dialogMock = {
+            open: jest.fn().mockReturnValue({
+                afterClosed: jest.fn().mockReturnValue(of({
+                    data: {
+                        id: 'pos1',
+                        position: 'Deputy Director',
+                        totalPositionsFilled: 3,
+                        totalPositionsVacant: 1
+                    }
+                }))
+            })
+        }
+
+        activeRouteMock = {
+            snapshot: {
+                data: {
+                    configService: {
+                        userProfile: {
+                            rootOrgId: 'org123'
+                        }
+                    }
+                }
+            }
+        }
+
+        configSvcMock = {
+            userProfile: {
+                rootOrgId: 'org123'
+            }
+        }
+
+        mdoinfoSrvcMock = {
+            getStaffdetails: jest.fn(),
+            addStaffdetails: jest.fn(),
+            updateStaffdetails: jest.fn(),
+            deleteStaffdetails: jest.fn()
+        }
+
+        // Setup default response for getStaffdetails
+        mdoinfoSrvcMock.getStaffdetails.mockReturnValue(of({
+            result: {
+                response: [...mockStaffDetails]
+            }
+        }))
+
+        // Setup default responses for other methods
+        mdoinfoSrvcMock.addStaffdetails.mockReturnValue(of({ success: true }))
+        mdoinfoSrvcMock.updateStaffdetails.mockReturnValue(of({ success: true }))
+        mdoinfoSrvcMock.deleteStaffdetails.mockReturnValue(of({ success: true }))
+
+        // Create component with mocked dependencies
         component = new StaffComponent(
-            mockMatSnackBar as any,
-            mockMatDialog as any,
-            mockActivatedRoute as any,
-            mockConfigurationsService as any,
-            mockMdoInfoService as any
+            snackBarMock,
+            dialogMock,
+            activeRouteMock,
+            configSvcMock,
+            mdoinfoSrvcMock
         )
 
-        // Mocking data source, paginator and selection model
-        component.dataSource = new MatTableDataSource()
-        component.selection = new SelectionModel<any>(true, [])
-        component.paginator = { firstPage: jest.fn() } as any
+        // Mock paginator
+        component.paginator = {
+            firstPage: jest.fn()
+        } as any
     })
 
-    afterEach(() => {
-        jest.clearAllMocks()
+    describe('initialization', () => {
+        it('should create component', () => {
+            expect(component).toBeTruthy()
+        })
+
+        it('should initialize form controls', () => {
+            expect(component.staffdata).toBeTruthy()
+            expect(component.staffdata.get('totalpositions')).toBeTruthy()
+            expect(component.staffdata.get('posfilled')).toBeTruthy()
+            expect(component.staffdata.get('posvacant')).toBeTruthy()
+            expect(component.staffdata.get('totalpositions')?.disabled).toBe(true)
+        })
+
+        it('should initialize tableData with correct columns', () => {
+            expect(component.tableData).toBeTruthy()
+            expect(component.tableData.columns.length).toBe(4)
+            expect(component.tableData.columns[0].displayName).toBe('Sr. no.')
+            expect(component.tableData.columns[1].displayName).toBe('Position')
+        })
+
+        it('should initialize dataSource', () => {
+            expect(component.dataSource).toBeInstanceOf(MatTableDataSource)
+        })
+
+
     })
 
-    it('should create the component', () => {
-        expect(component).toBeTruthy()
+    describe('ngOnInit', () => {
+        it('should set displayedColumns from tableData', () => {
+            component.ngOnInit()
+
+            expect(component.displayedColumns).toEqual(component.tableData.columns)
+        })
+
+        it('should set dataSource data if data exists', () => {
+            component.data = [{ srnumber: 1, position: 'Test', positionfilled: 1, positionvacant: 2 }]
+
+            component.ngOnInit()
+
+            expect(component.dataSource.data).toEqual(component.data)
+        })
     })
 
-    it('should call getStaffDetails on initialization if deptID is available', () => {
-        const spy = jest.spyOn(component, 'getStaffDetails')
-        component.ngOnInit()
-        expect(spy).toHaveBeenCalled()
+    describe('ngOnChanges', () => {
+        it('should update dataSource.data with new data', () => {
+            const mockChanges: SimpleChanges = {
+                data: new SimpleChange(null, [{ id: 'new', position: 'New Position' }], true)
+            }
+
+            component.ngOnChanges(mockChanges)
+
+            expect(component.paginator.firstPage).toHaveBeenCalled()
+        })
+
+        it('should handle empty data', () => {
+            const mockChanges: SimpleChanges = {
+                data: new SimpleChange(null, null, true)
+            }
+
+            component.ngOnChanges(mockChanges)
+
+            expect(component.dataSource.data).toEqual([])
+        })
     })
 
-    it('should handle error when getStaffDetails fails with a 400 error', () => {
-        const errorResponse = { status: 400 }
-        mockMdoInfoService.getStaffdetails.mockReturnValue(throwError(() => errorResponse))
+    describe('getFinalColumns', () => {
+        it('should return columns from tableData', () => {
+            const result = component.getFinalColumns()
 
-        // const spy = jest.spyOn(component, 'openSnackbar')
-        component.getStaffDetails()
+            // The expected columns from tableData defined in component
+            expect(result).toContain('srnumber')
+            expect(result).toContain('position')
+            expect(result).toContain('totalPositionsFilled')
+            expect(result).toContain('totalPositionsVacant')
 
-        // expect(spy).toHaveBeenCalledWith('No staff positions found')
+            // Should add Menu because needUserMenus is true
+            expect(result).toContain('Menu')
+        })
+
+        it('should include checkbox column if needCheckBox is true', () => {
+            component.tableData.needCheckBox = true
+
+            const result = component.getFinalColumns()
+
+            expect(result).toContain('select')
+        })
+
+        it('should include hash column if needHash is true', () => {
+            component.tableData.needHash = true
+
+            const result = component.getFinalColumns()
+
+            expect(result).toContain('SR')
+        })
+
+        it('should return empty string if tableData is undefined', () => {
+            component.tableData = undefined as any
+
+            const result = component.getFinalColumns()
+
+            expect(result).toBe('')
+        })
     })
 
-    it('should correctly handle ngOnChanges', () => {
-        // const changes = {
-        //     currentValue: [{ srnumber: 1, position: 'Manager', positionfilled: 2, positionvacant: 3 }],
-        // }
-        //component.ngOnChanges(changes)
+    describe('getStaffDetails', () => {
 
-        expect(component.dataSource.data.length).toBe(1)
-        expect(component.length).toBe(1)
-        expect(component.paginator.firstPage).toHaveBeenCalled()
+        it('should show error message if request fails with 400 status', () => {
+            mdoinfoSrvcMock.getStaffdetails.mockReturnValue(
+                throwError({ status: 400 })
+            )
+
+            component.getStaffDetails()
+
+            expect(snackBarMock.open).toHaveBeenCalledWith('No staff positions found')
+        })
     })
 
-    it('should call openSnackbar when updating staff details successfully', () => {
-        const mockResponse = { success: true }
-        const form = { value: { posfilled: 5, posvacant: 3 } }
-        mockMdoInfoService.updateStaffdetails.mockReturnValue(of(mockResponse))
+    describe('selection handling', () => {
+        beforeEach(() => {
+            // Setup test data
+            component.dataSource.data = [
+                { id: 1, position: 'Position 1' },
+                { id: 2, position: 'Position 2' },
+                { id: 3, position: 'Position 3' }
+            ]
 
-        //  const spy = jest.spyOn(component, 'openSnackbar')
-        component.onSubmit(form)
+            // Create selection model
+            component.selection = new SelectionModel<any>(true, [])
+        })
 
-        //  expect(spy).toHaveBeenCalledWith('Staff details updated successfully')
+        it('should detect if all rows are selected', () => {
+            // Initially nothing selected
+            expect(component.isAllSelected()).toBe(false)
+
+            // Select all rows
+            component.dataSource.data.forEach((row: any) => component.selection.select(row))
+
+            expect(component.isAllSelected()).toBe(true)
+        })
+
+        it('should toggle all selections with masterToggle', () => {
+            // Select all
+            component.masterToggle()
+            expect(component.selection.selected.length).toBe(3)
+
+            // Deselect all
+            component.masterToggle()
+            expect(component.selection.selected.length).toBe(0)
+        })
+
+        it('should return correct checkbox label', () => {
+            const row = component.dataSource.data[0]
+
+            // Label for "select all" checkbox
+            expect(component.checkboxLabel()).toContain('all')
+
+            // Label for row checkbox when not selected
+            expect(component.checkboxLabel(row)).toContain('select row')
+
+            // Select the row
+            component.selection.select(row)
+
+            // Label for row checkbox when selected
+            expect(component.checkboxLabel(row)).toContain('deselect row')
+        })
+
+        it('should filter list by key', () => {
+            const list = [
+                { id: 1, name: 'Item 1' },
+                { id: 2, name: 'Item 2' },
+                { id: 3, name: 'Item 3' }
+            ]
+
+            const result = component.filterList(list, 'name')
+
+            expect(result).toEqual(['Item 1', 'Item 2', 'Item 3'])
+        })
     })
 
-    it('should call addStaffdetails and openSnackbar when adding staff details', () => {
-        const form = { value: { posfilled: 5, posvacant: 3 } }
-        const mockResponse = { success: true }
-        mockMdoInfoService.addStaffdetails.mockReturnValue(of(mockResponse))
+    describe('dialog interactions', () => {
+        it('should open dialog with correct config when adding new position', () => {
+            component.onAddPosition(null)
 
-        //  const spy = jest.spyOn(component, 'openSnackbar')
-        component.onSubmit(form)
+            expect(dialogMock.open).toHaveBeenCalled()
 
-        expect(mockMdoInfoService.addStaffdetails).toHaveBeenCalled()
-        // expect(spy).toHaveBeenCalledWith('Staff details updated successfully')
+            // Verify dialog config
+            const dialogConfig = dialogMock.open.mock.calls[0][1]
+            expect(dialogConfig.disableClose).toBe(true)
+            expect(dialogConfig.width).toBe('50%')
+            expect(dialogConfig.data.data).toEqual([])
+        })
+
+        it('should open dialog with row data when updating position', () => {
+            const rowData = { id: 'pos1', position: 'Test Position' }
+
+            component.onAddPosition(rowData)
+
+            // Verify dialog config
+            const dialogConfig = dialogMock.open.mock.calls[0][1]
+            expect(dialogConfig.data.data).toEqual(rowData)
+        })
+
+        it('should call addStaffdetails when new position submitted from dialog', () => {
+            // Setup dialog to return new position data (no id)
+            dialogMock.open.mockReturnValue({
+                afterClosed: jest.fn().mockReturnValue(of({
+                    data: {
+                        designation: 'New Position',
+                        posfilled: '4',
+                        posvacant: '2'
+                    }
+                }))
+            })
+
+            component.onAddPosition(null)
+
+            // Verify addStaffdetails called with correct request
+            expect(mdoinfoSrvcMock.addStaffdetails).toHaveBeenCalledWith({
+                orgId: 'org123',
+                position: 'New Position',
+                totalPositionsFilled: 4,
+                totalPositionsVacant: 2
+            })
+
+            // Verify details refreshed after add
+            expect(mdoinfoSrvcMock.getStaffdetails).toHaveBeenCalled()
+        })
+
+
+
+        it('should show error when adding duplicate position', () => {
+            // Setup dialog to return new position
+            dialogMock.open.mockReturnValue({
+                afterClosed: jest.fn().mockReturnValue(of({
+                    data: {
+                        designation: 'Duplicate Position',
+                        posfilled: '1',
+                        posvacant: '1'
+                    }
+                }))
+            })
+
+            // Setup error for duplicate position
+            mdoinfoSrvcMock.addStaffdetails.mockReturnValue(
+                throwError({ status: 400 })
+            )
+
+            component.onAddPosition(null)
+
+            expect(snackBarMock.open).toHaveBeenCalledWith('Position exists for given name')
+        })
     })
 
-    it('should open dialog on calling onAddPosition', () => {
-        const rowData = { position: 'Manager' }
-        component.onAddPosition(rowData)
+    describe('form submission', () => {
+        beforeEach(() => {
+            // Set up mock form
+            component.staffdata = new UntypedFormGroup({
+                totalpositions: new UntypedFormControl({ value: '10', disabled: true }),
+                posfilled: new UntypedFormControl('6'),
+                posvacant: new UntypedFormControl('4')
+            })
+        })
 
-        expect(mockMatDialog.open).toHaveBeenCalled()
+        it('should call addStaffdetails when submitting new overall positions', () => {
+            // Clear overallpos to simulate new submission
+            component.overallpos = null
+
+            component.onSubmit(component.staffdata)
+
+            expect(mdoinfoSrvcMock.addStaffdetails).toHaveBeenCalledWith({
+                orgId: 'org123',
+                position: 'all',
+                totalPositionsFilled: 6,
+                totalPositionsVacant: 4
+            })
+
+            expect(snackBarMock.open).toHaveBeenCalledWith('Staff details updated successfully')
+        })
+
+        it('should call updateStaffdetails when updating overall positions', () => {
+            // Set overallpos to simulate update
+            component.overallpos = { id: 'total' }
+
+            component.onSubmit(component.staffdata)
+
+            expect(mdoinfoSrvcMock.updateStaffdetails).toHaveBeenCalledWith({
+                id: 'total',
+                orgId: 'org123',
+                position: 'all',
+                totalPositionsFilled: 6,
+                totalPositionsVacant: 4
+            })
+
+            expect(snackBarMock.open).toHaveBeenCalledWith('Staff details updated successfully')
+        })
     })
 
-    it('should select all rows when masterToggle is called', () => {
-        component.dataSource.data = [{ position: 'Manager' }]
-        component.masterToggle()
+    describe('updateStaffDetails', () => {
+        it('should call updateStaffdetails with correct parameters', () => {
+            const formData = {
+                id: 'pos1',
+                position: 'Updated Position',
+                totalPositionsFilled: 3,
+                totalPositionsVacant: 2
+            }
 
-        expect(component.selection.selected.length).toBe(1)
+            component.updateStaffDetails(formData)
+
+            expect(mdoinfoSrvcMock.updateStaffdetails).toHaveBeenCalledWith({
+                id: 'pos1',
+                orgId: 'org123',
+                position: 'Updated Position',
+                totalPositionsFilled: 3,
+                totalPositionsVacant: 2
+            })
+
+            expect(snackBarMock.open).toHaveBeenCalledWith('Staff details updated successfully')
+        })
     })
 
-    it('should correctly filter data in applyFilter method', () => {
-        const filterValue = 'Manager'
-        component.applyFilter(filterValue)
+    describe('deleteStaffDetails', () => {
+        it('should call deleteStaffdetails with correct ID', () => {
+            const formData = {
+                id: 'pos1',
+                position: 'Position to Delete'
+            }
 
-        expect(component.dataSource.filter).toBe(filterValue.toLowerCase())
+            component.deleteStaffDetails(formData)
+
+            expect(mdoinfoSrvcMock.deleteStaffdetails).toHaveBeenCalledWith('pos1', 'org123')
+            expect(snackBarMock.open).toHaveBeenCalledWith('Staff details deleted successfully')
+        })
     })
 
-    it('should correctly handle keyPressNumbers method', () => {
-        const event = { which: 49 } // Key code for '1'
-        const result = component.keyPressNumbers(event)
+    describe('filtering and validation', () => {
+        it('should apply filter to dataSource', () => {
+            component.applyFilter('test')
 
-        expect(result).toBe(true)
-    })
+            expect(component.dataSource.filter).toBe('test')
+        })
 
-    it('should prevent non-numeric input in keyPressNumbers method', () => {
-        const event = { which: 65 } // Key code for 'A'
-        const result = component.keyPressNumbers(event)
+        it('should clear filter when empty value provided', () => {
+            // Set initial filter
+            component.dataSource.filter = 'test'
 
-        expect(result).toBe(false)
+            // Clear filter
+            component.applyFilter('')
+
+            expect(component.dataSource.filter).toBe('')
+        })
+
+        it('should only allow numbers in keyPressNumbers', () => {
+            // Mock event with non-number key
+            const letterEvent = {
+                which: 65, // 'A' key
+                preventDefault: jest.fn()
+            }
+
+            // Test letter key
+            const letterResult = component.keyPressNumbers(letterEvent)
+            expect(letterResult).toBe(false)
+            expect(letterEvent.preventDefault).toHaveBeenCalled()
+
+            // Mock event with number key
+            const numberEvent = {
+                which: 49, // '1' key
+                preventDefault: jest.fn()
+            }
+
+            // Test number key
+            const numberResult = component.keyPressNumbers(numberEvent)
+            expect(numberResult).toBe(true)
+            expect(numberEvent.preventDefault).not.toHaveBeenCalled()
+        })
     })
 })

@@ -168,5 +168,22 @@ describe('HandsOnService', () => {
         { responseType: 'text' }
       )
     })
+
+    it('should return no-submission marker when response array is empty', () => {
+      const mockLexId = 'test-lex-id'
+      const emptyResponse = { response: [] }
+      httpClientSpy.get.mockReturnValueOnce(of(emptyResponse))
+
+      let result: any
+      service.viewLastSubmission(mockLexId).subscribe(r => { result = r })
+      expect(result).toBe('---no submission found---')
+    })
+
+    it('should return no-submission marker when response key is missing', () => {
+      httpClientSpy.get.mockReturnValueOnce(of(null))
+      let result: any
+      service.viewLastSubmission('lex_001').subscribe(r => { result = r })
+      expect(result).toBe('---no submission found---')
+    })
   })
 })

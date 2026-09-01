@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, Output, OnInit } from '@angular/core'
 // import { ActivatedRoute } from '@angular/router'
 /* tslint:disable */
-import _ from 'lodash'
+import * as _ from 'lodash'
 /* tslint:enable */
 import { LoaderService } from '../../../../../../../../../src/app/services/loader.service'
 import { UsersService } from '../../../users/services/users.service'

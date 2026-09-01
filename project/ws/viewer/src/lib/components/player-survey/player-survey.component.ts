@@ -13,8 +13,8 @@ import * as _ from 'lodash'
 import { ViewerDataService } from '../../viewer-data.service'
 import { ROOT_WIDGET_CONFIG } from '@sunbird-cb/toc'
 
-const EMAIL_PATTERN = /^[a-zA-Z0-9]+[a-zA-Z0-9._-]*[a-zA-Z0-9]+@[a-zA-Z0-9]+([-a-zA-Z0-9]*[a-zA-Z0-9]+)?(\.[a-zA-Z0-9-]+)*\.[a-zA-Z]{2,4}$/
-const MOBILE_PATTERN = /^[0]?[6789]\d{9}$/
+const EMAIL_PATTERN = /^[a-zA-Z0-9]+[a-zA-Z0-9._-]*[a-zA-Z0-9]+@[a-zA-Z0-9]+([-a-zA-Z0-9]*[a-zA-Z0-9]+)?(\.[a-zA-Z0-9-]+)*\.[a-zA-Z]{2,4}$/ // NOSONAR
+const MOBILE_PATTERN = /^[0]?[6789]\d{9}$/ // NOSONAR
 
 @Component({
   selector: 'ws-widget-player-survey',

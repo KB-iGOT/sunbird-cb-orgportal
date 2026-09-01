@@ -87,8 +87,9 @@
             </div>
           </div>
         </div>
+        <!-- //NOSONAR -->
         <table class="allocation-table margin-bottom-l mat-body-2" id="allocation-table" cell-spacing='0'
-          cell-padding='0'><!-- //NOSONAR -->
+          cell-padding='0' aria-label="allocation-table"><!-- //NOSONAR -->
           <tr>
             <th>Name and designation <mat-icon class="sort-icon">arrow_upward</mat-icon>
             </th>
@@ -97,7 +98,7 @@
             <th>Submit to</th>
             <th>Submission from</th>
           </tr>
-          <tr *ngFor="let d of filteredData" class="data-row" (click)="edit(d.id)">
+          <tr *ngFor="let d of filteredData" class="data-row" (click)="edit(d.id)" (keydown)="$event.preventDefault()">
             <td [attr.rowspan]="(d && d.roles) ? (d.roles.length+1) : 1 ">
               <div class="initials">
                 <ws-app-initial-avatar [name]="d.userName">

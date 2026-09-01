@@ -5,7 +5,7 @@ import { MatDialog } from '@angular/material/dialog'
 import { of } from 'rxjs'
 import { UntypedFormGroup } from '@angular/forms'
 import { DialogBoxComponent } from '../../components/dialog-box/dialog-box.component'
-import _ from 'lodash'
+import * as _ from 'lodash'
 
 jest.mock('../../services/org-profile.service')
 jest.mock('@sunbird-cb/utils-v2')

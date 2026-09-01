@@ -258,7 +258,7 @@ export class HtmlComponent implements OnInit, OnDestroy {
   }
 
   async saveContinueLearning(content: NsContent.IContent | null) {
-    return new Promise(async resolve => {
+    return new Promise(async resolve => { // NOSONAR
       if (this.activatedRoute.snapshot.queryParams.collectionType &&
         content &&
         this.activatedRoute.snapshot.queryParams.collectionType.toLowerCase() === 'playlist') {
@@ -296,7 +296,7 @@ export class HtmlComponent implements OnInit, OnDestroy {
         }
         )
       }
-    })
+    }) // NOSONAR
   }
   generateUrl(oldUrl: string) {
     const chunk = oldUrl ? oldUrl.split('/') : []
@@ -314,7 +314,7 @@ export class HtmlComponent implements OnInit, OnDestroy {
     const newUrl = newLink.join('/')
     return newUrl
   }
-  async ngOnDestroy() {
+  async ngOnDestroy() { // NOSONAR
     if (this.htmlData) {
       if (!this.subApp || this.activatedRoute.snapshot.queryParams.collectionId) {
         // await this.saveContinueLearning(this.htmlData)

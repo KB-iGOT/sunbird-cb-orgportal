@@ -3,7 +3,7 @@ import { BlendedApporvalService } from '../../services/blended-approval.service'
 import { NSProfileDataV2 } from '../../../home/models/profile-v2.model'
 
 /* tslint:disable */
-import _ from 'lodash'
+import * as _ from 'lodash'
 import { RejectReasonDialogComponent } from '../reject-reason-dialog/reject-reason-dialog.component'
 import { MatDialog } from '@angular/material/dialog'
 import { DialogConfirmComponent } from '../../../../../../../../../src/app/component/dialog-confirm/dialog-confirm.component'

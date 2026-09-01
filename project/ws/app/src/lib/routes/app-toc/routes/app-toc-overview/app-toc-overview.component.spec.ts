@@ -1,59 +1,70 @@
+jest.mock('./app-toc-overview.service', () => ({
+  AppTocOverviewService: class MockAppTocOverviewService {
+    getComponent() { return class MockOverviewComponent { } }
+  },
+}))
+
 import { AppTocOverviewComponent } from './app-toc-overview.component'
 import { AppTocOverviewDirective } from './app-toc-overview.directive'
 
+describe('AppTocOverviewComponent (routes)', () => {
+  let component: AppTocOverviewComponent
+  let mockComponentFactoryResolver: any
+  let mockAppTocOverviewService: any
+  let mockViewContainerRef: any
 
-describe('AppTocOverviewComponent', () => {
-    let component: AppTocOverviewComponent
-    let mockComponentFactoryResolver: any
-    let mockAppTocOverviewService: any
-    let mockViewContainerRef: any
+  beforeEach(() => {
+    mockViewContainerRef = {
+      clear: jest.fn(),
+      createComponent: jest.fn(),
+    }
 
-    beforeEach(() => {
-        mockViewContainerRef = {
-            clear: jest.fn(),
-            createComponent: jest.fn(),
-        }
+    mockAppTocOverviewService = {
+      getComponent: jest.fn().mockReturnValue(class MockComponent { }),
+    }
 
-        mockAppTocOverviewService = {
-            getComponent: jest.fn().mockReturnValue('MockComponent'),
-        }
+    mockComponentFactoryResolver = {
+      resolveComponentFactory: jest.fn().mockReturnValue({
+        create: jest.fn(),
+      }),
+    }
 
-        mockComponentFactoryResolver = {
-            resolveComponentFactory: jest.fn().mockReturnValue({
-                create: jest.fn(),
-            }),
-        }
+    component = new AppTocOverviewComponent(
+      mockComponentFactoryResolver,
+      mockAppTocOverviewService,
+    )
 
-        component = new AppTocOverviewComponent(
-            mockComponentFactoryResolver,
-            mockAppTocOverviewService,
-        )
+    component.wsAppAppTocOverview = {
+      viewContainerRef: mockViewContainerRef,
+    } as AppTocOverviewDirective
+  })
 
-        // Mock the ViewChild directive
-        component.wsAppAppTocOverview = {
-            viewContainerRef: mockViewContainerRef,
-        } as AppTocOverviewDirective
-    })
+  it('should create', () => {
+    expect(component).toBeTruthy()
+  })
 
-    it('should create the component', () => {
-        expect(component).toBeTruthy()
-    })
+  it('ngOnInit should call loadComponent', () => {
+    const spy = jest.spyOn(component, 'loadComponent')
+    component.ngOnInit()
+    expect(spy).toHaveBeenCalled()
+  })
 
-    it('should load component on ngOnInit', () => {
-        component.ngOnInit()
+  it('loadComponent should resolve factory and create component in view container', () => {
+    component.loadComponent()
 
-        expect(mockAppTocOverviewService.getComponent).toHaveBeenCalled()
-        expect(mockComponentFactoryResolver.resolveComponentFactory).toHaveBeenCalledWith('MockComponent')
-        expect(mockViewContainerRef.clear).toHaveBeenCalled()
-        expect(mockViewContainerRef.createComponent).toHaveBeenCalled()
-    })
+    expect(mockAppTocOverviewService.getComponent).toHaveBeenCalled()
+    expect(mockComponentFactoryResolver.resolveComponentFactory).toHaveBeenCalled()
+    expect(mockViewContainerRef.clear).toHaveBeenCalled()
+    expect(mockViewContainerRef.createComponent).toHaveBeenCalled()
+  })
 
-    it('should call loadComponent when loadComponent is invoked', () => {
-        component.loadComponent()
+  it('loadComponent should clear view container before creating component', () => {
+    const callOrder: string[] = []
+    mockViewContainerRef.clear.mockImplementation(() => callOrder.push('clear'))
+    mockViewContainerRef.createComponent.mockImplementation(() => callOrder.push('create'))
 
-        expect(mockAppTocOverviewService.getComponent).toHaveBeenCalled()
-        expect(mockComponentFactoryResolver.resolveComponentFactory).toHaveBeenCalledWith('MockComponent')
-        expect(mockViewContainerRef.clear).toHaveBeenCalled()
-        expect(mockViewContainerRef.createComponent).toHaveBeenCalled()
-    })
+    component.loadComponent()
+
+    expect(callOrder.indexOf('clear')).toBeLessThan(callOrder.indexOf('create'))
+  })
 })

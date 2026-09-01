@@ -3,8 +3,8 @@
         <div class="filter-header flex flex-1">
             <div class="flex flex-2 flex-row">
                 <div class="label">Filters</div>
-                <div class="cross-filter cursor-pointer" (click)="hideFilter('close')"><img src="assets/icons/close.svg"
-                        alt="close"></div>
+                <div class="cross-filter cursor-pointer" (keydown)="$event.preventDefault()"
+                    (click)="hideFilter('close')"><img src="assets/icons/close.svg" alt="close"></div>
             </div>
         </div>
         <div class="filter-content-container">
@@ -136,10 +136,10 @@
         </div>
         <div class="filter-footer flex flex-1">
             <div class="flex flex-2 flex-row">
-                <div class="filter-clear" (click)="clearFilter()">
+                <div class="filter-clear" (keydown)="$event.preventDefault()" (click)="clearFilter()">
                     Clear
                 </div>
-                <div class="filter-apply" (click)="applyFilter()">
+                <div class="filter-apply" (keydown)="$event.preventDefault()" (click)="applyFilter()">
                     Apply
                 </div>
             </div>

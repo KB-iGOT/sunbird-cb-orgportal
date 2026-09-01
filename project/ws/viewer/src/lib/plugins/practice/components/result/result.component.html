@@ -579,7 +579,7 @@
 <ng-template #incorrectDetail let-data=" data">
   <mat-card [ngClass]="{'highlight': selectedQuestionData?.sectionType === data.sectionType}"
     class="flex customcard flex-jc-space-between cursor-pointer margin-top-xs bg-gray"
-    (click)="getQuestionCount(data,'wrong')">
+    (click)="getQuestionCount(data,'wrong')" (keyup)="getQuestionCount(data,'wrong')">
     <div class="flex">
       <img src="assets/icons/final-assessment/{{data.imgIcon}}.svg" alt="final-assessment">
       <span class="mat-body-2 margin-left-xs" [innerHtml]="data.text"></span>
@@ -593,7 +593,7 @@
 <ng-template #detail let-data="data">
   <mat-card [ngClass]="{'highlight': selectedQuestionData?.sectionType === data.sectionType}"
     class="flex customcard flex-jc-space-between cursor-pointer margin-top-xs bg-gray"
-    (click)="getQuestionCount(data,'blank')">
+    (click)="getQuestionCount(data,'blank')" (keyup)="getQuestionCount(data,'blank')">
     <div class="flex">
       <img src="assets/icons/final-assessment/{{data.imgIcon}}.svg" alt="final-assessment">
       <span class="mat-body-2 margin-left-xs" [innerHtml]="data.text"></span>
@@ -606,7 +606,7 @@
 <ng-template #testdetail let-data="data">
   <mat-card class="flex customcard flex-jc-space-between cursor-pointer margin-top-xs bg-gray"
     [ngClass]="{'highlight': selectedQuestionData?.sectionType === data.sectionType}"
-    (click)="getQuestionCount(data,'answer')">
+    (click)="getQuestionCount(data,'answer')" (keyup)="getQuestionCount(data,'answer')">
     <div class="flex">
       <img src="assets/icons/final-assessment/{{data.imgIcon}}.svg" alt="final-assessment">
       <span class="mat-body-2 margin-left-xs" [innerHtml]="data.text"></span>

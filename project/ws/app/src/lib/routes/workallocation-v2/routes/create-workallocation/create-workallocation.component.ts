@@ -43,13 +43,13 @@ export class CreateWorkallocationComponent implements OnInit, AfterViewInit, OnD
   /**
    * this is for selecting tabs dynamically
    */
-  private activitySubscription: any
-  private groupSubscription: any
-  private compDetailsSubscription: any
+  public activitySubscription: any
+  public groupSubscription: any
+  public compDetailsSubscription: any
   officerFormSubscription: any
-  private errorCountSubscription: any
-  private progressSubscription: any
-  private autoSaveSubscription: any
+  public errorCountSubscription: any
+  public progressSubscription: any
+  public autoSaveSubscription: any
   dataStructure: any = {}
   departmentName: any
   departmentID: any
@@ -464,7 +464,7 @@ export class CreateWorkallocationComponent implements OnInit, AfterViewInit, OnD
       userName: officer.officerName,
       // userEmail: officer.user ? officer.user.userDetails.email : '',
       // tslint:disable-next-line:max-line-length
-      userEmail: officer.user && officer.user.profileDetails.personalDetails ? officer.user.profileDetails.personalDetails.primaryEmail : officer.user.email,
+      userEmail: officer.user && officer.user.profileDetails?.personalDetails ? officer.user.profileDetails.personalDetails.primaryEmail : officer.user.email,
       // deptId: this.departmentID,
       // deptName: this.departmentName,
       // status: 'DRAFT',

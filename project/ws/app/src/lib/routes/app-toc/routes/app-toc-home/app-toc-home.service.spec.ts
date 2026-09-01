@@ -1,3 +1,7 @@
+jest.mock('../../components/app-toc-home/app-toc-home.component', () => ({
+  AppTocHomeComponent: class MockAppTocHomeComponent { },
+}))
+
 import { AppTocHomeService } from './app-toc-home.service'
 import { AppTocHomeComponent } from '../../components/app-toc-home/app-toc-home.component'
 
@@ -12,8 +16,13 @@ describe('AppTocHomeService', () => {
     expect(service).toBeTruthy()
   })
 
-  it('should return AppTocHomeComponent from getComponent', () => {
-    const component = service.getComponent()
-    expect(component).toBe(AppTocHomeComponent)
+  it('getComponent should return AppTocHomeComponent class reference', () => {
+    const result = service.getComponent()
+    expect(result).toBe(AppTocHomeComponent)
+  })
+
+  it('getComponent should return a constructor (class)', () => {
+    const result = service.getComponent()
+    expect(typeof result).toBe('function')
   })
 })

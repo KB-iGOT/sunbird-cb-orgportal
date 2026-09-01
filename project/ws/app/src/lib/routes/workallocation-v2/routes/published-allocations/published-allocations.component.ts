@@ -2,7 +2,7 @@ import { Component, OnInit, SimpleChanges } from '@angular/core'
 import { MatPaginator } from '@angular/material/paginator'
 import { ExportAsService, ExportAsConfig } from 'ngx-export-as'
 /* tslint:disable */
-import _ from 'lodash'
+import * as _ from 'lodash'
 import { AllocationService } from '../../services/allocation.service'
 import { ActivatedRoute } from '@angular/router'
 @Component({
@@ -64,7 +64,7 @@ export class PublishedAllocationsComponent implements OnInit {
   // tslint:disable-next-line:use-lifecycle-interface
   ngOnChanges(data: SimpleChanges) {
     this.data = _.get(data, 'data.currentValue')
-    this.length = this.data.length
+    this.length = this.data?.length
     this.paginator.firstPage()
   }
 

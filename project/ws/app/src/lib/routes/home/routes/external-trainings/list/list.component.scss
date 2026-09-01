@@ -79,7 +79,9 @@
       word-wrap: break-word;
       overflow-wrap: break-word;
       color: rgba(0, 0, 0, 0.87) !important;
+      /* stylelint-disable */
       font: normal 14px Lato !important;
+      /* stylelint-enable */
       font-weight: 400 !important;
     }
 
@@ -104,8 +106,10 @@
 }
 
 .h-400-r-14-l {
+  /* stylelint-disable */
   font: normal 14px Lato !important;
   font-weight: 400 !important;
+  /* stylelint-enable */
 }
 
 .mat-paginator {

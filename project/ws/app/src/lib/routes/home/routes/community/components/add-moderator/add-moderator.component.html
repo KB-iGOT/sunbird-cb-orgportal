@@ -78,13 +78,13 @@
                 <ng-container *ngIf="!displayModerators">
                   <span class="cursor-pointer check-moderators mat-body-2 "
                     *ngIf="communityDetailsForm?.value?.moderators?.length > defaultModeratorsLength "
-                    (click)="displayModerators = true">+
+                    (click)="displayModerators = true" (keydown)="$event.preventDefault()">+
                     {{communityDetailsForm?.value?.moderators?.length - defaultModeratorsLength}} More</span>
                 </ng-container>
                 <ng-container *ngIf="displayModerators">
                   <span class="cursor-pointer check-moderators mat-body-2"
                     *ngIf="communityDetailsForm?.value?.moderators?.length > defaultModeratorsLength "
-                    (click)="displayModerators = false">View
+                    (click)="displayModerators = false" (keydown)="$event.preventDefault()">View
                     less</span>
                 </ng-container>
               </ng-container>
@@ -94,7 +94,7 @@
       </div>
       <div class=" col-span-1 flex justify-end items-center">
         <span *ngIf="communityDetailsForm?.value?.moderators?.length " (click)="clearAll()"
-          class="cursor-pointer check-moderators mat-body-2">Clear all</span>
+          (keydown)="$event.preventDefault()" class="cursor-pointer check-moderators mat-body-2">Clear all</span>
       </div>
     </div>
   </div>

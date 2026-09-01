@@ -6,7 +6,7 @@
 <div class="flex flex-4 flex-column background-color">
   <div class="flex justify-between">
     <span class="mobile-margin mat-h2">Create Custom Profile Form</span>
-    <mat-icon class="cursor-pointer" (click)="close()">close</mat-icon>
+    <mat-icon class="cursor-pointer" (click)="close()" (keydown)="$event.preventDefault()">close</mat-icon>
   </div>
 </div>
 <div class="form-content form-padding">
@@ -45,7 +45,7 @@
       <ng-container *ngFor="let section of sections">
         <div
           class="form-option mb-5 flex items-center p-4 gap-3 {{isEditMode ? '' : 'cursor-pointer'}} {{selectedTab === section.type ? 'active' : ''}}"
-          (click)="isEditMode ? '' : addContent(section.type)">
+          (click)="isEditMode ? '' : addContent(section.type)" (keydown)="$event.preventDefault()">
           <div class="icons"><mat-icon class="">{{section.icon}}</mat-icon></div>
           <div class="{{selectedTab === section.type ? 'text-white' : ''}}">
             <div class="icon-title">{{section.title}}</div>
@@ -65,7 +65,7 @@
         <div class="flex justify-end mt-5 gap-4">
           <div class="flex flex-col items-center" *ngIf="getQuestions?.length > 1">
             <div class="text-primary cursor-pointer ws-mat-white-background round mat-raised-button mat-button-base"
-              (click)="fileInput.click()" (dblclick)="$event.preventDefault()">
+              (click)="fileInput.click()" (dblclick)="$event.preventDefault()" (keydown)="$event.preventDefault()">
               Upload file</div>
             <input hidden type="file" #fileInput (click)="handleFileClick($event)" (change)="handleOnFileChange($event)"
               name="file" placeholder="Choose file" (dblclick)="$event.preventDefault();"

@@ -7,7 +7,8 @@
 
   <!-- Pre Event Setup Section -->
   <div class="event-section mt-6">
-    <div class="section-header flex items-center justify-between cursor-pointer" (click)="togglePreEventSetup()">
+    <div class="section-header flex items-center justify-between cursor-pointer" (click)="togglePreEventSetup()"
+      (keyup)="togglePreEventSetup()">
       <h3 class="section-title">Pre Event Setup</h3>
       <mat-icon class="toggle-icon">{{isPreEventExpanded ? 'keyboard_arrow_up' : 'keyboard_arrow_down'}}</mat-icon>
     </div>
@@ -158,7 +159,8 @@
 
   <!-- Post Event Setup Section -->
   <div class="event-section mt-6">
-    <div class="section-header flex items-center justify-between cursor-pointer" (click)="togglePostEventSetup()">
+    <div class="section-header flex items-center justify-between cursor-pointer" (click)="togglePostEventSetup()"
+      (keyup)="togglePostEventSetup()">
       <h3 class="section-title">Post Event Setup</h3>
       <mat-icon class="toggle-icon">{{isPostEventExpanded ? 'keyboard_arrow_up' : 'keyboard_arrow_down'}}</mat-icon>
     </div>

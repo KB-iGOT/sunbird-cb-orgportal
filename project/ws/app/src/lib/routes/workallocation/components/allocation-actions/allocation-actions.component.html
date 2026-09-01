@@ -72,7 +72,8 @@
                         placeholder="Type here" aria-label="Map Activities input" class="form-input" autocomplete="off"
                         (keypress)="onSearchActivity($event)" (keyup)="onSearchActivity($event)" maxlength="40" />
                       <span class="form-control" style="color:#0074B6; cursor:pointer; margin-left:10px;"
-                        (click)="mapSelectedActivity()" *ngIf="selectedActivity !== ''">Map</span>
+                        (click)="mapSelectedActivity()" *ngIf="selectedActivity !== ''"
+                        (keydown)="$event.preventDefault()">Map</span>
                     </mat-form-field>
 
                     <label for="mapActivities" class="margin-remove-bottom margin-top-xs form-label"
@@ -82,12 +83,13 @@
 
                     <ul *ngIf="activitieslist && activitieslist.length > 0"
                       style="list-style-type: none; padding-left: 0px; margin-top: 10px; height: 35px;">
-                      <li *ngFor="let a of activitieslist; let i = index" id="elementActivity{{i}}"
-                        (click)="showRemoveActivity(i)" style="height:35px;margin-bottom:10px; background-color:#FFF4ED; color:black; line-height: 35px; padding-left:15px; float:left;
+                      <!-- //NOSONAR -->
+                      <li (keydown)="$event.preventDefault()" *ngFor="let a of activitieslist; let i = index"
+                        id="elementActivity{{i}}" (click)="showRemoveActivity(i)" style="height:35px;margin-bottom:10px; background-color:#FFF4ED; line-height: 35px; padding-left:15px; float:left;
                         clear:left; word-wrap:break-word; border-radius: 4px; color:#716B66;padding-right: 15px;">
                         <!-- //NOSONAR -->
                         {{a.name}}
-                        <mat-icon id="showremove{{i}}" (click)="removeActivity(i)"
+                        <mat-icon (keydown)="$event.preventDefault()" id="showremove{{i}}" (click)="removeActivity(i)"
                           style="cursor:pointer; margin-left:10px; display:none; padding:5px;line-height: 35px;">close
                         </mat-icon>
                       </li>
@@ -197,13 +199,15 @@
 
                     <ul *ngIf="competencieslist && competencieslist.length > 0"
                       style="list-style-type: none; padding-left: 0px; margin-top: 10px; height: 35px;">
-                      <li *ngFor="let a of activitieslist; let i = index" id="elemenComp{{i}}"
-                        (click)="showRemoveCompetency(i)" style="height:35px;margin-bottom:10px; background-color:#FFF4ED; color:black; line-height: 35px; padding-left:15px; float:left;
+                      <!-- //NOSONAR -->
+                      <li (keydown)="$event.preventDefault()" *ngFor="let a of activitieslist; let i = index"
+                        id="elemenComp{{i}}" (click)="showRemoveCompetency(i)" style="height:35px;margin-bottom:10px; background-color:#FFF4ED;  line-height: 35px; padding-left:15px; float:left;
                       clear:left; word-wrap:break-word; border-radius: 4px; color:#716B66;padding-right: 15px;">
                         <!-- //NOSONAR -->
 
                         {{a.name}}
-                        <mat-icon id="showremoveComp{{i}}" (click)="removeCompetency(i)"
+                        <mat-icon id="showremoveComp{{i}}" (keydown)="$event.preventDefault()"
+                          (click)="removeCompetency(i)"
                           style="cursor:pointer; margin-left:10px; display:none; padding:5px;line-height: 35px;">close
                         </mat-icon>
                       </li>

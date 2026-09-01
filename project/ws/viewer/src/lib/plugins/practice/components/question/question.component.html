@@ -18,13 +18,13 @@
             *ngIf="ePrimaryCategory.PRACTICE_RESOURCE === primaryCategory && ((questionNumber) <= totalQCount)">
             <div *ngIf="!isMobile" class="cursor-pointer"
               [ngClass]="showAnswer ? 'rounded-flag':'rounded-flag-disable'">
-              <div class="flex" (click)="checkAns(questionNumber)">
+              <div class="flex" (click)="checkAns(questionNumber)" (keyup)="checkAns(questionNumber)">
                 <span>Show Answer</span>
 
               </div>
             </div>
             <div *ngIf="isMobile" class="cursor-pointer">
-              <div class="flex" (click)="checkAns(questionNumber)">
+              <div class="flex" (click)="checkAns(questionNumber)" (keyup)="checkAns(questionNumber)">
                 <img *ngIf="showAnswer" class="hw-24" src="assets/icons/final-assessment/view.svg" alt="view" />
                 <img *ngIf="!showAnswer" class="hw-24" src="assets/icons/final-assessment/gray-eye.svg"
                   alt="grey-eye" />
@@ -143,13 +143,13 @@
             *ngIf="ePrimaryCategory.PRACTICE_RESOURCE === primaryCategory && ((questionNumber) <= totalQCount)">
             <div *ngIf="!isMobile" class="cursor-pointer"
               [ngClass]="showAnswer ? 'rounded-flag':'rounded-flag-disable'">
-              <div class="flex" (click)="checkAns(questionNumber)">
+              <div class="flex" (click)="checkAns(questionNumber)" (keyup)="checkAns(questionNumber)">
                 <span>Show Answer</span>
 
               </div>
             </div>
             <div *ngIf="isMobile" class="cursor-pointer">
-              <div class="flex" (click)="checkAns(questionNumber)">
+              <div class="flex" (click)="checkAns(questionNumber)" (keyup)="checkAns(questionNumber)">
                 <img *ngIf="showAnswer" class="hw-24" src="assets/icons/final-assessment/view.svg" alt="view" />
                 <img *ngIf="!showAnswer" class="hw-24" src="assets/icons/final-assessment/gray-eye.svg"
                   alt="gray-eye" />

@@ -1,3 +1,10 @@
+jest.mock('ngx-export-as', () => ({
+	ExportAsService: jest.fn().mockImplementation(() => ({
+		save: jest.fn().mockReturnValue({ subscribe: jest.fn() })
+	})),
+	ExportAsConfig: jest.fn(),
+}))
+
 import { WorkallocationComponent } from './workallocation.component'
 import { of, throwError } from 'rxjs'
 
@@ -256,4 +263,62 @@ describe('WorkallocationComponent', () => {
 		expect(mockWorkallocationSrvc.fetchUserByWID).toHaveBeenCalledWith('123')
 		expect(result).toBe('Loading..')
 	})
+
+	it('should init with published params', () => {
+		mockActiveRoute.snapshot.params.tab = 'published'
+		const newComponent = new WorkallocationComponent(
+			mockExportAsService,
+			mockRouter,
+			mockWrkAllocServ,
+			mockWorkallocationSrvc,
+			mockActiveRoute,
+			mockEvents,
+			mockRoute,
+			mockDialog,
+			mockEventSvc
+		)
+		newComponent.paginator = { firstPage: jest.fn() } as any
+		newComponent.ngOnInit()
+		expect(newComponent.currentFilter).toBe('Published')
+		expect(newComponent.currentUrl).toBe('app/home/workallocation/published')
+	})
+
+	it('should init with archived params', () => {
+		mockActiveRoute.snapshot.params.tab = 'archived'
+		const newComponent = new WorkallocationComponent(
+			mockExportAsService,
+			mockRouter,
+			mockWrkAllocServ,
+			mockWorkallocationSrvc,
+			mockActiveRoute,
+			mockEvents,
+			mockRoute,
+			mockDialog,
+			mockEventSvc
+		)
+		newComponent.paginator = { firstPage: jest.fn() } as any
+		newComponent.ngOnInit()
+		expect(newComponent.currentFilter).toBe('Archived')
+	})
+
+	it('should call getdeptUsers and update departmentName', () => {
+		component.getdeptUsers()
+		expect(mockWorkallocationSrvc.getAllUsers).toHaveBeenCalled()
+		expect(component.departmentName).toBe('testChannel')
+		expect(component.departmentID).toBe('testOrgId')
+	})
+
+	it('should call getAllUsers and update data', () => {
+		component.departmentName = 'testDept'
+		component.getAllUsers('Draft')
+		expect(mockWorkallocationSrvc.getUsers).toHaveBeenCalled()
+		expect(component.userslist).toEqual([{ id: '1', name: 'User 1' }])
+		expect(component.totalusersCount).toBe(1)
+	})
+
+	it('should return getTableData', () => {
+		component.data = [{ id: '1' }]
+		expect(component.getTableData).toEqual([{ id: '1' }])
+	})
+
 })

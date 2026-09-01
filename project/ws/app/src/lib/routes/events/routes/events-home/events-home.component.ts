@@ -4,7 +4,7 @@ import { ConfigurationsService, ValueService } from '@sunbird-cb/utils-v2'
 import { map } from 'rxjs/operators'
 import { NsWidgetResolver } from '@sunbird-cb/resolver-v2'
 /* tslint:disable */
-import _ from 'lodash'
+import * as _ from 'lodash'
 import { ILeftMenu } from '@sunbird-cb/collection'
 /* tslint:enable */
 

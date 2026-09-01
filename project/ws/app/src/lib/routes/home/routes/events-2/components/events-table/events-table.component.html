@@ -82,7 +82,8 @@
                     <ng-template matMenuContent>
                       <ng-container *ngFor="let item of getButtonsToShow(element)">
                         <div mat-menu-item [ngClass]="{'disableMenu': element['disableMenu']}"
-                          [disabled]="element['disableMenu'] === true" (click)="buttonClick(item.action, element)">
+                          (keydown)="$event.preventDefault()" [disabled]="element['disableMenu'] === true"
+                          (click)="buttonClick(item.action, element)">
                           <button class="flex item-btn items-center" mat-icon-button i18n-aria-label
                             aria-label="Analytics">
                             <mat-icon *ngIf="item.icon" class="menu-item-icon">{{item.icon}}</mat-icon>

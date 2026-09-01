@@ -1,10 +1,10 @@
 import { Component, OnInit, OnDestroy, ViewChild, ElementRef, HostListener } from '@angular/core'
 import { ValueService, ConfigurationsService, WidgetContentService } from '@sunbird-cb/utils-v2'
 import { map } from 'rxjs/operators'
-import { ActivatedRoute, Router, Event, NavigationEnd  } from '@angular/router'
+import { ActivatedRoute, Router, Event, NavigationEnd } from '@angular/router'
 import { MDOinfo } from '../../models/mdoinfo.model'
 /* tslint:disable */
-import _ from 'lodash'
+import * as _ from 'lodash'
 /* tslint:enable */
 
 @Component({
@@ -27,7 +27,7 @@ export class MdoinfoComponent implements OnInit, OnDestroy {
   mode$ = this.isLtMedium$.pipe(map(isMedium => (isMedium ? 'over' : 'side')))
   tabs: any
   tabsData: MDOinfo.IProfileTab[] | undefined
-  private defaultSideNavBarOpenedSubscription: any
+  public defaultSideNavBarOpenedSubscription: any
   @HostListener('window:scroll', ['$event'])
   handleScroll() {
     const windowScroll = window.pageYOffset
@@ -44,11 +44,11 @@ export class MdoinfoComponent implements OnInit, OnDestroy {
     private valueSvc: ValueService,
     private configSvc: ConfigurationsService,
     private widgetContentSvc: WidgetContentService) {
-      this.router.events.subscribe((event: Event) => {
-        if (event instanceof NavigationEnd) {
-          this.bindUrl(event.urlAfterRedirects.replace('/app/home/mdoinfo/', '/app/home/mdoinfo/leadership'))
-        }
-      })
+    this.router.events.subscribe((event: Event) => {
+      if (event instanceof NavigationEnd) {
+        this.bindUrl(event.urlAfterRedirects.replace('/app/home/mdoinfo/', '/app/home/mdoinfo/leadership'))
+      }
+    })
 
   }
 

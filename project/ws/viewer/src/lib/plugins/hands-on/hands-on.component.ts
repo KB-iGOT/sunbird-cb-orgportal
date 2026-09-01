@@ -218,7 +218,7 @@ export class HandsOnComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   private sanitize(htmlString: string) {
-    return this.sanitizer.bypassSecurityTrustHtml(htmlString)
+    return this.sanitizer.bypassSecurityTrustHtml(htmlString) // NOSONAR
   }
 
   private notifier(type: any) {

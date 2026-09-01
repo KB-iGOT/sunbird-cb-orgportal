@@ -91,7 +91,7 @@ export class SearchInputHomeComponent implements OnInit, OnChanges {
     this.languageSearch = this.route.snapshot.data.searchPageData && this.route.snapshot.data.searchPageData.data.search.languageSearch.map(
       (u: string) => u.toLowerCase(),
     )
-    this.languageSearch = this.languageSearch.sort()
+    this.languageSearch = this.languageSearch.sort() //NOSONAR
     this.swapRemove(this.languageSearch, this.languageSearch.indexOf('all'), 0)
     if (this.preferredLanguages && this.preferredLanguages.split(',').length > 1) {
       this.languageSearch.splice(1, 0, this.preferredLanguages)
@@ -161,15 +161,33 @@ export class SearchInputHomeComponent implements OnInit, OnChanges {
     }
   }
 
-  getSearchAutoCompleteResults(q: string) {
-    if (this.searchLocale.split(',').length === 1) {
-      this.searchServSvc.searchAutoComplete({
-        q,
-        l: this.searchLocale,
-      }).then((result: ISearchAutoComplete[]) => {
-        this.autoCompleteResults = result
-      }).catch(() => { })
-    }
+  // getSearchAutoCompleteResults(q: string) {
+  //   if (this.searchLocale.split(',').length === 1) {
+  //     this.searchServSvc.searchAutoComplete({
+  //       q,
+  //       l: this.searchLocale,
+  //     }).then((result: ISearchAutoComplete[]) => {
+  //       this.autoCompleteResults = result
+  //     }).catch(() => { })
+  //   }
+  // }
+
+  getSearchAutoCompleteResults(q: string): Promise<void> {
+    return new Promise((resolve, reject) => {
+      if (this.searchLocale.split(',').length === 1) {
+        this.searchServSvc.searchAutoComplete({
+          q,
+          l: this.searchLocale,
+        }).then((result: ISearchAutoComplete[]) => {
+          this.autoCompleteResults = result
+          resolve() // Resolve the promise after successful completion
+        }).catch((error) => {
+          reject(error) // Reject the promise if there is an error
+        })
+      } else {
+        resolve() // Resolve the promise if the locale condition is not met
+      }
+    })
   }
 
   searchLanguage(lang: string) {

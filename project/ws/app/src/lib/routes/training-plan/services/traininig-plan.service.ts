@@ -3,7 +3,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http'
 import { Observable, forkJoin, of } from 'rxjs'
 import { map } from 'rxjs/operators'
 // tslint:disable
-import _ from 'lodash'
+import * as _ from 'lodash'
 // tslint:enable
 
 // The content search is called in batches when a plan carries a long content list

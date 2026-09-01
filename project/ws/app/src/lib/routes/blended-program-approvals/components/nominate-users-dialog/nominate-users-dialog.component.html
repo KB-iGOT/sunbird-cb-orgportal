@@ -10,7 +10,7 @@
             <div class="rsearch">
               <mat-icon class="color-60 search-icon">search</mat-icon>
               <input class="search-input color-60" type="Standard" #searchText placeholder="Search by name or email"
-                autofocus="none" (keyup.enter)="searchUsers(searchText)">
+                autofocus="none" (keyup)="searchUsers(searchText)">
             </div>
           </div>
         </div>
@@ -23,16 +23,17 @@
       </div>
     </div>
     <div class="users-data">
+      <!-- //NOSONAR -->
       <table mat-table [dataSource]="dataSource" class="nominate-learners  margin-top-s" matSort matSortActive="name"
-        matSortDisableClear *ngIf="dataSource.filteredData.length > 0"><!-- //NOSONAR -->
-
+        matSortDisableClear *ngIf="dataSource.filteredData.length > 0" aria-label="nominate-users"><!-- //NOSONAR -->
+        <!-- //NOSONAR -->
         <ng-container matColumnDef="select">
           <th mat-header-cell *matHeaderCellDef class="header-row">
 
           </th>
           <td mat-cell *matCellDef="let row">
-            <mat-checkbox (click)="$event.stopPropagation()" (change)="$event ? selection.toggle(row) : null"
-              [checked]="selection.isSelected(row)">
+            <mat-checkbox (keydown)="$event.preventDefault()" (click)="$event.stopPropagation()"
+              (change)="$event ? selection.toggle(row) : null" [checked]="selection.isSelected(row)">
             </mat-checkbox>
           </td>
         </ng-container>
@@ -43,7 +44,8 @@
         </ng-container>
 
         <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-        <tr mat-row *matRowDef="let row; columns: displayedColumns;" (click)="selection.toggle(row)">
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;" (keydown)="$event.preventDefault()"
+          (click)="selection.toggle(row)">
         </tr>
       </table>
       <mat-card class="flex-1" role="none" *ngIf="dataSource.filteredData.length === 0">

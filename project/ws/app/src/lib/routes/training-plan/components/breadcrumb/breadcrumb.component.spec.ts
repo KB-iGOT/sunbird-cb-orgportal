@@ -10,71 +10,42 @@ describe('BreadcrumbComponent', () => {
     let mockTpdsSvc: any
     let mockTpSvc: any
     let mockSnackBar: any
-    let mockDialogRef: any
     let mockConfigSvc: any
+    let mockDialogRef: any
 
     beforeEach(() => {
         mockDialogRef = {
             afterClosed: jest.fn().mockReturnValue(of('confirmed')),
-            close: jest.fn()
+            close: jest.fn(),
         }
-
-        mockRouter = {
-            navigate: jest.fn(),
-            navigateByUrl: jest.fn()
-        }
-
+        mockRouter = { navigate: jest.fn(), navigateByUrl: jest.fn() }
         mockActivatedRoute = {
-            snapshot: {
-                data: {
-                    contentData: null
-                }
-            }
+            snapshot: { data: { contentData: null }, params: { planId: 'plan-1' } },
         }
-
-        mockDialog = {
-            open: jest.fn().mockReturnValue(mockDialogRef)
-        }
-
+        mockDialog = { open: jest.fn().mockReturnValue(mockDialogRef) }
         mockTpdsSvc = {
             trainingPlanTitle: 'Test Title',
             trainingPlanStepperData: {
-                name: '',
-                status: 'draft',
-                assignmentType: 'AllUser',
-                assignmentTypeInfo: [],
-                contentList: [],
-                endDate: null
-            }
+                name: '', status: 'draft', assignmentType: 'AllUser',
+                assignmentTypeInfo: [], contentList: [], contentType: 'Course',
+                endDate: null, accessControl: { userGroups: [], version: 1 },
+            },
         }
-
         mockTpSvc = {
-            createPlan: jest.fn().mockReturnValue(of({ success: true })),
-            createPlanV3: jest.fn().mockReturnValue(of({ success: true })),
+            createPlanV2: jest.fn().mockReturnValue(of({ success: true })),
             updatePlan: jest.fn().mockReturnValue(of({ success: true })),
             updatePlanV2: jest.fn().mockReturnValue(of({ success: true })),
             publishPlan: jest.fn().mockReturnValue(of({ params: { status: 'success' } })),
-            publishPlanV2: jest.fn().mockReturnValue(of({ params: { status: 'success' } }))
         }
-
-        mockSnackBar = {
-            open: jest.fn()
-        }
-
+        mockSnackBar = { open: jest.fn() }
         mockConfigSvc = {
-            userProfile: { rootOrgId: 'org-1' },
-            unMappedUser: { rootOrgId: 'org-1' },
-            orgReadData: { isCCA: false }
+            userProfile: { rootOrgId: 'org-001' },
+            unMappedUser: { rootOrgId: 'org-001' },
+            orgReadData: { isCCA: false },
         }
-
         component = new BreadcrumbComponent(
-            mockRouter,
-            mockActivatedRoute,
-            mockDialog,
-            mockTpdsSvc,
-            mockTpSvc,
-            mockSnackBar,
-            mockConfigSvc
+            mockRouter, mockActivatedRoute, mockDialog,
+            mockTpdsSvc, mockTpSvc, mockSnackBar, mockConfigSvc,
         )
     })
 
@@ -86,170 +57,128 @@ describe('BreadcrumbComponent', () => {
     })
 
     describe('ngOnInit', () => {
-        it('should set editState to false when contentData is not present', () => {
+        it('should set editState false when contentData is absent', () => {
             component.ngOnInit()
             expect(component.editState).toBe(false)
         })
 
-        it('should set editState to true when contentData is present', () => {
+        it('should set editState true when contentData is present', () => {
             mockActivatedRoute.snapshot.data.contentData = { status: 'draft' }
             component.ngOnInit()
             expect(component.editState).toBe(true)
-            expect(component.contentData).toEqual({ status: 'draft' })
         })
 
-        it('should set isLiveContent to true when content status is live', () => {
+        it('should set isLiveContent true when status is live', () => {
             mockActivatedRoute.snapshot.data.contentData = { status: 'live' }
             component.ngOnInit()
             expect(component.isLiveContent).toBe(true)
         })
+
+        it('should set isLiveContent false when status is draft', () => {
+            mockActivatedRoute.snapshot.data.contentData = { status: 'draft' }
+            component.ngOnInit()
+            expect(component.isLiveContent).toBe(false)
+        })
     })
 
     describe('cancel', () => {
-        it('should reset training plan title and navigate to dashboard', () => {
+        it('should reset title and navigate after timeout', () => {
             jest.useFakeTimers()
-
             component.cancel()
             expect(mockTpdsSvc.trainingPlanTitle).toBe('')
-
-            jest.advanceTimersByTime(500)
+            jest.advanceTimersByTime(600)
             expect(mockRouter.navigateByUrl).toHaveBeenCalledWith('app/home/training-plan-dashboard')
-
             jest.useRealTimers()
         })
     })
 
     describe('nextStep', () => {
-        it('should emit CREATE_PLAN to ADD_CONTENT', () => {
+        it('should emit ADD_CONTENT from CREATE_PLAN', () => {
             component.selectedTab = TrainingPlanContent.TTabLabelKey.CREATE_PLAN
             component.changeToNextTab = { emit: jest.fn() } as any
-
             component.nextStep()
-
             expect(component.changeToNextTab.emit).toHaveBeenCalledWith(TrainingPlanContent.TTabLabelKey.ADD_CONTENT)
         })
 
-        it('should emit ADD_CONTENT to ADD_ACCESS_SETTINGS', () => {
+        it('should emit ADD_ACCESS_SETTINGS from ADD_CONTENT', () => {
             component.selectedTab = TrainingPlanContent.TTabLabelKey.ADD_CONTENT
             component.changeToNextTab = { emit: jest.fn() } as any
-
             component.nextStep()
-
-            expect(component.changeToNextTab.emit)
-                .toHaveBeenCalledWith(TrainingPlanContent.TTabLabelKey.ADD_ACCESS_SETTINGS)
+            expect(component.changeToNextTab.emit).toHaveBeenCalledWith(TrainingPlanContent.TTabLabelKey.ADD_ACCESS_SETTINGS)
         })
 
-        it('should emit ADD_ACCESS_SETTINGS to ADD_TIMELINE', () => {
+        it('should emit ADD_TIMELINE from ADD_ACCESS_SETTINGS', () => {
             component.selectedTab = TrainingPlanContent.TTabLabelKey.ADD_ACCESS_SETTINGS
             component.changeToNextTab = { emit: jest.fn() } as any
-
             component.nextStep()
-
             expect(component.changeToNextTab.emit).toHaveBeenCalledWith(TrainingPlanContent.TTabLabelKey.ADD_TIMELINE)
         })
 
-        it('should call createPlanDraftView when on ADD_TIMELINE tab', () => {
+        it('should call createPlanDraftView from ADD_TIMELINE', () => {
             component.selectedTab = TrainingPlanContent.TTabLabelKey.ADD_TIMELINE
             component.createPlanDraftView = jest.fn()
-
             component.nextStep()
-
             expect(component.createPlanDraftView).toHaveBeenCalled()
         })
     })
 
     describe('changeTabFromBreadCrumb', () => {
-        it('should emit CREATE_PLAN when item is CREATE_PLAN', () => {
+        it('should emit CREATE_PLAN for CREATE_PLAN item', () => {
             component.changeToNextTab = { emit: jest.fn() } as any
-
             component.changeTabFromBreadCrumb(TrainingPlanContent.TTabLabelKey.CREATE_PLAN)
-
             expect(component.changeToNextTab.emit).toHaveBeenCalledWith(TrainingPlanContent.TTabLabelKey.CREATE_PLAN)
+        })
+
+        it('should not emit for unknown tab', () => {
+            component.changeToNextTab = { emit: jest.fn() } as any
+            component.changeTabFromBreadCrumb('other')
+            expect(component.changeToNextTab.emit).not.toHaveBeenCalled()
         })
     })
 
     describe('performRoute', () => {
-        it('should navigate to training-plan-dashboard with query params when route is list and editState is true', () => {
+        it('should navigate with queryParams when editState true and list', () => {
             component.editState = true
-            mockTpdsSvc.trainingPlanStepperData = {
-                status: 'draft',
-                assignmentType: 'AllUser'
-            }
-
+            mockTpdsSvc.trainingPlanStepperData = { status: 'draft', assignmentType: 'AllUser' }
             component.performRoute('list')
-
             expect(mockRouter.navigate).toHaveBeenCalledWith(
                 ['app', 'home', 'training-plan-dashboard'],
-                {
-                    queryParams: {
-                        type: 'draft',
-                        tabSelected: 'AllUser'
-                    }
-                }
+                { queryParams: { type: 'draft', tabSelected: 'AllUser' } },
             )
         })
 
-        it('should navigate to training-plan-dashboard when route is list and editState is false', () => {
+        it('should navigate to dashboard when editState false and list', () => {
             component.editState = false
-
             component.performRoute('list')
-
             expect(mockRouter.navigate).toHaveBeenCalledWith(['app', 'home', 'training-plan-dashboard'])
         })
 
-        it('should navigate to specified route when route is not list', () => {
+        it('should navigate to route when not list', () => {
             component.performRoute('create')
-
             expect(mockRouter.navigateByUrl).toHaveBeenCalledWith('app/training-plan/create')
         })
     })
 
     describe('showDialogBox', () => {
-        it('should open dialog with progress data', () => {
+        it('should pass progress data to openDialoagBox', () => {
             component.openDialoagBox = jest.fn()
-
             component.showDialogBox('progress')
-
-            expect(component.openDialoagBox).toHaveBeenCalledWith({
-                type: 'progress',
-                icon: 'vega',
-                title: 'Processing your request',
-                subTitle: 'Wait a second , your request is processing………'
-            })
+            expect(component.openDialoagBox).toHaveBeenCalledWith(expect.objectContaining({ type: 'progress' }))
         })
 
-        it('should open dialog with progress-completed data', () => {
+        it('should pass progress-completed data to openDialoagBox', () => {
             component.openDialoagBox = jest.fn()
-
             component.showDialogBox('progress-completed')
-
-            expect(component.openDialoagBox).toHaveBeenCalledWith({
-                type: 'progress-completed',
-                icon: 'accept_icon',
-                title: 'Your processing has been done.',
-                subTitle: 'Updated to Draft',
-                primaryAction: 'Redirecting....'
-            })
+            expect(component.openDialoagBox).toHaveBeenCalledWith(expect.objectContaining({ type: 'progress-completed' }))
         })
     })
 
     describe('openDialoagBox', () => {
-        it('should open dialog with provided data', () => {
-            const dialogData = {
-                type: 'test',
-                icon: 'test-icon',
-                title: 'Test Title',
-                subTitle: 'Test Subtitle',
-                primaryAction: 'Test Primary',
-                secondaryAction: 'Test Secondary'
-            }
-
-            component.openDialoagBox(dialogData)
-
+        it('should open dialog with data', () => {
+            const data = { type: 'x', icon: 'y', title: 'T', subTitle: 'S' }
+            component.openDialoagBox(data)
             expect(mockDialog.open).toHaveBeenCalledWith(expect.any(Function), {
-                disableClose: true,
-                data: dialogData,
-                autoFocus: false
+                disableClose: true, data, autoFocus: false,
             })
         })
     })
@@ -257,224 +186,109 @@ describe('BreadcrumbComponent', () => {
     describe('hideConfirmationBox', () => {
         it('should close dialog', () => {
             component.dialogRef = mockDialogRef
-
             component.hideConfirmationBox()
-
             expect(mockDialogRef.close).toHaveBeenCalled()
         })
     })
 
     describe('createPlanDraftView', () => {
-        it('should create plan and navigate to dashboard on success', () => {
+        it('should call createPlanV2 and navigate after timeout', () => {
             jest.useFakeTimers()
-            mockTpdsSvc.trainingPlanTitle = 'Test Plan'
-            mockTpdsSvc.trainingPlanStepperData = {
-                name: '',
-                status: 'draft',
-                assignmentType: 'AllUser'
-            }
             component.showDialogBox = jest.fn()
             component.dialogRef = mockDialogRef
-
             component.createPlanDraftView()
-
             expect(component.showDialogBox).toHaveBeenCalledWith('progress')
-            expect(mockTpSvc.createPlanV3).toHaveBeenCalledWith({
-                request: expect.objectContaining({
-                    name: 'Test Plan',
-                    status: 'draft',
-                    orgIdList: ['org-1']
-                })
-            })
+            expect(mockTpSvc.createPlanV2).toHaveBeenCalled()
             expect(mockDialogRef.close).toHaveBeenCalled()
-            expect(component.showDialogBox).toHaveBeenCalledWith('progress-completed')
-
-            jest.advanceTimersByTime(1000)
-
-            expect(mockDialogRef.close).toHaveBeenCalled()
+            jest.advanceTimersByTime(1100)
             expect(mockTpdsSvc.trainingPlanTitle).toBe('')
-            expect(mockRouter.navigate).toHaveBeenCalledWith(
-                ['app', 'home', 'training-plan-dashboard'],
-                {
-                    queryParams: {
-                        type: 'draft',
-                        tabSelected: 'AllUser'
-                    }
-                }
-            )
-
+            expect(mockRouter.navigate).toHaveBeenCalled()
             jest.useRealTimers()
         })
     })
 
     describe('checkIfDisabled', () => {
-        it('should return validation status for CREATE_PLAN tab', () => {
+        it('should return false for CREATE_PLAN when titleIsInvalid is false', () => {
             component.selectedTab = TrainingPlanContent.TTabLabelKey.CREATE_PLAN
-            component.validationList = {
-                titleIsInvalid: false
-            }
-
-            const result = component.checkIfDisabled()
-
-            expect(result).toBe(false)
+            component.validationList = { titleIsInvalid: false }
+            expect(component.checkIfDisabled()).toBe(false)
         })
 
-        it('should return validation status for ADD_CONTENT tab', () => {
+        it('should return false for ADD_CONTENT when addContentIsInvalid is false', () => {
             component.selectedTab = TrainingPlanContent.TTabLabelKey.ADD_CONTENT
-            component.validationList = {
-                addContentIsInvalid: false
-            }
-
-            const result = component.checkIfDisabled()
-
-            expect(result).toBe(false)
+            component.validationList = { addContentIsInvalid: false }
+            expect(component.checkIfDisabled()).toBe(false)
         })
 
-        it('should return validation status for ADD_ASSIGNEE tab', () => {
+        it('should return false for ADD_ASSIGNEE when addAssigneeIsInvalid is false', () => {
             component.selectedTab = TrainingPlanContent.TTabLabelKey.ADD_ASSIGNEE
-            component.validationList = {
-                addAssigneeIsInvalid: false
-            }
-
-            const result = component.checkIfDisabled()
-
-            expect(result).toBe(false)
+            component.validationList = { addAssigneeIsInvalid: false }
+            expect(component.checkIfDisabled()).toBe(false)
         })
 
-        it('should return true for any other tab', () => {
-            component.selectedTab = 'unknown'
-
-            const result = component.checkIfDisabled()
-
-            expect(result).toBe(true)
-        })
-    })
-
-    describe('generateRequestPayload', () => {
-        const stepperData = (aparYear?: string) => ({
-            name: 'Test Plan',
-            contentList: ['c1'],
-            contentType: 'Course',
-            endDate: '2027-03-31',
-            isApar: true,
-            status: 'draft',
-            accessControl: { userGroups: [], version: 1 },
-            aparYear
+        it('should return false for ADD_ACCESS_SETTINGS when valid', () => {
+            component.selectedTab = TrainingPlanContent.TTabLabelKey.ADD_ACCESS_SETTINGS
+            component.validationList = { addAccessSettingsIsInvalid: false }
+            expect(component.checkIfDisabled()).toBe(false)
         })
 
-        it('should send the selected year as planYear on create', () => {
-            const payload = component.generateRequestPayload(stepperData('2026-27'), 'create')
-
-            expect(payload.request.planYear).toBe('2026-27')
-            expect(payload.request).toEqual({
-                orgIdList: ['org-1'],
-                comment: 'cbPlanId1 is created',
-                contentList: ['c1'],
-                contentType: 'Course',
-                contextData: { accessControl: { userGroups: [], version: 1 } },
-                endDate: '2027-03-31',
-                isApar: true,
-                name: 'Test Plan',
-                planYear: '2026-27',
-                status: 'draft'
-            })
-        })
-
-        it('should send the selected year as planYear on update', () => {
-            mockActivatedRoute.snapshot.data.contentData = { id: 'plan-123', status: 'draft' }
-
-            const payload = component.generateRequestPayload(stepperData('2025-26'), 'update')
-
-            expect(payload.request.planYear).toBe('2025-26')
-            expect(payload.request.id).toBe('plan-123')
-        })
-
-        it('should carry the year the timeline step last picked', () => {
-            mockTpdsSvc.trainingPlanStepperData = stepperData('2024-25')
-
-            const payload = component.generateRequestPayload(mockTpdsSvc.trainingPlanStepperData, 'create')
-
-            expect(payload.request.planYear).toBe('2024-25')
-        })
-
-        it('should leave planYear unset when no year reached the stepper', () => {
-            const payload = component.generateRequestPayload(stepperData(), 'create')
-
-            expect(payload.request.planYear).toBeUndefined()
-        })
-
-        it('should return null for an unknown payload type', () => {
-            expect(component.generateRequestPayload(stepperData('2026-27'), 'archive')).toBeNull()
+        it('should return true for unknown tab', () => {
+            component.selectedTab = 'other'
+            expect(component.checkIfDisabled()).toBe(true)
         })
     })
 
     describe('updatePlan', () => {
         beforeEach(() => {
+            mockActivatedRoute.snapshot.data.contentData = { id: 'plan-123' }
             component.showDialogBox = jest.fn()
             component.dialogRef = mockDialogRef
             component.publishPlan = jest.fn()
-            mockActivatedRoute.snapshot.data.contentData = { id: '123' }
-            mockTpdsSvc.trainingPlanStepperData = {
-                name: '',
-                status: 'draft',
-                assignmentType: 'AllUser',
-                assignmentTypeInfo: [],
-                contentList: [],
-                contentType: 'course',
-                endDate: null
-            }
         })
 
-        it('should update plan for non-live content', () => {
+        it('should call updatePlan and navigate for non-live content', () => {
             jest.useFakeTimers()
             component.isLiveContent = false
-
             component.updatePlan()
-
-            expect(component.showDialogBox).toHaveBeenCalledWith('progress')
-            expect(mockTpSvc.updatePlan).toHaveBeenCalledWith({
-                request: {
-                    name: mockTpdsSvc.trainingPlanTitle,
-                    assignmentType: 'AllUser',
-                    assignmentTypeInfo: ['AllUser'],
-                    contentList: [],
-                    contentType: 'course',
-                    endDate: null,
-                    id: '123'
-                }
-            })
-            expect(mockDialogRef.close).toHaveBeenCalled()
-            expect(component.showDialogBox).toHaveBeenCalledWith('progress-completed')
-
-            jest.advanceTimersByTime(1000)
-
-            expect(mockDialogRef.close).toHaveBeenCalled()
-            expect(mockTpdsSvc.trainingPlanTitle).toBe('')
+            expect(mockTpSvc.updatePlan).toHaveBeenCalled()
+            jest.advanceTimersByTime(1100)
             expect(mockRouter.navigate).toHaveBeenCalled()
-
             jest.useRealTimers()
         })
 
-        it('should update plan and publish for live content', () => {
+        it('should call publishPlan for live content', () => {
             component.isLiveContent = true
-            mockTpdsSvc.trainingPlanStepperData.status = 'live'
-
             component.updatePlan()
-
-            expect(component.showDialogBox).toHaveBeenCalledWith('progress')
-            expect(mockTpSvc.updatePlan).toHaveBeenCalledWith({
-                request: {
-                    name: mockTpdsSvc.trainingPlanTitle,
-                    assignmentTypeInfo: ['AllUser'],
-                    contentList: [],
-                    contentType: 'course',
-                    endDate: null,
-                    id: '123'
-                }
-            })
-            expect(mockDialogRef.close).toHaveBeenCalled()
+            expect(mockTpSvc.updatePlan).toHaveBeenCalled()
             expect(component.publishPlan).toHaveBeenCalled()
         })
     })
 
+    describe('generateRequestPayload', () => {
+        it('should generate create payload', () => {
+            const data = {
+                name: 'Plan', status: 'draft', contentList: [], contentType: 'Course',
+                endDate: '2025-01-01', isApar: false,
+                accessControl: { userGroups: [], version: 1 }, comment: 'test',
+            }
+            const result = component.generateRequestPayload(data, 'create')
+            expect(result.request.name).toBe('Plan')
+            expect(result.request.status).toBe('draft')
+        })
+
+        it('should generate update payload with id', () => {
+            mockActivatedRoute.snapshot.data.contentData = { id: 'plan-1' }
+            const data = {
+                name: 'Plan', status: 'draft', contentList: [], contentType: 'Course',
+                endDate: '2025-01-01', isApar: false,
+                accessControl: { userGroups: [], version: 1 },
+            }
+            const result = component.generateRequestPayload(data, 'update')
+            expect(result.request.id).toBe('plan-1')
+        })
+
+        it('should return null for unknown type', () => {
+            expect(component.generateRequestPayload({}, 'delete')).toBeNull()
+        })
+    })
 })

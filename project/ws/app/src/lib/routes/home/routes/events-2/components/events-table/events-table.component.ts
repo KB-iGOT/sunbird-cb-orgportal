@@ -2,7 +2,7 @@ import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChange
 import { FormControl } from '@angular/forms'
 import { PageEvent } from '@angular/material/paginator'
 import { MatTableDataSource } from '@angular/material/table'
-import _ from 'lodash'
+import * as _ from 'lodash'
 import { debounceTime } from 'rxjs/operators'
 import { events } from '../../models/events.model'
 import { MatSort } from '@angular/material/sort'
@@ -39,6 +39,7 @@ export class EventsTableComponent implements OnInit, OnChanges {
   tableColumns = []
   noDataMessage = 'No data found'
   showPagination = true
+  component: { columns: { key: string; displayName: string; cellType: string }[] }
 
   constructor() {
     this.dataSource = new MatTableDataSource<any>()
@@ -46,13 +47,13 @@ export class EventsTableComponent implements OnInit, OnChanges {
 
   ngOnInit() {
     if (this.tableData) {
-      this.displayedColumns = this.tableData.columns
+      this.displayedColumns = this.tableData?.columns
       this.showSearchBox = _.get(this.tableData, 'showSearchBox', true)
       this.noDataMessage = _.get(this.tableData, 'noDataMessage', 'No data found')
       this.showPagination = _.get(this.tableData, 'showPagination', true)
     }
 
-    this.searchControl.valueChanges
+    this.searchControl?.valueChanges
       .pipe(debounceTime(500))
       .subscribe(value => this.searchKey.emit(value))
   }
@@ -121,7 +122,7 @@ export class EventsTableComponent implements OnInit, OnChanges {
 
   getFinalColumns() {
     this.columnsList = []
-    const columns = JSON.parse(JSON.stringify(this.tableData.columns))
+    const columns = JSON.parse(JSON.stringify(this.tableData?.columns))
     if (this.menuItems.length > 0) {
       const selectColumn = { displayName: 'Actions', key: 'menu', cellType: 'menu' }
       columns.push(selectColumn)

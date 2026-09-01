@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy, Input } from '@angular/core'
 // tslint:disable-next-line
-import _ from 'lodash'
+import * as _ from 'lodash'
 import { Subscription } from 'rxjs'
 import { NSProfileDataV3 } from '../../models/state-profile.models'
 import { StepService } from '../../services/step.service'

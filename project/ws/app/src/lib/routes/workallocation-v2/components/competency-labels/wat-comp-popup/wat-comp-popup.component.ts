@@ -4,7 +4,7 @@ import { MatCheckboxChange } from '@angular/material/checkbox'
 import { MatRadioChange } from '@angular/material/radio'
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog'
 /* tslint:disable */
-import _ from 'lodash'
+import * as _ from 'lodash'
 /* tslint:enable */
 
 export interface IWatCompPopupData {

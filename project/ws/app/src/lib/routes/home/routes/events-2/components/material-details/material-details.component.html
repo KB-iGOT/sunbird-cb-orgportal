@@ -2,9 +2,11 @@
   <div class="flex justify-between">
     <div class="pdfName flex items-center">{{materialDetails?.title}}</div>
     <div class="flex gap-1">
-      <mat-icon class="edit-icon flex items-center" (click)="openStatus(true)">edit</mat-icon>
+      <mat-icon class="edit-icon flex items-center" (keydown)="$event.preventDefault()"
+        (click)="openStatus(true)">edit</mat-icon>
       <ng-container *ngIf="openMode === 'edit' && (openTab !== 'past' || this.materialDetails?.isNew)">
-        <mat-icon class="edit-icon flex items-center" (click)="deleteMaterialFromList()">delete</mat-icon>
+        <mat-icon class="edit-icon flex items-center" (keydown)="$event.preventDefault()"
+          (click)="deleteMaterialFromList()">delete</mat-icon>
       </ng-container>
     </div>
   </div>
@@ -44,7 +46,8 @@
             <div class="pdfName flex items-center">{{materialName}}</div>
           </div>
           <ng-container *ngIf="openMode === 'edit' && (openTab !== 'past' || this.materialDetails?.isNew)">
-            <mat-icon class="clearMaterial" (click)="removeMaterial()">clear</mat-icon>
+            <mat-icon class="clearMaterial" (keydown)="$event.preventDefault()"
+              (click)="removeMaterial()">clear</mat-icon>
           </ng-container>
         </div>
       </div>
@@ -55,7 +58,7 @@
         [cdkDropListData]="videoData" (cdkDropListDropped)="onMaterialSelect($event)"
         (dragover)="preventDefaultCDK($event)" (dragenter)="preventDefaultCDK($event, 'enter')"
         (dragleave)="preventDefaultCDK($event, 'leave')" (drop)="onDrop($event)"
-        onclick="document.getElementById('upload-material').click();">
+        onclick="document.getElementById('upload-material').click();" (keydown)="$event.preventDefault()">
         <input #file type="file" name="upload-material" id="upload-material" class="hidden"
           accept=".pdf, .doc, .ppt, .pptx, .docx" (change)="onMaterialSelect(file.files);">
         <div class="flex flex-column items-center gap-2">

@@ -247,7 +247,7 @@ export class UserBulkUploadComponent implements OnInit {
         ...request.request.filters, phone: userData,
       }
     }
-    return this.contentSvc.validateUser(request).toPromise().then(async (res: any) => {
+    return this.contentSvc.validateUser(request)?.toPromise().then(async (res: any) => {
       if (res.result.response) {
         return await res.result.response
       }

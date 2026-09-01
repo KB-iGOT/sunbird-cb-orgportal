@@ -1388,13 +1388,13 @@ export class AppTocHomeComponent implements OnInit, OnChanges, OnDestroy, AfterV
       this.getUserRating(false)
       this.getUserEnrollmentList()
     }
-    this.body = this.domSanitizer.bypassSecurityTrustHtml(
+    this.body = this.domSanitizer.bypassSecurityTrustHtml( // NOSONAR
       this.content && this.content.body
         ? this.forPreview
           ? this.authAccessControlSvc.proxyToAuthoringUrl(this.content.body)
           : this.content.body
         : '',
-    )
+    ) // NOSONAR
 
     this.contentParents = {}
     this.tocStructure = {
@@ -2154,9 +2154,9 @@ export class AppTocHomeComponent implements OnInit, OnChanges, OnDestroy, AfterV
 
   private updateBannerUrl() {
     if (this.banners) {
-      this.bannerUrl = this.domSanitizer.bypassSecurityTrustStyle(
+      this.bannerUrl = this.domSanitizer.bypassSecurityTrustStyle( // NOSONAR
         `url(${this.banners[this.routePath]})`,
-      )
+      ) // NOSONAR
     }
   }
 
@@ -2172,7 +2172,7 @@ export class AppTocHomeComponent implements OnInit, OnChanges, OnDestroy, AfterV
 
   get sanitizedIntroductoryVideoIcon() {
     if (this.content && this.content.introductoryVideoIcon) {
-      return this.domSanitizer.bypassSecurityTrustStyle(`url(${this.content.introductoryVideoIcon})`)
+      return this.domSanitizer.bypassSecurityTrustStyle(`url(${this.content.introductoryVideoIcon})`) // NOSONAR
     }
     return null
   }

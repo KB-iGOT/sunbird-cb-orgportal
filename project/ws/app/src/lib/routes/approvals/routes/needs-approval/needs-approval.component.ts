@@ -5,8 +5,8 @@ import { MatSnackBar } from '@angular/material/snack-bar'
 import { ActivatedRoute, Router, Event, NavigationEnd } from '@angular/router'
 import { NSProfileDataV2 } from '../../models/profile-v2.model'
 // tslint:disable
-import _ from 'lodash'
-import { EventService } from '@sunbird-cb/utils-v2'
+import * as _ from 'lodash'
+import { EventService } from '@sunbird-cb/utils'
 import { TelemetryEvents } from '../../../../head/_services/telemetry.event.model'
 // tslint:enable
 @Component({

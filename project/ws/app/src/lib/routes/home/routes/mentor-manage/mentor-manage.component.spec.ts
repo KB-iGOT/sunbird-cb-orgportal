@@ -1,360 +1,558 @@
 import { MentorManageComponent } from './mentor-manage.component'
-import { of } from 'rxjs'
-import { ActivatedRoute, Router } from '@angular/router'
-import { EventService } from '@sunbird-cb/utils-v2'
-import { DomSanitizer } from '@angular/platform-browser'
-import { UsersService } from '../../../users/services/users.service'
-import { LoaderService } from '../../../../../../../../../src/app/services/loader.service'
-import { TelemetryEvents } from '../../../../head/_services/telemetry.event.model'
-import { MatDialog } from '@angular/material/dialog'
-import { ReportsVideoComponent } from '../reports-video/reports-video.component'
+import { of, Subject } from 'rxjs'
 
-describe('MentorManageComponent', () => {
-    let component: MentorManageComponent
-    let mockDialog: jest.Mocked<MatDialog>
-    let mockRouter: jest.Mocked<Router>
-    let mockRoute: Partial<ActivatedRoute>
-    let mockEvents: jest.Mocked<EventService>
-    let mockLoaderService: jest.Mocked<LoaderService>
-    let mockSanitizer: jest.Mocked<DomSanitizer>
-    let mockUsersService: jest.Mocked<UsersService>
+// Mock dependencies
+const mockDialog = {
+    open: jest.fn()
+}
 
-    const mockConfigService = {
-        userProfile: {
-            userId: 'test-user-id'
-        },
-        unMappedUser: {
-            profileDetails: {
-                profileStatus: 'VERIFIED'
-            },
-            rootOrg: {
-                rootOrgId: 'test-root-org'
-            },
-            roles: ['CONTENT_CREATOR']
-        }
-    }
-
-    beforeEach(() => {
-        mockDialog = {
-            open: jest.fn(),
-        } as unknown as jest.Mocked<MatDialog>
-
-        mockRouter = {
-            navigate: jest.fn(),
-        } as unknown as jest.Mocked<Router>
-
-        // Updated route mock with correct structure
-        mockRoute = {
-            snapshot: {
-                params: { tab: 'verified' },
-                parent: {
-                    snapshot: {
-                        data: {
-                            configService: mockConfigService
-                        }
+const mockActivatedRoute = {
+    snapshot: {
+        params: { tab: 'verified' },
+        parent: {
+            data: {
+                configService: {
+                    userProfile: { userId: 'test-user-id' },
+                    unMappedUser: {
+                        profileDetails: { profileStatus: 'VERIFIED' },
+                        rootOrg: { rootOrgId: 'test-root-org' },
+                        roles: ['MDO_ADMIN']
                     }
                 }
             }
-        } as unknown as Partial<ActivatedRoute>
-
-        mockEvents = {
-            handleTabTelemetry: jest.fn(),
-            raiseInteractTelemetry: jest.fn(),
-        } as unknown as jest.Mocked<EventService>
-
-        mockLoaderService = {
-            changeLoad: {
-                next: jest.fn()
+        }
+    },
+    parent: {
+        snapshot: {
+            data: {
+                configService: {
+                    userProfile: { userId: 'test-user-id' },
+                    unMappedUser: {
+                        profileDetails: { profileStatus: 'VERIFIED' },
+                        rootOrg: { rootOrgId: 'test-root-org' },
+                        roles: ['MDO_ADMIN']
+                    }
+                }
             }
-        } as unknown as jest.Mocked<LoaderService>
+        }
+    }
+}
 
-        mockSanitizer = {
-            bypassSecurityTrustHtml: jest.fn(html => html)
-        } as unknown as jest.Mocked<DomSanitizer>
+const mockRouter = {
+    navigate: jest.fn()
+}
 
-        mockUsersService = {
-            mentorList$: of({}),
-            getAllUsersV3: jest.fn().mockReturnValue(of({
-                content: [{ userId: 'user1' }, { userId: 'user2' }],
-                count: 2,
+const mockEventService = {
+    handleTabTelemetry: jest.fn(),
+    raiseInteractTelemetry: jest.fn()
+}
+
+const mockLoaderService = {
+    changeLoad: {
+        next: jest.fn()
+    }
+}
+
+const mockDomSanitizer = {
+    bypassSecurityTrustHtml: jest.fn().mockReturnValue('sanitized-html')
+}
+
+const mockUsersService = {
+    mentorList$: new Subject(),
+    getAllUsersV3: jest.fn()
+}
+
+describe('MentorManageComponent', () => {
+    let component: MentorManageComponent
+
+    beforeEach(() => {
+        // Reset all mocks
+        jest.clearAllMocks()
+
+        // Create component instance
+        component = new MentorManageComponent(
+            mockDialog as any,
+            mockActivatedRoute as any,
+            mockRouter as any,
+            mockEventService as any,
+            mockLoaderService as any,
+            mockDomSanitizer as any,
+            mockUsersService as any
+        )
+    })
+
+    describe('Constructor', () => {
+        it('should initialize component with correct default values', () => {
+            expect(component.currentFilter).toBe('verified')
+            expect(component.isLoading).toBe(false)
+            expect(component.currentOffset).toBe(0)
+            expect(component.limit).toBe(20)
+            expect(component.pageIndex).toBe(0)
+            expect(component.searchQuery).toBe('')
+            expect(component.Math).toBe(Math)
+        })
+
+        it('should set current user from config service', () => {
+            expect(component.currentUser).toBe('test-user-id')
+        })
+
+        it('should set current user status from config service', () => {
+            expect(component.currentUserStatus).toBe('VERIFIED')
+        })
+
+        it('should set isMdoAdmin to true when user has MDO_ADMIN role', () => {
+            expect(component.isMdoAdmin).toBe(true)
+        })
+    })
+
+    describe('ngOnInit', () => {
+        beforeEach(() => {
+            // Mock service responses
+            mockUsersService.getAllUsersV3.mockReturnValue(of({
+                content: [{ userId: 'user1', firstName: 'John' }],
+                count: 1,
                 facets: []
             }))
-        } as unknown as jest.Mocked<UsersService>
+        })
 
-        component = new MentorManageComponent(
-            mockDialog,
-            mockRoute as ActivatedRoute,
-            mockRouter,
-            mockEvents,
-            mockLoaderService,
-            mockSanitizer,
-            mockUsersService
-        )
+        it('should set current filter from route params', () => {
+            component.ngOnInit()
+            expect(component.currentFilter).toBe('verified')
+        })
 
-        // Direct assignment as a backup in case the route structure isn't exactly matched
-        component.configSvc = mockConfigService
-        component.currentUser = mockConfigService.userProfile.userId
-        component.currentUserStatus = mockConfigService.unMappedUser.profileDetails.profileStatus
+        it('should set rootOrgId from route data', () => {
+            component.ngOnInit()
+            expect(component.rootOrgId).toBe('test-root-org')
+        })
+
+        it('should initialize reports note list', () => {
+            component.ngOnInit()
+            expect(component.reportsNoteList).toHaveLength(3)
+            expect(component.reportsNoteList[0]).toContain('All Verified Users')
+        })
+
+        it('should subscribe to mentorList$ and call user methods', (done) => {
+            jest.spyOn(component, 'getAllVerifiedUsers')
+            jest.spyOn(component, 'getMentorUsers')
+
+            component.ngOnInit()
+
+            // Trigger the subscription
+            mockUsersService.mentorList$.next()
+
+            setTimeout(() => {
+                expect(component.getAllVerifiedUsers).toHaveBeenCalledWith('')
+                expect(component.getMentorUsers).toHaveBeenCalledWith('')
+                done()
+            }, 1100)
+        })
     })
 
-    it('should initialize component properties', () => {
-        expect(component.Math).toBe(Math)
-        expect(component.currentUser).toBe('test-user-id')
-        expect(component.currentUserStatus).toBe('VERIFIED')
+    describe('sanitizeHtml', () => {
+        it('should sanitize HTML using DomSanitizer', () => {
+            const htmlString = '<p>Test HTML</p>'
+            const result = component.sanitizeHtml(htmlString)
+
+            expect(mockDomSanitizer.bypassSecurityTrustHtml).toHaveBeenCalledWith(htmlString)
+            expect(result).toBe('sanitized-html')
+        })
     })
 
-    it('should set current filter from route params on ngOnInit', () => {
-        jest.spyOn(component, 'getAllVerifiedUsers')
-        jest.spyOn(component, 'getMentorUsers')
+    describe('openVideoPopup', () => {
+        it('should open dialog with correct configuration', () => {
+            component.openVideoPopup()
 
-        // Setup route.snapshot.parent.data for rootOrgId extraction
-        const parent = { data: { configService: { unMappedUser: { rootOrg: { rootOrgId: 'test-root-org' } } } } }
-        jest.spyOn(mockRoute, 'snapshot', 'get').mockReturnValue({
-            params: { tab: 'verified' },
-            parent
-        } as any)
-
-        component.ngOnInit()
-
-        expect(component.currentFilter).toBe('verified')
-        expect(component.searchQuery).toBe('')
-        expect(component.getAllVerifiedUsers).toHaveBeenCalledWith('')
-        expect(component.getMentorUsers).toHaveBeenCalledWith('')
+            expect(mockDialog.open).toHaveBeenCalledWith(
+                expect.any(Function),
+                {
+                    data: {
+                        videoLink: 'https://www.youtube.com/embed/tgbNymZ7vqY?autoplay=1&mute=1',
+                    },
+                    disableClose: true,
+                    width: '50%',
+                    height: '60%',
+                    panelClass: 'overflow-visable',
+                }
+            )
+        })
     })
 
-    it('should set proper reportsNoteList on ngOnInit', () => {
-        // Setup route.snapshot.parent.data for rootOrgId extraction
-        const parent = { data: { configService: { unMappedUser: { rootOrg: { rootOrgId: 'test-root-org' } } } } }
-        jest.spyOn(mockRoute, 'snapshot', 'get').mockReturnValue({
-            params: { tab: 'verified' },
-            parent
-        } as any)
+    describe('filter', () => {
+        beforeEach(() => {
+            jest.spyOn(component, 'filterData')
+        })
 
-        component.ngOnInit()
+        it('should update filter properties and call filterData', () => {
+            component.filter('mentor')
 
-        expect(component.reportsNoteList.length).toBe(3)
-        expect(component.reportsNoteList[0]).toContain('All Verified Users')
+            expect(component.currentFilter).toBe('mentor')
+            expect(component.pageIndex).toBe(0)
+            expect(component.currentOffset).toBe(0)
+            expect(component.limit).toBe(20)
+            expect(component.searchQuery).toBe('')
+            expect(component.filterData).toHaveBeenCalledWith('')
+        })
     })
 
-    it('should sanitize HTML', () => {
-        const html = '<p>Test</p>'
-        component.sanitizeHtml(html)
+    describe('tabTelemetry', () => {
+        it('should handle tab telemetry with correct data', () => {
+            const label = 'Test Tab'
+            const index = 1
 
-        expect(mockSanitizer.bypassSecurityTrustHtml).toHaveBeenCalledWith(html)
+            component.tabTelemetry(label, index)
+
+            expect(mockEventService.handleTabTelemetry).toHaveBeenCalledWith(
+                'USER_TAB',
+                { label, index }
+            )
+        })
     })
 
-    it('should open video popup dialog', () => {
-        component.openVideoPopup()
+    describe('filterData', () => {
+        beforeEach(() => {
+            jest.spyOn(component, 'getAllVerifiedUsers')
+            jest.spyOn(component, 'getMentorUsers')
+        })
 
-        expect(mockDialog.open).toHaveBeenCalledWith(
-            ReportsVideoComponent,
-            expect.objectContaining({
-                data: {
-                    videoLink: expect.any(String)
+        it('should call getAllVerifiedUsers when filter is verified', () => {
+            component.currentFilter = 'verified'
+            component.filterData('test-query')
+
+            expect(component.getAllVerifiedUsers).toHaveBeenCalledWith('test-query')
+        })
+
+        it('should call getMentorUsers when filter is mentor', () => {
+            component.currentFilter = 'mentor'
+            component.filterData('test-query')
+
+            expect(component.getMentorUsers).toHaveBeenCalledWith('test-query')
+        })
+    })
+
+    describe('showEditUser', () => {
+        it('should return true when user is MDO_ADMIN and roles exist', () => {
+            component.isMdoAdmin = true
+            const roles = ['MENTOR', 'USER']
+
+            const result = component.showEditUser(roles)
+
+            expect(result).toBe(true)
+        })
+
+        it('should return true when user is not MDO_ADMIN', () => {
+            component.isMdoAdmin = false
+            const roles = ['USER']
+
+            const result = component.showEditUser(roles)
+
+            expect(result).toBe(true)
+        })
+
+        it('should return true when user is MDO_ADMIN but no roles provided', () => {
+            component.isMdoAdmin = true
+            const roles = null
+
+            const result = component.showEditUser(roles)
+
+            expect(result).toBe(true)
+        })
+    })
+
+    describe('getAllVerifiedUsers', () => {
+        const mockResponse = {
+            content: [
+                { userId: 'user1', firstName: 'John', profileDetails: { profileStatus: 'VERIFIED' } }
+            ],
+            count: 1,
+            facets: [{ name: 'group', values: [] }]
+        }
+
+        beforeEach(() => {
+            mockUsersService.getAllUsersV3.mockReturnValue(of(mockResponse))
+            component.rootOrgId = 'test-root-org'
+            component.limit = 20
+            component.pageIndex = 0
+        })
+
+        it('should call loader service and fetch verified users', async () => {
+            await component.getAllVerifiedUsers('')
+
+            expect(mockLoaderService.changeLoad.next).toHaveBeenCalledWith(true)
+            expect(mockUsersService.getAllUsersV3).toHaveBeenCalled()
+            expect(component.verifiedUsersData).toEqual(mockResponse.content)
+            expect(component.verifiedUsersDataCount).toBe(mockResponse.count)
+            expect(component.filterFacets).toEqual(mockResponse.facets)
+        })
+
+        it('should build correct request body for verified users', async () => {
+            await component.getAllVerifiedUsers('')
+
+            const expectedReqBody = {
+                request: {
+                    filters: {
+                        rootOrgId: 'test-root-org',
+                        status: 1,
+                        'profileDetails.profileStatus': 'VERIFIED',
+                    },
+                    fields: [
+                        'rootOrgId',
+                        'profileDetails',
+                        'userId',
+                        'roles',
+                    ],
+                    limit: 20,
+                    offset: 0,
+                    query: '',
+                    sort_by: { firstName: 'asc' },
                 },
-                disableClose: true,
-                width: '50%',
-                height: '60%',
-                panelClass: 'overflow-visable'
-            })
-        )
-    })
+            }
 
-    it('should filter data with specified filter type', () => {
-        jest.spyOn(component, 'getAllVerifiedUsers')
-        jest.spyOn(component, 'getMentorUsers')
-
-        component.filter('verified')
-
-        expect(component.currentFilter).toBe('verified')
-        expect(component.pageIndex).toBe(0)
-        expect(component.currentOffset).toBe(0)
-        expect(component.limit).toBe(20)
-        expect(component.searchQuery).toBe('')
-        expect(component.getAllVerifiedUsers).toHaveBeenCalledWith('')
-
-        component.filter('mentor')
-
-        expect(component.currentFilter).toBe('mentor')
-        expect(component.getMentorUsers).toHaveBeenCalledWith('')
-    })
-
-    it('should handle tab telemetry events', () => {
-        const label = 'Test Tab'
-        const index = 1
-
-        component.tabTelemetry(label, index)
-
-        expect(mockEvents.handleTabTelemetry).toHaveBeenCalledWith(
-            TelemetryEvents.EnumInteractSubTypes.USER_TAB,
-            { label, index }
-        )
-    })
-
-    it('should apply correct filter based on currentFilter', () => {
-        jest.spyOn(component, 'getAllVerifiedUsers')
-        jest.spyOn(component, 'getMentorUsers')
-
-        component.currentFilter = 'verified'
-        component.filterData('test-query')
-
-        expect(component.getAllVerifiedUsers).toHaveBeenCalledWith('test-query')
-
-        component.currentFilter = 'mentor'
-        component.filterData('test-query')
-
-        expect(component.getMentorUsers).toHaveBeenCalledWith('test-query')
-    })
-
-    it('should check if user editing is allowed', () => {
-        component.isMdoAdmin = true
-
-        expect(component.showEditUser(['PUBLIC'])).toBe(true)
-        expect(component.showEditUser([])).toBe(true)
-
-        component.isMdoAdmin = false
-
-        expect(component.showEditUser(['ADMIN'])).toBe(true)
-    })
-
-    it('should fetch all verified users', () => {
-        // Set rootOrgId manually for this test
-        component.rootOrgId = 'test-root-org'
-
-        component.getAllVerifiedUsers('')
-
-        expect(mockLoaderService.changeLoad.next).toHaveBeenCalledWith(true)
-        expect(mockUsersService.getAllUsersV3).toHaveBeenCalledWith({
-            request: expect.objectContaining({
-                filters: expect.objectContaining({
-                    rootOrgId: 'test-root-org',
-                    status: 1,
-                    'profileDetails.profileStatus': 'VERIFIED'
-                }),
-                limit: 20
-            })
+            expect(mockUsersService.getAllUsersV3).toHaveBeenCalledWith(expectedReqBody)
         })
-        expect(component.verifiedUsersData).toEqual([{ userId: 'user1' }, { userId: 'user2' }])
-        expect(component.verifiedUsersDataCount).toBe(2)
     })
 
-    it('should fetch mentor users', () => {
-        // Set rootOrgId manually for this test
-        component.rootOrgId = 'test-root-org'
+    describe('getMentorUsers', () => {
+        const mockResponse = {
+            content: [
+                { userId: 'mentor1', firstName: 'Jane', roles: [{ role: 'MENTOR' }] }
+            ],
+            count: 1,
+            facets: []
+        }
 
-        component.getMentorUsers('')
-
-        expect(mockLoaderService.changeLoad.next).toHaveBeenCalledWith(true)
-        expect(mockUsersService.getAllUsersV3).toHaveBeenCalledWith({
-            request: expect.objectContaining({
-                filters: expect.objectContaining({
-                    rootOrgId: 'test-root-org',
-                    'roles.role': 'MENTOR',
-                    'profileDetails.profileStatus': 'VERIFIED'
-                }),
-                limit: 20
-            })
+        beforeEach(() => {
+            mockUsersService.getAllUsersV3.mockReturnValue(of(mockResponse))
+            component.rootOrgId = 'test-root-org'
+            component.limit = 20
+            component.pageIndex = 0
         })
-        expect(component.mentorUsersData).toEqual([{ userId: 'user1' }, { userId: 'user2' }])
-        expect(component.mentorUsersDataCount).toBe(2)
+
+        it('should call loader service and fetch mentor users', async () => {
+            await component.getMentorUsers('')
+
+            expect(mockLoaderService.changeLoad.next).toHaveBeenCalledWith(true)
+            expect(mockUsersService.getAllUsersV3).toHaveBeenCalled()
+            expect(component.mentorUsersData).toEqual(mockResponse.content)
+            expect(component.mentorUsersDataCount).toBe(mockResponse.count)
+        })
+
+        it('should build correct request body for mentor users', async () => {
+            await component.getMentorUsers('')
+
+            const expectedReqBody = {
+                request: {
+                    filters: {
+                        rootOrgId: 'test-root-org',
+                        'roles.role': 'MENTOR',
+                        'profileDetails.profileStatus': 'VERIFIED',
+                    },
+                    fields: [
+                        'rootOrgId',
+                        'profileDetails',
+                        'userId',
+                        'roles',
+                    ],
+                    limit: 20,
+                    offset: 0,
+                    query: '',
+                    sort_by: { firstName: 'asc' },
+                },
+            }
+
+            expect(mockUsersService.getAllUsersV3).toHaveBeenCalledWith(expectedReqBody)
+        })
     })
 
-    it('should extract filter parameters from query object', () => {
+    describe('Filter helper methods', () => {
         const mockQuery = {
             filters: {
-                group: ['Group1'],
-                designation: ['Designation1'],
-                roles: ['Role1'],
-                tags: ['Tag1']
+                group: ['Engineering'],
+                designation: ['Senior Developer'],
+                roles: ['MENTOR'],
+                tags: ['Angular', 'TypeScript']
             }
         }
 
-        expect(component.getFilterGroup(mockQuery)).toEqual(['Group1'])
-        expect(component.getFilterDesignation(mockQuery)).toEqual(['Designation1'])
-        expect(component.getFilterRoles(mockQuery)).toEqual(['Role1'])
-        expect(component.getFilterTags(mockQuery)).toEqual(['Tag1'])
+        it('should return group filter when query has group filters', () => {
+            const result = component.getFilterGroup(mockQuery)
+            expect(result).toEqual(['Engineering'])
+        })
+
+        it('should return designation filter when query has designation filters', () => {
+            const result = component.getFilterDesignation(mockQuery)
+            expect(result).toEqual(['Senior Developer'])
+        })
+
+        it('should return roles filter when query has roles filters', () => {
+            const result = component.getFilterRoles(mockQuery)
+            expect(result).toEqual(['MENTOR'])
+        })
+
+        it('should return tags filter when query has tags filters', () => {
+            const result = component.getFilterTags(mockQuery)
+            expect(result).toEqual(['Angular', 'TypeScript'])
+        })
+
+        it('should return undefined when no filters are provided', () => {
+            expect(component.getFilterGroup({})).toBeUndefined()
+            expect(component.getFilterDesignation({})).toBeUndefined()
+            expect(component.getFilterRoles({})).toBeUndefined()
+            expect(component.getFilterTags({})).toBeUndefined()
+        })
     })
 
-    it('should extract search text from query object', () => {
-        expect(component.getSearchText({ searchText: 'test search' })).toBe('test search')
-        expect(component.getSearchText({})).toBe('')
+    describe('getSearchText', () => {
+        it('should return search text from query', () => {
+            const query = { searchText: 'test search' }
+            const result = component.getSearchText(query)
+
+            expect(result).toBe('test search')
+            expect(component.searchText).toBe('test search')
+        })
+
+        it('should return empty string when no search text provided', () => {
+            const result = component.getSearchText({})
+
+            expect(result).toBe('')
+            expect(component.searchText).toBe('')
+        })
     })
 
-    it('should determine sort order from query object', () => {
-        expect(component.getSortOrder({ sortOrder: 'alphabetical' })).toEqual({ firstName: 'asc' })
-        expect(component.getSortOrder({ sortOrder: 'oldest' })).toEqual({ createdDate: 'desc' })
-        expect(component.getSortOrder({ sortOrder: 'newest' })).toEqual({ createdDate: 'asc' })
-        expect(component.getSortOrder({})).toEqual({ firstName: 'asc' })
+    describe('getSortOrder', () => {
+        it('should return firstName asc for alphabetical sort', () => {
+            const query = { sortOrder: 'alphabetical' }
+            const result = component.getSortOrder(query)
+
+            expect(result).toEqual({ firstName: 'asc' })
+        })
+
+        it('should return createdDate desc for oldest sort', () => {
+            const query = { sortOrder: 'oldest' }
+            const result = component.getSortOrder(query)
+
+            expect(result).toEqual({ createdDate: 'desc' })
+        })
+
+        it('should return createdDate asc for newest sort', () => {
+            const query = { sortOrder: 'newest' }
+            const result = component.getSortOrder(query)
+
+            expect(result).toEqual({ createdDate: 'asc' })
+        })
+
+        it('should return default firstName asc when no sort order provided', () => {
+            const result = component.getSortOrder({})
+
+            expect(result).toEqual({ firstName: 'asc' })
+        })
     })
 
-    it('should handle click events appropriately', () => {
-        jest.spyOn(component, 'onCreateClick')
-        jest.spyOn(component, 'onUploadClick')
+    describe('clickHandler', () => {
+        beforeEach(() => {
+            jest.spyOn(component, 'onCreateClick')
+            jest.spyOn(component, 'onUploadClick')
+        })
 
-        component.clickHandler({ type: 'createUser' })
-        expect(component.onCreateClick).toHaveBeenCalled()
+        it('should call onCreateClick for createUser event', () => {
+            component.clickHandler({ type: 'createUser' })
 
-        component.clickHandler({ type: 'upload' })
-        expect(component.onUploadClick).toHaveBeenCalled()
+            expect(component.onCreateClick).toHaveBeenCalled()
+        })
+
+        it('should call onUploadClick for upload event', () => {
+            component.clickHandler({ type: 'upload' })
+
+            expect(component.onUploadClick).toHaveBeenCalled()
+        })
     })
 
-    it('should navigate to create user page', () => {
-        component.onCreateClick()
+    describe('onCreateClick', () => {
+        it('should navigate to create user page and raise telemetry', () => {
+            component.onCreateClick()
 
-        expect(mockRouter.navigate).toHaveBeenCalledWith(['/app/users/create-user'])
-        expect(mockEvents.raiseInteractTelemetry).toHaveBeenCalledWith(
-            expect.objectContaining({
-                type: TelemetryEvents.EnumInteractTypes.CLICK,
-                subType: TelemetryEvents.EnumInteractSubTypes.CREATE_BTN,
-                id: 'create-user-btn'
-            }),
-            {}
-        )
+            expect(mockRouter.navigate).toHaveBeenCalledWith(['/app/users/create-user'])
+            expect(mockEventService.raiseInteractTelemetry).toHaveBeenCalledWith(
+                {
+                    type: 'CLICK',
+                    subType: 'CREATE_BTN',
+                    id: 'create-user-btn',
+                },
+                {}
+            )
+        })
     })
 
-    it('should handle upload click', () => {
-        jest.spyOn(component, 'filter')
+    describe('onUploadClick', () => {
+        beforeEach(() => {
+            jest.spyOn(component, 'filter')
+        })
 
-        component.onUploadClick()
+        it('should call filter with upload parameter', () => {
+            component.onUploadClick()
 
-        expect(component.filter).toHaveBeenCalledWith('upload')
+            expect(component.filter).toHaveBeenCalledWith('upload')
+        })
     })
 
-    it('should navigate to user details on role click', () => {
-        const mockUser = { userId: 'test-user-id' }
+    describe('onRoleClick', () => {
+        it('should navigate to user details and raise telemetry', () => {
+            const user = { userId: 'test-user-123' }
 
-        component.onRoleClick(mockUser)
+            component.onRoleClick(user)
 
-        expect(mockRouter.navigate).toHaveBeenCalledWith(['/app/users/test-user-id/details'])
-        expect(mockEvents.raiseInteractTelemetry).toHaveBeenCalledWith(
-            expect.objectContaining({
-                type: TelemetryEvents.EnumInteractTypes.CLICK,
-                subType: TelemetryEvents.EnumInteractSubTypes.CARD_CONTENT,
-                id: TelemetryEvents.EnumIdtype.USER_ROW
-            }),
-            {
-                id: 'test-user-id',
-                type: TelemetryEvents.EnumIdtype.USER
+            expect(mockRouter.navigate).toHaveBeenCalledWith(['/app/users/test-user-123/details'])
+            expect(mockEventService.raiseInteractTelemetry).toHaveBeenCalledWith(
+                {
+                    type: 'CLICK',
+                    subType: 'CARD_CONTENT',
+                    id: 'USER_ROW',
+                },
+                {
+                    id: 'test-user-123',
+                    type: 'USER',
+                }
+            )
+        })
+    })
+
+    describe('onEnterkySearch', () => {
+        beforeEach(() => {
+            jest.spyOn(component, 'filterData')
+        })
+
+        it('should set search query and call filterData', () => {
+            const searchValue = 'test search'
+
+            component.onEnterkySearch(searchValue)
+
+            expect(component.searchQuery).toBe(searchValue)
+            expect(component.filterData).toHaveBeenCalledWith(searchValue)
+        })
+    })
+
+    describe('onPaginateChange', () => {
+        beforeEach(() => {
+            jest.spyOn(component, 'filterData')
+        })
+
+        it('should update pagination properties and call filterData', () => {
+            const event = {
+                pageIndex: 2,
+                pageSize: 50
             }
-        )
+
+            component.searchQuery = 'existing search'
+            component.onPaginateChange(event as any)
+
+            expect(component.pageIndex).toBe(2)
+            expect(component.limit).toBe(50)
+            expect(component.filterData).toHaveBeenCalledWith('existing search')
+        })
     })
 
-    it('should filter data on enter key search', () => {
-        jest.spyOn(component, 'filterData')
-
-        component.onEnterkySearch('search term')
-
-        expect(component.searchQuery).toBe('search term')
-        expect(component.filterData).toHaveBeenCalledWith('search term')
-    })
-
-    it('should handle pagination changes', () => {
-        jest.spyOn(component, 'filterData')
-
-        component.onPaginateChange({ pageIndex: 2, pageSize: 30 } as any)
-
-        expect(component.pageIndex).toBe(2)
-        expect(component.limit).toBe(30)
-        expect(component.filterData).toHaveBeenCalledWith(component.searchQuery)
+    describe('ngOnDestroy', () => {
+        it('should complete without errors', () => {
+            expect(() => component.ngOnDestroy()).not.toThrow()
+        })
     })
 })

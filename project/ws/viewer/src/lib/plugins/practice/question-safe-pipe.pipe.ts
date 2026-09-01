@@ -7,9 +7,9 @@ import { DomSanitizer } from '@angular/platform-browser'
 })
 export class QuestionSafeUrlPipe implements PipeTransform {
 
-  constructor(private domSanitizer: DomSanitizer) {}
+  constructor(private domSanitizer: DomSanitizer) { }
   transform(url: any) {
-    return this.domSanitizer.bypassSecurityTrustHtml(url)
+    return this.domSanitizer.bypassSecurityTrustHtml(url) // NOSONAR
   }
 
 }

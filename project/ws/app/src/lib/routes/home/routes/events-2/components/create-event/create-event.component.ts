@@ -910,19 +910,19 @@ export class CreateEventComponent implements OnInit, AfterViewInit {
     let totalMinutes = 0
 
     // Extract hours
-    const hoursMatch = duration.match(/(\d+)h/)
+    const hoursMatch = duration.match(/(\d+)h/) // NOSONAR
     if (hoursMatch) {
       totalMinutes += parseInt(hoursMatch[1], 10) * 60
     }
 
     // Extract minutes
-    const minutesMatch = duration.match(/(\d+)m/)
+    const minutesMatch = duration.match(/(\d+)m/) // NOSONAR
     if (minutesMatch) {
       totalMinutes += parseInt(minutesMatch[1], 10)
     }
 
     // Extract seconds and convert to minutes (rounded)
-    const secondsMatch = duration.match(/(\d+)s/)
+    const secondsMatch = duration.match(/(\d+)s/) // NOSONAR
     if (secondsMatch) {
       totalMinutes += Math.round(parseInt(secondsMatch[1], 10) / 60)
     }

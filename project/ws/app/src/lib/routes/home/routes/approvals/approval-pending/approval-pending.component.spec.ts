@@ -38,7 +38,7 @@ describe('ApprovalPendingComponent', () => {
 
 		// Mock approvals service
 		mockApprService = {
-			getApprovalsList: jest.fn(),
+			getApprovalsList: jest.fn().mockReturnValue(of({ result: { count: 0, data: [] } })),
 			handleWorkflow: jest.fn()
 		} as unknown as jest.Mocked<ApprovalsService>
 
@@ -162,15 +162,18 @@ describe('ApprovalPendingComponent', () => {
 			expect(mockDialog.open).toHaveBeenCalledWith(
 				ReportsVideoComponent,
 				expect.objectContaining({
-					data: {
-						videoLink: 'https://www.youtube.com/embed/tgbNymZ7vqY?autoplay=1&mute=1',
-					},
 					disableClose: true,
 					width: '50%',
 					height: '60%',
 					panelClass: 'overflow-visable',
 				})
 			)
+		})
+
+		it('should open dialog with video link containing guide-videos path', () => {
+			component.openVideoPopup()
+			const callArgs = (mockDialog.open as jest.Mock).mock.calls[0]
+			expect(callArgs[1].data.videoLink).toContain('/assets/public/content/guide-videos/MDO-User.mp4')
 		})
 	})
 
@@ -191,15 +194,16 @@ describe('ApprovalPendingComponent', () => {
 		})
 
 		it('should retrieve cached approvals when filter is profileverification and cache exists', () => {
-			// Setup
+			// Setup - use same key as currentFilter to hit the else-if branch
 			localStorage.getItem.mockImplementation((key: any) => {
 				if (key === 'profileverificationOffset') return '1'
 				return null
 			})
-			component.currentFilter = 'transfers'
+			component.currentFilter = 'profileverification'
+			component.tabChange = 1
 			const retrieveCachedApprovalsSpy = jest.spyOn(component, 'retrieveCachedApprovals')
 
-			// Call filter with same value
+			// Call filter with same key to hit the else-if branch
 			component.filter('profileverification')
 
 			// Verify result
@@ -340,7 +344,8 @@ describe('ApprovalPendingComponent', () => {
 			component.currentFilter = 'profileverification'
 			component.totalProfileVerificationRecords = 100
 			const getSortOrderSpy = jest.spyOn(component, 'getSortOrder')
-			const fetchApprovalsSpy = jest.spyOn(component, 'fetchApprovals')
+			// Mock fetchApprovals to prevent it from resetting profileVerificationData
+			const fetchApprovalsSpy = jest.spyOn(component, 'fetchApprovals').mockImplementation(() => { })
 
 			// Mock data
 			component.profileVerificationData = [
@@ -348,8 +353,8 @@ describe('ApprovalPendingComponent', () => {
 				{ fullname: 'Jane Smith' }
 			]
 
-			// Call method with search text
-			component.onSearch({ searchText: 'John', sortOrder: { sortOrder: 'alphabetical' } })
+			// Call method with lowercase search text so the filter works correctly
+			component.onSearch({ searchText: 'john', sortOrder: { sortOrder: 'alphabetical' } })
 
 			// Verify results
 			expect(component.pageIndex).toBe(0)

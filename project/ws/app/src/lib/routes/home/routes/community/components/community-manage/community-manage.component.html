@@ -1,6 +1,7 @@
 <div class="dashboard-container">
   <div class="flex gap-2 items-center">
-    <mat-icon class="back-arrow cursor-pointer" (click)="navigateBack()">arrow_back</mat-icon>
+    <mat-icon class="back-arrow cursor-pointer" (click)="navigateBack()"
+      (keydown)="$event.preventDefault()">arrow_back</mat-icon>
     <span class="event-text mat-body-2">MDO Portal</span>
     <mat-icon class="chevron-arrow">chevron_right</mat-icon>
     <span class="event-builder-text mat-body-2">Community Manage</span>
@@ -65,7 +66,7 @@
                           *ngIf="item?.createdBy?.first_name">
                           {{item?.createdBy?.first_name }}
                           <span *ngIf="item?.createdBy?.userProfileStatus?.toLowerCase()==='verified'">
-                            <img src="assets/icons/accept_icon.svg" class="verify_icon ml-1" />
+                            <img src="assets/icons/accept_icon.svg" alt="accept_icon" class="verify_icon ml-1" />
                           </span>
                         </p>
                         <p *ngIf="item?.createdBy?.designation"
@@ -104,9 +105,11 @@
                     [innerHTML]="item?.description">
                   </div>
                   <div class="more-or-less text-right" *ngIf="getEditorTextLength(item?.description) > viewMoreLength">
-                    <div class="cursor-pointer nodtranslate" (click)="viewMoreOrLess(item)" *ngIf="!item?.expanded">View
+                    <div class="cursor-pointer nodtranslate" (keydown)="$event.preventDefault()"
+                      (click)="viewMoreOrLess(item)" *ngIf="!item?.expanded">View
                       more</div>
-                    <div class="cursor-pointer nodtranslate" (click)="viewMoreOrLess(item)" *ngIf="item?.expanded">View
+                    <div class="cursor-pointer nodtranslate" (keydown)="$event.preventDefault()"
+                      (click)="viewMoreOrLess(item)" *ngIf="item?.expanded">View
                       less
                     </div>
                   </div>
@@ -165,7 +168,8 @@
                       <mat-icon class="mr-2 color-white">info</mat-icon>Reported Issues</a>
                     <a class="show-btn link-btn flex btn-blue items-center"
                       (click)="openDialog('showPlatform', item?.discussionId, item?.type)"><img
-                        src="assets/icons/accept_icon.svg" class="verify_icon1 mr-2" />Show on the platform </a>
+                        src="assets/icons/accept_icon.svg" alt="accept_icon" class="verify_icon1 mr-2" />Show on the
+                      platform </a>
                     <a class="hide-issue-btn link-btn flex btn-blue items-center"
                       (click)="openDialog('hideContent',item?.discussionId, item?.type)"><mat-icon
                         class="mr-2 color-orange">visibility_off</mat-icon>Keep it Hidden</a>
@@ -203,7 +207,7 @@
                           *ngIf="item?.createdBy?.first_name">
                           {{item?.createdBy?.first_name }}
                           <span *ngIf="item?.createdBy?.userProfileStatus?.toLowerCase()==='verified'">
-                            <img src="assets/icons/accept_icon.svg" class="verify_icon ml-1" />
+                            <img src="assets/icons/accept_icon.svg" alt="accept_icon" class="verify_icon ml-1" />
                           </span>
                         </p>
                         <p *ngIf="item?.createdBy?.designation"
@@ -223,9 +227,11 @@
                     [innerHTML]="item?.description">
                   </div>
                   <div class="more-or-less text-right" *ngIf="getEditorTextLength(item?.description) > viewMoreLength">
-                    <div class="cursor-pointer nodtranslate" (click)="viewMoreOrLess(item)" *ngIf="!item?.expanded">View
+                    <div class="cursor-pointer nodtranslate" (keydown)="$event.preventDefault()"
+                      (click)="viewMoreOrLess(item)" *ngIf="!item?.expanded">View
                       more</div>
-                    <div class="cursor-pointer nodtranslate" (click)="viewMoreOrLess(item)" *ngIf="item?.expanded">View
+                    <div class="cursor-pointer nodtranslate" (keydown)="$event.preventDefault()"
+                      (click)="viewMoreOrLess(item)" *ngIf="item?.expanded">View
                       less
                     </div>
                   </div>
@@ -276,7 +282,8 @@
                       <mat-icon class="mr-2 color-white">info</mat-icon>Reported Issues</a>
                     <a class="show-btn link-btn flex btn-blue items-center"
                       (click)="openDialog('showPlatform', item?.discussionId, item?.type)"><img
-                        src="assets/icons/accept_icon.svg" class="verify_icon1 mr-2" />Show on the platform </a>
+                        src="assets/icons/accept_icon.svg" class="verify_icon1 mr-2" alt="accept_icon" />Show on the
+                      platform </a>
                     <a class="hide-issue-btn link-btn flex btn-blue items-center"
                       (click)="openDialog('hideContent',item?.discussionId, item?.type)"><mat-icon
                         class="mr-2 color-orange">visibility_off</mat-icon>Keep it Hidden</a>
@@ -292,7 +299,7 @@
             <div class="flex justify-center items-center h-full flex-wrap"
               *ngIf="!getPostItems || getPostItems.length === 0">
               <img alt="Feature comming soon" src="/assets/instances/eagle/app_logos/allocation_empty.svg"
-                class="block mx-auto margin-top-xl margin-bottom-l">
+                class="block mx-auto margin-top-xl margin-bottom-l" alt="allocation_empty">
               <div class="flex justify-center items-center w-full text-gray-900 font-bold"> No data found</div>
             </div>
 
@@ -316,7 +323,7 @@
                           *ngIf="item?.createdBy?.first_name">
                           {{item?.createdBy?.first_name }}
                           <span *ngIf="item?.createdBy?.userProfileStatus?.toLowerCase()==='verified'">
-                            <img src="assets/icons/accept_icon.svg" class="verify_icon ml-1" />
+                            <img src="assets/icons/accept_icon.svg" alt="accept_icon" class="verify_icon ml-1" />
                           </span>
                         </p>
                         <p *ngIf="item?.createdBy?.designation"
@@ -335,9 +342,11 @@
                     [innerHTML]="item?.description">
                   </div>
                   <div class="more-or-less text-right" *ngIf="getEditorTextLength(item?.description) > viewMoreLength">
-                    <div class="cursor-pointer nodtranslate" (click)="viewMoreOrLess(item)" *ngIf="!item?.expanded">View
+                    <div class="cursor-pointer nodtranslate" (keydown)="$event.preventDefault()"
+                      (click)="viewMoreOrLess(item)" *ngIf="!item?.expanded">View
                       more</div>
-                    <div class="cursor-pointer nodtranslate" (click)="viewMoreOrLess(item)" *ngIf="item?.expanded">View
+                    <div class="cursor-pointer nodtranslate" (keydown)="$event.preventDefault()"
+                      (click)="viewMoreOrLess(item)" *ngIf="item?.expanded">View
                       less
                     </div>
                   </div>
@@ -388,7 +397,8 @@
                       <mat-icon class="mr-2 color-white">info</mat-icon>Reported Issues</a>
                     <a class="show-btn link-btn flex btn-blue items-center"
                       (click)="openDialog('showPlatform', item?.discussionId, item?.type)"><img
-                        src="assets/icons/accept_icon.svg" class="verify_icon1 mr-2" />Show on the platform </a>
+                        src="assets/icons/accept_icon.svg" class="verify_icon1 mr-2" alt="accept_icon" />Show on the
+                      platform </a>
                     <a class="hide-issue-btn link-btn flex btn-blue items-center"
                       (click)="openDialog('hideContent',item?.discussionId, item?.type)"><mat-icon
                         class="mr-2 color-orange">visibility_off</mat-icon>Keep it Hidden</a>
@@ -427,7 +437,7 @@
                           *ngIf="item?.createdBy?.first_name">
                           {{item?.createdBy?.first_name }}
                           <span *ngIf="item?.createdBy?.userProfileStatus?.toLowerCase()==='verified'">
-                            <img src="assets/icons/accept_icon.svg" class="verify_icon ml-1" />
+                            <img src="assets/icons/accept_icon.svg" alt="accept_icon" class="verify_icon ml-1" />
                           </span>
                         </p>
                         <p *ngIf="item?.createdBy?.designation"
@@ -446,9 +456,11 @@
                     [innerHTML]="item?.description">
                   </div>
                   <div class="more-or-less text-right" *ngIf="getEditorTextLength(item?.description) > viewMoreLength">
-                    <div class="cursor-pointer nodtranslate" (click)="viewMoreOrLess(item)" *ngIf="!item?.expanded">View
+                    <div class="cursor-pointer nodtranslate" (keydown)="$event.preventDefault()"
+                      (click)="viewMoreOrLess(item)" *ngIf="!item?.expanded">View
                       more</div>
-                    <div class="cursor-pointer nodtranslate" (click)="viewMoreOrLess(item)" *ngIf="item?.expanded">View
+                    <div class="cursor-pointer nodtranslate" (keydown)="$event.preventDefault()"
+                      (click)="viewMoreOrLess(item)" *ngIf="item?.expanded">View
                       less
                     </div>
                   </div>
@@ -496,7 +508,8 @@
                       <mat-icon class="mr-2 color-white">info</mat-icon>Reported Issues</a>
                     <a class="show-btn link-btn flex btn-blue items-center"
                       (click)="openDialog('showPlatform', item?.discussionId, item?.type)"><img
-                        src="assets/icons/accept_icon.svg" class="verify_icon1 mr-2" />Show on the platform </a>
+                        src="assets/icons/accept_icon.svg" class="verify_icon1 mr-2" alt="accept_icon" />Show on the
+                      platform </a>
                     <a class="hide-issue-btn link-btn flex btn-blue items-center"
                       (click)="openDialog('hideContent',item?.discussionId, item?.type)"><mat-icon
                         class="mr-2 color-orange">visibility_off</mat-icon>Keep it Hidden</a>
@@ -534,7 +547,7 @@
                     <p class="mat-body-1 bold mr-1 margin-remove-bottom text-name" *ngIf="item?.createdBy?.first_name">
                       {{item?.createdBy?.first_name }}
                       <span *ngIf="item?.createdBy?.userProfileStatus?.toLowerCase()==='verified'">
-                        <img src="assets/icons/accept_icon.svg" class="verify_icon ml-1" />
+                        <img src="assets/icons/accept_icon.svg" class="verify_icon ml-1" alt="accept_icon" />
                       </span>
                     </p>
                     <p *ngIf="item?.createdBy?.designation"
@@ -552,9 +565,11 @@
                 [innerHTML]="item?.description">
               </div>
               <div class="more-or-less text-right" *ngIf="getEditorTextLength(item?.description) > viewMoreLength">
-                <div class="cursor-pointer nodtranslate" (click)="viewMoreOrLess(item)" *ngIf="!item?.expanded">View
+                <div class="cursor-pointer nodtranslate" (keydown)="$event.preventDefault()"
+                  (click)="viewMoreOrLess(item)" *ngIf="!item?.expanded">View
                   more</div>
-                <div class="cursor-pointer nodtranslate" (click)="viewMoreOrLess(item)" *ngIf="item?.expanded">View less
+                <div class="cursor-pointer nodtranslate" (keydown)="$event.preventDefault()"
+                  (click)="viewMoreOrLess(item)" *ngIf="item?.expanded">View less
                 </div>
               </div>
               <div *ngIf="item?.categoryType?.includes('image')">
@@ -600,7 +615,8 @@
                   <mat-icon class="mr-2 color-white">info</mat-icon>Reported Issues</a>
                 <a class="show-btn link-btn flex btn-blue items-center"
                   (click)="openDialog('showPlatform', item?.discussionId, item?.type)"><img
-                    src="assets/icons/accept_icon.svg" class="verify_icon1 mr-2" />Show on the platform </a>
+                    src="assets/icons/accept_icon.svg" class="verify_icon1 mr-2" alt="accept_icon" />Show on the
+                  platform </a>
 
               </div>
             </div>

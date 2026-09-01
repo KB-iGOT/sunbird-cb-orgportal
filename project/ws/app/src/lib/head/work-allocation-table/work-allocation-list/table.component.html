@@ -19,9 +19,11 @@
             <ng-container matColumnDef="{{col.key}}" *ngFor="let col of tableData!.columns">
                 <mat-header-cell *matHeaderCellDef mat-sort-header [ngClass]="{
                             'min-wid':col.displayName === 'Work order'}"> {{col.displayName}} </mat-header-cell>
-                <mat-cell *matCellDef="let element" (click)="selection.toggle(element)" [ngClass]="{
+                <mat-cell *matCellDef="let element" (click)="selection.toggle(element)"
+                    (keydown)="$event.preventDefault()" [ngClass]="{
                             'min-wid':col.displayName === 'Work order'}">
-                    <mat-radio-button *ngIf="col.displayName==='Work order'" (click)="selectWorkOrder(element)">
+                    <mat-radio-button *ngIf="col.displayName==='Work order'" (keydown)="$event.preventDefault()"
+                        (click)="selectWorkOrder(element)">
                     </mat-radio-button>
                     <span *ngIf="!col.isList && element[col.key]!='Download'" class="flex textclass mat-body-2">
 
@@ -31,12 +33,12 @@
                         </ws-app-initial-avatar> <span [ngClass]="{
                             'mat-button':col.displayName === 'Work order',
                             'mat-body-2':col.displayName != 'Work order',
-                            'ws-mat-red-text':col.displayName === 'Errors' }"
-                            (click)="onRowClick(element)">{{element[col.key]}}
+                            'ws-mat-red-text':col.displayName === 'Errors' }" (click)="onRowClick(element)"
+                            (keydown)="$event.preventDefault()">{{element[col.key]}}
                             {{col.isList}}</span>
                     </span>
                     <div *ngIf="!col.isList && element[col.key]==='Download'" (click)="buttonClick(element)"
-                        class="url_value">
+                        (keydown)="$event.preventDefault()" class="url_value">
                         <img src="/assets/icons/pdf.svg" alt="PDF upload" class="pdf">
                         <a>{{element[col.key]}} {{col.isList}}</a>
                     </div>
@@ -49,11 +51,12 @@
                         <div *ngIf="ac.optional">
                             <ws-widget-app-button *ngIf="row[ac.optional_key] === ac.optional_Value" [type]="ac.type"
                                 [icon]="ac.icon" [disabled]="ac.disabled || false" [label]="ac.label"
-                                (click)="buttonClick(row)"></ws-widget-app-button>
+                                (click)="buttonClick(row)" (keydown)="$event.preventDefault()"></ws-widget-app-button>
                         </div>
                         <div *ngIf="!ac.optional">
                             <ws-widget-app-button [type]="ac.type" [icon]="ac.icon" [label]="ac.label"
-                                [disabled]="ac.disabled || false" (click)="buttonClick(row)">
+                                [disabled]="ac.disabled || false" (click)="buttonClick(row)"
+                                (keydown)="$event.preventDefault()">
                             </ws-widget-app-button>
                         </div>
                     </div>
@@ -72,7 +75,8 @@
             </ng-container>
 
             <mat-header-row *matHeaderRowDef="getFinalColumns()"></mat-header-row>
-            <mat-row *matRowDef="let row; columns: getFinalColumns();" (click)="selection.toggle(row);">
+            <mat-row *matRowDef="let row; columns: getFinalColumns();" (click)="selection.toggle(row);"
+                (keydown)="$event.preventDefault()">
             </mat-row>
         </mat-table>
         <div class="no-information-found" *ngIf="showLoading"><i>Loading...</i>

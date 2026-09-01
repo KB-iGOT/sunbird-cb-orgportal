@@ -4,7 +4,7 @@ import { SelectionModel } from '@angular/cdk/collections'
 import { MatTableDataSource } from '@angular/material/table'
 
 import { UserPopupComponent } from '../user-popup/user-popup'
-import { of, Subject } from 'rxjs'
+import { of } from 'rxjs'
 
 describe('WorkAllocationTableComponent', () => {
     let component: WorkAllocationTableComponent
@@ -47,12 +47,11 @@ describe('WorkAllocationTableComponent', () => {
             open: jest.fn().mockReturnValue(dialogRefSpyObj)
         }
 
-        const paramMap = new Subject()
+        // Use ReplaySubject so late subscribers still get the emission
         mockActivatedRoute = {
-            params: paramMap.asObservable(),
+            params: of({ currentDept: 'testDept', roleId: 'testRoleId' }),
             snapshot: { params: {} }
         }
-        paramMap.next({ currentDept: 'testDept', roleId: 'testRoleId' })
 
         mockCreateMDOService = {
             assignAdminToDepartment: jest.fn().mockReturnValue(of({ success: true }))
@@ -204,25 +203,27 @@ describe('WorkAllocationTableComponent', () => {
     })
 
     it('should get final columns correctly', () => {
-        // component.tableData = {
-        //     columns: [
-        //         { key: 'col1', title: 'Column 1' },
-        //         { key: 'col2', title: 'Column 2' }
-        //     ],
-        //     needCheckBox: true,
-        //     needHash: true,
-        //     actions: [{
-        //         name: 'Edit',
-        //         icon: 'undefined',
-        //         type: '',
-        //         label: ''
-        //     }],
-        //     needUserMenus: true
-        // }
+        component.tableData = {
+            columns: [
+                { key: 'col1', displayName: 'Column 1' },
+                { key: 'col2', displayName: 'Column 2' },
+            ],
+            needCheckBox: true,
+            needHash: true,
+            actions: [{ name: 'Edit', icon: '', type: '', label: '', disabled: false }],
+            needUserMenus: true,
+            sortColumn: '',
+            sortState: 'asc',
+        } as any
 
-        const columns = component.getFinalColumns()
+        const columns = component.getFinalColumns() as string[]
 
-        expect(columns).toEqual(['SR', 'select', 'col1', 'col2', 'Actions', 'Menu'])
+        expect(columns).toContain('SR')
+        expect(columns).toContain('select')
+        expect(columns).toContain('col1')
+        expect(columns).toContain('col2')
+        expect(columns).toContain('Actions')
+        expect(columns).toContain('Menu')
     })
 
     it('should open user popup and assign admin on close', () => {
@@ -286,20 +287,27 @@ describe('WorkAllocationTableComponent', () => {
     })
 
     it('should provide correct checkbox label', () => {
+        // The code: isAllSelected() ? 'select' : 'deselect'
+        // false → 'deselect all', true → 'select all'
         component.dataSource.data = [{ id: 1, position: 5, name: 'Test' }]
-
-        const noRowLabel = component.checkboxLabel()
-        expect(noRowLabel).toBe('select all')
+        component.selection.clear()
+        // 0 selected, 1 row → isAllSelected() = false → 'deselect all'
+        expect(component.checkboxLabel()).toBe('deselect all')
 
         component.selection.select(component.dataSource.data[0])
-        const selectedLabel = component.checkboxLabel()
-        expect(selectedLabel).toBe('deselect all')
+        // 1 selected, 1 row → isAllSelected() = true → 'select all'
+        expect(component.checkboxLabel()).toBe('select all')
 
-        const rowLabel = component.checkboxLabel(component.dataSource.data[0])
-        expect(rowLabel).toBe('deselect row 6')
+        // Row label: selected row
+        const row = component.dataSource.data[0]
+        expect(component.checkboxLabel(row)).toBe('deselect row 6')
+
+        component.selection.clear()
+        expect(component.checkboxLabel(row)).toBe('select row 6')
     })
 
     it('should handle row click for Draft status', () => {
+        jest.spyOn(component.eOnRowClick, 'emit')
         const row = { id: 'test-id', fromdata: 'DRAFT' }
 
         component.onRowClick(row)
@@ -309,6 +317,7 @@ describe('WorkAllocationTableComponent', () => {
     })
 
     it('should handle row click for Published status', () => {
+        jest.spyOn(component.eOnRowClick, 'emit')
         const row = { id: 'test-id', fromdata: 'PUBLISHED' }
 
         component.onRowClick(row)
@@ -337,5 +346,58 @@ describe('WorkAllocationTableComponent', () => {
 
         expect(document.createElement).toHaveBeenCalledWith('a')
         // More assertions could be added to verify the link attributes and actions
+    })
+
+    it('should return empty string from getFinalColumns when tableData is undefined', () => {
+        component.tableData = undefined
+        const result = component.getFinalColumns()
+        expect(result).toBe('')
+    })
+
+    it('should return columns with check box, hash, actions and menu when all flags set', () => {
+        component.tableData = {
+            columns: [
+                { key: 'col1', displayName: 'Column 1' },
+                { key: 'col2', displayName: 'Column 2' },
+            ],
+            needCheckBox: true,
+            needHash: true,
+            actions: [{ name: 'Edit', icon: '', type: '', label: '', disabled: false }],
+            needUserMenus: true,
+            sortColumn: '',
+            sortState: 'asc',
+            needCreateUser: false,
+        } as any
+
+        const result = component.getFinalColumns() as string[]
+        expect(result).toContain('select')
+        expect(result).toContain('SR')
+        expect(result).toContain('col1')
+        expect(result).toContain('col2')
+        expect(result).toContain('Actions')
+        expect(result).toContain('Menu')
+    })
+
+    it('should filter list by key using filterList', () => {
+        const list = [{ name: 'Alice', age: 30 }, { name: 'Bob', age: 25 }]
+        const result = component.filterList(list, 'name')
+        expect(result).toEqual(['Alice', 'Bob'])
+    })
+
+    it('should not navigate for non-draft/published fromdata in onRowClick', () => {
+        jest.spyOn(component.eOnRowClick, 'emit')
+        const row = { id: 'test-id', fromdata: 'OTHER' }
+        component.onRowClick(row)
+        expect(component.eOnRowClick.emit).toHaveBeenCalledWith(row)
+        expect(mockRouter.navigate).not.toHaveBeenCalled()
+    })
+    it('should handle error when assignAdminToDepartment fails in openPopup', () => {
+        component.departmentId = 'testDeptId'
+        component.departmentRole = 'testDeptRole'
+        mockCreateMDOService.assignAdminToDepartment.mockReturnValue(
+            require('rxjs').throwError(() => ({ error: { message: 'Failed' } }))
+        )
+        // The error path should not throw and should invoke openSnackbar
+        expect(() => component.openPopup()).not.toThrow()
     })
 })

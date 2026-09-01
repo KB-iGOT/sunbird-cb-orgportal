@@ -1,313 +1,389 @@
-// mock lodash before importing the component so component's use of _ is mocked
-jest.mock('lodash', () => {
-  const get = jest.fn((obj: any, path: string, defaultValue: any) => {
-    if (!obj) return defaultValue
-    if (path === 'showSearchBox') return obj.showSearchBox
-    if (path === 'noDataMessage') return obj.noDataMessage
-    if (path === 'showPagination') return obj.showPagination
-    return defaultValue
-  })
-  const map = jest.fn((array: any[], iteratee: any) => Array.isArray(array) ? array.map(iteratee) : [])
-  return {
-    __esModule: true,
-    default: { get, map },
-    get,
-    map
-  }
-})
-
-jest.mock('@angular/material/table')
-
-import { EventsTableComponent } from './events-table.component'
-import { SimpleChange, SimpleChanges } from '@angular/core'
+import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing'
+import { FormControl, ReactiveFormsModule } from '@angular/forms'
 import { MatTableDataSource } from '@angular/material/table'
 import { PageEvent } from '@angular/material/paginator'
-import { MatSort } from '@angular/material/sort'
-import { of } from 'rxjs'
+import { SimpleChanges } from '@angular/core'
+import { EventsTableComponent } from './events-table.component'
+import { events } from '../../models/events.model'
+
+// Mock lodash
+jest.mock('lodash', () => ({
+  get: jest.fn(),
+  map: jest.fn()
+}))
+
+const _ = require('lodash')
 
 describe('EventsTableComponent', () => {
   let component: EventsTableComponent
-  let mockMatTableDataSource: any
-  let compAny: any
-  // let mockValueChanges: any
+  let fixture: ComponentFixture<EventsTableComponent>
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      declarations: [EventsTableComponent],
+      imports: [ReactiveFormsModule]
+    }).compileComponents()
 
-  beforeEach(() => {
-    // Reset mocks
-    jest.clearAllMocks()
-    jest.useFakeTimers()
-
-    // Setup ValueChanges mock
-    // mockValueChanges = {
-    //   pipe: jest.fn().mockReturnThis(),
-    //   subscribe: jest.fn()
-    // }
-
-    // Setup MatTableDataSource mock
-    mockMatTableDataSource = {
-      data: [],
-      sort: null,
-      filter: ''
-    }
-
-      ; (MatTableDataSource as any).mockImplementation(() => mockMatTableDataSource)
-
-    // Initialize component
-    component = new EventsTableComponent()
-    compAny = component as any
-
-    // ensure tableData exists so component code that reads .columns or uses _.get won't throw
-    component.tableData = component.tableData || { columns: [], showSearchBox: true, noDataMessage: 'No data found', showPagination: true }
-
-    // --- STUB runtime helper methods/properties to avoid runtime errors in tests ---
-    // These are added only on the test instance (compAny) to avoid changing component code
-    compAny.applyFilter = compAny.applyFilter || ((val: any) => {
-      if (!component.dataSource) component.dataSource = mockMatTableDataSource
-      component.dataSource.filter = val ? String(val).trim().toLowerCase() : ''
-    })
-
-    compAny.trackBy = compAny.trackBy || ((idx: number, itm: any) => {
-      return itm && (itm as any).id != null ? (itm as any).id : idx
-    })
-
-    compAny.ngOnDestroy = compAny.ngOnDestroy || (() => {
-      if (compAny.searchSubscription && typeof compAny.searchSubscription.unsubscribe === 'function') {
-        compAny.searchSubscription.unsubscribe()
-      }
-    })
-    // ensure searchSubscription exists (may be set per-test)
-    compAny.searchSubscription = compAny.searchSubscription
-
-    // Mock FormControl valueChanges
-    // Avoid spying on a getter/property which causes "does not have access type get" error in Jest.
-    // Assign valueChanges directly on the instance (typed as any to avoid TS errors).
-    compAny.searchControl = { valueChanges: of('test') } as any
+    fixture = TestBed.createComponent(EventsTableComponent)
+    component = fixture.componentInstance
   })
 
   afterEach(() => {
-    jest.runOnlyPendingTimers()
-    jest.useRealTimers()
+    jest.clearAllMocks()
   })
 
-  it('should create', () => {
-    expect(component).toBeTruthy()
+  describe('Component Initialization', () => {
+    it('should create component', () => {
+      expect(component).toBeTruthy()
+    })
+
+    it('should initialize default values in constructor', () => {
+      expect(component.searchControl).toBeInstanceOf(FormControl)
+      expect(component.showSearchBox).toBe(true)
+      expect(component.dataSource).toBeInstanceOf(MatTableDataSource)
+      expect(component.pageSizeOptions).toEqual([20, 50, 100])
+      expect(component.columnsList).toEqual([])
+      expect(component.tableColumns).toEqual([])
+      expect(component.noDataMessage).toBe('No data found')
+      expect(component.showPagination).toBe(true)
+    })
+
+    it('should initialize default pagination details', () => {
+      expect(component.paginationDetails).toEqual({
+        startIndex: 0,
+        lastIndex: 20,
+        pageSize: 20,
+        pageIndex: 0,
+        totalCount: 20
+      })
+    })
+
+    it('should initialize empty menu items array', () => {
+      expect(component.menuItems).toEqual([])
+    })
+
+    it('should initialize showLoader as false', () => {
+      expect(component.showLoader).toBe(false)
+    })
   })
 
   describe('ngOnInit', () => {
-    it('should set displayedColumns and other properties from tableData', () => {
-      // Arrange
-      component.tableData = {
-        columns: [{
-          displayName: 'col1',
-          key: 'col1',
-          cellType: 'textImage'
-        },
-        {
-          displayName: 'col2',
-          key: 'col2',
-          cellType: 'text'
-        },
-        {
-          displayName: 'col3',
-          key: 'col3',
-          cellType: 'date'
-        },
-        {
-          displayName: 'col4',
-          key: 'col4',
-          cellType: 'number'
-        },
-        {
-          displayName: 'col5',
-          key: 'col5',
-          cellType: 'menu'
-        }],
-        showSearchBox: false,
-        noDataMessage: 'Custom message',
+    it('should set displayedColumns when tableData exists', () => {
+      const mockTableData: events.tableData = {
+        columns: [
+          { key: 'name', displayName: 'Name', cellType: 'text' },
+          { key: 'age', displayName: 'Age', cellType: 'text' }
+        ],
+        showSearchBox: true,
+        noDataMessage: 'Custom no data message',
         showPagination: false
       }
+      component.tableData = mockTableData
 
-      // Act
       component.ngOnInit()
 
-      // Assert
-      // component.displayedColumns contains the columns array (objects) — assert accordingly
-      expect(component.displayedColumns).toEqual(component.tableData.columns)
+      expect(component.displayedColumns).toEqual(mockTableData.columns)
+    })
+
+    it('should set properties from tableData using lodash get with defaults', () => {
+      const mockTableData: events.tableData = {
+        columns: [],
+        showSearchBox: false,
+        showPagination: false
+      }
+      component.tableData = mockTableData
+
+      _.get.mockReturnValueOnce(false) // showSearchBox
+        .mockReturnValueOnce('Custom message') // noDataMessage
+        .mockReturnValueOnce(false) // showPagination
+
+      component.ngOnInit()
+
+      expect(_.get).toHaveBeenCalledWith(mockTableData, 'showSearchBox', true)
+      expect(_.get).toHaveBeenCalledWith(mockTableData, 'noDataMessage', 'No data found')
+      expect(_.get).toHaveBeenCalledWith(mockTableData, 'showPagination', true)
       expect(component.showSearchBox).toBe(false)
       expect(component.noDataMessage).toBe('Custom message')
       expect(component.showPagination).toBe(false)
     })
 
-    it('should subscribe to searchControl valueChanges', () => {
-      // Arrange
-      const searchEmitSpy = jest.spyOn(component.searchKey, 'emit')
-      component.tableData = {
-        columns: [],
-        showSearchBox: false,
-        showPagination: false
-      }
+    it('should setup search control valueChanges subscription', fakeAsync(() => {
+      const searchKeySpy = jest.spyOn(component.searchKey, 'emit')
 
-      // Act
       component.ngOnInit()
 
-      // Assert - Verify debounceTime was applied and subscription emits values
-      expect(searchEmitSpy).toHaveBeenCalledWith('test')
+      // Simulate search input
+      component.searchControl.setValue('test search')
+      tick(500) // Wait for debounce
+
+      expect(searchKeySpy).toHaveBeenCalledWith('test search')
+    }))
+
+    it('should handle null searchControl gracefully', () => {
+      component.searchControl = null as any
+
+      expect(() => component.ngOnInit()).not.toThrow()
+    })
+
+    it('should not set properties when tableData is null', () => {
+      component.tableData = null as any
+
+      component.ngOnInit()
+
+      expect(component.displayedColumns).toBeUndefined()
     })
   })
 
   describe('ngOnChanges', () => {
     it('should call getFinalColumns when tableData changes', () => {
-      // Arrange
-      // ensure component.tableData exists before calling ngOnChanges to avoid undefined.columns
-      component.tableData = { columns: [] } as any
-      const getFinalColumnsSpy = jest.spyOn(component, 'getFinalColumns')
+      // Spy + mock-impl to avoid JSON.parse crash when tableData has no columns
+      const getFinalColumnsSpy = jest.spyOn(component, 'getFinalColumns').mockImplementation(() => { })
       const changes: SimpleChanges = {
-        tableData: new SimpleChange(null, { columns: [] }, true)
+        tableData: {
+          currentValue: { columns: [] },
+          previousValue: null,
+          firstChange: true,
+          isFirstChange: () => true
+        }
       }
 
-      // Act
       component.ngOnChanges(changes)
 
-      // Assert
       expect(getFinalColumnsSpy).toHaveBeenCalled()
     })
 
-    it('should update dataSource.data when data changes', () => {
-      // Arrange
-      const mockData = [{ id: 1 }, { id: 2 }]
-      const changes: SimpleChanges = {
-        data: new SimpleChange(null, mockData, true)
-      }
-      component.dataSource = mockMatTableDataSource
-      component.sort = new MatSort()
+    it('should update dataSource data when data changes and dataSource exists', fakeAsync(() => {
+      const mockData = [{ id: 1, name: 'Test' }]
+      component.dataSource = new MatTableDataSource()
+      // component uses this.data (@Input), not changes.data.currentValue
+      component.data = mockData as any
 
-      // Act
+      const changes: SimpleChanges = {
+        data: {
+          currentValue: mockData,
+          previousValue: null,
+          firstChange: true,
+          isFirstChange: () => true
+        }
+      }
+
       component.ngOnChanges(changes)
 
-      // Assert
-      expect(component.dataSource.data).toBe(undefined)
+      expect(component.dataSource.data).toEqual(mockData)
+      tick(10) // consume the setTimeout
+    }))
 
-      // Fast-forward timers
-      jest.advanceTimersByTime(10)
-      expect(component.dataSource.sort).toBe(component.sort)
+    it('should not update dataSource when dataSource is null', () => {
+      component.dataSource = null
+      const changes: SimpleChanges = {
+        data: {
+          currentValue: [],
+          previousValue: null,
+          firstChange: true,
+          isFirstChange: () => true
+        }
+      }
+
+      expect(() => component.ngOnChanges(changes)).not.toThrow()
     })
+
+    it('should handle both tableData and data changes', fakeAsync(() => {
+      const getFinalColumnsSpy = jest.spyOn(component, 'getFinalColumns').mockImplementation(() => { })
+      const mockData = [{ id: 1 }]
+      component.dataSource = new MatTableDataSource()
+      component.data = mockData as any
+
+      const changes: SimpleChanges = {
+        tableData: {
+          currentValue: { columns: [] },
+          previousValue: null,
+          firstChange: true,
+          isFirstChange: () => true
+        },
+        data: {
+          currentValue: mockData,
+          previousValue: null,
+          firstChange: true,
+          isFirstChange: () => true
+        }
+      }
+
+      component.ngOnChanges(changes)
+
+      expect(getFinalColumnsSpy).toHaveBeenCalled()
+      expect(component.dataSource.data).toEqual(mockData)
+
+      tick(10)
+    }))
   })
 
   describe('getFinalColumns', () => {
-    it('should set columnsList and tableColumns correctly without menu items', () => {
-      // Arrange
+    beforeEach(() => {
       component.tableData = {
-        columns: [{ displayName: 'Name', key: 'name', cellType: 'text' }],
-        showSearchBox: false,
-        showPagination: false
-      }
-      component.menuItems = []
-
-      // Act
-      component.getFinalColumns()
-
-      // Assert
-      expect(component.columnsList).toEqual(['name'])
-      expect(component.tableColumns).toEqual([{ displayName: 'Name', key: 'name', cellType: 'text' }])
+        columns: [
+          { key: 'name', displayName: 'Name', cellType: 'text' },
+          { key: 'age', displayName: 'Age', cellType: 'text' }
+        ]
+      } as any
     })
 
-    it('should add Actions column when menu items are present', () => {
-      // Arrange
-      component.tableData = {
-        columns: [{
-          displayName: 'Name', key: 'name', cellType: 'text'
-        }],
-        showSearchBox: false,
-        showPagination: false
-      }
-      component.menuItems = [{ btnText: 'Edit', action: 'edit' }]
+    it('should set tableColumns without menu when menuItems is empty', () => {
+      _.map.mockReturnValue(['name', 'age'])
+      component.menuItems = []
 
-      // Act
       component.getFinalColumns()
 
-      // Assert
-      expect(component.columnsList).toEqual(['name', 'menu'])
       expect(component.tableColumns).toEqual([
-        { displayName: 'Name', key: 'name', cellType: 'text' },
+        { key: 'name', displayName: 'Name', cellType: 'text' },
+        { key: 'age', displayName: 'Age', cellType: 'text' }
+      ])
+      expect(_.map).toHaveBeenCalledWith(component.tableColumns, expect.any(Function))
+      expect(component.columnsList).toEqual(['name', 'age'])
+    })
+
+    it('should add menu column to tableColumns when menuItems is non-empty', () => {
+      _.map.mockReturnValue(['name', 'age', 'menu'])
+      component.menuItems = [{ action: 'edit', btnText: 'Edit' } as any]
+
+      component.getFinalColumns()
+
+      expect(component.tableColumns).toEqual([
+        { key: 'name', displayName: 'Name', cellType: 'text' },
+        { key: 'age', displayName: 'Age', cellType: 'text' },
         { displayName: 'Actions', key: 'menu', cellType: 'menu' }
       ])
+      expect(component.columnsList).toEqual(['name', 'age', 'menu'])
+    })
+
+    it('should reset columnsList before processing', () => {
+      _.map.mockReturnValue(['name', 'age'])
+      component.columnsList = ['existing']
+      component.menuItems = []
+
+      component.getFinalColumns()
+
+      expect(component.columnsList).toEqual(['name', 'age'])
+    })
+
+    it('should create deep copy of columns so original is not mutated', () => {
+      _.map.mockReturnValue(['name', 'age'])
+      const originalColumns = component.tableData.columns
+      component.menuItems = []
+
+      component.getFinalColumns()
+
+      // Original columns array must be unchanged (no menu column appended)
+      expect(originalColumns).toEqual([
+        { key: 'name', displayName: 'Name', cellType: 'text' },
+        { key: 'age', displayName: 'Age', cellType: 'text' }
+      ])
+      expect(originalColumns.length).toBe(2)
     })
   })
 
   describe('getButtonsToShow', () => {
-    it('should return all menu items when no buttonsToHide specified', () => {
-      // Arrange
-      const menuItems = [
-        { btnText: 'Edit', action: 'edit' },
-        { btnText: 'Delete', action: 'delete' }
+    beforeEach(() => {
+      component.menuItems = [
+        { action: 'edit', btnText: 'Edit' } as any,
+        { action: 'delete', btnText: 'Delete' } as any,
+        { action: 'view', btnText: 'View' } as any,
       ]
-      component.menuItems = menuItems
-      const rowData = { id: 1 }
-
-      // Act
-      const result = component.getButtonsToShow(rowData)
-
-      // Assert
-      expect(result).toEqual(menuItems)
     })
 
-    it('should filter out buttons in buttonsToHide', () => {
-      // Arrange
-      const menuItems = [
-        { btnText: 'Edit', action: 'edit' },
-        { btnText: 'Delete', action: 'delete' },
-        { btnText: 'View', action: 'view' }
-      ]
-      component.menuItems = menuItems
-      const rowData = { id: 1, buttonsToHide: ['delete'] }
+    it('should return all menu items when buttonsToHide is not present', () => {
+      const rowData = { id: 1, name: 'Test' }
 
-      // Act
       const result = component.getButtonsToShow(rowData)
 
-      // Assert
+      expect(result).toEqual(component.menuItems)
+    })
+
+    it('should return filtered menu items when buttonsToHide is present', () => {
+      const rowData = {
+        id: 1,
+        name: 'Test',
+        buttonsToHide: ['delete']
+      }
+
+      const result = component.getButtonsToShow(rowData)
+
       expect(result).toEqual([
-        { btnText: 'Edit', action: 'edit' },
-        { btnText: 'View', action: 'view' }
+        { action: 'edit', btnText: 'Edit' },
+        { action: 'view', btnText: 'View' }
       ])
+    })
+
+    it('should return empty array when all buttons are hidden', () => {
+      const rowData = {
+        id: 1,
+        name: 'Test',
+        buttonsToHide: ['edit', 'delete', 'view']
+      }
+
+      const result = component.getButtonsToShow(rowData)
+
+      expect(result).toEqual([])
+    })
+
+    it('should return all menu items when buttonsToHide is empty array', () => {
+      const rowData = {
+        id: 1,
+        name: 'Test',
+        buttonsToHide: []
+      }
+
+      const result = component.getButtonsToShow(rowData)
+
+      expect(result).toEqual(component.menuItems)
+    })
+
+    it('should handle case when menuItems is empty', () => {
+      component.menuItems = []
+      const rowData = { buttonsToHide: ['edit'] }
+
+      const result = component.getButtonsToShow(rowData)
+
+      expect(result).toEqual([])
     })
   })
 
-  describe('buttonClick', () => {
-    it('should emit action and rows when tableData exists', () => {
-      // Arrange
-      const actionsClickSpy = jest.spyOn(component.actionsClick, 'emit')
-      component.tableData = {
-        columns: [],
-        showSearchBox: false,
-        showPagination: false
-      }
-      const action = 'edit'
-      const rows = { id: 1 }
 
-      // Act
+  describe('buttonClick', () => {
+    it('should emit actionsClick when tableData exists', () => {
+      const actionsClickSpy = jest.spyOn(component.actionsClick, 'emit')
+      component.tableData = { columns: [] } as any  // tableData must be truthy
+      const action = 'edit'
+      const rows = { id: 1, name: 'Test' }
+
       component.buttonClick(action, rows)
 
-      // Assert
       expect(actionsClickSpy).toHaveBeenCalledWith({ action, rows })
     })
 
-    it('should not emit when tableData is undefined', () => {
-      // Arrange
+    it('should not emit actionsClick when tableData is null', () => {
       const actionsClickSpy = jest.spyOn(component.actionsClick, 'emit')
-      component.tableData = undefined as any // ensure undefined for negative case
+      component.tableData = null as any
       const action = 'edit'
-      const rows = { id: 1 }
+      const rows = { id: 1, name: 'Test' }
 
-      // Act
       component.buttonClick(action, rows)
 
-      // Assert
+      expect(actionsClickSpy).not.toHaveBeenCalled()
+    })
+
+    it('should not emit actionsClick when tableData is undefined', () => {
+      const actionsClickSpy = jest.spyOn(component.actionsClick, 'emit')
+      component.tableData = undefined as any
+      const action = 'delete'
+      const rows = { id: 2, name: 'Test2' }
+
+      component.buttonClick(action, rows)
+
       expect(actionsClickSpy).not.toHaveBeenCalled()
     })
   })
 
   describe('onChangePage', () => {
-    it('should update pagination details and emit pageChange event', () => {
-      // Arrange
+    it('should update pagination details and emit pageChange', () => {
       const pageChangeSpy = jest.spyOn(component.pageChange, 'emit')
       const pageEvent: PageEvent = {
         pageIndex: 2,
@@ -316,75 +392,284 @@ describe('EventsTableComponent', () => {
         previousPageIndex: 1
       }
 
-      // Act
       component.onChangePage(pageEvent)
 
-      // Assert
-      expect(component.paginationDetails).toEqual({
-        startIndex: 60,
-        lastIndex: 90,
-        pageSize: 30,
-        pageIndex: 2,
-        totalCount: 20 // This value wasn't updated in the original component
-      })
+      expect(component.paginationDetails.startIndex).toBe(60) // 2 * 30
+      expect(component.paginationDetails.lastIndex).toBe(90) // (2 + 1) * 30
+      expect(component.paginationDetails.pageSize).toBe(30)
+      expect(component.paginationDetails.pageIndex).toBe(2)
+      expect(pageChangeSpy).toHaveBeenCalledWith(component.paginationDetails)
+    })
+
+    it('should handle first page correctly', () => {
+      const pageChangeSpy = jest.spyOn(component.pageChange, 'emit')
+      const pageEvent: PageEvent = {
+        pageIndex: 0,
+        pageSize: 20,
+        length: 100,
+        previousPageIndex: undefined
+      }
+
+      component.onChangePage(pageEvent)
+
+      expect(component.paginationDetails.startIndex).toBe(0)
+      expect(component.paginationDetails.lastIndex).toBe(20)
+      expect(component.paginationDetails.pageSize).toBe(20)
+      expect(component.paginationDetails.pageIndex).toBe(0)
+      expect(pageChangeSpy).toHaveBeenCalledWith(component.paginationDetails)
+    })
+
+    it('should handle different page sizes', () => {
+      const pageChangeSpy = jest.spyOn(component.pageChange, 'emit')
+      const pageEvent: PageEvent = {
+        pageIndex: 1,
+        pageSize: 40,
+        length: 100,
+        previousPageIndex: 0
+      }
+
+      component.onChangePage(pageEvent)
+
+      expect(component.paginationDetails.startIndex).toBe(40) // 1 * 40
+      expect(component.paginationDetails.lastIndex).toBe(80) // (1 + 1) * 40
+      expect(component.paginationDetails.pageSize).toBe(40)
+      expect(component.paginationDetails.pageIndex).toBe(1)
       expect(pageChangeSpy).toHaveBeenCalledWith(component.paginationDetails)
     })
   })
 
-  // === Added tests for commonly present helper methods to cover missing cases ===
-  describe('applyFilter', () => {
-    it('should set dataSource.filter normalized value', () => {
-      // Arrange
-      component.dataSource = mockMatTableDataSource
-
-      // Act
-      compAny.applyFilter('  TeSt  ')
-
-      // Assert
-      expect(component.dataSource.filter).toBe('test')
+  describe('Input Properties', () => {
+    it('should accept tableData input', () => {
+      const tableData: events.tableData = {
+        columns: [],
+        showSearchBox: false,
+        showPagination: false
+      }
+      component.tableData = tableData
+      expect(component.tableData).toBe(tableData)
     })
 
-    it('should handle empty or falsy filter values safely', () => {
-      component.dataSource = mockMatTableDataSource
+    it('should accept data input', () => {
+      const data = [{ id: 1 }] as any
+      component.data = data
+      expect(component.data).toBe(data)
+    })
 
-      compAny.applyFilter('')
-      expect(component.dataSource.filter).toBe('')
+    it('should accept custom paginationDetails', () => {
+      const customPagination: events.pagination = {
+        startIndex: 10,
+        lastIndex: 30,
+        pageSize: 20,
+        pageIndex: 1,
+        totalCount: 100
+      }
+      component.paginationDetails = customPagination
+      expect(component.paginationDetails).toBe(customPagination)
+    })
 
-      compAny.applyFilter(null as any)
-      expect(component.dataSource.filter).toBe('')
+    it('should accept menuItems input', () => {
+      const menuItems: events.menuItems[] = []
+      component.menuItems = menuItems
+      expect(component.menuItems).toBe(menuItems)
+    })
+
+    it('should accept showLoader input', () => {
+      component.showLoader = true
+      expect(component.showLoader).toBe(true)
     })
   })
 
-  describe('trackBy', () => {
-    it('should return item id when present', () => {
-      const item: any = { id: 'abc' }
-      const result = compAny.trackBy(0, item)
-      expect(result).toBe('abc')
+  describe('Output Events', () => {
+    it('should have actionsClick EventEmitter', () => {
+      expect(component.actionsClick).toBeDefined()
+      expect(component.actionsClick.emit).toBeDefined()
     })
 
-    it('should return index when id not present', () => {
-      const item: any = { name: 'no-id' }
-      const result = compAny.trackBy(5, item)
-      expect(result).toBe(5)
+    it('should have searchKey EventEmitter', () => {
+      expect(component.searchKey).toBeDefined()
+      expect(component.searchKey.emit).toBeDefined()
+    })
+
+    it('should have pageChange EventEmitter', () => {
+      expect(component.pageChange).toBeDefined()
+      expect(component.pageChange.emit).toBeDefined()
     })
   })
 
-  describe('ngOnDestroy', () => {
-    it('should unsubscribe from searchSubscription if present', () => {
-      // Arrange
-      const unsub = { unsubscribe: jest.fn() }
-      compAny.searchSubscription = unsub as any
+})
 
-      // Act
-      compAny.ngOnDestroy()
 
-      // Assert
-      expect(unsub.unsubscribe).toHaveBeenCalled()
+// ─────────────────────────────────────────────────────────────────────────────
+// No-TestBed suite covering parseDisplayDateToTimestamp and remaining branches
+// ─────────────────────────────────────────────────────────────────────────────
+
+describe('EventsTableComponent (no-TestBed)', () => {
+  let component: EventsTableComponent
+
+  beforeEach(() => {
+    component = new EventsTableComponent()
+    component.tableData = {
+      columns: [
+        { key: 'name', displayName: 'Name', cellType: 'text' },
+        { key: 'date', displayName: 'Date', cellType: 'date' },
+      ],
+      showSearchBox: true,
+      noDataMessage: 'No results',
+      showPagination: true,
+    }
+    component.menuItems = []
+    component.paginationDetails = {
+      startIndex: 0,
+      lastIndex: 20,
+      pageSize: 20,
+      pageIndex: 0,
+      totalCount: 100,
+    }
+  })
+
+  describe('parseDisplayDateToTimestamp', () => {
+    it('should return null for falsy input', () => {
+      expect(component.parseDisplayDateToTimestamp(null)).toBeNull()
+      expect(component.parseDisplayDateToTimestamp(undefined)).toBeNull()
+      expect(component.parseDisplayDateToTimestamp('')).toBeNull()
     })
 
-    it('should not throw if no subscription present', () => {
-      compAny.searchSubscription = undefined as any
-      expect(() => compAny.ngOnDestroy()).not.toThrow()
+    it('should parse "19 Jun 2025" format', () => {
+      const ts = component.parseDisplayDateToTimestamp('19 Jun 2025')
+      expect(ts).toBe(new Date(2025, 5, 19).getTime())
+    })
+
+    it('should parse "19 June 2025" full month name', () => {
+      const ts = component.parseDisplayDateToTimestamp('19 June 2025')
+      expect(ts).toBe(new Date(2025, 5, 19).getTime())
+    })
+
+    it('should parse all short month names', () => {
+      const cases: [string, number][] = [
+        ['1 Jan 2025', new Date(2025, 0, 1).getTime()],
+        ['1 Feb 2025', new Date(2025, 1, 1).getTime()],
+        ['1 Mar 2025', new Date(2025, 2, 1).getTime()],
+        ['1 Apr 2025', new Date(2025, 3, 1).getTime()],
+        ['1 May 2025', new Date(2025, 4, 1).getTime()],
+        ['1 Jul 2025', new Date(2025, 6, 1).getTime()],
+        ['1 Aug 2025', new Date(2025, 7, 1).getTime()],
+        ['1 Sep 2025', new Date(2025, 8, 1).getTime()],
+        ['1 Oct 2025', new Date(2025, 9, 1).getTime()],
+        ['1 Nov 2025', new Date(2025, 10, 1).getTime()],
+        ['1 Dec 2025', new Date(2025, 11, 1).getTime()],
+      ]
+      cases.forEach(([input, expected]) => {
+        expect(component.parseDisplayDateToTimestamp(input)).toBe(expected)
+      })
+    })
+
+    it('should strip trailing comma from "19 Jun, 2025"', () => {
+      const ts = component.parseDisplayDateToTimestamp('19 Jun, 2025')
+      expect(ts).toBe(new Date(2025, 5, 19).getTime())
+    })
+
+    it('should fallback to Date.parse for ISO format', () => {
+      const ts = component.parseDisplayDateToTimestamp('2025-06-19')
+      expect(ts).not.toBeNull()
+      expect(typeof ts).toBe('number')
+    })
+
+    it('should return null for completely invalid string', () => {
+      const ts = component.parseDisplayDateToTimestamp('not-a-date')
+      expect(ts).toBeNull()
+    })
+  })
+
+  describe('getFinalColumns (no-TestBed)', () => {
+    it('should add menu column to tableColumns when menuItems is non-empty', () => {
+      component.menuItems = [{ action: 'edit', label: 'Edit' } as any]
+      component.getFinalColumns()
+      // tableColumns is set without lodash, so it's reliable even with mock
+      const menuCol = (component.tableColumns as any[]).find((c: any) => c.key === 'menu')
+      expect(menuCol).toBeDefined()
+      expect(menuCol.cellType).toBe('menu')
+    })
+
+    it('should not add menu column when menuItems is empty', () => {
+      component.menuItems = []
+      component.getFinalColumns()
+      const menuCol = (component.tableColumns as any[]).find((c: any) => c.key === 'menu')
+      expect(menuCol).toBeUndefined()
+    })
+
+    it('should include all original columns in tableColumns', () => {
+      component.menuItems = []
+      component.getFinalColumns()
+      const cols = component.tableColumns as any[]
+      expect(cols.find((c: any) => c.key === 'name')).toBeDefined()
+      expect(cols.find((c: any) => c.key === 'date')).toBeDefined()
+    })
+  })
+
+  describe('getButtonsToShow (no-TestBed)', () => {
+    beforeEach(() => {
+      component.menuItems = [
+        { action: 'edit', label: 'Edit' } as any,
+        { action: 'delete', label: 'Delete' } as any,
+        { action: 'view', label: 'View' } as any,
+      ]
+    })
+
+    it('should return all menuItems when buttonsToHide is absent', () => {
+      expect(component.getButtonsToShow({ id: 1 })).toEqual(component.menuItems)
+    })
+
+    it('should filter out hidden buttons', () => {
+      const result = component.getButtonsToShow({ buttonsToHide: ['delete'] })
+      expect(result.map((m: any) => m.action)).toEqual(['edit', 'view'])
+    })
+
+    it('should return empty list when all buttons are hidden', () => {
+      const result = component.getButtonsToShow({ buttonsToHide: ['edit', 'delete', 'view'] })
+      expect(result).toHaveLength(0)
+    })
+
+    it('should return all items when buttonsToHide is empty', () => {
+      const result = component.getButtonsToShow({ buttonsToHide: [] })
+      expect(result).toEqual(component.menuItems)
+    })
+  })
+
+  describe('buttonClick (no-TestBed)', () => {
+    it('should emit actionsClick when tableData exists', () => {
+      const spy = jest.spyOn(component.actionsClick, 'emit')
+      component.buttonClick('edit', { id: 1 })
+      expect(spy).toHaveBeenCalledWith({ action: 'edit', rows: { id: 1 } })
+    })
+
+    it('should not emit when tableData is null', () => {
+      component.tableData = null as any
+      const spy = jest.spyOn(component.actionsClick, 'emit')
+      component.buttonClick('edit', { id: 1 })
+      expect(spy).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('onChangePage (no-TestBed)', () => {
+    it('should update pagination and emit pageChange', () => {
+      const spy = jest.spyOn(component.pageChange, 'emit')
+      const event: any = { pageIndex: 1, pageSize: 20, length: 100 }
+      component.onChangePage(event)
+      expect(component.paginationDetails.startIndex).toBe(20)
+      expect(component.paginationDetails.lastIndex).toBe(40)
+      expect(spy).toHaveBeenCalledWith(component.paginationDetails)
+    })
+  })
+
+  describe('ngOnInit (no-TestBed)', () => {
+    it('should set displayedColumns from tableData', () => {
+      component.ngOnInit()
+      expect(component.displayedColumns).toEqual(component.tableData.columns)
+    })
+
+    it('should call ngOnInit without throwing', () => {
+      // showSearchBox/noDataMessage/showPagination set via _.get which is mocked
+      expect(() => component.ngOnInit()).not.toThrow()
     })
   })
 })

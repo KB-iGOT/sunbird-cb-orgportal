@@ -1,4 +1,5 @@
-<div class="main-survey flex items-center justify-center" *ngIf="isSurveyPopup" (click)="clickedOut($event)">
+<div class="main-survey flex items-center justify-center" *ngIf="isSurveyPopup" (click)="clickedOut($event)"
+  (keydown)="$event.preventDefault()">
   <div class="surver-inner">
     <a mat-icon-button class="close-button flex" (click)="closeCard()">
       <mat-icon>close</mat-icon>

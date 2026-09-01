@@ -15,10 +15,10 @@
   <mat-card class="mb-4" [ngStyle]="{'background-color': showTopSection ? '#fff' : 'rgba(235, 235, 235, 1)'}">
     <div class="flex">
       <span class="mat-body-1 font-bold-imp flex-1">{{designationConfig?.topsection?.heading}}</span>
-      <mat-icon class="cursor-pointer mat-icon mr-4" *ngIf="showTopSection"
-        (click)="showTopSection = !showTopSection">keyboard_arrow_up</mat-icon>
-      <mat-icon class="cursor-pointer mat-icon mr-4" *ngIf="!showTopSection"
-        (click)="showTopSection = !showTopSection">keyboard_arrow_down</mat-icon>
+      <mat-icon class="cursor-pointer mat-icon mr-4" *ngIf="showTopSection" (click)="showTopSection = !showTopSection"
+        (keydown)="$event.preventDefault()">keyboard_arrow_up</mat-icon>
+      <mat-icon class="cursor-pointer mat-icon mr-4" *ngIf="!showTopSection" (click)="showTopSection = !showTopSection"
+        (keydown)="$event.preventDefault()">keyboard_arrow_down</mat-icon>
     </div>
     <div class="mt-5" *ngIf="showTopSection">
       <div class="flex gap-20">
@@ -30,7 +30,8 @@
         </div>
         <div class="">
           <div class="videoDemo flex justify-end section-2">
-            <div class="videoDemoVideo flex flex-column flex-middle justify-center" (click)="openVideoPopup()">
+            <div class="videoDemoVideo flex flex-column flex-middle justify-center" (keydown)="$event.preventDefault()"
+              (click)="openVideoPopup()">
               <mat-icon class="video_icon mb-2">play_arrow</mat-icon>
               <div>
                 Watch how it works

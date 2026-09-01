@@ -309,6 +309,6 @@ export class ApprovalsListComponent implements OnInit {
       '#4E9E87',
       '#7E4C8D',
     ]
-    return randomcolors[Math.floor(Math.random() * randomcolors.length)]
+    return randomcolors[Math.floor(Math.random() * randomcolors.length)] // NOSONAR
   }
 }

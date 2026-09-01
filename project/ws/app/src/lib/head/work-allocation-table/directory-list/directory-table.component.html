@@ -27,7 +27,8 @@
 
             <ng-container matColumnDef="{{col.key}}" *ngFor="let col of tableData!.columns">
                 <mat-header-cell *matHeaderCellDef mat-sort-header> {{col.displayName}} </mat-header-cell>
-                <mat-cell *matCellDef="let element" (click)="selection.toggle(element); onRowClick(element)">
+                <mat-cell *matCellDef="let element" (click)="selection.toggle(element); onRowClick(element)"
+                    (keydown)="$event.preventDefault()">
                     <span *ngIf="col.isList" class="textclass"
                         [matTooltip]="(element[col.key]).split('<br />').join(', ')">
                         <div innerHTML="{{element[col.key]}}"></div>
@@ -44,11 +45,13 @@
                         <div *ngIf="ac.optional">
                             <ws-widget-app-button *ngIf="row[ac.optional_key] === ac.optional_Value" [type]="ac.type"
                                 [icon]="ac.icon" [disabled]="ac.disabled || false" [label]="ac.label"
-                                (click)="buttonClick(ac.name,row)"></ws-widget-app-button>
+                                (click)="buttonClick(ac.name,row)"
+                                (keydown)="$event.preventDefault()"></ws-widget-app-button>
                         </div>
                         <div *ngIf="!ac.optional" class="mar-lft">
                             <ws-widget-app-button [type]="ac.type" [icon]="ac.icon" [label]="ac.label"
-                                [disabled]="ac.disabled || false" (click)="buttonClick(ac.name,row)">
+                                [disabled]="ac.disabled || false" (click)="buttonClick(ac.name,row)"
+                                (keydown)="$event.preventDefault()">
                             </ws-widget-app-button>
                         </div>
                     </div>

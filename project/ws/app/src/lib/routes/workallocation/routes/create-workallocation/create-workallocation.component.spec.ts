@@ -1,3 +1,8 @@
+jest.mock('ngx-export-as', () => ({
+  ExportAsService: jest.fn(),
+  ExportAsConfig: jest.fn(),
+}))
+
 import { CreateWorkallocationComponent } from './create-workallocation.component'
 import { UntypedFormBuilder } from '@angular/forms'
 import { of } from 'rxjs'
@@ -328,5 +333,136 @@ describe('CreateWorkallocationComponent', () => {
 
     expect(component.ralist.length).toBe(1)
     expect(component.ralist[0].name).toBe('Role 2')
+  })
+
+  it('should return newroleControls from rolelist FormArray', () => {
+    const controls = component.newroleControls
+    expect(controls).toBeDefined()
+    expect(Array.isArray(controls)).toBe(true)
+  })
+
+  it('should create a new role FormGroup via newRole()', () => {
+    const roleGroup = component.newRole()
+    expect(roleGroup.get('name')).toBeDefined()
+    expect(roleGroup.get('childNodes')).toBeDefined()
+  })
+
+  it('should set roles to FormArray from formdata via setRole()', () => {
+    component.formdata.rolelist = [{ name: 'Dev', childNodes: 'node1' }]
+    component.setRole()
+    const control = (component.newAllocationForm.get('rolelist') as any).controls
+    // setRole pushes to existing array which starts with 1 item
+    expect(control.length).toBeGreaterThanOrEqual(2)
+  })
+
+  it('should add activity from form input via addActivity()', () => {
+    component.inputvar = { nativeElement: { value: '' } } as any
+    component.newAllocationForm.patchValue({ rolelist: [{ name: 'Role', childNodes: 'ActivityX' }] })
+    component.newAllocationForm.value.rolelist[0].childNodes = 'ActivityX'
+    component.selectedActivity = null
+    component.addActivity()
+    expect(component.activitieslist.some((a: any) => a.name === 'ActivityX')).toBe(true)
+  })
+
+  it('should not add activity when selectedActivity is already set', () => {
+    component.selectedActivity = { name: 'Existing' }
+    const initialLen = component.activitieslist.length
+    component.addActivity()
+    expect(component.activitieslist.length).toBe(initialLen)
+  })
+
+  it('should handle getWorkAllocationDetails', () => {
+    component.getWorkAllocationDetails('user-123')
+    expect(mockAllocationService.getAllocationDetails).toHaveBeenCalled()
+    expect(component.waId).toBe('test-id')
+  })
+
+  it('should handle openDialog and set publishWorkAllocationData', () => {
+    mockDialog.open.mockReturnValue({
+      afterClosed: jest.fn().mockReturnValue(
+        require('rxjs').of({ data: { userId: 'u1', roleCompetencyList: [] } })
+      )
+    })
+    mockAllocationService.getAllocationDetails.mockReturnValue(
+      require('rxjs').of({ result: { data: [{ allocationDetails: { draftWAObject: { id: 'wa-new' } } }] } })
+    )
+    component.openDialog()
+    expect(mockDialog.open).toHaveBeenCalled()
+    expect(component.showPublishButton).toBe(true)
+  })
+
+  it('should handle pdfCallbackFn', () => {
+    const mockPdf = {
+      internal: {
+        getNumberOfPages: jest.fn().mockReturnValue(2),
+        pageSize: { getWidth: jest.fn().mockReturnValue(800), getHeight: jest.fn().mockReturnValue(600) },
+      },
+      setPage: jest.fn(),
+      text: jest.fn(),
+    }
+    expect(() => component.pdfCallbackFn(mockPdf)).not.toThrow()
+    expect(mockPdf.setPage).toHaveBeenCalledTimes(2)
+    expect(mockPdf.text).toHaveBeenCalledTimes(2)
+  })
+
+  it('should set nosimilarUsers true when search returns empty list', () => {
+    mockAllocationService.onSearchUser.mockReturnValue(require('rxjs').of({ result: { data: [] } }))
+    component.displayLoader = jest.fn()
+    component.onSearchUser({ target: { value: 'xyz' } })
+    expect(component.nosimilarUsers).toBe(true)
+  })
+
+  it('should set nosimilarRoles true when search returns empty list', () => {
+    mockAllocationService.onSearchRole.mockReturnValue(require('rxjs').of([]))
+    component.displayLoader = jest.fn()
+    component.onSearchRole({ target: { value: 'xyz' } })
+    expect(component.nosimilarRoles).toBe(true)
+  })
+
+  it('should set nosimilarPositions true when search returns empty positions', () => {
+    mockAllocationService.onSearchPosition.mockReturnValue(require('rxjs').of({ responseData: [] }))
+    component.displayLoader = jest.fn()
+    component.onSearchPosition({ target: { value: 'xyz' } })
+    expect(component.nosimilarPositions).toBe(true)
+  })
+
+  it('should show error when addRolesActivity called with no selected role and empty formdata', () => {
+    component.selectedRole = null
+    component.activitieslist = []
+    component.newAllocationForm.value.rolelist = [{ name: '', childNodes: '' }]
+    component.addRolesActivity(0)
+    expect(component.showRAerror).toBe(true)
+  })
+
+  it('should handle addRolesActivity with new unverified role (index != 0 path)', () => {
+    component.selectedRole = null
+    component.activitieslist = [{ name: 'Act1' }]
+    component.ralist = []
+    component.newAllocationForm.value.rolelist = [{ name: 'NewRole', childNodes: '' }]
+    component.addRolesActivity(1)
+    expect(component.showRAerror).toBe(false)
+    expect(component.ralist.length).toBe(1)
+    expect(component.ralist[0].name).toBe('NewRole')
+  })
+
+  it('should not navigate or reset if onSubmit service returns falsy', () => {
+    mockAllocationService.createAllocation.mockReturnValue(require('rxjs').of(null))
+    component.selectedUser = { userDetails: { wid: 'u1', email: 'e@e.com' } }
+    component.departmentID = 'd1'
+    component.departmentName = 'Dept'
+    component.ralist = []
+    component.newAllocationForm.patchValue({ fname: 'A', email: 'a@a.com', position: 'P' })
+    component.onSubmit()
+    expect(mockRouter.navigate).not.toHaveBeenCalled()
+  })
+
+  it('should set showAddNewRole when user has no allocationDetails position', () => {
+    const mockUser = {
+      userDetails: { first_name: 'A', last_name: 'B', email: 'a@b.com', wid: 'w1' },
+      allocationDetails: undefined,
+    }
+    component.newAllocationForm.patchValue({ position: 'existing' })
+    component.selectUser(mockUser)
+    expect(component.showAddNewRole).toBe(true)
   })
 })

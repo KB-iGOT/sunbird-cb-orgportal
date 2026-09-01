@@ -141,9 +141,9 @@ export class ViewerSecondaryTopBarComponent implements OnInit, OnDestroy {
     this.courseName = this.activatedRoute.snapshot.queryParams.courseName
     this.channelId = this.activatedRoute.snapshot.queryParams.channelId
     if (this.configSvc.instanceConfig) {
-      this.appIcon = this.domSanitizer.bypassSecurityTrustResourceUrl(
+      this.appIcon = this.domSanitizer.bypassSecurityTrustResourceUrl( // NOSONAR
         this.configSvc.instanceConfig.logos.app,
-      )
+      ) // NOSONAR
     }
     //   this.route.data.subscribe((data: any) => {
     //     this.appIcon =
@@ -161,7 +161,8 @@ export class ViewerSecondaryTopBarComponent implements OnInit, OnDestroy {
     this.viewerDataServiceSubscription = this.viewerDataSvc.tocChangeSubject.subscribe((data: any) => {
       if (data.prevResource) {
         if (data.prevResource && !data.prevResource.viewerUrl) {
-          data.prevResource['viewerUrl'] = `${this.forPreview ? '' : ''}/viewer/${VIEWER_ROUTE_FROM_MIME(
+          // data.prevResource['viewerUrl'] = `${this.forPreview ? '' : ''}/viewer/${VIEWER_ROUTE_FROM_MIME(
+          data.prevResource['viewerUrl'] = `/viewer/${VIEWER_ROUTE_FROM_MIME(
             data.prevResource.mimeType,
             // )}/${content.identifier}?primaryCategory=${content.primaryCategory}
             // &collectionId=${this.viewerDataSvc.collectionId}&collectionType=${this.collectionType}
@@ -194,7 +195,8 @@ export class ViewerSecondaryTopBarComponent implements OnInit, OnDestroy {
       }
       if (data.nextResource) {
         if (data.nextResource && !data.nextResource.viewerUrl) {
-          data.nextResource['viewerUrl'] = `${this.forPreview ? '' : ''}/viewer/${VIEWER_ROUTE_FROM_MIME(
+          // data.nextResource['viewerUrl'] = `${this.forPreview ? '' : ''}/viewer/${VIEWER_ROUTE_FROM_MIME(
+          data.nextResource['viewerUrl'] = `/viewer/${VIEWER_ROUTE_FROM_MIME(
             data.nextResource.mimeType,
             // )}/${content.identifier}?primaryCategory=${content.primaryCategory}
             // &collectionId=${this.viewerDataSvc.collectionId}&collectionType=${this.collectionType}

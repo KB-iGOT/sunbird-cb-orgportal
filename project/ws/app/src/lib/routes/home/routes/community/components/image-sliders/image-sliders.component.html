@@ -77,8 +77,10 @@
     </ng-container> -->
     <ng-container *ngIf="imageUrls?.length > 1">
       <div>
-        <a *ngIf="imageUrls?.length > 1" role="button" class="prev" (click)="slideTo(currentIndex - 1)">&#10094;</a>
-        <a *ngIf="imageUrls?.length > 1" role="button" class="next" (click)="slideTo(currentIndex + 1)">&#10095;</a>
+        <a *ngIf="imageUrls?.length > 1" role="button" class="prev" (keydown)="$event.preventDefault()"
+          (click)="slideTo(currentIndex - 1)">&#10094;</a>
+        <a *ngIf="imageUrls?.length > 1" role="button" class="next" (keydown)="$event.preventDefault()"
+          (click)="slideTo(currentIndex + 1)">&#10095;</a>
       </div>
     </ng-container>
   </div>

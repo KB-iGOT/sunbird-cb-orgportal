@@ -5,12 +5,11 @@ import { map, catchError } from 'rxjs/operators'
 import { IResolveResponse } from '@sunbird-cb/utils-v2'
 import { RolesService } from '../services/roles.service'
 /* tslint:disable */
-import _ from 'lodash'
+import * as _ from 'lodash'
 /* tslint:enable */
 
 @Injectable()
-export class RolesResolver
-   {
+export class RolesResolver {
   constructor(private rolesService: RolesService) { }
 
   resolve(

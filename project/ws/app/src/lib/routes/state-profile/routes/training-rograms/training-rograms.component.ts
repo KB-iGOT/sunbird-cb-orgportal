@@ -8,7 +8,7 @@ import { MatDialog } from '@angular/material/dialog'
 import { COMMA, ENTER } from '@angular/cdk/keycodes'
 import { ConfigurationsService } from '@sunbird-cb/utils-v2'
 /* tslint:disable*/
-import _ from 'lodash'
+import * as _ from 'lodash'
 import { DialogBoxComponent } from '../../components/dialog-box/dialog-box.component'
 
 @Component({

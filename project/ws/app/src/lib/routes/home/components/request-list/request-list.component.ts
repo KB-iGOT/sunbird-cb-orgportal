@@ -10,7 +10,7 @@ import { ConfirmationBoxComponent } from '../../../training-plan/components/conf
 import { AssignListPopupComponent } from './assign-list-popup/assign-list-popup.component'
 import { LoaderService } from '../../../../../../../../../src/app/services/loader.service'
 /* tslint:disable */
-import _ from 'lodash'
+import * as _ from 'lodash'
 import { SingleAssignPopupComponent } from './single-assign-popup/single-assign-popup.component'
 /* tslint:enable */
 export enum statusValue {

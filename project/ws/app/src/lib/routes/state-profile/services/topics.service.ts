@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http'
 import { Injectable } from '@angular/core'
 // tslint:disable-next-line
-import _ from 'lodash'
+import * as _ from 'lodash'
 import { BehaviorSubject, Observable } from 'rxjs'
 import { NSProfileDataV3 } from '../models/state-profile.models'
 

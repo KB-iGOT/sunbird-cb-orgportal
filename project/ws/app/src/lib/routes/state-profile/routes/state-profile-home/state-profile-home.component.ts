@@ -19,14 +19,14 @@ import { MatSnackBar } from '@angular/material/snack-bar'
 export class StateProfileHomeComponent implements OnInit, OnDestroy {
   @ViewChild('stickyMenu', { static: true }) menuElement!: ElementRef
   isLtMedium$ = this.valueSvc.isLtMedium$
-  private defaultSideNavBarOpenedSubscription: any
+  public defaultSideNavBarOpenedSubscription: any
   sideNavBarOpened = true
   public screenSizeIsLtMedium = false
   sticky = false
   currentRoute = 'all'
   banner!: NsWidgetResolver.IWidgetData<any>
   userRouteName = ''
-  private routerSubscription: Subscription | null = null
+  public routerSubscription: Subscription | null = null
 
   tabs!: NSProfileDataV3.IProfileTab[]
   tabsData = this.route.parent && this.route.parent.snapshot.data.pageData.data.tabs || []
@@ -39,7 +39,7 @@ export class StateProfileHomeComponent implements OnInit, OnDestroy {
     public router: Router,
     private stepService: StepService,
     private configSvc: ConfigurationsService,
-    private snackBar: MatSnackBar,
+    public snackBar: MatSnackBar,
     private orgSvc: OrgProfileService,
   ) {
     this.tabs = _.orderBy(this.tabsData, 'step')
@@ -156,10 +156,14 @@ export class StateProfileHomeComponent implements OnInit, OnDestroy {
     }
   }
   get next() {
-    if (!this.isNextStepAllowed) { return }
+    if (!this.isNextStepAllowed) {
+      return //NOSONAR
+    }
 
     // for checking the form validation
-    if (!this.isFormValid) { return }
+    if (!this.isFormValid) {
+      return //NOSONAR
+    }
 
     const nextStep = _.first(_.filter(this.tabs, { step: this.currentStep + 1 }))
     if (nextStep) {
@@ -177,7 +181,10 @@ export class StateProfileHomeComponent implements OnInit, OnDestroy {
     return 'first'
   }
   get skip() {
-    if (!this.isNextStepAllowed) { return }
+    if (!this.isNextStepAllowed) {
+      return  //NOSONAR
+
+    }
     this.stepService.skiped.next(true)
     const nextStep = _.first(_.filter(this.tabs, { step: this.currentStep + 1 }))
     if (nextStep && nextStep.step !== this.tabs.length + 1) {

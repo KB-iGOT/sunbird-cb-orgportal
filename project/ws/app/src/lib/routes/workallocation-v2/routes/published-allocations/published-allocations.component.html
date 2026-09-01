@@ -79,8 +79,9 @@
             </div>
           </div>
         </div>
+        <!-- //NOSONAR -->
         <table class="allocation-table margin-bottom-l mat-body-2" id="allocation-table" cell-spacing='0'
-          cell-padding='0'><!-- //NOSONAR -->
+          cell-padding='0' aria-label="allocation-table"><!-- //NOSONAR -->
           <tr>
             <th>Name and designation <mat-icon class="sort-icon">arrow_upward</mat-icon>
             </th>
@@ -106,7 +107,7 @@
                 </div> -->
               </div>
             </td>
-            <td colspan="4" (click)="viewAllocation(d)">
+            <td colspan="4" (click)="viewAllocation(d)" (keydown)="$event.preventDefault()">
               <ul>
                 <li *ngFor="let rc of d.roleCompetencyList">
                   <table><!-- //NOSONAR -->

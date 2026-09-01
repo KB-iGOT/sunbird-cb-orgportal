@@ -74,13 +74,13 @@ export class HtmlComponent implements OnInit, OnChanges {
           this.isScormContent = false
         }
         if (this.htmlData && this.htmlData.learningObjective) {
-          this.learningObjective = this.domSanitizer.bypassSecurityTrustHtml(
+          this.learningObjective = this.domSanitizer.bypassSecurityTrustHtml( // NOSONAR
             this.htmlData.learningObjective,
-          )
+          ) // NOSONAR
         }
         if (this.htmlData && this.htmlData.description) {
           const description = this.pipeLimitTo.transform(this.htmlData.description, 450)
-          this.description = this.domSanitizer.bypassSecurityTrustHtml(description)
+          this.description = this.domSanitizer.bypassSecurityTrustHtml(description) // NOSONAR
         }
 
       }

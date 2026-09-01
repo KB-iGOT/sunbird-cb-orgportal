@@ -6,13 +6,15 @@
     <p class="font-bold">More info</p>
     <div class="cursor-pointer font-bold ws-mat-primary-text">
       <p *ngIf="analyticsDataClient?.department?.length > 0"
-        class="margin-remove-bottom underline margin-left-xs text-left" (click)="onClick('departments')">{{category1}}
+        class="margin-remove-bottom underline margin-left-xs text-left" (click)="onClick('departments')"
+        (keyup)="onClick('departments')">{{category1}}
       </p>
       <p *ngIf="analyticsDataClient?.country?.length > 0"
-        class="margin-remove-bottom underline margin-left-xs text-left" (click)="onClick('countries')">{{category2}}
+        class="margin-remove-bottom underline margin-left-xs text-left" (click)="onClick('countries')"
+        (keyup)="onClick('countries')">{{category2}}
       </p>
       <p *ngIf="analyticsDataClient?.device?.length > 0" class="margin-remove-bottom underline margin-left-xs text-left"
-        (click)="onClick('devices')">{{category3}}</p>
+        (click)="onClick('devices')" (keyup)="onClick('devices')">{{category3}}</p>
     </div>
   </div>
 </mat-card>

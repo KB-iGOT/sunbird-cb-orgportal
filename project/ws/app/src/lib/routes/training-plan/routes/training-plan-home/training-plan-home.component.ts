@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy, AfterViewInit } from '@angular/core'
 /* tslint:disable */
-import _ from 'lodash'
+import * as _ from 'lodash'
 /* tslint:enable */
 import { TrainingPlanDataSharingService } from '../../services/training-plan-data-share.service'
 import { Subscription } from 'rxjs'

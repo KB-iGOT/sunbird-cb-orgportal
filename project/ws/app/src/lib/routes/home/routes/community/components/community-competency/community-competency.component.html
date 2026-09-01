@@ -15,15 +15,16 @@
         <div class="flex area my-border {{competency?.competencyAreaName?.toLocaleLowerCase()}}  justify-between">
           <div class="flex">
             <div class="flex gap-2 items-center">
-              <mat-icon class="cursor-pointer" *ngIf="competency?.collapsed"
-                (click)="hideAnfShow(competency)">arrow_drop_up</mat-icon>
-              <mat-icon class="cursor-pointer" *ngIf="!competency?.collapsed"
-                (click)="hideAnfShow(competency)">arrow_drop_down</mat-icon>
+              <mat-icon class="cursor-pointer" *ngIf="competency?.collapsed" (click)="hideAnfShow(competency)"
+                (keydown)="$event.preventDefault()">arrow_drop_up</mat-icon>
+              <mat-icon class="cursor-pointer" *ngIf="!competency?.collapsed" (click)="hideAnfShow(competency)"
+                (keydown)="$event.preventDefault()">arrow_drop_down</mat-icon>
               <div>{{competency?.competencyAreaName}}</div>
             </div>
           </div>
           <div *ngIf="openMode === 'edit'">
-            <mat-icon class="cursor-pointer" (click)="removeNode(competency)">delete</mat-icon>
+            <mat-icon class="cursor-pointer" (click)="removeNode(competency)"
+              (keydown)="$event.preventDefault()">delete</mat-icon>
           </div>
         </div>
         <ng-container *ngIf="competency?.themes?.length">
@@ -34,16 +35,17 @@
               <div class="flex ">
                 <div class="flex pl-4">
                   <div class="flex gap-2 items-center">
-                    <mat-icon class="cursor-pointer" *ngIf="theme?.collapsed"
-                      (click)="hideAnfShow(theme)">arrow_drop_up</mat-icon>
-                    <mat-icon class="cursor-pointer" *ngIf="!theme?.collapsed"
-                      (click)="hideAnfShow(theme)">arrow_drop_down</mat-icon>
+                    <mat-icon class="cursor-pointer" *ngIf="theme?.collapsed" (click)="hideAnfShow(theme)"
+                      (keydown)="$event.preventDefault()">arrow_drop_up</mat-icon>
+                    <mat-icon class="cursor-pointer" *ngIf="!theme?.collapsed" (click)="hideAnfShow(theme)"
+                      (keydown)="$event.preventDefault()">arrow_drop_down</mat-icon>
                     <div>{{i + 1}}. {{theme?.competencyThemeName}}</div>
                   </div>
                 </div>
               </div>
               <div>
                 <mat-icon class="cursor-pointer" (click)="removeTheme(competency, theme)"
+                  (keydown)="$event.preventDefault()"
                   *ngIf="competency?.themes?.length > 1 && openMode === 'edit'">delete</mat-icon>
               </div>
             </div>
@@ -61,7 +63,8 @@
                   </div>
                   <div>
                     <mat-icon class="cursor-pointer" *ngIf="theme?.subThems?.length > 1 && openMode === 'edit'"
-                      (click)="removeSubTheme(competency, theme, subTheme)">delete</mat-icon>
+                      (click)="removeSubTheme(competency, theme, subTheme)"
+                      (keydown)="$event.preventDefault()">delete</mat-icon>
                   </div>
                 </div>
               </div>

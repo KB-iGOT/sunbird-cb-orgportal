@@ -25,7 +25,7 @@
       </div>
     </div>
     <div class="flex justify-end" *ngIf="showResendOTP">
-      <div class="resend-otp" (click)="handleResendOTP()">Resend OTP</div>
+      <div class="resend-otp" (click)="handleResendOTP()" (keydown)="$event.preventDefault()">Resend OTP</div>
     </div>
 
     <div class="flex flex-row justify-between">

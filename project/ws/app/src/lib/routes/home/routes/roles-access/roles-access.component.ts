@@ -2,7 +2,7 @@ import { AfterViewInit, Component, OnInit, OnDestroy, Input } from '@angular/cor
 import { ActivatedRoute } from '@angular/router'
 import { EventService } from '@sunbird-cb/utils-v2'
 // tslint:disable-next-line
-import _ from 'lodash'
+import * as _ from 'lodash'
 import { TelemetryEvents } from '../../../../head/_services/telemetry.event.model'
 import { RolesService } from '../../../users/services/roles.service'
 import { UsersService } from '../../../users/services/users.service'

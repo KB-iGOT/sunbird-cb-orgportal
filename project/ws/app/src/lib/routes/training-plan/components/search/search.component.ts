@@ -3,7 +3,7 @@ import { ActivatedRoute } from '@angular/router'
 import { TrainingPlanService } from './../../services/traininig-plan.service'
 import { TrainingPlanDataSharingService } from './../../services/training-plan-data-share.service'
 /* tslint:disable */
-import _ from 'lodash'
+import * as _ from 'lodash'
 /* tslint:enable */
 import { LoaderService } from '../../../../../../../../../src/app/services/loader.service'
 import { InitService } from '../../../../../../../../../src/app/services/init.service'

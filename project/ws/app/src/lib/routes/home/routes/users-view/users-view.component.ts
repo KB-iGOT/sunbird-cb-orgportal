@@ -82,7 +82,7 @@ export class UsersViewComponent implements OnInit, OnDestroy {
   resetPagination: any = {}
   constructor(
     public dialog: MatDialog,
-    private route: ActivatedRoute,
+    public route: ActivatedRoute,
     private router: Router,
     private events: EventService,
     private loaderService: LoaderService,
@@ -93,8 +93,8 @@ export class UsersViewComponent implements OnInit, OnDestroy {
   ) {
     this.Math = Math
     this.configSvc = this.route.parent && this.route.parent.snapshot.data.configService
-    this.currentUser = this.configSvc.userProfile && this.configSvc.userProfile.userId
-    this.currentUserStatus = this.configSvc.unMappedUser.profileDetails.profileStatus
+    this.currentUser = this.configSvc?.userProfile && this.configSvc?.userProfile.userId
+    this.currentUserStatus = this.configSvc?.unMappedUser?.profileDetails.profileStatus
     this.departName = _.get(this.route, 'parent.snapshot.data.configService.unMappedUser.channel')
     this.totalUserLimit = this.usersService.TOTAL_USERS_LIMIT
     // this.usersData = _.get(this.route, 'snapshot.data.usersList.data') || {}

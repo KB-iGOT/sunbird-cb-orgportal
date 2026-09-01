@@ -387,4 +387,37 @@ describe('OfficerComponent', () => {
             expect(component['unsubscribe1'].next).toHaveBeenCalled()
         })
     })
+
+    describe('filterUsers - empty value', () => {
+        beforeEach(() => {
+            component.officerForm = formBuilder.group({
+                officerName: [''], position: [''],
+                positionDescription: [''], user: [{}], positionObj: [{}],
+            })
+        })
+
+        it('should handle empty string for filterUsers', () => {
+            component.filterUsers('')
+            expect(mockAllocationService.onSearchUser).toHaveBeenCalledWith('')
+            expect(component.filteredUserslist).toBeDefined()
+        })
+    })
+
+    describe('filterPositions - empty value', () => {
+        beforeEach(() => {
+            component.officerForm = formBuilder.group({
+                officerName: [''], position: [''],
+                positionDescription: [''], user: [{}], positionObj: [{}],
+            })
+        })
+
+        it('should handle empty string for filterPositions gracefully', () => {
+            mockAllocationService.onSearchPosition.mockReturnValue(
+                require('rxjs').of({ responseData: [] })
+            )
+            component.filterPositions('')
+            expect(mockAllocationService.onSearchPosition).toHaveBeenCalled()
+            expect(component.filteredPositionlist).toBeDefined()
+        })
+    })
 })

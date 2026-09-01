@@ -6,6 +6,13 @@ jest.mock('@sunbird-cb/collection', () => ({
     ContentStripMultipleService: jest.fn(),
     WidgetContentService: jest.fn()
 }))
+jest.mock('../../../../../../../../../src/environments/environment', () => ({
+    environment: {
+        compentencyVersionKey: 'v6',
+        doptOrg: 'test-org',
+        production: false,
+    }
+}))
 
 import { SearchComponent } from './search.component'
 import { of, Subject } from 'rxjs'
@@ -122,7 +129,7 @@ describe('SearchComponent', () => {
 
         mockInitService = {
             configSvc: {
-                competency: {
+                compentency: {
                     v6: {
                         vKey: 'competencies_v6',
                         vCompetencyArea: 'competencyArea',
@@ -131,10 +138,10 @@ describe('SearchComponent', () => {
                     }
                 }
             }
-        };
+        }
 
         // Set up environment
-        (global as any).environment = {
+        ; (global as any).environment = {
             compentencyVersionKey: 'v6'
         }
 
@@ -162,11 +169,11 @@ describe('SearchComponent', () => {
             component.ngOnInit()
 
             // Assert
-            expect(component.compentencyKey).toBe(mockInitService.configSvc.competency.v6)
+            expect(component.compentencyKey).toEqual(mockInitService.configSvc.compentency.v6)
 
             // Test content page change subscription
             const pageData = { pageIndex: 5, pageSize: 10 }
-            jest.spyOn(component, 'getContent')
+            jest.spyOn(component, 'getContent').mockImplementation(() => { })
             mockTpdsSvc.handleContentPageChange.next(pageData)
             expect(component.pageIndex).toBe(5)
             expect(component.pageSize).toBe(10)
@@ -176,12 +183,13 @@ describe('SearchComponent', () => {
             jest.clearAllMocks()
             const filterData = { competencyArea: ['Area1'] }
             component.selectedDropDownValue = 'Course'
+            jest.spyOn(component, 'getContent').mockImplementation(() => { })
             mockTpdsSvc.getFilterDataObject.next(filterData)
             expect(component.getContent).toHaveBeenCalledWith('Course', filterData)
 
             // Test filter data subscription for custom users
             jest.clearAllMocks()
-            jest.spyOn(component, 'getCustomUsers')
+            jest.spyOn(component, 'getCustomUsers').mockImplementation(() => { })
             component.selectedDropDownValue = 'CustomUser'
             mockTpdsSvc.getFilterDataObject.next(filterData)
             expect(component.getCustomUsers).toHaveBeenCalledWith('CustomUser', filterData)
@@ -229,11 +237,11 @@ describe('SearchComponent', () => {
 
     describe('handleCategorySelection', () => {
         beforeEach(() => {
-            jest.spyOn(component, 'resetPageIndex')
-            jest.spyOn(component, 'getContent')
-            jest.spyOn(component, 'getDesignations')
-            jest.spyOn(component, 'getCustomUsers')
-            jest.spyOn(component, 'getAllUsers')
+            jest.spyOn(component, 'resetPageIndex').mockImplementation(() => { })
+            jest.spyOn(component, 'getContent').mockImplementation(() => { })
+            jest.spyOn(component, 'getDesignations').mockImplementation(() => { })
+            jest.spyOn(component, 'getCustomUsers').mockImplementation(() => { })
+            jest.spyOn(component, 'getAllUsers').mockImplementation(() => { })
             jest.spyOn(mockTpdsSvc.clearFilter, 'next')
         })
 
@@ -305,13 +313,16 @@ describe('SearchComponent', () => {
 
     describe('getContent', () => {
         beforeEach(() => {
-            component.compentencyKey = mockInitService.configSvc.competency.v6
+            component.compentencyKey = mockInitService.configSvc.compentency.v6
             jest.spyOn(mockTpdsSvc.moderatedCourseSelectStatus, 'next')
             jest.spyOn(mockTpdsSvc.clearFilter, 'next')
             jest.spyOn(component.handleApiData, 'emit')
         })
 
         it('should call getAllContent with correct parameters', () => {
+            // Set up compentencyKey
+            component.compentencyKey = mockInitService.configSvc.compentency.v6
+
             // Act
             component.getContent('Course')
 
@@ -321,7 +332,7 @@ describe('SearchComponent', () => {
                 request: expect.objectContaining({
                     secureSettings: false,
                     filters: expect.objectContaining({
-                        primaryCategory: ['Course']
+                        courseCategory: ['Course']
                     }),
                     offset: 0,
                     limit: 20,
@@ -331,6 +342,9 @@ describe('SearchComponent', () => {
         })
 
         it('should handle moderated course type correctly', () => {
+            // Set up compentencyKey
+            component.compentencyKey = mockInitService.configSvc.compentency.v6
+
             // Act
             component.getContent('Moderated Course')
 
@@ -340,13 +354,16 @@ describe('SearchComponent', () => {
                 request: expect.objectContaining({
                     secureSettings: true,
                     filters: expect.objectContaining({
-                        primaryCategory: ['Course']
+                        courseCategory: ['Moderated Course']
                     })
                 })
             }))
         })
 
         it('should apply filter object when provided', () => {
+            // Set up compentencyKey
+            component.compentencyKey = mockInitService.configSvc.compentency.v6
+
             // Arrange
             const filterObj = {
                 providers: ['provider1'],
@@ -368,18 +385,14 @@ describe('SearchComponent', () => {
         })
 
         it('should clear filters when searchText is present', () => {
-            // Arrange
+            // When only searchText is set (no applyFilterObj), clearFilter should be called
             component.searchText = 'search query'
-            const filterObj = {
-                providers: ['provider1']
-            }
 
-            // Act
-            component.getContent('Course', filterObj)
+            // Act - no filterObj, so applyFilterObj is undefined
+            component.getContent('Course')
 
             // Assert
             expect(mockTpdsSvc.clearFilter.next).toHaveBeenCalledWith({ from: 'content', status: true })
-            // Filters should be empty
             expect(mockTrainingPlanService.getAllContent).toHaveBeenCalledWith(expect.objectContaining({
                 request: expect.objectContaining({
                     filters: expect.objectContaining({
@@ -462,18 +475,14 @@ describe('SearchComponent', () => {
         })
 
         it('should clear filters when searchText is present', () => {
-            // Arrange
+            // When only searchText is set (no applyFilterObj), clearFilter should be called
             component.searchText = 'search query'
-            const filterObj = {
-                designation: ['des1']
-            }
 
-            // Act
-            component.getCustomUsers('CustomUser', filterObj)
+            // Act - no filterObj, so applyFilterObj is undefined
+            component.getCustomUsers('CustomUser')
 
             // Assert
             expect(mockTpdsSvc.clearFilter.next).toHaveBeenCalledWith({ from: 'assignee', status: true })
-            // Filters should be empty
             expect(mockTrainingPlanService.getCustomUsers).toHaveBeenCalledWith(expect.objectContaining({
                 request: expect.objectContaining({
                     filters: expect.objectContaining({
@@ -571,10 +580,10 @@ describe('SearchComponent', () => {
 
     describe('searchData', () => {
         beforeEach(() => {
-            jest.spyOn(component, 'getContent')
-            jest.spyOn(component, 'getDesignations')
-            jest.spyOn(component, 'getCustomUsers')
-            jest.spyOn(component, 'getAllUsers')
+            jest.spyOn(component, 'getContent').mockImplementation(() => { })
+            jest.spyOn(component, 'getDesignations').mockImplementation(() => { })
+            jest.spyOn(component, 'getCustomUsers').mockImplementation(() => { })
+            jest.spyOn(component, 'getAllUsers').mockImplementation(() => { })
         })
 
         it('should call appropriate method based on selectedDropDownValue for content types', () => {

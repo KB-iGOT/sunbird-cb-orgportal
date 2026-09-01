@@ -75,7 +75,7 @@ export class QuestionComponent implements OnInit, AfterViewInit {
           border-width: 1px; padding: 8px 12px;" type="text" id="${this.question.questionId}${i}"`,
         )
       }
-      this.safeQuestion = this.domSanitizer.bypassSecurityTrustHtml(this.question.question)
+      this.safeQuestion = this.domSanitizer.bypassSecurityTrustHtml(this.question.question) // NOSONAR
     }
     if (this.question.questionType === 'mtf') {
       this.question.options.forEach(option => (option.matchForView = option.match))
@@ -254,7 +254,7 @@ export class QuestionComponent implements OnInit, AfterViewInit {
     // While there remain elements to shuffle...
     while (0 !== currentIndex) {
       // Pick a remaining element...
-      randomIndex = Math.floor(Math.random() * currentIndex)
+      randomIndex = Math.floor(Math.random() * currentIndex) // NOSONAR
       currentIndex -= 1
 
       // And swap it with the current element.

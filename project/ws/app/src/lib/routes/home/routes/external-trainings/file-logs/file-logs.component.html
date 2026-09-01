@@ -1,12 +1,14 @@
 <ng-container *ngIf="!isLoading">
   <div class="flex flex-col gap-6 bulk-container mt-6" *ngIf="lastUploadList?.length else noData">
-    <div class="file-container" *ngFor="let list of lastUploadList | slice : startIndex : lastIndex | orderBy:'dateCreatedOn':'desc'">
+    <div class="file-container"
+      *ngFor="let list of lastUploadList | slice : startIndex : lastIndex | orderBy:'dateCreatedOn':'desc'">
       <div class="flex flex-col gap-4">
         <div class="flex flex-row justify-between items-center">
           <div class="flex flex-row gap-1">
             <div class="font-bold">File Information</div>
           </div>
-          <div class="flex flex-row gap-2 outline-button items-center" (click)="handleDownloadFile(list)">
+          <div class="flex flex-row gap-2 outline-button items-center" (click)="handleDownloadFile(list)"
+            (keyup)="handleDownloadFile(list)">
             <mat-icon>download_2</mat-icon>
             {{ list?.status?.toLowerCase() !== 'success' ? 'Download error log' : 'Download file' }}
           </div>

@@ -1,5 +1,7 @@
 export namespace NsTnc {
   export interface ITnc {
+    id(id: any): unknown
+    content(content: any): unknown
     isAccepted: boolean
     isNewUser?: boolean
     termsAndConditions: ITncUnit[]

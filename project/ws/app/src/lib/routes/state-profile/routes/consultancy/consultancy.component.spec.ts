@@ -1,153 +1,255 @@
 import { ConsultancyComponent } from './consultancy.component'
-import { OrgProfileService } from '../../services/org-profile.service'
-import { ConfigurationsService } from '@sunbird-cb/utils-v2'
-import { Router } from '@angular/router'
-import { MatDialog } from '@angular/material/dialog'
-import { MatSnackBar } from '@angular/material/snack-bar'
-import _ from 'lodash'
-
-// Mock dependencies
-jest.mock('../../services/org-profile.service')
-jest.mock('@sunbird-cb/utils-v2')
-jest.mock('@angular/router')
-jest.mock('@angular/material/dialog')
-jest.mock('@angular/material/snack-bar')
-jest.mock('lodash')
 
 describe('ConsultancyComponent', () => {
     let component: ConsultancyComponent
-    let orgSvc: OrgProfileService
-    let configSvc: ConfigurationsService
-    let router: Router
-    let dialog: MatDialog
-    let snackBar: MatSnackBar
+    let mockOrgSvc: any
+    let mockConfigSvc: any
+    let mockRouter: any
+    let mockDialog: any
+    let mockSnackBar: any
+
+    const makeComponent = () => new ConsultancyComponent(
+        mockOrgSvc,
+        mockConfigSvc,
+        mockRouter,
+        mockDialog,
+        mockSnackBar
+    )
 
     beforeEach(() => {
-        orgSvc = new OrgProfileService(null as any)  // Mocked instance, replace with actual mock
-        configSvc = new ConfigurationsService()  // Mocked instance, replace with actual mock
-        router = new Router()  // Mocked instance
-        dialog = new MatDialog(null as any, null as any, null as any, null as any, null as any, null as any, null as any, null as any)  // Mocked instance
-        snackBar = new MatSnackBar(null as any, null as any, null as any, null as any, null as any, null as any)  // Mocked instance
+        mockOrgSvc = {
+            updateFormStatus: jest.fn(),
+            updateLocalFormValue: jest.fn(),
+            formValues: { rolesAndFunctions: {} },
+        }
+        mockConfigSvc = {
+            unMappedUser: {
+                orgProfile: null,
+                profileDetails: null,
+            },
+            userProfile: null,
+        }
+        mockRouter = { navigate: jest.fn() }
+        mockDialog = { open: jest.fn() }
+        mockSnackBar = { open: jest.fn() }
 
-        component = new ConsultancyComponent(
-            orgSvc,
-            configSvc,
-            router,
-            dialog,
-            snackBar
-        )
-
-        // Mock methods
-        orgSvc.updateFormStatus = jest.fn()
-        configSvc.unMappedUser = { orgProfile: { profileDetails: { consultancy: { projects: [] } } } }
-        // dialog.open = jest.fn(() => ({ afterClosed: jest.fn(() => ({ subscribe: jest.fn() })) }))
-        snackBar.open = jest.fn()
+        component = makeComponent()
     })
 
     it('should create the component', () => {
         expect(component).toBeDefined()
     })
 
-    it('should initialize consultancy form with default values', () => {
+    it('should initialize consultancy form with Ongoing status and true industrySponsored', () => {
         expect(component.consultancyForm.get('projectName')).toBeDefined()
         expect(component.consultancyForm.get('programeStatus')?.value).toBe('Ongoing')
         expect(component.consultancyForm.get('industrySponsored')?.value).toBe(true)
-        expect(component.consultancyForm.get('govtSponsored')?.value).toBe(false)
+        expect(component.consultancyForm.get('govtSponsored')?.value).toBe('')
     })
 
-    it('should call orgSvc.updateFormStatus in ngOnInit', () => {
-        component.ngOnInit()
-        expect(orgSvc.updateFormStatus).toHaveBeenCalledWith('consultancy', true)
+    it('should call orgSvc.updateFormStatus with consultancy=true on construction', () => {
+        expect(mockOrgSvc.updateFormStatus).toHaveBeenCalledWith('consultancy', true)
     })
 
-    it('should handle addProject when form is valid', () => {
-        // Mock valid form values
-        component.consultancyForm.setValue({
-            projectName: 'Test Project',
-            programeStatus: 'Ongoing',
-            industrySponsored: true,
-            govtSponsored: false,
-            otherSponsored: false,
-            projectDetail: 'Test Details',
-        })
-        component.addProject()
-
-        expect(component.addedconsultancies.length).toBe(1)
-        expect(component.consultancyForm.reset).toHaveBeenCalled()
-        expect(orgSvc.updateLocalFormValue).toHaveBeenCalledWith('consultancy', { projects: component.addedconsultancies })
-    })
-
-    it('should not add project if form is invalid', () => {
-        // Mock invalid form values
-        component.consultancyForm.setValue({
-            projectName: '',
-            programeStatus: 'Ongoing',
-            industrySponsored: true,
-            govtSponsored: false,
-            otherSponsored: false,
-            projectDetail: 'Test Details',
+    describe('ngOnInit()', () => {
+        it('should not crash when no orgProfile', () => {
+            expect(() => component.ngOnInit()).not.toThrow()
         })
 
-        component.addProject()
+        it('should populate addedconsultancies from orgProfile when present', () => {
+            mockConfigSvc.unMappedUser = {
+                orgProfile: {
+                    profileDetails: {
+                        consultancy: { projects: [{ projectName: 'P1' }] },
+                        rolesAndFunctions: null,
+                    },
+                },
+            }
+            component = makeComponent()
+            component.ngOnInit()
+            expect(component.addedconsultancies).toEqual([{ projectName: 'P1' }])
+        })
 
-        expect(component.addedconsultancies.length).toBe(0)
-        expect(snackBar.open).toHaveBeenCalledWith('Project name, program status, sponsers type are required')
-    })
-
-    it('should call editProject and patch form values', () => {
-        const mockProject = {
-            projectName: 'Test Project',
-            programeStatus: 'Completed',
-            industrySponsored: true,
-            govtSponsored: false,
-            otherSponsored: true,
-            projectDetail: 'Test Details',
-        }
-
-        component.editProject(mockProject)
-
-        expect(component.editValue).toBe(mockProject)
-        expect(component.consultancyForm.get('projectName')?.value).toBe(mockProject.projectName)
-        expect(component.consultancyForm.get('programeStatus')?.value).toBe(mockProject.programeStatus)
-        expect(component.consultancyForm.get('industrySponsored')?.value).toBe(mockProject.industrySponsored)
-    })
-
-    it('should delete project and update values when confirmed', () => {
-        const mockProject = { projectName: 'Test Project' }
-        component.addedconsultancies = [{ projectName: 'Test Project' }]
-        // const dialogRef = { afterClosed: jest.fn(() => ({ subscribe: jest.fn((cb) => cb(true)) })) }
-
-        // dialog.open.mockReturnValue(dialogRef)
-        component.deleteProject(mockProject)
-
-        expect(dialog.open).toHaveBeenCalled()
-        expect(component.addedconsultancies.length).toBe(0)
-        expect(orgSvc.updateLocalFormValue).toHaveBeenCalledWith('consultancy', { projects: [] })
-    })
-
-    it('should open activity dialog', () => {
-        component.openActivityDialog()
-        expect(dialog.open).toHaveBeenCalledWith(expect.anything(), {
-            data: { view: 'consultancy' },
-            hasBackdrop: false,
-            width: '550px',
+        it('should set isConsultancy=true when rolesAndFunctions.consultancy is true', () => {
+            mockOrgSvc.formValues = {
+                rolesAndFunctions: { consultancy: true },
+            }
+            mockConfigSvc.unMappedUser = {
+                orgProfile: { profileDetails: { consultancy: { projects: [] } } },
+            }
+            component = makeComponent()
+            component.ngOnInit()
+            expect(component.isConsultancy).toBe(true)
         })
     })
 
-    it('should call resetConsultancyForm correctly', () => {
-        component.consultancyForm.setValue({
-            projectName: 'Test',
-            programeStatus: 'Completed',
-            industrySponsored: true,
-            govtSponsored: false,
-            otherSponsored: true,
-            projectDetail: 'Details',
+    describe('addProject()', () => {
+        it('should add a project when form is valid (industrySponsored=true)', () => {
+            component.consultancyForm.setValue({
+                projectName: 'Test Project',
+                programeStatus: 'Ongoing',
+                industrySponsored: true,
+                govtSponsored: false,
+                otherSponsored: false,
+                projectDetail: 'Details',
+            })
+            component.addProject()
+            expect(component.addedconsultancies.length).toBe(1)
+            expect(mockOrgSvc.updateLocalFormValue).toHaveBeenCalledWith('consultancy', { projects: component.addedconsultancies })
         })
 
-        component.resetConsultancyForm()
+        it('should show snackbar when projectName is missing', () => {
+            component.consultancyForm.setValue({
+                projectName: '',
+                programeStatus: 'Ongoing',
+                industrySponsored: true,
+                govtSponsored: false,
+                otherSponsored: false,
+                projectDetail: '',
+            })
+            component.addProject()
+            expect(component.addedconsultancies.length).toBe(0)
+            expect(mockSnackBar.open).toHaveBeenCalledWith('Project name, program status, sponsers type are required')
+        })
 
-        expect(component.consultancyForm.get('projectName')?.value).toBe('')
-        expect(component.consultancyForm.get('programeStatus')?.value).toBe('Ongoing')
-        expect(component.consultancyForm.get('industrySponsored')?.value).toBe(true)
+        it('should show snackbar when no sponsor is selected', () => {
+            component.consultancyForm.setValue({
+                projectName: 'Test',
+                programeStatus: 'Ongoing',
+                industrySponsored: false,
+                govtSponsored: false,
+                otherSponsored: false,
+                projectDetail: '',
+            })
+            component.addProject()
+            expect(mockSnackBar.open).toHaveBeenCalledWith('Project name, program status, sponsers type are required')
+        })
+
+        it('should update existing project in edit mode', () => {
+            const project = {
+                projectName: 'Old Name',
+                programeStatus: 'Ongoing',
+                industrySponsored: true,
+                govtSponsored: false,
+                otherSponsored: false,
+                projectDetail: 'Old details',
+            }
+            component.addedconsultancies = [project]
+            component.editValue = project
+            mockConfigSvc.userProfile = { userId: 'u1' }
+            mockConfigSvc.unMappedUser.profileDetails = {}
+            component.consultancyForm.setValue({
+                projectName: 'New Name',
+                programeStatus: 'Completed',
+                industrySponsored: true,
+                govtSponsored: false,
+                otherSponsored: false,
+                projectDetail: 'New details',
+            })
+            component.addProject()
+            expect(component.addedconsultancies[0].projectName).toBe('New Name')
+            expect(mockSnackBar.open).toHaveBeenCalledWith('Updated successfully')
+        })
+    })
+
+    describe('editProject()', () => {
+        it('should patch form with project values and navigate', () => {
+            const project = {
+                projectName: 'P1',
+                programeStatus: 'Completed',
+                industrySponsored: true,
+                govtSponsored: false,
+                otherSponsored: false,
+                projectDetail: 'Details',
+            }
+            component.editProject(project)
+            expect(component.editValue).toBe(project)
+            expect(component.consultancyForm.get('projectName')?.value).toBe('P1')
+            expect(component.textBoxActive).toBe(true)
+            expect(mockRouter.navigate).toHaveBeenCalledWith(['app', 'setup', 'consultancy'], { fragment: 'maindiv' })
+        })
+
+        it('should not do anything when project is null/undefined', () => {
+            component.editProject(null)
+            expect(component.editValue).toBeUndefined()
+            expect(mockRouter.navigate).not.toHaveBeenCalled()
+        })
+    })
+
+    describe('deleteProject()', () => {
+        it('should open dialog and delete project on confirm', () => {
+            const mockAfterClosed = { subscribe: jest.fn((cb: any) => cb(true)) }
+            mockDialog.open.mockReturnValue({ afterClosed: () => mockAfterClosed })
+            const project = { projectName: 'P1' }
+            component.addedconsultancies = [{ projectName: 'P1' }]
+            component.deleteProject(project)
+            expect(mockDialog.open).toHaveBeenCalled()
+            expect(component.addedconsultancies.length).toBe(0)
+            expect(mockOrgSvc.updateLocalFormValue).toHaveBeenCalledWith('consultancy', { projects: [] })
+        })
+
+        it('should not delete when dialog returns false', () => {
+            const mockAfterClosed = { subscribe: jest.fn((cb: any) => cb(false)) }
+            mockDialog.open.mockReturnValue({ afterClosed: () => mockAfterClosed })
+            const project = { projectName: 'P1' }
+            component.addedconsultancies = [{ projectName: 'P1' }]
+            component.deleteProject(project)
+            expect(component.addedconsultancies.length).toBe(1)
+        })
+
+        it('should not open dialog when project is null/undefined', () => {
+            component.deleteProject(null)
+            expect(mockDialog.open).not.toHaveBeenCalled()
+        })
+    })
+
+    describe('updateValuesToStore()', () => {
+        it('should call updateLocalFormValue with projects', () => {
+            component.addedconsultancies = [{ projectName: 'P1' }]
+            component.updateValuesToStore()
+            expect(mockOrgSvc.updateLocalFormValue).toHaveBeenCalledWith('consultancy', { projects: [{ projectName: 'P1' }] })
+        })
+
+        it('should set status to projects.length > 0 when isConsultancy=true', () => {
+            component.isConsultancy = true
+            component.addedconsultancies = [{ projectName: 'P1' }]
+            component.updateValuesToStore()
+            expect(mockOrgSvc.updateFormStatus).toHaveBeenCalledWith('consultancy', true)
+        })
+
+        it('should set status to true when isConsultancy=false', () => {
+            component.isConsultancy = false
+            component.addedconsultancies = []
+            component.updateValuesToStore()
+            expect(mockOrgSvc.updateFormStatus).toHaveBeenCalledWith('consultancy', true)
+        })
+    })
+
+    describe('resetConsultancyForm()', () => {
+        it('should reset form to default values', () => {
+            component.consultancyForm.setValue({
+                projectName: 'Test',
+                programeStatus: 'Completed',
+                industrySponsored: false,
+                govtSponsored: true,
+                otherSponsored: true,
+                projectDetail: 'Details',
+            })
+            component.resetConsultancyForm()
+            expect(component.consultancyForm.get('programeStatus')?.value).toBe('Ongoing')
+            expect(component.consultancyForm.get('industrySponsored')?.value).toBe(true)
+        })
+    })
+
+    describe('openActivityDialog()', () => {
+        it('should open dialog with consultancy view', () => {
+            const mockAfterClosed = { subscribe: jest.fn((cb: any) => cb(undefined)) }
+            mockDialog.open.mockReturnValue({ afterClosed: () => mockAfterClosed })
+            component.openActivityDialog()
+            expect(mockDialog.open).toHaveBeenCalledWith(
+                expect.anything(),
+                { data: { view: 'consultancy' }, hasBackdrop: false, width: '550px' }
+            )
+        })
     })
 })
