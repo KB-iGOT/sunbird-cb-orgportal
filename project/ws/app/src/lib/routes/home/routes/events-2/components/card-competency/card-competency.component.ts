@@ -26,7 +26,7 @@ import { trigger, state, style, animate, transition } from '@angular/animations'
 
 export class CardCompetencyComponent implements OnInit {
 
-  @Input() theme: any[] = []
+  @Input() theme: any = {}
   @Input() competencyArea = ''
   isExpanded = false
 
@@ -36,7 +36,7 @@ export class CardCompetencyComponent implements OnInit {
   ngOnInit() {
   }
 
-  handleToggleSize(_viewMore: any): void {
+  handleToggleSize(_viewMore?: any): void {
     this.isExpanded = !this.isExpanded
   }
 }

@@ -7,6 +7,7 @@ import { NsContent } from '@sunbird-cb/collection'
   selector: 'viewer-plugin-iap',
   templateUrl: './iap.component.html',
   styleUrls: ['./iap.component.scss'],
+  standalone: false,
 })
 export class IapComponent implements OnInit, OnChanges, OnDestroy, AfterViewInit {
   @Input() iapContent: NsContent.IContent | null = null

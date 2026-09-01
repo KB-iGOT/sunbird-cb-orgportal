@@ -12,7 +12,7 @@ export class YoutubePlayerComponent implements OnInit {
   eventData: any
   videoId: any
   youtubeURL = true
-  videoLink: SafeResourceUrl = ''
+  videoLink: any = ''
   iframeSrc: SafeResourceUrl = ''
   constructor(
     private dialogRef: MatDialogRef<YoutubePlayerComponent>,

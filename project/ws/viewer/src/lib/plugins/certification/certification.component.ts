@@ -8,6 +8,7 @@ import { NsContent } from '@sunbird-cb/collection'
   selector: 'viewer-plugin-certification',
   templateUrl: './certification.component.html',
   styleUrls: ['./certification.component.scss'],
+  standalone: false,
 })
 export class CertificationComponent {
   @Input() certificationContent: NsContent.IContent | null = null

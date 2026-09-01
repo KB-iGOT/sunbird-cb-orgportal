@@ -19,6 +19,7 @@ import { MatSnackBar } from '@angular/material/snack-bar'
   selector: 'ws-app-toc-certification-result-verification-card',
   templateUrl: './result-verification-card.component.html',
   styleUrls: ['./result-verification-card.component.scss'],
+  standalone: false,
 })
 export class ResultVerificationCardComponent implements OnDestroy {
   @Input() certification?: ICertificationMeta

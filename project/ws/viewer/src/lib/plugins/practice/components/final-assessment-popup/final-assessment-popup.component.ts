@@ -8,6 +8,7 @@ import * as _ from 'lodash'
   selector: 'viewer-final-assessment-popup',
   templateUrl: './final-assessment-popup.component.html',
   styleUrls: ['./final-assessment-popup.component.scss'],
+  standalone: false,
 })
 export class FinalAssessmentPopupComponent implements OnInit {
 

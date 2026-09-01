@@ -10,6 +10,7 @@ import { AppTocHomeService } from './app-toc-home.service'
   selector: 'ws-app-app-toc-home-root',
   templateUrl: './app-toc-home.component.html',
   styleUrls: ['./app-toc-home.component.scss'],
+  standalone: false,
 })
 export class AppTocHomeComponent implements OnInit {
   @ViewChild(AppTocHomeDirective, { static: true }) wsAppAppTocHome!: AppTocHomeDirective

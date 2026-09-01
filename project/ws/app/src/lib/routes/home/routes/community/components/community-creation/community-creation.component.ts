@@ -1,4 +1,5 @@
 import { AfterViewInit, ChangeDetectorRef, Component, ViewChild } from '@angular/core'
+import { STEPPER_GLOBAL_OPTIONS } from '@angular/cdk/stepper'
 import { MatDialog } from '@angular/material/dialog'
 import { ActivatedRoute, Router } from '@angular/router'
 import { ConfirmDialogComponent } from '../../../../../workallocation-v2/components/confirm-dialog/confirm-dialog.component'
@@ -18,7 +19,8 @@ import { environment } from '../../../../../../../../../../../src/environments/e
   selector: 'ws-app-community-creation',
   templateUrl: './community-creation.component.html',
   styleUrls: ['./community-creation.component.scss'],
-  standalone: false
+  standalone: false,
+  providers: [{ provide: STEPPER_GLOBAL_OPTIONS, useValue: { displayDefaultIndicatorType: false } }],
 })
 
 

@@ -12,6 +12,7 @@ import { environment } from '../../../../../../../src/environments/environment'
   selector: 'viewer-quiz',
   templateUrl: './quiz.component.html',
   styleUrls: ['./quiz.component.scss'],
+  standalone: false,
 })
 export class QuizComponent implements OnInit, OnDestroy {
   private dataSubscription: Subscription | null = null

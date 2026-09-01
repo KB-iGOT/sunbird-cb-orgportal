@@ -18,6 +18,7 @@ import { AccessControlService } from '@sunbird-cb/toc'
   selector: 'viewer-html',
   templateUrl: './html.component.html',
   styleUrls: ['./html.component.scss'],
+  standalone: false,
 })
 export class HtmlComponent implements OnInit, OnDestroy {
   private routeDataSubscription: Subscription | null = null

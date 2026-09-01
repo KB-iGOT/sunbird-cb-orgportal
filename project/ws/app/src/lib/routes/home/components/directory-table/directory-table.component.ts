@@ -24,6 +24,7 @@ export class DirectoryTableComponent implements OnInit {
   @ViewChild(MatPaginator) private paginator!: MatPaginator
   @ViewChild(MatSort, { static: true }) sort: MatSort | null = null;
 
+  bodyHeight = document.body.clientHeight - 125
   openCreateNavBar = false;
   filterSubject: BehaviorSubject<any> = new BehaviorSubject<any>('');
   moreThanTwoChar = false;

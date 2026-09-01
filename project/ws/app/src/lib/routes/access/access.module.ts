@@ -19,7 +19,7 @@ import { MatSidenavModule } from '@angular/material/sidenav'
 import { MatCardModule } from '@angular/material/card'
 
 @NgModule({
-  declarations: [HomeComponent, PrivilegesComponent, UsersComponent],
+  declarations: [HomeComponent, PrivilegesComponent],
   imports: [CommonModule, AccessRoutingModule, BreadcrumbsOrgModule, LeftMenuWithoutLogoModule, SbUiResolverModule,
     MatSidenavModule, MatIconModule, GroupCheckboxModule, HomeModule, RouterModule, UIORGTableModule, MatCardModule],
   exports: [UsersComponent],

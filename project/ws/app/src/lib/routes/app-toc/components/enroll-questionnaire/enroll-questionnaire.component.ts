@@ -5,6 +5,7 @@ import { MatSnackBar } from '@angular/material/snack-bar'
   selector: 'ws-app-enroll-questionnaire',
   templateUrl: './enroll-questionnaire.component.html',
   styleUrls: ['./enroll-questionnaire.component.scss'],
+  standalone: false,
 })
 export class EnrollQuestionnaireComponent implements OnInit {
   public afterSubmitAction = this.checkAfterSubmit.bind(this)

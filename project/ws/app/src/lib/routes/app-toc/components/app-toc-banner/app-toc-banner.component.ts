@@ -52,6 +52,7 @@ import { MatSnackBar } from '@angular/material/snack-bar'
   templateUrl: './app-toc-banner.component.html',
   styleUrls: ['./app-toc-banner.component.scss'],
   providers: [AccessControlService, DatePipe],
+  standalone: false,
 })
 
 export class AppTocBannerComponent implements OnInit, OnChanges, OnDestroy {

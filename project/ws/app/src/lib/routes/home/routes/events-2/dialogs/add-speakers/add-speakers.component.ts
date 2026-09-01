@@ -26,7 +26,7 @@ export class AddSpeakersComponent implements OnInit {
   speakerIndex = -1
 
   constructor(
-    private dialogRef: MatDialogRef<AddSpeakersComponent>,
+    public dialogRef: MatDialogRef<AddSpeakersComponent>,
     @Inject(MAT_DIALOG_DATA) data: any,
     private formBuilder: FormBuilder,
     private eventsService: EventsService,

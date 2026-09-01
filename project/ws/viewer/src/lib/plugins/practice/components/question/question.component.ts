@@ -15,7 +15,8 @@ import { MatSnackBar, MatSnackBarConfig } from '@angular/material/snack-bar'
   templateUrl: './question.component.html',
   styleUrls: ['./question.component.scss'],
   // tslint:disable-next-line
-  encapsulation: ViewEncapsulation.None
+  encapsulation: ViewEncapsulation.None,
+  standalone: false
 })
 export class QuestionComponent implements OnInit, OnChanges, AfterViewInit {
   @Input() artifactUrl = ''

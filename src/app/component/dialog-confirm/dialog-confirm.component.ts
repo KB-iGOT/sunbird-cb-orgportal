@@ -6,6 +6,7 @@ export interface IPopData {
   body: string
   cancel?: string
   ok?: string
+  componentType?: string
 }
 @Component({
     selector: 'ws-dialog-confirm',

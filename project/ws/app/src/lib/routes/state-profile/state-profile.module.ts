@@ -44,7 +44,6 @@ import { OrgProfileService } from './services/org-profile.service'
         PlatformWalkthroughComponent,
         LevelCardComponent,
         LevelInfoComponent,
-        CompTooltipDirective,
         WelcomeOnboardComponent,
         DialogBoxComponent,
         ConsultancyComponent,
@@ -57,6 +56,7 @@ import { OrgProfileService } from './services/org-profile.service'
     ],
     imports: [
         CommonModule,
+        CompTooltipDirective,
         MatCardModule,
         MatListModule,
         MatSidenavModule,

@@ -25,6 +25,7 @@ import { MatTabChangeEvent } from '@angular/material/tabs'
   selector: 'ws-app-app-toc-single-page',
   templateUrl: './app-toc-single-page.component.html',
   styleUrls: ['./app-toc-single-page.component.scss'],
+  standalone: false,
 })
 export class AppTocSinglePageComponent implements OnInit, OnChanges, OnDestroy {
   contentTypes = NsContent.EContentTypes
