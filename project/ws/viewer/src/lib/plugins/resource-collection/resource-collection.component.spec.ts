@@ -1,5 +1,5 @@
 import { UntypedFormControl } from '@angular/forms'
-import { MatLegacyTableDataSource as MatTableDataSource } from '@angular/material/legacy-table'
+import { MatTableDataSource } from '@angular/material/table'
 import { of, throwError } from 'rxjs'
 
 // Mock the view-submission component that has an unresolvable dependency

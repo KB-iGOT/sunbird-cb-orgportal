@@ -1,75 +1,131 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <testExecutions version="1">
-  <file path="/home/mansurshaik/Desktop/Office/projects/igot/igot-mdo-sunbird-cb-orgportal/project/ws/viewer/src/lib/components/viewer-toc/viewer-toc.component.spec.ts">
-    <testCase name="ViewerTocComponent should create" duration="3"/>
-    <testCase name="ViewerTocComponent ngOnInit should initialize with default values" duration="1">
-      <failure message="TypeError: Cannot read properties of undefined (reading &apos;data&apos;)"><![CDATA[TypeError: Cannot read properties of undefined (reading 'data')
-    at ViewerTocComponent.data [as ngOnInit] (/home/mansurshaik/Desktop/Office/projects/igot/igot-mdo-sunbird-cb-orgportal/project/ws/viewer/src/lib/components/viewer-toc/viewer-toc.component.ts:126:55)
-    at /home/mansurshaik/Desktop/Office/projects/igot/igot-mdo-sunbird-cb-orgportal/project/ws/viewer/src/lib/components/viewer-toc/viewer-toc.component.spec.ts:93:23
-    at _ZoneDelegate.Object.<anonymous>._ZoneDelegate.invoke (/home/mansurshaik/Desktop/Office/projects/igot/igot-mdo-sunbird-cb-orgportal/node_modules/zone.js/bundles/zone.umd.js:411:30)
-    at ProxyZoneSpec.Object.<anonymous>.ProxyZoneSpec.onInvoke (/home/mansurshaik/Desktop/Office/projects/igot/igot-mdo-sunbird-cb-orgportal/node_modules/zone.js/bundles/zone-testing.umd.js:300:43)
-    at _ZoneDelegate.Object.<anonymous>._ZoneDelegate.invoke (/home/mansurshaik/Desktop/Office/projects/igot/igot-mdo-sunbird-cb-orgportal/node_modules/zone.js/bundles/zone.umd.js:410:56)
-    at Zone.Object.<anonymous>.Zone.run (/home/mansurshaik/Desktop/Office/projects/igot/igot-mdo-sunbird-cb-orgportal/node_modules/zone.js/bundles/zone.umd.js:165:47)
-    at Object.wrappedFunc (/home/mansurshaik/Desktop/Office/projects/igot/igot-mdo-sunbird-cb-orgportal/node_modules/zone.js/bundles/zone-testing.umd.js:789:34)
-    at Promise.then.completed (/home/mansurshaik/Desktop/Office/projects/igot/igot-mdo-sunbird-cb-orgportal/node_modules/jest-circus/build/utils.js:298:28)
+  <file path="/home/bharathr/iGot/projects/portals/mdo-portal/sunbird-cb-orgportal/project/ws/app/src/lib/routes/training-plan/routes/preview-plan/preview-plan.component.spec.ts">
+    <testCase name="PreviewPlanComponent should create the component" duration="10"/>
+    <testCase name="PreviewPlanComponent ngOnInit with route data should show the APAR year of the plan being previewed" duration="2"/>
+    <testCase name="PreviewPlanComponent ngOnInit with route data should show no APAR year when the plan holds none" duration="1"/>
+    <testCase name="PreviewPlanComponent ngOnInit with route data should initialize from contentData with Designation assignment type" duration="13">
+      <failure message="Error: expect(received).toEqual(expected) // deep equality"><![CDATA[Error: expect(received).toEqual(expected) // deep equality
+
+- Expected  - 1
++ Received  + 1
+
+@@ -1,9 +1,9 @@
+  Object {
+    "queryParams": Object {
+      "tabSelected": "Designation",
+-     "type": "live",
++     "type": "LIVE",
+    },
+    "url": Array [
+      "app",
+      "home",
+      "training-plan-dashboard",
+    at /home/bharathr/iGot/projects/portals/mdo-portal/sunbird-cb-orgportal/project/ws/app/src/lib/routes/training-plan/routes/preview-plan/preview-plan.component.spec.ts:118:38
+    at _ZoneDelegate.invoke (/home/bharathr/iGot/projects/portals/mdo-portal/sunbird-cb-orgportal/node_modules/zone.js/bundles/zone.umd.js:410:32)
+    at ProxyZoneSpec.Object.<anonymous>.ProxyZoneSpec.onInvoke (/home/bharathr/iGot/projects/portals/mdo-portal/sunbird-cb-orgportal/node_modules/zone.js/bundles/zone-testing.umd.js:2219:43)
+    at _ZoneDelegate.invoke (/home/bharathr/iGot/projects/portals/mdo-portal/sunbird-cb-orgportal/node_modules/zone.js/bundles/zone.umd.js:409:38)
+    at ZoneImpl.run (/home/bharathr/iGot/projects/portals/mdo-portal/sunbird-cb-orgportal/node_modules/zone.js/bundles/zone.umd.js:145:47)
+    at Object.wrappedFunc (/home/bharathr/iGot/projects/portals/mdo-portal/sunbird-cb-orgportal/node_modules/zone.js/bundles/zone-testing.umd.js:449:38)
+    at Promise.then.completed (/home/bharathr/iGot/projects/portals/mdo-portal/sunbird-cb-orgportal/node_modules/jest-circus/build/utils.js:298:28)
     at new Promise (<anonymous>)
-    at callAsyncCircusFn (/home/mansurshaik/Desktop/Office/projects/igot/igot-mdo-sunbird-cb-orgportal/node_modules/jest-circus/build/utils.js:231:10)
-    at _callCircusTest (/home/mansurshaik/Desktop/Office/projects/igot/igot-mdo-sunbird-cb-orgportal/node_modules/jest-circus/build/run.js:316:40)
-    at processTicksAndRejections (node:internal/process/task_queues:95:5)
-    at _runTest (/home/mansurshaik/Desktop/Office/projects/igot/igot-mdo-sunbird-cb-orgportal/node_modules/jest-circus/build/run.js:252:3)
-    at _runTestsForDescribeBlock (/home/mansurshaik/Desktop/Office/projects/igot/igot-mdo-sunbird-cb-orgportal/node_modules/jest-circus/build/run.js:126:9)
-    at _runTestsForDescribeBlock (/home/mansurshaik/Desktop/Office/projects/igot/igot-mdo-sunbird-cb-orgportal/node_modules/jest-circus/build/run.js:121:9)
-    at _runTestsForDescribeBlock (/home/mansurshaik/Desktop/Office/projects/igot/igot-mdo-sunbird-cb-orgportal/node_modules/jest-circus/build/run.js:121:9)
-    at run (/home/mansurshaik/Desktop/Office/projects/igot/igot-mdo-sunbird-cb-orgportal/node_modules/jest-circus/build/run.js:71:3)
-    at runAndTransformResultsToJestFormat (/home/mansurshaik/Desktop/Office/projects/igot/igot-mdo-sunbird-cb-orgportal/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapterInit.js:122:21)]]></failure>
+    at callAsyncCircusFn (/home/bharathr/iGot/projects/portals/mdo-portal/sunbird-cb-orgportal/node_modules/jest-circus/build/utils.js:231:10)
+    at _callCircusTest (/home/bharathr/iGot/projects/portals/mdo-portal/sunbird-cb-orgportal/node_modules/jest-circus/build/run.js:316:40)
+    at processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at _runTest (/home/bharathr/iGot/projects/portals/mdo-portal/sunbird-cb-orgportal/node_modules/jest-circus/build/run.js:252:3)
+    at _runTestsForDescribeBlock (/home/bharathr/iGot/projects/portals/mdo-portal/sunbird-cb-orgportal/node_modules/jest-circus/build/run.js:126:9)
+    at _runTestsForDescribeBlock (/home/bharathr/iGot/projects/portals/mdo-portal/sunbird-cb-orgportal/node_modules/jest-circus/build/run.js:121:9)
+    at _runTestsForDescribeBlock (/home/bharathr/iGot/projects/portals/mdo-portal/sunbird-cb-orgportal/node_modules/jest-circus/build/run.js:121:9)
+    at run (/home/bharathr/iGot/projects/portals/mdo-portal/sunbird-cb-orgportal/node_modules/jest-circus/build/run.js:71:3)
+    at runAndTransformResultsToJestFormat (/home/bharathr/iGot/projects/portals/mdo-portal/sunbird-cb-orgportal/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapterInit.js:122:21)]]></failure>
     </testCase>
-    <testCase name="ViewerTocComponent ngOnInit should set default thumbnail from config service" duration="0">
-      <failure message="TypeError: Cannot read properties of undefined (reading &apos;data&apos;)"><![CDATA[TypeError: Cannot read properties of undefined (reading 'data')
-    at ViewerTocComponent.data [as ngOnInit] (/home/mansurshaik/Desktop/Office/projects/igot/igot-mdo-sunbird-cb-orgportal/project/ws/viewer/src/lib/components/viewer-toc/viewer-toc.component.ts:126:55)
-    at /home/mansurshaik/Desktop/Office/projects/igot/igot-mdo-sunbird-cb-orgportal/project/ws/viewer/src/lib/components/viewer-toc/viewer-toc.component.spec.ts:101:23
-    at _ZoneDelegate.Object.<anonymous>._ZoneDelegate.invoke (/home/mansurshaik/Desktop/Office/projects/igot/igot-mdo-sunbird-cb-orgportal/node_modules/zone.js/bundles/zone.umd.js:411:30)
-    at ProxyZoneSpec.Object.<anonymous>.ProxyZoneSpec.onInvoke (/home/mansurshaik/Desktop/Office/projects/igot/igot-mdo-sunbird-cb-orgportal/node_modules/zone.js/bundles/zone-testing.umd.js:300:43)
-    at _ZoneDelegate.Object.<anonymous>._ZoneDelegate.invoke (/home/mansurshaik/Desktop/Office/projects/igot/igot-mdo-sunbird-cb-orgportal/node_modules/zone.js/bundles/zone.umd.js:410:56)
-    at Zone.Object.<anonymous>.Zone.run (/home/mansurshaik/Desktop/Office/projects/igot/igot-mdo-sunbird-cb-orgportal/node_modules/zone.js/bundles/zone.umd.js:165:47)
-    at Object.wrappedFunc (/home/mansurshaik/Desktop/Office/projects/igot/igot-mdo-sunbird-cb-orgportal/node_modules/zone.js/bundles/zone-testing.umd.js:789:34)
-    at Promise.then.completed (/home/mansurshaik/Desktop/Office/projects/igot/igot-mdo-sunbird-cb-orgportal/node_modules/jest-circus/build/utils.js:298:28)
-    at new Promise (<anonymous>)
-    at callAsyncCircusFn (/home/mansurshaik/Desktop/Office/projects/igot/igot-mdo-sunbird-cb-orgportal/node_modules/jest-circus/build/utils.js:231:10)
-    at _callCircusTest (/home/mansurshaik/Desktop/Office/projects/igot/igot-mdo-sunbird-cb-orgportal/node_modules/jest-circus/build/run.js:316:40)
-    at processTicksAndRejections (node:internal/process/task_queues:95:5)
-    at _runTest (/home/mansurshaik/Desktop/Office/projects/igot/igot-mdo-sunbird-cb-orgportal/node_modules/jest-circus/build/run.js:252:3)
-    at _runTestsForDescribeBlock (/home/mansurshaik/Desktop/Office/projects/igot/igot-mdo-sunbird-cb-orgportal/node_modules/jest-circus/build/run.js:126:9)
-    at _runTestsForDescribeBlock (/home/mansurshaik/Desktop/Office/projects/igot/igot-mdo-sunbird-cb-orgportal/node_modules/jest-circus/build/run.js:121:9)
-    at _runTestsForDescribeBlock (/home/mansurshaik/Desktop/Office/projects/igot/igot-mdo-sunbird-cb-orgportal/node_modules/jest-circus/build/run.js:121:9)
-    at run (/home/mansurshaik/Desktop/Office/projects/igot/igot-mdo-sunbird-cb-orgportal/node_modules/jest-circus/build/run.js:71:3)
-    at runAndTransformResultsToJestFormat (/home/mansurshaik/Desktop/Office/projects/igot/igot-mdo-sunbird-cb-orgportal/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapterInit.js:122:21)]]></failure>
-    </testCase>
-    <testCase name="ViewerTocComponent changeTocMode should toggle between FLAT and TREE modes" duration="3">
+    <testCase name="PreviewPlanComponent ngOnInit with route data should initialize from contentData with CustomUser assignment type" duration="4"/>
+    <testCase name="PreviewPlanComponent ngOnInit with route data should initialize from contentData with AllUser assignment type" duration="2"/>
+    <testCase name="PreviewPlanComponent ngOnInit with form input should initialize contentList from trainingPlanContentData when form is &quot;content&quot;" duration="3">
       <failure message="Error: expect(received).toBe(expected) // Object.is equality"><![CDATA[Error: expect(received).toBe(expected) // Object.is equality
 
-Expected: "FLAT"
-Received: "TREE"
-    at /home/mansurshaik/Desktop/Office/projects/igot/igot-mdo-sunbird-cb-orgportal/project/ws/viewer/src/lib/components/viewer-toc/viewer-toc.component.spec.ts:108:33
-    at _ZoneDelegate.Object.<anonymous>._ZoneDelegate.invoke (/home/mansurshaik/Desktop/Office/projects/igot/igot-mdo-sunbird-cb-orgportal/node_modules/zone.js/bundles/zone.umd.js:411:30)
-    at ProxyZoneSpec.Object.<anonymous>.ProxyZoneSpec.onInvoke (/home/mansurshaik/Desktop/Office/projects/igot/igot-mdo-sunbird-cb-orgportal/node_modules/zone.js/bundles/zone-testing.umd.js:300:43)
-    at _ZoneDelegate.Object.<anonymous>._ZoneDelegate.invoke (/home/mansurshaik/Desktop/Office/projects/igot/igot-mdo-sunbird-cb-orgportal/node_modules/zone.js/bundles/zone.umd.js:410:56)
-    at Zone.Object.<anonymous>.Zone.run (/home/mansurshaik/Desktop/Office/projects/igot/igot-mdo-sunbird-cb-orgportal/node_modules/zone.js/bundles/zone.umd.js:165:47)
-    at Object.wrappedFunc (/home/mansurshaik/Desktop/Office/projects/igot/igot-mdo-sunbird-cb-orgportal/node_modules/zone.js/bundles/zone-testing.umd.js:789:34)
-    at Promise.then.completed (/home/mansurshaik/Desktop/Office/projects/igot/igot-mdo-sunbird-cb-orgportal/node_modules/jest-circus/build/utils.js:298:28)
+Expected: 2
+Received: 0
+    at /home/bharathr/iGot/projects/portals/mdo-portal/sunbird-cb-orgportal/project/ws/app/src/lib/routes/training-plan/routes/preview-plan/preview-plan.component.spec.ts:219:50
+    at _ZoneDelegate.invoke (/home/bharathr/iGot/projects/portals/mdo-portal/sunbird-cb-orgportal/node_modules/zone.js/bundles/zone.umd.js:410:32)
+    at ProxyZoneSpec.Object.<anonymous>.ProxyZoneSpec.onInvoke (/home/bharathr/iGot/projects/portals/mdo-portal/sunbird-cb-orgportal/node_modules/zone.js/bundles/zone-testing.umd.js:2219:43)
+    at _ZoneDelegate.invoke (/home/bharathr/iGot/projects/portals/mdo-portal/sunbird-cb-orgportal/node_modules/zone.js/bundles/zone.umd.js:409:38)
+    at ZoneImpl.run (/home/bharathr/iGot/projects/portals/mdo-portal/sunbird-cb-orgportal/node_modules/zone.js/bundles/zone.umd.js:145:47)
+    at Object.wrappedFunc (/home/bharathr/iGot/projects/portals/mdo-portal/sunbird-cb-orgportal/node_modules/zone.js/bundles/zone-testing.umd.js:449:38)
+    at Promise.then.completed (/home/bharathr/iGot/projects/portals/mdo-portal/sunbird-cb-orgportal/node_modules/jest-circus/build/utils.js:298:28)
     at new Promise (<anonymous>)
-    at callAsyncCircusFn (/home/mansurshaik/Desktop/Office/projects/igot/igot-mdo-sunbird-cb-orgportal/node_modules/jest-circus/build/utils.js:231:10)
-    at _callCircusTest (/home/mansurshaik/Desktop/Office/projects/igot/igot-mdo-sunbird-cb-orgportal/node_modules/jest-circus/build/run.js:316:40)
-    at processTicksAndRejections (node:internal/process/task_queues:95:5)
-    at _runTest (/home/mansurshaik/Desktop/Office/projects/igot/igot-mdo-sunbird-cb-orgportal/node_modules/jest-circus/build/run.js:252:3)
-    at _runTestsForDescribeBlock (/home/mansurshaik/Desktop/Office/projects/igot/igot-mdo-sunbird-cb-orgportal/node_modules/jest-circus/build/run.js:126:9)
-    at _runTestsForDescribeBlock (/home/mansurshaik/Desktop/Office/projects/igot/igot-mdo-sunbird-cb-orgportal/node_modules/jest-circus/build/run.js:121:9)
-    at _runTestsForDescribeBlock (/home/mansurshaik/Desktop/Office/projects/igot/igot-mdo-sunbird-cb-orgportal/node_modules/jest-circus/build/run.js:121:9)
-    at run (/home/mansurshaik/Desktop/Office/projects/igot/igot-mdo-sunbird-cb-orgportal/node_modules/jest-circus/build/run.js:71:3)
-    at runAndTransformResultsToJestFormat (/home/mansurshaik/Desktop/Office/projects/igot/igot-mdo-sunbird-cb-orgportal/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapterInit.js:122:21)]]></failure>
+    at callAsyncCircusFn (/home/bharathr/iGot/projects/portals/mdo-portal/sunbird-cb-orgportal/node_modules/jest-circus/build/utils.js:231:10)
+    at _callCircusTest (/home/bharathr/iGot/projects/portals/mdo-portal/sunbird-cb-orgportal/node_modules/jest-circus/build/run.js:316:40)
+    at processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at _runTest (/home/bharathr/iGot/projects/portals/mdo-portal/sunbird-cb-orgportal/node_modules/jest-circus/build/run.js:252:3)
+    at _runTestsForDescribeBlock (/home/bharathr/iGot/projects/portals/mdo-portal/sunbird-cb-orgportal/node_modules/jest-circus/build/run.js:126:9)
+    at _runTestsForDescribeBlock (/home/bharathr/iGot/projects/portals/mdo-portal/sunbird-cb-orgportal/node_modules/jest-circus/build/run.js:121:9)
+    at _runTestsForDescribeBlock (/home/bharathr/iGot/projects/portals/mdo-portal/sunbird-cb-orgportal/node_modules/jest-circus/build/run.js:121:9)
+    at run (/home/bharathr/iGot/projects/portals/mdo-portal/sunbird-cb-orgportal/node_modules/jest-circus/build/run.js:71:3)
+    at runAndTransformResultsToJestFormat (/home/bharathr/iGot/projects/portals/mdo-portal/sunbird-cb-orgportal/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapterInit.js:122:21)]]></failure>
     </testCase>
-    <testCase name="ViewerTocComponent minimizenav should emit false when minimizenav is called" duration="1"/>
-    <testCase name="ViewerTocComponent hasNestedChild should return true for nodes with children" duration="1"/>
-    <testCase name="ViewerTocComponent hasNestedChild should return false for nodes without children" duration="1"/>
-    <testCase name="ViewerTocComponent ngOnDestroy should unsubscribe from subscriptions" duration="1"/>
+    <testCase name="PreviewPlanComponent ngOnInit with form input should initialize assigneeData from trainingPlanAssigneeData with Designation category when form is &quot;assignee&quot;" duration="1"/>
+    <testCase name="PreviewPlanComponent ngOnInit with form input should initialize assigneeData from trainingPlanAssigneeData with CustomUser category when form is &quot;assignee&quot;" duration="1"/>
+    <testCase name="PreviewPlanComponent goBack should navigate to the correct URL with query params" duration="2"/>
+  </file>
+  <file path="/home/bharathr/iGot/projects/portals/mdo-portal/sunbird-cb-orgportal/project/ws/app/src/lib/routes/training-plan/routes/create-timeline/create-timeline.component.spec.ts">
+    <testCase name="CreateTimelineComponent should initialize with content data and assignee data" duration="7"/>
+    <testCase name="CreateTimelineComponent should show the content selected on the plan, in the order of the plan" duration="1"/>
+    <testCase name="CreateTimelineComponent should show the selected content without the search having been called" duration="1"/>
+    <testCase name="CreateTimelineComponent should drop the content of the plan whose details could not be read" duration="1"/>
+    <testCase name="CreateTimelineComponent should filter assignee data correctly for Designation" duration="1"/>
+    <testCase name="CreateTimelineComponent should open dialog when showAll is called" duration="1"/>
+    <testCase name="CreateTimelineComponent should call getContentData when contentRemoved is called" duration="1"/>
+    <testCase name="CreateTimelineComponent should call getDesignationData when selectedUserRemoved is called with Designation" duration="0"/>
+    <testCase name="CreateTimelineComponent should call getCustomUserData when selectedUserRemoved is called with CustomUser" duration="1"/>
+  </file>
+  <file path="/home/bharathr/iGot/projects/portals/mdo-portal/sunbird-cb-orgportal/project/ws/app/src/lib/common/apar-year-select/apar-year.service.spec.ts">
+    <testCase name="AparYearService with the global config available should list the years configured in the global config" duration="7"/>
+    <testCase name="AparYearService with the global config available should ignore the year count when the global config drives the list" duration="1"/>
+    <testCase name="AparYearService with the global config available should take the current year from the global config" duration="0"/>
+    <testCase name="AparYearService with the global config available should skip entries without a value and label the rest" duration="1"/>
+    <testCase name="AparYearService with the global config available should close only the years the config marks as closed" duration="0"/>
+    <testCase name="AparYearService with the global config available should close a past year the config says nothing about, and open the current one" duration="1"/>
+    <testCase name="AparYearService with the global config available should open the year the config marks editable even when it is a past one" duration="0"/>
+    <testCase name="AparYearService with the global config available should follow the first year of the list when no current year is set" duration="1"/>
+    <testCase name="AparYearService with the global config available should fall back to the first configured year when no current year is set" duration="0"/>
+    <testCase name="AparYearService without the global config should open the current cycle only, the years behind it are closed" duration="2"/>
+    <testCase name="AparYearService without the global config should list the requested number of years, newest first" duration="0"/>
+    <testCase name="AparYearService without the global config should format years as YYYY-YY and step back one cycle at a time" duration="1"/>
+    <testCase name="AparYearService without the global config should only mark the first entry as the current cycle" duration="1"/>
+  </file>
+  <file path="/home/bharathr/iGot/projects/portals/mdo-portal/sunbird-cb-orgportal/project/ws/app/src/lib/common/apar-year-select/apar-year-select.component.spec.ts">
+    <testCase name="AparYearSelectComponent should start with the documented defaults" duration="16"/>
+    <testCase name="AparYearSelectComponent ngOnInit should load the years from the service" duration="1"/>
+    <testCase name="AparYearSelectComponent ngOnInit should keep a year the config no longer lists on the list, unpickable" duration="0"/>
+    <testCase name="AparYearSelectComponent ngOnInit should not repeat a year the config already lists" duration="1"/>
+    <testCase name="AparYearSelectComponent ngOnInit should pass the year count through for the fallback list" duration="0"/>
+    <testCase name="AparYearSelectComponent ngOnChanges should hold on to a year handed over after the list was read" duration="0"/>
+    <testCase name="AparYearSelectComponent ngOnChanges should leave the list alone when the year did not change" duration="0"/>
+    <testCase name="AparYearSelectComponent onSelectionChange should hold the picked year and emit it" duration="1"/>
+    <testCase name="AparYearSelectComponent should give every instance its own field id" duration="1"/>
+    <testCase name="AparYearSelectComponent rendering should keep a closed year on the list but out of reach of a plan" duration="152"/>
+    <testCase name="AparYearSelectComponent rendering should leave every year pickable where the plan is not being authored" duration="46"/>
+  </file>
+  <file path="/home/bharathr/iGot/projects/portals/mdo-portal/sunbird-cb-orgportal/project/ws/app/src/lib/routes/training-plan/components/add-timeline-form/add-timeline-form.component.spec.ts">
+    <testCase name="AddTimelineFormComponent ngOnInit should set todayDate if endDate is present in trainingPlanStepperData" duration="7"/>
+    <testCase name="AddTimelineFormComponent ngOnInit should not set todayDate if endDate is not present in trainingPlanStepperData" duration="1"/>
+    <testCase name="AddTimelineFormComponent APAR year should default to the current APAR year and share it with the stepper" duration="1"/>
+    <testCase name="AddTimelineFormComponent APAR year should keep an APAR year already held by the stepper" duration="1"/>
+    <testCase name="AddTimelineFormComponent APAR year should push a newly picked year to the stepper" duration="0"/>
+    <testCase name="AddTimelineFormComponent changeTimeline should update trainingPlanStepperData with the correct transformed date" duration="1"/>
+    <testCase name="AddTimelineFormComponent changeTimeline should call transform method with the correct parameters" duration="1"/>
+  </file>
+  <file path="/home/bharathr/iGot/projects/portals/mdo-portal/sunbird-cb-orgportal/project/ws/app/src/lib/routes/home/routes/training-plan-dashboard/training-plan-dashboard.component.spec.ts">
+    <testCase name="TrainingPlanDashboardComponent should create a instance of component" duration="8"/>
+    <testCase name="TrainingPlanDashboardComponent should seed the selected year from the apar year service on init" duration="2"/>
+    <testCase name="TrainingPlanDashboardComponent getTrainingPlanCBP payload should send the selected year as planYear inside the filter" duration="1"/>
+    <testCase name="TrainingPlanDashboardComponent getTrainingPlanCBP payload should keep planYear alongside a search string" duration="1"/>
+    <testCase name="TrainingPlanDashboardComponent getTrainingPlanCBP payload should omit planYear when no year is selected" duration="0"/>
+    <testCase name="TrainingPlanDashboardComponent changeAparYear should hold the new year and reload the list from the first page" duration="2"/>
+    <testCase name="TrainingPlanDashboardComponent changeAparYear should keep the current search string while reloading" duration="0"/>
+    <testCase name="TrainingPlanDashboardComponent changeAparYear should not reload when the same year is picked again" duration="1"/>
+    <testCase name="TrainingPlanDashboardComponent createCbp should carry the selected year to the create plan route" duration="1"/>
+    <testCase name="TrainingPlanDashboardComponent createCbp should refuse to start a plan with no year selected" duration="0"/>
   </file>
 </testExecutions>

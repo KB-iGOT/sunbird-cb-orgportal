@@ -1,4 +1,4 @@
-FROM node:22.6.0
+FROM node:22.13.0
 
 RUN mkdir -p /app && chown -R node:node /app
 WORKDIR /app

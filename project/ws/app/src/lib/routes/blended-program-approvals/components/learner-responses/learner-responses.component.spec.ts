@@ -1,6 +1,6 @@
 import { LearnerResponsesComponent } from './learner-responses.component'
 import { BlendedApporvalService } from '../../services/blended-approval.service'
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog'
+import { MatDialog } from '@angular/material/dialog'
 import { of, throwError } from 'rxjs'
 
 // Mock lodash

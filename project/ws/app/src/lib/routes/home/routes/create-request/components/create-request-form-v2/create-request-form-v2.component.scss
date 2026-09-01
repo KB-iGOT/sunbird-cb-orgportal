@@ -14,3 +14,7 @@
     margin: 0px !important;
   }
 }
+
+::ng-deep .duration-field {
+  width:50px !important
+}

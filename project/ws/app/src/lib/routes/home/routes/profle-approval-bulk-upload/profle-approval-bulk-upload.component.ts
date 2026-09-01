@@ -1,8 +1,8 @@
 import { DatePipe } from '@angular/common'
 import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core'
 import { Validators, UntypedFormGroup, UntypedFormBuilder, UntypedFormControl } from '@angular/forms'
-import { MatLegacyRadioChange as MatRadioChange } from '@angular/material/legacy-radio'
-import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar'
+import { MatRadioChange } from '@angular/material/radio'
+import { MatSnackBar } from '@angular/material/snack-bar'
 import { MatSort } from '@angular/material/sort'
 import { ActivatedRoute } from '@angular/router'
 import { Observable, Subscription, interval } from 'rxjs'
@@ -12,13 +12,13 @@ import { MatTableDataSource } from '@angular/material/table'
 import { environment } from '../../../../../../../../../src/environments/environment'
 import { FileService } from '../../../users/services/upload.service'
 import { UsersService } from '../../../users/services/users.service'
-import { ITableData } from '@sunbird-cb/collection/lib/ui-org-table/interface/interfaces'
 import * as _ from 'lodash'
 
 @Component({
   selector: 'ws-app-profle-approval-bulk-upload',
   templateUrl: './profle-approval-bulk-upload.component.html',
   styleUrls: ['./profle-approval-bulk-upload.component.scss'],
+  standalone: false
 })
 export class ProfleApprovalBulkUploadComponent implements OnInit, OnDestroy, AfterViewInit {
 
@@ -38,7 +38,7 @@ export class ProfleApprovalBulkUploadComponent implements OnInit, OnDestroy, Aft
   dataSource: MatTableDataSource<any>
   // tslint:disable-next-line:max-line-length
   displayedColumns: string[] = ['fileName', 'status', 'failedRecordsCount', 'successfulRecordsCount', 'totalRecords', 'dateCreatedOn', 'dateUpdatedOn']
-  tabledata!: ITableData
+  tabledata!: any
   departments: string[] = []
   contactUsUrl = ''
   fileSelected!: any

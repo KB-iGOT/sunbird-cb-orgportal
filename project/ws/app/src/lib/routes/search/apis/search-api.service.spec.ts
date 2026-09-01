@@ -1,8 +1,9 @@
 import { TestBed } from '@angular/core/testing'
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing'
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing'
 import { SearchApiService } from './search-api.service'
 import { ISocialSearchRequest, ISocialSearchResult, ISearchAutoComplete } from '../models/search.model'
 import { NSSearch } from '@sunbird-cb/collection'
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 
 describe('SearchApiService', () => {
   let service: SearchApiService
@@ -10,9 +11,9 @@ describe('SearchApiService', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
-      providers: [SearchApiService]
-    })
+    imports: [],
+    providers: [SearchApiService, provideHttpClient(withInterceptorsFromDi()), provideHttpClientTesting()]
+})
 
     service = TestBed.inject(SearchApiService)
     httpMock = TestBed.inject(HttpTestingController)

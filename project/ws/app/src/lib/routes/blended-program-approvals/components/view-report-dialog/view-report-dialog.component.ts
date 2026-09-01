@@ -1,15 +1,16 @@
 import { Component, Inject, OnInit } from '@angular/core'
 import { UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms'
-import { MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA, MatLegacyDialogRef as MatDialogRef } from '@angular/material/legacy-dialog'
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog'
 /* tslint:disable */
 import * as _ from 'lodash'
 import { BlendedApporvalService } from '../../services/blended-approval.service'
 /* tslint:enable */
 
 @Component({
-  selector: 'ws-auth-app-view-report-dialog',
-  templateUrl: './view-report-dialog.component.html',
-  styleUrls: ['./view-report-dialog.component.scss'],
+    selector: 'ws-auth-app-view-report-dialog',
+    templateUrl: './view-report-dialog.component.html',
+    styleUrls: ['./view-report-dialog.component.scss'],
+    standalone: false
 })
 export class ViewReportDialogComponent implements OnInit {
   reasonForm!: UntypedFormGroup

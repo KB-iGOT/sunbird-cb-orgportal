@@ -8,9 +8,10 @@ import * as _ from 'lodash'
 /* tslint:enable */
 
 @Component({
-  selector: 'ws-app-mdoinfo',
-  templateUrl: './mdoinfo.component.html',
-  styleUrls: ['./mdoinfo.component.scss'],
+    selector: 'ws-app-mdoinfo',
+    templateUrl: './mdoinfo.component.html',
+    styleUrls: ['./mdoinfo.component.scss'],
+    standalone: false
 })
 export class MdoinfoComponent implements OnInit, OnDestroy {
   @ViewChild('stickyMenu', { static: true }) menuElement!: ElementRef

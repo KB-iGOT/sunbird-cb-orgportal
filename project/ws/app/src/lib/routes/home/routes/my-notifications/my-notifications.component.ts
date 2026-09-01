@@ -6,9 +6,10 @@ import { NotificationsService } from '../../../../../../../../../src/app/service
 import { MatSnackBar } from '@angular/material/snack-bar'
 
 @Component({
-  selector: 'ws-app-my-notifications',
-  templateUrl: './my-notifications.component.html',
-  styleUrls: ['./my-notifications.component.scss']
+    selector: 'ws-app-my-notifications',
+    templateUrl: './my-notifications.component.html',
+    styleUrls: ['./my-notifications.component.scss'],
+    standalone: false
 })
 export class MyNotificationsComponent {
   environment: any

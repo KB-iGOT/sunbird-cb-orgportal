@@ -32,9 +32,9 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser'
 import { ViewerDataService } from '../../viewer-data.service'
 import { ViewerHeaderSideBarToggleService } from './../../viewer-header-side-bar-toggle.service'
 import { FinalAssessmentPopupComponent } from './components/final-assessment-popup/final-assessment-popup.component'
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog'
+import { MatDialog } from '@angular/material/dialog'
 import { MatSidenav } from '@angular/material/sidenav'
-import { MatLegacySnackBar as MatSnackBar, MatLegacySnackBarConfig as MatSnackBarConfig } from '@angular/material/legacy-snack-bar'
+import { MatSnackBar, MatSnackBarConfig } from '@angular/material/snack-bar'
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms'
 
 // import { ViewerDataService } from '../../viewer-data.service'
@@ -43,6 +43,7 @@ export type FetchStatus = 'hasMore' | 'fetching' | 'done' | 'error' | 'none'
   selector: 'viewer-plugin-practice',
   templateUrl: './practice.component.html',
   styleUrls: ['./practice.component.scss'],
+  standalone: false,
 })
 // ComponentCanDeactivate
 export class PracticeComponent implements OnInit, OnChanges, OnDestroy {
@@ -2022,7 +2023,7 @@ export class PracticeComponent implements OnInit, OnChanges, OnDestroy {
         }
       } else {
         if (
-          correctOptions.sort((a, b) => a.localeCompare(b)).join(',') === selectedOptions.sort((a, b) => a.localeCompare(b)).join(',')
+          correctOptions.sort((a: string, b: string) => a.localeCompare(b)).join(',') === selectedOptions.sort((a: string, b: string) => a.localeCompare(b)).join(',')
         ) {
           this.numCorrectAnswers += 1
         } else if (selectedOptions.length > 0) {

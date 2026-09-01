@@ -10,9 +10,10 @@ import { IKhubItemTile, IKhubViewResultDocs } from '../../models/knowledgeHub.mo
 export type IKhubFetchStatus = 'hasMore' | 'fetching' | 'done' | 'error' | 'none'
 
 @Component({
-  selector: 'ws-app-knowledge',
-  templateUrl: './knowledge.component.html',
-  styleUrls: ['./knowledge.component.scss'],
+    selector: 'ws-app-knowledge',
+    templateUrl: './knowledge.component.html',
+    styleUrls: ['./knowledge.component.scss'],
+    standalone: false
 })
 export class KnowledgeComponent implements OnInit, OnDestroy {
   defaultSideNavBarOpenedSubscription: Subscription | null = null

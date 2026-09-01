@@ -1,6 +1,6 @@
 import { UserCardComponent } from './user-card.component'
-import { LegacyPageEvent as PageEvent } from '@angular/material/legacy-paginator'
-import { MatLegacyTableDataSource as MatTableDataSource } from '@angular/material/legacy-table'
+import { PageEvent } from '@angular/material/paginator'
+import { MatTableDataSource } from '@angular/material/table'
 
 describe('UserCardComponent', () => {
     let component: UserCardComponent

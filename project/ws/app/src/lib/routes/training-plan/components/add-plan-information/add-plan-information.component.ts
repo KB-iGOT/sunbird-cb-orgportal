@@ -8,13 +8,14 @@ import { Subscription } from 'rxjs'
   selector: 'ws-app-add-plan-information',
   templateUrl: './add-plan-information.component.html',
   styleUrls: ['./add-plan-information.component.scss'],
+  standalone: false
 })
 export class AddPlanInformationComponent implements OnInit, OnDestroy {
 
   @Output() planTitleInvalid = new EventEmitter<any>()
 
   contentForm!: UntypedFormGroup
-  private subscr: Subscription = new Subscription()
+  private subscr: Subscription | any = new Subscription()
   specialCharList = `( a-z/A-Z , 0-9 . _ - $ / \ : [ ]' ' !)`
   constructor(
     private formBuilder: UntypedFormBuilder,
@@ -29,10 +30,10 @@ export class AddPlanInformationComponent implements OnInit, OnDestroy {
     }
     this.contentForm = this.formBuilder.group({
       name:
-        new UntypedFormControl('', [Validators.required, Validators.pattern(noSpecialChar), Validators.minLength(10)]),
+        new UntypedFormControl('', [Validators.required, Validators.pattern(noSpecialChar), Validators.minLength(10), Validators.maxLength(70)]),
     })
 
-    this.subscr = this.subscr.add(this.contentForm.controls['name'].valueChanges.pipe(debounceTime(500)).subscribe((_ele: any) => {
+    this.subscr.add(this.contentForm.controls['name'].valueChanges.pipe(debounceTime(500)).subscribe((_ele: any) => {
       if (!this.contentForm.invalid) {
         this.tpdsSvc.trainingPlanTitle = _ele
         this.tpdsSvc.trainingPlanStepperData.name = _ele

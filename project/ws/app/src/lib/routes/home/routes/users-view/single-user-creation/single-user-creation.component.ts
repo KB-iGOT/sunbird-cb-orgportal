@@ -2,10 +2,10 @@ import { AfterViewInit, Component, ElementRef, EventEmitter, Input, OnDestroy, O
 import { UntypedFormBuilder, UntypedFormControl, Validators } from '@angular/forms'
 import { MomentDateAdapter } from '@angular/material-moment-adapter'
 import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE } from '@angular/material/core'
-import { MatLegacyCheckboxChange as MatCheckboxChange } from '@angular/material/legacy-checkbox'
-import { MatLegacyChipInputEvent as MatChipInputEvent } from '@angular/material/legacy-chips'
-import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar'
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog'
+import { MatCheckboxChange } from '@angular/material/checkbox'
+import { MatChipInputEvent } from '@angular/material/chips'
+import { MatSnackBar } from '@angular/material/snack-bar'
+import { MatDialog } from '@angular/material/dialog'
 import { HttpErrorResponse } from '@angular/common/http'
 import { COMMA, ENTER } from '@angular/cdk/keycodes'
 import { Subject } from 'rxjs'
@@ -43,16 +43,19 @@ const PIN_CODE_PATTERN = /^[1-9][0-9]{5}$/
     { provide: DateAdapter, useClass: MomentDateAdapter, deps: [MAT_DATE_LOCALE] },
     { provide: MAT_DATE_FORMATS, useValue: MY_FORMATS },
   ],
+  standalone: false
 })
 export class SingleUserCreationComponent implements OnInit, AfterViewInit, OnDestroy {
 
   @Input() selectedOrgData: any
   @Input() editUserData: any
+  @Input() isNgo: boolean = false
   @Output() userCreated = new EventEmitter<any>()
 
   @ViewChildren('rolesCheckbox') checkboxes!: QueryList<ElementRef>
   @ViewChild('updateconfirm') updateConfirmTemplate!: TemplateRef<any>
   defaultRole = ['PUBLIC']
+  defaultNgoDesignation = 'Volunteer'
   private destroySubject$ = new Subject()
   separatorKeysCodes: number[] = [ENTER, COMMA]
   masterData: any = {}
@@ -72,6 +75,7 @@ export class SingleUserCreationComponent implements OnInit, AfterViewInit, OnDes
 
   displayLoader = false
   isMdoLeader = false
+  isMoAdmin = false
   orgHasDesignations = false
   designationSearchText = ''
 
@@ -154,19 +158,37 @@ export class SingleUserCreationComponent implements OnInit, AfterViewInit, OnDes
   }
 
   ngOnInit() {
-    if (this.selectedOrgData && this.selectedOrgData.roleId && !this.userCreationForm.contains('department')) {
+    if (this.selectedOrgData && this.selectedOrgData.roleId && !this.userCreationForm.contains('department') && !this.isNgo) {
       this.userCreationForm.addControl('department', new UntypedFormControl({ value: this.selectedOrgData.depatName, disabled: true }))
       if (this.editUserData) {
         this.assignData()
       }
     }
-    this.checkOrgHasDesignations()
+
+    // Remove validators for designation and group if isNgo is true
+    if (this.isNgo) {
+      this.userCreationForm.get('designation')?.clearValidators()
+      this.userCreationForm.get('designation')?.updateValueAndValidity()
+      this.userCreationForm.get('group')?.clearValidators()
+      this.userCreationForm.get('group')?.updateValueAndValidity()
+      if (!this.userCreationForm.contains('externalId')) {
+        this.userCreationForm.addControl('externalId', new UntypedFormControl(''))
+      }
+      if (this.editUserData) {
+        this.assignData()
+      }
+    } else {
+      // Only load designation and group data if not NGO
+      this.checkOrgHasDesignations()
+      this.getGroups()
+    }
+
     this.getMasterLanguages()
-    this.getGroups()
     this.getOrgRolesList()
     const fullProfile = _.get(this.activatedRouter?.snapshot, 'data.configService')
     if (fullProfile?.unMappedUser && fullProfile?.unMappedUser?.roles) {
       this.isMdoLeader = fullProfile?.unMappedUser?.roles.includes('MDO_LEADER')
+      this.isMoAdmin = fullProfile?.unMappedUser?.roles.includes('MDO_ADMIN')
     }
   }
 
@@ -180,13 +202,20 @@ export class SingleUserCreationComponent implements OnInit, AfterViewInit, OnDes
       switch (ele) {
         case 'designation':
         case 'group':
-          this.userCreationForm.get(ele)?.patchValue(this.editUserData?.profileDetails?.professionalDetails?.[0][ele] || '')
+          this.userCreationForm.get(ele)?.patchValue(this.editUserData?.profileDetails?.professionalDetails?.[0]?.[ele] || '')
           break
         case 'tags':
           this.userCreationForm.get(ele)?.patchValue(this.editUserData?.profileDetails?.additionalProperties?.tag || [])
           break
+        case 'externalId':
+          this.userCreationForm.get(ele)?.patchValue(this.editUserData?.profileDetails?.additionalProperties?.externalSystemId || '')
+          break
         case 'pincode':
-          this.userCreationForm.get(ele)?.patchValue(this.editUserData?.profileDetails?.employmentDetails?.pinCode || '')
+          this.userCreationForm.get(ele)?.patchValue(
+            this.isNgo
+              ? (this.editUserData?.profileDetails?.personalDetails?.pinCode
+                || this.editUserData?.profileDetails?.employmentDetails?.pinCode || '')
+              : (this.editUserData?.profileDetails?.employmentDetails?.pinCode || ''))
           break
         case 'roles':
           this.userCreationForm.get(ele)?.patchValue(this.editUserData?.[ele] || [])
@@ -360,7 +389,7 @@ export class SingleUserCreationComponent implements OnInit, AfterViewInit, OnDes
   }
 
   setDefaultValue(): void {
-    if (!this.userCreationForm.get('roles')?.value || this.userCreationForm.get('roles')?.value.length === 0) {
+    if (!this.isNgo && (!this.userCreationForm.get('roles')?.value || this.userCreationForm.get('roles')?.value.length === 0)) {
       // tslint:disable-next-line
       this.userCreationForm.get('roles')!.patchValue(this.defaultRole)
     }
@@ -479,10 +508,16 @@ export class SingleUserCreationComponent implements OnInit, AfterViewInit, OnDes
           this.masterData['rolesList'] = JSON.parse(res.result.response.value)
           if (Array.isArray(this.masterData.rolesList.orgTypeList)) {
             const mdoArray = this.masterData.rolesList.orgTypeList.find((elem: any) => elem.name === 'MDO')
+            const ngoArray = this.masterData.rolesList.orgTypeList.find((elem: any) => elem.name === 'NGO')
             this.masterData['mdoRoles'] = mdoArray.roles || []
+            this.masterData['ngoRoles'] = ngoArray.roles || []
             // Filter based on isMdoLeader flag
-            if (this.isMdoLeader) {
+            if (this.isNgo) {
+              this.filteredRoles = this.masterData?.ngoRoles
+            } else if (this.isMdoLeader) {
               this.filteredRoles = this.masterData?.mdoRoles  // show all roles
+            } else if (this.isMoAdmin) {
+              this.filteredRoles = this.masterData?.mdoRoles.filter((role: any) => role !== 'MDO_LEADER'&& role !=='MDO_ADMIN')  // show only PUBLIC
             } else {
               this.filteredRoles = this.masterData?.mdoRoles.filter((role: any) => role === 'PUBLIC')  // show only PUBLIC
             }
@@ -505,7 +540,11 @@ export class SingleUserCreationComponent implements OnInit, AfterViewInit, OnDes
       }
     }
     // tslint:disable-next-line
-    this.userCreationForm.get('roles')!.patchValue([...this.defaultRole, ...this.rolesArr])
+    if (this.isNgo) {
+      this.userCreationForm.get('roles')!.patchValue(this.rolesArr)
+    } else {
+      this.userCreationForm.get('roles')!.patchValue([...this.defaultRole, ...this.rolesArr])
+    }
   }
 
   handleAddTags(event: MatChipInputEvent): void {
@@ -518,12 +557,18 @@ export class SingleUserCreationComponent implements OnInit, AfterViewInit, OnDes
 
     if ((value && value.trim()) && this.userCreationForm.get('tags')) {
       // tslint:disable-next-line
-      this.userCreationForm.get('tags')!.value.push(value)
+      this.userCreationForm.get('tags')!.value.push(value.trim())
     }
 
     if (event.input) {
       event.input.value = ''
     }
+
+    // Clear textbox
+    event.value = ''
+
+    // Optional - mark form control update
+    this.userCreationForm.get('tags')?.updateValueAndValidity()
   }
 
   handleValidTags(event: any): any {
@@ -566,16 +611,64 @@ export class SingleUserCreationComponent implements OnInit, AfterViewInit, OnDes
     if (this.selectedOrgData && this.selectedOrgData.roleId) {
       dataToSubmit.channel = this.selectedOrgData.depatName
     }
+    if (this.isNgo) {
+      dataToSubmit.designation = this.defaultNgoDesignation
+    }
 
     if (!this.userCreationForm.value.channel) {
       this.matSnackBar.open('Channel info is empty! So unable to create user')
       return
     }
 
-    const postData = {
-      personalDetails: '',
+    // Account-level fields go under personalDetails (top level), same contract the
+    // legacy create-user flow uses. Profile fields (gender, category, designation,
+    // group, pincode, tags, ehrmsId/externalId) must be nested the same way
+    // updateUser() below sends them, under profileDetails, otherwise they land in
+    // the wrong place in the request.
+    const postData: any = {
+      personalDetails: {
+        email: dataToSubmit.email,
+        firstName: dataToSubmit.firstName,
+        phone: dataToSubmit.phone,
+        channel: dataToSubmit.channel,
+        roles: dataToSubmit.roles,
+      },
+      profileDetails: {
+        personalDetails: {
+          dob: dataToSubmit.dob,
+          domicileMedium: dataToSubmit.domicileMedium,
+          gender: dataToSubmit.gender,
+          category: dataToSubmit.category,
+          mobile: dataToSubmit.phone,
+          primaryEmail: dataToSubmit.email,
+          firstname: dataToSubmit.firstName,
+          // NGO (volunteer org) users carry pin code in personalDetails
+          ...(this.isNgo ? { pinCode: dataToSubmit.pincode } : null)
+        },
+        // NGO (volunteer org) users have no professionalDetails
+        ...(this.isNgo ? null : {
+          professionalDetails: [
+            {
+              designation: dataToSubmit.designation,
+              group: dataToSubmit.group
+            }
+          ]
+        }),
+        additionalProperties: {
+          tag: dataToSubmit.tags,
+          ...(this.isNgo ? {
+            externalSystemId: (dataToSubmit.externalId || '').trim(),
+            externalSystem: 'eHRMS ID',
+          } : null)
+        },
+        employmentDetails: {
+          pinCode: dataToSubmit.pincode
+        }
+      }
     }
-    postData.personalDetails = dataToSubmit
+    if (this.isNgo) {
+      postData.isNgo = true
+    }
     this.usersService.createUser(postData)
       .pipe(takeUntil(this.destroySubject$))
       .subscribe((_res: any) => {
@@ -617,6 +710,10 @@ export class SingleUserCreationComponent implements OnInit, AfterViewInit, OnDes
       dataToSubmit.channel = this.selectedOrgData.depatName
     }
 
+    if (this.isNgo) {
+      dataToSubmit.designation = this.defaultNgoDesignation
+    }
+
     if (!this.userCreationForm.value.channel) {
       this.matSnackBar.open('Channel info is empty! So unable to create user')
       return
@@ -633,16 +730,25 @@ export class SingleUserCreationComponent implements OnInit, AfterViewInit, OnDes
             category: dataToSubmit.category,
             mobile: dataToSubmit.phone,
             primaryEmail: dataToSubmit.email,
-            firstname: dataToSubmit.firstName
+            firstname: dataToSubmit.firstName,
+            // NGO (volunteer org) users carry pin code in personalDetails
+            ...(this.isNgo ? { pinCode: dataToSubmit.pincode } : null)
           },
-          professionalDetails: [
-            {
-              designation: dataToSubmit.designation,
-              group: dataToSubmit.group
-            }
-          ],
+          // NGO (volunteer org) users have no professionalDetails
+          ...(this.isNgo ? null : {
+            professionalDetails: [
+              {
+                designation: dataToSubmit.designation,
+                group: dataToSubmit.group
+              }
+            ]
+          }),
           additionalProperties: {
-            tag: dataToSubmit.tags
+            tag: dataToSubmit.tags,
+            ...(this.isNgo ? {
+              externalSystemId: (dataToSubmit.externalId || '').trim(),
+              externalSystem: 'eHRMS ID',
+            } : null)
           },
           employmentDetails: {
             pinCode: dataToSubmit.pincode

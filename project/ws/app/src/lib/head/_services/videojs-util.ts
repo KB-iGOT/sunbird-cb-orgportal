@@ -5,11 +5,9 @@ import 'videojs-hls-quality-selector'
 import 'videojs-vr'
 
 import { Subscription, interval, fromEvent } from 'rxjs'
-// import { IWidgetsPlayerMediaData } from '../_models/player-media.model'
 import { WsEvents } from '@sunbird-cb/utils-v2'
 import { ROOT_WIDGET_CONFIG } from '@sunbird-cb/collection'
 import { NsContent } from './widget-content.model'
-import { IWidgetsPlayerMediaData, ROOT_WIDGET_CONFIG } from '@sunbird-cb/collection'
 
 export interface IWidgetsPlayerMediaData {
   subtitles?: {
@@ -92,8 +90,7 @@ function eventDispatchHelper(
   playerState: string,
   mimeT: string,
 ) {
-  //|| WsEvents.EnumTelemetrySubType.Unloaded
-  if (state === WsEvents.EnumTelemetrySubType.Loaded) {
+  if (state === WsEvents.EnumTelemetrySubType.Loaded || state === WsEvents.EnumTelemetrySubType.Unloaded) {
     const event = {
       eventType: WsEvents.WsEventType.Telemetry,
       eventLogLevel: WsEvents.WsEventLogLevel.Info,

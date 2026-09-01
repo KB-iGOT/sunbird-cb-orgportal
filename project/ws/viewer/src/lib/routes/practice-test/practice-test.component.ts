@@ -8,13 +8,14 @@ import { NsContent } from '@sunbird-cb/collection'
 import { NSQuiz } from '../../plugins/quiz/quiz.model'
 import { ViewerPreviewPopupComponent } from '../../viewer-preview-popup/viewer-preview-popup.component'
 // import { ViewerDataService } from '../../viewer-data.service'
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog'
+import { MatDialog } from '@angular/material/dialog'
 import { WidgetContentService } from '@sunbird-cb/toc'
 import { AccessControlService } from '@sunbird-cb/toc'
 @Component({
     selector: 'viewer-practice',
     templateUrl: './practice-test.component.html',
     styleUrls: ['./practice-test.component.scss'],
+    standalone: false,
 })
 export class PracticeTestComponent implements OnInit, OnDestroy {
     isPreviewMode = false

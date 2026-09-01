@@ -62,3 +62,33 @@
     </div>
   </div>
 </ng-container>
+
+<ng-container *ngIf="data.type === 'download-file-with-progress'">
+  <div class="info-dialog-wrapper relative">
+    <div class="text-center mt-8">
+      <img src="/assets/icons/i-icon-large.svg" alt="success-icon" class="mb-4">
+        <ng-container>
+          <div *ngIf="!isComplete">
+            <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+            <div class="mb-4 mt-4 downloading-text">Downloading report for {{ items[currentIndex]?.orgName || 'file' }} ({{ currentIndex + 1 }}/{{ items?.length || 0 }})</div>
+          </div>
+          <div *ngIf="results && results.length > 0" class="errors-list mt-4">
+            <ng-container *ngFor="let result of results">
+              <div *ngIf="result.status === 'Failed'" class="error-section mt-2">
+                <div class="error-title">Failed: {{result.item.orgName || 'Download'}}</div>
+                <div class="error-message">{{result.message}}</div>
+              </div>
+            </ng-container>
+          </div>
+        </ng-container>
+    </div>
+    <div class="actions flex justify-center items-center gap-4 my-6 ">
+      <ng-container>
+        <button *ngIf="!isComplete" mat-flat-button (click)="cancel()" class="new-bg-color text-white" i18n> Cancel</button>
+        <button *ngIf="isComplete" mat-icon-button (click)="closeDialog()" aria-label="Close" class="close-btn">
+          <mat-icon>close</mat-icon>
+        </button>
+      </ng-container>
+    </div>
+  </div>
+</ng-container>

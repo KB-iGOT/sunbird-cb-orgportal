@@ -1,11 +1,11 @@
 import { UntypedFormBuilder } from '@angular/forms'
-import { MatLegacyTableDataSource as MatTableDataSource } from '@angular/material/legacy-table'
+import { MatTableDataSource } from '@angular/material/table'
 import { of, throwError } from 'rxjs'
 
 import { AssignListPopupComponent } from './assign-list-popup.component'
 import { ProfileV2Service } from '../../../services/home.servive'
 import { ConfigResolveService } from '../../../resolvers/config-resolve.service'
-import { MatLegacyDialogRef as MatDialogRef } from '@angular/material/legacy-dialog'
+import { MatDialogRef } from '@angular/material/dialog'
 
 describe('AssignListPopupComponent', () => {
     let component: AssignListPopupComponent

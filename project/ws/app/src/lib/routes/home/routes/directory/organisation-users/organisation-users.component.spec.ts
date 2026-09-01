@@ -1,150 +1,163 @@
-import { of, Subject } from 'rxjs'
+import { Subject } from 'rxjs'
 import { OrganisationUsersComponent } from './organisation-users.component'
 
 describe('OrganisationUsersComponent', () => {
   let component: OrganisationUsersComponent
   let mockActivatedRoute: any
   let mockRouter: any
-  let mockLoaderService: any
-  let mockOrgHieService: any
   let queryParamsSubject: Subject<any>
 
-  function createComponent(snapshotQueryParams: any = { roleId: 'org-001', tab: 'users' }) {
+  beforeEach(() => {
     queryParamsSubject = new Subject<any>()
+
     mockActivatedRoute = {
-      snapshot: { queryParams: snapshotQueryParams },
+      snapshot: {
+        data: {},
+        queryParams: { roleId: 'org-123', orgName: 'Test Org' },
+      },
       queryParams: queryParamsSubject.asObservable(),
     }
-    mockRouter = { navigate: jest.fn() }
-    mockLoaderService = { changeLoaderState: jest.fn() }
-    mockOrgHieService = {
-      getOrgReadData: jest.fn().mockReturnValue(of({ result: { response: { name: 'Test Org' } } })),
-      setOrgData: jest.fn(),
-      setParentOrgData: jest.fn(),
-    }
-    component = new OrganisationUsersComponent(
-      mockActivatedRoute,
-      mockRouter,
-      mockLoaderService,
-      mockOrgHieService
-    )
-  }
 
-  beforeEach(() => {
-    createComponent()
+    mockRouter = {
+      navigate: jest.fn(),
+    }
+
+    component = new OrganisationUsersComponent(mockActivatedRoute, mockRouter)
   })
 
-  afterEach(() => jest.clearAllMocks())
-
-  // ─── creation ──────────────────────────────────────────────────────────────
+  afterEach(() => {
+    jest.clearAllMocks()
+  })
 
   it('should create', () => {
     expect(component).toBeTruthy()
   })
 
-  it('should initialise defaults', () => {
-    expect(component.selectedTabIndex).toBe(0)
-    expect(component.tabs).toEqual([])
-    expect(component.orgDataLoaded).toBe(false)
-  })
+  describe('ngOnInit()', () => {
+    it('should set orgData and orgDataLoaded when resolver returns valid data without error', () => {
+      mockActivatedRoute.snapshot.data = { orgUsersData: { orgData: { id: 'org-123' }, parentOrgData: null, error: null } }
 
-  // ─── ngOnInit ──────────────────────────────────────────────────────────────
-
-  describe('ngOnInit', () => {
-    it('should set orgData from snapshot queryParams', () => {
       component.ngOnInit()
-      expect(component.orgData).toEqual({ roleId: 'org-001', tab: 'users' })
+
+      expect(component.orgData).toEqual(mockActivatedRoute.snapshot.queryParams)
+      expect(component.orgDataLoaded).toBe(true)
     })
 
-    it('should not override orgData when queryParams is falsy', () => {
-      createComponent(null)
-      jest.spyOn(component, 'checkAndGetOrgData').mockResolvedValue(undefined)
+    it('should not set orgDataLoaded when resolver returns error', () => {
+      mockActivatedRoute.snapshot.data = { orgUsersData: { orgData: null, parentOrgData: null, error: 'No organisationId provided' } }
+
       component.ngOnInit()
-      expect(component.orgData).toBeUndefined()
+
+      expect(component.orgDataLoaded).toBe(false)
     })
 
-    it('should populate the 6 tabs', () => {
+    it('should not set orgDataLoaded when orgUsersData is missing from resolver', () => {
+      mockActivatedRoute.snapshot.data = {}
+
       component.ngOnInit()
-      expect(component.tabs).toHaveLength(6)
-      expect(component.tabs.map(t => t.value)).toEqual([
-        'users',
-        'rolesAndAccess',
-        'mentorManagement',
-        'designationMaster',
-        'userOnboarding',
-        'userTransfer',
-      ])
+
+      expect(component.orgDataLoaded).toBe(false)
     })
 
-    it('should set selectedTabIndex from queryParams tab', () => {
+    it('should initialise tabs array with 6 tabs', () => {
       component.ngOnInit()
+
+      expect(component.tabs.length).toBe(6)
+      expect(component.tabs[0]).toEqual({ name: 'Users', value: 'users' })
+      expect(component.tabs[1]).toEqual({ name: 'Roles and access', value: 'rolesAndAccess' })
+      expect(component.tabs[2]).toEqual({ name: 'Mentor Management', value: 'mentorManagement' })
+      expect(component.tabs[3]).toEqual({ name: 'Designation Master', value: 'designationMaster' })
+      expect(component.tabs[4]).toEqual({ name: 'User Onboarding', value: 'userOnboarding' })
+      expect(component.tabs[5]).toEqual({ name: 'User Transfer', value: 'userTransfer' })
+    })
+
+    it('should update selectedTabIndex when queryParams emits a known tab value', () => {
+      component.ngOnInit()
+
       queryParamsSubject.next({ tab: 'rolesAndAccess' })
+
       expect(component.selectedTabIndex).toBe(1)
     })
 
-    it('should not change selectedTabIndex if tab value is not found', () => {
+    it('should update selectedTabIndex to correct index for designationMaster tab', () => {
       component.ngOnInit()
-      queryParamsSubject.next({ tab: 'nonExistentTab' })
-      expect(component.selectedTabIndex).toBe(0)
-    })
 
-    it('should not change selectedTabIndex if params has no tab key', () => {
-      component.ngOnInit()
-      queryParamsSubject.next({})
-      expect(component.selectedTabIndex).toBe(0)
-    })
+      queryParamsSubject.next({ tab: 'designationMaster' })
 
-    it('should call checkAndGetOrgData', () => {
-      const spy = jest.spyOn(component, 'checkAndGetOrgData')
-      component.ngOnInit()
-      expect(spy).toHaveBeenCalled()
-    })
-  })
-
-  // ─── checkAndGetOrgData ────────────────────────────────────────────────────
-
-  describe('checkAndGetOrgData', () => {
-    it('should resolve after calling getOrgData', async () => {
-      component.orgData = { roleId: 'org-001' }
-      await expect(component.checkAndGetOrgData()).resolves.toBeUndefined()
-    })
-  })
-
-  // ─── getCurrentTabDetails ──────────────────────────────────────────────────
-
-  describe('getCurrentTabDetails', () => {
-    it('should return the current tab when tabs are populated', () => {
-      component.ngOnInit()
-      component.selectedTabIndex = 2
-      const tab = component.getCurrentTabDetails()
-      expect(tab?.value).toBe('mentorManagement')
-    })
-
-    it('should return null when tabs is empty', () => {
-      component.tabs = []
-      component.selectedTabIndex = 0
-      expect(component.getCurrentTabDetails()).toBeNull()
-    })
-
-    it('should return null when selectedTabIndex is out of range', () => {
-      component.ngOnInit()
-      component.selectedTabIndex = 99
-      expect(component.getCurrentTabDetails()).toBeNull()
-    })
-  })
-
-  // ─── onTabChange ───────────────────────────────────────────────────────────
-
-  describe('onTabChange', () => {
-    beforeEach(() => component.ngOnInit())
-
-    it('should update selectedTabIndex', () => {
-      component.onTabChange(3)
       expect(component.selectedTabIndex).toBe(3)
     })
 
-    it('should navigate with the tab value as queryParam', () => {
+    it('should not update selectedTabIndex when tab param is absent', () => {
+      component.ngOnInit()
+      component.selectedTabIndex = 2
+
+      queryParamsSubject.next({ someOtherParam: 'value' })
+
+      expect(component.selectedTabIndex).toBe(2)
+    })
+
+    it('should not update selectedTabIndex when tab value is not found in tabs', () => {
+      component.ngOnInit()
+      component.selectedTabIndex = 0
+
+      queryParamsSubject.next({ tab: 'unknownTab' })
+
+      expect(component.selectedTabIndex).toBe(0)
+    })
+  })
+
+  describe('getCurrentTabDetails()', () => {
+    beforeEach(() => {
+      component.ngOnInit()
+    })
+
+    it('should return the tab at the current selectedTabIndex', () => {
+      component.selectedTabIndex = 0
+
+      const result: any = component.getCurrentTabDetails()
+
+      expect(result).toEqual({ name: 'Users', value: 'users' })
+    })
+
+    it('should return the correct tab when selectedTabIndex is non-zero', () => {
+      component.selectedTabIndex = 2
+
+      const result: any = component.getCurrentTabDetails()
+
+      expect(result).toEqual({ name: 'Mentor Management', value: 'mentorManagement' })
+    })
+
+    it('should return null when tabs array is empty', () => {
+      component.tabs = []
+
+      const result: any = component.getCurrentTabDetails()
+
+      expect(result).toBeNull()
+    })
+
+    it('should return null when selectedTabIndex is out of bounds', () => {
+      component.selectedTabIndex = 99
+
+      const result: any = component.getCurrentTabDetails()
+
+      expect(result).toBeNull()
+    })
+  })
+
+  describe('onTabChange()', () => {
+    beforeEach(() => {
+      component.ngOnInit()
+    })
+
+    it('should set selectedTabIndex', () => {
+      component.onTabChange(2)
+
+      expect(component.selectedTabIndex).toBe(2)
+    })
+
+    it('should navigate with the selected tab value as query param', () => {
       component.onTabChange(1)
+
       expect(mockRouter.navigate).toHaveBeenCalledWith([], {
         relativeTo: mockActivatedRoute,
         queryParams: { tab: 'rolesAndAccess' },
@@ -152,117 +165,105 @@ describe('OrganisationUsersComponent', () => {
       })
     })
 
-    it('should not navigate if selectedTab has no value', () => {
-      component.tabs = [{ name: 'No Value' }]
+    it('should navigate with userOnboarding tab value', () => {
+      component.onTabChange(4)
+
+      expect(mockRouter.navigate).toHaveBeenCalledWith([], {
+        relativeTo: mockActivatedRoute,
+        queryParams: { tab: 'userOnboarding' },
+        queryParamsHandling: 'merge',
+      })
+    })
+
+    it('should not call navigate when tab index is out of bounds', () => {
+      component.onTabChange(99)
+
+      expect(mockRouter.navigate).not.toHaveBeenCalled()
+    })
+
+    it('should not call navigate when tab has no value property', () => {
+      component.tabs = [{ name: 'No Value Tab' }]
       component.onTabChange(0)
+
       expect(mockRouter.navigate).not.toHaveBeenCalled()
     })
   })
 
-  // ─── onCreateUser ──────────────────────────────────────────────────────────
-
-  describe('onCreateUser', () => {
-    beforeEach(() => component.ngOnInit())
-
-    it('should switch to userOnboarding tab when event is truthy', () => {
-      component.onCreateUser('clicked')
-      const expectedIndex = component.tabs.findIndex(t => t.value === 'userOnboarding')
-      expect(component.selectedTabIndex).toBe(expectedIndex)
+  describe('onCreateUser()', () => {
+    beforeEach(() => {
+      component.ngOnInit()
     })
 
-    it('should not change tab when event is falsy', () => {
-      component.selectedTabIndex = 0
+    it('should navigate to userOnboarding tab when event is truthy', () => {
+      component.onCreateUser({ someEvent: true })
+
+      expect(mockRouter.navigate).toHaveBeenCalledWith([], expect.objectContaining({
+        queryParams: { tab: 'userOnboarding' },
+      }))
+    })
+
+    it('should not navigate when event is falsy', () => {
       component.onCreateUser(null)
-      expect(component.selectedTabIndex).toBe(0)
+
+      expect(mockRouter.navigate).not.toHaveBeenCalled()
+    })
+
+    it('should not navigate when event is undefined', () => {
+      component.onCreateUser(undefined)
+
+      expect(mockRouter.navigate).not.toHaveBeenCalled()
     })
   })
 
-  // ─── showDesTab ────────────────────────────────────────────────────────────
+  describe('showDesTab()', () => {
+    beforeEach(() => {
+      component.ngOnInit()
+    })
 
-  describe('showDesTab', () => {
-    beforeEach(() => component.ngOnInit())
-
-    it('should switch to designationMaster tab when event is truthy', () => {
+    it('should navigate to designationMaster tab when event is truthy', () => {
       component.showDesTab(true)
-      const expectedIndex = component.tabs.findIndex(t => t.value === 'designationMaster')
-      expect(component.selectedTabIndex).toBe(expectedIndex)
+
+      expect(mockRouter.navigate).toHaveBeenCalledWith([], expect.objectContaining({
+        queryParams: { tab: 'designationMaster' },
+      }))
     })
 
-    it('should not change tab when event is falsy', () => {
-      component.selectedTabIndex = 0
+    it('should not navigate when event is falsy', () => {
+      component.showDesTab(false)
+
+      expect(mockRouter.navigate).not.toHaveBeenCalled()
+    })
+
+    it('should not navigate when event is null', () => {
       component.showDesTab(null)
-      expect(component.selectedTabIndex).toBe(0)
+
+      expect(mockRouter.navigate).not.toHaveBeenCalled()
     })
   })
 
-  // ─── onUserCreated ─────────────────────────────────────────────────────────
-
-  describe('onUserCreated', () => {
-    beforeEach(() => component.ngOnInit())
-
-    it('should switch to users tab when event is truthy', () => {
-      component.selectedTabIndex = 3
-      component.onUserCreated('created')
-      expect(component.selectedTabIndex).toBe(0)
+  describe('onUserCreated()', () => {
+    beforeEach(() => {
+      component.ngOnInit()
     })
 
-    it('should not change tab when event is falsy', () => {
-      component.selectedTabIndex = 3
+    it('should navigate to users tab when event is truthy', () => {
+      component.onUserCreated({ userId: 'new-user' })
+
+      expect(mockRouter.navigate).toHaveBeenCalledWith([], expect.objectContaining({
+        queryParams: { tab: 'users' },
+      }))
+    })
+
+    it('should not navigate when event is falsy', () => {
       component.onUserCreated(null)
-      expect(component.selectedTabIndex).toBe(3)
-    })
-  })
 
-  // ─── getOrgData ────────────────────────────────────────────────────────────
-
-  describe('getOrgData', () => {
-    it('should call loaderService and getOrgReadData, then set orgDataLoaded=true', async () => {
-      component.orgData = { roleId: 'org-001' }
-      mockOrgHieService.getOrgReadData.mockReturnValue(
-        of({ result: { response: { name: 'Test Org' } } })
-      )
-      await component.getOrgData()
-      expect(mockLoaderService.changeLoaderState).toHaveBeenCalledWith(true)
-      expect(mockOrgHieService.getOrgReadData).toHaveBeenCalled()
-      expect(component.orgDataLoaded).toBe(true)
-      expect(mockLoaderService.changeLoaderState).toHaveBeenCalledWith(false)
+      expect(mockRouter.navigate).not.toHaveBeenCalled()
     })
 
-    it('should call setOrgData and setParentOrgData with null when response is not ministry', async () => {
-      component.orgData = { roleId: 'org-001' }
-      mockOrgHieService.getOrgReadData.mockReturnValue(
-        of({ result: { response: { name: 'State Org' } } })
-      )
-      await component.getOrgData()
-      expect(mockOrgHieService.setOrgData).toHaveBeenCalledWith(undefined)
-      expect(mockOrgHieService.setParentOrgData).toHaveBeenCalledWith(undefined)
-    })
+    it('should not navigate when event is undefined', () => {
+      component.onUserCreated(undefined)
 
-    it('should fetch parent org data when ministryOrStateType is ministry', async () => {
-      component.orgData = { roleId: 'org-001' }
-      const orgResponse = {
-        result: {
-          response: {
-            name: 'Ministry Org',
-            ministryOrStateType: 'ministry',
-            ministryOrStateId: 'parent-org-001',
-          },
-        },
-      }
-      const parentOrgResponse = {
-        result: { response: { name: 'Parent Ministry' } },
-      }
-      mockOrgHieService.getOrgReadData
-        .mockReturnValueOnce(of(orgResponse))
-        .mockReturnValueOnce(of(parentOrgResponse))
-
-      await component.getOrgData()
-
-      expect(mockOrgHieService.getOrgReadData).toHaveBeenCalledTimes(2)
-      expect(mockOrgHieService.setOrgData).toHaveBeenCalledWith(orgResponse.result.response)
-      expect(mockOrgHieService.setParentOrgData).toHaveBeenCalledWith(parentOrgResponse.result.response)
-      expect(component.orgDataLoaded).toBe(true)
+      expect(mockRouter.navigate).not.toHaveBeenCalled()
     })
   })
 })
-

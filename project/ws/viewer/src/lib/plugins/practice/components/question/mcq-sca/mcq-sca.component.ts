@@ -20,6 +20,7 @@ import { NsContent } from '@sunbird-cb/utils-v2'
     styleUrls: ['./mcq-sca.component.scss'],
     // tslint:disable-next-line
     encapsulation: ViewEncapsulation.None,
+    standalone: false,
     // changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SingleChoiseQuesComponent implements OnInit, OnDestroy {

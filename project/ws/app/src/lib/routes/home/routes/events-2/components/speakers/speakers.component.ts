@@ -1,12 +1,13 @@
 import { Component, Input } from '@angular/core'
 import { speaker } from '../../models/events.model'
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog'
+import { MatDialog } from '@angular/material/dialog'
 import { AddSpeakersComponent } from '../../dialogs/add-speakers/add-speakers.component'
 
 @Component({
-  selector: 'ws-app-speakers',
-  templateUrl: './speakers.component.html',
-  styleUrls: ['./speakers.component.scss']
+    selector: 'ws-app-speakers',
+    templateUrl: './speakers.component.html',
+    styleUrls: ['./speakers.component.scss'],
+    standalone: false
 })
 export class SpeakersComponent {
   @Input() speakersList: speaker[] = []

@@ -6,8 +6,8 @@ import { ApprovalPendingComponent } from './approval-pending.component'
 import { ApprovalsService } from '../../../services/approvals.service'
 import { ReportsVideoComponent } from '../../reports-video/reports-video.component'
 
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog'
-import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar'
+import { MatDialog } from '@angular/material/dialog'
+import { MatSnackBar } from '@angular/material/snack-bar'
 
 describe('ApprovalPendingComponent', () => {
 	let component: ApprovalPendingComponent

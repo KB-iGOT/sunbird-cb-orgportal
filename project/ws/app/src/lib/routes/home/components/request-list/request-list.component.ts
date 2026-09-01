@@ -1,12 +1,11 @@
 import { Component, OnInit } from '@angular/core'
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser'
-import { ITableData } from '@sunbird-cb/collection/lib/ui-org-table/interface/interfaces'
 import { ProfileV2Service } from '../../services/home.servive'
 import { DatePipe } from '@angular/common'
 import { ActivatedRoute, Router } from '@angular/router'
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog'
-import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar'
-import { MatLegacyTableDataSource as MatTableDataSource } from '@angular/material/legacy-table'
+import { MatDialog } from '@angular/material/dialog'
+import { MatSnackBar } from '@angular/material/snack-bar'
+import { MatTableDataSource } from '@angular/material/table'
 import { ConfirmationBoxComponent } from '../../../training-plan/components/confirmation-box/confirmation.box.component'
 import { AssignListPopupComponent } from './assign-list-popup/assign-list-popup.component'
 import { LoaderService } from '../../../../../../../../../src/app/services/loader.service'
@@ -25,9 +24,10 @@ export enum statusValue {
   selector: 'ws-app-request-list',
   templateUrl: './request-list.component.html',
   styleUrls: ['./request-list.component.scss'],
+  standalone: false
 })
 export class RequestListComponent implements OnInit {
-  tabledata: ITableData = {
+  tabledata: any = {
     columns: [
       { displayName: 'Request Id', key: 'demand_id' },
       { displayName: 'Title', key: 'title' },
@@ -241,7 +241,7 @@ export class RequestListComponent implements OnInit {
       demand_id: row.demand_id,
       newStatus: 'Invalid',
     }
-    this.homeService.markAsInvalid(request).subscribe(res => {
+    this.homeService.markAsInvalid(request).subscribe((res: any) => {
       this.invalidRes = res
       if (res) {
         setTimeout(() => {
@@ -315,7 +315,7 @@ export class RequestListComponent implements OnInit {
       orderBy: 'createdOn',
       orderDirection: 'ASC',
     }
-    this.homeService.getRequestList(request).subscribe(res => {
+    this.homeService.getRequestList(request).subscribe((res: { data: any; totalCount: any }) => {
       if (res) {
         this.requestListData = res.data
         if (this.requestListData) {

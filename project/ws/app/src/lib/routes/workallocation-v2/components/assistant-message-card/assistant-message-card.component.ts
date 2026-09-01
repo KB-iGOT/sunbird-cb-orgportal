@@ -6,9 +6,10 @@ import { WatStoreService } from '../../services/wat.store.service'
 // tslint:enable
 
 @Component({
-  selector: 'ws-app-assistant-message-card',
-  templateUrl: './assistant-message-card.component.html',
-  styleUrls: ['./assistant-message-card.component.scss'],
+    selector: 'ws-app-assistant-message-card',
+    templateUrl: './assistant-message-card.component.html',
+    styleUrls: ['./assistant-message-card.component.scss'],
+    standalone: false
 })
 
 export class AssistantMessageCardComponent implements OnInit, OnDestroy {

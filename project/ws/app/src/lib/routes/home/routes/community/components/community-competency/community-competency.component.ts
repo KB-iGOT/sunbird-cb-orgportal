@@ -1,13 +1,14 @@
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core'
-import { MatLegacyDialog } from '@angular/material/legacy-dialog'
-import { MatLegacySnackBar } from '@angular/material/legacy-snack-bar'
+import { MatDialog } from '@angular/material/dialog'
+import { MatSnackBar } from '@angular/material/snack-bar'
 import { EventsService } from '../../../events-2/services/events.service'
 import { CompetencyAddComponent } from '../../../../../../common/competency-add/competency-add.component'
 
 @Component({
-  selector: 'ws-app-community-competency',
-  templateUrl: './community-competency.component.html',
-  styleUrls: ['./community-competency.component.scss']
+    selector: 'ws-app-community-competency',
+    templateUrl: './community-competency.component.html',
+    styleUrls: ['./community-competency.component.scss'],
+    standalone: false
 })
 export class CommunityCompetencyComponent implements OnChanges {
   @Input() openMode = 'edit'
@@ -18,8 +19,8 @@ export class CommunityCompetencyComponent implements OnChanges {
   event: any
   eventId: any
 
-  constructor(private matSnackBar: MatLegacySnackBar,
-    private dialog: MatLegacyDialog,
+  constructor(private matSnackBar: MatSnackBar,
+    private dialog: MatDialog,
     private eventsService: EventsService,
   ) { }
 

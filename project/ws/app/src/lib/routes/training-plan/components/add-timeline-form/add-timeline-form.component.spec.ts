@@ -1,11 +1,13 @@
 import { AddTimelineFormComponent } from './add-timeline-form.component'
 import { DatePipe } from '@angular/common'
 import { TrainingPlanDataSharingService } from '../../services/training-plan-data-share.service'
+import { AparYearService } from '../../../../common/apar-year-select/apar-year.service'
 
 describe('AddTimelineFormComponent', () => {
     let component: AddTimelineFormComponent
     let tpdsSvcMock: jest.Mocked<TrainingPlanDataSharingService>
     let datePipeMock: jest.Mocked<DatePipe>
+    let aparYearSvcMock: jest.Mocked<AparYearService>
 
     beforeEach(() => {
         tpdsSvcMock = {
@@ -16,7 +18,11 @@ describe('AddTimelineFormComponent', () => {
             transform: jest.fn(),
         } as any
 
-        component = new AddTimelineFormComponent(tpdsSvcMock, datePipeMock)
+        aparYearSvcMock = {
+            getCurrentAparYear: jest.fn().mockReturnValue('2026-27'),
+        } as any
+
+        component = new AddTimelineFormComponent(tpdsSvcMock, datePipeMock, aparYearSvcMock)
     })
 
     describe('ngOnInit', () => {
@@ -30,6 +36,31 @@ describe('AddTimelineFormComponent', () => {
             tpdsSvcMock.trainingPlanStepperData.endDate = undefined
             component.ngOnInit()
             expect(component.todayDate).toBeUndefined()
+        })
+    })
+
+    describe('APAR year', () => {
+        it('should default to the current APAR year and share it with the stepper', () => {
+            component.ngOnInit()
+
+            expect(component.aparYear).toBe('2026-27')
+            expect(tpdsSvcMock.trainingPlanStepperData['aparYear']).toBe('2026-27')
+        })
+
+        it('should keep an APAR year already held by the stepper', () => {
+            tpdsSvcMock.trainingPlanStepperData['aparYear'] = '2024-25'
+
+            component.ngOnInit()
+
+            expect(component.aparYear).toBe('2024-25')
+            expect(aparYearSvcMock.getCurrentAparYear).not.toHaveBeenCalled()
+        })
+
+        it('should push a newly picked year to the stepper', () => {
+            component.changeAparYear('2023-24')
+
+            expect(component.aparYear).toBe('2023-24')
+            expect(tpdsSvcMock.trainingPlanStepperData['aparYear']).toBe('2023-24')
         })
     })
 

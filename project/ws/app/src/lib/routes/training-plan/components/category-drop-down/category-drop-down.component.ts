@@ -1,13 +1,14 @@
 import { Component, EventEmitter, Input, Output, OnInit, OnChanges } from '@angular/core'
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog'
+import { MatDialog } from '@angular/material/dialog'
 import { ConfirmationBoxComponent } from '../confirmation-box/confirmation.box.component'
 import { TrainingPlanDataSharingService } from '../../services/training-plan-data-share.service'
 import { debounceTime } from 'rxjs/operators'
 
 @Component({
-  selector: 'ws-app-category-drop-down',
-  templateUrl: './category-drop-down.component.html',
-  styleUrls: ['./category-drop-down.component.scss'],
+    selector: 'ws-app-category-drop-down',
+    templateUrl: './category-drop-down.component.html',
+    styleUrls: ['./category-drop-down.component.scss'],
+    standalone: false
 })
 export class CategoryDropDownComponent implements OnInit, OnChanges {
   @Input() categoryData: any[] = []
@@ -33,6 +34,7 @@ export class CategoryDropDownComponent implements OnInit, OnChanges {
           data.event === 'Moderated Course'
         ) {
           this.tpdsSvc.trainingPlanStepperData.contentList = []
+          this.tpdsSvc.trainingPlanSelectedContent = []
           this.tpdsSvc.trainingPlanContentData.data = []
         } else if (data.event === 'Designation' || data.event === 'AllUser' || data.event === 'CustomUser') {
           this.tpdsSvc.trainingPlanStepperData.assignmentTypeInfo = []

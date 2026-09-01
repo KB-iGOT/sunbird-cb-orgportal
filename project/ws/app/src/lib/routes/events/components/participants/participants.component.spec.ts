@@ -1,8 +1,8 @@
 import { of, Subject } from 'rxjs'
 
 // Mock Angular Material modules first
-jest.mock('@angular/material/legacy-table', () => ({
-    MatLegacyTableDataSource: jest.fn().mockImplementation(() => ({
+jest.mock('@angular/material/table', () => ({
+    MatTableDataSource: jest.fn().mockImplementation(() => ({
         data: []
     }))
 }))

@@ -9,9 +9,10 @@ import * as _ from 'lodash'
 import { CustomFieldsService } from '../../../../users/custom-fields.service'
 
 @Component({
-  selector: 'ws-app-create-form',
-  templateUrl: './create-form.component.html',
-  styleUrls: ['./create-form.component.scss']
+    selector: 'ws-app-create-form',
+    templateUrl: './create-form.component.html',
+    styleUrls: ['./create-form.component.scss'],
+    standalone: false
 })
 
 export class CreateFormComponent implements OnInit {

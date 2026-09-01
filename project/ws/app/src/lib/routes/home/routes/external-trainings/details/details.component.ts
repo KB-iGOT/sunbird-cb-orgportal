@@ -8,7 +8,8 @@ import { LoaderService } from '../../../../../../../../../../src/app/services/lo
 @Component({
   selector: 'ws-app-details',
   templateUrl: './details.component.html',
-  styleUrls: ['./details.component.scss']
+  styleUrls: ['./details.component.scss'],
+  standalone: false
 })
 export class DetailsComponent implements OnInit {
   training: any = {}
@@ -37,11 +38,10 @@ export class DetailsComponent implements OnInit {
       (response: any) => {
         const event = _.get(response, 'result.event', {})
         const durationInSeconds = event.duration || 0
-        const hours = durationInSeconds / 3600
-        const learningHours = hours > 0
-          ? (Number.isInteger(hours)
-            ? `${hours} Hour${hours !== 1 ? 's' : ''}`
-            : `${hours.toFixed(2)} Hours`)
+        const hours = Math.floor(durationInSeconds / 3600)
+        const minutes = Math.floor((durationInSeconds % 3600) / 60)
+        const learningHours = durationInSeconds > 0
+          ? `${hours}h ${minutes}m`
           : ''
 
         this.training = {

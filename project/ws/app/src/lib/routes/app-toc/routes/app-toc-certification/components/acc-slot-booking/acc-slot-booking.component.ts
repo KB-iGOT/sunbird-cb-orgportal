@@ -16,12 +16,13 @@ import { CertificationApiService } from '../../apis/certification-api.service'
 import { CertificationService } from '../../services/certification.service'
 import { ActivatedRoute, Router } from '@angular/router'
 import { SnackbarComponent } from '../snackbar/snackbar.component'
-import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar'
+import { MatSnackBar } from '@angular/material/snack-bar'
 
 @Component({
   selector: 'ws-app-acc-slot-booking',
   templateUrl: './acc-slot-booking.component.html',
   styleUrls: ['./acc-slot-booking.component.scss'],
+  standalone: false,
 })
 export class AccSlotBookingComponent implements OnInit {
   content?: NsContent.IContent

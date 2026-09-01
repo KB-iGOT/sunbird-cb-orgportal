@@ -44,6 +44,7 @@ interface IFeaturePermissionConfigs {
 const endpoint = {
   profilePid: '/apis/proxies/v8/api/user/v2/read',
   orgRead: '/apis/proxies/v8/org/v1/read',
+  formRead: '/apis/v1/form/read',
   // profileV2: '/apis/protected/v8/user/profileRegistry/getUserRegistryById',
   // details: `/apis/protected/v8/user/details?ts=${Date.now()}`,
   orgProfile: (orgId: string) => `/apis/proxies/v8/org/v1/profile/read?orgId=${orgId}`,
@@ -206,6 +207,7 @@ export class InitService {
       const appsConfigPromise = this.fetchAppsConfig()
       const instanceConfigPromise = this.fetchInstanceConfig() // config: depends only on details
       const widgetStatusPromise = this.fetchWidgetStatus() // widget: depends only on details & feature
+      const globalConfigPromise = this.fetchGlobalConfig() // global config: MDO portal page configuration
       await this.fetchFeaturesStatus() // feature: depends only on details
 
       /**
@@ -233,6 +235,11 @@ export class InitService {
           id => appsConfig.features[id],
         )
       }
+
+      /**
+       * Wait for the global config, components read it during their init
+       */
+      await globalConfigPromise
 
       // Apply the settings using settingsService
       this.settingsSvc.initializePrefChanges(environment.production)
@@ -328,9 +335,9 @@ export class InitService {
   // }
 
   private async fetchDefaultConfig(): Promise<NsInstanceConfig.IConfig> {
-    const publicConfig: NsInstanceConfig.IConfig = await this.http
+    const publicConfig = (await this.http
       .get<NsInstanceConfig.IConfig>(`${this.baseUrl}/host.config.json`)
-      .toPromise()
+      .toPromise())!
     this.configSvc.instanceConfig = publicConfig
     this.configSvc.rootOrg = publicConfig.rootOrg
     this.configSvc.org = publicConfig.org
@@ -349,9 +356,9 @@ export class InitService {
   }
 
   private async fetchAppsConfig(): Promise<NsAppsConfig.IAppsConfig> {
-    const appsConfig = await this.http
+    const appsConfig = (await this.http
       .get<NsAppsConfig.IAppsConfig>(`${this.baseUrl}/feature/apps.json`)
-      .toPromise()
+      .toPromise())!
     return appsConfig
   }
 
@@ -595,11 +602,37 @@ export class InitService {
     }
   }
 
-  private async fetchInstanceConfig(): Promise<NsInstanceConfig.IConfig> {
+  /**
+   * Reads the MDO portal global page configuration (APAR/CBP plan years, etc.)
+   * and keeps it on the config service for the whole app to use.
+   */
+  private async fetchGlobalConfig(): Promise<any> {
+    const request = {
+      request: {
+        type: 'mdo',
+        subType: 'global',
+        action: 'page-configuration',
+        component: 'portal',
+        rootOrgId: '*',
+      },
+    }
+    try {
+      this.configSvc.globalConfig = await this.http
+        .post<any>(endpoint.formRead, request)
+        .pipe(map((res: any) => _.get(res, 'result.form.data')))
+        .toPromise() || null
+    } catch (e) {
+      this.logger.warn('Unable to fetch the global config', e)
+      this.configSvc.globalConfig = null
+    }
+    return this.configSvc.globalConfig
+  }
+
+  private async fetchInstanceConfig(): Promise<NsInstanceConfig.IConfig | any> {
     // TODO: use the rootOrg and org to fetch the instance
-    const publicConfig = await this.http
+    const publicConfig = (await this.http
       .get<NsInstanceConfig.IConfig>(`${this.configSvc.sitePath}/site.config.json`)
-      .toPromise()
+      .toPromise())!
     this.configSvc.instanceConfig = publicConfig
     this.configSvc.rootOrg = publicConfig.rootOrg
     this.configSvc.org = publicConfig.org
@@ -610,11 +643,11 @@ export class InitService {
 
   private async fetchFeaturesStatus(): Promise<Set<string>> {
     // TODO: use the rootOrg and org to fetch the features
-    const featureConfigs = await this.http
+    const featureConfigs = (await this.http
       .get<IFeaturePermissionConfigs>(`${this.baseUrl}/features.config.json`)
-      .toPromise()
+      .toPromise())!
     this.configSvc.restrictedFeatures = new Set(
-      Object.entries(featureConfigs)
+      Object.entries((featureConfigs || {}) as Record<string, any>)
         .filter(
           ([_k, v]) => !hasPermissions(v, this.configSvc.userRoles, this.configSvc.userGroups),
         )
@@ -623,9 +656,9 @@ export class InitService {
     return this.configSvc.restrictedFeatures
   }
   private async fetchWidgetStatus(): Promise<NsWidgetResolver.IRegistrationsPermissionConfig[]> {
-    const widgetConfigs = await this.http
+    const widgetConfigs = (await this.http
       .get<NsWidgetResolver.IRegistrationsPermissionConfig[]>(`${this.baseUrl}/widgets.config.json`)
-      .toPromise()
+      .toPromise())!
     return widgetConfigs
   }
 

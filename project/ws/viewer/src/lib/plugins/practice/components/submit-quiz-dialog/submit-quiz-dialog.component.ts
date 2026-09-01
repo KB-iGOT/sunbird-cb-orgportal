@@ -1,11 +1,12 @@
 import { Component, OnInit, Inject } from '@angular/core'
 import { NSPractice } from '../../practice.model'
-import { MatLegacyDialogRef as MatDialogRef, MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA } from '@angular/material/legacy-dialog'
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog'
 
 @Component({
   selector: 'viewer-submit-quiz-dialog',
   templateUrl: './submit-quiz-dialog.component.html',
   styleUrls: ['./submit-quiz-dialog.component.scss'],
+  standalone: false,
 })
 export class SubmitQuizDialogComponent implements OnInit {
 

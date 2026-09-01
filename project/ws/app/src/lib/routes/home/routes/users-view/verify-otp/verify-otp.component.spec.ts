@@ -1,7 +1,7 @@
 import { VerifyOtpComponent } from './verify-otp.component'
 import { of, throwError } from 'rxjs'
 import { HttpErrorResponse } from '@angular/common/http'
-import { MatLegacyRadioChange as MatRadioChange } from '@angular/material/legacy-radio'
+import { MatRadioChange } from '@angular/material/radio'
 import { UntypedFormControl, UntypedFormGroup } from '@angular/forms'
 
 describe('VerifyOtpComponent', () => {

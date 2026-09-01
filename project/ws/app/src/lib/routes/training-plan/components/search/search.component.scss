@@ -1,5 +1,13 @@
-.search-container {
+.search_container {
     margin-top:20px;
+
+}
+
+.search_container {
+    .search {
+        width: 78% !important;
+    height: 48px !important;
+    }
 }
 
 .rsearch {
@@ -38,6 +46,7 @@
     font-size: 14px;
     border-radius: 4px;
     min-width: 199px;
+    height: 48px;
 }
 
 .btn-disabled {

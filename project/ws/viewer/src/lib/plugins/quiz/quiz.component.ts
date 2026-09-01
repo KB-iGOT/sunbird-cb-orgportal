@@ -16,7 +16,7 @@ import { SubmitQuizDialogComponent } from './components/submit-quiz-dialog/submi
 import { OnConnectionBindInfo } from 'jsplumb'
 // import { QuizService } from './quiz.service'
 import { EventService } from '@sunbird-cb/utils'
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog'
+import { MatDialog } from '@angular/material/dialog'
 import { MatSidenav } from '@angular/material/sidenav'
 export type FetchStatus = 'hasMore' | 'fetching' | 'done' | 'error' | 'none'
 
@@ -24,6 +24,7 @@ export type FetchStatus = 'hasMore' | 'fetching' | 'done' | 'error' | 'none'
   selector: 'viewer-plugin-quiz',
   templateUrl: './quiz.component.html',
   styleUrls: ['./quiz.component.scss'],
+  standalone: false,
 })
 export class QuizComponent implements OnInit, OnChanges, OnDestroy {
 

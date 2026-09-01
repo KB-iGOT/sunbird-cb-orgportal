@@ -10,7 +10,7 @@ const API_END_POINTS = {
   getDesignation: '/apis/protected/v8/frac/searchNodes',
   getTeamUsers: '/apis/proxies/v8/user/v1/search',
   GET_ALL_USERS: '/apis/proxies/v8/user/v1/search',
-  assign_role: '/apis/proxies/v8/user/private/v1/assign/role',
+  assign_role: '/apis/proxies/v8/user/v1/role/assign',
   get_staffdetails: '/apis/proxies/v8/staff/position',
   staffdetails: '/apis/proxies/v8/staff/position',
   delete_staffdetails: '/apis/proxies/v8/staff/position?orgId=',

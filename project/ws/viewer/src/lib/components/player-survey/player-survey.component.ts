@@ -5,7 +5,7 @@ import { interval, Subscription } from 'rxjs'
 import { ConfigurationsService, EventService, WsEvents } from '@sunbird-cb/utils-v2'
 import { ActivatedRoute } from '@angular/router'
 import { ViewerUtilService } from '@sunbird-cb/toc'
-import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar'
+import { MatSnackBar } from '@angular/material/snack-bar'
 import { WidgetContentService } from '@sunbird-cb/toc'
 import { HttpErrorResponse } from '@angular/common/http'
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms'
@@ -20,6 +20,7 @@ const MOBILE_PATTERN = /^[0]?[6789]\d{9}$/ // NOSONAR
   selector: 'ws-widget-player-survey',
   templateUrl: './player-survey.component.html',
   styleUrls: ['./player-survey.component.scss'],
+  standalone: false,
 })
 export class PlayerSurveyComponent extends WidgetBaseComponent
   implements OnInit, NsWidgetResolver.IWidgetData<any>, OnDestroy {

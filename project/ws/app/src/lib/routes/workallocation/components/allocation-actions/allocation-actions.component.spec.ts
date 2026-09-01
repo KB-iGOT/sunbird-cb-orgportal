@@ -1,7 +1,7 @@
 import { AllocationActionsComponent } from './allocation-actions.component'
 // import { AllocationService } from '../../services/allocation.service'
 import { UntypedFormBuilder } from '@angular/forms'
-// import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/legacy-dialog'
+// import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog'
 import { of } from 'rxjs'
 
 describe('AllocationActionsComponent', () => {

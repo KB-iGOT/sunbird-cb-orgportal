@@ -1,7 +1,7 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
-    "esModuleInterop": false,
+    "esModuleInterop": true,
     "skipLibCheck": true,
     "types": [
       "jest"
@@ -10,14 +10,13 @@
     "baseUrl": "./",
     "declaration": false,
     "experimentalDecorators": true,
-    "allowSyntheticDefaultImports": true,
     "importHelpers": true,
     "lib": [
       "es2018",
       "dom"
     ],
     "module": "es2020",
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "noFallthroughCasesInSwitch": true,
     "noImplicitAny": true,
     "noImplicitReturns": true,

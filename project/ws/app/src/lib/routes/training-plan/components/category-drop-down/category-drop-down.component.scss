@@ -1,34 +1,42 @@
 .category-box {
-    display: inline-block;
-    width: 11%;
-    min-height: 48px;
+  display: inline-block;
+  width: 11%;
+  min-height: 48px;
 }
 
-.category-box ::ng-deep .mat-form-field-appearance-outline .mat-form-field-flex {
-    width: 192px;
-    min-height: 48px;
+/* OUTER FORM FIELD WRAPPER */
+.category-box ::ng-deep .mat-mdc-form-field {
+  width: 192px;
 }
 
-.category-box ::ng-deep .mat-form-field-appearance-outline .mat-form-field-wrapper {
-    padding: 0;
-    margin: 0;
-    height: 48px;
+/* TEXT FIELD CONTAINER (MDC core) */
+.category-box ::ng-deep .mat-mdc-text-field-wrapper {
+  min-height: 48px;
+  border-radius: 4px;
 }
 
-.category-box ::ng-deep .mat-form-field-appearance-outline .mat-form-field-infix {
-    padding: 0.25em 0 0.75em 0 !important;
+/* FLEX CONTAINER INSIDE FIELD */
+.category-box ::ng-deep .mat-mdc-form-field-flex {
+  min-height: 48px;
+  align-items: center;
 }
 
-.category-box ::ng-deep .mat-form-field-appearance-outline .mat-form-field-infix .mat-select-arrow-wrapper {
-    vertical-align: inherit !important;
-    transform: translateY(2%) !important;
+/* INPUT / SELECT AREA */
+.category-box ::ng-deep .mat-mdc-form-field-infix {
+  padding: 0 !important;
+  min-height: 48px;
+  display: flex;
+  align-items: center;
 }
 
-.category-box  ::ng-deep .mat-form-field-flex {
-    min-height: 48px;
-    border-radius: 4px;
+/* SELECT ARROW FIX */
+.category-box ::ng-deep .mat-mdc-select-arrow-wrapper {
+  transform: translateY(0) !important;
+  display: flex;
+  align-items: center;
 }
 
-.category-box ::ng-deep.mat-form-field.mat-focused.mat-primary .mat-select-arrow {
+/* FOCUS STATE (MDC underline/outline color fix) */
+.category-box ::ng-deep .mat-mdc-form-field.mat-focused .mat-mdc-select-arrow {
   color: rgba(0, 0, 0, 0.54) !important;
 }

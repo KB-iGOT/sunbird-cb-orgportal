@@ -13,6 +13,7 @@ import { ViewerUtilService } from '../../viewer-util.service'
   selector: 'viewer-survey',
   templateUrl: './survey.component.html',
   styleUrls: ['./survey.component.scss'],
+  standalone: false,
 })
 export class SurveyComponent implements OnInit, OnDestroy {
   private dataSubscription: Subscription | null = null
@@ -158,10 +159,10 @@ export class SurveyComponent implements OnInit, OnDestroy {
   }
 
   async fetchContent() {
-    const content = await this.contentSvc
+    const content: any = await this.contentSvc
       .fetchContent(this.widgetResolverSurveyData.widgetData.collectionId || '', 'minimal')
       .toPromise()
-    this.widgetResolverSurveyData.widgetData.courseName = content.result.content.name
+    this.widgetResolverSurveyData.widgetData.courseName = content!.result.content.name
   }
 
   // generateUrl(oldUrl: string) {

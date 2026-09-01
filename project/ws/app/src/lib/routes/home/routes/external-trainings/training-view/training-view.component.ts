@@ -7,7 +7,8 @@ import { filter } from 'rxjs/operators'
 @Component({
   selector: 'ws-app-training-view',
   templateUrl: './training-view.component.html',
-  styleUrls: ['./training-view.component.scss']
+  styleUrls: ['./training-view.component.scss'],
+  standalone: false
 })
 export class TrainingViewComponent implements OnInit, OnDestroy {
   trainingId: string = ''

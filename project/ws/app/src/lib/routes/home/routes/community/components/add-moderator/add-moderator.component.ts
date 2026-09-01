@@ -20,9 +20,10 @@ export interface User {
   }
 }
 @Component({
-  selector: 'ws-app-add-moderator',
-  templateUrl: './add-moderator.component.html',
-  styleUrls: ['./add-moderator.component.scss']
+    selector: 'ws-app-add-moderator',
+    templateUrl: './add-moderator.component.html',
+    styleUrls: ['./add-moderator.component.scss'],
+    standalone: false
 })
 export class AddModeratorComponent {
   @Input() communityDetailsForm!: FormGroup

@@ -3,6 +3,7 @@ import { DatePipe } from '@angular/common'
 import { TrainingPlanDataSharingService } from '../../services/training-plan-data-share.service'
 import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE } from '@angular/material/core'
 import { MomentDateAdapter, MAT_MOMENT_DATE_ADAPTER_OPTIONS } from '@angular/material-moment-adapter'
+import { AparYearService } from '../../../../common/apar-year-select/apar-year.service'
 export const MY_FORMATS = {
   parse: {
     dateInput: 'LL',
@@ -15,33 +16,45 @@ export const MY_FORMATS = {
   },
 }
 @Component({
-  selector: 'ws-app-add-timeline-form',
-  templateUrl: './add-timeline-form.component.html',
-  styleUrls: ['./add-timeline-form.component.scss'],
-  providers: [DatePipe,
-    {
-      provide: DateAdapter,
-      useClass: MomentDateAdapter,
-      deps: [MAT_DATE_LOCALE, MAT_MOMENT_DATE_ADAPTER_OPTIONS],
-    },
-    { provide: MAT_DATE_FORMATS, useValue: MY_FORMATS },
-  ],
+    selector: 'ws-app-add-timeline-form',
+    templateUrl: './add-timeline-form.component.html',
+    styleUrls: ['./add-timeline-form.component.scss'],
+    providers: [DatePipe,
+        {
+            provide: DateAdapter,
+            useClass: MomentDateAdapter,
+            deps: [MAT_DATE_LOCALE, MAT_MOMENT_DATE_ADAPTER_OPTIONS],
+        },
+        { provide: MAT_DATE_FORMATS, useValue: MY_FORMATS },
+    ],
+    standalone: false
 })
 
 export class AddTimelineFormComponent implements OnInit {
 
   minDate: Date = new Date()
   todayDate: any
-  constructor(private tpdsSvc: TrainingPlanDataSharingService, private datePipe: DatePipe) { }
+  aparYear = ''
+  constructor(
+    private tpdsSvc: TrainingPlanDataSharingService,
+    private datePipe: DatePipe,
+    private aparYearSvc: AparYearService) { }
 
   ngOnInit() {
     if (this.tpdsSvc.trainingPlanStepperData['endDate']) {
       this.todayDate = new Date(this.tpdsSvc.trainingPlanStepperData['endDate'])
     }
+    this.aparYear = this.tpdsSvc.trainingPlanStepperData['aparYear'] || this.aparYearSvc.getCurrentAparYear()
+    this.tpdsSvc.trainingPlanStepperData['aparYear'] = this.aparYear
   }
 
   changeTimeline(timeline: any) {
     this.tpdsSvc.trainingPlanStepperData['endDate'] = this.datePipe.transform(timeline, 'yyyy-MM-dd')
+  }
+
+  changeAparYear(aparYear: string) {
+    this.aparYear = aparYear
+    this.tpdsSvc.trainingPlanStepperData['aparYear'] = aparYear
   }
 
 }

@@ -171,6 +171,9 @@ export class NotificationsService {
       this.handleProfileCategory(notification, environment, snackBar)
     } else if (notification.category === 'LEARN') {
       let url = `${environment.portalsForNotifications.learner}/app/toc/${notification.message.data.id}`
+      if (notification.sub_category === 'EXTERNAL_TRAINING') {
+        url = `${environment.portalsForNotifications.learner}/page/competency-passbook/list`
+      }
       window.open(url, '_blank')
     } else if (notification.category === 'NETWORK') {
       this.handleNetworkRedirection(notification, snackBar, environment)

@@ -58,6 +58,7 @@ interface ICollectionCard {
   selector: 'viewer-viewer-toc',
   templateUrl: './viewer-toc.component.html',
   styleUrls: ['./viewer-toc.component.scss'],
+  standalone: false,
 })
 export class ViewerTocComponent implements OnInit, OnDestroy, OnChanges, AfterViewInit {
   @Output() hidenav = new EventEmitter<boolean>()
@@ -613,11 +614,11 @@ export class ViewerTocComponent implements OnInit, OnDestroy, OnChanges, AfterVi
     _collectionType: string,
   ): Promise<IViewerTocCard | null> {
     try {
-      const playlistFetchResponse = await this.contentSvc
+      const playlistFetchResponse: any = await this.contentSvc
         .fetchCollectionHierarchy('playlist', collectionId, 0, 1000)
         .toPromise()
 
-      const content: any = playlistFetchResponse.data
+      const content: any = playlistFetchResponse!.data
       this.collectionCard = this.createCollectionCard(content)
       const viewerTocCardContent = this.convertContentToIViewerTocCard(content)
       console.log('viewerTocCardContent--', viewerTocCardContent)

@@ -37,9 +37,7 @@ import { MobileAppsService } from '../../services/mobile-apps.service'
 import { RootService } from './root.service'
 import { SwUpdate } from '@angular/service-worker'
 import { environment } from '../../../environments/environment'
-import { interval, concat, timer, Subscription } from 'rxjs'
-import { DialogConfirmComponent } from '../dialog-confirm/dialog-confirm.component'
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog'
+import { interval, concat, Subscription } from 'rxjs'
 import { LoaderService } from '../../services/loader.service'
 // import { MatDialog } from '@angular/material'
 // import { DialogConfirmComponent } from '../dialog-confirm/dialog-confirm.component'
@@ -49,6 +47,7 @@ import { LoaderService } from '../../services/loader.service'
   templateUrl: './root.component.html',
   styleUrls: ['./root.component.scss'],
   providers: [SwUpdate, TelemetryService],
+  standalone: false
 })
 export class RootComponent implements OnInit, AfterViewInit {
   @ViewChild('previewContainer', { read: ViewContainerRef, static: true })
@@ -77,7 +76,6 @@ export class RootComponent implements OnInit, AfterViewInit {
     private appRef: ApplicationRef,
     private logger: LoggerService,
     private swUpdate: SwUpdate,
-    private dialog: MatDialog,
     public configSvc: ConfigurationsService,
     private valueSvc: ValueService,
     private telemetrySvc: TelemetryService,
@@ -235,33 +233,33 @@ export class RootComponent implements OnInit, AfterViewInit {
       const everySixHoursOnceAppIsStable$ = concat(appIsStable$, everySixHours$)
       everySixHoursOnceAppIsStable$.subscribe(() => this.swUpdate.checkForUpdate())
       if (this.swUpdate.isEnabled) {
-        this.swUpdate.available.subscribe(() => {
-          const dialogRef = this.dialog.open(DialogConfirmComponent, {
-            data: {
-              title: (this.appUpdateTitleRef && this.appUpdateTitleRef.nativeElement.value) || '',
-              body: (this.appUpdateBodyRef && this.appUpdateBodyRef.nativeElement.value) || '',
-            },
-          })
-          dialogRef.afterClosed().subscribe(
-            (result: any) => {
-              if (result) {
-                this.swUpdate.activateUpdate().then(() => {
-                  if ('caches' in window) {
-                    caches.keys()
-                      .then(keyList => {
-                        timer(2000).subscribe(
-                          _ => window.location.reload(),
-                        )
-                        return Promise.all(keyList.map(key => {
-                          return caches.delete(key)
-                        }))
-                      })
-                  }
-                })
-              }
-            },
-          )
-        })
+        // this.swUpdate.available.subscribe(() => {
+        //   const dialogRef = this.dialog.open(DialogConfirmComponent, {
+        //     data: {
+        //       title: (this.appUpdateTitleRef && this.appUpdateTitleRef.nativeElement.value) || '',
+        //       body: (this.appUpdateBodyRef && this.appUpdateBodyRef.nativeElement.value) || '',
+        //     },
+        //   })
+        //   dialogRef.afterClosed().subscribe(
+        //     (result: any) => {
+        //       if (result) {
+        //         this.swUpdate.activateUpdate().then(() => {
+        //           if ('caches' in window) {
+        //             caches.keys()
+        //               .then(keyList => {
+        //                 timer(2000).subscribe(
+        //                   _ => window.location.reload(),
+        //                 )
+        //                 return Promise.all(keyList.map(key => {
+        //                   return caches.delete(key)
+        //                 }))
+        //               })
+        //           }
+        //         })
+        //       }
+        //     },
+        //   )
+        // })
       }
     }
   }

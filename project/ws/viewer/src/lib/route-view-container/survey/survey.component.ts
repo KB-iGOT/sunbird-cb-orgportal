@@ -8,6 +8,7 @@ import { ConfigurationsService } from '@sunbird-cb/utils-v2'
   selector: 'viewer-survey-container',
   templateUrl: './survey.component.html',
   styleUrls: ['./survey.component.scss'],
+  standalone: false,
 })
 export class SurveyComponent implements OnInit {
   @Input() isFetchingDataComplete = false

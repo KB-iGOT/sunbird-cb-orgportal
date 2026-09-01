@@ -1,6 +1,6 @@
 import { ImportDesignationComponent } from './import-designation.component'
 import { of, throwError } from 'rxjs'
-import { LegacyPageEvent as PageEvent } from '@angular/material/legacy-paginator'
+import { PageEvent } from '@angular/material/paginator'
 import * as _ from 'lodash'
 
 describe('ImportDesignationComponent', () => {

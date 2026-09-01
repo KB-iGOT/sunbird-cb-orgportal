@@ -1,12 +1,13 @@
 import { Component, Inject, OnInit } from '@angular/core'
-import { MatLegacyDialogRef as MatDialogRef, MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA } from '@angular/material/legacy-dialog'
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog'
 
-import { DomSanitizer } from '@angular/platform-browser'
+// import { DomSanitizer } from '@angular/platform-browser'
 
 @Component({
   selector: 'ws-app-reports-video',
   templateUrl: './reports-video.component.html',
   styleUrls: ['./reports-video.component.scss'],
+  standalone: false
 })
 export class ReportsVideoComponent implements OnInit {
   videoLink = ''
@@ -14,7 +15,7 @@ export class ReportsVideoComponent implements OnInit {
   constructor(
     public dialogRef: MatDialogRef<ReportsVideoComponent>,
     @Inject(MAT_DIALOG_DATA) public dialogData: any,
-    private domSanitizer: DomSanitizer
+    // private domSanitizer: DomSanitizer
   ) {
     this.videoLink = this.dialogData.videoLink
   }
@@ -22,8 +23,8 @@ export class ReportsVideoComponent implements OnInit {
   ngOnInit() {
   }
 
-  get getVideoLink() {
-    return this.domSanitizer.bypassSecurityTrustResourceUrl(this.videoLink)
-  }
+  // get getVideoLink() {
+  //   return this.domSanitizer.bypassSecurityTrustUrl(this.videoLink)
+  // }
 
 }

@@ -24,6 +24,9 @@ const API_END_POINTS = {
   DOWNLOAD_REPORT: `apis/proxies/v8/bp/v1/bpreport/download/`,
   GET_FORM_BY_ID: `/apis/proxies/v8/forms/v2/getFormById`,
   INVITE_USERS: 'apis/proxies/v8/workflow/blendedprogram/nominate',
+  LIST_REPORTS: 'apis/proxies/v8/bp/v2/bpreport/list',
+  GENERATE_CONSUMPTION_REPORT: `apis/proxies/v8/bp/v2/generate/report`,
+  BPCONSUMPTION_REPORT_STATUS: 'apis/proxies/v8/bp/v2/bpreport/status',
 }
 
 @Injectable({
@@ -93,6 +96,18 @@ export class BlendedApporvalService {
     return this.http
       .post(API_END_POINTS.BLENDED_USER_COUNT, req)
       .toPromise()
+  }
+
+  listBpReports(reqBody: any) {
+    return this.http.post<null>(API_END_POINTS.LIST_REPORTS, reqBody)
+  }
+
+  generateBpConsumptionReport(reqBody: any) {
+    return this.http.post<null>(API_END_POINTS.GENERATE_CONSUMPTION_REPORT, reqBody)
+  }
+
+  getBpConsumptionReportStatusApi(reqBody: any) {
+    return this.http.post<null>(API_END_POINTS.BPCONSUMPTION_REPORT_STATUS, reqBody)
   }
 
   getBpReportStatusApi(reqBody: any) {

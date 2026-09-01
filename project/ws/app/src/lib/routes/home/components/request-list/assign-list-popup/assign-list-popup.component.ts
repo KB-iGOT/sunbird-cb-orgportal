@@ -1,14 +1,15 @@
 import { Component, Inject, OnInit } from '@angular/core'
 import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms'
 import { ProfileV2Service } from '../../../services/home.servive'
-import { MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA, MatLegacyDialogRef as MatDialogRef } from '@angular/material/legacy-dialog'
-import { MatLegacyTableDataSource as MatTableDataSource } from '@angular/material/legacy-table'
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog'
+import { MatTableDataSource } from '@angular/material/table'
 import { ConfigResolveService } from '../../../resolvers/config-resolve.service'
 
 @Component({
-  selector: 'ws-app-assign-list-popup',
-  templateUrl: './assign-list-popup.component.html',
-  styleUrls: ['./assign-list-popup.component.scss'],
+    selector: 'ws-app-assign-list-popup',
+    templateUrl: './assign-list-popup.component.html',
+    styleUrls: ['./assign-list-popup.component.scss'],
+    standalone: false
 })
 export class AssignListPopupComponent implements OnInit {
   requestForm!: UntypedFormGroup
@@ -26,7 +27,7 @@ export class AssignListPopupComponent implements OnInit {
   constructor(private fb: UntypedFormBuilder,
     private homeService: ProfileV2Service,
     @Inject(MAT_DIALOG_DATA) public data: any,
-    public configService: ConfigResolveService,
+    private configService: ConfigResolveService,
     public dialogRef: MatDialogRef<AssignListPopupComponent>,
   ) {
     this.requestForm = this.fb.group({

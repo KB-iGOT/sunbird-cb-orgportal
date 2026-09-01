@@ -24,9 +24,10 @@ interface Community {
 
 }
 @Component({
-  selector: 'ws-app-community-dashboard',
-  templateUrl: './community-dashboard.component.html',
-  styleUrls: ['./community-dashboard.component.scss']
+    selector: 'ws-app-community-dashboard',
+    templateUrl: './community-dashboard.component.html',
+    styleUrls: ['./community-dashboard.component.scss'],
+    standalone: false
 })
 
 export class CommunityDashboardComponent implements OnInit {

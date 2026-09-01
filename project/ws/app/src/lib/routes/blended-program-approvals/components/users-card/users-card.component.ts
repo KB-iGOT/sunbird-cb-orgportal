@@ -1,13 +1,14 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core'
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog'
+import { MatDialog } from '@angular/material/dialog'
 import { DialogConfirmComponent } from '../../../../../../../../../src/app/component/dialog-confirm/dialog-confirm.component'
 import { ViewReportDialogComponent } from '../view-report-dialog/view-report-dialog.component'
 import { RejectReasonDialogComponent } from '../reject-reason-dialog/reject-reason-dialog.component'
 
 @Component({
-  selector: 'ws-app-users-card',
-  templateUrl: './users-card.component.html',
-  styleUrls: ['./users-card.component.scss'],
+    selector: 'ws-app-users-card',
+    templateUrl: './users-card.component.html',
+    styleUrls: ['./users-card.component.scss'],
+    standalone: false
 })
 export class UsersCardComponent implements OnInit {
   @Input() user!: any

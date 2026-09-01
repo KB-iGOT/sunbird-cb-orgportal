@@ -1,8 +1,8 @@
 import { Component, OnInit, ViewChild, AfterViewInit, OnChanges, SimpleChanges } from '@angular/core'
 import { ConfigurationsService } from '@sunbird-cb/utils-v2'
-import { MatLegacyPaginator as MatPaginator } from '@angular/material/legacy-paginator'
-import { MatLegacyTableDataSource as MatTableDataSource } from '@angular/material/legacy-table'
-import { MatLegacyTabChangeEvent as MatTabChangeEvent } from '@angular/material/legacy-tabs'
+import { MatPaginator } from '@angular/material/paginator'
+import { MatTableDataSource } from '@angular/material/table'
+import { MatTabChangeEvent } from '@angular/material/tabs'
 import { ActivatedRoute } from '@angular/router'
 import { IColums, ITableData } from '../../interface/interfaces'
 import { MatSort } from '@angular/material/sort'
@@ -11,9 +11,10 @@ import { MdoInfoService } from '../../services/mdoinfo.service'
 import { ProfileV2UtillService } from '../../services/home-utill.service'
 
 @Component({
-  selector: 'ws-app-leadership',
-  templateUrl: './leadership.component.html',
-  styleUrls: ['./leadership.component.scss'],
+    selector: 'ws-app-leadership',
+    templateUrl: './leadership.component.html',
+    styleUrls: ['./leadership.component.scss'],
+    standalone: false
 })
 export class LeadershipComponent implements OnInit, AfterViewInit, OnChanges {
   tableData: ITableData = {

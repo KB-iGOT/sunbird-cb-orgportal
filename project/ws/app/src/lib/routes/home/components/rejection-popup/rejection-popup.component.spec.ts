@@ -1,5 +1,5 @@
 import { RejectionPopupComponent } from './rejection-popup.component'
-import { MatLegacyDialogRef as MatDialogRef } from '@angular/material/legacy-dialog'
+import { MatDialogRef } from '@angular/material/dialog'
 import { UntypedFormControl } from '@angular/forms'
 import * as _ from 'lodash'
 

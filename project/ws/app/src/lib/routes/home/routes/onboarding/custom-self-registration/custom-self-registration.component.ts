@@ -1,20 +1,22 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core'
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog'
+import { MatDialog } from '@angular/material/dialog'
 import { ActivatedRoute, Router } from '@angular/router'
 import { ICustomRegistrationQRCodeResponse, IOnBoardingConfig, IRegisteredLinksList } from '../interface/onboarding.interface'
 import { FormBuilder, FormGroup, Validators } from '@angular/forms'
-import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar'
+import { MatSnackBar } from '@angular/material/snack-bar'
 import { Clipboard } from '@angular/cdk/clipboard'
 import { LoadingPopupComponent } from '../loading-popup/loading-popup.component'
 import { OnboardingService } from '../../../services/onboarding.service'
 import { DesignationsService } from '../../designation/services/designations.service'
 import * as _ from 'lodash'
 import { EventService } from '@sunbird-cb/utils-v2'
+import { LoaderService } from '../../../../../../../../../../src/app/services/loader.service'
 
 @Component({
   selector: 'ws-app-custom-self-registration',
   templateUrl: './custom-self-registration.component.html',
   styleUrls: ['./custom-self-registration.component.scss'],
+  standalone: false
 })
 export class CustomSelfRegistrationComponent implements OnInit {
 
@@ -43,7 +45,8 @@ export class CustomSelfRegistrationComponent implements OnInit {
     private clipboard: Clipboard,
     private onboardingService: OnboardingService,
     private designationsService: DesignationsService,
-    private eventService: EventService
+    private eventService: EventService,
+    public loader: LoaderService
 
   ) { }
 
@@ -77,6 +80,7 @@ export class CustomSelfRegistrationComponent implements OnInit {
         } else {
           this.customRegistrationLinks = undefined
         }
+        this.loader.changeLoad.next(false)
         this.isLoading = false
       },
       error: () => {

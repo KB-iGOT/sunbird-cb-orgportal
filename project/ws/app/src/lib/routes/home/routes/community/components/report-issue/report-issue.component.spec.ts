@@ -1,5 +1,5 @@
 import { ReportIssueComponent, IDialogData } from './report-issue.component'
-import { MatLegacyDialogRef as MatDialogRef } from '@angular/material/legacy-dialog'
+import { MatDialogRef } from '@angular/material/dialog'
 
 describe('ReportIssueComponent', () => {
   let component: ReportIssueComponent

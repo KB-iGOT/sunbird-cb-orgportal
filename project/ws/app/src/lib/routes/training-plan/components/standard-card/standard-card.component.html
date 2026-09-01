@@ -1,12 +1,12 @@
 <ng-container>
     <div class="flex flex-3 flex-row card-grid-container flex-wrap">
         <div class="flex course-card margin-right-xl" *ngFor="let item of contentData">
-            <mat-card [ngClass]="item?.selected ? 'active-card':''" class="card-standard-container mr-5 padding-remove">
+            <mat-card [ngClass]="isSelected(item) ? 'active-card':''" class="card-standard-container mr-5 padding-remove">
                 <mat-card-content class="min-top">
                     <div style="position: relative; z-index: 1;">
                         <ng-container>
                             <div class="card-select-box" *ngIf="checkboxVisibility">
-                                <mat-checkbox class="card-select-check" [checked]="item?.selected"
+                                <mat-checkbox class="card-select-check" [checked]="isSelected(item)"
                                     [disabled]="item?.courseCategory === multilingualCourses"
                                     (change)="selectContentItem($event, item)"></mat-checkbox>
                             </div>

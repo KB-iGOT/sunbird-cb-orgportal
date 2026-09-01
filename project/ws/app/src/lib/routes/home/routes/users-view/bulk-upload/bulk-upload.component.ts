@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy, AfterViewInit, Input } from '@angular/core'
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog'
-import { LegacyPageEvent as PageEvent } from '@angular/material/legacy-paginator'
-import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar'
+import { MatDialog } from '@angular/material/dialog'
+import { PageEvent } from '@angular/material/paginator'
+import { MatSnackBar } from '@angular/material/snack-bar'
 import { HttpErrorResponse } from '@angular/common/http'
 import { ActivatedRoute } from '@angular/router'
 // tslint:disable-next-line
@@ -13,15 +13,18 @@ import { FileService } from '../../../../users/services/upload.service'
 import { UsersService } from '../../../../users/services/users.service'
 import { VerifyOtpComponent } from '../verify-otp/verify-otp.component'
 import { FileProgressComponent } from '../file-progress/file-progress.component'
+import { LoaderService } from '../../../../../../../../../../src/app/services/loader.service'
 
 @Component({
   selector: 'ws-bulk-upload',
   templateUrl: './bulk-upload.component.html',
   styleUrls: ['./bulk-upload.component.scss'],
+  standalone: false
 })
 export class BulkUploadComponent implements OnInit, AfterViewInit, OnDestroy {
 
   @Input() selectedOrgData: any
+  @Input() isNgo: boolean = false
 
   lastUploadList: any[] = []
   private destroySubject$ = new Subject()
@@ -30,6 +33,8 @@ export class BulkUploadComponent implements OnInit, AfterViewInit, OnDestroy {
   rootOrgId: any
 
   showFileError = false
+  showFileSizeError = false
+  maxFileSizeBytes = 10 * 1024 * 1024
   public fileName: any
   fileSelected!: any
   userProfile: any
@@ -45,7 +50,8 @@ export class BulkUploadComponent implements OnInit, AfterViewInit, OnDestroy {
     private matSnackBar: MatSnackBar,
     private router: ActivatedRoute,
     public dialog: MatDialog,
-    private usersService: UsersService
+    private usersService: UsersService,
+    public loader: LoaderService,
   ) {
 
 
@@ -64,8 +70,14 @@ export class BulkUploadComponent implements OnInit, AfterViewInit, OnDestroy {
       this.userProfile = _.get(this.router.snapshot, 'data.configService.userProfileV2')
     }
     if (this.selectedOrgData) {
-      this.downloadSampleFilePath = _.get(this.router.snapshot.data.pageData.data.bulkUploadConfig, 'downloadSampleUserFilePath')
-      this.downloadAsFileName = _.get(this.router.snapshot.data.pageData.data.bulkUploadConfig, 'downloadAsUserFileName')
+      const bulkUploadConfig = _.get(this.router.snapshot.data.pageData.data, 'bulkUploadConfig')
+      if (this.isNgo) {
+        this.downloadSampleFilePath = _.get(bulkUploadConfig, 'downloadSampleNgoUserFilePath') || _.get(bulkUploadConfig, 'downloadSampleUserFilePath')
+        this.downloadAsFileName = _.get(bulkUploadConfig, 'downloadAsNgoUserFileName') || _.get(bulkUploadConfig, 'downloadAsUserFileName')
+      } else {
+        this.downloadSampleFilePath = _.get(bulkUploadConfig, 'downloadSampleUserFilePath')
+        this.downloadAsFileName = _.get(bulkUploadConfig, 'downloadAsUserFileName')
+      }
     }
     this.getBulkStatusList()
   }
@@ -87,6 +99,7 @@ export class BulkUploadComponent implements OnInit, AfterViewInit, OnDestroy {
       .subscribe((res: any) => {
         this.lastUploadList = res.result.content.sort((a: any, b: any) =>
           new Date(b.dateCreatedOn).getTime() - new Date(a.dateCreatedOn).getTime())
+        this.loader.changeLoad.next(false)
         // tslint:disable-next-line
       }, (error: HttpErrorResponse) => {
         if (!error.ok) {
@@ -143,17 +156,20 @@ export class BulkUploadComponent implements OnInit, AfterViewInit, OnDestroy {
 
   handleOnFileChange(event: any): void {
     this.showFileError = false
+    this.showFileSizeError = false
     const fileList = (<HTMLInputElement>event.target).files
     if (fileList && fileList.length > 0) {
       const file: File = fileList[0]
       this.fileName = file.name
       this.fileSelected = file
-      if (this.fileService.validateFile(this.fileName)) {
+      if (!this.fileService.validateFile(this.fileName, ['csv'])) {
+        this.showFileError = true
+      } else if (file.size > this.maxFileSizeBytes) {
+        this.showFileSizeError = true
+      } else {
         this.sendOTP()
         // this.verifyOTP(this.userProfile.email ? 'email' : 'phone')
         // this.uploadWithOtp() // dont use this function this is for dev purposes only
-      } else {
-        this.showFileError = true
       }
     }
   }
@@ -181,11 +197,24 @@ export class BulkUploadComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   uploadCSVFile(): void {
-    if (this.fileService.validateFile(this.fileName)) {
+    if (this.fileSelected && this.fileSelected.size > this.maxFileSizeBytes) {
+      this.fileUploadDialogInstance?.close()
+      this.showFileSizeError = true
+      return
+    }
+    if (this.fileService.validateFile(this.fileName, ['csv'])) {
       if (this.fileSelected) {
         const formData: FormData = new FormData()
-        formData.append('data', this.fileSelected, this.fileName)
-        this.fileService.upload(this.fileName, formData, (this.selectedOrgData) ? this.selectedOrgData : '')
+        let uploadRequest
+        if (this.isNgo) {
+          formData.append('file', this.fileSelected, this.fileName)
+          formData.append('targetorgid', this.rootOrgId || '')
+          uploadRequest = this.fileService.uploadNonGovtUser(this.fileName, formData)
+        } else {
+          formData.append('data', this.fileSelected, this.fileName)
+          uploadRequest = this.fileService.upload(this.fileName, formData, (this.selectedOrgData) ? this.selectedOrgData : '')
+        }
+        uploadRequest
           .pipe(takeUntil(this.destroySubject$))
           .subscribe((_res: any) => {
             this.fileUploadDialogInstance.close()
@@ -196,7 +225,9 @@ export class BulkUploadComponent implements OnInit, AfterViewInit, OnDestroy {
             // tslint:disable-next-line
           }, (_err: HttpErrorResponse) => {
             if (!_err.ok) {
-              this.matSnackBar.open('Uploading CSV file failed due to some error, please try again later!')
+              this.fileUploadDialogInstance.close()
+              this.matSnackBar.open(_.get(_err, 'error.params.errmsg')
+                || 'Uploading CSV file failed due to some error, please try again later!')
             }
           })
       }

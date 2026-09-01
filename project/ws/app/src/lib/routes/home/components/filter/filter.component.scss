@@ -110,7 +110,7 @@
 
 .category-item {
     color: rgba(0,0,0,0.6);
-    padding: 12px 0;
+   // padding: 12px 0;
     width: 318px;
     overflow: hidden;
 }
@@ -152,6 +152,7 @@
 .filter .category-content {
     max-height: 232px;
     overflow-y: auto;
+    margin-top: 60px;
 }
 
 .filter .category-content-without-theme {

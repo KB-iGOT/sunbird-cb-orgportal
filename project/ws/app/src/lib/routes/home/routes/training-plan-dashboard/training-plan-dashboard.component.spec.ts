@@ -3,8 +3,8 @@ import { Router } from '@angular/router'
 import { TrainingPlanDashboardService } from '../../services/training-plan-dashboard.service'
 import { LoaderService } from '../../../../../../../../../src/app/services/loader.service'
 import { TrainingPlanService } from '../../../training-plan/services/traininig-plan.service'
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog'
-import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar'
+import { MatDialog } from '@angular/material/dialog'
+import { MatSnackBar } from '@angular/material/snack-bar'
 import { of, throwError } from 'rxjs'
 
 describe('TrainingPlanDashboardComponent', () => {

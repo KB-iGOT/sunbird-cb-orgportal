@@ -1,5 +1,5 @@
 import { SelectLearnersToBatchComponent } from './select-learners-to-batch.component'
-import { MatLegacyTableDataSource as MatTableDataSource } from '@angular/material/legacy-table'
+import { MatTableDataSource } from '@angular/material/table'
 import { SelectionModel } from '@angular/cdk/collections'
 import { UntypedFormControl, UntypedFormGroup } from '@angular/forms'
 import { SPACE, ENTER } from '@angular/cdk/keycodes'

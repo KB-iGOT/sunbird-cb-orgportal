@@ -1,10 +1,10 @@
 import { Component, EventEmitter, OnInit, Output, Input } from '@angular/core'
-import { MatLegacyTableDataSource as MatTableDataSource } from '@angular/material/legacy-table'
+import { MatTableDataSource } from '@angular/material/table'
 import { SelectionModel } from '@angular/cdk/collections'
 import { ContentBatchService } from '../../services/content-batch.service'
 import { DialogConfirmComponent } from './../dialog-confirm/dialog-confirm.component'
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog'
-import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar'
+import { MatDialog } from '@angular/material/dialog'
+import { MatSnackBar } from '@angular/material/snack-bar'
 import { SnackbarComponent } from '../snackbar/snackbar.component'
 import { ActivatedRoute } from '@angular/router'
 // import { LocalDataService } from '../../services/local-data.service'
@@ -21,9 +21,10 @@ export interface WorkflowEntry {
   [key: string]: string
 }
 @Component({
-  selector: 'ws-app-user-request-bulk-upload',
-  templateUrl: './user-request-bulk-upload.component.html',
-  styleUrls: ['./user-request-bulk-upload.component.scss'],
+    selector: 'ws-app-user-request-bulk-upload',
+    templateUrl: './user-request-bulk-upload.component.html',
+    styleUrls: ['./user-request-bulk-upload.component.scss'],
+    standalone: false
 })
 export class UserRequestBulkUploadComponent implements OnInit {
   csvContent: any

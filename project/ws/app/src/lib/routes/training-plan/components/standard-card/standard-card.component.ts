@@ -1,12 +1,13 @@
 import { Component, EventEmitter, Input, Output, OnInit, ChangeDetectorRef, ViewChild, AfterViewChecked } from '@angular/core'
-import { MatLegacyPaginator as MatPaginator, LegacyPageEvent as PageEvent } from '@angular/material/legacy-paginator'
+import { MatPaginator, PageEvent } from '@angular/material/paginator'
 import { TrainingPlanDataSharingService } from '../../services/training-plan-data-share.service'
 import { SafeUrl } from '@angular/platform-browser'
 
 @Component({
-  selector: 'ws-app-standard-card',
-  templateUrl: './standard-card.component.html',
-  styleUrls: ['./standard-card.component.scss'],
+    selector: 'ws-app-standard-card',
+    templateUrl: './standard-card.component.html',
+    styleUrls: ['./standard-card.component.scss'],
+    standalone: false
 })
 export class StandardCardComponent implements OnInit, AfterViewChecked {
   @Input() cardSize: any
@@ -47,10 +48,22 @@ export class StandardCardComponent implements OnInit, AfterViewChecked {
     this.tpdsSvc.handleContentPageChange.next({ pageIndex: this.startIndex, pageSize: pe.pageSize })
   }
 
-  selectContentItem(event: any, item: any) {
-    if (!this.tpdsSvc.trainingPlanContentData) {
-      this.tpdsSvc.trainingPlanContentData = { data: { content: [] } }
+  /**
+   * On the selection grid a content is selected when its id is on the plan content list, whatever
+   * page it is shown on. A read only list (preview, selected items dialog) shows what it was given.
+   */
+  isSelected(item: any): boolean {
+    if (!item || !item.identifier) {
+      return false
     }
+    if (!this.checkboxVisibility) {
+      return !!item.selected
+    }
+    const contentList = this.tpdsSvc.trainingPlanStepperData?.['contentList'] || []
+    return contentList.indexOf(item.identifier) > -1
+  }
+
+  selectContentItem(event: any, item: any) {
     if (!this.tpdsSvc.trainingPlanStepperData['contentList']) {
       this.tpdsSvc.trainingPlanStepperData['contentList'] = []
     }
@@ -58,58 +71,57 @@ export class StandardCardComponent implements OnInit, AfterViewChecked {
       this.tpdsSvc.isContentChanged = true
     }
     if (event.checked) {
-      const contentItem = this.contentData.find(sitem => sitem.identifier === item.identifier)
-      if (contentItem) {
-        contentItem['selected'] = true
-      }
-
-      const serviceIndex = this.tpdsSvc.trainingPlanContentData.data.content
-        .findIndex((sitem: any) => sitem.identifier === item.identifier)
-
-      if (serviceIndex !== -1) {
-        const sitem = this.tpdsSvc.trainingPlanContentData.data.content[serviceIndex]
-        sitem['selected'] = true
-        this.tpdsSvc.trainingPlanContentData.data.content.splice(serviceIndex, 1)
-        this.tpdsSvc.trainingPlanContentData.data.content.unshift(sitem)
-        this.tpdsSvc.trainingPlanStepperData['contentList'].push(item.identifier)
-      }
-
+      this.addToContentList(item)
     } else {
-      // this.selectedContent = this.selectedContent.filter( sitem  => sitem.identifier !== item.identifier)
-      this.tpdsSvc.trainingPlanContentData.data.content.map((sitem: any) => {
-        if (sitem.identifier === item.identifier) {
-          sitem['selected'] = false
-        }
-      })
-      this.tpdsSvc.trainingPlanStepperData['contentList'].filter((identifier: any, index: any) => {
-        if (identifier === item.identifier) {
-          this.tpdsSvc.trainingPlanStepperData['contentList'].splice(index, 1)
-        }
-      })
+      this.removeFromContentList(item)
     }
+    this.markItem(item, event.checked)
     this.handleSelectedChips.emit(true)
   }
 
   deleteItem(item: any) {
-    this.tpdsSvc.trainingPlanContentData.data.content.map((sitem: any) => {
-      if (sitem.identifier === item.identifier) {
-        sitem['selected'] = false
-      }
-    })
     if (this.tpdsSvc.trainingPlanStepperData.status === 'Live') {
       this.tpdsSvc.isContentChanged = true
     }
+    this.removeFromContentList(item)
+    this.markItem(item, false)
     this.contentData.filter((sitem: any, index: any) => { //NOSONAR
       if (sitem.identifier === item.identifier) {
         this.contentData.splice(index, 1)
       }
     })
-    this.tpdsSvc.trainingPlanStepperData['contentList'].filter((identifier: any, index: any) => {
-      if (identifier === item.identifier) {
-        this.tpdsSvc.trainingPlanStepperData['contentList'].splice(index, 1)
+    this.selectedContentRemoved.emit(true)
+  }
+
+  private addToContentList(item: any) {
+    const contentList = this.tpdsSvc.trainingPlanStepperData['contentList']
+    if (contentList.indexOf(item.identifier) === -1) {
+      contentList.push(item.identifier)
+    }
+    this.tpdsSvc.addSelectedContent(item)
+  }
+
+  private removeFromContentList(item: any) {
+    const contentList = this.tpdsSvc.trainingPlanStepperData['contentList'] || []
+    const index = contentList.indexOf(item.identifier)
+    if (index > -1) {
+      contentList.splice(index, 1)
+    }
+    this.tpdsSvc.removeSelectedContent(item.identifier)
+  }
+
+  /** Keeps the shown content in step with the plan content list, used by the competency summary */
+  private markItem(item: any, selected: boolean) {
+    const shownItem = this.contentData.find((sitem: any) => sitem && sitem.identifier === item.identifier)
+    if (shownItem) {
+      shownItem['selected'] = selected
+    }
+    const pageContent = this.tpdsSvc.trainingPlanContentData?.data?.content || []
+    pageContent.forEach((sitem: any) => {
+      if (sitem && sitem.identifier === item.identifier) {
+        sitem['selected'] = selected
       }
     })
-    this.selectedContentRemoved.emit(true)
   }
 
   resetPageIndex() {

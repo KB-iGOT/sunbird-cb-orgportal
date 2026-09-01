@@ -1,9 +1,10 @@
 import { Component, Inject, OnInit } from '@angular/core'
-import { MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA, MatLegacyDialogRef as MatDialogRef } from '@angular/material/legacy-dialog'
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog'
 @Component({
-  selector: 'ws-app-preview-dialog-box',
-  templateUrl: './preview-dialog-box.component.html',
-  styleUrls: ['./preview-dialog-box.component.scss'],
+    selector: 'ws-app-preview-dialog-box',
+    templateUrl: './preview-dialog-box.component.html',
+    styleUrls: ['./preview-dialog-box.component.scss'],
+    standalone: false
 })
 export class PreviewDialogBoxComponent implements OnInit {
 

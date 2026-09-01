@@ -1,18 +1,19 @@
 import { Component, OnInit } from '@angular/core'
-import { FormBuilder, FormGroup, Validators } from '@angular/forms'
+import { FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors } from '@angular/forms'
 import { ActivatedRoute, Router } from '@angular/router'
 import { ExternalTrainingsService } from '../../../services/external-trainings.service'
 import { deliveryModeList as deliveryModes } from '../models/external-trainings.model'
 import { mergeMap } from 'rxjs/operators'
 import * as _ from 'lodash'
-import { MatLegacySnackBar } from '@angular/material/legacy-snack-bar'
+import { MatSnackBar } from '@angular/material/snack-bar'
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser'
 import { environment } from '../../../../../../../../../../src/environments/environment'
 
 @Component({
   selector: 'ws-app-new-external-training',
   templateUrl: './new-external-training.component.html',
-  styleUrls: ['./new-external-training.component.scss']
+  styleUrls: ['./new-external-training.component.scss'],
+  standalone: false
 })
 export class NewExternalTrainingComponent implements OnInit {
   trainingForm!: FormGroup
@@ -39,9 +40,9 @@ export class NewExternalTrainingComponent implements OnInit {
   certificateUrl = ''
   safeCertificateUrl: SafeResourceUrl | null = null
   selectedLogoImage: string | ArrayBuffer | null = null
-  private readonly TARGET_HEIGHT = 100;
-  private readonly TARGET_Y_CENTER = 300;
-  private readonly TARGET_X_START = 2250;
+  private readonly TARGET_HEIGHT = 80;
+  private readonly TARGET_Y_CENTER = -170;
+  private readonly TARGET_X_START = 600;
 
   private readonly FILE_UPLOAD_MAX_SIZE = 1 * 1024 * 1024 // 1MB
   // tslint:disable-next-line: max-line-length
@@ -54,7 +55,7 @@ export class NewExternalTrainingComponent implements OnInit {
     private readonly router: Router,
     private activeRoute: ActivatedRoute,
     private externalTrainingsSvc: ExternalTrainingsService,
-    private matSnackBar: MatLegacySnackBar,
+    private matSnackBar: MatSnackBar,
     public sanitizer: DomSanitizer,
   ) { }
 
@@ -72,6 +73,10 @@ export class NewExternalTrainingComponent implements OnInit {
         try {
           const valueObj = JSON.parse(valueStr)
           let templateUrl = _.get(valueObj, 'template', '')
+          if (templateUrl && (templateUrl.includes('static.') || templateUrl.includes('storage.googleapis.com')) && !templateUrl.includes('content-store')) {
+            const splitURL = templateUrl.split('content')
+            templateUrl = `${environment.mdoPath}/content-store/content${splitURL[1]}`
+          }
           this.templateId = _.get(valueObj, 'identifier', '')
           let splitURL = templateUrl.split('/content-store')
           templateUrl = environment.portalsForNotifications.mdo + '/content-store/' + splitURL[1]
@@ -111,10 +116,20 @@ export class NewExternalTrainingComponent implements OnInit {
       trainingTitle: ['', [Validators.required, Validators.minLength(10), Validators.maxLength(70), Validators.pattern(this.noSpecialChar)]],
       learningObjective: ['', [Validators.maxLength(500), Validators.pattern(this.noSpecialCharMultiline)]],
       deliveryMode: [''],
-      learningHours: ['', [Validators.min(1), Validators.pattern(/^[1-9]\d*$/)]],
+      learningHours: ['', [Validators.min(0), Validators.max(100)]],
+      learningMinutes: ['', [Validators.min(0), Validators.max(59)]],
       trainingType: ['', Validators.required],
       partnerName: ['', [Validators.maxLength(70), Validators.pattern(this.noSpecialChar)]]
-    })
+    }, { validators: [this.hundredHoursValidator] })
+  }
+
+  onNumberPaste(event: ClipboardEvent, controlName: string): void {
+    event.preventDefault()
+    const pasted = event.clipboardData?.getData('text') || ''
+    const numeric = pasted.replace(/[^0-9]/g, '')
+    if (numeric) {
+      this.trainingForm.get(controlName)?.setValue(+numeric)
+    }
   }
 
   onFileSelected(event: any): void {
@@ -125,12 +140,15 @@ export class NewExternalTrainingComponent implements OnInit {
   }
 
   private isValidFile(file: File): boolean {
-    return file.name.toLowerCase().endsWith('.svg') || file.type === 'image/svg+xml'
+    const validTypes = ['image/png', 'image/jpeg', 'image/svg+xml']
+    const validExtensions = ['.png', '.jpg', '.jpeg', '.svg']
+    const extension = file.name.toLowerCase().slice(file.name.lastIndexOf('.'))
+    return validTypes.includes(file.type) || validExtensions.includes(extension)
   }
 
   private handleLogoUpload(file: File): void {
     if (!this.isValidFile(file)) {
-      this.openSnackbar('Please upload a valid SVG file.')
+      this.openSnackbar('Please upload a valid SVG, PNG, JPG, or  JPEG file.')
       return
     }
 
@@ -140,9 +158,8 @@ export class NewExternalTrainingComponent implements OnInit {
     }
 
     const fileName = file.name
-    // const uploadedDate = new Date().toLocaleDateString()
+    const isSvg = file.type === 'image/svg+xml' || file.name.toLowerCase().endsWith('.svg')
 
-    // Read file as data URL for preview
     const reader = new FileReader()
     reader.onload = (event) => {
       const imageData = event.target?.result
@@ -152,7 +169,13 @@ export class NewExternalTrainingComponent implements OnInit {
       this.selectedLogoImage = imageData || null
       this.mergeLogo()
     }
-    reader.readAsDataURL(file)
+    // SVG: read as text so it can be parsed and embedded as vector nodes.
+    // PNG/JPEG: read as data URL to embed via <image href>.
+    if (isSvg) {
+      reader.readAsText(file)
+    } else {
+      reader.readAsDataURL(file)
+    }
   }
 
   private mergeLogo(): void {
@@ -164,23 +187,8 @@ export class NewExternalTrainingComponent implements OnInit {
       const certificateReader = new FileReader()
       certificateReader.onload = (certEvent) => {
         const certificateSvgContent = certEvent.target?.result as string
-
-        // If selectedLogoImage is a data URL, we need to convert it
-        if (typeof this.selectedLogoImage === 'string' && this.selectedLogoImage.startsWith('data:')) {
-          // Extract the base64 content and decode it
-          const base64Content = this.selectedLogoImage.split(',')[1]
-          const binaryString = atob(base64Content)
-          const bytes = new Uint8Array(binaryString.length)
-          for (let i = 0; i < binaryString.length; i++) {
-            bytes[i] = binaryString.charCodeAt(i)
-          }
-          const logoBlob = new Blob([bytes])
-          const logoReader = new FileReader()
-          logoReader.onload = (logoEvent) => {
-            this.processMergeLogo(certificateSvgContent, logoEvent.target?.result as string)
-          }
-          logoReader.readAsText(logoBlob)
-        }
+        const logoDataUrl = this.selectedLogoImage as string
+        this.processMergeLogo(certificateSvgContent, logoDataUrl)
       }
       certificateReader.readAsText(this.originalContentFile)
     } catch (error: any) {
@@ -217,116 +225,88 @@ export class NewExternalTrainingComponent implements OnInit {
     }
   }
 
-  // Extracts the logo and places it at the ProvidersLogo_Placement location in the certificate
-  private updateCertificateWithLogo(certificateSvgContent: string, logoSvgContent: string): string {
+  // Embeds the uploaded logo at the ProvidersLogo_Placement location in the certificate SVG.
+  // For SVG logos: parses and embeds as vector child nodes with transform.
+  // For PNG/JPEG logos: embeds as an SVG <image> element using the data URL.
+  private updateCertificateWithLogo(certificateSvgContent: string, logoData: string): string {
     const parser = new DOMParser()
-    const certDoc = parser.parseFromString(certificateSvgContent, 'image/svg+xml')
+    // Use text/html for lenient parsing — avoids strict XML errors from HTML entities.
+    const htmlDoc = parser.parseFromString(certificateSvgContent, 'text/html')
+    const certSvgEl = htmlDoc.querySelector('svg')
 
-    // Check for parsing errors in certificate
-    if (certDoc.querySelector('parsererror')) {
+    if (!certSvgEl) {
       this.openSnackbar('Error parsing certificate SVG', 'close')
       return ''
     }
 
     // Find the ProvidersLogo_Placement group
-    let logoGroup = certDoc.getElementById('ProvidersLogo_Placement')
+    let logoGroup = htmlDoc.getElementById('ProvidersLogo_Placement')
     if (!logoGroup) {
-      logoGroup = certDoc.querySelector('[id="ProvidersLogo_Placement"]')
+      logoGroup = htmlDoc.querySelector('[id="ProvidersLogo_Placement"]')
     }
     if (!logoGroup) {
-      logoGroup = certDoc.querySelector('g[id*="ProvidersLogo_Placement"]')
+      logoGroup = htmlDoc.querySelector('g[id*="ProvidersLogo_Placement"]')
     }
 
-    // Parse the new logo SVG
-    const logoDoc = parser.parseFromString(logoSvgContent, 'image/svg+xml')
-    if (logoDoc.querySelector('parsererror')) {
-      this.openSnackbar('Error parsing logo SVG', 'close')
-      return ''
-    }
-
-    const logoSvg = logoDoc.querySelector('svg')
-    if (!logoSvg) {
-      this.openSnackbar('Invalid logo SVG structure: No <svg> tag found', 'close')
-      return ''
-    }
-
-    // Create a new group for the logo
-    const newLogoGroup = certDoc.createElementNS('http://www.w3.org/2000/svg', 'g')
+    const newLogoGroup = htmlDoc.createElementNS('http://www.w3.org/2000/svg', 'g')
     newLogoGroup.setAttribute('id', 'ProvidersLogo_Placement')
 
-    // --- Dimension Extraction & Alignment Logic ---
-    const viewBox = logoSvg.getAttribute('viewBox')
-    let minX = 0, minY = 0, logoWidth = 100, logoHeight = 100
-
-    if (viewBox) {
-      const vbParts = viewBox.split(/[\s,]+/).map(parseFloat)
-      if (vbParts.length >= 4) {
-        minX = vbParts[0]
-        minY = vbParts[1]
-        logoWidth = vbParts[2]
-        logoHeight = vbParts[3]
-      }
+    if (logoData.startsWith('data:')) {
+      // --- Raster (PNG/JPEG): embed as SVG <image> with data URL ---
+      const imageEl = htmlDoc.createElementNS('http://www.w3.org/2000/svg', 'image')
+      imageEl.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:href', logoData)
+      imageEl.setAttribute('href', logoData)
+      imageEl.setAttribute('x', String(this.TARGET_X_START))
+      imageEl.setAttribute('y', String(this.TARGET_Y_CENTER - this.TARGET_HEIGHT / 2))
+      imageEl.setAttribute('height', String(this.TARGET_HEIGHT))
+      imageEl.setAttribute('preserveAspectRatio', 'xMidYMid meet')
+      newLogoGroup.appendChild(imageEl)
     } else {
-      // Fallback to width/height attributes if viewBox is missing
-      const wAttr = logoSvg.getAttribute('width')
-      const hAttr = logoSvg.getAttribute('height')
+      // --- SVG: parse and embed vector child nodes with scale/translate transform ---
+      const logoHtmlDoc = parser.parseFromString(logoData, 'text/html')
+      const logoSvgEl = logoHtmlDoc.querySelector('svg')
 
-      // Attempt to parse pixel values, ignoring 'px'
-      logoWidth = wAttr ? parseFloat(wAttr) : 100
-      logoHeight = hAttr ? parseFloat(hAttr) : 100
-    }
+      if (!logoSvgEl) {
+        this.openSnackbar('Invalid SVG logo: no <svg> element found', 'close')
+        return ''
+      }
 
-    // 1. Calculate Scale to match target height
-    if (logoHeight === 0) logoHeight = 100
-    const scale = this.TARGET_HEIGHT / logoHeight
+      const viewBox = logoSvgEl.getAttribute('viewBox')
+      let minX = 0, minY = 0, logoHeight = 100
 
-    // 2. Calculate Translate X
-    // Rendered Left = (minX * scale) + tx => tx = TargetLeft - (minX * scale)
-    const tx = this.TARGET_X_START - (minX * scale)
-
-    // 3. Calculate Translate Y
-    // Rendered Center Y = ((minY + height/2) * scale) + ty => ty = TargetCenterY - (LocalCenterY * scale)
-    const localCenterY = minY + (logoHeight / 2)
-    const ty = this.TARGET_Y_CENTER - (localCenterY * scale)
-
-    const newTransform = `translate(${tx.toFixed(2)}, ${ty.toFixed(2)}) scale(${scale.toFixed(4)})`
-    newLogoGroup.setAttribute('transform', newTransform)
-
-    // We clone nodes to avoid modifying the parsed source logic references directly during iteration
-    const logoChildren = Array.from(logoSvg.childNodes)
-
-    for (const child of logoChildren) {
-      if (child.nodeType === 1) {
-        const importedNode = certDoc.importNode(child, true) as Element
-
-        if (importedNode.tagName.toLowerCase() === 'svg') {
-          if (!importedNode.getAttribute('width')) {
-            importedNode.setAttribute('width', logoWidth.toString())
-          }
-          if (!importedNode.getAttribute('height')) {
-            importedNode.setAttribute('height', logoHeight.toString())
-          }
-          if (!importedNode.getAttribute('viewBox') && viewBox) {
-            importedNode.setAttribute('viewBox', viewBox)
-          }
+      if (viewBox) {
+        const vbParts = viewBox.split(/[\s,]+/).map(parseFloat)
+        if (vbParts.length >= 4) {
+          minX = vbParts[0]; minY = vbParts[1]
+          logoHeight = vbParts[3]
         }
+      } else {
+        logoHeight = parseFloat(logoSvgEl.getAttribute('height') || '100')
+      }
 
-        newLogoGroup.appendChild(importedNode)
+      if (logoHeight === 0) logoHeight = 100
+      const scale = this.TARGET_HEIGHT / logoHeight
+      const tx = this.TARGET_X_START - (minX * scale)
+      const localCenterY = minY + (logoHeight / 2)
+      const ty = this.TARGET_Y_CENTER - (localCenterY * scale)
+
+      newLogoGroup.setAttribute('transform', `translate(${tx.toFixed(2)}, ${ty.toFixed(2)}) scale(${scale.toFixed(4)})`)
+
+      for (const child of Array.from(logoSvgEl.childNodes)) {
+        if (child.nodeType === 1) {
+          newLogoGroup.appendChild(htmlDoc.importNode(child, true))
+        }
       }
     }
 
     if (logoGroup && logoGroup.parentNode) {
       logoGroup.parentNode.replaceChild(newLogoGroup, logoGroup)
     } else {
-      // If no existing group, append to the root SVG element
-      const rootSvg = certDoc.querySelector('svg')
-      if (rootSvg) {
-        rootSvg.appendChild(newLogoGroup)
-      }
+      certSvgEl.appendChild(newLogoGroup)
     }
 
     const serializer = new XMLSerializer()
-    return serializer.serializeToString(certDoc)
+    return serializer.serializeToString(certSvgEl)
   }
 
   removeUploadedLogo(): void {
@@ -349,6 +329,8 @@ export class NewExternalTrainingComponent implements OnInit {
     const form = this.trainingForm.value
     const eventType = _.get(form, 'deliveryMode') || ''
     const learningHours = _.get(form, 'learningHours') || 0
+    const learningMinutes = _.get(form, 'learningMinutes') || 0
+    const totalMinutes = (learningHours * 60) + learningMinutes
     const logoUrl = this.mergedLogoUrl || this.defaultCertificateTemplateUrl
     return {
       request: {
@@ -359,7 +341,7 @@ export class NewExternalTrainingComponent implements OnInit {
           description: _.get(form, 'learningObjective'),
           category: 'externalTraining',
           resourceType: 'externalTraining',
-          duration: learningHours * 3600,
+          duration: totalMinutes * 60,
           createdBy: _.get(this.configSvc, 'userProfile.userId'),
           categoryType: _.get(form, 'trainingType'),
           sourceName: _.get(this.configSvc, 'unMappedUser.rootOrg.orgName'),
@@ -514,5 +496,13 @@ export class NewExternalTrainingComponent implements OnInit {
     this.matSnackBar.open(message, action, {
       duration: 3000,
     })
+  }
+
+
+
+  hundredHoursValidator = (form: AbstractControl): ValidationErrors | null => {
+    const hours = form.get('learningHours')?.value || 0
+    const minutes = form.get('learningMinutes')?.value || 0
+    return (hours === 100 && minutes > 0) ? { invalidHundredHours: true } : null
   }
 }

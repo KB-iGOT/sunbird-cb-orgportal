@@ -3,9 +3,10 @@ import { ActivatedRoute } from '@angular/router'
 import { ConfigurationsService } from '@sunbird-cb/utils-v2'
 
 @Component({
-  selector: 'ws-survey-form',
-  templateUrl: './survey-form.component.html',
-  styleUrls: ['./survey-form.component.scss'],
+    selector: 'ws-survey-form',
+    templateUrl: './survey-form.component.html',
+    styleUrls: ['./survey-form.component.scss'],
+    standalone: false
 })
 export class SurveyFormComponent implements OnInit {
   surveyPopupData: any
@@ -22,7 +23,7 @@ export class SurveyFormComponent implements OnInit {
 
   ngOnInit() {
     if (this.activatedRoute.snapshot.data.pageData && this.activatedRoute.snapshot.data.pageData.data) {
-      this.surveyPopupData = this.activatedRoute.snapshot.data.pageData.data.menus.surveyPopup.banners
+      this.surveyPopupData = this.activatedRoute.snapshot.data.pageData.data.menus.surveyPopup?.banners
       this.surveyPopup = this.activatedRoute.snapshot.data.pageData.data.menus.surveyPopup
       this.widgetData = this.activatedRoute.snapshot.data.pageData.data.menus.surveyPopup
     }

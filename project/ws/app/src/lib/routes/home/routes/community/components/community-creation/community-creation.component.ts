@@ -1,5 +1,6 @@
 import { AfterViewInit, ChangeDetectorRef, Component, ViewChild } from '@angular/core'
-import { MatLegacyDialog } from '@angular/material/legacy-dialog'
+import { STEPPER_GLOBAL_OPTIONS } from '@angular/cdk/stepper'
+import { MatDialog } from '@angular/material/dialog'
 import { ActivatedRoute, Router } from '@angular/router'
 import { ConfirmDialogComponent } from '../../../../../workallocation-v2/components/confirm-dialog/confirm-dialog.component'
 import { FormBuilder, Validators, FormGroup, FormControl } from '@angular/forms'
@@ -7,7 +8,7 @@ import { StepperSelectionEvent } from '@angular/cdk/stepper'
 import { MatStepper } from '@angular/material/stepper'
 import { noSpecialChar } from '../../../events-2/models/events.model'
 import { CommunityService } from '../../services/community.service'
-import { MatLegacySnackBar } from '@angular/material/legacy-snack-bar'
+import { MatSnackBar } from '@angular/material/snack-bar'
 import { LoaderService } from '../../../../../../../../../../../src/app/services/loader.service'
 import { HttpErrorResponse } from '@angular/common/http'
 import * as _ from 'lodash'
@@ -17,7 +18,9 @@ import { environment } from '../../../../../../../../../../../src/environments/e
 @Component({
   selector: 'ws-app-community-creation',
   templateUrl: './community-creation.component.html',
-  styleUrls: ['./community-creation.component.scss']
+  styleUrls: ['./community-creation.component.scss'],
+  standalone: false,
+  providers: [{ provide: STEPPER_GLOBAL_OPTIONS, useValue: { displayDefaultIndicatorType: false } }],
 })
 
 
@@ -48,8 +51,8 @@ export class CommunityCreationComponent implements AfterViewInit {
     private formBuilder: FormBuilder,
     private cdr: ChangeDetectorRef,
     private router: Router,
-    private dialog: MatLegacyDialog,
-    private matSnackBar: MatLegacySnackBar,
+    private dialog: MatDialog,
+    private matSnackBar: MatSnackBar,
     private communitySvc: CommunityService,
     private loaderService: LoaderService,
     private activatedRoute: ActivatedRoute
@@ -174,7 +177,7 @@ export class CommunityCreationComponent implements AfterViewInit {
   }
   ngAfterViewInit() {
     if (this.stepper) {
-      this.stepper._getIndicatorType = () => 'number'
+      //this.stepper.indicatorType = 'number'
       this.cdr.detectChanges()
     }
   }

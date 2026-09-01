@@ -14,6 +14,7 @@ import { deliveryModeList } from '../models/external-trainings.model'
   selector: 'ws-app-external-trainings-list',
   templateUrl: './list.component.html',
   styleUrls: ['./list.component.scss'],
+  standalone: false,
   providers: [DatePipe],
 })
 export class ListComponent implements OnInit, AfterViewInit {
@@ -90,6 +91,9 @@ export class ListComponent implements OnInit, AfterViewInit {
         const transformed = items.map((item: any) => {
           const durationSec = item.duration || 0
           const hours = Math.floor(durationSec / 3600)
+          const minutes = Math.floor((durationSec % 3600) / 60)
+          const formattedTime = durationSec ?
+            `${hours}h ${minutes}m` : ''
           return {
             ...item,
             eventType: deliveryModeList[item.eventType] || item.eventType || '',
@@ -97,7 +101,7 @@ export class ListComponent implements OnInit, AfterViewInit {
               ? this.datePipe.transform(item.createdOn, 'MMM dd, yyyy') || ''
               : '',
             createdOnSort: item.createdOn ? new Date(item.createdOn).getTime() : 0,
-            durationFormatted: durationSec ? `${hours} ${hours === 1 ? 'Hour' : 'Hours'}` : '',
+            durationFormatted: formattedTime,
           }
         })
         return { data: transformed, count }

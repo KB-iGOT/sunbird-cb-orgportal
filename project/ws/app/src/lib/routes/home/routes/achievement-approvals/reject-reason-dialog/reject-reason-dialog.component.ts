@@ -1,6 +1,6 @@
 import { Component, Inject } from '@angular/core'
 import { FormBuilder, FormGroup, Validators } from '@angular/forms'
-import { MatLegacyDialogRef as MatDialogRef, MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA } from '@angular/material/legacy-dialog'
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog'
 
 export interface RejectReasonDialogData {
   title?: string
@@ -9,9 +9,10 @@ export interface RejectReasonDialogData {
 }
 
 @Component({
-  selector: 'ws-app-reject-reason-dialog',
-  templateUrl: './reject-reason-dialog.component.html',
-  styleUrls: ['./reject-reason-dialog.component.scss'],
+    selector: 'ws-app-reject-reason-dialog',
+    templateUrl: './reject-reason-dialog.component.html',
+    styleUrls: ['./reject-reason-dialog.component.scss'],
+    standalone: false
 })
 export class RejectReasonDialogComponent {
   form: FormGroup

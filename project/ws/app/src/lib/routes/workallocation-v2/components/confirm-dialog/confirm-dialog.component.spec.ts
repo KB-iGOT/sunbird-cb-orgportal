@@ -1,16 +1,16 @@
 import { ConfirmDialogComponent } from './confirm-dialog.component'
-import { MatLegacyDialogRef } from '@angular/material/legacy-dialog'
+import { MatDialogRef } from '@angular/material/dialog'
 
 describe('ConfirmDialogComponent', () => {
   let component: ConfirmDialogComponent
-  let mockDialogRef: jest.Mocked<MatLegacyDialogRef<ConfirmDialogComponent>>
+  let mockDialogRef: jest.Mocked<MatDialogRef<ConfirmDialogComponent>>
   let mockData: any
 
   beforeEach(() => {
-    // Create Jest mock object for MatLegacyDialogRef
+    // Create Jest mock object for MatDialogRef
     mockDialogRef = {
       close: jest.fn()
-    } as unknown as jest.Mocked<MatLegacyDialogRef<ConfirmDialogComponent>>
+    } as unknown as jest.Mocked<MatDialogRef<ConfirmDialogComponent>>
 
     // Mock data to be injected
     mockData = {

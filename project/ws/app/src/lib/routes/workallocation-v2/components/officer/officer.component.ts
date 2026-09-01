@@ -10,9 +10,10 @@ import * as _ from 'lodash'
 
 
 @Component({
-  selector: 'ws-app-officer',
-  templateUrl: './officer.component.html',
-  styleUrls: ['./officer.component.scss'],
+    selector: 'ws-app-officer',
+    templateUrl: './officer.component.html',
+    styleUrls: ['./officer.component.scss'],
+    standalone: false
 })
 export class OfficerComponent implements OnInit, OnDestroy {
   private unsubscribe = new Subject<void>()

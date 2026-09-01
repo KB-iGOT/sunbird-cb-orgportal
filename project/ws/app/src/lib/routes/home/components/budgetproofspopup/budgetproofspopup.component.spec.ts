@@ -1,6 +1,6 @@
 import { BudgetproofspopupComponent, PeriodicElement } from './budgetproofspopup.component'
 import { UntypedFormControl, UntypedFormGroup } from '@angular/forms'
-import { MatLegacyTableDataSource as MatTableDataSource } from '@angular/material/legacy-table'
+import { MatTableDataSource } from '@angular/material/table'
 import { SelectionModel } from '@angular/cdk/collections'
 import { of } from 'rxjs'
 

@@ -28,6 +28,109 @@
   }
 }
 
+.generate-report-button {
+  background-color: #1a4b8f !important;
+}
+
+::ng-deep .report-type-select .mat-mdc-select {
+  padding-top: 4px !important;
+}
+
+::ng-deep .report-type-select .mat-mdc-select:not(.mat-mdc-select-empty) .mat-mdc-select-value-text {
+  font-weight: 600;
+}
+
+.w-90 {
+  width: 90%;
+}
+
+// ── Report table ────────────────────────────────────────────────────────────
+.report-table {
+  width: 100%;
+  border-collapse: collapse;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-top: 16px;
+  margin-bottom: 24px;
+  background: #fff;
+
+  &__header-row {
+    background-color: #f5f5f5;
+  }
+
+  &__th {
+    padding: 12px 16px;
+    text-align: left;
+    /* stylelint-disable */
+    font: 600 13px/20px Lato;
+    /* stylelint-enable */
+    color: #666;
+    border-bottom: 2px solid #e0e0e0;
+    white-space: nowrap;
+  }
+
+  &__row {
+    border-bottom: 1px solid #eeeeee;
+    transition: background 0.15s ease;
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    &:hover {
+      background-color: #fafafa;
+    }
+  }
+
+  &__td {
+    padding: 12px 16px;
+    /* stylelint-disable */
+    font: 400 14px/20px Lato;
+    /* stylelint-enable */
+    color: #333;
+    vertical-align: middle;
+
+    &--index {
+      font-weight: 600;
+    }
+  }
+}
+
+.report-status-badge {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+
+  &--completed {
+    background-color: #e8f5e9;
+    color: #2e7d32;
+  }
+
+  &--failed {
+    background-color: #fdecea;
+    color: #c62828;
+  }
+
+  &--progress {
+    background-color: #fff8e1;
+    color: #e65100;
+  }
+}
+
+.report-action-btn {
+  color: #555 !important;
+
+  &:hover {
+    color: #1976d2 !important;
+  }
+}
+// ── End report table ─────────────────────────────────────────────────────────
+
+
 .filter {
   .filter-option {
     margin: $size-s $size-s;

@@ -1,8 +1,8 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core'
 import { UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms'
 import { OrgProfileService } from '../../services/org-profile.service'
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog'
-import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar'
+import { MatDialog } from '@angular/material/dialog'
+import { MatSnackBar } from '@angular/material/snack-bar'
 /* tslint:disable*/
 import * as _ from 'lodash'
 import { ConfigurationsService } from '@sunbird-cb/utils-v2'
@@ -16,7 +16,7 @@ import { DialogBoxComponent } from '../../components/dialog-box/dialog-box.compo
     styleUrls: ['./research.component.scss'],
     /* tslint:disable */
     host: { class: 'w-full role-card flex flex-1' },
-    /* tslint:enable */
+    standalone: false
 })
 export class ResearchComponent implements OnInit {
     @ViewChild('deleteProgramTitleRef', { static: true })

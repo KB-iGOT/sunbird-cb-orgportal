@@ -1,9 +1,9 @@
 import { RejectionReasonComponent } from './rejection-reason.component'
-import { MatLegacyDialogRef } from '@angular/material/legacy-dialog'
+import { MatDialogRef } from '@angular/material/dialog'
 
 describe('RejectionReasonComponent', () => {
   let component: RejectionReasonComponent
-  let mockDialogRef: jest.Mocked<MatLegacyDialogRef<RejectionReasonComponent>>
+  let mockDialogRef: jest.Mocked<MatDialogRef<RejectionReasonComponent>>
   let mockData: any
 
   beforeEach(() => {

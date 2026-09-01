@@ -3,9 +3,10 @@ import { NsContent } from '@sunbird-cb/collection'
 import { ConfigurationsService, EventService } from '@sunbird-cb/utils-v2'
 import { SafeHtml, DomSanitizer } from '@angular/platform-browser'
 @Component({
-  selector: 'ws-app-learning-card',
-  templateUrl: './learning-card.component.html',
-  styleUrls: ['./learning-card.component.scss'],
+    selector: 'ws-app-learning-card',
+    templateUrl: './learning-card.component.html',
+    styleUrls: ['./learning-card.component.scss'],
+    standalone: false
 })
 export class LearningCardComponent implements OnInit, OnChanges {
   @Input()

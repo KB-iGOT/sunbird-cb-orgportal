@@ -183,10 +183,13 @@
       <div class="form-lable required">
         Date
       </div>
-      <mat-form-field appearance="outline" class="disable-round">
+      <mat-form-field appearance="outline" class="disable-round start-date">
         <input matInput [matDatepicker]="startDate" [min]="minDate" placeholder="Enter Start Date"
           formControlName="startDate" readonly>
-        <mat-datepicker-toggle matSuffix [for]="startDate"></mat-datepicker-toggle>
+        <!-- <mat-datepicker-toggle matSuffix [for]="startDate"></mat-datepicker-toggle> -->
+        <mat-datepicker-toggle matSuffix [for]="startDate">
+          <mat-icon class="mr-5" matDatepickerToggleIcon>calendar_today</mat-icon>
+        </mat-datepicker-toggle>
         <mat-datepicker #startDate
           [disabled]="openTab === 'upcoming' || openTab === 'past' || openMode === 'view' || eventStatus === 'live'"></mat-datepicker>
         <mat-error *ngIf="showValidationMsg('startDate','required')">
@@ -198,7 +201,7 @@
       <div class="form-lable required">
         Start Time
       </div>
-      <mat-form-field appearance="outline" class="disable-round">
+      <mat-form-field appearance="outline" class="disable-round start-time-field">
         <input matInput placeholder="Enter Start Time" formControlName="startTime" [ngxTimepicker]="startTimepicker"
           [max]="maxTimeToStart" [min]="minTimeToStart" readonly>
         <ngx-material-timepicker-toggle [for]="startTimepicker" matSuffix></ngx-material-timepicker-toggle>
@@ -215,7 +218,7 @@
       <div class="form-lable required">
         End Time
       </div>
-      <mat-form-field appearance="outline" class="disable-round">
+      <mat-form-field appearance="outline" class="disable-round end-time-field">
         <input matInput placeholder="Enter End Time" formControlName="endTime" [ngxTimepicker]="endTimepicker"
           [min]="minTimeToEnd" [disabled]="uploadedVideoDuration > 0 && uploadedVideoDuration < 15"
           [disableClick]="uploadedVideoDuration > 0 && uploadedVideoDuration < 15" readonly>
@@ -236,10 +239,10 @@
       </div>
     </div>
     <mat-radio-group aria-label="Select an option" class="flex" formControlName="typeofEvent">
-      <!-- <mat-radio-button class="mr-5 p-4" value="live" *ngIf="checkIfSCEvent()">
+      <mat-radio-button class="mr-5 p-4" value="live">
         Live Event
-      </mat-radio-button> -->
-      <mat-radio-button class="mr-5 p-4" value="record" *ngIf="edf?.typeofEvent?.value?.toLowerCase() === 'record'">
+      </mat-radio-button>
+      <mat-radio-button class="mr-5 p-4" value="record">
         Recorded Event
       </mat-radio-button>
     </mat-radio-group>

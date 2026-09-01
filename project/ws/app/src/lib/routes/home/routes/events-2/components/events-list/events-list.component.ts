@@ -1,19 +1,20 @@
 import { HttpErrorResponse } from '@angular/common/http'
 import { Component, OnDestroy, OnInit } from '@angular/core'
-import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar'
+import { MatSnackBar } from '@angular/material/snack-bar'
 import { ActivatedRoute, Router } from '@angular/router'
 import { Subscription } from 'rxjs'
 import { events } from '../../models/events.model'
 import { EventsService } from '../../services/events.service'
 import * as _ from 'lodash'
-import { MatLegacyDialog } from '@angular/material/legacy-dialog'
+import { MatDialog } from '@angular/material/dialog'
 import { RejectionReasonComponent } from '../../dialogs/rejection-reason/rejection-reason.component'
 import { ConfirmDialogComponent } from '../../../../../workallocation-v2/components/confirm-dialog/confirm-dialog.component'
 
 @Component({
   selector: 'ws-app-events-list',
   templateUrl: './events-list.component.html',
-  styleUrls: ['./events-list.component.scss']
+  styleUrls: ['./events-list.component.scss'],
+  standalone: false
 })
 export class EventsListComponent implements OnInit, OnDestroy {
   //#region (global variables)
@@ -34,7 +35,7 @@ export class EventsListComponent implements OnInit, OnDestroy {
     private matSnackBar: MatSnackBar,
     private activatedRoute: ActivatedRoute,
     private route: Router,
-    private dialog: MatLegacyDialog
+    private dialog: MatDialog
   ) { }
   //#endregion
 
@@ -364,7 +365,8 @@ export class EventsListComponent implements OnInit, OnDestroy {
 
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
       width: '500px',
-      height: '210px',
+      minHeight: '210px',
+      height: 'auto',
       data: dialgData,
       autoFocus: false
     })

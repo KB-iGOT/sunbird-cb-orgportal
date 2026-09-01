@@ -1,24 +1,27 @@
 import { AfterViewInit, ChangeDetectorRef, Component, inject, OnInit, ViewChild } from '@angular/core'
+import { STEPPER_GLOBAL_OPTIONS } from '@angular/cdk/stepper'
 import { Location } from '@angular/common'
 import { EventsService } from '../../services/events.service'
 import { ActivatedRoute, Router } from '@angular/router'
 import * as _ from 'lodash'
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms'
-import { URL_PATRON, material, noSpecialCharEvent, speaker } from '../../models/events.model'
+import { DEFAULT_EVENT_CATEGORIES, URL_PATRON, material, noSpecialCharEvent, speaker } from '../../models/events.model'
 import { StepperSelectionEvent } from '@angular/cdk/stepper'
 import { MatStepper } from '@angular/material/stepper'
-import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar'
+import { MatSnackBar } from '@angular/material/snack-bar'
 import { HttpErrorResponse } from '@angular/common/http'
 import { DatePipe } from '@angular/common'
 import { LoaderService } from '../../../../../../../../../../../src/app/services/loader.service'
-import { MatLegacyDialog } from '@angular/material/legacy-dialog'
+import { MatDialog } from '@angular/material/dialog'
 import { ConfirmDialogComponent } from '../../../../../workallocation-v2/components/confirm-dialog/confirm-dialog.component'
 import { CourseListingComponent } from '../course-listing/course-listing.component'
 
 @Component({
   selector: 'ws-app-create-event',
   templateUrl: './create-event.component.html',
-  styleUrls: ['./create-event.component.scss']
+  styleUrls: ['./create-event.component.scss'],
+  standalone: false,
+  providers: [{ provide: STEPPER_GLOBAL_OPTIONS, useValue: { displayDefaultIndicatorType: false } }],
 })
 export class CreateEventComponent implements OnInit, AfterViewInit {
   //#region (global varialbles)
@@ -44,6 +47,9 @@ export class CreateEventComponent implements OnInit, AfterViewInit {
   selectedStepperLable = 'Basic Details'
   eventStatus = 'draft'
   contentLoaded = false
+  eventCategoriesList: string[] = DEFAULT_EVENT_CATEGORIES
+  mdoEventCategories: any = {}
+  enableCourseLinking = false // course selection is disabled for live events for now
   //#endregion
 
   constructor(
@@ -55,7 +61,7 @@ export class CreateEventComponent implements OnInit, AfterViewInit {
     private datePipe: DatePipe,
     private loaderService: LoaderService,
     private cdr: ChangeDetectorRef,
-    private dialog: MatLegacyDialog
+    private dialog: MatDialog
   ) { }
 
   //#region (onInit)
@@ -97,10 +103,46 @@ export class CreateEventComponent implements OnInit, AfterViewInit {
       }
     })
     this.userProfile = _.get(this.activatedRoute, 'snapshot.data.configService.userProfile')
+    this.mdoEventCategories = _.get(this.activatedRoute, 'snapshot.data.eventForm.mdoEventCategories', {})
+    let previousTypeOfEvent = ''
+    this.eventDetailsForm.controls.typeofEvent.valueChanges.subscribe((type: any) => {
+      const typeOfEvent = (type || '').toString().toLowerCase()
+      this.updateEventCategoriesList()
+      this.updateFlowForEventType(typeOfEvent)
+      if (previousTypeOfEvent && previousTypeOfEvent !== typeOfEvent) {
+        this.eventDetailsForm.controls.eventCategory.patchValue('')
+      }
+      previousTypeOfEvent = typeOfEvent
+    })
+    this.updateEventCategoriesList()
     if (_.get(this.activatedRoute, 'snapshot.data.eventDetails')) {
       this.eventDetails = _.get(this.activatedRoute, 'snapshot.data.eventDetails.data')
       this.patchEventDetails()
     }
+  }
+
+  updateEventCategoriesList() {
+    const typeOfEvent = (this.eventDetailsForm.controls.typeofEvent.value || '').toString().toLowerCase()
+    const categories = typeOfEvent === 'live' ?
+      _.get(this.mdoEventCategories, 'live', []) : _.get(this.mdoEventCategories, 'record', [])
+    this.eventCategoriesList = (categories && categories.length) ? categories : DEFAULT_EVENT_CATEGORIES
+  }
+
+  updateFlowForEventType(typeOfEvent: string) {
+    if (typeOfEvent === 'live' && this.enableCourseLinking) {
+      this.courseSelectionForm.controls.selectedCourse.setValidators([Validators.required])
+      if (!this.courseSelectionForm.controls.selectedCourse.value) {
+        this.courseSelectionForm.controls.selectedCourse.setValue({})
+      }
+      this.contentLoaded = true
+    } else {
+      this.courseSelectionForm.controls.selectedCourse.clearValidators()
+    }
+    this.courseSelectionForm.controls.selectedCourse.updateValueAndValidity()
+  }
+
+  get isLiveEvent(): boolean {
+    return _.get(this.edf, 'typeofEvent.value', '').toString().toLowerCase() === 'live'
   }
 
   async patchEventDetails() {
@@ -154,7 +196,9 @@ export class CreateEventComponent implements OnInit, AfterViewInit {
     this.eventDetailsForm.patchValue(eventBaseDetails)
 
     if (this.eventDetails?.typeofEvent?.toLowerCase() === 'live') {
-      this.courseSelectionForm.controls.selectedCourse.setValidators([Validators.required])
+      if (this.enableCourseLinking) {
+        this.courseSelectionForm.controls.selectedCourse.setValidators([Validators.required])
+      }
       if (this.eventDetails?.courseLinked) {
         const contentData: any = await this.eventSvc.getContentRead(this.eventDetails?.courseLinked).toPromise().catch(_err => { })
         if (contentData?.result) {
@@ -217,7 +261,7 @@ export class CreateEventComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit() {
     if (this.stepper) {
-      this.stepper._getIndicatorType = () => 'number'
+      //this.stepper.indicatorType = 'number'
       this.cdr.detectChanges()
     }
   }
@@ -239,10 +283,24 @@ export class CreateEventComponent implements OnInit, AfterViewInit {
 
   //#region (ui interactions)
   onSelectionChange(event: StepperSelectionEvent) {
+    const steps = this.stepper?.steps?.toArray() || []
     const selectedStep = this.stepper?.steps.toArray()[event.selectedIndex]
     const previousStep = this.stepper?.steps.toArray()[event.previouslySelectedIndex]
     const selectedLabel = selectedStep?.label
     const previousLabel = previousStep?.label
+
+    if (event?.selectedIndex > event?.previouslySelectedIndex &&
+      !this.canMoveToStep(steps, event.previouslySelectedIndex, event?.selectedIndex)) {
+      this.currentStepperIndex = event.previouslySelectedIndex
+      this.selectedStepperLable = previousLabel || this.selectedStepperLable
+      setTimeout(() => {
+        if (this.stepper) {
+          this.stepper.selectedIndex = event?.previouslySelectedIndex
+        }
+      })
+      return
+    }
+
     if (previousLabel === 'Basic Details') {
       this.eventDetailsForm.markAllAsTouched()
       this.eventDetailsForm.updateValueAndValidity()
@@ -335,7 +393,7 @@ export class CreateEventComponent implements OnInit, AfterViewInit {
 
       const dialogRef = this.dialog.open(ConfirmDialogComponent, {
         width: '500px',
-        height: '210px',
+        height: 'auto',
         data: dialgData,
         autoFocus: false,
         disableClose: true
@@ -368,6 +426,9 @@ export class CreateEventComponent implements OnInit, AfterViewInit {
     //   this.matSnackBar.open('Please fill mandatory fields')
     //   return
     // }
+    if (!this.canMoveToNext) {
+      return
+    }
     if (this.stepper && this.currentStepperIndex < this.stepper.steps.length - 1) {
       this.currentStepperIndex = this.currentStepperIndex + 1
     }
@@ -419,6 +480,12 @@ export class CreateEventComponent implements OnInit, AfterViewInit {
       } else {
         this.openSnackBar('Please fill mandatory fields')
       }
+    } else if (this.selectedStepperLable === 'Course Linking') {
+      if (!this.courseSelectionForm.invalid) {
+        currentFormIsValid = true
+      } else {
+        this.openSnackBar('Please select one course in course Linking')
+      }
     } else if (this.selectedStepperLable === 'Add Speaker') {
       if (this.speakersList && this.speakersList.length) {
         currentFormIsValid = true
@@ -433,6 +500,55 @@ export class CreateEventComponent implements OnInit, AfterViewInit {
       }
     }
     return currentFormIsValid
+  }
+
+  private canMoveToStep(steps: any[], fromIndex: number, toIndex: number): boolean {
+    if (this.openMode === 'view' || toIndex <= fromIndex) {
+      return true
+    }
+    for (let index = fromIndex; index < toIndex; index += 1) {
+      if (!this.validateStep(steps[index]?.label)) {
+        return false
+      }
+    }
+    return true
+  }
+
+  private validateStep(stepLabel: string): boolean {
+    if (stepLabel === 'Basic Details') {
+      return this.validateBasicDetails()
+    }
+    if (stepLabel === 'Course Linking') {
+      return this.validateCourseLinking()
+    }
+    if (stepLabel === 'Add Material') {
+      if (this.isMaterialsValid) {
+        return true
+      }
+      this.openSnackBar('Please provied valid name and material')
+      return false
+    }
+    return true
+  }
+
+  private validateBasicDetails(): boolean {
+    this.eventDetailsForm.markAllAsTouched()
+    this.eventDetailsForm.updateValueAndValidity()
+    if (this.eventDetailsForm.invalid) {
+      this.openSnackBar('Please fill mandatory fields')
+      return false
+    }
+    return true
+  }
+
+  private validateCourseLinking(): boolean {
+    this.courseSelectionForm.markAllAsTouched()
+    this.courseSelectionForm.updateValueAndValidity()
+    if (this.courseSelectionForm.invalid) {
+      this.openSnackBar('Please select one course in course Linking')
+      return false
+    }
+    return true
   }
 
   get isMaterialsValid(): boolean {
@@ -458,7 +574,7 @@ export class CreateEventComponent implements OnInit, AfterViewInit {
         this.openSnackBar('Please provied valid name and matrial in Add Material')
         return false
       }
-      if (!(this.competencies && this.competencies.length)) {
+      if (!(this.competencies && this.competencies.length) && !(this.isLiveEvent && !this.enableCourseLinking)) {
         this.openSnackBar(this.eventDetails.typeofEvent === 'live' ? 'Select course from course linking' : 'Please add atleast one competency in Add Competency')
         return false
       }
@@ -475,7 +591,7 @@ export class CreateEventComponent implements OnInit, AfterViewInit {
           this.openSnackBar('Please fill mandatory fields in Event Setup > Pre Event Setup')
           return false
         }
-        if (this.courseSelectionForm?.invalid) {
+        if (this.enableCourseLinking && this.courseSelectionForm?.invalid) {
           this.openSnackBar('Please select one course in course Linking')
           return false
         }
@@ -699,13 +815,13 @@ export class CreateEventComponent implements OnInit, AfterViewInit {
 
     if (eventBaseDetails?.typeofEvent?.toLowerCase() === 'live') {
       eventDetails['maxEnrolments'] = eventBaseDetails?.maxEnrolments || 0
-      if (this.courseSelectionForm?.value?.selectedCourse) {
+      if (this.enableCourseLinking && this.courseSelectionForm?.value?.selectedCourse) {
         eventDetails['courseLinked'] = this.courseSelectionForm?.value?.selectedCourse?.identifier || ''
       }
-      eventDetails['registrationLink'] = this.preEventForm.controls['meetingLink'].value || ''
-      eventDetails['meetingAgenda'] = this.preEventForm.controls['agenda'].value || ''
-      eventDetails['preEventReads'] = [this.preEventForm.controls['preEventReads'].value || '']
-      eventDetails['speakerDetails'] = JSON.stringify(this.preEventForm.controls['selectedSpeaker'].value) || []
+      eventDetails['registrationLink'] = this.preEventForm?.controls['meetingLink']?.value || ''
+      eventDetails['meetingAgenda'] = this.preEventForm?.controls['agenda']?.value || ''
+      eventDetails['preEventReads'] = [this.preEventForm?.controls['preEventReads']?.value || '']
+      eventDetails['speakerDetails'] = JSON.stringify(this.preEventForm?.controls['selectedSpeaker']?.value || [])
       this.competencies = this.getLatestCompetencies(this.courseSelectionForm?.value?.selectedCourse)
       eventDetails['noOfAttendes'] = this.postEventForm?.controls['noOfAttendes'].value || 0
       eventDetails['eventDuration'] = this.convertDurationToMinutes(this.postEventForm?.controls['eventDuration'].value) || 0

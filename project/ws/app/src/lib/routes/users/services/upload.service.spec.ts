@@ -1,6 +1,6 @@
 
 import { HttpClient, HttpResponse } from '@angular/common/http'
-import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar'
+import { MatSnackBar } from '@angular/material/snack-bar'
 import { of, throwError } from 'rxjs'
 import * as fileSaver from 'file-saver'
 import { FileService } from './upload.service'

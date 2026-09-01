@@ -1,11 +1,11 @@
 import { Component, OnDestroy, OnInit } from '@angular/core'
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog'
+import { MatDialog } from '@angular/material/dialog'
 import { ActivatedRoute, Router } from '@angular/router'
 /* tslint:disable */
 import * as _ from 'lodash'
 /* tslint:enable */
 import { environment } from 'src/environments/environment'
-import { LegacyPageEvent as PageEvent } from '@angular/material/legacy-paginator'
+import { PageEvent } from '@angular/material/paginator'
 import { EventService } from '@sunbird-cb/utils-v2'
 import { NsContent } from '@sunbird-cb/collection'
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser'
@@ -22,7 +22,7 @@ import { ApprovalsService } from '../../services/approvals.service'
   styleUrls: ['./users-view.component.scss'],
   /* tslint:disable */
   host: { class: 'flex flex-col' },
-  /* tslint:enable */
+  standalone: false
 })
 export class UsersViewComponent implements OnInit, OnDestroy {
   /* tslint:disable */
@@ -210,6 +210,7 @@ export class UsersViewComponent implements OnInit, OnDestroy {
 
   async getAllUsers(query: any) {
     this.loaderService.changeLoad.next(true)
+    this.resetUserData('allusers')
     let reqBody
     const filtreq = {
       rootOrgId: this.rootOrgId,
@@ -247,79 +248,84 @@ export class UsersViewComponent implements OnInit, OnDestroy {
         sort_by: this.getSortOrder(query),
       },
     }
-    this.usersService.getAllKongUsers(reqBody).subscribe((data: any) => {
-      // const allusersData = data.result.response
-      // this.activeUsersData = allusersData.content
-      // // this.activeUsersData = this.activeUsersData.filter((wf: any) => wf.profileDetails.profileStatus !== 'NOT-MY-USER')
-      // this.activeUsersDataCount = allusersData.count
-      const allusersData = data && data.result && data.result.response
-      const userContent = allusersData.content
-      const apiUserCount = data?.result?.response?.count
-      const searchText = this.getSearchText(query).toLowerCase()
-      if (searchText && searchText.length && searchText.length > 0) {
-        const userData: any = []
-        if (data && data.result && data.result.response && data.result.response.count &&
-          data.result.response.count > 0) {
-          if (userContent && userContent.length > 0) {
-            // userContent.forEach((element: any) => {
-            for (const element of userContent) {
-              const userPrimaryEmail = (element && element.profileDetails && element.profileDetails.personalDetails &&
-                element.profileDetails.personalDetails.primaryEmail &&
-                element.profileDetails.personalDetails.primaryEmail.toLowerCase())
+    this.usersService.getAllKongUsers(reqBody).subscribe({
+      next: (data: any) => {
+        // const allusersData = data.result.response
+        // this.activeUsersData = allusersData.content
+        // // this.activeUsersData = this.activeUsersData.filter((wf: any) => wf.profileDetails.profileStatus !== 'NOT-MY-USER')
+        // this.activeUsersDataCount = allusersData.count
+        const allusersData = data?.result?.response || {}
+        const userContent = allusersData.content || []
+        const apiUserCount = allusersData.count || 0
+        const searchText = this.getSearchText(query).toLowerCase()
+        if (searchText && searchText.length && searchText.length > 0) {
+          const userData: any = []
+          if (data && data.result && data.result.response && data.result.response.count &&
+            data.result.response.count > 0) {
+            if (userContent && userContent.length > 0) {
+              // userContent.forEach((element: any) => {
+              for (const element of userContent) {
+                const userPrimaryEmail = (element && element.profileDetails && element.profileDetails.personalDetails &&
+                  element.profileDetails.personalDetails.primaryEmail &&
+                  element.profileDetails.personalDetails.primaryEmail.toLowerCase())
 
-              const userMail = element && element.email && element.email.toLowerCase()
+                const userMail = element && element.email && element.email.toLowerCase()
 
-              const userOfficialMail = element && element.profileDetails && element.profileDetails.personalDetails &&
-                element.profileDetails.personalDetails.officialEmail &&
-                element.profileDetails.personalDetails.officialEmail.toLowerCase()
+                const userOfficialMail = element && element.profileDetails && element.profileDetails.personalDetails &&
+                  element.profileDetails.personalDetails.officialEmail &&
+                  element.profileDetails.personalDetails.officialEmail.toLowerCase()
 
-              const userPersonalMail = element && element.profileDetails && element.profileDetails.personalDetails &&
-                element.profileDetails.personalDetails.personalEmail &&
-                element.profileDetails.personalDetails.personalEmail.toLowerCase()
+                const userPersonalMail = element && element.profileDetails && element.profileDetails.personalDetails &&
+                  element.profileDetails.personalDetails.personalEmail &&
+                  element.profileDetails.personalDetails.personalEmail.toLowerCase()
 
-              const userName = element && element.firstName && element.firstName.toLowerCase()
-              const userFirstName = element && element.profileDetails && element.profileDetails.personalDetails &&
-                element.profileDetails.personalDetails.firstname &&
-                element.profileDetails.personalDetails.firstname.toLowerCase()
+                const userName = element && element.firstName && element.firstName.toLowerCase()
+                const userFirstName = element && element.profileDetails && element.profileDetails.personalDetails &&
+                  element.profileDetails.personalDetails.firstname &&
+                  element.profileDetails.personalDetails.firstname.toLowerCase()
 
-              const userMob = element && element.profileDetails && element.profileDetails.personalDetails &&
-                element.profileDetails.personalDetails.mobile
+                const userMob = element && element.profileDetails && element.profileDetails.personalDetails &&
+                  element.profileDetails.personalDetails.mobile
 
-              const userTelePhone = element && element.profileDetails && element.profileDetails.personalDetails &&
-                element.profileDetails.personalDetails.telephone
+                const userTelePhone = element && element.profileDetails && element.profileDetails.personalDetails &&
+                  element.profileDetails.personalDetails.telephone
 
-              const userPhone = element && element.phone
+                const userPhone = element && element.phone
 
-              const emailMatch = (userMail && userMail.includes(searchText.toLowerCase())) ||
-                (userPrimaryEmail && userPrimaryEmail.includes(searchText.toLowerCase())) ||
-                (userOfficialMail && userOfficialMail.includes(searchText.toLowerCase())) ||
-                (userPersonalMail && userPersonalMail.includes(searchText.toLowerCase()))
+                const emailMatch = (userMail && userMail.includes(searchText.toLowerCase())) ||
+                  (userPrimaryEmail && userPrimaryEmail.includes(searchText.toLowerCase())) ||
+                  (userOfficialMail && userOfficialMail.includes(searchText.toLowerCase())) ||
+                  (userPersonalMail && userPersonalMail.includes(searchText.toLowerCase()))
 
-              const firstNameMatch = (userName && userName.includes(searchText.toLowerCase())) ||
-                (userFirstName && userFirstName.includes(searchText.toLowerCase()))
+                const firstNameMatch = (userName && userName.includes(searchText.toLowerCase())) ||
+                  (userFirstName && userFirstName.includes(searchText.toLowerCase()))
 
-              const phoneMatch = (userTelePhone && userTelePhone.includes(searchText)) ||
-                (userMob && userMob.toString().includes(searchText)) || (userPhone && userPhone.includes(searchText))
-              if (emailMatch || firstNameMatch || phoneMatch) {
-                userData.push(element)
-                this.activeUsersData = userData
-                this.activeUsersDataCount = apiUserCount
-                this.updateUserCounts(userData, apiUserCount, 'all_user')
-              } else {
-                this.activeUsersData = userData
-                this.activeUsersDataCount = apiUserCount
-                this.updateUserCounts(allusersData, apiUserCount, 'all_user')
+                const phoneMatch = (userTelePhone && userTelePhone.includes(searchText)) ||
+                  (userMob && userMob.toString().includes(searchText)) || (userPhone && userPhone.includes(searchText))
+                if (emailMatch || firstNameMatch || phoneMatch) {
+                  userData.push(element)
+                  this.activeUsersData = userData
+                  this.activeUsersDataCount = apiUserCount
+                  this.updateUserCounts(userData, apiUserCount, 'all_user')
+                } else {
+                  this.activeUsersData = userData
+                  this.activeUsersDataCount = apiUserCount
+                  this.updateUserCounts(userContent, apiUserCount, 'all_user')
+                }
               }
             }
+          } else {
+            const userCount = allusersData?.count
+            this.updateUserCounts(userContent, userCount, 'all_user')
           }
+
         } else {
           const userCount = allusersData?.count
-          this.updateUserCounts(allusersData, userCount, 'all_user')
+          this.updateUserCounts(userContent, userCount, 'all_user')
         }
-
-      } else {
-        const userCount = allusersData?.count
-        this.updateUserCounts(allusersData, userCount, 'all_user')
+      }, error: () => {
+        this.resetUserData('allusers')
+        this.loaderService.changeLoad.next(false)
       }
     })
   }
@@ -346,6 +352,7 @@ export class UsersViewComponent implements OnInit, OnDestroy {
   async getVUsers(query: any) {
     let reqBody
     this.loaderService.changeLoad.next(true)
+    this.resetUserData('verified')
     const filtreq = {
       rootOrgId: this.rootOrgId,
       'profileDetails.profileStatus': 'VERIFIED',
@@ -382,92 +389,97 @@ export class UsersViewComponent implements OnInit, OnDestroy {
         sort_by: this.getSortOrder(query),
       },
     }
-    this.usersService.getAllKongUsers(reqBody).subscribe((data: any) => {
-      // const allusersData = data.result.response
-      // this.verifiedUsersData = allusersData.content
-      // this.verifiedUsersDataCount = data.result.response.count
-      // this.verifiedUsersData = allusersData.content
-      // this.verifiedUsersDataCount = data.result.response.count
-      // this.filterFacets = allusersData.facets ? allusersData.facets : []
+    this.usersService.getAllKongUsers(reqBody).subscribe({
+      next: (data: any) => {
+        // const allusersData = data.result.response
+        // this.verifiedUsersData = allusersData.content
+        // this.verifiedUsersDataCount = data.result.response.count
+        // this.verifiedUsersData = allusersData.content
+        // this.verifiedUsersDataCount = data.result.response.count
+        // this.filterFacets = allusersData.facets ? allusersData.facets : []
 
-      // if (this.currentUserStatus === 'VERIFIED') {
-      //   const i = this.verifiedUsersData.findIndex((wf: any) => wf.userId === this.currentUser)
-      //   if (i > -1) {
-      //     this.verifiedUsersData.splice(i, 1)
-      //     this.verifiedUsersDataCount = this.verifiedUsersDataCount ? this.verifiedUsersDataCount - 1 : this.verifiedUsersDataCount
-      //   }
-      // }
-      const apiUserCount = data?.result?.response?.count
-      const allusersData = data && data.result && data.result.response
-      const userContent = allusersData.content
-      const searchText = this.getSearchText(query).toLowerCase()
-      if (searchText && searchText.length && searchText.length > 0) {
-        const userData: any = []
-        if (data && data.result && data.result.response && data.result.response.count &&
-          data.result.response.count > 0) {
-          for (const element of userContent) {
-            // const userMail = element && element.profileDetails && element.profileDetails.personalDetails &&
-            //   element.profileDetails.personalDetails.primaryEmail &&
-            //   element.profileDetails.personalDetails.primaryEmail.toLowerCase()
-            // const userName = element && element.firstName && element.firstName.toLowerCase()
-            // const userPhone = element && element.profileDetails && element.profileDetails.personalDetails &&
-            //   element.profileDetails.personalDetails.mobile
+        // if (this.currentUserStatus === 'VERIFIED') {
+        //   const i = this.verifiedUsersData.findIndex((wf: any) => wf.userId === this.currentUser)
+        //   if (i > -1) {
+        //     this.verifiedUsersData.splice(i, 1)
+        //     this.verifiedUsersDataCount = this.verifiedUsersDataCount ? this.verifiedUsersDataCount - 1 : this.verifiedUsersDataCount
+        //   }
+        // }
+        const allusersData = data?.result?.response || {}
+        const userContent = allusersData.content || []
+        const apiUserCount = allusersData.count || 0
+        const searchText = this.getSearchText(query).toLowerCase()
+        if (searchText && searchText.length && searchText.length > 0) {
+          const userData: any = []
+          if (data && data.result && data.result.response && data.result.response.count &&
+            data.result.response.count > 0) {
+            for (const element of userContent) {
+              // const userMail = element && element.profileDetails && element.profileDetails.personalDetails &&
+              //   element.profileDetails.personalDetails.primaryEmail &&
+              //   element.profileDetails.personalDetails.primaryEmail.toLowerCase()
+              // const userName = element && element.firstName && element.firstName.toLowerCase()
+              // const userPhone = element && element.profileDetails && element.profileDetails.personalDetails &&
+              //   element.profileDetails.personalDetails.mobile
 
-            const userPrimaryEmail = element && element.profileDetails && element.profileDetails.personalDetails &&
-              element.profileDetails.personalDetails.primaryEmail &&
-              element.profileDetails.personalDetails.primaryEmail.toLowerCase()
+              const userPrimaryEmail = element && element.profileDetails && element.profileDetails.personalDetails &&
+                element.profileDetails.personalDetails.primaryEmail &&
+                element.profileDetails.personalDetails.primaryEmail.toLowerCase()
 
-            const userMail = element && element.email && element.email.toLowerCase()
+              const userMail = element && element.email && element.email.toLowerCase()
 
-            const userOfficialMail = element && element.profileDetails && element.profileDetails.personalDetails &&
-              element.profileDetails.personalDetails.officialEmail &&
-              element.profileDetails.personalDetails.officialEmail.toLowerCase()
+              const userOfficialMail = element && element.profileDetails && element.profileDetails.personalDetails &&
+                element.profileDetails.personalDetails.officialEmail &&
+                element.profileDetails.personalDetails.officialEmail.toLowerCase()
 
-            const userPersonalMail = element && element.profileDetails && element.profileDetails.personalDetails &&
-              element.profileDetails.personalDetails.personalEmail &&
-              element.profileDetails.personalDetails.personalEmail.toLowerCase()
+              const userPersonalMail = element && element.profileDetails && element.profileDetails.personalDetails &&
+                element.profileDetails.personalDetails.personalEmail &&
+                element.profileDetails.personalDetails.personalEmail.toLowerCase()
 
-            const userName = element && element.firstName && element.firstName.toLowerCase()
-            const userFirstName = element && element.profileDetails && element.profileDetails.personalDetails &&
-              element.profileDetails.personalDetails.firstname &&
-              element.profileDetails.personalDetails.firstname.toLowerCase()
+              const userName = element && element.firstName && element.firstName.toLowerCase()
+              const userFirstName = element && element.profileDetails && element.profileDetails.personalDetails &&
+                element.profileDetails.personalDetails.firstname &&
+                element.profileDetails.personalDetails.firstname.toLowerCase()
 
-            const userMob = element && element.profileDetails && element.profileDetails.personalDetails &&
-              element.profileDetails.personalDetails.mobile
+              const userMob = element && element.profileDetails && element.profileDetails.personalDetails &&
+                element.profileDetails.personalDetails.mobile
 
-            const userTelePhone = element && element.profileDetails && element.profileDetails.personalDetails &&
-              element.profileDetails.personalDetails.telephone
+              const userTelePhone = element && element.profileDetails && element.profileDetails.personalDetails &&
+                element.profileDetails.personalDetails.telephone
 
-            const userPhone = element && element.phone
+              const userPhone = element && element.phone
 
-            const emailMatch = (userMail && userMail.includes(searchText.toLowerCase())) ||
-              (userPrimaryEmail && userPrimaryEmail.includes(searchText.toLowerCase())) ||
-              (userOfficialMail && userOfficialMail.includes(searchText.toLowerCase())) ||
-              (userPersonalMail && userPersonalMail.includes(searchText.toLowerCase()))
+              const emailMatch = (userMail && userMail.includes(searchText.toLowerCase())) ||
+                (userPrimaryEmail && userPrimaryEmail.includes(searchText.toLowerCase())) ||
+                (userOfficialMail && userOfficialMail.includes(searchText.toLowerCase())) ||
+                (userPersonalMail && userPersonalMail.includes(searchText.toLowerCase()))
 
-            const firstNameMatch = (userName && userName.includes(searchText.toLowerCase())) ||
-              (userFirstName && userFirstName.includes(searchText.toLowerCase()))
+              const firstNameMatch = (userName && userName.includes(searchText.toLowerCase())) ||
+                (userFirstName && userFirstName.includes(searchText.toLowerCase()))
 
-            const phoneMatch = (userTelePhone && userTelePhone.includes(searchText)) ||
-              (userMob && userMob.toString().includes(searchText)) || (userPhone && userPhone.includes(searchText))
+              const phoneMatch = (userTelePhone && userTelePhone.includes(searchText)) ||
+                (userMob && userMob.toString().includes(searchText)) || (userPhone && userPhone.includes(searchText))
 
-            if (emailMatch || firstNameMatch || phoneMatch) {
-              userData.push(element)
-              this.verifiedUsersData = userData
-              this.verifiedUsersDataCount = apiUserCount
-              this.updateUserCounts(userData, apiUserCount, 'ver_user')
-            } else {
-              this.verifiedUsersData = userData
-              this.verifiedUsersDataCount = apiUserCount
-              this.updateUserCounts(allusersData, apiUserCount, 'ver_user')
+              if (emailMatch || firstNameMatch || phoneMatch) {
+                userData.push(element)
+                this.verifiedUsersData = userData
+                this.verifiedUsersDataCount = apiUserCount
+                this.updateUserCounts(userData, apiUserCount, 'ver_user')
+              } else {
+                this.verifiedUsersData = userData
+                this.verifiedUsersDataCount = apiUserCount
+                this.updateUserCounts(allusersData, apiUserCount, 'ver_user')
+              }
             }
+          } else {
+            this.updateUserCounts(userContent, apiUserCount, 'ver_user')
           }
-        } else {
-          this.updateUserCounts(allusersData, apiUserCount, 'ver_user')
-        }
 
-      } else {
-        this.updateUserCounts(allusersData, apiUserCount, 'ver_user')
+        } else {
+          this.updateUserCounts(userContent, apiUserCount, 'ver_user')
+        }
+      }, error: () => {
+        this.resetUserData('verified')
+        this.loaderService.changeLoad.next(false)
       }
     })
   }
@@ -475,6 +487,7 @@ export class UsersViewComponent implements OnInit, OnDestroy {
   async getNVUsers(query: any) {
     let reqBody
     this.loaderService.changeLoad.next(true)
+    this.resetUserData('nonverified')
     const filtreq = {
       rootOrgId: this.rootOrgId,
       'profileDetails.profileStatus': 'NOT-VERIFIED',
@@ -511,80 +524,85 @@ export class UsersViewComponent implements OnInit, OnDestroy {
         sort_by: this.getSortOrder(query),
       },
     }
-    this.usersService.getAllKongUsers(reqBody).subscribe((data: any) => {
-      // const allusersData = data.result.response
-      // this.nonverifiedUsersData = allusersData.content
-      // this.nonverifiedUsersDataCount = data.result.response.count
-      const allusersData = data && data.result && data.result.response
-      const userContent = allusersData.content
-      const apiUserCount = data?.result?.response?.count
-      const searchText = this.getSearchText(query).toLowerCase()
-      if (searchText && searchText.length && searchText.length > 0) {
-        const userData: any = []
-        if (data && data.result && data.result.response && data.result.response.count &&
-          data.result.response.count > 0) {
-          for (const element of userContent) {
-            // const userMail = element && element.profileDetails && element.profileDetails.personalDetails &&
-            //   element.profileDetails.personalDetails.primaryEmail &&
-            //   element.profileDetails.personalDetails.primaryEmail.toLowerCase()
-            // const userName = element && element.firstName && element.firstName.toLowerCase()
-            // const userPhone = element && element.profileDetails && element.profileDetails.personalDetails &&
-            //   element.profileDetails.personalDetails.mobile
+    this.usersService.getAllKongUsers(reqBody).subscribe({
+      next: (data: any) => {
+        // const allusersData = data.result.response
+        // this.nonverifiedUsersData = allusersData.content
+        // this.nonverifiedUsersDataCount = data.result.response.count
+        const allusersData = data?.result?.response || {}
+        const userContent = allusersData.content || []
+        const apiUserCount = allusersData.count || 0
+        const searchText = this.getSearchText(query).toLowerCase()
+        if (searchText && searchText.length && searchText.length > 0) {
+          const userData: any = []
+          if (data && data.result && data.result.response && data.result.response.count &&
+            data.result.response.count > 0) {
+            for (const element of userContent) {
+              // const userMail = element && element.profileDetails && element.profileDetails.personalDetails &&
+              //   element.profileDetails.personalDetails.primaryEmail &&
+              //   element.profileDetails.personalDetails.primaryEmail.toLowerCase()
+              // const userName = element && element.firstName && element.firstName.toLowerCase()
+              // const userPhone = element && element.profileDetails && element.profileDetails.personalDetails &&
+              //   element.profileDetails.personalDetails.mobile
 
-            const userPrimaryEmail = element && element.profileDetails && element.profileDetails.personalDetails &&
-              element.profileDetails.personalDetails.primaryEmail &&
-              element.profileDetails.personalDetails.primaryEmail.toLowerCase()
+              const userPrimaryEmail = element && element.profileDetails && element.profileDetails.personalDetails &&
+                element.profileDetails.personalDetails.primaryEmail &&
+                element.profileDetails.personalDetails.primaryEmail.toLowerCase()
 
-            const userMail = element && element.email && element.email.toLowerCase()
+              const userMail = element && element.email && element.email.toLowerCase()
 
-            const userOfficialMail = element && element.profileDetails && element.profileDetails.personalDetails &&
-              element.profileDetails.personalDetails.officialEmail &&
-              element.profileDetails.personalDetails.officialEmail.toLowerCase()
+              const userOfficialMail = element && element.profileDetails && element.profileDetails.personalDetails &&
+                element.profileDetails.personalDetails.officialEmail &&
+                element.profileDetails.personalDetails.officialEmail.toLowerCase()
 
-            const userPersonalMail = element && element.profileDetails && element.profileDetails.personalDetails &&
-              element.profileDetails.personalDetails.personalEmail &&
-              element.profileDetails.personalDetails.personalEmail.toLowerCase()
+              const userPersonalMail = element && element.profileDetails && element.profileDetails.personalDetails &&
+                element.profileDetails.personalDetails.personalEmail &&
+                element.profileDetails.personalDetails.personalEmail.toLowerCase()
 
-            const userName = element && element.firstName && element.firstName.toLowerCase()
-            const userFirstName = element && element.profileDetails && element.profileDetails.personalDetails &&
-              element.profileDetails.personalDetails.firstname &&
-              element.profileDetails.personalDetails.firstname.toLowerCase()
+              const userName = element && element.firstName && element.firstName.toLowerCase()
+              const userFirstName = element && element.profileDetails && element.profileDetails.personalDetails &&
+                element.profileDetails.personalDetails.firstname &&
+                element.profileDetails.personalDetails.firstname.toLowerCase()
 
-            const userMob = element && element.profileDetails && element.profileDetails.personalDetails &&
-              element.profileDetails.personalDetails.mobile
+              const userMob = element && element.profileDetails && element.profileDetails.personalDetails &&
+                element.profileDetails.personalDetails.mobile
 
-            const userTelePhone = element && element.profileDetails && element.profileDetails.personalDetails &&
-              element.profileDetails.personalDetails.telephone
+              const userTelePhone = element && element.profileDetails && element.profileDetails.personalDetails &&
+                element.profileDetails.personalDetails.telephone
 
-            const userPhone = element && element.phone
+              const userPhone = element && element.phone
 
-            const emailMatch = (userMail && userMail.includes(searchText.toLowerCase())) ||
-              (userPrimaryEmail && userPrimaryEmail.includes(searchText.toLowerCase())) ||
-              (userOfficialMail && userOfficialMail.includes(searchText.toLowerCase())) ||
-              (userPersonalMail && userPersonalMail.includes(searchText.toLowerCase()))
+              const emailMatch = (userMail && userMail.includes(searchText.toLowerCase())) ||
+                (userPrimaryEmail && userPrimaryEmail.includes(searchText.toLowerCase())) ||
+                (userOfficialMail && userOfficialMail.includes(searchText.toLowerCase())) ||
+                (userPersonalMail && userPersonalMail.includes(searchText.toLowerCase()))
 
-            const firstNameMatch = (userName && userName.includes(searchText.toLowerCase())) ||
-              (userFirstName && userFirstName.includes(searchText.toLowerCase()))
+              const firstNameMatch = (userName && userName.includes(searchText.toLowerCase())) ||
+                (userFirstName && userFirstName.includes(searchText.toLowerCase()))
 
-            const phoneMatch = (userTelePhone && userTelePhone.includes(searchText)) ||
-              (userMob && userMob.toString().includes(searchText)) || (userPhone && userPhone.includes(searchText))
+              const phoneMatch = (userTelePhone && userTelePhone.includes(searchText)) ||
+                (userMob && userMob.toString().includes(searchText)) || (userPhone && userPhone.includes(searchText))
 
-            if (emailMatch || firstNameMatch || phoneMatch) {
-              userData.push(element)
-              this.nonverifiedUsersData = userData
-              this.nonverifiedUsersDataCount = apiUserCount
-              this.updateUserCounts(userData, apiUserCount, 'non_ver_user')
-            } else {
-              this.nonverifiedUsersData = userData
-              this.updateUserCounts(allusersData, apiUserCount, 'non_ver_user')
+              if (emailMatch || firstNameMatch || phoneMatch) {
+                userData.push(element)
+                this.nonverifiedUsersData = userData
+                this.nonverifiedUsersDataCount = apiUserCount
+                this.updateUserCounts(userData, apiUserCount, 'non_ver_user')
+              } else {
+                this.nonverifiedUsersData = userData
+                this.updateUserCounts(userContent, apiUserCount, 'non_ver_user')
+              }
             }
+          } else {
+            this.updateUserCounts(userContent, apiUserCount, 'non_ver_user')
           }
-        } else {
-          this.updateUserCounts(allusersData, apiUserCount, 'non_ver_user')
-        }
 
-      } else {
-        this.updateUserCounts(allusersData, apiUserCount, 'non_ver_user')
+        } else {
+          this.updateUserCounts(userContent, apiUserCount, 'non_ver_user')
+        }
+      }, error: () => {
+        this.resetUserData('nonverified')
+        this.loaderService.changeLoad.next(false)
       }
     })
   }
@@ -592,6 +610,7 @@ export class UsersViewComponent implements OnInit, OnDestroy {
   async getNMUsers(query: any) {
     let reqBody
     this.loaderService.changeLoad.next(true)
+    this.resetUserData('notmyuser')
     const filtreq = {
       rootOrgId: this.rootOrgId,
       'profileDetails.profileStatus': 'NOT-MY-USER',
@@ -627,83 +646,115 @@ export class UsersViewComponent implements OnInit, OnDestroy {
         sort_by: this.getSortOrder(query),
       },
     }
-    this.usersService.getAllKongUsers(reqBody).subscribe((data: any) => {
-      // const allusersData = data.result.response
-      // this.notmyuserUsersData = allusersData.content
-      // this.notmyuserUsersDataCount = data.result.response.count
-      const allusersData = data && data.result && data.result.response
-      const apiUserCount = data?.result?.response?.count
-      const userContent = allusersData.content
-      const searchText = this.getSearchText(query).toLowerCase()
-      if (searchText && searchText.length && searchText.length > 0) {
-        const userData: any = []
-        if (data && data.result && data.result.response && data.result.response.count &&
-          data.result.response.count > 0) {
-          for (const element of userContent) {
-            // const userMail = element && element.profileDetails && element.profileDetails.personalDetails &&
-            //   element.profileDetails.personalDetails.primaryEmail &&
-            //   element.profileDetails.personalDetails.primaryEmail.toLowerCase()
-            // const userName = element && element.firstName && element.firstName.toLowerCase()
-            // const userPhone = element && element.profileDetails && element.profileDetails.personalDetails &&
-            //   element.profileDetails.personalDetails.mobile
+    this.usersService.getAllKongUsers(reqBody).subscribe({
+      next: (data: any) => {
+        // const allusersData = data.result.response
+        // this.notmyuserUsersData = allusersData.content
+        // this.notmyuserUsersDataCount = data.result.response.count
+        const allusersData = data?.result?.response || {}
+        const userContent = allusersData.content || []
+        const apiUserCount = allusersData.count || 0
+        const searchText = this.getSearchText(query).toLowerCase()
+        if (searchText && searchText.length && searchText.length > 0) {
+          const userData: any = []
+          if (data && data.result && data.result.response && data.result.response.count &&
+            data.result.response.count > 0) {
+            for (const element of userContent) {
+              // const userMail = element && element.profileDetails && element.profileDetails.personalDetails &&
+              //   element.profileDetails.personalDetails.primaryEmail &&
+              //   element.profileDetails.personalDetails.primaryEmail.toLowerCase()
+              // const userName = element && element.firstName && element.firstName.toLowerCase()
+              // const userPhone = element && element.profileDetails && element.profileDetails.personalDetails &&
+              //   element.profileDetails.personalDetails.mobile
 
-            const userPrimaryEmail = element && element.profileDetails && element.profileDetails.personalDetails &&
-              element.profileDetails.personalDetails.primaryEmail &&
-              element.profileDetails.personalDetails.primaryEmail.toLowerCase()
+              const userPrimaryEmail = element && element.profileDetails && element.profileDetails.personalDetails &&
+                element.profileDetails.personalDetails.primaryEmail &&
+                element.profileDetails.personalDetails.primaryEmail.toLowerCase()
 
-            const userMail = element && element.email && element.email.toLowerCase()
+              const userMail = element && element.email && element.email.toLowerCase()
 
-            const userOfficialMail = element && element.profileDetails && element.profileDetails.personalDetails &&
-              element.profileDetails.personalDetails.officialEmail &&
-              element.profileDetails.personalDetails.officialEmail.toLowerCase()
+              const userOfficialMail = element && element.profileDetails && element.profileDetails.personalDetails &&
+                element.profileDetails.personalDetails.officialEmail &&
+                element.profileDetails.personalDetails.officialEmail.toLowerCase()
 
-            const userPersonalMail = element && element.profileDetails && element.profileDetails.personalDetails &&
-              element.profileDetails.personalDetails.personalEmail &&
-              element.profileDetails.personalDetails.personalEmail.toLowerCase()
+              const userPersonalMail = element && element.profileDetails && element.profileDetails.personalDetails &&
+                element.profileDetails.personalDetails.personalEmail &&
+                element.profileDetails.personalDetails.personalEmail.toLowerCase()
 
-            const userName = element && element.firstName && element.firstName.toLowerCase()
+              const userName = element && element.firstName && element.firstName.toLowerCase()
 
-            const userFirstName = element && element.profileDetails && element.profileDetails.personalDetails &&
-              element.profileDetails.personalDetails.firstname &&
-              element.profileDetails.personalDetails.firstname.toLowerCase()
+              const userFirstName = element && element.profileDetails && element.profileDetails.personalDetails &&
+                element.profileDetails.personalDetails.firstname &&
+                element.profileDetails.personalDetails.firstname.toLowerCase()
 
-            const userMob = element && element.profileDetails && element.profileDetails.personalDetails &&
-              element.profileDetails.personalDetails.mobile
+              const userMob = element && element.profileDetails && element.profileDetails.personalDetails &&
+                element.profileDetails.personalDetails.mobile
 
-            const userTelePhone = element && element.profileDetails && element.profileDetails.personalDetails &&
-              element.profileDetails.personalDetails.telephone
+              const userTelePhone = element && element.profileDetails && element.profileDetails.personalDetails &&
+                element.profileDetails.personalDetails.telephone
 
-            const userPhone = element && element.phone
+              const userPhone = element && element.phone
 
-            const emailMatch = (userMail && userMail.includes(searchText.toLowerCase())) ||
-              (userPrimaryEmail && userPrimaryEmail.includes(searchText.toLowerCase())) ||
-              (userOfficialMail && userOfficialMail.includes(searchText.toLowerCase())) ||
-              (userPersonalMail && userPersonalMail.includes(searchText.toLowerCase()))
+              const emailMatch = (userMail && userMail.includes(searchText.toLowerCase())) ||
+                (userPrimaryEmail && userPrimaryEmail.includes(searchText.toLowerCase())) ||
+                (userOfficialMail && userOfficialMail.includes(searchText.toLowerCase())) ||
+                (userPersonalMail && userPersonalMail.includes(searchText.toLowerCase()))
 
-            const firstNameMatch = (userName && userName.includes(searchText.toLowerCase())) ||
-              (userFirstName && userFirstName.includes(searchText.toLowerCase()))
+              const firstNameMatch = (userName && userName.includes(searchText.toLowerCase())) ||
+                (userFirstName && userFirstName.includes(searchText.toLowerCase()))
 
-            const phoneMatch = (userTelePhone && userTelePhone.includes(searchText)) ||
-              (userMob && userMob.toString().includes(searchText)) || (userPhone && userPhone.includes(searchText))
+              const phoneMatch = (userTelePhone && userTelePhone.includes(searchText)) ||
+                (userMob && userMob.toString().includes(searchText)) || (userPhone && userPhone.includes(searchText))
 
-            if (emailMatch || firstNameMatch || phoneMatch) {
-              userData.push(element)
-              this.notmyuserUsersData = userData
-              this.notmyuserUsersDataCount = apiUserCount
-              this.updateUserCounts(userData, apiUserCount, 'not_my_user')
-            } else {
-              this.notmyuserUsersData = userData
-              this.updateUserCounts(allusersData, apiUserCount, 'not_my_user')
+              if (emailMatch || firstNameMatch || phoneMatch) {
+                userData.push(element)
+                this.notmyuserUsersData = userData
+                this.notmyuserUsersDataCount = apiUserCount
+                this.updateUserCounts(userData, apiUserCount, 'not_my_user')
+              } else {
+                this.notmyuserUsersData = userData
+                this.updateUserCounts(userContent, apiUserCount, 'not_my_user')
+              }
             }
+          } else {
+            this.updateUserCounts(userContent, apiUserCount, 'not_my_user')
           }
-        } else {
-          this.updateUserCounts(allusersData, apiUserCount, 'not_my_user')
-        }
 
-      } else {
-        this.updateUserCounts(allusersData, apiUserCount, 'not_my_user')
+        } else {
+          this.updateUserCounts(userContent, apiUserCount, 'not_my_user')
+        }
+      }, error: () => {
+        this.resetUserData('notmyuser')
+        this.loaderService.changeLoad.next(false)
       }
     })
+  }
+
+  private resetUserData(filter: string) {
+    const dataKey = {
+      allusers: 'activeUsersData',
+      verified: 'verifiedUsersData',
+      nonverified: 'nonverifiedUsersData',
+      notmyuser: 'notmyuserUsersData',
+    }[filter]
+    const countKey = {
+      allusers: 'activeUsersDataCount',
+      verified: 'verifiedUsersDataCount',
+      nonverified: 'nonverifiedUsersDataCount',
+      notmyuser: 'notmyuserUsersDataCount',
+    }[filter]
+    const innerCountKey = {
+      allusers: 'activeUsersDataCountInner',
+      verified: 'verifiedUsersDataCountInner',
+      nonverified: 'nonverifiedUsersDataCountInner',
+      notmyuser: 'notmyuserUsersDataCountInner',
+    }[filter]
+
+    if (dataKey && countKey && innerCountKey) {
+      (this as any)[dataKey] = []
+        ; (this as any)[countKey] = 0
+        ; (this as any)[innerCountKey] = 0
+    }
   }
 
   getFilterGroup(query: any) {

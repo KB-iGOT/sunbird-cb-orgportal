@@ -183,8 +183,9 @@
   /* stylelint-disable */
   font: 400 14px Lato;
   /* stylelint-enable */
-  width: 160px;
-
+  width: auto !important;
+    margin: 0;
+    padding: 0 !important;
   .menu-item-icon {
     color: #00000099;
     margin-right: 5px;
@@ -263,4 +264,8 @@
 
 :host ::ng-deep mat-cell:last-of-type, mat-header-cell:last-of-type, mat-footer-cell:last-of-type {
   padding-right: 16px !important;
+}
+
+:host ::ng-deep .mat-mdc-menu-item-text {
+  margin-left: 10px !important;
 }

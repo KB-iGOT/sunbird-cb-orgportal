@@ -1,5 +1,5 @@
 import { LoadingPopupComponent } from './loading-popup.component'
-import { MatLegacyDialogRef as MatDialogRef } from '@angular/material/legacy-dialog'
+import { MatDialogRef } from '@angular/material/dialog'
 
 describe('LoadingPopupComponent', () => {
   let component: LoadingPopupComponent

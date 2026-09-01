@@ -10,8 +10,8 @@ import { ProfileV2Service } from '@ws/app/src/lib/routes/profile-v2/services/pro
 /* tslint:disable */
 import _ from 'lodash'
 import { TranslateService } from '@ngx-translate/core'
-import { MatLegacyDialogRef as MatDialogRef, MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA } from '@angular/material/legacy-dialog'
-import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar'
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog'
+import { MatSnackBar } from '@angular/material/snack-bar'
 
 const MOBILE_PATTERN = /^[0]?[6789]\d{9}$/
 const PIN_CODE_PATTERN = /^[1-9][0-9]{5}$/
@@ -23,6 +23,7 @@ const EMAIL_PATTERN = /^[a-zA-Z0-9]+[a-zA-Z0-9._-]*[a-zA-Z0-9]+@[a-zA-Z0-9]+([-a
   selector: 'ws-app-enroll-profile-form',
   templateUrl: './enroll-profile-form.component.html',
   styleUrls: ['./enroll-profile-form.component.scss'],
+  standalone: false,
 })
 export class EnrollProfileFormComponent implements OnInit {
   public afterSubmitAction = this.checkAfterSubmit.bind(this)

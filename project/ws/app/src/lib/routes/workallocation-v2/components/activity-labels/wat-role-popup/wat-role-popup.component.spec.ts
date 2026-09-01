@@ -1,6 +1,6 @@
 import { UntypedFormArray, UntypedFormBuilder, UntypedFormControl, UntypedFormGroup } from '@angular/forms'
-import { MatLegacyCheckboxChange as MatCheckboxChange } from '@angular/material/legacy-checkbox'
-import { MatLegacyDialogRef as MatDialogRef } from '@angular/material/legacy-dialog'
+import { MatCheckboxChange } from '@angular/material/checkbox'
+import { MatDialogRef } from '@angular/material/dialog'
 import { WatRolePopupComponent, IWatRolePopupData, IChield } from './wat-role-popup.component'
 
 // Mock lodash

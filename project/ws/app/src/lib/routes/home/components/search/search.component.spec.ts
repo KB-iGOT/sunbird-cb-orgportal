@@ -1,7 +1,7 @@
 import { SearchComponent } from './search.component'
 import { LoaderService } from '../../../../../../../../../src/app/services/loader.service'
 import { UsersService } from '../../../users/services/users.service'
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog'
+import { MatDialog } from '@angular/material/dialog'
 import { EventEmitter } from '@angular/core'
 
 describe('SearchComponent', () => {

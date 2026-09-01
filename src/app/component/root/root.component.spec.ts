@@ -16,7 +16,7 @@ import {
 } from '@angular/router'
 import { ApplicationRef, ChangeDetectorRef, ElementRef } from '@angular/core'
 import { SwUpdate } from '@angular/service-worker'
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog'
+import { MatDialog } from '@angular/material/dialog'
 import { BehaviorSubject, Subject, of } from 'rxjs'
 import {
 	ConfigurationsService,

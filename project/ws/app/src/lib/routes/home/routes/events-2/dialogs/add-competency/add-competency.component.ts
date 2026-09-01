@@ -1,14 +1,15 @@
 import { Component, Inject, OnInit } from '@angular/core'
 import { FormControl } from '@angular/forms'
 import { ProfileV2Service } from '../../../../services/home.servive'
-import { MAT_LEGACY_DIALOG_DATA, MatLegacyDialogRef } from '@angular/material/legacy-dialog'
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog'
 import { debounceTime } from 'rxjs/operators'
 import * as _ from 'lodash'
 
 @Component({
   selector: 'ws-app-add-competency',
   templateUrl: './add-competency.component.html',
-  styleUrls: ['./add-competency.component.scss']
+  styleUrls: ['./add-competency.component.scss'],
+  standalone: false
 })
 
 export class AddCompetencyComponent implements OnInit {
@@ -22,8 +23,8 @@ export class AddCompetencyComponent implements OnInit {
   selectedThemesList: any[] = []
   preSelectedThemesCount = 0
   constructor(
-    private dialogRef: MatLegacyDialogRef<AddCompetencyComponent>,
-    @Inject(MAT_LEGACY_DIALOG_DATA) private competencies: any[],
+    private dialogRef: MatDialogRef<AddCompetencyComponent>,
+    @Inject(MAT_DIALOG_DATA) private competencies: any[],
     private homeService: ProfileV2Service
   ) { }
 
@@ -187,7 +188,7 @@ export class AddCompetencyComponent implements OnInit {
   }
 
   get canAddCompetencies(): boolean {
-    if (!this.selectedThemesList || (
+    if (!this.selectedThemesList || this.selectedThemesList?.length === 0 || (
       this.selectedThemesList &&
       this.selectedThemesList.find((selectedThem: any) => (!selectedThem.selectedSubThemes || selectedThem.selectedSubThemes.length === 0)))) {
       return false

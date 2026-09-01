@@ -1,6 +1,6 @@
 import { LeadershiptableComponent } from './leadershiptable.component'
 import { SelectionModel } from '@angular/cdk/collections'
-import { MatLegacyTableDataSource as MatTableDataSource } from '@angular/material/legacy-table'
+import { MatTableDataSource } from '@angular/material/table'
 import { of, throwError } from 'rxjs'
 
 // Mock dependencies

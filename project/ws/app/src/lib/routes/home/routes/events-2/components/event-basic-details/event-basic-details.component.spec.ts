@@ -1,6 +1,6 @@
 import { EventBasicDetailsComponent } from './event-basic-details.component'
 import { FormGroup, FormControl, Validators } from '@angular/forms'
-import { MatLegacySnackBar } from '@angular/material/legacy-snack-bar'
+import { MatSnackBar } from '@angular/material/snack-bar'
 import { EventsService } from '../../services/events.service'
 import { LoaderService } from '../../../../../../../../../../../src/app/services/loader.service'
 import { DatePipe } from '@angular/common'
@@ -11,7 +11,7 @@ import { NgZone } from '@angular/core'
 
 describe('EventBasicDetailsComponent', () => {
   let component: EventBasicDetailsComponent
-  let mockMatSnackBar: jest.Mocked<MatLegacySnackBar>
+  let mockMatSnackBar: jest.Mocked<MatSnackBar>
   let mockEventsService: jest.Mocked<EventsService>
   let mockLoaderService: jest.Mocked<LoaderService>
   let mockDatePipe: jest.Mocked<DatePipe>
@@ -34,7 +34,7 @@ describe('EventBasicDetailsComponent', () => {
     // Create mocks for all dependencies
     mockMatSnackBar = {
       open: jest.fn()
-    } as unknown as jest.Mocked<MatLegacySnackBar>
+    } as unknown as jest.Mocked<MatSnackBar>
 
     mockEventsService = {
       createContent: jest.fn().mockReturnValue(of(mockCreateContentResponse)),

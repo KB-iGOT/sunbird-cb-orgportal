@@ -1,10 +1,14 @@
 import { Component, Input, OnInit } from '@angular/core'
 import { Router, ActivatedRoute } from '@angular/router'
 import { TrainingPlanDataSharingService } from '../../services/training-plan-data-share.service'
+/* tslint:disable */
+import _ from 'lodash'
+/* tslint:enable */
 @Component({
-  selector: 'ws-app-preview-plan',
-  templateUrl: './preview-plan.component.html',
-  styleUrls: ['./preview-plan.component.scss'],
+    selector: 'ws-app-preview-plan',
+    templateUrl: './preview-plan.component.html',
+    styleUrls: ['./preview-plan.component.scss'],
+    standalone: false
 })
 export class PreviewPlanComponent implements OnInit {
   @Input() form?: string
@@ -16,6 +20,9 @@ export class PreviewPlanComponent implements OnInit {
   selectedTab = ''
   showBackBtn = false
   navUrl: any
+  // The APAR year of the plan being previewed, shown read only. The plan has to be authored to
+  // change it, the stepper is where the year is picked
+  planYear = ''
   constructor(
     private router: Router,
     private route: ActivatedRoute,
@@ -24,8 +31,14 @@ export class PreviewPlanComponent implements OnInit {
   ngOnInit() {
     // this.from = this.route.snapshot.queryParams['from']
     const contentData = this.route.snapshot.data['contentData']
+    // Opened as a dialog from the stepper, the form asked for wins over the plan of the route
+    if (this.form === 'content' || this.form === 'assignee') {
+      this.showSelectionOfPlanBeingEdited()
+      return
+    }
     if (contentData) {
       this.showBackBtn = true
+      this.planYear = contentData.planYear || ''
       this.navUrl = {
         url: ['app', 'home', 'training-plan-dashboard'],
         queryParams: {
@@ -93,30 +106,39 @@ export class PreviewPlanComponent implements OnInit {
         })
         this.allContentChips = arr
       }
-    } else if (this.form === 'content') {
-      if (this.tpdsSvc.trainingPlanContentData &&
-        this.tpdsSvc.trainingPlanContentData.data) {
-        this.contentList = this.tpdsSvc.trainingPlanContentData.data.content.filter((item: any) => {
+    }
+  }
+
+  /**
+   * The content or the assignees picked so far on the plan being edited, shown in the dialog the
+   * stepper opens from the selected items link.
+   */
+  private showSelectionOfPlanBeingEdited() {
+    if (this.form === 'content') {
+      this.getSelectedContent()
+      return
+    }
+    if (this.tpdsSvc.trainingPlanAssigneeData) {
+      const category = this.tpdsSvc.trainingPlanAssigneeData.category
+      if (category === 'Designation' || category === 'CustomUser') {
+        const assigneeData = this.tpdsSvc.trainingPlanAssigneeData.data.filter((item: any) => {
           return item.selected
         })
+        this.assigneeData = { category, data: assigneeData }
       }
-    } else if (this.form === 'assignee') {
-      if (this.tpdsSvc.trainingPlanAssigneeData) {
-        const category = this.tpdsSvc.trainingPlanAssigneeData.category
-        if (category === 'Designation') {
-          const assigneeData = this.tpdsSvc.trainingPlanAssigneeData.data.filter((item: any) => {
-            return item.selected
-          })
-          this.assigneeData = { category, data: assigneeData }
-        } else if (category === 'CustomUser') {
-          const assigneeData = this.tpdsSvc.trainingPlanAssigneeData.data.filter((item: any) => {
-            return item.selected
-          })
-          this.assigneeData = { category, data: assigneeData }
-        }
-      }
-
     }
+  }
+
+  /**
+   * Content selected on the plan. It is read once when the plan is opened and kept in step with
+   * what the user ticks, so opening the selected items does not call the search again.
+   */
+  getSelectedContent() {
+    const contentIds = this.tpdsSvc.trainingPlanStepperData?.contentList || []
+    const selectedContent = _.keyBy(this.tpdsSvc.trainingPlanSelectedContent || [], 'identifier')
+    this.contentList = contentIds
+      .map((identifier: string) => selectedContent[identifier])
+      .filter((content: any) => !!content)
   }
 
   goBack() {

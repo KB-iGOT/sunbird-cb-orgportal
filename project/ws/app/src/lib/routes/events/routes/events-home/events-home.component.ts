@@ -9,12 +9,12 @@ import { ILeftMenu } from '@sunbird-cb/collection'
 /* tslint:enable */
 
 @Component({
-  selector: 'ws-app-events-home',
-  templateUrl: './events-home.component.html',
-  styleUrls: ['./events-home.component.scss'],
-  /* tslint:disable */
-  host: { class: 'margin-top-l' },
-  /* tslint:enable */
+    selector: 'ws-app-events-home',
+    templateUrl: './events-home.component.html',
+    styleUrls: ['./events-home.component.scss'],
+    /* tslint:disable */
+    host: { class: 'margin-top-l' },
+    standalone: false
 })
 export class EventsHomeComponent implements OnInit, AfterViewInit, OnDestroy {
   sideNavBarOpened = true

@@ -4,14 +4,16 @@ import { UploadLogoDialogComponent } from './upload-logo-dialog/upload-logo-dial
 import { MatDialog } from '@angular/material/dialog'
 import { MatSnackBar } from '@angular/material/snack-bar'
 import _ from 'lodash'
+import { EventService, WsEvents } from '@sunbird-cb/utils-v2'
 // import { ConfigurationsService } from '@sunbird-cb/utils'
 // import { NsWidgetResolver, WidgetBaseComponent } from '@ws-widget/resolver'
 // import { ILeftMenu, IMenu } from './left-menu-v1.model'
 // import { defaultImg } from './img.json'
 @Component({
-  selector: 'ws-widget-left-menu',
-  templateUrl: './left-menu.component.html',
-  styleUrls: ['./left-menu.component.scss'],
+    selector: 'ws-widget-left-menu',
+    templateUrl: './left-menu.component.html',
+    styleUrls: ['./left-menu.component.scss'],
+    standalone: false
 })
 export class LeftMenuComponent implements OnInit, OnDestroy {
   @Input() widgetData!: any
@@ -28,8 +30,12 @@ export class LeftMenuComponent implements OnInit, OnDestroy {
   rootOrgId = ''
   channelName = ''
   expandedParentMenuKey: string | null = null;
-  constructor(private activatedRoute: ActivatedRoute, private router: Router, public dialog: MatDialog,
+  constructor(
+    private activatedRoute: ActivatedRoute,
+    private router: Router,
+    public dialog: MatDialog,
     private matSnackBar: MatSnackBar,
+    private events: EventService,
 
     // private configSvc: ConfigurationsService,
   ) { }
@@ -176,4 +182,23 @@ export class LeftMenuComponent implements OnInit, OnDestroy {
     return menu.defaultExpanded || this.expandedParentMenuKey === menu.key
   }
 
+  raiseTelemetry(tab: any) {
+    if (tab && tab.key === 'external-trainings') {
+      this.events.raiseInteractTelemetry(
+        {
+          type: WsEvents.EnumInteractTypes.CLICK,
+          id: `${tab.key}`,
+        },
+        {},
+        {
+          module: WsEvents.EnumTelemetrymodules.HOME,
+        }
+      )
+    }
+  }
+
+
+  changeToDefaultImg($event: any) {
+    $event.target.src = '/assets/instances/eagle/app_logos/default.png'
+  }
 }

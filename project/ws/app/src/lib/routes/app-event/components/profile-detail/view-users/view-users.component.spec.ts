@@ -1,4 +1,4 @@
-import { MatLegacyDialogRef as MatDialogRef } from '@angular/material/legacy-dialog'
+import { MatDialogRef } from '@angular/material/dialog'
 import { UntypedFormControl } from '@angular/forms'
 import { ViewUsersComponent } from './view-users.component'
 

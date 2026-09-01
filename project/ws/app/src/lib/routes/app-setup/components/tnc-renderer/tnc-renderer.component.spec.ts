@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { EventEmitter, Pipe, PipeTransform } from '@angular/core'
-import { MatLegacySelectChange as MatSelectChange } from '@angular/material/legacy-select'
+import { MatSelectChange } from '@angular/material/select'
 import { TncRendererComponent } from './tnc-renderer.component'
 import { NsTnc } from '../../../../../../../../../src/app/models/tnc.model'
 

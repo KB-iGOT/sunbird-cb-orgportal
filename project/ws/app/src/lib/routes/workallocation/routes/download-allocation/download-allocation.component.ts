@@ -1,9 +1,10 @@
 import { Component, OnInit, Input } from '@angular/core'
 
 @Component({
-  selector: 'ws-app-download-allocation',
-  templateUrl: './download-allocation.component.html',
-  styleUrls: ['./download-allocation.component.scss'],
+    selector: 'ws-app-download-allocation',
+    templateUrl: './download-allocation.component.html',
+    styleUrls: ['./download-allocation.component.scss'],
+    standalone: false
 })
 export class DownloadAllocationComponent implements OnInit {
   @Input() data: any[] | undefined

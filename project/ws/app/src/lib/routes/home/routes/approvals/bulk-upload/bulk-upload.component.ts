@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy, AfterViewInit } from '@angular/core'
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog'
-import { LegacyPageEvent as PageEvent } from '@angular/material/legacy-paginator'
-import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar'
+import { MatDialog } from '@angular/material/dialog'
+import { PageEvent } from '@angular/material/paginator'
+import { MatSnackBar } from '@angular/material/snack-bar'
 import { HttpErrorResponse } from '@angular/common/http'
 import { ActivatedRoute } from '@angular/router'
 // tslint:disable-next-line
@@ -15,9 +15,10 @@ import { FileProgressComponent } from '../../users-view/file-progress/file-progr
 import { VerifyOtpComponent } from '../../users-view/verify-otp/verify-otp.component'
 
 @Component({
-  selector: 'ws-bulk-upload-approval',
-  templateUrl: './bulk-upload.component.html',
-  styleUrls: ['./bulk-upload.component.scss'],
+    selector: 'ws-bulk-upload-approval',
+    templateUrl: './bulk-upload.component.html',
+    styleUrls: ['./bulk-upload.component.scss'],
+    standalone: false
 })
 export class BulkUploadApprovalComponent implements OnInit, AfterViewInit, OnDestroy {
 

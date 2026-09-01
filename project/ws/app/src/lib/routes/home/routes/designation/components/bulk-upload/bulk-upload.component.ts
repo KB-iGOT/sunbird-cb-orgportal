@@ -11,15 +11,16 @@ import { UsersService } from '../../../../../users/services/users.service'
 import { FileProgressComponent } from '../../../users-view/file-progress/file-progress.component'
 import { VerifyOtpComponent } from '../../../users-view/verify-otp/verify-otp.component'
 import { IBulkUploadDesignationList } from '../../interface/interface'
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog'
-import { LegacyPageEvent as PageEvent } from '@angular/material/legacy-paginator'
-import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar'
+import { MatDialog } from '@angular/material/dialog'
+import { PageEvent } from '@angular/material/paginator'
+import { MatSnackBar } from '@angular/material/snack-bar'
 import { DesignationsService } from '../../services/designations.service'
 
 @Component({
-  selector: 'ws-app-bulk-upload',
-  templateUrl: './bulk-upload.component.html',
-  styleUrls: ['./bulk-upload.component.scss'],
+    selector: 'ws-app-bulk-upload',
+    templateUrl: './bulk-upload.component.html',
+    styleUrls: ['./bulk-upload.component.scss'],
+    standalone: false
 })
 export class BulkUploadComponent implements OnInit, OnDestroy, AfterViewInit {
 

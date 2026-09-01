@@ -1,6 +1,6 @@
 import { SingleAssignPopupComponent } from './single-assign-popup.component'
 import { UntypedFormBuilder, UntypedFormControl, Validators } from '@angular/forms'
-import { MatLegacyPaginator as MatPaginator } from '@angular/material/legacy-paginator'
+import { MatPaginator } from '@angular/material/paginator'
 import { MatTableDataSource } from '@angular/material/table'
 import { of, throwError } from 'rxjs'
 

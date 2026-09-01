@@ -11,6 +11,7 @@ import { NsAnalytics, NsCourseAnalytics } from '../../models/app-toc-analytics.m
   selector: 'ws-app-app-toc-analytics',
   templateUrl: './app-toc-analytics.component.html',
   styleUrls: ['./app-toc-analytics.component.scss'],
+  standalone: false,
 })
 export class AppTocAnalyticsComponent implements OnInit, OnDestroy {
   content: NsContent.IContent | null = null

@@ -7,14 +7,14 @@ jest.mock('@sunbird-cb/collection', () => ({ WidgetUserService: jest.fn() }))
 import { ProfileViewComponent } from './profile-view.component'
 import { BlendedApporvalService } from '../../services/blended-approval.service'
 import { WidgetUserService } from '@sunbird-cb/collection'
-import { MatLegacyDialog } from '@angular/material/legacy-dialog'
+import { MatDialog } from '@angular/material/dialog'
 import { Router, ActivatedRoute } from '@angular/router'
 import { of, throwError } from 'rxjs'
 import moment from 'moment'
 import { ProfileCertificateDialogComponent } from '../profile-certificate-dialog/profile-certificate-dialog.component'
 
 // Jest mocks
-jest.mock('@angular/material/legacy-dialog')
+jest.mock('@angular/material/dialog')
 jest.mock('../../services/blended-approval.service')
 jest.mock('@angular/router')
 
@@ -22,7 +22,7 @@ describe('ProfileViewComponent', () => {
     let component: ProfileViewComponent
     let bpServiceMock: jest.Mocked<BlendedApporvalService>
     let userSvcMock: jest.Mocked<WidgetUserService>
-    let dialogMock: jest.Mocked<MatLegacyDialog>
+    let dialogMock: jest.Mocked<MatDialog>
     let routerMock: jest.Mocked<Router>
     let routeMock: jest.Mocked<ActivatedRoute>
 
@@ -54,7 +54,7 @@ describe('ProfileViewComponent', () => {
 
         dialogMock = {
             open: jest.fn().mockReturnValue({ afterClosed: () => of(null) }),
-        } as unknown as jest.Mocked<MatLegacyDialog>
+        } as unknown as jest.Mocked<MatDialog>
 
         routerMock = {
             getCurrentNavigation: jest.fn().mockReturnValue(null),

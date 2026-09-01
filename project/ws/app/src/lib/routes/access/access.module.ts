@@ -16,10 +16,10 @@ import { UsersComponent } from './routes/users/users.component'
 import { UsersService } from './services/users.service'
 import { MatIconModule } from '@angular/material/icon'
 import { MatSidenavModule } from '@angular/material/sidenav'
-import { MatLegacyCardModule as MatCardModule } from '@angular/material/legacy-card'
+import { MatCardModule } from '@angular/material/card'
 
 @NgModule({
-  declarations: [HomeComponent, PrivilegesComponent, UsersComponent],
+  declarations: [HomeComponent, PrivilegesComponent],
   imports: [CommonModule, AccessRoutingModule, BreadcrumbsOrgModule, LeftMenuWithoutLogoModule, SbUiResolverModule,
     MatSidenavModule, MatIconModule, GroupCheckboxModule, HomeModule, RouterModule, UIORGTableModule, MatCardModule],
   exports: [UsersComponent],

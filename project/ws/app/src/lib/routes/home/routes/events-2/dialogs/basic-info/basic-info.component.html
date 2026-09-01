@@ -18,21 +18,21 @@
               eventForm.controls['eventName'].errors?.minlength">
               Minimum characters left to create {{ 10 - eventForm?.controls['eventName'].value.length}}
             </mat-error>
-            <mat-error *ngIf="eventForm?.get('eventName') && eventForm.get('eventName').hasError('required')">
+            <mat-error *ngIf="eventForm?.get('eventName')?.hasError('required')">
               Event name is mandatory
             </mat-error>
-            <mat-error *ngIf="eventForm?.get('eventName') && eventForm.get('eventName').hasError('pattern')">
+            <mat-error *ngIf="eventForm?.get('eventName')?.hasError('pattern')">
               Only ( a-z/A-Z , 0-9 . _ - $ / : [ ]' ' " " !) characters are supported
             </mat-error>
           </mat-form-field>
         </div>
 
 
-        <!-- <div class="label flex items-center mt-2">
+        <div class="label flex items-center mt-2">
           <span class="mr-1 label font-semibold">Event Type </span>
           <strong class="text-red-700">*</strong>
-        </div> -->
-        <!-- <mat-radio-group aria-label="Select an option" class="flex" formControlName="eventType">
+        </div>
+        <mat-radio-group aria-label="Select an option" class="flex" formControlName="eventType">
           <mat-radio-button class="mr-5 p-4" value="live">
             Live Event
           </mat-radio-button>
@@ -43,10 +43,10 @@
         <div class="note-container">
           <b>Note:</b>
           <ul class="margin-remove">
-             <li>Select Live Event type for Samuhik Charcha events.</li>
+            <li>Select Live Event type for meeting.</li>
             <li>Select Recorded Event type for the other events.</li>
           </ul>
-        </div> -->
+        </div>
       </div>
       <div class="action-btns save-event  flex justify-center gap-4">
         <button mat-stroked-button class="flex justify-center items-center mat-btn-outline cancel-button"
@@ -94,11 +94,11 @@
               </span>
             </div>
             <div class="input-event mb-4">
-              <ng-container *ngIf="eventForm?.get('eventName') && eventForm.get('eventName').value">
+              <ng-container *ngIf="eventForm?.get('eventName')?.value">
                 <label class="custome-title" #tooltip="matTooltip" [matTooltip]="eventForm.get('eventName').value"
                   matTooltipClass="new-toolTip" matTooltipPosition="above">{{eventForm.get('eventName').value}}</label>
               </ng-container>
-              <ng-container *ngIf="!(eventForm?.get('eventName') && eventForm.get('eventName').value)">
+              <ng-container *ngIf="!(eventForm?.get('eventName')?.value)">
                 <label class="custome-title">Event Name</label>
               </ng-container>
             </div>

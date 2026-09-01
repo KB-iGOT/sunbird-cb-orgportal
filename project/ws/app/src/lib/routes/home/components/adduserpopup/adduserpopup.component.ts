@@ -1,6 +1,6 @@
 import { Component, OnInit, Inject } from '@angular/core'
-import { MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA, MatLegacyDialogRef as MatDialogRef } from '@angular/material/legacy-dialog'
-import { MatLegacyTableDataSource as MatTableDataSource } from '@angular/material/legacy-table'
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog'
+import { MatTableDataSource } from '@angular/material/table'
 import { UntypedFormGroup } from '@angular/forms'
 import { SelectionModel } from '@angular/cdk/collections'
 import { Router } from '@angular/router'
@@ -23,9 +23,10 @@ export interface PeriodicElement {
 // ]
 
 @Component({
-  selector: 'ws-app-adduserpopup',
-  templateUrl: './adduserpopup.component.html',
-  styleUrls: ['./adduserpopup.component.scss'],
+    selector: 'ws-app-adduserpopup',
+    templateUrl: './adduserpopup.component.html',
+    styleUrls: ['./adduserpopup.component.scss'],
+    standalone: false
 })
 export class AdduserpopupComponent implements OnInit {
   usersListData: PeriodicElement[] = []

@@ -11,7 +11,8 @@ import {
 import { TooltipComponent } from './tooltip/tooltip.component'
 
 @Directive({
-  selector: '[appTooltip]'
+    selector: '[appTooltip]',
+    standalone: false
 })
 export class TooltipDirective implements OnDestroy {
   @Input('appTooltip') content: string = '';

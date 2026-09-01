@@ -1,6 +1,6 @@
 import { ChipComponent } from './chip.component'
 import { TrainingPlanDataSharingService } from '../../services/training-plan-data-share.service'
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog'
+import { MatDialog } from '@angular/material/dialog'
 import { PreviewDialogBoxComponent } from '../preview-dialog-box/preview-dialog-box.component'
 import { of } from 'rxjs'
 

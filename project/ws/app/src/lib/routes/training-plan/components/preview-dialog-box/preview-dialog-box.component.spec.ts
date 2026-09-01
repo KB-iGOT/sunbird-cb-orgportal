@@ -1,5 +1,5 @@
 
-import { MatLegacyDialogRef as MatDialogRef } from '@angular/material/legacy-dialog'
+import { MatDialogRef } from '@angular/material/dialog'
 import { PreviewDialogBoxComponent } from './preview-dialog-box.component'
 
 describe('PreviewDialogBoxComponent', () => {

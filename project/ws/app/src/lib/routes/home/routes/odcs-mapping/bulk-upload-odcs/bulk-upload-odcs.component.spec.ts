@@ -1,6 +1,6 @@
 import { of, throwError } from 'rxjs'
 import { HttpErrorResponse } from '@angular/common/http'
-import { LegacyPageEvent as PageEvent } from '@angular/material/legacy-paginator'
+import { PageEvent } from '@angular/material/paginator'
 import { BulkUploadOdcsComponent } from './bulk-upload-odcs.component'
 import { FileProgressComponent } from '../../users-view/file-progress/file-progress.component'
 

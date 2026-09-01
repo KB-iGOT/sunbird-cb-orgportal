@@ -5,8 +5,7 @@ import { UsersService } from '../../services/users.service'
 import { UsersService as UsersService2 } from '../../../users/services/users.service'
 
 /* tslint:disable */
-import * as _ from 'lodash'
-import { ITableData } from '@sunbird-cb/collection/lib/ui-org-table/interface/interfaces'
+import _ from 'lodash'
 import { ProfileV2UtillService } from '../../../home/services/home-utill.service'
 
 /* tslint:enable */
@@ -14,6 +13,7 @@ import { ProfileV2UtillService } from '../../../home/services/home-utill.service
   selector: 'ws-app-users',
   templateUrl: './users.component.html',
   styleUrls: ['./users.component.scss'],
+  standalone: false
 })
 
 export class UsersComponent implements OnInit, AfterViewInit, AfterContentChecked, OnDestroy {
@@ -21,7 +21,7 @@ export class UsersComponent implements OnInit, AfterViewInit, AfterContentChecke
   @Input() selectedOrgData: any
   @Input() selectedRole: any
 
-  tabledata!: ITableData
+  tabledata!: any
   configSvc: any
   data: any = []
   usersData: any
@@ -134,9 +134,6 @@ export class UsersComponent implements OnInit, AfterViewInit, AfterContentChecke
   menuActions($event: { action: string, row: any }) {
     const user = { userId: _.get($event.row, 'wid') }
     _.set(user, 'deptId', _.get(this.data2, 'id'))
-
-    // const user = { userId: $event.row?.wid }
-    // user.deptId = this.data2?.id
     switch ($event.action) {
       case 'showOnKarma':
         window.open(`${environment.karmYogiPath}/app/person-profile/${user.userId}`)

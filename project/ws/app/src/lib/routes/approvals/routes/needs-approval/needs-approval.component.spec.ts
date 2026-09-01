@@ -5,15 +5,15 @@ jest.mock('@sunbird-cb/utils-v2', () => ({
 
 import { NeedsApprovalComponent } from './needs-approval.component'
 import { NeedApprovalsService } from '../../services/need-approvals.service'
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog'
-import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar'
+import { MatDialog } from '@angular/material/dialog'
+import { MatSnackBar } from '@angular/material/snack-bar'
 import { NavigationEnd } from '@angular/router'
 import { TelemetryEvents } from '../../../../head/_services/telemetry.event.model'
 import { of, Subject } from 'rxjs'
 
 jest.mock('../../services/need-approvals.service')
-jest.mock('@angular/material/legacy-dialog')
-jest.mock('@angular/material/legacy-snack-bar')
+jest.mock('@angular/material/dialog')
+jest.mock('@angular/material/snack-bar')
 jest.mock('@sunbird-cb/utils-v2')
 
 describe('NeedsApprovalComponent', () => {

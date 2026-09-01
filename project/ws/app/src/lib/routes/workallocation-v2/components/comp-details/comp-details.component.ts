@@ -8,12 +8,12 @@ import { NSWatCompetency } from '../../models/competency-wat.model'
 import { WatStoreService } from '../../services/wat.store.service'
 
 @Component({
-  selector: 'ws-app-comp-details',
-  templateUrl: './comp-details.component.html',
-  styleUrls: ['./comp-details.component.scss'],
-  // tslint:disable
-  encapsulation: ViewEncapsulation.None,
-  // tslint:enable
+    selector: 'ws-app-comp-details',
+    templateUrl: './comp-details.component.html',
+    styleUrls: ['./comp-details.component.scss'],
+    // tslint:disable
+    encapsulation: ViewEncapsulation.None,
+    standalone: false
 })
 export class CompDetailsComponent implements OnInit, OnDestroy {
   dataStructure: NSWatCompetency.ICompActivity[] = []

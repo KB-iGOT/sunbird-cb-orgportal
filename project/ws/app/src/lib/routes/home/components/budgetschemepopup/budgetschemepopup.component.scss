@@ -5,7 +5,7 @@
 }
 
 ::ng-deep.schemeform-form .mat-form-field-infix {
-    width: 225px !important;
+    width: auto !important;
 }
 
 .mat-column-srnumber, .mat-column-Menu {
@@ -17,5 +17,36 @@
 }
 
 .width-44 {
-    width: 44% !important;
+    flex: 1;
+    width: auto !important;
+    min-width: 0;
+}
+
+.form-row {
+    display: flex;
+    gap: 32px;
+    align-items: flex-start;
+    margin-bottom: 16px;
+}
+
+.width-44 mat-form-field {
+    width: 100%;
+}
+
+.form-label {
+    display: block;
+    min-height: 48px;
+}
+
+
+.ws-mat-primary-background-popup {
+    background-color: #1b4ca1  !important;
+}
+
+.ws-mat-default-text-popup {
+    color: #1b4ca1  !important;
+}
+
+.color-black {
+    color:#000 !important;
 }

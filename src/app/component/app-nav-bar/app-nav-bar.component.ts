@@ -11,9 +11,10 @@ import { Subscription } from 'rxjs'
 import { environment } from '../../../environments/environment'
 import { MatSnackBar } from '@angular/material/snack-bar'
 @Component({
-  selector: 'ws-app-nav-bar',
-  templateUrl: './app-nav-bar.component.html',
-  styleUrls: ['./app-nav-bar.component.scss'],
+    selector: 'ws-app-nav-bar',
+    templateUrl: './app-nav-bar.component.html',
+    styleUrls: ['./app-nav-bar.component.scss'],
+    standalone: false
 })
 export class AppNavBarComponent implements OnInit, OnChanges, OnDestroy {
   @Input() mode: 'top' | 'bottom' = 'top'

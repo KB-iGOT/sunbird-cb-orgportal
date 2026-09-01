@@ -1,6 +1,6 @@
 import { FormControl } from '@angular/forms'
 import { MatSnackBar } from '@angular/material/snack-bar'
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog'
+import { MatDialog } from '@angular/material/dialog'
 import { of, throwError } from 'rxjs'
 import { FormsListComponent } from './forms-list.component'
 import { CustomFieldsService } from '../../../../users/custom-fields.service'

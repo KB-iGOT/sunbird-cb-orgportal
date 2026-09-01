@@ -1,13 +1,12 @@
 import { Component, OnInit } from '@angular/core'
 
 @Component({
-  selector: 'ws-file-progress',
-  templateUrl: './file-progress.component.html',
-  styleUrls: ['./file-progress.component.scss'],
-  /* tslint:disable */
-  host: { class: 'flex h-full justify-center' },
-  /* tslint:enable */
-
+    selector: 'ws-file-progress',
+    templateUrl: './file-progress.component.html',
+    styleUrls: ['./file-progress.component.scss'],
+    /* tslint:disable */
+    host: { class: 'flex h-full justify-center' },
+    standalone: false
 })
 export class FileProgressComponent implements OnInit {
 

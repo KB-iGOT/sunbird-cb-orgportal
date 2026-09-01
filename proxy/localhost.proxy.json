@@ -1,6 +1,6 @@
 {
-  "/apis/*": {
-    "target": "https://igot-dev.in",
+  "/apis": {
+    "target": "https://mdo.qa.karmayogibharat.net/",
     "secure": false,
     "logLevel": "debug",
     "changeOrigin": true,
@@ -8,79 +8,70 @@
       "/apis": "/apis"
     },
     "headers": {
-      "Cookie": "connect.sid=s%3Aejx2T5VMPKvL9b3QdLxpeq-YwdbkUbb7.d3K6oDSmLMIbs3ncKTkvPdnfs2lP8zmQE%2Bzo%2FwLa5is"
+      "Cookie": "connect.sid=s%3AE6FlzB2joUFmf72OACe4ldJKeWGHX6x2.dj28mm9U7wwTC5d%2Bv%2FDLAF2G%2B87HBdy4R%2FiKlSd2%2B7M"
     }
   },
-  "/api/*": {
-    "target": "https://igot-dev.in",
+  "/api": {
+    "target": "https://mdo.qa.karmayogibharat.net/",
     "secure": false,
     "logLevel": "debug",
     "changeOrigin": true,
     "pathRewrite": {
       "/api": "/api"
+    },
+    "headers": {
+      "Cookie": "connect.sid=s%3AE6FlzB2joUFmf72OACe4ldJKeWGHX6x2.dj28mm9U7wwTC5d%2Bv%2FDLAF2G%2B87HBdy4R%2FiKlSd2%2B7M"
     }
   },
-  "/event/*": {
-    "target": "https://igot-dev.in",
-    "secure": false,
-    "logLevel": "debug",
-    "changeOrigin": true,
-    "pathRewrite": {
-      "/apis": "/apis"
-    }
-  },
-  "/content-api/*": {
+  "/content-api": {
     "target": "http://localhost:3004",
     "secure": false,
     "logLevel": "debug",
     "changeOrigin": true,
     "pathRewrite": {
-      "/apis": ""
+      "^/content-api": ""
     }
   },
-  "/content-store/*": {
+  "/content-store": {
     "target": "http://localhost:3005",
     "secure": false,
     "logLevel": "debug",
     "changeOrigin": true,
     "pathRewrite": {
-      "/apis": ""
+      "^/content-store": ""
     }
   },
-  "/chat-bot/*": {
+  "/chat-bot": {
     "target": "http://localhost:3006",
     "secure": false,
     "logLevel": "debug",
     "changeOrigin": true,
     "pathRewrite": {
-      "/apis": ""
+      "^/chat-bot": ""
     }
   },
-  "/mobile-apps/*": {
+  "/mobile-apps": {
     "target": "http://localhost:3007",
     "secure": false,
     "logLevel": "debug",
     "changeOrigin": true,
     "pathRewrite": {
-      "/apis": ""
+      "^/mobile-apps": ""
     }
   },
-  "/LA/*": {
+  "/LA": {
     "target": "http://localhost:3008",
     "secure": false,
     "logLevel": "debug",
     "changeOrigin": true,
     "pathRewrite": {
-      "/apis": ""
+      "^/LA": ""
     }
   },
-  "/assets/*": {
+  "/assets": {
     "target": "http://127.0.0.1:8080",
     "secure": false,
     "logLevel": "debug",
-    "changeOrigin": true,
-    "pathRewrite": {
-      "/apis": ""
-    }
+    "changeOrigin": true
   }
 }

@@ -14,6 +14,7 @@ import { AppTocService } from '@ws/app/src/lib/routes/app-toc/services/app-toc.s
   selector: 'viewer-viewer-secondary-top-bar',
   templateUrl: './viewer-secondary-top-bar.component.html',
   styleUrls: ['./viewer-secondary-top-bar.component.scss'],
+  standalone: false,
 })
 export class ViewerSecondaryTopBarComponent implements OnInit, OnDestroy {
 

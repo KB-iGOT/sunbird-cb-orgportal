@@ -11,7 +11,8 @@ import { Subject, Subscription } from 'rxjs'
 import { debounceTime } from 'rxjs/operators'
 
 @Directive({
-  selector: '[appDebounceClick]',
+    selector: '[appDebounceClick]',
+    standalone: false
 })
 export class DebounceClickDirective implements OnInit, OnDestroy {
   @Input()

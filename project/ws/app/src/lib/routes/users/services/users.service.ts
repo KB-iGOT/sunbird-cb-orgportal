@@ -14,7 +14,7 @@ const API_END_POINTS = {
   PROFILE_REGISTRY_V1: '/apis/proxies/v8/api/user/v2/read/',
   PROFILE_REGISTRY_V2: '/apis/proxies/v8/api/user/v2/read',
   CREATE_PROFILE_REGISTRY: '/apis/protected/v8/user/profileRegistry/createUserRegistryV2',
-  ADD_USER_ROLE: '/apis/proxies/v8/user/private/v1/assign/role',
+  ADD_USER_ROLE: '/apis/proxies/v8/user/v1/role/assign',
   WF_HISTORY_BY_APPID: 'apis/protected/v8/workflowhandler/historyByApplicationId/',
   SEARCH_USER: 'apis/protected/v8/user/autocomplete/department',
   USER_BDD: '/apis/protected/v8/portal/mdo/deptAction/userrole',

@@ -6,10 +6,11 @@ import { ICompentencyKeys } from '../../../home/interface/interfaces'
 import { InitService } from '../../../../../../../../../src/app/services/init.service'
 import { environment } from '../../../../../../../../../src/environments/environment'
 @Component({
-  selector: 'ws-app-filter',
-  templateUrl: './filter.component.html',
-  styleUrls: ['./filter.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'ws-app-filter',
+    templateUrl: './filter.component.html',
+    styleUrls: ['./filter.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class FilterComponent implements OnInit, AfterContentChecked {
   @Output() toggleFilter = new EventEmitter()

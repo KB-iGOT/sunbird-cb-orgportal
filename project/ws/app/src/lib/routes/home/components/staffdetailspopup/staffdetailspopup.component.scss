@@ -4,9 +4,44 @@
     padding-top: 20px
 }
 
-::ng-deep.staffform-form .mat-form-field-infix {
-    width: 250px !important;
-}
+// ::ng-deep.staffform-form .mat-form-field-infix {
+//     width: 250px !important;
+// }
 .mat-raised-button[disabled] {
     opacity: 0.6;
+}
+
+.mat-title {
+    font-weight: bold;
+    color: #000 !important;
+}
+
+.staff-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 24px;
+    width: 100%;
+}
+
+.formgroup {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.formgroup mat-form-field {
+    width: 100%;
+}
+
+.formgroup .mat-mdc-form-field,
+.formgroup .mat-form-field {
+    width: 100%;
+}
+
+.ws-mat-primary-background-popup {
+    background-color: #1b4ca1  !important;
+}
+
+.ws-mat-default-text-popup {
+    color: #1b4ca1  !important;
 }

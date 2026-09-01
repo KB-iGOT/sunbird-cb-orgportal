@@ -3,8 +3,8 @@ import { AbstractControl, UntypedFormControl, UntypedFormGroup, Validators } fro
 import { debounceTime, switchMap, takeUntil } from 'rxjs/operators'
 import { OrgProfileService } from '../../services/org-profile.service'
 import { Subject } from 'rxjs'
-import { MatLegacyChipInputEvent as MatChipInputEvent } from '@angular/material/legacy-chips'
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog'
+import { MatChipInputEvent } from '@angular/material/chips'
+import { MatDialog } from '@angular/material/dialog'
 import { COMMA, ENTER } from '@angular/cdk/keycodes'
 import { ConfigurationsService } from '@sunbird-cb/utils-v2'
 /* tslint:disable*/
@@ -17,7 +17,7 @@ import { DialogBoxComponent } from '../../components/dialog-box/dialog-box.compo
     styleUrls: ['./training-rograms.component.scss'],
     /* tslint:disable */
     host: { class: 'w-full role-card flex flex-1' },
-    /* tslint:enable */
+    standalone: false
 })
 export class TrainingRogramsComponent implements OnInit {
     trainingProgramForm!: UntypedFormGroup

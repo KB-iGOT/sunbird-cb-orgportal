@@ -12,6 +12,7 @@ import { AppTocService } from '../../services/app-toc.service'
   selector: 'ws-app-app-toc-overview',
   templateUrl: './app-toc-overview.component.html',
   styleUrls: ['./app-toc-overview.component.scss'],
+  standalone: false,
 })
 export class AppTocOverviewComponent implements OnInit, OnDestroy {
   content: NsContent.IContent | null = null

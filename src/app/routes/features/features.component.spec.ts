@@ -4,20 +4,13 @@ import { ConfigurationsService } from '@sunbird-cb/utils-v2'
 import { CustomTourService } from '@sunbird-cb/collection'
 import { SubapplicationRespondService } from '@sunbird-cb/utils-v2'
 import { ValueService } from '@sunbird-cb/utils-v2'
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog'
+import { MatDialog } from '@angular/material/dialog'
 import { of, Subject } from 'rxjs'
 
 jest.mock('@angular/router')
 jest.mock('@sunbird-cb/utils-v2')
-jest.mock('@sunbird-cb/collection', () => ({
-  CustomTourService: class CustomTourService {
-    startTour = jest.fn()
-    stopTour = jest.fn()
-    onTourStart = { subscribe: jest.fn() }
-  },
-  ROOT_WIDGET_CONFIG: {}
-}))
-jest.mock('@angular/material/legacy-dialog')
+jest.mock('@sunbird-cb/collection')
+jest.mock('@angular/material/dialog')
 
 describe('FeaturesComponent', () => {
     let component: FeaturesComponent
@@ -33,7 +26,7 @@ describe('FeaturesComponent', () => {
         // Mocking all the service dependencies
         mockRouter = { navigate: jest.fn() } as any
         mockActivatedRoute = { snapshot: { queryParamMap: { get: jest.fn(() => 'test-query') } } } as any
-        mockConfigurationsService = { appsConfig: { groups: [], features: {} }, tourGuideNotifier: new Subject<boolean>(), restrictedFeatures: new Set<string>() } as any
+        mockConfigurationsService = { appsConfig: { groups: [], features: {} }, tourGuideNotifier: new Subject<boolean>() } as any
         mockCustomTourService = { startTour: jest.fn() } as any
         mockSubapplicationRespondService = { unsubscribeResponse: jest.fn() } as any
         mockValueService = { isXSmall$: of(false) } as any
@@ -55,8 +48,7 @@ describe('FeaturesComponent', () => {
         expect(component).toBeTruthy()
     })
 
-    xit('should subscribe to queryControl valueChanges and update query param in the URL', () => {
-        // debounceTime(500) requires fake timers - skip for now
+    it('should subscribe to queryControl valueChanges and update query param in the URL', () => {
         const spyNavigate = jest.spyOn(mockRouter, 'navigate')
         const newQuery = 'new-query'
 
@@ -66,10 +58,14 @@ describe('FeaturesComponent', () => {
         expect(spyNavigate).toHaveBeenCalledWith([], { queryParams: { q: newQuery } })
     })
 
-    xit('should filter features based on query', () => {
-        // featuresConfig setup required - skip
+    it('should filter features based on query', () => {
         const query = 'feature-query'
+        //const mockFeature = { name: 'Feature 1', keywords: ['keyword1'], description: 'feature description' }
+        // const mockGroup = { featureWidgets: [{ widgetData: { actionBtn: mockFeature } }] }
+        // component['featuresConfig'] = [mockGroup]
+
         const filteredFeatures = component['filteredFeatures'](query)
+
         expect(filteredFeatures.length).toBe(1)
         expect(filteredFeatures[0].featureWidgets.length).toBe(1)
     })
@@ -82,7 +78,7 @@ describe('FeaturesComponent', () => {
     it('should call startTour when startTour is invoked', () => {
         component.startTour()
         expect(mockCustomTourService.startTour).toHaveBeenCalled()
-        // unsubscribeResponse only called if responseSubscription is set (it isn't by default)
+        expect(mockSubapplicationRespondService.unsubscribeResponse).toHaveBeenCalled()
     })
 
     it('should open the logout dialog when logout method is called', () => {

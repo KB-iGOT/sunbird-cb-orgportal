@@ -3,7 +3,7 @@ import { BehaviorSubject, Subject, Observable } from 'rxjs'
 import { finalize } from 'rxjs/operators'
 import { HttpClient, HttpResponse } from '@angular/common/http'
 import * as fileSaver from 'file-saver'
-import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar'
+import { MatSnackBar } from '@angular/material/snack-bar'
 
 const API_ENDPOINTS = {
   // bulkUpload: `/apis/proxies/v8/user/v1/bulkupload`,
@@ -14,6 +14,7 @@ const API_ENDPOINTS = {
   getBulkApproval: '/apis/proxies/v8/workflow/admin/bulkupdate/getstatus',
   // bulkApprovalUpload: `/apis/proxies/v8/workflow/admin/transition/bulkupdate`,
   bulkApprovalUpload: '/apis/proxies/v8/workflow/admin/v2/bulkupdate/transition', // csv support
+  bulkUploadNonGovtUser: `/apis/proxies/v8/user/nongovt/v1/bulkupload`, // volunteer organisation users
 
   // Bulk Upload Designation
   BULK_UPLOAD_SAMPLE_FILE: (frameworkId: string) =>
@@ -64,6 +65,12 @@ export class FileService {
       url = `${API_ENDPOINTS.bulkUploadV3}?orgId=${selectedOrgData.roleId}&channel=${selectedOrgData.depatName}`
     }
     return this.http.post<any>(url, fileContent)
+      .pipe(finalize(() => this.displayLoader$.next(false)))
+  }
+
+  public uploadNonGovtUser(_fileName: string, fileContent: FormData): Observable<any> {
+    this.displayLoader$.next(true)
+    return this.http.post<any>(API_ENDPOINTS.bulkUploadNonGovtUser, fileContent)
       .pipe(finalize(() => this.displayLoader$.next(false)))
   }
 

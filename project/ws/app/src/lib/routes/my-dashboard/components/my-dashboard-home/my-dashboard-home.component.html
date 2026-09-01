@@ -10,11 +10,11 @@
 </mat-card> -->
 
 <div *ngIf="currentDashboard[0] && !showLookerProDashboard" class="container-balanced mat-drawer-side">
-  <lib-rain-dashboards [showFilters]="true" [showMessage]="false" [messageType]="currentDashboard[0].messageType"
+  <!-- <lib-rain-dashboards [showFilters]="true" [showMessage]="false" [messageType]="currentDashboard[0].messageType"
     [message]="currentDashboard[0].message" [mapLayoutFilePath]="mapPath" (libDashboardId)="getDashboardId($event)"
     (libDateFilterPreset)="getDateFilterPreset($event)" [authToken]="token" [getDashboardForKM]="getDashboardForKM"
     [getDashboardForProfile]="getDashboardForProfile" [getChartV2]="getChartV2"
-    [isFrontPage]="false"></lib-rain-dashboards>
+    [isFrontPage]="false"></lib-rain-dashboards> -->
 </div>
 <div class="container-balanced mat-drawer-side" *ngIf="showLookerProDashboard">
   <mat-card-content>

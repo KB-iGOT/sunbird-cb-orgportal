@@ -1,8 +1,8 @@
 import { Component, Input, NgZone, OnChanges, OnInit, SimpleChanges } from '@angular/core'
 import { FormGroup, Validators } from '@angular/forms'
-import { MatLegacySnackBar } from '@angular/material/legacy-snack-bar'
+import { MatSnackBar } from '@angular/material/snack-bar'
 import * as _ from 'lodash'
-import { URL_PATRON, YOUTUBE_URL_PATRON, events } from '../../models/events.model'
+import { DEFAULT_EVENT_CATEGORIES, URL_PATRON, YOUTUBE_URL_PATRON, events } from '../../models/events.model'
 import { EventsService } from '../../services/events.service'
 import { map, mergeMap } from 'rxjs/operators'
 import { environment } from '../../../../../../../../../../../src/environments/environment'
@@ -11,9 +11,10 @@ import { LoaderService } from '../../../../../../../../../../../src/app/services
 import { DatePipe } from '@angular/common'
 
 @Component({
-  selector: 'ws-app-event-basic-details',
-  templateUrl: './event-basic-details.component.html',
-  styleUrls: ['./event-basic-details.component.scss']
+    selector: 'ws-app-event-basic-details',
+    templateUrl: './event-basic-details.component.html',
+    styleUrls: ['./event-basic-details.component.scss'],
+    standalone: false
 })
 export class EventBasicDetailsComponent implements OnInit, OnChanges {
 
@@ -23,8 +24,8 @@ export class EventBasicDetailsComponent implements OnInit, OnChanges {
   @Input() eventStatus = 'draft'
   @Input() userProfile: any
   @Input() openTab = 'draft'
+  @Input() eventCategoriesList: string[] = DEFAULT_EVENT_CATEGORIES
 
-  eventCategoriesList = ['Webinar', 'Karmayogi Talks', 'Karmayogi Saptah', 'Sadhana Saptah', 'Samuhik Charcha - NLW 2026']
   minDate = new Date()
 
   maxTimeToStart = '11:44 pm'
@@ -38,7 +39,7 @@ export class EventBasicDetailsComponent implements OnInit, OnChanges {
   //#endregion
 
   constructor(
-    private matSnackBar: MatLegacySnackBar,
+    private matSnackBar: MatSnackBar,
     private eventSvc: EventsService,
     private loaderService: LoaderService,
     private datePipe: DatePipe,
@@ -98,13 +99,14 @@ export class EventBasicDetailsComponent implements OnInit, OnChanges {
 
   ngOnInit(): void {
     if (this.eventDetails) {
-      if (this.edf?.typeofEvent?.value?.toLowerCase() === 'live') {
-        this.eventCategoriesList = ['Samuhik Charcha']
-        this.timeGap = 30
-        this.maxTimeToStart = '11:29 pm'
-      }
+      this.applyEventTypeRules(this.edf?.typeofEvent?.value)
     }
     if (this.eventDetails && this.eventDetails.controls && this.openMode === 'edit' && this.openTab !== 'past') {
+      if (this.eventDetails.controls.typeofEvent) {
+        this.eventDetails.controls.typeofEvent.valueChanges.subscribe((type: string) => {
+          this.applyEventTypeRules(type)
+        })
+      }
       if (this.eventDetails.controls.startDate) {
         this.eventDetails.controls.startDate.valueChanges.subscribe((date) => {
           this.checkMinTimeToStart(date)
@@ -132,19 +134,32 @@ export class EventBasicDetailsComponent implements OnInit, OnChanges {
           }
         })
       }
-      if (this.edf?.typeofEvent?.value?.toLowerCase() === 'live') {
-        this.edf.maxEnrolments?.setValidators([Validators.required, Validators.min(10), Validators.max(10000)])
-        this.edf.maxEnrolments?.updateValueAndValidity()
-        this.edf.registrationLink?.setValidators([])
-        this.edf.registrationLink?.updateValueAndValidity()
-        this.eventCategoriesList = ['Samuhik Charcha']
-      }
-    } else if (this.openMode === 'view') {
-      if (this.edf?.typeofEvent?.value?.toLowerCase() === 'live') {
-        this.eventCategoriesList = ['Samuhik Charcha']
-      }
     }
 
+  }
+
+  applyEventTypeRules(type: string) {
+    const typeOfEvent = (type || '').toString().toLowerCase()
+    if (typeOfEvent === 'live') {
+      this.timeGap = 30
+      this.maxTimeToStart = '11:29 pm'
+    } else {
+      this.timeGap = 15
+      this.maxTimeToStart = '11:44 pm'
+    }
+    if (this.openMode === 'edit' && this.openTab !== 'past' && this.edf) {
+      if (typeOfEvent === 'live') {
+        this.edf.maxEnrolments?.setValidators([Validators.required, Validators.min(10), Validators.max(10000)])
+        this.edf.registrationLink?.clearValidators()
+      } else {
+        this.edf.maxEnrolments?.setValidators([Validators.min(10), Validators.max(10000)])
+        if (!this.disableUrl) {
+          this.edf.registrationLink?.setValidators([Validators.required, Validators.pattern(URL_PATRON)])
+        }
+      }
+      this.edf.maxEnrolments?.updateValueAndValidity()
+      this.edf.registrationLink?.updateValueAndValidity()
+    }
   }
 
   get edf() {

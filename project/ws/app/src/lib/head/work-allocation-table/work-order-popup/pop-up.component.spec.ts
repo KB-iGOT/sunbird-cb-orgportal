@@ -1,5 +1,5 @@
 import { WorkAllocationPopUpComponent } from './pop-up.component'
-import { MatLegacyTableDataSource as MatTableDataSource } from '@angular/material/legacy-table'
+import { MatTableDataSource } from '@angular/material/table'
 import { SelectionModel } from '@angular/cdk/collections'
 import { of, throwError } from 'rxjs'
 

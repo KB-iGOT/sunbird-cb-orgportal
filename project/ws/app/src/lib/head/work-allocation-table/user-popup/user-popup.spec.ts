@@ -1,5 +1,5 @@
 import { UserPopupComponent, IDialogData } from './user-popup'
-// import { MatLegacyDialogRef as MatDialogRef } from '@angular/material/legacy-dialog';
+// import { MatDialogRef } from '@angular/material/dialog';
 
 // Mock implementation of MatDialogRef
 const createMockDialogRef = () => {

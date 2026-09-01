@@ -6,9 +6,10 @@ import * as _ from 'lodash'
 // import { ConfigurationsService } from '@sunbird-cb/utils-v2'
 
 @Component({
-  selector: 'ws-app-basic-info',
-  templateUrl: './basic-info.component.html',
-  styleUrls: ['./basic-info.component.scss'],
+    selector: 'ws-app-basic-info',
+    templateUrl: './basic-info.component.html',
+    styleUrls: ['./basic-info.component.scss'],
+    standalone: false
 })
 export class BasicInfoComponent implements OnInit {
   basicInfo: any

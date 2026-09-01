@@ -1,9 +1,9 @@
 import { Component } from '@angular/core'
-import { MatLegacyDialog } from '@angular/material/legacy-dialog'
+import { MatDialog } from '@angular/material/dialog'
 import { ActivatedRoute, Router } from '@angular/router'
 import { CommunityService } from '../../services/community.service'
 import { ReportIssueComponent } from '../report-issue/report-issue.component'
-import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar'
+import { MatSnackBar } from '@angular/material/snack-bar'
 import { DialogConfirmComponent } from '../../../../../../../../../../../src/app/component/dialog-confirm/dialog-confirm.component'
 import { map } from 'rxjs/operators'
 import { Observable } from 'rxjs'
@@ -16,10 +16,10 @@ export interface IDialogData {
 }
 
 @Component({
-  selector: 'ws-app-community-manage',
-  templateUrl: './community-manage.component.html',
-  styleUrls: ['./community-manage.component.scss'],
-  // changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'ws-app-community-manage',
+    templateUrl: './community-manage.component.html',
+    styleUrls: ['./community-manage.component.scss'],
+    standalone: false
 })
 export class CommunityManageComponent {
   selectedTabIndex = 0
@@ -51,7 +51,7 @@ export class CommunityManageComponent {
   // reportedDiscussion$ = this.reportedDiscussionSubject.asObservable();
 
 
-  constructor(private dialog: MatLegacyDialog,
+  constructor(private dialog: MatDialog,
     private communitySvc: CommunityService,
     private actvRoute: ActivatedRoute,
     private snackbar: MatSnackBar,

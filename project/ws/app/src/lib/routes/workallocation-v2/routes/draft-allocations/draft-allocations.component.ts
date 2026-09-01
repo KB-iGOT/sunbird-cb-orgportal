@@ -1,6 +1,6 @@
 import { Component, OnInit, SimpleChanges } from '@angular/core'
-import { MatLegacyDialog as MatDialog, MatLegacyDialogConfig as MatDialogConfig } from '@angular/material/legacy-dialog'
-import { MatLegacyPaginator as MatPaginator } from '@angular/material/legacy-paginator'
+import { MatDialog, MatDialogConfig as MatDialogConfig } from '@angular/material/dialog'
+import { MatPaginator } from '@angular/material/paginator'
 import { Router, ActivatedRoute } from '@angular/router'
 import { EventService } from '@sunbird-cb/utils-v2'
 /* tslint:disable */
@@ -11,9 +11,10 @@ import { AllocationService } from '../../services/allocation.service'
 import { UploadFileService } from '../../services/uploadfile.service'
 import { TelemetryEvents } from "../../../../head/_services/telemetry.event.model"
 @Component({
-  selector: 'ws-app-draft-allocations',
-  templateUrl: './draft-allocations.component.html',
-  styleUrls: ['./draft-allocations.component.scss'],
+    selector: 'ws-app-draft-allocations',
+    templateUrl: './draft-allocations.component.html',
+    styleUrls: ['./draft-allocations.component.scss'],
+    standalone: false
 })
 export class DraftAllocationsComponent implements OnInit {
   tabs: any

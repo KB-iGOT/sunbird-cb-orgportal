@@ -89,13 +89,13 @@
                 as
                 non-verified</mat-slide-toggle>
             </p>
-            <!-- <p class="float-right mat-body-2" *ngIf="user?.profileDetails?.profileStatus === 'NOT-VERIFIED'">
+            <p class="float-right mat-body-2" *ngIf="user?.profileDetails?.profileStatus === 'NOT-VERIFIED'">
               <mat-slide-toggle (change)="confirmUserRequest(updateconfirm,'NOT-MY-USER', user, $event)"
                 [checked]="true">This is my
                 user</mat-slide-toggle>
-            </p> -->
+            </p>
             <div class="flex flex-row margin-top-m">
-              <div class="md:w-1/3">
+              <div class="md:w-1/2">
                 <label class="margin-remove-bottom form-label required">Group</label>
                 <mat-form-field appearance="outline">
                   <mat-select #group formControlName="group" placeholder="Select group">
@@ -117,7 +117,7 @@
                   cancel</mat-icon> <span *ngIf="user?.profileDetails?.profileGroupStatus === 'NOT-VERIFIED'"
                   class="mat-caption status-text ws-mat-black40-text"> Non-verified</span>
               </div>
-              <div class="md:w-1/3">
+              <div class="md:w-1/2">
                 <label class="margin-remove-bottom form-label">Designation</label>
                 <mat-form-field appearance="outline" class="fixed-height-select">
                   <mat-select #designation formControlName="designation" placeholder="Select designation"
@@ -206,7 +206,7 @@
                   +91
                 </div>
                 <!-- </mat-form-field> -->
-                <mat-form-field appearance="outline" class="flex-expand w-48p">
+                <mat-form-field appearance="outline" class="flex-expand w-48p mnumber">
                   <input id="mobileNumber" #mobile type="text" matInput placeholder="Type here" formControlName="mobile"
                     aria-label="Mobile Number input" maxlength="10" (keypress)="numericOnly($event)"
                     (paste)="numericOnly($event)">
@@ -435,7 +435,7 @@
             </div>
 
             <div class="flex flex-row margin-top-m">
-              <div class="md:w-1/1" *ngIf="isMdoLeader || isBoth">
+              <div class="md:w-1/1" *ngIf="canEditRoles(user)">
                 <label for="roles" class="margin-remove-bottom form-label required" aria-label="Roles label">
                   Role
                 </label>
@@ -450,7 +450,7 @@
                 </div>
               </div>
 
-              <div class="md:w-1/1" *ngIf="!isMdoLeader">
+              <div class="md:w-1/1" *ngIf="!canEditRoles(user)">
                 <label class="view-text-label">Roles</label>
                 <div *ngIf="user?.organisations && user?.organisations[0]?.roles?.length > 0">
                   <ul class="roleslist">

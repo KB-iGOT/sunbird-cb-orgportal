@@ -1,7 +1,7 @@
 import { StaffComponent } from './staff.component'
 import { of, throwError } from 'rxjs'
 import { SelectionModel } from '@angular/cdk/collections'
-import { MatLegacyTableDataSource as MatTableDataSource } from '@angular/material/legacy-table'
+import { MatTableDataSource } from '@angular/material/table'
 import { SimpleChange, SimpleChanges } from '@angular/core'
 import { UntypedFormControl, UntypedFormGroup } from '@angular/forms'
 

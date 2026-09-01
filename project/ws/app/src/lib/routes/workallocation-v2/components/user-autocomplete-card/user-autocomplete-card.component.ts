@@ -1,9 +1,10 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core'
 
 @Component({
-  selector: 'ws-app-user-autocomplete-card',
-  templateUrl: './user-autocomplete-card.component.html',
-  styleUrls: ['./user-autocomplete-card.component.scss'],
+    selector: 'ws-app-user-autocomplete-card',
+    templateUrl: './user-autocomplete-card.component.html',
+    styleUrls: ['./user-autocomplete-card.component.scss'],
+    standalone: false
 })
 export class UserAutocompleteCardComponent implements OnInit {
   @Input() user: any

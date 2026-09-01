@@ -23,12 +23,13 @@ import {
 import { CertificationApiService } from '../../apis/certification-api.service'
 import { CertificationService } from '../../services/certification.service'
 import { SnackbarComponent } from '../snackbar/snackbar.component'
-import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar'
+import { MatSnackBar } from '@angular/material/snack-bar'
 
 @Component({
   selector: 'ws-app-result-upload',
   templateUrl: './result-upload.component.html',
   styleUrls: ['./result-upload.component.scss'],
+  standalone: false,
 })
 export class ResultUploadComponent implements OnInit, OnDestroy {
   @Input() content!: NsContent.IContent

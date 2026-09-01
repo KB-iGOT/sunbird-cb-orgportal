@@ -1,13 +1,13 @@
 import { CreateContentComponent } from './create-content.component'
 import { TrainingPlanDataSharingService } from './../../services/training-plan-data-share.service'
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog'
+import { MatDialog } from '@angular/material/dialog'
 import { Router } from '@angular/router'
 import { ConfirmationBoxComponent } from '../../components/confirmation-box/confirmation.box.component'
 
 // Mock dependencies
 jest.mock('../../services/training-plan-data-share.service')
 jest.mock('@angular/router')
-jest.mock('@angular/material/legacy-dialog')
+jest.mock('@angular/material/dialog')
 
 describe('CreateContentComponent', () => {
     let component: CreateContentComponent

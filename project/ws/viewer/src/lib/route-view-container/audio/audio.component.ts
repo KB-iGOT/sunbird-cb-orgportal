@@ -7,6 +7,7 @@ import { ConfigurationsService } from '@sunbird-cb/utils-v2'
   selector: 'viewer-audio-container',
   templateUrl: './audio.component.html',
   styleUrls: ['./audio.component.scss'],
+  standalone: false,
 })
 export class AudioComponent implements OnInit {
   @Input() isScreenSizeSmall = false

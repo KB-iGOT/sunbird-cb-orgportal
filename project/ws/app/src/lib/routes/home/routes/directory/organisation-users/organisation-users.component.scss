@@ -46,3 +46,40 @@
     display: none !important;
   }
 }
+
+:host ::ng-deep .vertical-tabs {
+  display: flex;
+  flex-direction: row;
+}
+
+:host ::ng-deep .vertical-tabs .mat-mdc-tab-header {
+  border-bottom: none !important;
+  width: 250px;
+  flex-shrink: 0;
+}
+
+:host ::ng-deep .vertical-tabs .mat-mdc-tab-labels {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch;
+}
+
+:host ::ng-deep .vertical-tabs .mat-mdc-tab {
+  justify-content: flex-start !important;
+  text-align: left;
+  min-width: 250px !important;
+}
+
+:host ::ng-deep .vertical-tabs .mdc-tab--active {
+  background: #eee !important;
+  font-weight: 700 !important;
+}
+
+:host ::ng-deep .vertical-tabs .mat-mdc-tab-body-wrapper {
+  flex: 1;
+  padding: 0 32px;
+}
+
+:host ::ng-deep .vertical-tabs .mdc-tab-indicator {
+  display: none !important;
+}

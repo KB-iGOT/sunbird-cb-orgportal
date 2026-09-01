@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core'
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog'
-import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar'
+import { MatDialog } from '@angular/material/dialog'
+import { MatSnackBar } from '@angular/material/snack-bar'
 import { ActivatedRoute, Router } from '@angular/router'
 // tslint:disable-next-line:import-name
-import * as _ from 'lodash'
+import _ from 'lodash'
 import { BlendedApporvalService } from '../../services/blended-approval.service'
 import { TelemetryEvents } from '../../../../head/_services/telemetry.event.model'
 import { ConfigurationsService, EventService } from '@sunbird-cb/utils-v2'
@@ -11,13 +11,13 @@ import { NominateUsersDialogComponent } from '../nominate-users-dialog/nominate-
 import moment from 'moment'
 import { NsContent } from '../../../../head/_services/widget-content.model'
 import { DialogConfirmComponent } from '../../../../../../../../../src/app/component/dialog-confirm/dialog-confirm.component'
-import { ITableData } from '@sunbird-cb/collection/lib/ui-org-table/interface/interfaces'
 import { IRequestLearnerType } from '../../enums/enrolment-type'
 import { FormControl, FormGroup, Validators } from '@angular/forms'
 @Component({
   selector: 'ws-app-batch-details',
   templateUrl: './batch-details.component.html',
   styleUrls: ['./batch-details.component.scss'],
+  standalone: false
 })
 export class BatchDetailsComponent implements OnInit {
   currentFilter = 'pending'
@@ -42,10 +42,16 @@ export class BatchDetailsComponent implements OnInit {
   showUserDetails = false
   selectedUser: any
   fetchStatus = true
-  checkSurveyLink = false
+  checkSurveyLink = true
   reportStatusList: any[] = []
+  reportOptions: any[] = [
+    { label: 'Enrollment Report', value: 'enrollment' },
+    { label: 'Consumption Report', value: 'consumption' }
+  ]
+  lastGeneratedAt: any = null
+  selectedReportType = ''
   enroleTypeList = Object.values(IRequestLearnerType)
-  tabledata: ITableData = {
+  tabledata: any = {
     actions: [],
     columns: [
       { displayName: 'Sl.No', key: 'SlNo' },
@@ -77,12 +83,11 @@ export class BatchDetailsComponent implements OnInit {
     if (currentState && currentState.extras.state) {
       this.batchData = currentState.extras.state
     }
-    if (this.activeRouter && (this.activeRouter.parent && this.activeRouter.parent.snapshot && this.activeRouter.parent.snapshot.data &&
-      this.activeRouter.parent.snapshot.data.configService)) {
+    if (this.activeRouter.parent && this.activeRouter.parent.snapshot.data.configService) {
       this.userProfile = this.activeRouter.parent.snapshot.data.configService.unMappedUser
     }
-    this.programID = this.activeRouter?.snapshot?.params?.id
-    this.batchID = this.activeRouter?.snapshot?.params?.batchid
+    this.programID = this.activeRouter.snapshot.params.id
+    this.batchID = this.activeRouter.snapshot.params.batchid
     if (this.programID) {
       this.getBPDetails(this.programID)
     }
@@ -92,7 +97,7 @@ export class BatchDetailsComponent implements OnInit {
     })
   }
 
-  async ngOnInit() { //NOSONAR
+  async ngOnInit() {
     this.userDetails = await this.bpService.getUserById('').toPromise().catch(_error => { })
   }
 
@@ -123,7 +128,7 @@ export class BatchDetailsComponent implements OnInit {
         break
       case 'reportStatus':
         this.currentFilter = 'reportStatus'
-        this.getBpReportStatus()
+        this.listReports()
         break
       case 'nominate-learner':
         this.currentFilter = 'nominate-learner'
@@ -180,12 +185,12 @@ export class BatchDetailsComponent implements OnInit {
 
   getBPDetails(programID: any) {
     this.bpService.getBlendedProgramsDetails(programID).subscribe((res: any) => {
-      this.programData = res?.result?.content
+      this.programData = res.result.content
       if (this.programData && this.programData.wfSurveyLink && this.programData.wfSurveyLink.length) {
         this.checkSurveyLink = true
       }
       if (!this.batchData) {
-        this.programData?.batches.forEach((b: any) => {
+        this.programData.batches.forEach((b: any) => {
           if (b.batchId === this.batchID) {
             this.batchData = b
           }
@@ -198,11 +203,11 @@ export class BatchDetailsComponent implements OnInit {
           { title: this.batchData.name, url: 'none' }],
         }
         this.linkData = {
-          // programName: this.programData.name,
-          programID: this.programData?.identifier,
-          batchName: this.batchData?.name,
+          programName: this.programData.name,
+          programID: this.programData.identifier,
+          batchName: this.batchData.name,
           batchID: this.batchID,
-          approvalType: this.programData?.wfApprovalType,
+          approvalType: this.programData.wfApprovalType,
         }
         this.getNewRequestsList()
       }
@@ -210,7 +215,7 @@ export class BatchDetailsComponent implements OnInit {
   }
 
   getLearnersList() {
-    this.bpService.getLearners(this.batchData?.batchId, this.userProfile?.channel).subscribe((res: any) => {
+    this.bpService.getLearners(this.batchData.batchId, this.userProfile.channel).subscribe((res: any) => {
       if (res && res.length > 0) {
         this.approvedUsers = res
         this.clonedApprovedUsers = res
@@ -224,7 +229,7 @@ export class BatchDetailsComponent implements OnInit {
     const request = {
       serviceName: 'blendedprogram',
       applicationStatus: 'SEND_FOR_MDO_APPROVAL',
-      applicationIds: [this.batchData?.batchId],
+      applicationIds: [this.batchData.batchId],
       limit: 100,
       offset: 0,
       deptName: this.userProfile.channel,
@@ -233,16 +238,16 @@ export class BatchDetailsComponent implements OnInit {
       if (res) {
         this.newUsers = res.result.data
         this.newUsers.sort((a: any, b: any) => {
-          return <any>new Date(a?.wfInfo[0]?.lastUpdatedOn) - <any>new Date(b?.wfInfo[0]?.lastUpdatedOn)
+          return <any>new Date(a.wfInfo[0].lastUpdatedOn) - <any>new Date(b.wfInfo[0].lastUpdatedOn)
         })
-        this.clonedNewUsers = res?.result?.data
+        this.clonedNewUsers = res.result.data
       }
     })
     this.getAllLearner()
   }
 
   getAllLearner() {
-    this.bpService.getLearnersWithoutOrg(this.batchData?.batchId).subscribe((res: any) => {
+    this.bpService.getLearnersWithoutOrg(this.batchData.batchId).subscribe((res: any) => {
       if (res && res.length > 0) {
         this.learnerCount = res.length
       }
@@ -253,14 +258,14 @@ export class BatchDetailsComponent implements OnInit {
     const request = {
       serviceName: 'blendedprogram',
       applicationStatus: 'REJECTED',
-      applicationIds: [this.batchData?.batchId],
+      applicationIds: [this.batchData.batchId],
       limit: 100,
       offset: 0,
-      deptName: this.userProfile?.rootOrg?.orgName,
+      deptName: this.userProfile.rootOrg.orgName,
     }
     this.bpService.getRequests(request).subscribe((res: any) => {
       if (res) {
-        this.rejectedUsers = res?.result?.data
+        this.rejectedUsers = res.result.data
         this.clonedRejectedUsers = res.result.data
       }
     })
@@ -270,10 +275,10 @@ export class BatchDetailsComponent implements OnInit {
     const request = {
       serviceName: ['blendedprogram'],
       applicationStatus: ['SEND_FOR_PC_APPROVAL', 'SEND_FOR_MDO_APPROVAL', 'REJECTED', 'REMOVED'],
-      applicationIds: [this.batchData?.batchId],
+      applicationIds: [this.batchData.batchId],
       limit: 100,
       offset: 0,
-      deptName: [this.userProfile?.rootOrg?.orgName],
+      deptName: [this.userProfile.rootOrg.orgName],
     }
     this.bpService.getSerchRequests(request).subscribe((res: any) => {
       if (res) {
@@ -285,13 +290,13 @@ export class BatchDetailsComponent implements OnInit {
   }
 
   getSessionDetails() {
-    this.sessionDetails = this.batchData?.batchAttributes?.sessionDetails_v2
+    this.sessionDetails = this.batchData.batchAttributes.sessionDetails_v2
   }
 
   onSubmit(event: any) {
     const actionType = event.action.toUpperCase()
     // const reqData = event.userData.wfInfo[0]
-    const reqData = _.maxBy(event?.userData?.wfInfo, (el: any) => {
+    const reqData = _.maxBy(event.userData.wfInfo, (el: any) => {
       return new Date(el.lastUpdatedOn).getTime()
     })
     const request = {
@@ -336,13 +341,13 @@ export class BatchDetailsComponent implements OnInit {
     })
   }
 
-  requestMesages(): string {
-    if (this.programData?.wfApprovalType === NsContent.WFBlendedProgramApprovalTypes.ONE_STEP_MDO ||
-      this.programData?.wfApprovalType === NsContent.WFBlendedProgramApprovalTypes.TWO_STEP_PC_MDO
+  requestMesages() {
+    if (this.programData.wfApprovalType === NsContent.WFBlendedProgramApprovalTypes.ONE_STEP_MDO ||
+      this.programData.wfApprovalType === NsContent.WFBlendedProgramApprovalTypes.TWO_STEP_PC_MDO
     ) {
       return 'Request is approved successfully!'
     }
-    if (this.programData?.wfApprovalType === NsContent.WFBlendedProgramApprovalTypes.TWO_STEP_MDO_PC) {
+    if (this.programData.wfApprovalType === NsContent.WFBlendedProgramApprovalTypes.TWO_STEP_MDO_PC) {
       return 'Request is approved successfully! Further needs to be approved by program coordinator.'
     }
     return 'Request is approved successfully!'
@@ -552,28 +557,69 @@ export class BatchDetailsComponent implements OnInit {
     }
   }
 
-  actionsClick(evt: any) {
-    if (evt.action === 'refreshStatus') {
-      this.getBpReportStatus()
+  async listReports() {
+    const batchDetails = this.batchData
+    const roleName = this.userDetails.roles.includes('MDO_LEADER') ? 'MDO_LEADER' :
+      this.userDetails.roles.includes('MDO_ADMIN') ? 'MDO_ADMIN' : ''
+    const req = {
+      request: {
+        orgId: this.userDetails.rootOrgId || '',
+        courseId: this.programData.identifier || '',
+        batchId: batchDetails.batchId || '',
+        reportRequester: roleName,
+      },
     }
-    if (evt.action === 'downloadReport') {
-      this.downloadReport()
+    const resData: any = await this.bpService.listBpReports(req).toPromise().catch(_error => { })
+    if (!resData) {
+      this.fetchStatus = false
+      this.snackBar.open('Something went wrong while fetching the report status. Please try again after sometime.')
+      this.reportStatusList = []
+    } else if (Object.keys(resData.result).length <= 0) {
+      this.reportStatusList = []
+    } else {
+      this.reportStatusList = resData.result.content
+      this.lastGeneratedAt = this.findLastGeneratedReportDate()
     }
+  }
+
+  onReportTypeChange(reportType: string) {
+    this.selectedReportType = reportType
+    console.log('selectedReportType', this.selectedReportType)
+  }
+
+  findLastGeneratedReportDate() {
+    const validReports = this.reportStatusList.filter(
+      (item: any) => item.lastReportGeneratedOn !== null
+    )
+    if (validReports.length === 0) {
+      return ''
+    }
+    const latest = validReports.reduce((prev: any, curr: any) => {
+      return new Date(curr.lastReportGeneratedOn) > new Date(prev.lastReportGeneratedOn) ? curr : prev
+    })
+    return latest.lastReportGeneratedOn
   }
 
   async getBpReportStatus() {
     const batchDetails = this.batchData
-    const roleName = this.userDetails?.roles.includes('MDO_LEADER') ? 'MDO_LEADER' :
-      this.userDetails?.roles.includes('MDO_ADMIN') ? 'MDO_ADMIN' : ''
+    const roleName = this.userDetails.roles.includes('MDO_LEADER') ? 'MDO_LEADER' :
+      this.userDetails.roles.includes('MDO_ADMIN') ? 'MDO_ADMIN' : ''
     const req = {
       request: {
-        orgId: this.userDetails?.rootOrgId || '',
-        courseId: this.programData?.identifier || '',
-        batchId: batchDetails?.batchId || '',
+        orgId: this.userDetails.rootOrgId || '',
+        courseId: this.programData.identifier || '',
+        batchId: batchDetails.batchId || '',
         reportRequester: roleName,
+        surveyId: this.programData.wfSurveyLink ? this.programData.wfSurveyLink.split('/')[this.programData.wfSurveyLink.split('/').length - 1] : '',
       },
     }
-    const resData: any = await this.bpService.getBpReportStatusApi(req).toPromise().catch(_error => { })
+
+    let resData: any
+    if (this.selectedReportType === 'enrollment') {
+      resData = await this.bpService.getBpReportStatusApi(req).toPromise().catch(_error => { })
+    } else if (this.selectedReportType === 'consumption') {
+      resData = await this.bpService.getBpConsumptionReportStatusApi(req).toPromise().catch(_error => { })
+    }
     if (!resData) {
       this.fetchStatus = false
       this.snackBar.open('Something went wrong while fetching the report status. Please try again after sometime.')
@@ -603,26 +649,35 @@ export class BatchDetailsComponent implements OnInit {
         courseId: this.programData.identifier || '',
         batchId: batchDetails.batchId || '',
         reportRequester: roleName,
-        surveyId: this.programData.wfSurveyLink.split('/')[this.programData.wfSurveyLink.split('/').length - 1] || '',
+        surveyId: this.programData.wfSurveyLink ? this.programData.wfSurveyLink.split('/')[this.programData.wfSurveyLink.split('/').length - 1] : '',
       },
     }
-    const resData: any = await this.bpService.generateBpReport(reqBody).toPromise().catch(_error => { })
+    let resData: any
+    if (this.selectedReportType === 'enrollment') {
+      resData = await this.bpService.generateBpReport(reqBody).toPromise().catch(_error => { })
+    } else {
+      resData = await this.bpService.generateBpConsumptionReport(reqBody).toPromise().catch(_error => { })
+    }
     if (resData && resData.params && resData.params.status.toLowerCase() === 'success') {
       this.reportStatusList = []
-      this.getBpReportStatus()
+      this.listReports()
     } else {
       this.snackBar.open('Something went wrong while generating the report. Please try again after sometime.')
       this.reportStatusList = []
     }
   }
 
-  async downloadReport() {
+  async downloadReports(item: any) {
     const batchDetails = this.batchData
-    const downloadUrl = this.reportStatusList[0]?.downloadLink.split('gcpbpreports/')
-    [this.reportStatusList[0]?.downloadLink.split('gcpbpreports/').length - 1]
-    const fileExtension = downloadUrl?.split('.')?.pop()?.toLowerCase()
+    const downloadUrl = item.downloadLink.split('gcpbpreports/')
+    [item.downloadLink.split('gcpbpreports/').length - 1]
+    const fileExtension = downloadUrl.split('.').pop()?.toLowerCase()
     // tslint:disable-next-line: max-line-length
-    const fileName = `MDO_${batchDetails?.name.split(' ').join('')}_Enrollment_Requests_Report_${this.formatDate(this.reportStatusList[0]?.lastReportGeneratedOn)}.${fileExtension}`
+    let fileName = `MDO_${batchDetails.name.split(' ').join('')}_Enrollment_Requests_Report_${this.formatDate(item.lastReportGeneratedOn)}.${fileExtension}`
+    if (item?.contextType === 'Blended Program Consumption Report') {
+      // tslint:disable-next-line: max-line-length
+      fileName = `MDO_${batchDetails.name.split(' ').join('')}_Consumption_Report_${this.formatDate(item.lastReportGeneratedOn)}.${fileExtension}`
+    }
     await this.bpService.downloadReport(downloadUrl, fileName)
   }
 

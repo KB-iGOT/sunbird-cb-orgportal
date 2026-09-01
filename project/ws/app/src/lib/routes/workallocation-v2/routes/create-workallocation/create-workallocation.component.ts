@@ -1,8 +1,8 @@
 // import { untilDestroyed } from 'ngx-take-until-destroy'
-import { DOCUMENT } from '@angular/common'
-import { AfterViewInit, Component, ElementRef, HostListener, Inject, OnDestroy, OnInit, ViewChild } from '@angular/core'
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog'
-import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar'
+
+import { AfterViewInit, Component, ElementRef, HostListener, Inject, OnDestroy, OnInit, ViewChild, DOCUMENT } from '@angular/core'
+import { MatDialog } from '@angular/material/dialog'
+import { MatSnackBar } from '@angular/material/snack-bar'
 import { ActivatedRoute, Router } from '@angular/router'
 import { EventService } from '@sunbird-cb/utils-v2'
 // tslint:disable
@@ -18,9 +18,10 @@ import { AllocationService } from '../../services/allocation.service'
 import { WatStoreService } from '../../services/wat.store.service'
 
 @Component({
-  selector: 'ws-app-create-workallocation',
-  templateUrl: './create-workallocation.component.html',
-  styleUrls: ['./create-workallocation.component.scss'],
+    selector: 'ws-app-create-workallocation',
+    templateUrl: './create-workallocation.component.html',
+    styleUrls: ['./create-workallocation.component.scss'],
+    standalone: false
 })
 export class CreateWorkallocationComponent implements OnInit, AfterViewInit, OnDestroy {
   canPublish = false

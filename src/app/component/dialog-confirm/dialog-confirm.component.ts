@@ -1,16 +1,18 @@
 import { Component, Inject } from '@angular/core'
-import { MatLegacyDialogRef as MatDialogRef, MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA } from '@angular/material/legacy-dialog'
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog'
 
 export interface IPopData {
   title: string
   body: string
   cancel?: string
   ok?: string
+  componentType?: string
 }
 @Component({
-  selector: 'ws-dialog-confirm',
-  templateUrl: './dialog-confirm.component.html',
-  styleUrls: ['./dialog-confirm.component.scss'],
+    selector: 'ws-dialog-confirm',
+    templateUrl: './dialog-confirm.component.html',
+    styleUrls: ['./dialog-confirm.component.scss'],
+    standalone: false
 })
 export class DialogConfirmComponent {
 

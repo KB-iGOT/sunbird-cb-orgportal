@@ -7,6 +7,7 @@ import { NsAccessControlConfig } from '@sunbird-cb/access-settings'
   selector: 'ws-app-stepper',
   templateUrl: './stepper.component.html',
   styleUrls: ['./stepper.component.scss'],
+  standalone: false
 })
 export class StepperComponent implements OnInit, OnChanges, AfterViewInit {
 

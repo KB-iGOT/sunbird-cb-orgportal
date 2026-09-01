@@ -13,13 +13,14 @@ import {
   ICertificationSendResponse,
 } from '../../models/certification.model'
 import { RequestCancelDialogComponent } from '../request-cancel-dialog/request-cancel-dialog.component'
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog'
-import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar'
+import { MatDialog } from '@angular/material/dialog'
+import { MatSnackBar } from '@angular/material/snack-bar'
 
 @Component({
   selector: 'ws-app-toc-certification-booking-card',
   templateUrl: './booking-card.component.html',
   styleUrls: ['./booking-card.component.scss'],
+  standalone: false,
 })
 export class BookingCardComponent implements OnDestroy {
   @Input() certification!: ICertificationMeta

@@ -4,9 +4,10 @@ import { Subscription } from 'rxjs'
 import { ActivatedRoute } from '@angular/router'
 
 @Component({
-  selector: 'ws-public-logout',
-  templateUrl: './public-logout.component.html',
-  styleUrls: ['./public-logout.component.scss'],
+    selector: 'ws-public-logout',
+    templateUrl: './public-logout.component.html',
+    styleUrls: ['./public-logout.component.scss'],
+    standalone: false
 })
 export class PublicLogoutComponent implements OnInit, OnDestroy {
   contactUsMail = ''

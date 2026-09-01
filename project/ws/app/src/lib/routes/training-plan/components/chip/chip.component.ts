@@ -1,11 +1,12 @@
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output } from '@angular/core'
 import { TrainingPlanDataSharingService } from '../../services/training-plan-data-share.service'
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog'
+import { MatDialog } from '@angular/material/dialog'
 import { PreviewDialogBoxComponent } from '../preview-dialog-box/preview-dialog-box.component'
 @Component({
-  selector: 'ws-app-chip',
-  templateUrl: './chip.component.html',
-  styleUrls: ['./chip.component.scss'],
+    selector: 'ws-app-chip',
+    templateUrl: './chip.component.html',
+    styleUrls: ['./chip.component.scss'],
+    standalone: false
 })
 export class ChipComponent implements OnInit, OnChanges {
   @Input() selectedContentChips: any[] = []
@@ -43,15 +44,15 @@ export class ChipComponent implements OnInit, OnChanges {
   clearAll() {
     if (this.from === 'content') {
       this.selectContentCount = 0
-      const selectedIndex: any = []
-      this.tpdsSvc.trainingPlanContentData.data.content.map((sitem: any) => {
+      const pageContent = this.tpdsSvc.trainingPlanContentData?.data?.content || []
+      pageContent.map((sitem: any) => {
         if (sitem && sitem['selected']) {
-          selectedIndex.push(sitem['identifier'])
           sitem['selected'] = false
         }
       })
 
       this.tpdsSvc.trainingPlanStepperData.contentList = []
+      this.tpdsSvc.trainingPlanSelectedContent = []
       // this.tpdsSvc.trainingPlanStepperData.contentType = ''
     }
     if (this.from === 'assignee') {
@@ -77,7 +78,8 @@ export class ChipComponent implements OnInit, OnChanges {
   }
 
   removeContent(item: any) {
-    this.tpdsSvc.trainingPlanContentData.data.content.map((sitem: any) => {
+    const pageContent = this.tpdsSvc.trainingPlanContentData?.data?.content || []
+    pageContent.map((sitem: any) => {
       if (sitem && sitem['selected'] && sitem['identifier'] === item['identifier']) {
         sitem['selected'] = false
       }
@@ -86,6 +88,7 @@ export class ChipComponent implements OnInit, OnChanges {
       const index = this.tpdsSvc.trainingPlanStepperData.contentList.findIndex((x: any) => x === item['identifier'])
       this.tpdsSvc.trainingPlanStepperData.contentList.splice(index, 1)
     }
+    this.tpdsSvc.removeSelectedContent(item['identifier'])
     if (this.selectContentCount) {
       this.selectContentCount = this.selectContentCount - 1
     }

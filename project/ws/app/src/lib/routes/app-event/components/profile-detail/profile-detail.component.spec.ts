@@ -3,7 +3,7 @@ import { of } from 'rxjs'
 import { Router } from '@angular/router'
 import { ActivatedRoute } from '@angular/router'
 import { EventService } from '../../services/event.service'
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog'
+import { MatDialog } from '@angular/material/dialog'
 import { ValueService } from '@sunbird-cb/utils-v2'
 import { ViewUsersComponent } from './view-users/view-users.component'
 
@@ -26,8 +26,8 @@ jest.mock('@sunbird-cb/utils-v2', () => ({
     })),
 }))
 
-jest.mock('@angular/material/legacy-dialog', () => ({
-    MatLegacyDialog: jest.fn().mockImplementation(() => ({
+jest.mock('@angular/material/dialog', () => ({
+    MatDialog: jest.fn().mockImplementation(() => ({
         open: jest.fn(),
     })),
 }))

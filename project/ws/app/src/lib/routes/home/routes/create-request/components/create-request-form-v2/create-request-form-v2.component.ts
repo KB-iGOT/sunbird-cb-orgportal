@@ -1,14 +1,15 @@
 import { Component, OnInit } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
 import { ConfirmationBoxComponent } from '../../../../../training-plan/components/confirmation-box/confirmation.box.component'
-import { MatLegacyDialog } from '@angular/material/legacy-dialog'
-import { MatLegacySnackBar } from '@angular/material/legacy-snack-bar'
+import { MatDialog } from '@angular/material/dialog'
+import { MatSnackBar } from '@angular/material/snack-bar'
 import { CreateRequestService } from '../../services/create-request.service'
 
 @Component({
-  selector: 'ws-app-create-request-form-v2',
-  templateUrl: './create-request-form-v2.component.html',
-  styleUrls: ['./create-request-form-v2.component.scss']
+    selector: 'ws-app-create-request-form-v2',
+    templateUrl: './create-request-form-v2.component.html',
+    styleUrls: ['./create-request-form-v2.component.scss'],
+    standalone: false
 })
 export class CreateRequestFormV2Component implements OnInit {
 
@@ -18,9 +19,9 @@ export class CreateRequestFormV2Component implements OnInit {
 
   constructor(
     private router: Router,
-    public dialog: MatLegacyDialog,
+    public dialog: MatDialog,
     private activatedRoute: ActivatedRoute,
-    private snackBar: MatLegacySnackBar,
+    private snackBar: MatSnackBar,
     private createRequestSvc: CreateRequestService,
   ) { }
 

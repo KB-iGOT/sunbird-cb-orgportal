@@ -2,7 +2,7 @@ import { ResultUploadComponent } from './result-upload.component'
 import { CertificationApiService } from '../../apis/certification-api.service'
 import { CertificationService } from '../../services/certification.service'
 import { ActivatedRoute, ActivatedRouteSnapshot, Router } from '@angular/router'
-import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar'
+import { MatSnackBar } from '@angular/material/snack-bar'
 import { of, throwError } from 'rxjs'
 
 jest.mock('@angular/router')

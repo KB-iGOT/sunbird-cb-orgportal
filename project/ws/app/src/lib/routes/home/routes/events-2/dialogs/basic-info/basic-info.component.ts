@@ -1,7 +1,7 @@
 import { Component, Inject, OnInit } from '@angular/core'
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms'
-import { MatLegacyDialogRef as MatDialogRef, MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA, } from '@angular/material/legacy-dialog'
-import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar'
+import { MatDialogRef, MAT_DIALOG_DATA, } from '@angular/material/dialog'
+import { MatSnackBar } from '@angular/material/snack-bar'
 import { events, noSpecialCharEvent } from '../../models/events.model'
 import * as _ from 'lodash'
 import { EventsService } from '../../services/events.service'
@@ -12,9 +12,10 @@ import { LoaderService } from '../../../../../../../../../../../src/app/services
 import { ConfigurationsService } from '@sunbird-cb/utils-v2'
 
 @Component({
-  selector: 'ws-app-basic-info',
-  templateUrl: './basic-info.component.html',
-  styleUrls: ['./basic-info.component.scss']
+    selector: 'ws-app-basic-info',
+    templateUrl: './basic-info.component.html',
+    styleUrls: ['./basic-info.component.scss'],
+    standalone: false
 })
 export class BasicInfoComponent implements OnInit {
 
@@ -26,7 +27,7 @@ export class BasicInfoComponent implements OnInit {
   orgData: any
 
   constructor(
-    private dialogRef: MatDialogRef<BasicInfoComponent>,
+    public dialogRef: MatDialogRef<BasicInfoComponent>,
     @Inject(MAT_DIALOG_DATA) data: any,
     private formBuilder: FormBuilder,
     private matSnackBar: MatSnackBar,

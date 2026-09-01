@@ -7,12 +7,12 @@ import {
 } from '@angular/core'
 import { UntypedFormGroup, UntypedFormControl, Validators } from '@angular/forms'
 import { UsersService } from '../../../users/services/users.service'
-import { MatLegacyChipInputEvent as MatChipInputEvent } from '@angular/material/legacy-chips'
+import { MatChipInputEvent } from '@angular/material/chips'
 import { DateAdapter, MAT_DATE_FORMATS } from '@angular/material/core'
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog'
+import { MatDialog } from '@angular/material/dialog'
 import { MatExpansionPanel } from '@angular/material/expansion'
-import { MatLegacyPaginator as MatPaginator, LegacyPageEvent as PageEvent } from '@angular/material/legacy-paginator'
-import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar'
+import { MatPaginator, PageEvent } from '@angular/material/paginator'
+import { MatSnackBar } from '@angular/material/snack-bar'
 import { COMMA, ENTER } from '@angular/cdk/keycodes'
 // tslint:disable-next-line
 import * as _ from 'lodash'
@@ -35,13 +35,14 @@ import { DatePipe } from '@angular/common'
 const EMAIL_PATTERN = /^[a-zA-Z0-9]+[a-zA-Z0-9._-]*[a-zA-Z0-9]+@[a-zA-Z0-9]+([-a-zA-Z0-9]*[a-zA-Z0-9]+)?(\.[a-zA-Z0-9-]+)*\.[a-zA-Z]{2,4}$/
 
 @Component({
-  selector: 'ws-widget-user-card',
-  templateUrl: './user-card.component.html',
-  styleUrls: ['./user-card.component.scss'],
-  providers: [
-    { provide: DateAdapter, useClass: AppDateAdapter },
-    { provide: MAT_DATE_FORMATS, useValue: APP_DATE_FORMATS },
-  ],
+    selector: 'ws-widget-user-card',
+    templateUrl: './user-card.component.html',
+    styleUrls: ['./user-card.component.scss'],
+    providers: [
+        { provide: DateAdapter, useClass: AppDateAdapter },
+        { provide: MAT_DATE_FORMATS, useValue: APP_DATE_FORMATS },
+    ],
+    standalone: false
 })
 export class UserCardComponent implements OnInit, OnChanges, AfterViewChecked, AfterViewInit {
   @Input() userId: any
@@ -621,7 +622,7 @@ export class UserCardComponent implements OnInit, OnChanges, AfterViewChecked, A
             if (this.isMdoLeader) {
               u.enableEdit = true
               userval.enableEdit = true
-            } else if (this.isMdoAdmin && userval?.roles?.includes('MDO_ADMIN')) {
+            } else if (this.isMdoAdmin && (userval?.roles?.includes('MDO_ADMIN') || userval?.roles?.includes('MDO_LEADER'))) {
               u.enableEdit = false
               userval.enableEdit = false
               this.snackBar.open('Only MDO Leader Can Update Profile')
@@ -699,11 +700,16 @@ export class UserCardComponent implements OnInit, OnChanges, AfterViewChecked, A
       for (let i = 0; i < this.orgTypeList.length; i += 1) {
         if (this.orgTypeList[i].name === 'MDO') {
           _.each(this.orgTypeList[i].roles, rolesObject => {
-            if (rolesObject !== 'MDO_LEADER') {
-              this.uniqueRoles.push({
-                roleName: rolesObject, description: rolesObject,
-              })
+            if (rolesObject === 'MDO_LEADER') {
+              return
             }
+            // MDO_ADMIN editors (without MDO_LEADER) cannot assign/remove the MDO_ADMIN role
+            if (rolesObject === 'MDO_ADMIN' && !this.isMdoLeader) {
+              return
+            }
+            this.uniqueRoles.push({
+              roleName: rolesObject, description: rolesObject,
+            })
           })
         }
       }
@@ -752,6 +758,17 @@ export class UserCardComponent implements OnInit, OnChanges, AfterViewChecked, A
         }
       }, 150)
     }
+  }
+
+  canEditRoles(user: any): boolean {
+    if (this.isMdoLeader) {
+      return true
+    }
+    if (this.isMdoAdmin) {
+      const targetUserRoles = _.get(user, 'organisations[0].roles') || _.get(user, 'roles') || []
+      return !targetUserRoles.includes('MDO_LEADER')
+    }
+    return false
   }
 
   setUserDetails(user: any) {
@@ -989,7 +1006,7 @@ export class UserCardComponent implements OnInit, OnChanges, AfterViewChecked, A
       }
       this.usersSvc.updateUserDetails(this.reqbody).subscribe(dres => {
         if (dres) {
-          if (this.isMdoLeader) {
+          if (this.canEditRoles(user)) {
             if (form.value.roles !== this.orguserRoles) {
               const dreq = {
                 request: {
@@ -1333,7 +1350,7 @@ export class UserCardComponent implements OnInit, OnChanges, AfterViewChecked, A
       // }
       if (this.isMdoLeader) {
         showPopup = true
-      } else if (this.isMdoAdmin && data.roles.includes('MDO_ADMIN')) {
+      } else if (this.isMdoAdmin && (data.roles.includes('MDO_ADMIN') || data.roles.includes('MDO_LEADER'))) {
         showPopup = false
         this.snackBar.open('Only MDO Leader Can Update Profile')
       } else {

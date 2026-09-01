@@ -1,0 +1,55 @@
+.apar-year-wrapper {
+  display: flex;
+
+  &.inline {
+    align-items: center;
+    gap: 12px;
+  }
+
+  &.stacked {
+    flex-direction: column;
+    // Hosts can widen this to line the field up with neighbouring form controls
+    gap: var(--apar-year-label-gap, 6px);
+  }
+}
+
+.apar-year-label {
+  font: 700 14px/20px Lato, sans-serif;
+  letter-spacing: 0.25px;
+  color: rgba(0, 0, 0, 0.87);
+  white-space: nowrap;
+
+  &.required::after {
+    content: ' *';
+    color: #d3423e;
+  }
+}
+
+.apar-year-select {
+  font-size: 14px;
+
+  // A disabled field is a read only display of a year picked elsewhere (the plan stepper reads the
+  // year chosen on the dashboard), so the value is kept legible instead of faded out
+  --mat-select-disabled-trigger-text-color: rgba(0, 0, 0, 0.87);
+  --mat-select-disabled-arrow-color: rgba(0, 0, 0, 0.38);
+
+  // Angular Material 20 is MDC based, so these are .mat-mdc-* internals.
+  // The default 56px infix is trimmed to 40px so the field lines up with
+  // buttons in a toolbar; form hosts can put it back via the custom property.
+  ::ng-deep {
+    .mat-mdc-form-field-infix {
+      min-height: var(--apar-year-field-height, 40px);
+      padding-top: var(--apar-year-field-padding, 9px);
+      padding-bottom: var(--apar-year-field-padding, 9px);
+    }
+
+    .mat-mdc-form-field-subscript-wrapper {
+      display: none;
+    }
+
+    .mat-mdc-text-field-wrapper {
+      width: 100%;
+      background: #fff;
+    }
+  }
+}

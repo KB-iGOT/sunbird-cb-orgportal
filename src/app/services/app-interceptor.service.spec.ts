@@ -1,6 +1,6 @@
 import { AppInterceptorService } from './app-interceptor.service'
 import { ConfigurationsService } from '@sunbird-cb/utils-v2'
-import { MatLegacySnackBar } from '@angular/material/legacy-snack-bar'
+import { MatSnackBar } from '@angular/material/snack-bar'
 import { AuthKeycloakService } from '@sunbird-cb/utils-v2'
 import { HttpRequest, HttpHandler, HttpErrorResponse } from '@angular/common/http'
 import { of, throwError } from 'rxjs'
@@ -8,7 +8,7 @@ import { of, throwError } from 'rxjs'
 describe('AppInterceptorService', () => {
     let interceptor: AppInterceptorService
     let configSvcMock: jest.Mocked<ConfigurationsService>
-    let snackBarMock: jest.Mocked<MatLegacySnackBar>
+    let snackBarMock: jest.Mocked<MatSnackBar>
     let authSvcMock: jest.Mocked<AuthKeycloakService>
     let locale: string
 

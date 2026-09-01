@@ -1,13 +1,14 @@
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core'
 import { EventsService } from '../../services/events.service'
-import { MatLegacySnackBar } from '@angular/material/legacy-snack-bar'
+import { MatSnackBar } from '@angular/material/snack-bar'
 import { AddCompetencyComponent } from '../../dialogs/add-competency/add-competency.component'
-import { MatLegacyDialog } from '@angular/material/legacy-dialog'
+import { MatDialog } from '@angular/material/dialog'
 
 @Component({
-  selector: 'ws-app-event-competencies',
-  templateUrl: './event-competencies.component.html',
-  styleUrls: ['./event-competencies.component.scss']
+    selector: 'ws-app-event-competencies',
+    templateUrl: './event-competencies.component.html',
+    styleUrls: ['./event-competencies.component.scss'],
+    standalone: false
 })
 export class EventCompetenciesComponent implements OnChanges {
   @Input() openMode = 'edit'
@@ -19,8 +20,8 @@ export class EventCompetenciesComponent implements OnChanges {
   event: any
   eventId: any
 
-  constructor(private matSnackBar: MatLegacySnackBar,
-    private dialog: MatLegacyDialog,
+  constructor(private matSnackBar: MatSnackBar,
+    private dialog: MatDialog,
     private eventsService: EventsService,
   ) { }
 

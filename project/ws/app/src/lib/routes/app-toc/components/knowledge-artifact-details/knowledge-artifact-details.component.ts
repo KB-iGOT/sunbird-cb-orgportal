@@ -12,6 +12,7 @@ import { EditorService } from '../../../../../../../author/src/lib/routing/modul
   selector: 'ws-app-knowledge-artifact-details',
   templateUrl: './knowledge-artifact-details.component.html',
   styleUrls: ['./knowledge-artifact-details.component.scss'],
+  standalone: false,
 })
 export class KnowledgeArtifactDetailsComponent implements OnInit, OnDestroy {
   content: NsContent.IContent | null = null

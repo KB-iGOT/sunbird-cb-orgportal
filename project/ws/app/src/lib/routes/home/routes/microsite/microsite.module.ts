@@ -9,7 +9,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { MicrositeV1Component } from './microsite-v1/microsite-v1.component'
 import { MicrositeRoutingModule } from './microsite-routing.module'
 import { TranslateModule } from '@ngx-translate/core'
-import { MatLegacyDialogModule } from '@angular/material/legacy-dialog'
+import { MatDialogModule } from '@angular/material/dialog'
 
 // Removed getTranslateModule function as it's no longer needed
 
@@ -23,7 +23,7 @@ import { MatLegacyDialogModule } from '@angular/material/legacy-dialog'
     SlidersLibModule,
     MDOChannelModule,
     TranslateModule.forChild(),
-    MatLegacyDialogModule
+    MatDialogModule
   ],
   providers: [
   ],

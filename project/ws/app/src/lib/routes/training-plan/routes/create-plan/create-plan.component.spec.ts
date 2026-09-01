@@ -513,7 +513,8 @@ describe('CreatePlanComponent', () => {
             assignmentTypeInfo: 'info',
             endDate: '2025-12-31',
             status: 'Draft',
-            isApar: true
+            isApar: true,
+            contextData: { accessControl: { userGroups: [], version: 1 } }
         }
         const route: any = { snapshot: { data: { contentData: mockContentData } } }
         const tpdsSvc: any = {
@@ -538,7 +539,8 @@ describe('CreatePlanComponent', () => {
             contentType: 'Course',
             endDate: '2025-12-31',
             status: 'Draft',
-            isApar: false
+            isApar: false,
+            contextData: { accessControl: { userGroups: [], version: 1 } }
         }
         const route: any = { snapshot: { data: { contentData: mockContentData } } }
         const tpdsSvc: any = {
@@ -551,6 +553,71 @@ describe('CreatePlanComponent', () => {
         expect(tpdsSvc.trainingPlanAssigneeData.category).toBe('Department')
         expect(tpdsSvc.trainingPlanAssigneeData.data).toEqual(['deptInfo'])
         expect(tpdsSvc.trainingPlanStepperData.isApar).toBe(false)
+    })
+
+    describe('APAR year seeding', () => {
+        const buildStepperSvc = () => ({
+            trainingPlanStepperData: { contentList: [] },
+            filterToggle: { subscribe: jest.fn() }
+        }) as any
+
+        const editContentData = (planYear?: string) => ({
+            name: 'Test Plan',
+            assignmentType: 'Department',
+            assignmentTypeInfo: 'deptInfo',
+            contentList: [],
+            contentType: 'Course',
+            endDate: '2025-12-31',
+            status: 'Draft',
+            isApar: true,
+            planYear,
+            contextData: { accessControl: { userGroups: [], version: 1 } }
+        })
+
+        it('should take the year from the plan being edited', () => {
+            const route: any = { snapshot: { data: { contentData: editContentData('2025-26') } } }
+            const tpdsSvc = buildStepperSvc()
+
+            new CreatePlanComponent(route, tpdsSvc).ngOnInit()
+
+            expect(tpdsSvc.trainingPlanStepperData.aparYear).toBe('2025-26')
+        })
+
+        it('should leave the year unset for a plan saved before planYear existed', () => {
+            const route: any = { snapshot: { data: { contentData: editContentData() } } }
+            const tpdsSvc = buildStepperSvc()
+
+            new CreatePlanComponent(route, tpdsSvc).ngOnInit()
+
+            expect(tpdsSvc.trainingPlanStepperData.aparYear).toBeUndefined()
+        })
+
+        it('should take the year the dashboard passed on the query string', () => {
+            const route: any = {
+                snapshot: { data: { contentData: null }, queryParams: { aparYear: '2026-27' } }
+            }
+            const tpdsSvc = buildStepperSvc()
+
+            new CreatePlanComponent(route, tpdsSvc).ngOnInit()
+
+            expect(tpdsSvc.trainingPlanStepperData.aparYear).toBe('2026-27')
+        })
+
+        it('should leave the year unset when the query string carries none', () => {
+            const route: any = { snapshot: { data: { contentData: null }, queryParams: {} } }
+            const tpdsSvc = buildStepperSvc()
+
+            new CreatePlanComponent(route, tpdsSvc).ngOnInit()
+
+            expect(tpdsSvc.trainingPlanStepperData.aparYear).toBeUndefined()
+        })
+
+        it('should survive a snapshot with no query params at all', () => {
+            const route: any = { snapshot: { data: { contentData: null } } }
+            const tpdsSvc = buildStepperSvc()
+
+            expect(() => new CreatePlanComponent(route, tpdsSvc).ngOnInit()).not.toThrow()
+        })
     })
 
     it('should update selectedTabData and nextTab on selectedTabAction', () => {

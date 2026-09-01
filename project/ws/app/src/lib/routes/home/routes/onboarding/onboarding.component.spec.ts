@@ -1,5 +1,5 @@
 import { OnboardingComponent } from './onboarding.component'
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog'
+import { MatDialog } from '@angular/material/dialog'
 import { NavigationEnd, Router } from '@angular/router'
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser'
 import { ReportsVideoComponent } from '../reports-video/reports-video.component'

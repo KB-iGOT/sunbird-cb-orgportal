@@ -8,6 +8,7 @@ import { ConfigurationsService } from '@sunbird-cb/utils-v2'
   selector: 'viewer-iap-container',
   templateUrl: './iap.component.html',
   styleUrls: ['./iap.component.scss'],
+  standalone: false,
 })
 export class IapComponent implements OnInit {
   @Input() isFetchingDataComplete = false

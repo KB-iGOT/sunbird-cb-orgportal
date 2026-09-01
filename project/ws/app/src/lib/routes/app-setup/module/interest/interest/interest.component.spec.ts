@@ -16,7 +16,7 @@ import { of, throwError } from 'rxjs'
 // import { ActivatedRoute, Router } from '@angular/router'
 // import { WidgetContentService, BtnPlaylistService } from '@sunbird-cb/collection'
 // import { ConfigurationsService } from '@sunbird-cb/utils'
-// import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar'
+// import { MatSnackBar } from '@angular/material/snack-bar'
 import { ElementRef } from '@angular/core'
 
 describe('InterestComponent', () => {

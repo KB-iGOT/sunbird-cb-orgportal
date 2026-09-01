@@ -45,6 +45,35 @@ describe('PreviewPlanComponent', () => {
             component.showBackBtn = false
         })
 
+        it('should show the APAR year of the plan being previewed', () => {
+            mockActivatedRoute.snapshot.data = {
+                contentData: {
+                    status: 'LIVE',
+                    assignmentType: 'Designation',
+                    assignmentTypeInfo: [],
+                    planYear: '2025-26',
+                },
+            }
+
+            component.ngOnInit()
+
+            expect(component.planYear).toBe('2025-26')
+        })
+
+        it('should show no APAR year when the plan holds none', () => {
+            mockActivatedRoute.snapshot.data = {
+                contentData: {
+                    status: 'LIVE',
+                    assignmentType: 'Designation',
+                    assignmentTypeInfo: [],
+                },
+            }
+
+            component.ngOnInit()
+
+            expect(component.planYear).toBe('')
+        })
+
         it('should initialize from contentData with Designation assignment type', () => {
             // Arrange
             const mockContentData = {

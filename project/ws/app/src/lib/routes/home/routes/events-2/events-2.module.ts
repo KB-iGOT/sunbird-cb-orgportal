@@ -9,19 +9,18 @@ import { SpeakersComponent } from './components/speakers/speakers.component'
 import { EventMaterialsComponent } from './components/event-materials/event-materials.component'
 import { EventCompetenciesComponent } from './components/event-competencies/event-competencies.component'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
-import { MatLegacyButtonModule } from '@angular/material/legacy-button'
-import { MatLegacyDialogModule as MatDialogModule } from '@angular/material/legacy-dialog'
-import { MatLegacyProgressSpinnerModule } from '@angular/material/legacy-progress-spinner'
-import { MatLegacyFormFieldModule } from '@angular/material/legacy-form-field'
-import { MatLegacyTooltipModule } from '@angular/material/legacy-tooltip'
-import { MatLegacyMenuModule as MatMenuModule } from '@angular/material/legacy-menu'
-import { MatLegacyInputModule as MatInputModule } from '@angular/material/legacy-input'
-import { MatLegacyRadioModule as MatRadioModule } from '@angular/material/legacy-radio'
-import { MatLegacySelectModule as MatSelectModule } from '@angular/material/legacy-select'
-import { MatLegacyFormFieldModule as MatFormFieldModule } from '@angular/material/legacy-form-field'
-import { MatLegacySnackBarModule as MatSnackBarModule } from '@angular/material/legacy-snack-bar'
+import { MatButtonModule } from '@angular/material/button'
+import { MatDialogModule } from '@angular/material/dialog'
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner'
+import { MatFormFieldModule } from '@angular/material/form-field'
+import { MatTooltipModule } from '@angular/material/tooltip'
+import { MatMenuModule } from '@angular/material/menu'
+import { MatInputModule } from '@angular/material/input'
+import { MatRadioModule } from '@angular/material/radio'
+import { MatSelectModule } from '@angular/material/select'
+import { MatSnackBarModule } from '@angular/material/snack-bar'
 import { EventsTableComponent } from './components/events-table/events-table.component'
-import { MatLegacyCardModule as MatCardModule } from '@angular/material/legacy-card'
+import { MatCardModule } from '@angular/material/card'
 import { MatTableModule } from '@angular/material/table'
 import { MatIconModule } from '@angular/material/icon'
 import { EventsService } from './services/events.service'
@@ -31,15 +30,16 @@ import { MatDatepickerModule } from '@angular/material/datepicker'
 import { AddSpeakersComponent } from './dialogs/add-speakers/add-speakers.component'
 import { MaterialDetailsComponent } from './components/material-details/material-details.component'
 import { EventsListComponent } from './components/events-list/events-list.component'
-import { MatLegacyPaginatorModule } from '@angular/material/legacy-paginator'
+import { MatPaginatorModule } from '@angular/material/paginator'
 import { EventResolverService } from './services/event-resolver'
+import { EventCategoryResolverService } from './services/event-category-resolver'
 import { AddCompetencyComponent } from './dialogs/add-competency/add-competency.component'
-import { MatLegacyCheckboxModule } from '@angular/material/legacy-checkbox'
-import { MatLegacyAutocompleteModule } from '@angular/material/legacy-autocomplete'
-import { MatLegacyChipsModule } from '@angular/material/legacy-chips'
+import { MatCheckboxModule } from '@angular/material/checkbox'
+import { MatAutocompleteModule } from '@angular/material/autocomplete'
+import { MatChipsModule } from '@angular/material/chips'
 import { EventsPreviewComponent } from './components/events-preview/events-preview.component'
 import { YoutubePlayerComponent } from './dialogs/youtube-player/youtube-player.component'
-import { MatLegacyTabsModule } from '@angular/material/legacy-tabs'
+import { MatTabsModule } from '@angular/material/tabs'
 import { CardCompetencyComponent } from './components/card-competency/card-competency.component'
 import { SbUiResolverModule } from '@sunbird-cb/resolver-v2'
 import { NgxMaterialTimepickerModule } from 'ngx-material-timepicker'
@@ -77,28 +77,28 @@ import { EventDetailsComponent } from './components/event-details/event-details.
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
-    MatLegacyButtonModule,
+    MatButtonModule,
     MatDialogModule,
-    MatLegacyProgressSpinnerModule,
-    MatLegacyFormFieldModule,
-    MatLegacyTooltipModule,
+    MatProgressSpinnerModule,
+    MatFormFieldModule,
+    MatTooltipModule,
     MatMenuModule,
     MatInputModule,
     MatRadioModule,
     MatSelectModule,
-    MatLegacyCheckboxModule,
+    MatCheckboxModule,
     Events2RoutingModule,
     MatCardModule,
     MatSnackBarModule,
     MatTableModule,
     MatIconModule,
-    MatLegacyPaginatorModule,
+    MatPaginatorModule,
     MatStepperModule,
     MatFormFieldModule,
     MatDatepickerModule,
-    MatLegacyAutocompleteModule,
-    MatLegacyChipsModule,
-    MatLegacyTabsModule,
+    MatAutocompleteModule,
+    MatChipsModule,
+    MatTabsModule,
     SbUiResolverModule,
     NgxMaterialTimepickerModule,
     CarouselModule,
@@ -109,7 +109,8 @@ import { EventDetailsComponent } from './components/event-details/event-details.
   providers: [
     DatePipe,
     EventsService,
-    EventResolverService
+    EventResolverService,
+    EventCategoryResolverService
   ]
 })
 export class Events2Module { }

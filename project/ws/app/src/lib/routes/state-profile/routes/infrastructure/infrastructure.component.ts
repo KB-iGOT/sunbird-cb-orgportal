@@ -7,7 +7,7 @@ import { OrgProfileService } from '../../services/org-profile.service'
 /* tslint:disable*/
 import * as _ from 'lodash'
 import { DialogBoxComponent } from '../../components/dialog-box/dialog-box.component'
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog'
+import { MatDialog } from '@angular/material/dialog'
 
 @Component({
     selector: 'ws-app-infrastructure',
@@ -15,7 +15,7 @@ import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog'
     styleUrls: ['./infrastructure.component.scss'],
     /* tslint:disable */
     host: { class: 'w-full role-card flex flex-1' },
-    /* tslint:enable */
+    standalone: false
 })
 export class InfrastructureComponent implements OnInit {
     infrastructureForm!: UntypedFormGroup

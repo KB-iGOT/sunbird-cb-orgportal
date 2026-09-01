@@ -14,12 +14,12 @@ const endpoint = {
   lookerProDashboard: 'apis/proxies/v8/looker/dashboard',
 }
 @Component({
-  selector: 'ws-app-my-dashboard-home',
-  templateUrl: './my-dashboard-home.component.html',
-  styleUrls: ['./my-dashboard-home.component.scss', 'bootstrap-rain.scss'],
-  /* tslint:disable-next-line */
-  encapsulation: ViewEncapsulation.None,
-  /* tslint:enable */
+    selector: 'ws-app-my-dashboard-home',
+    templateUrl: './my-dashboard-home.component.html',
+    styleUrls: ['./my-dashboard-home.component.scss', 'bootstrap-rain.scss'],
+    /* tslint:disable-next-line */
+    encapsulation: ViewEncapsulation.None,
+    standalone: false
 })
 export class MyDashboardHomeComponent implements OnInit {
 

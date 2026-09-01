@@ -1,5 +1,5 @@
 <mat-sidenav-container class="nav-container" autosize name="auth-tool-exp">
-  <mat-sidenav-content>
+  <mat-sidenav-content class="sidnav-content">
     <div class="filter-overlay-12">
       <div class="filter-12">
         <div class="flex justify-between right-sidenav-header px-5 pt-5 pb-4">
@@ -55,7 +55,8 @@
                       is already in use.</mat-error>
                     <mat-error
                       *ngIf="controls['organisationName'].touched && controls['organisationName'].errors?.['pattern']">
-                      Only ( a-z/A-Z , 0-9 . - @ $ / : [ ]' ' !) characters are supported</mat-error>
+                      Please provide a valid value. - Only alphanumeric characters, spaces, and common punctuation
+                      (&amp;.,'()-) are allowed</mat-error>
                     <mat-error
                       *ngIf="controls['organisationName'].touched && controls['organisationName'].errors?.['maxlength']">Maximum
                       character length

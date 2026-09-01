@@ -33,3 +33,47 @@
 .importBtn:disabled {
   opacity: 0.6;
 }
+
+.odcs-taxonomy-view {
+  overflow: hidden;
+}
+
+// :host {
+//   .mat-mdc-menu-item {
+//     min-height: auto;
+//   padding:0 !important;
+// }
+// }
+
+::ng-deep
+    .mat-mdc-menu-content {
+
+   padding:0 !important;
+
+}
+
+:host ::ng-deep .odcs-taxonomy-view lib-taxonomy-view #box2Header.category-header-items {
+  .addCardButtonNew {
+    .mat-icon-custom {
+      margin-right: 2px !important;
+    }
+  }
+}
+
+::ng-deep .mat-mdc-snack-bar-container:not(:has(.mat-mdc-snack-bar-action)) {
+  --mdc-snackbar-container-color: #1d8923;
+  --mdc-snackbar-supporting-text-color: #ffffff;
+
+  background-color: #1d8923 !important;
+  color: #ffffff !important;
+  opacity: 1 !important;
+
+  .mdc-snackbar__surface {
+    background-color: #1d8923 !important;
+    color: #ffffff !important;
+  }
+
+  .mat-mdc-snack-bar-label {
+    color: #ffffff !important;
+  }
+}

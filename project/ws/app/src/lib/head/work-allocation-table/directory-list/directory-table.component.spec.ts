@@ -1,12 +1,12 @@
 import { UIDirectoryTableComponent } from './directory-table.component'
 import { SelectionModel } from '@angular/cdk/collections'
-import { MatLegacyTableDataSource as MatTableDataSource } from '@angular/material/legacy-table'
+import { MatTableDataSource } from '@angular/material/table'
 import { Router } from '@angular/router'
 import * as _ from 'lodash'
 
 // Mock dependencies
 jest.mock('@angular/cdk/collections')
-jest.mock('@angular/material/legacy-table')
+jest.mock('@angular/material/table')
 jest.mock('@angular/router')
 jest.mock('lodash')
 

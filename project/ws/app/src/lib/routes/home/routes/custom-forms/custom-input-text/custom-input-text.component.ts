@@ -2,14 +2,15 @@ import { Component, EventEmitter, Input, Output } from '@angular/core'
 import { UntypedFormGroup } from '@angular/forms'
 
 @Component({
-  selector: 'ws-app-custom-input-text',
-  templateUrl: './custom-input-text.component.html',
-  styleUrls: ['./custom-input-text.component.scss']
+    selector: 'ws-app-custom-input-text',
+    templateUrl: './custom-input-text.component.html',
+    styleUrls: ['./custom-input-text.component.scss'],
+    standalone: false
 })
 export class CustomInputTextComponent {
-  @Input() question: UntypedFormGroup | undefined
+  @Input() question!: UntypedFormGroup
   @Input() customForm: UntypedFormGroup | undefined
-  @Input() index: UntypedFormGroup | undefined
+  @Input() index = 0
   @Output() removeRow: EventEmitter<any> = new EventEmitter()
   @Output() customRegex: EventEmitter<any> = new EventEmitter()
 

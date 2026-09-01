@@ -12,10 +12,10 @@ export class FracService {
     private configSvc: ConfigurationsService,
     private http: HttpClient) { }
 
-  fetchFrac() {
-    const frac: Promise<IFrac> = this.http
-      .get<IFrac>(`${this.configSvc.baseUrl}/feature/frac.json`)
+  async fetchFrac() {
+    const frac: any = await this.http
+      .get<IFrac | any>(`${this.configSvc.baseUrl}/feature/frac.json`)
       .toPromise()
-    return frac
+    return frac as IFrac
   }
 }

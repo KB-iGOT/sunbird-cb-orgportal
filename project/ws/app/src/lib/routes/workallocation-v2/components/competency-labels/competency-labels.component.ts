@@ -7,12 +7,12 @@ import { AllocationService } from '../../../workallocation/services/allocation.s
 import { debounceTime, first, map, switchMap, takeUntil } from 'rxjs/operators'
 import { BehaviorSubject, Observable, Subject } from 'rxjs'
 import { WatStoreService } from '../../services/wat.store.service'
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog'
-import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar'
+import { MatDialog } from '@angular/material/dialog'
+import { MatSnackBar } from '@angular/material/snack-bar'
 import { NSWatCompetency } from '../../models/competency-wat.model'
 import { NSWatActivity } from '../../models/activity-wot.model'
 // tslint:disable
-import * as _ from 'lodash'
+import _ from 'lodash'
 import { WatCompPopupComponent } from './wat-comp-popup/wat-comp-popup.component'
 import { ActivatedRoute } from '@angular/router'
 import { DialogConfirmComponent } from '../../../../../../../../../src/app/component/dialog-confirm/dialog-confirm.component'
@@ -23,6 +23,7 @@ import { DialogConfirmComponent } from '../../../../../../../../../src/app/compo
   selector: 'ws-app-competency-labels',
   templateUrl: './competency-labels.component.html',
   styleUrls: ['./competency-labels.component.scss'],
+  standalone: false
 })
 export class CompetencyLabelsComponent implements OnInit, OnDestroy, AfterViewInit {
   private activitySubscription: any
@@ -53,14 +54,14 @@ export class CompetencyLabelsComponent implements OnInit, OnDestroy, AfterViewIn
   }
 
   get labelsList(): UntypedFormArray {
-    return this.activityForm?.get('labelsArray') as UntypedFormArray
+    return this.activityForm.get('labelsArray') as UntypedFormArray
   }
 
   get groupList(): UntypedFormArray {
-    return this.activityForm?.get('groupsArray') as UntypedFormArray
+    return this.activityForm.get('groupsArray') as UntypedFormArray
   }
   groupListByIndex(index: number): UntypedFormArray {
-    return ((this.activityForm?.get('groupsArray') as UntypedFormArray).at(index) as any).get('compDescription')
+    return ((this.activityForm.get('groupsArray') as UntypedFormArray).at(index) as any).get('compDescription')
   }
 
   get groupcompetencyList(): UntypedFormArray {
@@ -106,7 +107,9 @@ export class CompetencyLabelsComponent implements OnInit, OnDestroy, AfterViewIn
             compLevel: _.get(numa, 'level') || '',
             compType: _.get(numa, 'additionalProperties.competencyType') || '',
             compArea: _.get(numa, 'additionalProperties.competencyArea') || '',
-            levelList: [_.get(numa, 'chield')] || [this.activated.snapshot.data.pageData.data.levels], //NOSONAR
+            levelList: _.get(numa, 'chield')
+              ? [_.get(numa, 'chield')]
+              : [this.activated.snapshot.data.pageData.data.levels],
             compSource: _.get(numa, 'source') || 'Work Allocation Tool',
           }
         })
@@ -160,7 +163,7 @@ export class CompetencyLabelsComponent implements OnInit, OnDestroy, AfterViewIn
       moveItemInArray(this.groupcompetencyList.controls, event.previousIndex, event.currentIndex)
       moveItemInArray(this.groupcompetencyList.value, event.previousIndex, event.currentIndex)
     } else {
-      if (event.item && !event.item.data.compName) {
+      if (!event.item.data.compName) {
         this.snackBar.open('Competency Name is required to drag', undefined, { duration: 2000 })
         return
       }
@@ -497,7 +500,9 @@ export class CompetencyLabelsComponent implements OnInit, OnDestroy, AfterViewIn
     const dialogRef = this.dialog.open(WatCompPopupComponent, {
       restoreFocus: false,
       disableClose: true,
-      data: { ...oldcompData, children } || event.option.value, //NOSONAR
+      data: children
+        ? { ...oldcompData, children }
+        : event.option.value
     })
     if (this.activated.snapshot.data && this.activated.snapshot.data.pageData) {
       dialogRef.componentInstance.defaultCompLevels = this.activated.snapshot.data.pageData

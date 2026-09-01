@@ -5,7 +5,7 @@ import { CreateRequestRoutingModule } from './create-request-routing.module'
 import { CreateRequestFormV2Component } from './components/create-request-form-v2/create-request-form-v2.component'
 import { MatIconModule } from '@angular/material/icon'
 import { RouterModule } from '@angular/router'
-import { MatLegacyCardModule } from '@angular/material/legacy-card'
+import { MatCardModule } from '@angular/material/card'
 import { CreateRequestModule as LibCreateRequestModule } from '@sunbird-cb/consumption'
 
 
@@ -18,7 +18,7 @@ import { CreateRequestModule as LibCreateRequestModule } from '@sunbird-cb/consu
     CreateRequestRoutingModule,
     RouterModule,
     MatIconModule,
-    MatLegacyCardModule,
+    MatCardModule,
     LibCreateRequestModule
   ]
 })

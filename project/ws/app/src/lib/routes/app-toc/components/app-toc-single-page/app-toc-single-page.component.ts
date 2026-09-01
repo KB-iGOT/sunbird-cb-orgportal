@@ -19,12 +19,13 @@ import { UntypedFormGroup, UntypedFormControl } from '@angular/forms'
 import { RatingService } from '@ws-widget/collection/src/lib/_services/rating.service'
 import { TranslateService } from '@ngx-translate/core'
 import { environment } from 'src/environments/environment'
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog'
-import { MatLegacyTabChangeEvent as MatTabChangeEvent } from '@angular/material/legacy-tabs'
+import { MatDialog } from '@angular/material/dialog'
+import { MatTabChangeEvent } from '@angular/material/tabs'
 @Component({
   selector: 'ws-app-app-toc-single-page',
   templateUrl: './app-toc-single-page.component.html',
   styleUrls: ['./app-toc-single-page.component.scss'],
+  standalone: false,
 })
 export class AppTocSinglePageComponent implements OnInit, OnChanges, OnDestroy {
   contentTypes = NsContent.EContentTypes

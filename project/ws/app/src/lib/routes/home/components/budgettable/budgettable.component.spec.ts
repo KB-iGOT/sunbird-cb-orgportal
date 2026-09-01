@@ -1,12 +1,12 @@
 import { BudgettableComponent } from './budgettable.component'
 import { SelectionModel } from '@angular/cdk/collections'
-import { MatLegacyTableDataSource as MatTableDataSource } from '@angular/material/legacy-table'
+import { MatTableDataSource } from '@angular/material/table'
 import { SimpleChanges } from '@angular/core'
 import * as _ from 'lodash'
 
 // Mock dependencies
 jest.mock('@angular/cdk/collections')
-jest.mock('@angular/material/legacy-table')
+jest.mock('@angular/material/table')
 jest.mock('lodash')
 
 describe('BudgettableComponent', () => {

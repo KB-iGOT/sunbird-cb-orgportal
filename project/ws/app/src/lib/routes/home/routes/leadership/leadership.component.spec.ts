@@ -42,8 +42,8 @@ const mockMatTableDataSource = {
 }
 
 // Mock MatTableDataSource constructor
-jest.mock('@angular/material/legacy-table', () => ({
-    MatLegacyTableDataSource: jest.fn().mockImplementation(() => mockMatTableDataSource)
+jest.mock('@angular/material/table', () => ({
+    MatTableDataSource: jest.fn().mockImplementation(() => mockMatTableDataSource)
 }))
 
 describe('LeadershipComponent (Without TestBed)', () => {

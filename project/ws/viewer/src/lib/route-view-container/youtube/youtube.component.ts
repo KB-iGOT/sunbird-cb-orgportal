@@ -8,6 +8,7 @@ import { ConfigurationsService } from '@sunbird-cb/utils-v2'
   selector: 'viewer-youtube-container',
   templateUrl: './youtube.component.html',
   styleUrls: ['./youtube.component.scss'],
+  standalone: false,
 })
 export class YoutubeComponent implements OnInit {
   @Input() isScreenSizeSmall = false

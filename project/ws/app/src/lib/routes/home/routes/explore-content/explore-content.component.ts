@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core'
 import { MatTableDataSource } from '@angular/material/table'
-import { MatLegacyPaginator as MatPaginator } from '@angular/material/legacy-paginator'
+import { MatPaginator } from '@angular/material/paginator'
 import { PageEvent } from '@angular/material/paginator'
 import { ExploreContentService } from '../../services/explore-content.service'
 import { animate, state, style, transition, trigger } from '@angular/animations'
@@ -11,6 +11,7 @@ import { LoaderService } from '../../../../../../../../../src/app/services/loade
   selector: 'ws-app-explore-content',
   templateUrl: './explore-content.component.html',
   styleUrls: ['./explore-content.component.scss'],
+  standalone: false,
   animations: [
     trigger('detailExpand', [
       state('collapsed, void', style({ height: '0px', minHeight: '0' })), // Removed display: 'none'

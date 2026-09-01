@@ -1,5 +1,5 @@
 import { DialogConfirmComponent } from './dialog-confirm.component'
-import { MatLegacyDialogRef as MatDialogRef } from '@angular/material/legacy-dialog'
+import { MatDialogRef } from '@angular/material/dialog'
 
 describe('DialogConfirmComponent', () => {
   let component: DialogConfirmComponent

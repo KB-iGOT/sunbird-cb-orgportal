@@ -39,10 +39,10 @@ import { debounceTime, distinctUntilChanged } from 'rxjs/operators'
 import { TimerService } from '../../services/timer.service'
 
 import { EnrollProfileFormComponent } from '../enroll-profile-form/enroll-profile-form.component'
-import { MatLegacyAutocomplete as MatAutocomplete, MatLegacyAutocompleteSelectedEvent as MatAutocompleteSelectedEvent } from '@angular/material/legacy-autocomplete'
-import { MatLegacyChipInputEvent as MatChipInputEvent } from '@angular/material/legacy-chips'
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog'
-import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar'
+import { MatAutocomplete, MatAutocompleteSelectedEvent } from '@angular/material/autocomplete'
+import { MatChipInputEvent } from '@angular/material/chips'
+import { MatDialog } from '@angular/material/dialog'
+import { MatSnackBar } from '@angular/material/snack-bar'
 
 // dayjs.extend(isSameOrBefore)
 // dayjs.extend(isSameOrAfter)
@@ -52,6 +52,7 @@ import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack
   templateUrl: './app-toc-banner.component.html',
   styleUrls: ['./app-toc-banner.component.scss'],
   providers: [AccessControlService, DatePipe],
+  standalone: false,
 })
 
 export class AppTocBannerComponent implements OnInit, OnChanges, OnDestroy {

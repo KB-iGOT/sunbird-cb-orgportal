@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core'
 import { ReportsVideoComponent } from '../reports-video/reports-video.component'
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog'
+import { MatDialog } from '@angular/material/dialog'
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router'
 import { IOnBoardingConfig } from './interface/onboarding.interface'
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser'
@@ -8,9 +8,10 @@ import { Subscription } from 'rxjs'
 import { environment } from '../../../../../../../../../src/environments/environment'
 
 @Component({
-  selector: 'ws-app-onboarding',
-  templateUrl: './onboarding.component.html',
-  styleUrls: ['./onboarding.component.scss'],
+    selector: 'ws-app-onboarding',
+    templateUrl: './onboarding.component.html',
+    styleUrls: ['./onboarding.component.scss'],
+    standalone: false
 })
 export class OnboardingComponent implements OnInit, OnDestroy {
   onboardingNoteList: string[] = []

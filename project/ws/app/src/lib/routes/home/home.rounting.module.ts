@@ -35,8 +35,10 @@ import { MyNotificationsComponent } from './routes/my-notifications/my-notificat
 import { FormDataResolverService } from './resolvers/form-data-resolver.service'
 import { DirectoryComponent } from './routes/directory/directory.component'
 import { OrganisationUsersComponent } from './routes/directory/organisation-users/organisation-users.component'
+import { OrgUsersResolve } from './resolvers/org-users-resolve.service'
 import { ExploreContentComponent } from './routes/explore-content/explore-content.component'
 import { PreviewComponent } from './routes/explore-content/preview/preview.component'
+import { GeneralGuard } from '../../../../../../../src/app/guards/general.guard'
 const routes: Routes = [
   {
     path: '',
@@ -363,6 +365,10 @@ const routes: Routes = [
         resolve: {
           configService: ConfigResolveService,
         },
+        canActivate: [GeneralGuard],
+        data: {
+          requiredRoles: ['mdo_leader', 'community_moderator'],  // user needs at least one of these
+        },
       },
 
       {
@@ -524,6 +530,10 @@ const routes: Routes = [
         }
       },
       {
+        path: 'ai-cbp-requests',
+        loadChildren: () => import('./ai-cbp-request/ai-cbp-request.module').then(m => m.AICBPRequestModule),
+      },
+      {
         path: 'peer-validation',
         loadChildren: () => import('./routes/peer-validation/peer-validation.module').then(m => m.PeerValidationModule),
         data: {
@@ -594,8 +604,10 @@ const routes: Routes = [
     resolve: {
       pageData: PageResolve,
       configService: ConfigResolveService,
+      orgUsersData: OrgUsersResolve,
     },
-  },
+  }
+
 
 ]
 
@@ -607,6 +619,7 @@ const routes: Routes = [
     // DepartmentResolve,
     ConfigResolveService,
     UsersListResolve,
+    OrgUsersResolve,
   ],
 })
 export class HomeRoutingModule { }

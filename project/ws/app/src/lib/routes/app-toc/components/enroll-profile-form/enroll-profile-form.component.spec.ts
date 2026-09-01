@@ -1,21 +1,17 @@
-jest.mock('@ws/app/src/lib/routes/user-profile/services/user-profile.service', () => ({
-  UserProfileService: class UserProfileService {}
-}), { virtual: true })
-jest.mock('@ws/app/src/lib/routes/profile-v2/services/profile-v2.servive', () => ({
-  ProfileV2Service: class ProfileV2Service {}
-}), { virtual: true })
-import { MatLegacyDialogRef as MatDialogRef } from '@angular/material/legacy-dialog'
-import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar'
+import { MatDialogRef } from '@angular/material/dialog'
+import { MatSnackBar } from '@angular/material/snack-bar'
 import { TranslateService } from '@ngx-translate/core'
+import { UserProfileService } from '@ws/app/src/lib/routes/user-profile/services/user-profile.service'
 import { ConfigurationsService } from '@sunbird-cb/utils-v2'
+import { ProfileV2Service } from '@ws/app/src/lib/routes/profile-v2/services/profile-v2.servive'
 import { of, throwError } from 'rxjs'
 import { EnrollProfileFormComponent } from './enroll-profile-form.component'
 
 describe('EnrollProfileFormComponent', () => {
   let component: EnrollProfileFormComponent
-  let mockUserProfileService: any
+  let mockUserProfileService: jest.Mocked<UserProfileService>
   let mockConfigService: jest.Mocked<ConfigurationsService>
-  let mockProfileV2Service: any
+  let mockProfileV2Service: jest.Mocked<ProfileV2Service>
   let mockTranslateService: jest.Mocked<TranslateService>
   let mockDialogRef: jest.Mocked<MatDialogRef<EnrollProfileFormComponent>>
   let mockSnackBar: jest.Mocked<MatSnackBar>
