@@ -77,6 +77,7 @@ export class EventDetailsComponent implements OnInit, OnChanges {
   @Input() openMode = 'edit'
   @Input() openTab = 'draft'
   @Input() eventStatus = ''
+  @Input() eventCategory = ''
   @Output() preEventFormReady = new EventEmitter<FormGroup>()
   @Output() postEventFormReady = new EventEmitter<FormGroup>()
   @ViewChild('speakerAuto') speakerAutocomplete!: MatAutocomplete
@@ -579,7 +580,7 @@ export class EventDetailsComponent implements OnInit, OnChanges {
       createdforarray.push(_.get(this.userProfile, 'rootOrgId', ''))
       org.push(_.get(this.userProfile, 'departmentName', ''))
 
-      const request = {
+      const request: any = {
         request: {
           content: {
             name: 'image asset',
@@ -591,9 +592,11 @@ export class EventDetailsComponent implements OnInit, OnChanges {
             contentType: 'Asset',
             primaryCategory: 'Asset',
             organisation: org,
-            createdFor: createdforarray,
           },
         },
+      }
+      if (!this.eventSvc.isBharatKalpCategory(this.eventCategory)) {
+        request.request.content.createdFor = createdforarray
       }
       this.loaderService.changeLoaderState(true)
       this.eventSvc.createContent(request).pipe(mergeMap((res: any) => {
