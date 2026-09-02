@@ -573,10 +573,6 @@ export class EventDetailsComponent implements OnInit, OnChanges {
     }
   }
 
-  isBharatKalpCategory(): boolean {
-    return this.eventCategory === 'Bharat Kalp - Talks' || this.eventCategory === 'Bharat Kalp - Podcast'
-  }
-
   saveFile(filePath: any, type: string) {
     if (filePath) {
       const org = []
@@ -599,7 +595,7 @@ export class EventDetailsComponent implements OnInit, OnChanges {
           },
         },
       }
-      if (!this.isBharatKalpCategory()) {
+      if (!this.eventSvc.isBharatKalpCategory(this.eventCategory)) {
         request.request.content.createdFor = createdforarray
       }
       this.loaderService.changeLoaderState(true)

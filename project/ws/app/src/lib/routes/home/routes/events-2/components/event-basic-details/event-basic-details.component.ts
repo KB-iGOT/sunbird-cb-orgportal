@@ -315,11 +315,6 @@ export class EventBasicDetailsComponent implements OnInit, OnChanges {
     this.saveImage(imagePath)
   }
 
-  isBharatKalpCategory(): boolean {
-    const category = this.edf?.eventCategory?.value
-    return category === 'Bharat Kalp - Talks' || category === 'Bharat Kalp - Podcast'
-  }
-
   saveImage(imagePath: any, mediaType = 'image') {
     if (imagePath) {
       const org = []
@@ -342,7 +337,7 @@ export class EventBasicDetailsComponent implements OnInit, OnChanges {
           },
         },
       }
-      if (!this.isBharatKalpCategory()) {
+      if (!this.eventSvc.isBharatKalpCategory(this.edf?.eventCategory?.value)) {
         request.request.content.createdFor = createdforarray
       }
       this.loaderService.changeLoaderState(true)
