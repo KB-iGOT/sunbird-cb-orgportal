@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
 import moment from 'moment'
 import { BlendedService } from '../../services/blended.service'
+import { LoaderService } from '../../../../../../../../../src/app/services/loader.service'
 
 @Component({
   selector: 'ws-app-blended-approvals',
@@ -35,7 +36,8 @@ export class BlendedApprovalsComponent implements OnInit {
   constructor(
     private activeRouter: ActivatedRoute,
     private router: Router,
-    private bpService: BlendedService) { }
+    private bpService: BlendedService,
+    private loaderService: LoaderService) { }
 
   ngOnInit() {
     if (this.activeRouter.parent && this.activeRouter.parent.snapshot.data.configService) {
@@ -45,6 +47,7 @@ export class BlendedApprovalsComponent implements OnInit {
   }
 
   getBlendedPreogramsList() {
+    this.loaderService.changeLoaderState(true)
     const req = {
       locale: ['en'],
       query: '',
@@ -63,6 +66,7 @@ export class BlendedApprovalsComponent implements OnInit {
       },
     }
     this.bpService.getBlendedPrograms(req).subscribe((res: any) => {
+      this.loaderService.changeLoaderState(false)
       if (res && res.result.content) {
         const resultList = res.result.content
         resultList.forEach((val: any) => {
@@ -105,6 +109,8 @@ export class BlendedApprovalsComponent implements OnInit {
         })
         this.data = resultList
       }
+    }, () => {
+      this.loaderService.changeLoaderState(false)
     })
   }
 
