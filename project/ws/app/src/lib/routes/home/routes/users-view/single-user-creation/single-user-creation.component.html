@@ -189,7 +189,7 @@
         <div class="label">Tags</div>
 
         <mat-form-field appearance="outline" class="profile-form-field">
-          <input matInput #tagInput placeholder="Type tag here and press enter" maxlength="100"
+          <input matInput class="input-text" #tagInput placeholder="Type tag here and press enter" maxlength="100"
             (keydown.enter)="$event.preventDefault(); handleAddTags(tagInput)"
             (blur)="handleAddTags(tagInput)">
         </mat-form-field>
