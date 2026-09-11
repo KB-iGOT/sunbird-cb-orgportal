@@ -10,7 +10,11 @@ import { HttpErrorResponse } from '@angular/common/http'
 import { Observable } from 'rxjs'
 import { switchMap, tap } from 'rxjs/operators'
 import * as _ from 'lodash'
-import { comprehensiveAssessment, noSpecialCharAssessment } from '../../models/comprehensive-assessment.model'
+import {
+  comprehensiveAssessment,
+  comprehensiveAssessmentList,
+  noSpecialCharAssessment,
+} from '../../models/comprehensive-assessment.model'
 import { richTextValidator } from '../../models/rich-text.validator'
 import { ComprehensiveAssessmentService } from '../../services/comprehensive-assessment.service'
 import { LoaderService } from '../../../../../../../../../../../src/app/services/loader.service'
@@ -81,7 +85,8 @@ export class CreateAssessmentComponent implements OnInit {
       learningOutcome: new FormControl('', [
         richTextValidator(0, comprehensiveAssessment.LEARNING_OUTCOME_MAX_LENGTH),
       ]),
-      appIcon: new FormControl('', [Validators.required]),
+      // the thumbnail is optional, an assessment can go live without one
+      appIcon: new FormControl(''),
     })
 
     // any edit invalidates the saved copy the preview step renders
@@ -417,6 +422,74 @@ export class CreateAssessmentComponent implements OnInit {
     if (previewIndex !== -1) {
       this.currentStepperIndex = previewIndex
     }
+  }
+  //#endregion
+
+  /**
+   * Publishing is offered on the preview step, once the admin has seen what the officer
+   * will. The window is the linked plan's, and only the plan can correct it, so a window
+   * that has already ended blocks the publish rather than asking for a date to be changed
+   * here. The server validates all of this again, this is only the near check.
+   */
+  get canPublish(): boolean {
+    return this.openMode === 'edit' && !!this.contentId && !!this.linkedAssessmentId
+  }
+
+  publishAssessment() {
+    if (!this.validateBasicDetails() || !this.validateAssessment()) {
+      return
+    }
+    const linkedPlan = _.get(this.assessmentDetailsForm, 'controls.linkedPlan.value')
+    if (!this.assessmentSvc.isWindowOpen(_.get(linkedPlan, 'endDate'))) {
+      this.openSnackBar(comprehensiveAssessmentList.WINDOW_CLOSED_MESSAGE)
+      return
+    }
+    this.confirmPublish()
+  }
+
+  private confirmPublish() {
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      width: '500px',
+      height: 'auto',
+      autoFocus: false,
+      data: {
+        dialogType: 'warning',
+        icon: { iconName: 'error_outline', iconClass: 'warning-icon' },
+        message: 'Are you sure you want to publish this assessment?',
+        buttonsList: [
+          { btnAction: false, displayText: 'No', btnClass: 'btn-outline-primary' },
+          { btnAction: true, displayText: 'Yes', btnClass: 'successBtn' },
+        ],
+      },
+    })
+    dialogRef.afterClosed().subscribe((btnAction: any) => {
+      if (btnAction) {
+        this.runPublish()
+      }
+    })
+  }
+
+  /** The draft is saved first, so what goes Live is what the preview just showed. */
+  private runPublish() {
+    this.loaderService.changeLoaderState(true)
+    this.persistContent().pipe(
+      switchMap(() => this.assessmentSvc.publishAssessment(
+        this.contentId,
+        _.get(this.userProfile, 'userId', '')
+      ))
+    ).subscribe({
+      next: () => {
+        this.loaderService.changeLoaderState(false)
+        this.openSnackBar('Assessment published successfully')
+        // a published assessment belongs to the Live tab, whichever tab it was opened from
+        this.pathUrl = 'live'
+        this.navigateBack()
+      },
+      error: (error: HttpErrorResponse) => {
+        this.loaderService.changeLoaderState(false)
+        this.openSnackBar(_.get(error, 'error.message', 'Unable to publish the assessment, please try again'))
+      },
+    })
   }
   //#endregion
 

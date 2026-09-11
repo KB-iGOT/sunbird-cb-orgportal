@@ -239,7 +239,9 @@ export class ComprehensiveAssessmentService {
       endDateDisplay: this.toDisplayDate(endDate),
       orgName: _.get(plan, 'orgName', '') || _.get(plan, 'departmentName', ''),
       gatingCourseCount: this.countGatingCourses(plan),
+      // both flags are the picker's to work out, the search knows neither
       hasActiveAssessment: false,
+      isYearClosed: false,
     }
   }
 
@@ -290,7 +292,28 @@ export class ComprehensiveAssessmentService {
       lastPublishedOn: this.toDisplayDate(_.get(row, 'lastPublishedOn')),
       creator: _.get(row, 'creator', '') || '-',
       durationDisplay: this.toDisplayDuration(Number(_.get(row, 'duration', 0)) || 0),
+      // The plan and everything derived from it are read off the assessment rather than
+      // fetched again, they are written onto it when the plan is linked
+      planName: _.get(row, aparPlan.METADATA.planName, '') || '-',
+      reportingYear: _.get(row, aparPlan.METADATA.reportingYear, '') || '-',
+      assessmentWindow: this.toDisplayDate(_.get(row, aparPlan.METADATA.windowEndDate)) || '-',
     }
+  }
+
+  /**
+   * The assessment window is the linked plan's, and the plan is the only place it can be
+   * corrected — so a window that has already ended blocks publishing rather than asking the
+   * admin to change a date the assessment does not own.
+   */
+  isWindowOpen(endDate: any): boolean {
+    if (!endDate) {
+      return false
+    }
+    const windowEnd = new Date(endDate).getTime()
+    if (Number.isNaN(windowEnd)) {
+      return false
+    }
+    return windowEnd >= Date.now()
   }
 
   private toDisplayDate(value: any): string {

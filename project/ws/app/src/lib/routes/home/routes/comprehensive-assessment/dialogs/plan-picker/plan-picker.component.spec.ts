@@ -16,6 +16,7 @@ const row = (overrides: Partial<aparPlan.IPlanRow> = {}): aparPlan.IPlanRow => (
   orgName: 'Department of Personnel & Training',
   gatingCourseCount: 2,
   hasActiveAssessment: false,
+  isYearClosed: false,
   ...overrides,
 })
 
@@ -99,6 +100,78 @@ describe('PlanPickerComponent', () => {
 
       expect(assessmentSvc.searchAparPlans).toHaveBeenCalledTimes(1)
       expect(component.plans.length).toBe(1)
+    })
+  })
+
+  describe('the closed reporting year', () => {
+    /** An assessment for a cycle that has closed is meaningless, so the plan cannot be linked. */
+    it('should flag and lock a plan whose reporting year is closed', () => {
+      assessmentSvc.searchAparPlans.mockReturnValue(of({
+        plans: [row({ id: 'plan-old', planYear: '2025-26' })],
+        count: 1,
+      }))
+
+      component.ngOnInit()
+
+      expect(component.plans[0].isYearClosed).toBe(true)
+      expect(component.isPlanSelectable(component.plans[0])).toBe(false)
+    })
+
+    it('should refuse a plan on a closed year', () => {
+      assessmentSvc.searchAparPlans.mockReturnValue(of({
+        plans: [row({ id: 'plan-old', planYear: '2025-26' })],
+        count: 1,
+      }))
+      component.ngOnInit()
+
+      component.selectPlan('plan-old')
+
+      expect(component.selectedPlan).toBeNull()
+      expect(component.selectedPlanId).toBe('')
+    })
+
+    it('should leave a plan on the open year selectable', () => {
+      component.ngOnInit()
+
+      expect(component.plans[0].isYearClosed).toBe(false)
+      expect(component.isPlanSelectable(component.plans[0])).toBe(true)
+    })
+
+    /** A year the config no longer lists is closed too, it is only kept for the plans on it. */
+    it('should treat a year that is not on the list as closed', () => {
+      assessmentSvc.searchAparPlans.mockReturnValue(of({
+        plans: [row({ id: 'plan-ancient', planYear: '2019-20' })],
+        count: 1,
+      }))
+
+      component.ngOnInit()
+
+      expect(component.plans[0].isYearClosed).toBe(true)
+    })
+
+    it('should treat a plan carrying no year as closed', () => {
+      assessmentSvc.searchAparPlans.mockReturnValue(of({
+        plans: [row({ id: 'plan-no-year', planYear: '' })],
+        count: 1,
+      }))
+
+      component.ngOnInit()
+
+      expect(component.plans[0].isYearClosed).toBe(true)
+    })
+
+    /** Reopening an assessment already linked to a plan whose year has since closed. */
+    it('should leave the plan this assessment is already on selectable', () => {
+      assessmentSvc.searchAparPlans.mockReturnValue(of({
+        plans: [row({ id: 'plan-old', planYear: '2025-26' })],
+        count: 1,
+      }))
+      component = build({ selectedPlanId: 'plan-old' })
+
+      component.ngOnInit()
+
+      expect(component.plans[0].isYearClosed).toBe(false)
+      expect(component.isPlanSelectable(component.plans[0])).toBe(true)
     })
   })
 
@@ -269,6 +342,13 @@ describe('PlanPickerComponent', () => {
       component.selectPlan('plan-gone')
 
       expect(component.selectedPlan).toBeNull()
+    })
+
+    it('should refuse a plan blocked for either reason', () => {
+      expect(component.isPlanSelectable(row({ hasActiveAssessment: true }))).toBe(false)
+      expect(component.isPlanSelectable(row({ isYearClosed: true }))).toBe(false)
+      expect(component.isPlanSelectable(row())).toBe(true)
+      expect(component.isPlanSelectable({} as aparPlan.IPlanRow)).toBe(true)
     })
   })
 

@@ -180,5 +180,13 @@ export class CreateContentComponent implements OnInit, OnChanges {
     const target = event.target as HTMLInputElement
     this.isAparEnabled = target.checked
     this.tpdsSvc.trainingPlanStepperData.isApar = this.isAparEnabled
+    if (!this.isAparEnabled) {
+      // Gating courses are hidden with the toggle, so the flags they set have to go with them:
+      // a plan left carrying mandatory content nothing shows would still be saved with it
+      this.tpdsSvc.clearMandatoryContent()
+      if (this.tpdsSvc.trainingPlanStepperData.status === 'Live') {
+        this.tpdsSvc.isContentChanged = true
+      }
+    }
   }
 }

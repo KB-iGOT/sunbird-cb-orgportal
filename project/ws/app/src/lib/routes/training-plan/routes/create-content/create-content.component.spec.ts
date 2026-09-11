@@ -130,4 +130,78 @@ describe('CreateContentComponent', () => {
         expect(dialogMock.open).toHaveBeenCalledWith(ConfirmationBoxComponent, expect.any(Object))
         expect(navigateSpy).not.toHaveBeenCalled()
     })
+
+    // Test case 8: the APAR toggle, which is also what shows and hides the gating courses
+    it('should raise the APAR flag when the toggle is switched on', () => {
+        tpdsSvcMock.trainingPlanStepperData = { isApar: false }
+
+        component.onAparCheckboxChange({ target: { checked: true } } as any)
+
+        expect(component.isAparEnabled).toBe(true)
+        expect(tpdsSvcMock.trainingPlanStepperData.isApar).toBe(true)
+    })
+
+    it('should drop the APAR flag when the toggle is switched off', () => {
+        tpdsSvcMock.trainingPlanStepperData = { isApar: true }
+        component.isAparEnabled = true
+
+        component.onAparCheckboxChange({ target: { checked: false } } as any)
+
+        expect(component.isAparEnabled).toBe(false)
+        expect(tpdsSvcMock.trainingPlanStepperData.isApar).toBe(false)
+    })
+
+    // Test case 9: the gating courses go with the toggle, and so do the flags they set
+    it('should clear the mandatory content when APAR is switched off', () => {
+        tpdsSvcMock.trainingPlanStepperData = { isApar: true }
+
+        component.onAparCheckboxChange({ target: { checked: false } } as any)
+
+        expect(tpdsSvcMock.clearMandatoryContent).toHaveBeenCalled()
+    })
+
+    it('should leave the mandatory content alone when APAR is switched on', () => {
+        tpdsSvcMock.trainingPlanStepperData = { isApar: false }
+
+        component.onAparCheckboxChange({ target: { checked: true } } as any)
+
+        expect(tpdsSvcMock.clearMandatoryContent).not.toHaveBeenCalled()
+    })
+
+    it('should mark a Live plan as changed when APAR is switched off', () => {
+        tpdsSvcMock.trainingPlanStepperData = { isApar: true, status: 'Live' }
+        tpdsSvcMock.isContentChanged = false
+
+        component.onAparCheckboxChange({ target: { checked: false } } as any)
+
+        expect(tpdsSvcMock.isContentChanged).toBe(true)
+    })
+
+    it('should not mark a draft plan as changed when APAR is switched off', () => {
+        tpdsSvcMock.trainingPlanStepperData = { isApar: true, status: 'Draft' }
+        tpdsSvcMock.isContentChanged = false
+
+        component.onAparCheckboxChange({ target: { checked: false } } as any)
+
+        expect(tpdsSvcMock.isContentChanged).toBe(false)
+    })
+
+    it('should open an APAR plan with the flag already raised', () => {
+        tpdsSvcMock.trainingPlanStepperData = { isApar: true }
+        component = new CreateContentComponent(tpdsSvcMock, dialogMock, routerMock)
+
+        component.ngOnInit()
+
+        expect(component.isAparEnabled).toBe(true)
+        expect(component.aparCheckboxDisabled).toBe(true)
+    })
+
+    it('should open a plan that is not APAR with the flag down', () => {
+        tpdsSvcMock.trainingPlanStepperData = {}
+        component = new CreateContentComponent(tpdsSvcMock, dialogMock, routerMock)
+
+        component.ngOnInit()
+
+        expect(component.isAparEnabled).toBe(false)
+    })
 })

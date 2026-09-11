@@ -25,7 +25,9 @@
         <div class="flex-2 margin-left-s margin-top-s">
             <ws-app-competency-summary [contentData]="selectedContentData"
                 [selectContentCount]="selectContentCount"></ws-app-competency-summary>
-            <div class="margin-top-m">
+            <!-- Gating courses only mean anything on an APAR plan, they are the set the
+                 comprehensive assessment unlock is derived from -->
+            <div class="margin-top-m" *ngIf="isAparEnabled">
                 <ws-app-gating-courses [contentData]="selectedContentData"></ws-app-gating-courses>
             </div>
         </div>

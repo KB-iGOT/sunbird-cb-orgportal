@@ -1,5 +1,25 @@
 @import '../../assessment-theme';
 
+/* Height of one row and of the header, so the scroll area can be sized in whole rows.
+   Every row is the same height — the plan title is one ellipsised line and the note under
+   it another — so the list can stop on a row boundary instead of slicing one in half. */
+$row-height: 56px;
+$header-height: 44px;
+$visible-rows: 5;
+$field-height: 44px;
+
+/* The global stylesheet pads every dialog surface by 24px. The picker draws its own
+   header, filter bar, framed table and action row, each with its own padding, so that
+   ring of surface padding only doubled up on every edge. */
+::ng-deep .apar-plan-picker-dialog {
+  .mat-mdc-dialog-container .mdc-dialog__surface,
+  .mat-dialog-container {
+    padding: 0 !important;
+    border-radius: $ca-radius-card !important;
+    overflow: hidden;
+  }
+}
+
 .plan-picker {
   width: 100%;
   background-color: #FFFFFF;
@@ -37,10 +57,69 @@
   }
 }
 
-.picker-body {
-  // the list grows every cycle, the dialog scrolls instead of the page behind it
-  max-height: 340px;
+/* Both filters take the flow's pill, the same shape as its buttons. Material draws an
+   outlined field as three pieces — a leading corner, the notch the label sits in and a
+   trailing corner — so the radius has to go on the two ends rather than on the field. */
+:host ::ng-deep .picker-filters {
+  .mdc-notched-outline__leading {
+    border-radius: $ca-radius-pill 0 0 $ca-radius-pill;
+    width: 20px;
+  }
+
+  .mdc-notched-outline__trailing {
+    border-radius: 0 $ca-radius-pill $ca-radius-pill 0;
+  }
+
+  /* Neither field carries a hint or an error, so the row Material reserves under them
+     was only holding the filters off the table. */
+  .mat-mdc-form-field-subscript-wrapper {
+    display: none;
+  }
+
+  /* Neither field carries a label, so there is nothing for Material's asymmetric infix
+     padding to leave room for — it only pushed the placeholder off the centre line.
+     The row centres itself instead, which also brings the search icon onto that line. */
+  .mat-mdc-text-field-wrapper {
+    height: $field-height;
+  }
+
+  .mat-mdc-form-field-flex {
+    align-items: center;
+    height: 100%;
+  }
+
+  .mat-mdc-form-field-infix {
+    display: flex;
+    align-items: center;
+    min-height: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+}
+
+/* The list grows every cycle, so the rows scroll. The frame sits on the scroll area
+   rather than on the table, which is what kept the scrollbar outside the border and
+   scrolled the table's own top edge out of sight. */
+.plans-scroll {
+  display: block;
+  max-height: $header-height + ($row-height * $visible-rows);
   overflow-y: auto;
+  border: 1px solid $ca-border;
+  border-radius: $ca-radius-control;
+
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: $ca-neutral-strong;
+    border-radius: $ca-radius-pill;
+    border: 2px solid #FFFFFF;
+  }
 }
 
 .picker-state {
@@ -50,25 +129,45 @@
 }
 
 .plans-table {
-  border: 1px solid $ca-border;
-  border-radius: $ca-radius-control;
-  overflow: hidden;
-
-  th.mat-header-cell {
+  /* Material 20 renames every table part to `mat-mdc-*`, the `mat-header-cell` /
+     `mat-cell` / `mat-row` selectors these rules used to carry matched nothing, so the
+     header type, the cell padding and the row hover were all silently doing nothing. */
+  .mat-mdc-header-cell {
     /* stylelint-disable */
     font: 700 13px Lato;
     /* stylelint-enable */
     color: $ca-text;
-    background-color: $ca-surface;
+    /* The header stays put while the rows scroll under it. Its background is painted by
+       the global `.mat-mdc-header-cell` rule, which is opaque, so nothing shows through. */
+    position: sticky;
+    top: 0;
+    z-index: 1;
   }
 
-  td.mat-cell {
-    padding-top: 12px;
-    padding-bottom: 12px;
+  /* Material sizes its rows off these two, with a 56px header and 52px rows by default.
+     The header height is a property of the row, so the `height` this rule used to put on
+     the header cell was never going to shrink it. */
+  --mat-table-header-container-height: #{$header-height};
+  --mat-table-row-item-container-height: #{$row-height};
+
+  .mat-mdc-cell {
+    padding-top: 8px;
+    padding-bottom: 8px;
   }
 
+  /* The three short columns are sized, the plan title takes whatever is left — otherwise
+     the columns shift about as one page of plans is replaced by the next. */
   .select-cell {
     width: 48px;
+    padding-right: 0;
+  }
+
+  .year-cell {
+    width: 120px;
+  }
+
+  .timeline-cell {
+    width: 130px;
   }
 
   .plan-title-cell {
@@ -95,7 +194,7 @@
     color: $ca-text-muted;
   }
 
-  tr.mat-row {
+  tr.mat-mdc-row {
     cursor: pointer;
 
     &:hover {
@@ -109,7 +208,8 @@
     background-color: $ca-surface-selected;
   }
 
-  // a plan that already carries a Live assessment stays listed, it is only not pickable
+  // a plan on a closed year, or one that already carries a Live assessment, stays listed
+  // so the user can see it is there — it is only not pickable
   tr.row-disabled {
     cursor: not-allowed;
     opacity: 0.55;

@@ -22,6 +22,10 @@
       <ng-container *ngIf="selectedStepperLable === 'Assessment'">
         <button mat-flat-button class="flex items-center publish-btn" (click)="preview()">Preview</button>
       </ng-container>
+      <ng-container *ngIf="selectedStepperLable === 'Preview' && canPublish">
+        <button mat-flat-button class="flex items-center publish-btn"
+          (click)="publishAssessment()">Publish</button>
+      </ng-container>
     </div>
   </div>
 

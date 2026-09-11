@@ -33,6 +33,7 @@ import { PlanPickerComponent } from './dialogs/plan-picker/plan-picker.component
 import { ComprehensiveAssessmentService } from './services/comprehensive-assessment.service'
 import { AssessmentResolverService } from './services/assessment-resolver'
 import { ComponentSharedModule } from '../../../workallocation-v2/components/component-shared.module'
+import { PipePublicURLModule } from '@sunbird-cb/utils-v2'
 
 @NgModule({
   declarations: [
@@ -70,6 +71,7 @@ import { ComponentSharedModule } from '../../../workallocation-v2/components/com
     AssessmentModule,
     AppTocLibModule,
     ComponentSharedModule,
+    PipePublicURLModule,
     ComprehensiveAssessmentRoutingModule,
   ],
   providers: [

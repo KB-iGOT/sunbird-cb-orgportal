@@ -99,6 +99,7 @@ export class PlanPickerComponent implements OnInit, OnDestroy {
           ...plan,
           // the plan this assessment is already on stays selectable, it is its own plan
           hasActiveAssessment: _.includes(this.linkedPlanIds, plan.id) && plan.id !== this.selectedPlanId,
+          isYearClosed: !this.isYearOpen(plan.planYear) && plan.id !== this.selectedPlanId,
         }))
         this.totalCount = res.count
         this.restoreSelection()
@@ -145,10 +146,19 @@ export class PlanPickerComponent implements OnInit, OnDestroy {
     this.selectPlan(event.value)
   }
 
+  /**
+   * A plan can be linked only while its reporting year is still open and no other Live
+   * assessment holds it. Both kinds of plan stay listed so the user can see why they are
+   * there, they are only not pickable.
+   */
+  isPlanSelectable(plan: aparPlan.IPlanRow): boolean {
+    return !_.get(plan, 'hasActiveAssessment', false) && !_.get(plan, 'isYearClosed', false)
+  }
+
   /** The whole row is a hit area, the radio is only the marker of what is picked. */
   selectPlan(planId: string) {
     const plan = _.find(this.plans, (row: aparPlan.IPlanRow) => row.id === planId)
-    if (!plan || plan.hasActiveAssessment) {
+    if (!plan || !this.isPlanSelectable(plan)) {
       return
     }
     this.selectedPlan = plan
@@ -174,6 +184,15 @@ export class PlanPickerComponent implements OnInit, OnDestroy {
 
   isCurrentYear(planYear: string): boolean {
     return !!planYear && planYear === this.currentYear
+  }
+
+  /**
+   * Open years come off the same list the filter is built from, so a year the config closes
+   * and a year it no longer lists at all are both closed here.
+   */
+  private isYearOpen(planYear: string): boolean {
+    const match = _.find(this.years, (year: IAparYear) => year.value === planYear)
+    return Boolean(match && match.editable)
   }
 
   trackByPlanId(_index: number, plan: aparPlan.IPlanRow): string {

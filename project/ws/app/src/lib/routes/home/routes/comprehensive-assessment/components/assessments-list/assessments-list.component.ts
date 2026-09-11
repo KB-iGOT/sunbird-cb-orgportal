@@ -67,10 +67,23 @@ export class AssessmentsListComponent implements OnInit, OnDestroy {
       cellClass: 'text-overflow-elipse',
     }
 
+    /**
+     * The linked plan and the three values derived from it. The assessment owns none of
+     * them — they are read back off the plan metadata written when the plan was linked —
+     * but the dashboard is where an admin tells two assessments of the same name apart.
+     */
+    const planColumns: comprehensiveAssessmentList.columnData[] = [
+      { displayName: 'Linked APAR Plan', key: 'planName', cellType: 'text', cellClass: 'text-overflow-elipse' },
+      { displayName: 'Reporting Year', key: 'reportingYear', cellType: 'text' },
+      { displayName: 'Assessment Window', key: 'assessmentWindow', cellType: 'text' },
+      { displayName: 'Status', key: 'status', cellType: 'status' },
+    ]
+
     if (this.pathUrl === TAB_DRAFT) {
       this.tableData = {
         columns: [
           nameColumn,
+          ...planColumns,
           { displayName: 'Created By', key: 'creator', cellType: 'text' },
           { displayName: 'Duration', key: 'durationDisplay', cellType: 'text' },
           { displayName: 'Created On', key: 'createdOn', cellType: 'date' },
@@ -91,6 +104,7 @@ export class AssessmentsListComponent implements OnInit, OnDestroy {
     this.tableData = {
       columns: [
         nameColumn,
+        ...planColumns,
         { displayName: 'Created By', key: 'creator', cellType: 'text' },
         { displayName: 'Duration', key: 'durationDisplay', cellType: 'text' },
         { displayName: 'Published On', key: 'lastPublishedOn', cellType: 'date' },
@@ -205,6 +219,10 @@ export class AssessmentsListComponent implements OnInit, OnDestroy {
   }
 
   publishAssessment(rowData: any) {
+    if (!this.assessmentSvc.isWindowOpen(_.get(rowData, comprehensiveAssessmentList.WINDOW_END_KEY))) {
+      this.openSnackBar(comprehensiveAssessmentList.WINDOW_CLOSED_MESSAGE)
+      return
+    }
     this.loaderService.changeLoaderState(true)
     this.assessmentSvc.publishAssessment(
       _.get(rowData, 'identifier', ''),

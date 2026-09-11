@@ -50,7 +50,7 @@
     <div class="basic-info-row flex items-center gap-3 px-3 py-2">
       <div class="app-icon-thumb flex justify-center items-center">
         <ng-container *ngIf="appIcon; else noAppIcon">
-          <img [src]="appIcon" alt="assessment icon">
+          <img [src]="appIcon | pipePublicURL" alt="assessment icon">
         </ng-container>
         <ng-template #noAppIcon>
           <mat-icon class="app-icon-placeholder">image</mat-icon>
@@ -78,9 +78,6 @@
 
     <mat-error class="mat-caption mat-error-text" *ngIf="showValidationMsg('assessmentName','required')">
       Assessment name is mandatory
-    </mat-error>
-    <mat-error class="mat-caption mat-error-text" *ngIf="showValidationMsg('appIcon','required')">
-      Assessment image is mandatory
     </mat-error>
   </div>
 

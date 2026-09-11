@@ -29,8 +29,8 @@ export namespace comprehensiveAssessment {
   export const NAME_MIN_LENGTH = 10
   export const NAME_MAX_LENGTH = 70
   export const DESCRIPTION_MIN_LENGTH = 250
-  export const DESCRIPTION_MAX_LENGTH = 2000
-  export const LEARNING_OUTCOME_MAX_LENGTH = 2000
+  export const DESCRIPTION_MAX_LENGTH = 500
+  export const LEARNING_OUTCOME_MAX_LENGTH = 500
 }
 
 export namespace comprehensiveAssessmentList {
@@ -38,6 +38,11 @@ export namespace comprehensiveAssessmentList {
   export const STATUS_LIVE = 'Live'
   export const STATUS_DRAFT = 'Draft'
   export const DEFAULT_PAGE_SIZE = 20
+
+  /** Where the window end sits on an assessment row, it is the linked plan's end date. */
+  export const WINDOW_END_KEY = 'aparPlanEndDate'
+  export const WINDOW_CLOSED_MESSAGE =
+    'The assessment window of the linked APAR plan has ended, this assessment can no longer be published'
 
   export interface columnData {
     displayName: string
@@ -86,6 +91,10 @@ export namespace comprehensiveAssessmentList {
     'lastUpdatedOn',
     'lastPublishedOn',
     'versionKey',
+    // the linked plan and everything derived from it, the dashboard lists all three
+    'aparPlanName',
+    'aparYear',
+    'aparPlanEndDate',
   ]
 }
 
@@ -119,6 +128,8 @@ export namespace aparPlan {
     gatingCourseCount: number
     /** A Live assessment already points at this plan, so it cannot be linked again. */
     hasActiveAssessment: boolean
+    /** The reporting year is closed, so no new assessment can be linked to this plan. */
+    isYearClosed: boolean
   }
 
   /** What is kept on the assessment once a plan is linked, the source of every derived value. */
