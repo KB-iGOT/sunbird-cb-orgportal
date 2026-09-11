@@ -79,7 +79,8 @@
       <mat-step label="Event Setup">
         <ng-template matStepLabel>Event Setup</ng-template>
         <ws-app-event-details [eventDetailsData]="eventDetails" [openMode]="openMode" [openTab]="pathUrl"
-          [eventStatus]="eventStatus" (preEventFormReady)="onPreEventFormReady($event)"
+          [eventStatus]="eventStatus" [eventCategory]="edf?.eventCategory?.value"
+          (preEventFormReady)="onPreEventFormReady($event)"
           (postEventFormReady)="onPostEventFormReady($event)"></ws-app-event-details>
       </mat-step>
     </ng-container>
@@ -87,8 +88,8 @@
     <ng-container *ngIf="edf?.typeofEvent?.value?.toLowerCase() === 'record'">
       <mat-step label="Add Material">
         <ng-template matStepLabel>Add Material</ng-template>
-        <ws-app-event-materials [materialsList]="materialsList" [openMode]="openMode"
-          [openTab]="pathUrl"></ws-app-event-materials>
+        <ws-app-event-materials [materialsList]="materialsList" [openMode]="openMode" [openTab]="pathUrl"
+          [eventCategory]="edf?.eventCategory?.value"></ws-app-event-materials>
       </mat-step>
     </ng-container>
 

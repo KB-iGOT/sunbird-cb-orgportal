@@ -54,3 +54,8 @@ export const noSpecialChar = new RegExp(
 )
 
 export const DEFAULT_EVENT_CATEGORIES = ['Webinar', 'Karmayogi Talks', 'Karmayogi Saptah', 'Sadhana Saptah', 'Samuhik Charcha - NLW 2026']
+
+export enum IEventResourceType {
+  BharatKalpTalks = 'bharat kalp - talks',
+  BharatKalpPodcast = 'bharat kalp - podcast',
+}
