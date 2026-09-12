@@ -4,6 +4,7 @@ import { map } from 'rxjs/operators'
 import * as _ from 'lodash'
 import { DatePipe } from '@angular/common'
 import { Observable } from 'rxjs'
+import { IEventResourceType } from '../models/events.model'
 
 const API_END_POINTS = {
   GET_EVENTS: 'apis/proxies/v8/sunbirdigot/search',
@@ -202,6 +203,11 @@ export class EventsService {
 
   setCourseDetails(content: any) {
     this.courseDetails = content
+  }
+
+  isBharatKalpCategory(resourceType: string | undefined | null): boolean {
+    const category = (resourceType || '').toLowerCase()
+    return category === IEventResourceType.BharatKalpTalks || category === IEventResourceType.BharatKalpPodcast
   }
 
 }

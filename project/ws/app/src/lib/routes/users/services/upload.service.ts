@@ -38,7 +38,7 @@ const API_ENDPOINTS = {
   GET_BULK_USER_TRANSFER_UPLOAD_SAMPLE_FILE: (orgHierarchyFramworkId: string) =>
     `/apis/proxies/v8/user/v1/org-migration/sample-file/${orgHierarchyFramworkId}`,
   GET_BULK_UPLOAD_USER_TRANSFER: (orgHierarchyFramworkId: string) =>
-    `/apis/proxies/v8/user/v1/org-migration/bulk-upload/${orgHierarchyFramworkId}`,
+    `/apis/proxies/v8/user/v2/org-migration/bulk-upload/${orgHierarchyFramworkId}`,
   GET_BULK_UPLOAD_USER_TRANSFER_STATUS: (filePath: string) =>
     `/apis/proxies/v8/user/v1/org-migration/bulk-upload/progress/${filePath}`
 }
