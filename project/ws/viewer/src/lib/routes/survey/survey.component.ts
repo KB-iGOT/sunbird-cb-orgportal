@@ -13,6 +13,7 @@ import { ViewerUtilService } from '../../viewer-util.service'
   selector: 'viewer-survey',
   templateUrl: './survey.component.html',
   styleUrls: ['./survey.component.scss'],
+  standalone: false,
 })
 export class SurveyComponent implements OnInit, OnDestroy {
   private dataSubscription: Subscription | null = null

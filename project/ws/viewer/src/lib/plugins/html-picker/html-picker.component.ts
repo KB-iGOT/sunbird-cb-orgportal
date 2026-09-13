@@ -20,6 +20,7 @@ import { IHtmlPicker } from './html-picker.model'
   selector: 'viewer-plugin-html-picker',
   templateUrl: './html-picker.component.html',
   styleUrls: ['./html-picker.component.scss'],
+  standalone: false,
 })
 export class HtmlPickerComponent implements OnInit, OnDestroy {
   @Input() identifier: string | null = null

@@ -8,6 +8,7 @@ import { NsWidgetResolver } from '@ws-widget/resolver'
   selector: 'ws-app-app-toc-dialog-intro-video',
   templateUrl: './app-toc-dialog-intro-video.component.html',
   styleUrls: ['./app-toc-dialog-intro-video.component.scss'],
+  standalone: false,
 })
 export class AppTocDialogIntroVideoComponent implements OnInit {
   introVideoRenderConfig: NsWidgetResolver.IRenderConfigWithTypedData<any> | null = null

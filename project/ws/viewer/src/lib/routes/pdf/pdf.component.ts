@@ -12,6 +12,7 @@ import { AccessControlService } from '@sunbird-cb/toc'
   selector: 'viewer-pdf',
   templateUrl: './pdf.component.html',
   styleUrls: ['./pdf.component.scss'],
+  standalone: false,
 })
 export class PdfComponent implements OnInit, OnDestroy {
   private dataSubscription: Subscription | null = null

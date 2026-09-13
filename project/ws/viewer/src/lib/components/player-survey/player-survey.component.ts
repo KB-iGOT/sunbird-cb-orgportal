@@ -20,6 +20,7 @@ const MOBILE_PATTERN = /^[0]?[6789]\d{9}$/
   selector: 'ws-widget-player-survey',
   templateUrl: './player-survey.component.html',
   styleUrls: ['./player-survey.component.scss'],
+  standalone: false,
 })
 export class PlayerSurveyComponent extends WidgetBaseComponent
   implements OnInit, NsWidgetResolver.IWidgetData<any>, OnDestroy {

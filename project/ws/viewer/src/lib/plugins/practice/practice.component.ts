@@ -43,6 +43,7 @@ export type FetchStatus = 'hasMore' | 'fetching' | 'done' | 'error' | 'none'
   selector: 'viewer-plugin-practice',
   templateUrl: './practice.component.html',
   styleUrls: ['./practice.component.scss'],
+  standalone: false,
 })
 // ComponentCanDeactivate
 export class PracticeComponent implements OnInit, OnChanges, OnDestroy {
@@ -434,8 +435,11 @@ export class PracticeComponent implements OnInit, OnChanges, OnDestroy {
       this.questionAnswerHash = this.quizSvc.questionAnswerHash.getValue()
     }
 
-    this.coursePrimaryCategory = this.widgetContentService.currentMetaData.primaryCategory
-    if (this.widgetContentService.currentMetaData.children && this.widgetContentService.currentMetaData.children.length) {
+    // The collection metadata is only set once the toc has read the collection hierarchy, so
+    // an assessment opened without a readable collection never gets one. Guarded the same way
+    // the `else if` below already guards the very same object.
+    this.coursePrimaryCategory = this.widgetContentService.currentMetaData?.primaryCategory
+    if (this.widgetContentService.currentMetaData?.children && this.widgetContentService.currentMetaData.children.length) {
       let activeResourceFound = false
       this.widgetContentService.currentMetaData.children.forEach((item: any) => {
         const activeResource = this.findNested(item, 'identifier', this.identifier)

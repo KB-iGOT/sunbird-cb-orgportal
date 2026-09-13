@@ -11,6 +11,7 @@ import { ViewerUtilService } from '../../viewer-util.service'
   selector: 'viewer-web-module',
   templateUrl: './web-module.component.html',
   styleUrls: ['./web-module.component.scss'],
+  standalone: false,
 })
 export class WebModuleComponent implements OnInit, OnDestroy {
   private dataSubscription: Subscription | null = null

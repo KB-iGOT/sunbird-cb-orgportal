@@ -8,6 +8,7 @@ import { ConfigurationsService } from '@sunbird-cb/utils-v2'
   selector: 'viewer-offline-session-container',
   templateUrl: './offline-session.component.html',
   styleUrls: ['./offline-session.component.scss'],
+  standalone: false,
 })
 export class OfflineSessionComponent implements OnInit {
   @Input() isFetchingDataComplete = false

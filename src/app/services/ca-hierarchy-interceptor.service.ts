@@ -8,6 +8,12 @@ const COURSE_HIERARCHY_URL = /course\/v1\/hierarchy\/([^/?]+)/
 const DRAFT_HIERARCHY_URL = (contentId: string) =>
   `apis/proxies/v8/action/content/v3/hierarchy/${contentId}?mode=edit`
 const ASSESSMENT_BUILDER_ROUTE = '/comprehensive-assessment/'
+/**
+ * The builder frames the player rather than navigating to it, and inside that frame the
+ * location is the player's own, not the builder's. The frame is given this marker so the
+ * read can still be recognised as one made for a draft assessment.
+ */
+export const CA_DRAFT_PREVIEW_PARAM = 'caDraftPreview'
 
 /**
  * The comprehensive assessment builder previews its draft with `ws-app-app-toc-home-v2`. That
@@ -21,8 +27,9 @@ const ASSESSMENT_BUILDER_ROUTE = '/comprehensive-assessment/'
  * pointed here at the endpoint that does serve the draft. Both answer `result.content`, so the
  * component gets the shape it expects.
  *
- * Only reads made from the assessment builder are touched, the course reader is left alone
- * everywhere else. This can go once the library takes the content it is given, or lets the
+ * Only reads made from the assessment builder, or from the player it frames, are touched.
+ * The course reader is left alone everywhere else — a published course previewed from
+ * anywhere else in the portal still reads through it. This can go once the library takes the content it is given, or lets the
  * endpoint be passed in.
  */
 @Injectable({
@@ -47,8 +54,12 @@ export class CaHierarchyInterceptorService implements HttpInterceptor {
     return (match && match[1]) ? match[1] : ''
   }
 
+  /** The builder itself, or the player it frames. */
   private isOnAssessmentBuilder(): boolean {
-    return (typeof window !== 'undefined') &&
-      window.location.pathname.includes(ASSESSMENT_BUILDER_ROUTE)
+    if (typeof window === 'undefined') {
+      return false
+    }
+    return window.location.pathname.includes(ASSESSMENT_BUILDER_ROUTE) ||
+      window.location.search.includes(`${CA_DRAFT_PREVIEW_PARAM}=true`)
   }
 }

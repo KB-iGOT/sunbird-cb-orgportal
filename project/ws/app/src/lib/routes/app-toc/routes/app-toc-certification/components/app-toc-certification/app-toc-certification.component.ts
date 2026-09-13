@@ -14,6 +14,7 @@ import { CertificationApiService } from '../../apis/certification-api.service'
   selector: 'ws-app-toc-certification',
   templateUrl: './app-toc-certification.component.html',
   styleUrls: ['./app-toc-certification.component.scss'],
+  standalone: false,
 })
 export class AppTocCertificationComponent implements OnInit, OnDestroy {
   content?: NsContent.IContent | null

@@ -10,6 +10,7 @@ import { ViewerUtilService } from '../../viewer-util.service'
   selector: 'viewer-class-diagram',
   templateUrl: './class-diagram.component.html',
   styleUrls: ['./class-diagram.component.scss'],
+  standalone: false,
 })
 export class ClassDiagramComponent implements OnInit, OnDestroy {
   private routeDataSubscription: Subscription | null = null

@@ -2,6 +2,7 @@ import { Directive, ViewContainerRef } from '@angular/core'
 
 @Directive({
   selector: '[wsAppAppTocOverview]',
+  standalone: false,
 })
 export class AppTocOverviewDirective {
 

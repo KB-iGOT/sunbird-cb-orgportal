@@ -21,6 +21,7 @@ import { ClassDiagramService } from './class-diagram.service'
   selector: 'viewer-plugin-class-diagram',
   templateUrl: './class-diagram.component.html',
   styleUrls: ['./class-diagram.component.scss'],
+  standalone: false,
 })
 export class ClassDiagramComponent implements OnInit, OnChanges, OnDestroy, AfterViewInit {
 

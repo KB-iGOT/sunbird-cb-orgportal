@@ -8,6 +8,7 @@ import { ConfigurationsService } from '@sunbird-cb/utils-v2'
   selector: 'viewer-video-container',
   templateUrl: './video.component.html',
   styleUrls: ['./video.component.scss'],
+  standalone: false,
 })
 export class VideoComponent implements OnInit {
   @Input() isScreenSizeSmall = false

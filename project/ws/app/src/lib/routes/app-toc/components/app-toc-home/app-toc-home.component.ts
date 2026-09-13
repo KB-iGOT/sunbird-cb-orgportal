@@ -589,6 +589,7 @@ const flattenItems = (items: any[], key: string | number) => {
   styleUrls: ['./app-toc-home.component.scss'],
   // tslint:disable-next-line: use-component-view-encapsulation
   encapsulation: ViewEncapsulation.None,
+  standalone: false,
 })
 
 export class AppTocHomeComponent implements OnInit, OnChanges, OnDestroy, AfterViewChecked, AfterViewInit {
