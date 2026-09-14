@@ -188,7 +188,7 @@ export class BreadcrumbComponent implements OnInit {
     const transformedData = this.generateRequestPayload(this.tpdsSvc.trainingPlanStepperData, 'create')
     this.showDialogBox('progress')
 
-    this.tpSvc.createPlanV3(transformedData).subscribe((_data: any) => {
+    this.tpSvc.createPlanV4(transformedData).subscribe((_data: any) => {
       this.dialogRef.close()
       this.showDialogBox('progress-completed')
       setTimeout(() => {
@@ -306,44 +306,6 @@ export class BreadcrumbComponent implements OnInit {
     return true
   }
 
-  updatePlan() {
-    this.tpdsSvc.trainingPlanStepperData.name = this.tpdsSvc.trainingPlanTitle
-    if (this.tpdsSvc.trainingPlanStepperData.assignmentType === 'AllUser') {
-      this.tpdsSvc.trainingPlanStepperData.assignmentTypeInfo = [
-        'AllUser',
-      ]
-    }
-    const obj: any = { request: { ...this.tpdsSvc.trainingPlanStepperData, id: this.activeRoute.snapshot.data['contentData'].id } }
-    if (obj.request.status && obj.request.status.toLowerCase() === 'live') {
-      //delete obj.request.contentList
-      //delete obj.request.contentType
-      delete obj.request.assignmentType
-    }
-    delete obj.request.status
-    // if (this.isLiveContent) {
-    //   delete obj.request.isApar
-    // }
-    this.showDialogBox('progress')
-    this.tpSvc.updatePlan(obj).subscribe((_data: any) => {
-      this.dialogRef.close()
-      if (this.isLiveContent) {
-        this.publishPlan()
-      } else {
-        this.showDialogBox('progress-completed')
-        setTimeout(() => {
-          this.dialogRef.close()
-          this.tpdsSvc.trainingPlanTitle = ''
-          this.router.navigate(['app', 'home', 'training-plan-dashboard'], {
-            queryParams: {
-              type: this.tpdsSvc.trainingPlanStepperData.status.toLowerCase(),
-              tabSelected: this.tpdsSvc.trainingPlanStepperData.assignmentType,
-            },
-          })
-        }, 1000)
-      }
-    })
-  }
-
   updatePlan_v2() {
     this.tpdsSvc.trainingPlanStepperData.name = this.tpdsSvc.trainingPlanTitle
     if (this.tpdsSvc.trainingPlanStepperData.assignmentType === 'AllUser') {
@@ -360,7 +322,7 @@ export class BreadcrumbComponent implements OnInit {
     }
     delete obj.request.status
     this.showDialogBox('progress')
-    this.tpSvc.updatePlanV3(obj).subscribe((_data: any) => {
+    this.tpSvc.updatePlanV4(obj).subscribe((_data: any) => {
       this.dialogRef.close()
       if (this.isLiveContent) {
         this.publishPlan()
@@ -390,7 +352,7 @@ export class BreadcrumbComponent implements OnInit {
         comment: 'CBP plan approved',
       },
     }
-    this.tpSvc.publishPlanV3(obj).subscribe((data: any) => {
+    this.tpSvc.publishPlanV4(obj).subscribe((data: any) => {
       if (data && data.params && data.params.status && data.params.status.toLowerCase() === 'success') {
         this.showDialogBox('progress-completed')
         setTimeout(() => {

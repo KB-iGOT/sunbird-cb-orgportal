@@ -7,8 +7,8 @@ import { MatDialog } from '@angular/material/dialog'
 import { MatStepper } from '@angular/material/stepper'
 import { StepperSelectionEvent } from '@angular/cdk/stepper'
 import { HttpErrorResponse } from '@angular/common/http'
-import { Observable } from 'rxjs'
-import { switchMap, tap } from 'rxjs/operators'
+import { Observable, of } from 'rxjs'
+import { catchError, map, switchMap, tap } from 'rxjs/operators'
 import * as _ from 'lodash'
 import {
   comprehensiveAssessment,
@@ -19,6 +19,13 @@ import { richTextValidator } from '../../models/rich-text.validator'
 import { ComprehensiveAssessmentService } from '../../services/comprehensive-assessment.service'
 import { LoaderService } from '../../../../../../../../../../../src/app/services/loader.service'
 import { ConfirmDialogComponent } from '../../../../../workallocation-v2/components/confirm-dialog/confirm-dialog.component'
+
+/** A section of the question set: the questions it promised against the ones it holds. */
+interface ISectionCount {
+  name: string
+  declared: number
+  added: number
+}
 
 const STEP_BASIC_DETAILS = 'Basic Details'
 const STEP_ASSESSMENT = 'Assessment'
@@ -50,6 +57,8 @@ export class CreateAssessmentComponent implements OnInit {
   /** Tab the listing was on when this assessment was opened, so Back returns to it. */
   pathUrl = 'live'
   userProfile: any
+  /** Set while moving to a step the guard has just cleared, so it is not checked twice. */
+  private bypassStepGuard = false
   //#endregion
 
   constructor(
@@ -152,63 +161,98 @@ export class CreateAssessmentComponent implements OnInit {
   //#endregion
 
   //#region (stepper interactions)
+  /**
+   * A step header moves the stepper before anything is checked. The assessment step is
+   * checked against the question set the api holds, so a forward move is applied only once
+   * that read answers and is taken back when it refuses.
+   */
   onSelectionChange(event: StepperSelectionEvent) {
     const steps = this.stepper?.steps?.toArray() || []
     const previousLabel = _.get(steps, `[${event.previouslySelectedIndex}].label`, '')
     const selectedLabel = _.get(steps, `[${event.selectedIndex}].label`, '')
+    const guardBypassed = this.bypassStepGuard
+    this.bypassStepGuard = false
 
-    if (event.selectedIndex > event.previouslySelectedIndex &&
-      !this.canMoveToStep(steps, event.previouslySelectedIndex, event.selectedIndex)) {
-      this.currentStepperIndex = event.previouslySelectedIndex
-      this.selectedStepperLable = previousLabel || this.selectedStepperLable
-      setTimeout(() => {
-        if (this.stepper) {
-          this.stepper.selectedIndex = event.previouslySelectedIndex
-        }
-      })
+    if (!guardBypassed && event.selectedIndex > event.previouslySelectedIndex) {
+      this.canMoveToStep(steps, event.previouslySelectedIndex, event.selectedIndex)
+        .subscribe((allowed: boolean) => {
+          if (allowed) {
+            this.applyStep(event.selectedIndex, selectedLabel, previousLabel)
+            return
+          }
+          this.revertToStep(event.previouslySelectedIndex, previousLabel)
+        })
       return
     }
 
+    this.applyStep(event.selectedIndex, selectedLabel, previousLabel)
+  }
+
+  private applyStep(index: number, label: string, previousLabel: string) {
     if (previousLabel === STEP_BASIC_DETAILS) {
       this.assessmentDetailsForm.markAllAsTouched()
       this.assessmentDetailsForm.updateValueAndValidity()
     }
 
-    this.currentStepperIndex = event.selectedIndex
-    this.selectedStepperLable = selectedLabel || ''
+    this.currentStepperIndex = index
+    this.selectedStepperLable = label || ''
     if (this.selectedStepperLable === STEP_PREVIEW && !this.previewReady) {
       this.saveBeforePreview()
     }
     this.cdr.detectChanges()
   }
 
+  /** Puts the stepper back on the step it was moved off, header and binding together. */
+  private revertToStep(index: number, label: string) {
+    this.currentStepperIndex = index
+    this.selectedStepperLable = label || this.selectedStepperLable
+    setTimeout(() => {
+      if (this.stepper) {
+        this.stepper.selectedIndex = index
+      }
+    })
+  }
+
+  /** Moves to a step that has already passed the guard, so it is not checked a second time. */
+  private selectStep(index: number) {
+    if (index === this.currentStepperIndex) {
+      return
+    }
+    const steps = this.stepper?.steps?.toArray() || []
+    this.bypassStepGuard = true
+    this.currentStepperIndex = index
+    this.selectedStepperLable = _.get(steps, `[${index}].label`, '') || this.selectedStepperLable
+  }
+
   /** Every Next persists the current step and carries the saved content to the next one. */
   moveToNextForm() {
     this.assessmentDetailsForm.markAllAsTouched()
     this.assessmentDetailsForm.updateValueAndValidity()
-    if (!this.canMoveToNext) {
-      return
-    }
-    if (!this.contentId) {
-      this.goToNextStep()
-      return
-    }
-    this.loaderService.changeLoaderState(true)
-    this.persistContent().subscribe({
-      next: () => {
-        this.loaderService.changeLoaderState(false)
+    this.validateSteps([this.selectedStepperLable]).subscribe((valid: boolean) => {
+      if (!valid) {
+        return
+      }
+      if (!this.contentId) {
         this.goToNextStep()
-      },
-      error: (error: HttpErrorResponse) => {
-        this.loaderService.changeLoaderState(false)
-        this.openSnackBar(_.get(error, 'error.message', 'Something went wrong while saving, please try again'))
-      },
+        return
+      }
+      this.loaderService.changeLoaderState(true)
+      this.persistContent().subscribe({
+        next: () => {
+          this.loaderService.changeLoaderState(false)
+          this.goToNextStep()
+        },
+        error: (error: HttpErrorResponse) => {
+          this.loaderService.changeLoaderState(false)
+          this.openSnackBar(_.get(error, 'error.message', 'Something went wrong while saving, please try again'))
+        },
+      })
     })
   }
 
   private goToNextStep() {
     if (this.stepper && this.currentStepperIndex < this.stepper.steps.length - 1) {
-      this.currentStepperIndex = this.currentStepperIndex + 1
+      this.selectStep(this.currentStepperIndex + 1)
     }
   }
 
@@ -235,36 +279,27 @@ export class CreateAssessmentComponent implements OnInit {
     this.currentStepperIndex = this.currentStepperIndex - 1
   }
 
-  get canMoveToNext(): boolean {
-    if (this.selectedStepperLable === STEP_BASIC_DETAILS) {
-      return this.validateBasicDetails()
-    }
-    if (this.selectedStepperLable === STEP_ASSESSMENT) {
-      return this.validateAssessment()
-    }
-    return true
+  /** Every step being stepped over has to pass, not just the one being left. */
+  private canMoveToStep(steps: any[], fromIndex: number, toIndex: number): Observable<boolean> {
+    const labels = _.map(_.range(fromIndex, toIndex), (index: number) => _.get(steps, `[${index}].label`, ''))
+    return this.validateSteps(labels)
   }
 
-  private canMoveToStep(steps: any[], fromIndex: number, toIndex: number): boolean {
-    if (this.openMode === 'view' || toIndex <= fromIndex) {
-      return true
+  /**
+   * Nothing is authored on a view only assessment, so nothing is asked of it. The basic
+   * details answer from the form, the assessment step from the question set the api holds.
+   */
+  private validateSteps(labels: string[]): Observable<boolean> {
+    if (this.openMode === 'view') {
+      return of(true)
     }
-    for (let index = fromIndex; index < toIndex; index += 1) {
-      if (!this.validateStep(_.get(steps, `[${index}].label`, ''))) {
-        return false
-      }
+    if (_.includes(labels, STEP_BASIC_DETAILS) && !this.validateBasicDetails()) {
+      return of(false)
     }
-    return true
-  }
-
-  private validateStep(stepLabel: string): boolean {
-    if (stepLabel === STEP_BASIC_DETAILS) {
-      return this.validateBasicDetails()
-    }
-    if (stepLabel === STEP_ASSESSMENT) {
+    if (_.includes(labels, STEP_ASSESSMENT)) {
       return this.validateAssessment()
     }
-    return true
+    return of(true)
   }
 
   private validateBasicDetails(): boolean {
@@ -281,12 +316,59 @@ export class CreateAssessmentComponent implements OnInit {
     return true
   }
 
-  private validateAssessment(): boolean {
+  /**
+   * The settings step takes "the number of questions you will be adding" as a promise and
+   * lets the section be saved long before those questions are authored, so the promise is
+   * checked here against the question set the api actually holds.
+   */
+  private validateAssessment(): Observable<boolean> {
     if (!this.linkedAssessmentId) {
       this.openSnackBar('Please create the assessment before moving ahead')
+      return of(false)
+    }
+    this.loaderService.changeLoaderState(true)
+    return this.readQuestionSet().pipe(
+      map((questionSet: any) => {
+        this.loaderService.changeLoaderState(false)
+        return this.validateQuestionCounts(questionSet)
+      }),
+      catchError(() => {
+        this.loaderService.changeLoaderState(false)
+        this.openSnackBar('Unable to read the questions added so far, please try again')
+        return of(false)
+      })
+    )
+  }
+
+  private validateQuestionCounts(questionSet: any): boolean {
+    const sections = this.readSectionCounts(questionSet)
+    if (!sections.length) {
+      this.openSnackBar('Save the assessment settings and add its questions before moving ahead')
       return false
     }
-    return true
+    // a section declaring nothing still has to hold a question, an empty one cannot be taken
+    const incomplete = _.find(sections, (section: ISectionCount) => section.added < Math.max(section.declared, 1))
+    if (!incomplete) {
+      return true
+    }
+    // the section name only helps while there is more than one of them
+    const subject = sections.length > 1 ? incomplete.name : 'This assessment'
+    this.openSnackBar(incomplete.declared
+      ? `${subject} is set to have ${incomplete.declared} questions, only ${incomplete.added} added so far`
+      : `${subject} has no questions added yet`)
+    return false
+  }
+
+  /**
+   * What every section of the question set promised against what it holds: `totalQuestions`
+   * is the count typed into the settings, its `children` are the questions authored under it.
+   */
+  private readSectionCounts(questionSet: any): ISectionCount[] {
+    return _.map(_.get(questionSet, 'children', []), (section: any, index: number) => ({
+      name: _.get(section, 'name', '') || `Section ${index + 1}`,
+      declared: Number(_.get(section, 'totalQuestions', 0)) || 0,
+      added: _.get(section, 'children', []).length,
+    }))
   }
   //#endregion
 
@@ -318,15 +400,21 @@ export class CreateAssessmentComponent implements OnInit {
     if (!this.linkedAssessmentId) {
       return
     }
-    this.assessmentSvc.getQuestionSetHierarchy(this.linkedAssessmentId).subscribe({
-      next: (questionSet: any) => {
-        this.duration = Number(_.get(questionSet, 'expectedDuration', 0)) || 0
-        this.cdr.detectChanges()
-      },
+    this.readQuestionSet().subscribe({
+      next: () => this.cdr.detectChanges(),
       error: () => {
         // duration stays at whatever is already stored on the content
       },
     })
+  }
+
+  /** Reads the question set back, mirroring the duration it is currently configured with. */
+  private readQuestionSet(): Observable<any> {
+    return this.assessmentSvc.getQuestionSetHierarchy(this.linkedAssessmentId).pipe(
+      tap((questionSet: any) => {
+        this.duration = Number(_.get(questionSet, 'expectedDuration', 0)) || 0
+      })
+    )
   }
 
   reloadContentHierarchy() {
@@ -414,14 +502,16 @@ export class CreateAssessmentComponent implements OnInit {
   }
 
   preview() {
-    if (!this.validateBasicDetails() || !this.validateAssessment()) {
-      return
-    }
-    const steps = this.stepper?.steps?.toArray() || []
-    const previewIndex = steps.findIndex((step: any) => step.label === STEP_PREVIEW)
-    if (previewIndex !== -1) {
-      this.currentStepperIndex = previewIndex
-    }
+    this.validateSteps([STEP_BASIC_DETAILS, STEP_ASSESSMENT]).subscribe((valid: boolean) => {
+      if (!valid) {
+        return
+      }
+      const steps = this.stepper?.steps?.toArray() || []
+      const previewIndex = steps.findIndex((step: any) => step.label === STEP_PREVIEW)
+      if (previewIndex !== -1) {
+        this.selectStep(previewIndex)
+      }
+    })
   }
   //#endregion
 
@@ -436,15 +526,17 @@ export class CreateAssessmentComponent implements OnInit {
   }
 
   publishAssessment() {
-    if (!this.validateBasicDetails() || !this.validateAssessment()) {
-      return
-    }
-    const linkedPlan = _.get(this.assessmentDetailsForm, 'controls.linkedPlan.value')
-    if (!this.assessmentSvc.isWindowOpen(_.get(linkedPlan, 'endDate'))) {
-      this.openSnackBar(comprehensiveAssessmentList.WINDOW_CLOSED_MESSAGE)
-      return
-    }
-    this.confirmPublish()
+    this.validateSteps([STEP_BASIC_DETAILS, STEP_ASSESSMENT]).subscribe((valid: boolean) => {
+      if (!valid) {
+        return
+      }
+      const linkedPlan = _.get(this.assessmentDetailsForm, 'controls.linkedPlan.value')
+      if (!this.assessmentSvc.isWindowOpen(_.get(linkedPlan, 'endDate'))) {
+        this.openSnackBar(comprehensiveAssessmentList.WINDOW_CLOSED_MESSAGE)
+        return
+      }
+      this.confirmPublish()
+    })
   }
 
   private confirmPublish() {

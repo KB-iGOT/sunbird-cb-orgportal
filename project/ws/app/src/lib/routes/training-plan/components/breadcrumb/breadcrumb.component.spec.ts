@@ -55,13 +55,11 @@ describe('BreadcrumbComponent', () => {
             ))
         }
 
+        // the v1 and v2 plan apis are gone, the component talks to v3
         mockTpSvc = {
-            createPlan: jest.fn().mockReturnValue(of({ success: true })),
-            createPlanV3: jest.fn().mockReturnValue(of({ success: true })),
-            updatePlan: jest.fn().mockReturnValue(of({ success: true })),
-            updatePlanV2: jest.fn().mockReturnValue(of({ success: true })),
-            publishPlan: jest.fn().mockReturnValue(of({ params: { status: 'success' } })),
-            publishPlanV2: jest.fn().mockReturnValue(of({ params: { status: 'success' } }))
+            createPlanV4: jest.fn().mockReturnValue(of({ success: true })),
+            updatePlanV4: jest.fn().mockReturnValue(of({ success: true })),
+            publishPlanV4: jest.fn().mockReturnValue(of({ params: { status: 'success' } })),
         }
 
         mockSnackBar = {
@@ -286,7 +284,7 @@ describe('BreadcrumbComponent', () => {
             component.createPlanDraftView()
 
             expect(component.showDialogBox).toHaveBeenCalledWith('progress')
-            expect(mockTpSvc.createPlanV3).toHaveBeenCalledWith({
+            expect(mockTpSvc.createPlanV4).toHaveBeenCalledWith({
                 request: expect.objectContaining({
                     name: 'Test Plan',
                     status: 'draft',
@@ -412,75 +410,6 @@ describe('BreadcrumbComponent', () => {
 
         it('should return null for an unknown payload type', () => {
             expect(component.generateRequestPayload(stepperData('2026-27'), 'archive')).toBeNull()
-        })
-    })
-
-    describe('updatePlan', () => {
-        beforeEach(() => {
-            component.showDialogBox = jest.fn()
-            component.dialogRef = mockDialogRef
-            component.publishPlan = jest.fn()
-            mockActivatedRoute.snapshot.data.contentData = { id: '123' }
-            mockTpdsSvc.trainingPlanStepperData = {
-                name: '',
-                status: 'draft',
-                assignmentType: 'AllUser',
-                assignmentTypeInfo: [],
-                contentList: [],
-                contentType: 'course',
-                endDate: null
-            }
-        })
-
-        it('should update plan for non-live content', () => {
-            jest.useFakeTimers()
-            component.isLiveContent = false
-
-            component.updatePlan()
-
-            expect(component.showDialogBox).toHaveBeenCalledWith('progress')
-            expect(mockTpSvc.updatePlan).toHaveBeenCalledWith({
-                request: {
-                    name: mockTpdsSvc.trainingPlanTitle,
-                    assignmentType: 'AllUser',
-                    assignmentTypeInfo: ['AllUser'],
-                    contentList: [],
-                    contentType: 'course',
-                    endDate: null,
-                    id: '123'
-                }
-            })
-            expect(mockDialogRef.close).toHaveBeenCalled()
-            expect(component.showDialogBox).toHaveBeenCalledWith('progress-completed')
-
-            jest.advanceTimersByTime(1000)
-
-            expect(mockDialogRef.close).toHaveBeenCalled()
-            expect(mockTpdsSvc.trainingPlanTitle).toBe('')
-            expect(mockRouter.navigate).toHaveBeenCalled()
-
-            jest.useRealTimers()
-        })
-
-        it('should update plan and publish for live content', () => {
-            component.isLiveContent = true
-            mockTpdsSvc.trainingPlanStepperData.status = 'live'
-
-            component.updatePlan()
-
-            expect(component.showDialogBox).toHaveBeenCalledWith('progress')
-            expect(mockTpSvc.updatePlan).toHaveBeenCalledWith({
-                request: {
-                    name: mockTpdsSvc.trainingPlanTitle,
-                    assignmentTypeInfo: ['AllUser'],
-                    contentList: [],
-                    contentType: 'course',
-                    endDate: null,
-                    id: '123'
-                }
-            })
-            expect(mockDialogRef.close).toHaveBeenCalled()
-            expect(component.publishPlan).toHaveBeenCalled()
         })
     })
 

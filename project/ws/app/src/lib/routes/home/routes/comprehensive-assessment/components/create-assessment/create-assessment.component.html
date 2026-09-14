@@ -52,6 +52,7 @@
       <ng-template matStepLabel>Assessment</ng-template>
       <ng-container *ngIf="selectedStepperLable === 'Assessment'">
         <ws-app-assessment-builder [assessmentId]="linkedAssessmentId" [openMode]="openMode"
+          [assessmentName]="assessmentDetailsForm.get('assessmentName')?.value"
           (assessmentSaved)="onAssessmentSaved($event)"></ws-app-assessment-builder>
       </ng-container>
     </mat-step>

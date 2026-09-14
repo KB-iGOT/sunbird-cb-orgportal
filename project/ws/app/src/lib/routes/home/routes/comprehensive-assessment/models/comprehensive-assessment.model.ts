@@ -2,6 +2,10 @@
  * Content categories used while creating the "Comprehensive assessment" collection.
  * The collection itself is created as a `Standalone Assessment` content, the
  * question set built in step 2 is created as a `Course Assessment` question set.
+ *
+ * The platform has no `Comprehensive Assessment` course category yet. When the backend
+ * takes one, only `CONTENT_COURSE_CATEGORY` moves to it: the settings step of the
+ * consumption library already accepts either value, so this is the only line to change.
  */
 export const CONTENT_PRIMARY_CATEGORY = 'Standalone Assessment'
 export const CONTENT_COURSE_CATEGORY = 'Standalone Assessment'
@@ -21,7 +25,11 @@ export namespace comprehensiveAssessment {
   export interface IAssessmentConfig {
     identifier: string
     primaryCategory: string
+    /** Tells the settings step this is a comprehensive assessment, which fixes several of them. */
+    courseCategory: string
     contextCategory: string
+    /** Seeds the settings title, so the name given in step 1 is not typed a second time. */
+    name: string
     isReadOnly: boolean
   }
 

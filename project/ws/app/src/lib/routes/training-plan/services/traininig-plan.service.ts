@@ -35,6 +35,12 @@ const API_END_POINTS = {
   READ_PLAN_V3: 'apis/proxies/v8/cbplan/v3/read',
   ARCHIVE_PLAN_V3: 'apis/proxies/v8/cbplan/v3/archive',
 
+  CREATE_PLAN_V4: 'apis/proxies/v8/cbplan/v4/create',
+  UPDATE_PLAN_V4: 'apis/proxies/v8/cbplan/v4/update',
+  PUBLISH_PLAN_V4: 'apis/proxies/v8/cbplan/v4/publish',
+  READ_PLAN_V4: 'apis/proxies/v8/cbplan/v4/read',
+  ADMIN_READ_V4:'/apis/proxies/v8/cbplan/v4/admin/read',
+  ARCHIVE_PLAN_V4: 'apis/proxies/v8/cbplan/v4/archive',
 }
 @Injectable({
   providedIn: 'root',
@@ -178,6 +184,35 @@ export class TrainingPlanService {
       body: obj,
     }
     return this.http.delete<any>(`${API_END_POINTS.ARCHIVE_PLAN_V3}`, options)
+  }
+
+
+  createPlanV4(obj: any) {
+    return this.http.post<any>(`${API_END_POINTS.CREATE_PLAN_V4}`, obj).pipe(map(res => _.get(res, 'result')))
+  }
+  updatePlanV4(obj: any) {
+    return this.http.post<any>(`${API_END_POINTS.UPDATE_PLAN_V4}`, obj).pipe(map(res => _.get(res, 'result')))
+  }
+
+  publishPlanV4(obj: any) {
+    return this.http.post<any>(`${API_END_POINTS.PUBLISH_PLAN_V4}`, obj)
+  }
+
+  readPlanV4(planId: any) {
+    return this.http.get<any>(`${API_END_POINTS.READ_PLAN_V4}/${planId}`)
+  }
+  adminReadV4(planId: any) {
+    return this.http.get<any>(`${API_END_POINTS.ADMIN_READ_V4}/${planId}`)
+  }
+
+   archivePlanV4(obj: any) {
+    const options = {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json',
+      }),
+      body: obj,
+    }
+    return this.http.delete<any>(`${API_END_POINTS.ARCHIVE_PLAN_V4}`, options)
   }
 
 

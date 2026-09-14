@@ -1,6 +1,10 @@
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core'
 import { LoaderService } from '../../../../../../../../../../../src/app/services/loader.service'
-import { comprehensiveAssessment, QUESTIONSET_PRIMARY_CATEGORY } from '../../models/comprehensive-assessment.model'
+import {
+  comprehensiveAssessment,
+  CONTENT_COURSE_CATEGORY,
+  QUESTIONSET_PRIMARY_CATEGORY,
+} from '../../models/comprehensive-assessment.model'
 
 /**
  * Step 2 of the builder. Delegates the whole question set authoring to
@@ -17,6 +21,8 @@ export class AssessmentBuilderComponent implements OnChanges {
 
   @Input() assessmentId = ''
   @Input() openMode = 'edit'
+  /** The name given in step 1, which seeds the title of the settings step. */
+  @Input() assessmentName = ''
   /** Emits the question set identifier as soon as the assessment is created. */
   @Output() assessmentSaved = new EventEmitter<string>()
 
@@ -27,7 +33,7 @@ export class AssessmentBuilderComponent implements OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes.assessmentId || changes.openMode) {
+    if (changes.assessmentId || changes.openMode || changes.assessmentName) {
       this.config = this.buildConfig()
     }
   }
@@ -36,7 +42,9 @@ export class AssessmentBuilderComponent implements OnChanges {
     return {
       identifier: this.assessmentId || '',
       primaryCategory: QUESTIONSET_PRIMARY_CATEGORY,
+      courseCategory: CONTENT_COURSE_CATEGORY,
       contextCategory: '',
+      name: this.assessmentName || '',
       isReadOnly: this.openMode === 'view',
     }
   }
