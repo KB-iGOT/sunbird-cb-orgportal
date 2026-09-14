@@ -15,6 +15,7 @@ import { UserAutocompleteService } from '../../services/user-autocomplete.servic
   selector: 'ws-app-share-toc',
   templateUrl: './share-toc.component.html',
   styleUrls: ['./share-toc.component.scss'],
+  standalone: false,
 })
 export class ShareTocComponent implements OnInit {
   shareForm: UntypedFormGroup | undefined

@@ -51,6 +51,19 @@ describe('CreateAssessmentComponent', () => {
     ...overrides,
   })
 
+  /**
+   * A question set as the hierarchy hands it over: one section declaring the questions it
+   * will hold in `totalQuestions`, with the questions authored so far as its children.
+   */
+  const questionSet = (declared = 2, added = 2) => ({
+    expectedDuration: 2400,
+    children: [{
+      name: 'Section A',
+      totalQuestions: declared,
+      children: Array.from({ length: added }, (_x, index) => ({ identifier: `q${index + 1}` })),
+    }],
+  })
+
   /** The three stepper steps, as `MatStepper.steps.toArray()` hands them over. */
   const steps = [{ label: 'Basic Details' }, { label: 'Assessment' }, { label: 'Preview' }]
   const withStepper = () => {
@@ -108,7 +121,7 @@ describe('CreateAssessmentComponent', () => {
       getLinkedAssessmentId: jest.fn().mockReturnValue(''),
       updateContent: jest.fn().mockReturnValue(of({ result: { versionKey: 'v2' } })),
       getContentHierarchy: jest.fn().mockReturnValue(of({ result: { content: content() } })),
-      getQuestionSetHierarchy: jest.fn().mockReturnValue(of({ expectedDuration: 2400 })),
+      getQuestionSetHierarchy: jest.fn().mockReturnValue(of(questionSet())),
       linkAssessmentToCollection: jest.fn().mockReturnValue(of({})),
       publishAssessment: jest.fn().mockReturnValue(of({})),
       isWindowOpen: jest.fn().mockReturnValue(true),
@@ -244,7 +257,7 @@ describe('CreateAssessmentComponent', () => {
 
     it('should pull the duration off a question set that is already linked', () => {
       assessmentSvc.getLinkedAssessmentId.mockReturnValue('do_456')
-      assessmentSvc.getQuestionSetHierarchy.mockReturnValue(of({ expectedDuration: 6000 }))
+      assessmentSvc.getQuestionSetHierarchy.mockReturnValue(of({ ...questionSet(), expectedDuration: 6000 }))
 
       component = build({ assessmentDetails: { data: content() } })
 
@@ -451,9 +464,9 @@ describe('CreateAssessmentComponent', () => {
 
       component.moveToNextForm()
 
-      expect(component.canMoveToNext).toBe(false)
       expect(matSnackBar.open).toHaveBeenCalledWith('Please create the assessment before moving ahead')
       expect(component.currentStepperIndex).toBe(1)
+      expect(assessmentSvc.updateContent).not.toHaveBeenCalled()
     })
 
     it('should leave the assessment step once a question set is linked', () => {
@@ -469,8 +482,95 @@ describe('CreateAssessmentComponent', () => {
     /** The preview step asks nothing of the user, it is always free to move on from. */
     it('should ask nothing of the preview step', () => {
       component.selectedStepperLable = 'Preview'
+      component.currentStepperIndex = 1
+      component.linkedAssessmentId = ''
 
-      expect(component.canMoveToNext).toBe(true)
+      component.moveToNextForm()
+
+      expect(assessmentSvc.getQuestionSetHierarchy).not.toHaveBeenCalled()
+      expect(component.currentStepperIndex).toBe(2)
+    })
+
+    /**
+     * The settings step takes the number of questions to be added as a promise and lets the
+     * section be saved before they are authored, so leaving the step checks the promise.
+     */
+    describe('the questions promised by the settings', () => {
+      beforeEach(() => {
+        component.selectedStepperLable = 'Assessment'
+        component.currentStepperIndex = 1
+        component.linkedAssessmentId = 'do_456'
+      })
+
+      it('should refuse to leave with fewer questions than the settings declared', () => {
+        assessmentSvc.getQuestionSetHierarchy.mockReturnValue(of(questionSet(10, 3)))
+
+        component.moveToNextForm()
+
+        expect(matSnackBar.open).toHaveBeenCalledWith(
+          'This assessment is set to have 10 questions, only 3 added so far'
+        )
+        expect(component.currentStepperIndex).toBe(1)
+        expect(assessmentSvc.updateContent).not.toHaveBeenCalled()
+      })
+
+      it('should name the section that is short once there is more than one', () => {
+        assessmentSvc.getQuestionSetHierarchy.mockReturnValue(of({
+          expectedDuration: 2400,
+          children: [
+            { name: 'Section A', totalQuestions: 1, children: [{ identifier: 'q1' }] },
+            { name: 'Section B', totalQuestions: 4, children: [{ identifier: 'q2' }] },
+          ],
+        }))
+
+        component.moveToNextForm()
+
+        expect(matSnackBar.open).toHaveBeenCalledWith(
+          'Section B is set to have 4 questions, only 1 added so far'
+        )
+        expect(component.currentStepperIndex).toBe(1)
+      })
+
+      it('should refuse to leave a section that declared nothing and holds nothing', () => {
+        assessmentSvc.getQuestionSetHierarchy.mockReturnValue(of(questionSet(0, 0)))
+
+        component.moveToNextForm()
+
+        expect(matSnackBar.open).toHaveBeenCalledWith('This assessment has no questions added yet')
+        expect(component.currentStepperIndex).toBe(1)
+      })
+
+      it('should refuse to leave while the settings have not been saved', () => {
+        assessmentSvc.getQuestionSetHierarchy.mockReturnValue(of({ expectedDuration: 0 }))
+
+        component.moveToNextForm()
+
+        expect(matSnackBar.open).toHaveBeenCalledWith(
+          'Save the assessment settings and add its questions before moving ahead'
+        )
+        expect(component.currentStepperIndex).toBe(1)
+      })
+
+      it('should move on once every question promised has been added', () => {
+        assessmentSvc.getQuestionSetHierarchy.mockReturnValue(of(questionSet(10, 10)))
+
+        component.moveToNextForm()
+
+        expect(component.currentStepperIndex).toBe(2)
+      })
+
+      /** The count cannot be taken on trust, so a read that fails holds the step. */
+      it('should hold the step when the question set cannot be read', () => {
+        assessmentSvc.getQuestionSetHierarchy.mockReturnValue(throwError(() => ({})))
+
+        component.moveToNextForm()
+
+        expect(matSnackBar.open).toHaveBeenCalledWith(
+          'Unable to read the questions added so far, please try again'
+        )
+        expect(component.currentStepperIndex).toBe(1)
+        expect(loaderService.changeLoaderState).toHaveBeenLastCalledWith(false)
+      })
     })
   })
 

@@ -64,6 +64,18 @@ const routes: Routes = [
   // },
   { path: 'viewer', redirectTo: 'app/home/explore-content/viewer' },
   {
+    // The player without the home shell around it, for the comprehensive assessment builder
+    // to frame in its preview step. Same ViewerModule, mounted away from the left menu.
+    path: 'app/assessment-player',
+    loadChildren: () => import('./routes/route-assessment-player.module')
+      .then(u => u.RouteAssessmentPlayerModule),
+    canActivate: [GeneralGuard],
+    data: {
+      pageId: 'assessment-player',
+      module: 'comprehensive-assessment',
+    },
+  },
+  {
     path: 'app/training-plan',
     loadChildren: () => import('./routes/route-training-plan.module').then(u => u.RouteTrainingPlanAppModule),
     canActivate: [GeneralGuard],

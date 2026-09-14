@@ -17,6 +17,7 @@ import { AccessControlService } from '@sunbird-cb/toc'
   selector: 'viewer-video',
   templateUrl: './video.component.html',
   styleUrls: ['./video.component.scss'],
+  standalone: false,
 })
 export class VideoComponent implements OnInit, OnDestroy {
   private routeDataSubscription: Subscription | null = null

@@ -1,6 +1,6 @@
 import { HttpRequest, HttpHandler } from '@angular/common/http'
 import { of } from 'rxjs'
-import { CaHierarchyInterceptorService } from './ca-hierarchy-interceptor.service'
+import { CA_DRAFT_PREVIEW_PARAM, CaHierarchyInterceptorService } from './ca-hierarchy-interceptor.service'
 
 describe('CaHierarchyInterceptorService', () => {
   let service: CaHierarchyInterceptorService
@@ -52,6 +52,28 @@ describe('CaHierarchyInterceptorService', () => {
     it('leaves writes alone', () => {
       const url = 'apis/proxies/v8/course/v1/hierarchy/do_123?mode=edit'
       expect(intercept(new HttpRequest('POST', url, {})).url).toBe(url)
+    })
+  })
+
+  /**
+   * The builder frames the player rather than navigating to it, so inside the frame the
+   * path is the player's own. The marker on that url is what still identifies the read.
+   */
+  describe('inside the player the builder frames', () => {
+    it('reads the draft hierarchy when the frame carries the marker', () => {
+      onPath(`/app/home/explore-content/viewer/practice/do_qs?preview=true&${CA_DRAFT_PREVIEW_PARAM}=true`)
+      const req = new HttpRequest('GET', 'apis/proxies/v8/course/v1/hierarchy/do_123?mode=edit')
+
+      expect(intercept(req).url)
+        .toBe('apis/proxies/v8/action/content/v3/hierarchy/do_123?mode=edit')
+    })
+
+    /** The same player opened for a published course still reads through the course reader. */
+    it('leaves the course hierarchy alone on the same route without the marker', () => {
+      onPath('/app/home/explore-content/viewer/practice/do_qs?preview=true&editMode=true')
+      const url = 'apis/proxies/v8/course/v1/hierarchy/do_123?mode=edit'
+
+      expect(intercept(new HttpRequest('GET', url)).url).toBe(url)
     })
   })
 

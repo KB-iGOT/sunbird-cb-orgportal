@@ -143,8 +143,6 @@ export class BasicInfoComponent implements OnInit {
 
   createEvent(appIcon: string) {
     if (this.eventForm.valid && this.imgURL) {
-      const createdforarray: any[] = []
-      createdforarray.push(_.get(this.userProfile, 'rootOrgId', ''))
       const requestBody = {
         request: {
           event: {
@@ -178,7 +176,6 @@ export class BasicInfoComponent implements OnInit {
             typeofEvent: _.get(this.eventForm, 'controls.eventType.value', ''),
             registrationEndDate: '',
             owner: _.get(this.userProfile, 'departmentName', ''),
-            createdFor: createdforarray
           }
         }
       }

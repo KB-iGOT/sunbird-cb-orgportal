@@ -322,7 +322,7 @@ export class EventBasicDetailsComponent implements OnInit, OnChanges {
       createdforarray.push(_.get(this.userProfile, 'rootOrgId', ''))
       org.push(_.get(this.userProfile, 'departmentName', ''))
 
-      const request = {
+      const request: any = {
         request: {
           content: {
             name: 'image asset',
@@ -334,9 +334,11 @@ export class EventBasicDetailsComponent implements OnInit, OnChanges {
             contentType: 'Asset',
             primaryCategory: 'Asset',
             organisation: org,
-            createdFor: createdforarray,
           },
         },
+      }
+      if (!this.eventSvc.isBharatKalpCategory(this.edf?.eventCategory?.value)) {
+        request.request.content.createdFor = createdforarray
       }
       this.loaderService.changeLoaderState(true)
       this.eventSvc.createContent(request).pipe(mergeMap((res: any) => {

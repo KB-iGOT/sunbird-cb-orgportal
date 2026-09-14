@@ -16,6 +16,7 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog'
     { provide: forwardRef(() => DateAdapter), useClass: forwardRef(() => AppDateAdapter) },
     { provide: forwardRef(() => MAT_DATE_FORMATS), useValue: forwardRef(() => APP_DATE_FORMATS) },
   ],
+  standalone: false,
 })
 export class CreateBatchDialogComponent implements OnInit {
   createBatchForm: UntypedFormGroup

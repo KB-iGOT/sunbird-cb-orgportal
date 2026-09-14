@@ -12,6 +12,7 @@ import { MatDialog } from '@angular/material/dialog'
   selector: 'ws-app-toc-content-card',
   templateUrl: './app-toc-content-card.component.html',
   styleUrls: ['./app-toc-content-card.component.scss'],
+  standalone: false,
 })
 export class AppTocContentCardComponent implements OnInit, OnChanges {
   @Input() content: NsContent.IContent | null = null

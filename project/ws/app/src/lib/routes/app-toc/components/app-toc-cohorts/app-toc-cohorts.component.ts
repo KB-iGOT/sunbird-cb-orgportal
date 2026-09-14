@@ -9,6 +9,7 @@ import { Router } from '@angular/router'
   selector: 'ws-app-toc-cohorts',
   templateUrl: './app-toc-cohorts.component.html',
   styleUrls: ['./app-toc-cohorts.component.scss'],
+  standalone: false,
 })
 export class AppTocCohortsComponent implements OnInit {
   @Input() content!: NsContent.IContent

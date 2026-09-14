@@ -5,6 +5,7 @@ import { NsContent } from '@sunbird-cb/collection'
   selector: 'viewer-class-diagram-container',
   templateUrl: './class-diagram.component.html',
   styleUrls: ['./class-diagram.component.scss'],
+  standalone: false,
 })
 export class ClassDiagramComponent {
   @Input() isLtMedium = false

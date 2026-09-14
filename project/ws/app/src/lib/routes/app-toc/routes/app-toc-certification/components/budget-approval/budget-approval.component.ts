@@ -27,6 +27,7 @@ import { MatSnackBar } from '@angular/material/snack-bar'
   selector: 'ws-app-budget-approval',
   templateUrl: './budget-approval.component.html',
   styleUrls: ['./budget-approval.component.scss'],
+  standalone: false,
 })
 export class BudgetApprovalComponent implements OnInit, OnDestroy {
   content?: NsContent.IContent

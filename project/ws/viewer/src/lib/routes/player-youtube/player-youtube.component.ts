@@ -71,6 +71,7 @@ export interface IWidgetsPlayerMediaData {
   selector: 'ws-widget-player-youtube',
   templateUrl: './player-youtube.component.html',
   styleUrls: ['./player-youtube.component.scss'],
+  standalone: false,
 })
 export class PlayerYoutubeComponent extends WidgetBaseComponent
   implements OnInit, AfterViewInit, OnDestroy, NsWidgetResolver.IWidgetData<any> {
