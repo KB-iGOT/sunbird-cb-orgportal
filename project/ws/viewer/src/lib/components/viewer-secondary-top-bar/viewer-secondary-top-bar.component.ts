@@ -10,10 +10,14 @@ import { ViewerDataService } from '../../viewer-data.service'
 import { ViewerUtilService } from '../../viewer-util.service'
 import { PdfScormDataService } from '../../pdf-scorm-data-service'
 import { AppTocService } from '@ws/app/src/lib/routes/app-toc/services/app-toc.service'
+/** Query param naming where Finish should land, for a caller that opened the player itself. */
+export const FINISH_URL_PARAM = 'finishUrl'
+
 @Component({
   selector: 'viewer-viewer-secondary-top-bar',
   templateUrl: './viewer-secondary-top-bar.component.html',
   styleUrls: ['./viewer-secondary-top-bar.component.scss'],
+  standalone: false,
 })
 export class ViewerSecondaryTopBarComponent implements OnInit, OnDestroy {
 
@@ -382,7 +386,16 @@ export class ViewerSecondaryTopBarComponent implements OnInit, OnDestroy {
       // } else {
       //   this.router.navigateByUrl(`public/toc/${this.collectionId}/overview`)
       // }
-      if (this.activatedRoute.snapshot.queryParams && this.activatedRoute.snapshot.queryParams['collectionId']) {
+      // Where Finish lands can be named by whoever opened the player, for a caller that is
+      // not the content preview page — the assessment builder frames this player in a step
+      // of its own, where the content preview is not a page it ever came from. Without one
+      // the content preview stays the destination, as it always was.
+      const namedFinishUrl = this.activatedRoute.snapshot.queryParams[FINISH_URL_PARAM]
+      if (namedFinishUrl) {
+        this.router.navigateByUrl('/', { skipLocationChange: true }).then(() => {
+          this.router.navigateByUrl(this.finishLanding(decodeURIComponent(namedFinishUrl)))
+        })
+      } else if (this.activatedRoute.snapshot.queryParams && this.activatedRoute.snapshot.queryParams['collectionId']) {
         let url = `app/home/explore-content/${this.activatedRoute.snapshot.queryParams['collectionId']}/preview`
         this.router.navigateByUrl('/', { skipLocationChange: true }).then(() => {
           this.router.navigate([url])
@@ -391,6 +404,19 @@ export class ViewerSecondaryTopBarComponent implements OnInit, OnDestroy {
       //  window.parent.postMessage('showPreviewTOC', '*') // NOSONAR
 
     }
+  }
+
+  /**
+   * The page Finish lands on has to name the landing itself, or the next Finish finds no
+   * url to go to and falls back to the content preview. Carrying the param onto the landing
+   * makes it hold for every attempt, not just the first.
+   */
+  private finishLanding(target: string): string {
+    if (target.includes(`${FINISH_URL_PARAM}=`)) {
+      return target
+    }
+    const separator = target.includes('?') ? '&' : '?'
+    return `${target}${separator}${FINISH_URL_PARAM}=${encodeURIComponent(target)}`
   }
 
   showCompletionPopUp() {

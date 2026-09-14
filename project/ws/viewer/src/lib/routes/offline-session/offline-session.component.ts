@@ -14,6 +14,7 @@ import { AccessControlService } from '@sunbird-cb/toc/lib/services/access-contro
   selector: 'viewer-offline-session',
   templateUrl: './offline-session.component.html',
   styleUrls: ['./offline-session.component.scss'],
+  standalone: false,
 })
 export class OfflineSessionComponent implements OnInit, OnDestroy {
   private dataSubscription: Subscription | null = null

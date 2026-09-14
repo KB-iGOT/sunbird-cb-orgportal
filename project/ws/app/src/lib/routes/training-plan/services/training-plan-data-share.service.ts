@@ -142,6 +142,20 @@ export class TrainingPlanDataSharingService {
     return !!this.normalizeContent(this.trainingPlanStepperData['contentList'][index]).mandatory
   }
 
+  /**
+   * Drops the gating flag from every content of the plan. The flag only means something on an
+   * APAR plan — it is the set the comprehensive assessment unlock is derived from — so turning
+   * APAR off has to clear it, otherwise the plan would be saved still carrying mandatory
+   * content that nothing in the UI shows any more.
+   * The entries are rewritten in place, the content list keeps its identity and its order.
+   */
+  clearMandatoryContent() {
+    const contentList = this.trainingPlanStepperData['contentList'] || []
+    contentList.forEach((item: any, index: number) => {
+      contentList[index] = { ...this.normalizeContent(item), mandatory: false }
+    })
+  }
+
   getMandatoryContentCount(): number {
     return this.getContentList()
       .filter((item: any) => !!this.normalizeContent(item).mandatory).length

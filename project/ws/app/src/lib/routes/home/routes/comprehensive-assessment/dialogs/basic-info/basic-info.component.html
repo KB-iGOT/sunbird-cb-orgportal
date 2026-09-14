@@ -38,14 +38,12 @@
         </div>
       </div>
 
-      <div class="action-btns save-assessment flex justify-center gap-4">
-        <button mat-stroked-button class="flex justify-center items-center mat-btn-outline cancel-button"
-          (click)="dialogRef.close();" type="button">
-          <span class="font-bold text-sm">Cancel</span>
+      <div class="action-btns save-assessment flex justify-center items-center gap-4">
+        <button mat-stroked-button class="cancel-button" (click)="dialogRef.close();" type="button">
+          Cancel
         </button>
-        <button mat-flat-button class="flex justify-center items-center save-button" type="submit"
-          [disabled]="(assessmentForm.invalid || !imgURL)">
-          <span class="font-bold text-sm">{{ isEditMode ? 'Update' : 'Create' }}</span>
+        <button mat-flat-button class="save-button" type="submit" [disabled]="assessmentForm.invalid">
+          {{ isEditMode ? 'Update' : 'Create' }}
         </button>
       </div>
     </form>
@@ -62,13 +60,15 @@
           <ng-container *ngIf="!imgURL">
             <div class="flex flex-column items-center gap-2">
               <img src="/assets/icons/upload-upward-arrow.svg" alt="icon">
-              <span class="text-sm font-bold text-blue">Upload Image <strong class="text-red-700">*</strong></span>
+              <span class="text-sm font-bold text-blue">Upload Image</span>
               <span class="text-xs font-normal">Supported file types: PNG, JPG, JPEG</span>
               <span class="text-xs font-normal">Max Size - 500KB</span>
             </div>
           </ng-container>
           <ng-container *ngIf="imgURL">
-            <img class="preview-img" [src]="imgURL" alt="assessment thumbnail" />
+            <!-- a just-picked file previews from its own data url, only the stored icon is an artifact path -->
+            <img class="preview-img" [src]="imagePath ? imgURL : (imgURL | pipePublicURL)"
+              alt="assessment thumbnail" />
             <div class="change-image-overlay flex justify-center items-center gap-1">
               <mat-icon class="change-icon">photo_camera</mat-icon>
               <span class="text-xs font-bold">Change image</span>

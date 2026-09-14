@@ -1,0 +1,23 @@
+.assessment-player-page {
+  width: 100%;
+  min-height: 100vh;
+  background-color: #FFFFFF;
+}
+
+/**
+ * The player's own ways back out. Both lead away from the assessment being authored, and
+ * the builder's step already has its own control for returning to the card, so they are
+ * dropped here. Scoped to this page — the player keeps them everywhere else it is opened.
+ *
+ * The first is a bare `div.cursor-pointer` sitting as the very first child of the viewer,
+ * the only piece of its chrome carrying no condition of its own, which is why it survives
+ * every other way of turning the chrome off. It reads "Back to Preview" and navigates to
+ * `explore-content/{collectionId}/preview`, a page the builder never came from.
+ */
+:host ::ng-deep viewer-container > div.cursor-pointer:first-child {
+  display: none !important;
+}
+
+:host ::ng-deep ws-widget-btn-page-back-nav {
+  display: none !important;
+}

@@ -20,7 +20,7 @@ export class UpdatePlanResolveService {
     // The plan read API returns contentList as { identifier, mandatory } entries. The complete
     // content is read once here, it is what the competency summary is built on and what the
     // selected items dialog shows, so neither of them is limited to the page of results shown.
-    return this.tpSvc.readPlanV3(_route.paramMap.get('planId')).pipe(
+    return this.tpSvc.adminReadV4(_route.paramMap.get('planId')).pipe(
       map((_res: any) => {
         return _res.result.content
       }),

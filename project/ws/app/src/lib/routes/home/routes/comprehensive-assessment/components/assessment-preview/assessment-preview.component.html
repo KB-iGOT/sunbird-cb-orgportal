@@ -1,8 +1,25 @@
+<!-- The View click is taken in the capture phase from the component, before RouterLink
+     can answer it, so the player opens on this step. See `ngAfterViewInit`. -->
 <div class="assessment-preview">
   <ng-container *ngIf="content?.identifier; else noPreview">
-    <ws-app-app-toc-home-v2 [inputContent]="content" [forPreview]="true"
-      [displayViewBtn]="false"></ws-app-app-toc-home-v2>
+    <!-- Hidden rather than removed while the player is open, so coming back shows the card
+         already loaded instead of reading the hierarchy again. -->
+    <div [hidden]="isPlayerOpen">
+      <ws-app-app-toc-home-v2 [inputContent]="content" [forPreview]="true"
+        [displayViewBtn]="true"></ws-app-app-toc-home-v2>
+    </div>
+
+    <ng-container *ngIf="isPlayerOpen">
+      <div class="player-shell flex flex-column gap-3">
+        <button type="button" class="back-to-card flex items-center gap-1" (click)="closePlayer()">
+          <mat-icon class="back-icon">arrow_back</mat-icon>
+          <span>Back to preview</span>
+        </button>
+        <iframe class="assessment-player" [src]="playerUrl" title="Assessment preview"></iframe>
+      </div>
+    </ng-container>
   </ng-container>
+
   <ng-template #noPreview>
     <div class="no-preview flex justify-center items-center">
       Complete the previous steps to see the preview.

@@ -7,6 +7,7 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog'
   selector: 'ws-app-request-cancel-dialog',
   templateUrl: './request-cancel-dialog.component.html',
   styleUrls: ['./request-cancel-dialog.component.scss'],
+  standalone: false,
 })
 export class RequestCancelDialogComponent implements OnInit {
   constructor(

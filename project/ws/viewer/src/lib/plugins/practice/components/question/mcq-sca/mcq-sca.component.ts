@@ -21,6 +21,7 @@ import { NsContent } from '@sunbird-cb/utils-v2'
     // tslint:disable-next-line
     encapsulation: ViewEncapsulation.None,
     // changeDetection: ChangeDetectionStrategy.OnPush
+    standalone: false,
 })
 export class SingleChoiseQuesComponent implements OnInit, OnDestroy {
     @Input() question: NSPractice.IQuestion = {

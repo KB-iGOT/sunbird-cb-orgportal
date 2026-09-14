@@ -20,6 +20,7 @@ import { MatSnackBar } from '@angular/material/snack-bar'
   selector: 'ws-app-toc-certification-booking-card',
   templateUrl: './booking-card.component.html',
   styleUrls: ['./booking-card.component.scss'],
+  standalone: false,
 })
 export class BookingCardComponent implements OnDestroy {
   @Input() certification!: ICertificationMeta

@@ -9,7 +9,7 @@ describe('AparYearService', () => {
     cbpPlanYear: {
       currentYear: '2026-27',
       yearList: [
-        { label: '2026-27 (Current A.Y.)', value: '2026-27', editable: true },
+        { label: '2026-27', value: '2026-27', editable: true },
         { label: '2025-26', value: '2025-26', editable: false },
       ],
     },
@@ -87,6 +87,103 @@ describe('AparYearService', () => {
       expect(service.getAparYears().map(year => year.editable)).toEqual([true, false])
     })
 
+    it('should mark the flagged year as current and label it, in place of the field', () => {
+      configSvc.globalConfig = {
+        cbpPlanYear: {
+          currentYear: '2026-27',
+          yearList: [
+            { label: '2027-28', value: '2027-28', editable: true, current: true },
+            { label: '2026-27', value: '2026-27', editable: true },
+            { label: '2025-26', value: '2025-26', editable: false },
+          ],
+        },
+      }
+
+      const years = service.getAparYears()
+
+      expect(years.map(year => year.current)).toEqual([true, false, false])
+      expect(years[0].label).toBe('2027-28 (Current A.Y.)')
+      expect(service.getCurrentAparYear()).toBe('2027-28')
+    })
+
+    it('should hold one current year only, whatever the flag count', () => {
+      configSvc.globalConfig = {
+        cbpPlanYear: {
+          yearList: [
+            { value: '2027-28', current: true },
+            { value: '2026-27', current: true },
+          ],
+        },
+      }
+
+      expect(service.getAparYears().map(year => year.current)).toEqual([true, false])
+    })
+
+    it('should strip a suffix authored into a label that is no longer the current year', () => {
+      configSvc.globalConfig = {
+        cbpPlanYear: {
+          yearList: [
+            { label: '2027-28', value: '2027-28', current: true },
+            { label: '2026-27 (Current A.Y.)', value: '2026-27' },
+          ],
+        },
+      }
+
+      expect(service.getAparYears().map(year => year.label))
+        .toEqual(['2027-28 (Current A.Y.)', '2026-27'])
+    })
+
+    it('should not label a year twice when the suffix is already authored on it', () => {
+      configSvc.globalConfig = {
+        cbpPlanYear: {
+          yearList: [{ label: '2026-27 (Current A.Y.)', value: '2026-27', current: true }],
+        },
+      }
+
+      expect(service.getAparYears()[0].label).toBe('2026-27 (Current A.Y.)')
+    })
+
+    it('should open the flagged year when the config says nothing about editing it', () => {
+      configSvc.globalConfig = {
+        cbpPlanYear: { yearList: [{ value: '2027-28', current: true }, { value: '2026-27' }] },
+      }
+
+      expect(service.getAparYears().map(year => year.editable)).toEqual([true, false])
+    })
+
+    it('should keep the flagged year closed when the config closes it', () => {
+      configSvc.globalConfig = {
+        cbpPlanYear: {
+          yearList: [{ value: '2026-27', current: true, editable: false }],
+        },
+      }
+
+      expect(service.isAparYearEditable('2026-27')).toBe(false)
+    })
+
+    it('should fall back to the current year field for a list carrying no flag', () => {
+      const years = service.getAparYears()
+
+      expect(years.map(year => year.current)).toEqual([true, false])
+      expect(service.getCurrentAparYear()).toBe('2026-27')
+    })
+
+    it('should take the current year from the field when the list is left out', () => {
+      configSvc.globalConfig = { cbpPlanYear: { currentYear: '2026-27' } }
+
+      expect(service.getCurrentAparYear()).toBe('2026-27')
+    })
+
+    it('should report a year as editable only when the config leaves it open', () => {
+      expect(service.isAparYearEditable('2026-27')).toBe(true)
+      expect(service.isAparYearEditable('2025-26')).toBe(false)
+    })
+
+    it('should treat a year the config does not list as closed', () => {
+      expect(service.isAparYearEditable('2019-20')).toBe(false)
+      expect(service.isAparYearEditable('')).toBe(false)
+    })
+
     it('should fall back to the first configured year when no current year is set', () => {
       configSvc.globalConfig = { cbpPlanYear: { yearList: globalConfig.cbpPlanYear.yearList } }
 
@@ -95,6 +192,20 @@ describe('AparYearService', () => {
   })
 
   describe('without the global config', () => {
+    it('should flag and label the current cycle only', () => {
+      const years = service.getAparYears(3)
+
+      expect(years.map(year => year.current)).toEqual([true, false, false])
+      expect(years[0].label).toBe(`${years[0].value} (Current A.Y.)`)
+    })
+
+    it('should only report the current cycle as editable', () => {
+      const years = service.getAparYears()
+
+      expect(service.isAparYearEditable(years[0].value)).toBe(true)
+      expect(service.isAparYearEditable(years[1].value)).toBe(false)
+    })
+
     it('should open the current cycle only, the years behind it are closed', () => {
       expect(service.getAparYears(3).map(year => year.editable)).toEqual([true, false, false])
     })

@@ -8,6 +8,7 @@ import { PdfScormDataService } from '../../pdf-scorm-data-service'
   selector: 'viewer-pdf-container',
   templateUrl: './pdf.component.html',
   styleUrls: ['./pdf.component.scss'],
+  standalone: false,
 })
 export class PdfComponent implements OnInit, OnDestroy {
   @Input() isFetchingDataComplete = false

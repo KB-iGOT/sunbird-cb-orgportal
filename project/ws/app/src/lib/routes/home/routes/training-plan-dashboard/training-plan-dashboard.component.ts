@@ -360,7 +360,7 @@ export class TrainingPlanDashboardComponent implements OnInit, AfterViewInit {
       },
     }
 
-    this.trainingPlanService.archivePlanV3(obj).subscribe({
+    this.trainingPlanService.archivePlanV4(obj).subscribe({
       next: () => {
         this.snackBar.open('CBP plan deleted successfully.')
         this.loaderService.changeLoaderState(false)
@@ -381,7 +381,7 @@ export class TrainingPlanDashboardComponent implements OnInit, AfterViewInit {
       },
     }
 
-    this.trainingPlanService.publishPlanV3(obj).subscribe({
+    this.trainingPlanService.publishPlanV4(obj).subscribe({
       next: (data: any) => {
         if (data?.params?.status?.toLowerCase() === 'success') {
           this.snackBar.open('CBP plan published successfully.')

@@ -21,6 +21,7 @@ export class MaterialDetailsComponent implements OnChanges {
   @Input() openMode = 'edit'
   @Input() userProfile: any
   @Input() openTab = 'draft'
+  @Input() eventCategory = ''
   @Output() updatedMaterialDetails = new EventEmitter<material>()
   @Output() canCloseOrOpenMaterial = new EventEmitter<boolean>()
   @Output() currentMaterialSaveUpdate = new EventEmitter<boolean>()
@@ -173,7 +174,7 @@ export class MaterialDetailsComponent implements OnChanges {
       createdforarray.push(_.get(this.userProfile, 'rootOrgId', ''))
       org.push(_.get(this.userProfile, 'departmentName', ''))
 
-      const request = {
+      const request: any = {
         request: {
           content: {
             name: 'image asset',
@@ -185,9 +186,11 @@ export class MaterialDetailsComponent implements OnChanges {
             contentType: 'Asset',
             primaryCategory: 'Asset',
             organisation: org,
-            createdFor: createdforarray,
           },
         },
+      }
+      if (!this.eventSvc.isBharatKalpCategory(this.eventCategory)) {
+        request.request.content.createdFor = createdforarray
       }
       this.loaderService.changeLoaderState(true)
       this.eventSvc.createContent(request).pipe(mergeMap((res: any) => {

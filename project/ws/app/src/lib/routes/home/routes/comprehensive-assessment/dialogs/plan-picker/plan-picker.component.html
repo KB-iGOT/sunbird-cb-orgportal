@@ -20,7 +20,9 @@
     <mat-form-field appearance="outline" class="year-field">
       <mat-select [value]="selectedYear" (selectionChange)="onYearChange($event.value)">
         <mat-option [value]="allYears">All reporting years</mat-option>
-        <mat-option *ngFor="let year of years" [value]="year.value">{{year.label}}</mat-option>
+        <mat-option *ngFor="let year of years" [value]="year.value" [disabled]="!year.editable">
+          {{year.label}}
+        </mat-option>
       </mat-select>
     </mat-form-field>
   </div>
@@ -34,18 +36,18 @@
 
     <ng-container *ngIf="!showLoader">
       <ng-container *ngIf="plans.length; else noPlans">
-        <mat-radio-group class="w-full" [value]="selectedPlanId" (change)="onPlanSelected($event)">
+        <mat-radio-group class="w-full plans-scroll" [value]="selectedPlanId" (change)="onPlanSelected($event)">
           <table mat-table [dataSource]="plans" [trackBy]="trackByPlanId" class="w-full plans-table">
             <ng-container matColumnDef="select">
               <th mat-header-cell *matHeaderCellDef class="select-cell"></th>
               <td mat-cell *matCellDef="let plan" class="select-cell">
-                <mat-radio-button [value]="plan.id" [disabled]="plan.hasActiveAssessment"></mat-radio-button>
+                <mat-radio-button [value]="plan.id" [disabled]="!isPlanSelectable(plan)"></mat-radio-button>
               </td>
             </ng-container>
 
             <ng-container matColumnDef="reportingYear">
-              <th mat-header-cell *matHeaderCellDef>Reporting Year</th>
-              <td mat-cell *matCellDef="let plan">
+              <th mat-header-cell *matHeaderCellDef class="year-cell">Reporting Year</th>
+              <td mat-cell *matCellDef="let plan" class="year-cell">
                 <div class="flex flex-column gap-1">
                   <span class="cell-value">{{plan.planYear || '-'}}</span>
                   <span class="cell-note">{{ isCurrentYear(plan.planYear) ? 'Current' : 'Previous' }}</span>
@@ -54,8 +56,8 @@
             </ng-container>
 
             <ng-container matColumnDef="timeline">
-              <th mat-header-cell *matHeaderCellDef>Timeline</th>
-              <td mat-cell *matCellDef="let plan">
+              <th mat-header-cell *matHeaderCellDef class="timeline-cell">Timeline</th>
+              <td mat-cell *matCellDef="let plan" class="timeline-cell">
                 <span class="cell-value">{{plan.endDateDisplay || '-'}}</span>
               </td>
             </ng-container>
@@ -71,6 +73,9 @@
                     <ng-container *ngIf="plan.hasActiveAssessment">
                       <ng-container *ngIf="plan.orgName"> · </ng-container>already has an active assessment
                     </ng-container>
+                    <ng-container *ngIf="!plan.hasActiveAssessment && plan.isYearClosed">
+                      <ng-container *ngIf="plan.orgName"> · </ng-container>the reporting year is closed
+                    </ng-container>
                   </span>
                 </div>
               </td>
@@ -78,7 +83,7 @@
 
             <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
             <tr mat-row *matRowDef="let plan; columns: displayedColumns"
-              [ngClass]="{'row-disabled': plan.hasActiveAssessment, 'row-selected': plan.id === selectedPlanId}"
+              [ngClass]="{'row-disabled': !isPlanSelectable(plan), 'row-selected': plan.id === selectedPlanId}"
               (click)="selectPlan(plan.id)"></tr>
           </table>
         </mat-radio-group>

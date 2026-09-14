@@ -5,6 +5,7 @@ import { MAT_LEGACY_SNACK_BAR_DATA as MAT_SNACK_BAR_DATA } from '@angular/materi
   selector: 'ws-app-certification-snackbar',
   templateUrl: './snackbar.component.html',
   styleUrls: ['./snackbar.component.scss'],
+  standalone: false,
 })
 export class SnackbarComponent implements OnInit {
   constructor(

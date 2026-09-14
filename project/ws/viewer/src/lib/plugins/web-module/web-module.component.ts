@@ -19,6 +19,7 @@ import { ActivatedRoute } from '@angular/router'
   selector: 'viewer-plugin-web-module',
   templateUrl: './web-module.component.html',
   styleUrls: ['./web-module.component.scss'],
+  standalone: false,
 })
 export class WebModuleComponent implements OnInit, OnChanges, OnDestroy {
   @Input() collectionId = ''

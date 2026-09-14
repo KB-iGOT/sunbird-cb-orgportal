@@ -22,7 +22,7 @@
                 <mat-cell *matCellDef="let element" class="imageCell flex flex-row items-center gap-2">
                   <ng-container *ngIf="col.imageKey">
                     <div class="imageDiv">
-                      <img class="cellImage" [src]="element[col.imageKey]" alt="assessment icon">
+                      <img class="cellImage" [src]="element[col.imageKey] | pipePublicURL" alt="assessment icon">
                     </div>
                   </ng-container>
                   <span [matTooltip]="element[col.key]" [ngClass]="col.cellClass" class="table-cell-text">

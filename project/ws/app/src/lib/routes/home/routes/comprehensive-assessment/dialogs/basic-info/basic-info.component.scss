@@ -52,16 +52,13 @@
   width: 1016px !important;
 }
 
+/* Both take the shared width, so Cancel and Create read as one pair. */
 .cancel-button {
   @include ca-button-secondary;
-
-  width: 74px;
 }
 
 .save-button {
   @include ca-button-primary;
-
-  min-width: 62px;
 }
 
 .save-assessment {

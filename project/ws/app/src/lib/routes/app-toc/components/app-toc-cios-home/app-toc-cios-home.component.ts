@@ -9,6 +9,7 @@ import { MatSnackBar } from '@angular/material/snack-bar'
   selector: 'ws-app-app-toc-cios-home',
   templateUrl: './app-toc-cios-home.component.html',
   styleUrls: ['./app-toc-cios-home.component.scss'],
+  standalone: false,
 })
 export class AppTocCiosHomeComponent implements OnInit, AfterViewInit {
   skeletonLoader = true

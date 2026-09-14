@@ -23,6 +23,7 @@ const EMAIL_PATTERN = /^[a-zA-Z0-9]+[a-zA-Z0-9._-]*[a-zA-Z0-9]+@[a-zA-Z0-9]+([-a
   selector: 'ws-app-enroll-profile-form',
   templateUrl: './enroll-profile-form.component.html',
   styleUrls: ['./enroll-profile-form.component.scss'],
+  standalone: false,
 })
 export class EnrollProfileFormComponent implements OnInit {
   public afterSubmitAction = this.checkAfterSubmit.bind(this)

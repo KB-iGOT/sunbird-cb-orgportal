@@ -4,6 +4,7 @@ import { Component, Input, OnInit } from '@angular/core'
   selector: 'ws-widget-skeleton-loader',
   templateUrl: './skeleton-loader.component.html',
   styleUrls: ['./skeleton-loader.component.scss'],
+  standalone: false,
 })
 export class SkeletonLoaderComponent implements OnInit {
 

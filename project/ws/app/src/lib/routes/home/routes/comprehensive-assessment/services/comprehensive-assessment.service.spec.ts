@@ -73,6 +73,7 @@ describe('ComprehensiveAssessmentService', () => {
         filter: {
           status: ['Live'],
           orgIdList: ['org-1'],
+          isApar: true,
           planYear: '2026-27',
         },
         pageNumber: 0,
@@ -119,6 +120,7 @@ describe('ComprehensiveAssessmentService', () => {
         // two of the three contents are marked mandatory, they are the gating set
         gatingCourseCount: 2,
         hasActiveAssessment: false,
+        isYearClosed: false,
       }])
     })
 
@@ -483,6 +485,29 @@ describe('ComprehensiveAssessmentService', () => {
       // only the leading empty segment is dropped, the path behind the igot root is kept whole
       expect(service.toPublicUrl('https://storage.googleapis.com/igot/bucket/content/a.png'))
         .toContain('/assets/public/bucket/content/a.png')
+    })
+  })
+
+  describe('isWindowOpen', () => {
+    const hours = (count: number) => new Date(Date.now() + (count * 60 * 60 * 1000)).toISOString()
+
+    it('should let a window that has not ended yet through', () => {
+      expect(service.isWindowOpen(hours(24))).toBe(true)
+    })
+
+    it('should close a window whose end date has passed', () => {
+      expect(service.isWindowOpen(hours(-24))).toBe(false)
+    })
+
+    /** No plan linked, or a plan with no timeline — there is no window to publish into. */
+    it('should treat a missing end date as no window at all', () => {
+      expect(service.isWindowOpen('')).toBe(false)
+      expect(service.isWindowOpen(null)).toBe(false)
+      expect(service.isWindowOpen(undefined)).toBe(false)
+    })
+
+    it('should treat an unreadable end date as no window at all', () => {
+      expect(service.isWindowOpen('not a date')).toBe(false)
     })
   })
 })

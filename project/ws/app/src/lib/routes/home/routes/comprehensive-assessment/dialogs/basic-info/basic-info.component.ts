@@ -3,6 +3,7 @@ import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms'
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog'
 import { MatSnackBar } from '@angular/material/snack-bar'
 import { HttpErrorResponse } from '@angular/common/http'
+import { of } from 'rxjs'
 import { mergeMap } from 'rxjs/operators'
 import * as _ from 'lodash'
 import { ConfigurationsService } from '@sunbird-cb/utils-v2'
@@ -99,10 +100,6 @@ export class BasicInfoComponent implements OnInit {
       this.assessmentForm.markAllAsTouched()
       return
     }
-    if (!this.imgURL) {
-      this.openSnackBar('Please upload image')
-      return
-    }
     if (this.isEditMode) {
       this.updateBasicInfo()
       return
@@ -137,10 +134,15 @@ export class BasicInfoComponent implements OnInit {
   /**
    * Creates the image asset, uploads the picked file against it and then creates the
    * assessment collection with the resulting artifact url as appIcon / posterImage.
+   * The thumbnail is optional, so an assessment with no image is created without one
+   * and picks the default up from the content api.
    */
   createAssessment() {
     this.loaderService.changeLoaderState(true)
-    this.assessmentSvc.uploadImageAsset(this.imagePath, this.userProfile).pipe(
+    const appIcon$ = this.imagePath
+      ? this.assessmentSvc.uploadImageAsset(this.imagePath, this.userProfile)
+      : of('')
+    appIcon$.pipe(
       mergeMap((appIcon: string) => this.assessmentSvc.createAssessmentCollection(
         _.get(this.assessmentForm, 'controls.assessmentName.value', '').trim(),
         appIcon,

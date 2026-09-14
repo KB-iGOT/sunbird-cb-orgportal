@@ -40,6 +40,9 @@ $ca-status-draft-surface: #FEF0DC;
 $ca-radius-card: 12px;    // panels and the inset rows inside them
 $ca-radius-control: 8px;  // thumbnails, tables, editors
 $ca-control-height: 32px;
+// A pair of buttons reads as a pair only at one width, so the shorter label is padded
+// out to this rather than each button being hand-sized to its own text.
+$ca-button-min-width: 96px;
 
 // Fully round, whatever the control's height. The flow carried 17px, 18px, 23px
 // and 25px because each was a radius hand-matched to one control's height, and
@@ -59,23 +62,36 @@ $ca-font-button: 700 14px Lato;
 // The two button shapes of the flow. Every action in the journey is one of
 // these, so a new screen cannot invent a third.
 // ───────────────────────────────────────────────────────────────────────
+// One box for both shapes. The filled and the outlined button are different Material
+// components with their own heights, paddings and label centring, so every part of the
+// box is stated here: an outlined button that only borrowed the height still sat a
+// border's worth taller than the filled one beside it.
 @mixin ca-button-base {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
   height: $ca-control-height;
+  min-width: $ca-button-min-width;
   border-radius: $ca-radius-pill;
   font: $ca-font-button;
   padding: 0 16px;
 }
 
+// The theme bundle colours every Material button from `.theme-igot.day-mode
+// .mat-flat-button`, which outranks a component-scoped class — so the accent
+// has to be stated as important or the button renders in the theme's plain
+// white. The rest of the shape wins on its own and stays as it is.
 @mixin ca-button-primary {
   @include ca-button-base;
 
   border: 0;
-  background-color: $ca-primary;
-  color: $ca-on-primary;
+  background-color: $ca-primary !important;
+  color: $ca-on-primary !important;
 
   &[disabled] {
-    background-color: $ca-disabled-surface;
-    color: $ca-disabled-text;
+    background-color: $ca-disabled-surface !important;
+    color: $ca-disabled-text !important;
   }
 }
 

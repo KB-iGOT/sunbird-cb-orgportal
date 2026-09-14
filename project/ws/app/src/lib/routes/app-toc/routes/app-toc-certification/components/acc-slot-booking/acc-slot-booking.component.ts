@@ -22,6 +22,7 @@ import { MatSnackBar } from '@angular/material/snack-bar'
   selector: 'ws-app-acc-slot-booking',
   templateUrl: './acc-slot-booking.component.html',
   styleUrls: ['./acc-slot-booking.component.scss'],
+  standalone: false,
 })
 export class AccSlotBookingComponent implements OnInit {
   content?: NsContent.IContent

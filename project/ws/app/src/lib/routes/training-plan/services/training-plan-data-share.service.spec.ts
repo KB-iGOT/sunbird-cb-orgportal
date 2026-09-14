@@ -50,6 +50,46 @@ describe('TrainingPlanDataSharingService content list', () => {
     ])
   })
 
+  it('clears the mandatory flag off every content', () => {
+    svc.addContentToPlan('A'); svc.addContentToPlan('B'); svc.addContentToPlan('C')
+    svc.setContentMandatory('A', true)
+    svc.setContentMandatory('C', true)
+
+    svc.clearMandatoryContent()
+
+    expect(svc.getMandatoryContentCount()).toBe(0)
+    expect(svc.isContentMandatory('A')).toBe(false)
+    expect(svc.isContentMandatory('C')).toBe(false)
+  })
+
+  it('keeps the content itself when the mandatory flags are cleared', () => {
+    svc.addContentToPlan('A'); svc.addContentToPlan('B')
+    svc.setContentMandatory('B', true)
+    const contentList = svc.getContentList()
+
+    svc.clearMandatoryContent()
+
+    // the list is rewritten in place, the index built off it stays good
+    expect(svc.getContentList()).toBe(contentList)
+    expect(svc.getContentIdentifiers()).toEqual(['A', 'B'])
+    expect(svc.isContentSelected('B')).toBe(true)
+  })
+
+  it('clears the flags on a plan saved as plain content ids', () => {
+    svc.trainingPlanStepperData.contentList = ['A', 'B']
+
+    svc.clearMandatoryContent()
+
+    expect(svc.buildContentListPayload(svc.getContentList()))
+      .toEqual([{ identifier: 'A', mandatory: false }, { identifier: 'B', mandatory: false }])
+  })
+
+  it('is safe on a plan with no content at all', () => {
+    svc.trainingPlanStepperData.contentList = null
+
+    expect(() => svc.clearMandatoryContent()).not.toThrow()
+  })
+
   it('reads plans saved as plain content ids', () => {
     svc.trainingPlanStepperData.contentList = ['A', 'B']
     expect(svc.isContentSelected('B')).toBe(true)

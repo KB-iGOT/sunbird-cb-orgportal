@@ -2,6 +2,33 @@
 
 .assessment-preview {
   width: 100%;
+  position:relative;
+
+  .back-to-card {
+    align-self: flex-start;
+    border: 0;
+    background: transparent;
+    padding: 0;
+    cursor: pointer;
+    color: $ca-primary;
+    font: $ca-font-button;
+
+    .back-icon {
+      font-size: 18px;
+      height: 18px;
+      width: 18px;
+    }
+  }
+
+  /* The player brings its own full page layout with it, so the frame is tall enough to
+     hold a question and its options without a second scrollbar inside the builder's. */
+  .assessment-player {
+    width: 100%;
+    height: 720px;
+    border: 1px solid $ca-border;
+    border-radius: $ca-radius-card;
+    background-color: #FFFFFF;
+  }
 
   /* An empty placeholder, so it stays neutral rather than outlined in the accent. */
   .no-preview {

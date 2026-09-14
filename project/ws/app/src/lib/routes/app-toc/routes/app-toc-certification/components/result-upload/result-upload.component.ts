@@ -29,6 +29,7 @@ import { MatSnackBar } from '@angular/material/snack-bar'
   selector: 'ws-app-result-upload',
   templateUrl: './result-upload.component.html',
   styleUrls: ['./result-upload.component.scss'],
+  standalone: false,
 })
 export class ResultUploadComponent implements OnInit, OnDestroy {
   @Input() content!: NsContent.IContent

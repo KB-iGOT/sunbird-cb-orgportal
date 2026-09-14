@@ -18,6 +18,7 @@ import { NsContent } from '../../models/constant'
   selector: 'viewer-audio',
   templateUrl: './audio.component.html',
   styleUrls: ['./audio.component.scss'],
+  standalone: false,
 })
 export class AudioComponent implements OnInit, OnDestroy {
   private routeDataSubscription: Subscription | null = null

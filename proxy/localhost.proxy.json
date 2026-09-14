@@ -1,6 +1,6 @@
 {
   "/apis": {
-    "target": "https://mdo.qa.karmayogibharat.net/",
+    "target": "https://mdo.dev.karmayogibharat.net/",
     "secure": false,
     "logLevel": "debug",
     "changeOrigin": true,
@@ -8,11 +8,11 @@
       "/apis": "/apis"
     },
     "headers": {
-      "Cookie": "connect.sid=s%3AE6FlzB2joUFmf72OACe4ldJKeWGHX6x2.dj28mm9U7wwTC5d%2Bv%2FDLAF2G%2B87HBdy4R%2FiKlSd2%2B7M"
+      "Cookie": "connect.sid=s%3APnWlFiyX6uDFbsouZC7YaFPkc9E0cw-U.dZAnFgqN0vhrfhSgY5A6%2FbCGQ2EI6wZN0oLCgeApdQc"
     }
   },
   "/api": {
-    "target": "https://mdo.qa.karmayogibharat.net/",
+    "target": "https://mdo.dev.karmayogibharat.net/",
     "secure": false,
     "logLevel": "debug",
     "changeOrigin": true,
@@ -20,7 +20,7 @@
       "/api": "/api"
     },
     "headers": {
-      "Cookie": "connect.sid=s%3AE6FlzB2joUFmf72OACe4ldJKeWGHX6x2.dj28mm9U7wwTC5d%2Bv%2FDLAF2G%2B87HBdy4R%2FiKlSd2%2B7M"
+      "Cookie": "connect.sid=s%3APnWlFiyX6uDFbsouZC7YaFPkc9E0cw-U.dZAnFgqN0vhrfhSgY5A6%2FbCGQ2EI6wZN0oLCgeApdQc"
     }
   },
   "/content-api": {

@@ -12,6 +12,7 @@ import { SubapplicationRespondService } from '../../services/subapplication-resp
   selector: 'viewer-iap',
   templateUrl: './iap.component.html',
   styleUrls: ['./iap.component.scss'],
+  standalone: false,
 })
 export class IapComponent implements OnInit, OnDestroy {
   private routeDataSubscription: Subscription | null = null
