@@ -22,12 +22,15 @@ describe('AssessmentsListComponent', () => {
   const openWindow = new Date(Date.now() + (365 * 24 * 60 * 60 * 1000)).toISOString()
   const row = { identifier: 'do_123', name: 'APAR assessment', aparPlanEndDate: openWindow }
 
-  /** The tab is taken off the child route the tab link points at. */
-  const build = (path = 'live') => {
+  /**
+   * The tab is taken off the child route the tab link points at, the roles off the same
+   * resolved config. `userRoles` is the lowercased set the init service builds on login.
+   */
+  const build = (path = 'live', roles: string[] | null = ['mdo_leader']) => {
     activatedRoute = {
       snapshot: {
         url: [{ path }],
-        data: { configService: { userProfile } },
+        data: { configService: { userProfile, userRoles: roles ? new Set(roles) : null } },
       },
     }
     return new AssessmentsListComponent(
@@ -101,13 +104,14 @@ describe('AssessmentsListComponent', () => {
   })
 
   describe('the tab configuration', () => {
-    it('should show published on and no publish action on the live tab', () => {
+    /** A published assessment is viewed and edited, it is not deleted off the dashboard. */
+    it('should show published on and only view and edit on the live tab', () => {
       component.ngOnInit()
 
       expect(component.tableData.columns.map((column: any) => column.key))
         .toEqual(['name', 'planName', 'reportingYear', 'assessmentWindow', 'status',
           'creator', 'durationDisplay', 'lastPublishedOn'])
-      expect(component.menuItems.map((item: any) => item.action)).toEqual(['view', 'edit', 'delete'])
+      expect(component.menuItems.map((item: any) => item.action)).toEqual(['view', 'edit'])
       expect(component.tableData.noDataMessage).toBe('There are no live assessments.')
     })
 
@@ -119,8 +123,35 @@ describe('AssessmentsListComponent', () => {
       expect(component.tableData.columns.map((column: any) => column.key))
         .toEqual(['name', 'planName', 'reportingYear', 'assessmentWindow', 'status',
           'creator', 'durationDisplay', 'createdOn', 'lastUpdatedOn'])
-      expect(component.menuItems.map((item: any) => item.action)).toEqual(['edit', 'publish', 'delete'])
+      expect(component.menuItems.map((item: any) => item.action))
+        .toEqual(['view', 'edit', 'publish', 'delete'])
       expect(component.tableData.noDataMessage).toBe('There are no draft assessments.')
+    })
+
+    /** Edit is the one action the requirement holds behind a role. */
+    it('should not offer edit to a user who is not an MDO leader', () => {
+      component = build('draft', ['mdo_admin'])
+
+      component.ngOnInit()
+
+      expect(component.menuItems.map((item: any) => item.action)).toEqual(['view', 'publish', 'delete'])
+    })
+
+    it('should not offer edit on the live tab either without the role', () => {
+      component = build('live', ['mdo_admin'])
+
+      component.ngOnInit()
+
+      expect(component.menuItems.map((item: any) => item.action)).toEqual(['view'])
+    })
+
+    /** A role set that never resolved is not a reason to offer an action that needs one. */
+    it('should not offer edit while the roles are unresolved', () => {
+      component = build('draft', null)
+
+      component.ngOnInit()
+
+      expect(component.menuItems.map((item: any) => item.action)).toEqual(['view', 'publish', 'delete'])
     })
 
     it('should list the linked plan and everything derived from it on either tab', () => {

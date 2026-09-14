@@ -209,7 +209,7 @@ export class ComprehensiveAssessmentService {
         query: '',
         limit: 200,
         offset: 0,
-        fields: ['identifier', aparPlan.METADATA.planId],
+        fields: ['identifier', aparPlan.METADATA.planId, aparPlan.TRAINING_PLAN_KEY],
         filters: {
           status: [comprehensiveAssessmentList.STATUS_LIVE],
           courseCategory: [CONTENT_COURSE_CATEGORY],
@@ -222,7 +222,8 @@ export class ComprehensiveAssessmentService {
     return this.http.post<any>(API_END_POINTS.CONTENT_SEARCH, request).pipe(
       map((res: any) => _.compact(_.map(
         _.get(res, 'result.content', []),
-        (row: any) => _.get(row, aparPlan.METADATA.planId, '')
+        (row: any) => _.get(this.readTrainingPlanLink(row), 'identifier', '') ||
+          _.get(row, aparPlan.METADATA.planId, '')
       ))),
       catchError(() => of([]))
     )
@@ -239,6 +240,7 @@ export class ComprehensiveAssessmentService {
       endDateDisplay: this.toDisplayDate(endDate),
       orgName: _.get(plan, 'orgName', '') || _.get(plan, 'departmentName', ''),
       gatingCourseCount: this.countGatingCourses(plan),
+      contentList: this.readContentList(plan),
       // both flags are the picker's to work out, the search knows neither
       hasActiveAssessment: false,
       isYearClosed: false,
@@ -250,9 +252,22 @@ export class ComprehensiveAssessmentService {
     return _.filter(_.get(plan, 'contentList', []), (content: any) => !!_.get(content, 'mandatory')).length
   }
 
-  /** The linked plan as it is written onto the assessment content. */
+  /** The plan's courses, kept down to the identifier and the flag that gates the unlock. */
+  private readContentList(plan: any): aparPlan.IPlanContent[] {
+    return _.map(_.get(plan, 'contentList', []), (content: any) => ({
+      identifier: _.get(content, 'identifier', ''),
+      mandatory: !!_.get(content, 'mandatory'),
+    }))
+  }
+
+  /**
+   * The linked plan as it is written onto the assessment content: the linkage the platform
+   * reads the unlock rule from, and the display copies the dashboard and the reopened
+   * builder are served from, which a content search cannot join back to the plan for.
+   */
   buildPlanMetadata(plan: aparPlan.ILinkedPlan | null): any {
     return {
+      [aparPlan.TRAINING_PLAN_KEY]: this.buildTrainingPlanLink(plan),
       [aparPlan.METADATA.planId]: _.get(plan, 'id', ''),
       [aparPlan.METADATA.planName]: _.get(plan, 'name', ''),
       [aparPlan.METADATA.reportingYear]: _.get(plan, 'planYear', ''),
@@ -263,20 +278,55 @@ export class ComprehensiveAssessmentService {
     }
   }
 
+  /** The plan and the courses it gates, each carrying the flag the unlock is read off. */
+  private buildTrainingPlanLink(plan: aparPlan.ILinkedPlan | null): aparPlan.ITrainingPlanLink {
+    return {
+      identifier: _.get(plan, 'id', ''),
+      contentList: this.readContentList(plan),
+    }
+  }
+
   /** The linked plan read back off a saved assessment, null while none is linked. */
   readPlanMetadata(content: any): aparPlan.ILinkedPlan | null {
-    const id = _.get(content, aparPlan.METADATA.planId, '')
+    const link = this.readTrainingPlanLink(content)
+    const id = _.get(link, 'identifier', '') || _.get(content, aparPlan.METADATA.planId, '')
     if (!id) {
       return null
     }
+    const contentList = _.get(link, 'contentList', [])
     return {
       id,
+      contentList,
       name: _.get(content, aparPlan.METADATA.planName, ''),
       planYear: _.get(content, aparPlan.METADATA.reportingYear, ''),
       endDate: _.get(content, aparPlan.METADATA.windowEndDate, ''),
       orgName: _.get(content, aparPlan.METADATA.owningOrg, ''),
-      gatingCourseCount: Number(_.get(content, aparPlan.METADATA.gatingCourseCount, 0)) || 0,
+      // the course list is what says how many are gating, the stored count is only what an
+      // assessment linked before the list was written onto it still has to answer from
+      gatingCourseCount: contentList.length
+        ? this.countGatingCourses({ contentList })
+        : Number(_.get(content, aparPlan.METADATA.gatingCourseCount, 0)) || 0,
     }
+  }
+
+  /**
+   * The linkage as the api hands it back. It is written as an object, but a content schema
+   * that types the field as a String returns it serialised, so both are read.
+   */
+  private readTrainingPlanLink(content: any): aparPlan.ITrainingPlanLink | null {
+    const link = _.get(content, aparPlan.TRAINING_PLAN_KEY)
+    if (!link) {
+      return null
+    }
+    if (_.isString(link)) {
+      try {
+        return JSON.parse(link)
+      } catch (error) {
+        // a linkage that cannot be read leaves the display copies to answer for the plan
+        return null
+      }
+    }
+    return link
   }
 
   //#endregion

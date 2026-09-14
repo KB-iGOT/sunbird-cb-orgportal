@@ -108,9 +108,16 @@ export namespace comprehensiveAssessmentList {
 
 export namespace aparPlan {
   /**
-   * Keys the linked plan is written to on the assessment collection. Everything the
-   * assessment derives (reporting year, window, owning MDO, access criteria, unlock rule)
-   * is read back off these, so a rename only has to happen here.
+   * The linkage itself: the plan and the courses it gates, written as one object so the
+   * unlock rule can be read off the assessment without going back to the plan for it.
+   */
+  export const TRAINING_PLAN_KEY = 'trainingPlan_v1'
+
+  /**
+   * Keys the values derived from the plan are denormalised to on the assessment
+   * collection. The linkage above is what the platform reads; these are the display copies
+   * the dashboard columns and the reopened builder are served from, since neither can join
+   * back to the plan through a content search. A rename only has to happen here.
    */
   export const METADATA = {
     planId: 'aparPlanId',
@@ -119,6 +126,18 @@ export namespace aparPlan {
     windowEndDate: 'aparPlanEndDate',
     owningOrg: 'aparPlanOrgName',
     gatingCourseCount: 'aparGatingCourseCount',
+  }
+
+  /** One course of the plan, `mandatory` being the flag that gates the assessment. */
+  export interface IPlanContent {
+    identifier: string
+    mandatory: boolean
+  }
+
+  /** The shape `trainingPlan_v1` holds on the assessment content. */
+  export interface ITrainingPlanLink {
+    identifier: string
+    contentList: IPlanContent[]
   }
 
   export const PAGE_SIZE = 20
@@ -134,6 +153,8 @@ export namespace aparPlan {
     endDateDisplay: string
     orgName: string
     gatingCourseCount: number
+    /** The plan's courses, carried through so the linkage can be written from the row. */
+    contentList: IPlanContent[]
     /** A Live assessment already points at this plan, so it cannot be linked again. */
     hasActiveAssessment: boolean
     /** The reporting year is closed, so no new assessment can be linked to this plan. */
@@ -148,5 +169,6 @@ export namespace aparPlan {
     endDate: string
     orgName: string
     gatingCourseCount: number
+    contentList: IPlanContent[]
   }
 }

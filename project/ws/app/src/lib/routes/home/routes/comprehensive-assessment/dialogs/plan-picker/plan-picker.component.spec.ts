@@ -15,6 +15,11 @@ const row = (overrides: Partial<aparPlan.IPlanRow> = {}): aparPlan.IPlanRow => (
   endDateDisplay: '31 Mar, 2027',
   orgName: 'Department of Personnel & Training',
   gatingCourseCount: 2,
+  contentList: [
+    { identifier: 'do-1', mandatory: true },
+    { identifier: 'do-2', mandatory: false },
+    { identifier: 'do-3', mandatory: true },
+  ],
   hasActiveAssessment: false,
   isYearClosed: false,
   ...overrides,
@@ -369,7 +374,23 @@ describe('PlanPickerComponent', () => {
         endDate: '2027-03-31T00:00:00.000Z',
         orgName: 'Department of Personnel & Training',
         gatingCourseCount: 2,
+        // the courses come back with the plan, the unlock rule is written from them
+        contentList: [
+          { identifier: 'do-1', mandatory: true },
+          { identifier: 'do-2', mandatory: false },
+          { identifier: 'do-3', mandatory: true },
+        ],
       })
+    })
+
+    /** A plan the search answered without a course list links with an empty one. */
+    it('should hand back an empty course list rather than none at all', () => {
+      component.plans = [row({ contentList: undefined } as any)]
+
+      component.selectPlan('plan-1')
+      component.linkPlan()
+
+      expect(dialogRef.close).toHaveBeenCalledWith(expect.objectContaining({ contentList: [] }))
     })
 
     it('should do nothing while no plan is picked', () => {
