@@ -76,6 +76,18 @@ const routes: Routes = [
     },
   },
   {
+    path: 'app/reusable-user-groups',
+    loadChildren: () => import('./routes/route-reusable-user-groups.module').then(u => u.RouteReusableUserGroupsModule),
+    canActivate: [GeneralGuard],
+    data: {
+      pageType: 'feature',
+      pageKey: 'reusable-user-groups',
+    },
+    resolve: {
+      pageData: PageResolve,
+    },
+  },
+  {
     path: 'app/roles',
     loadChildren: () => import('./routes/route-roles-access.module').then(u => u.RouteAccessAppModule),
     canActivate: [GeneralGuard],

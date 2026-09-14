@@ -345,6 +345,10 @@ const routes: Routes = [
         path: 'custom-fields',
         loadChildren: () => import('./routes/custom-forms/custom-forms.module').then(m => m.CustomFormsModule),
       },
+      {
+        path: 'reusable-user-groups',
+        loadChildren: () => import('../reusable-user-groups/reusable-user-groups.module').then(m => m.ReusableUserGroupsModule),
+      },
       // {
       //   path: 'achievement-approvals',
       //   loadChildren: () => import('./routes/achievement-approvals/achievement-approvals.module').then(m => m.AchievementApprovalsModule),

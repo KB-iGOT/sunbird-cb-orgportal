@@ -6,6 +6,7 @@ import { CreatePlanComponent } from './routes/create-plan/create-plan.component'
 import { PreviewPlanComponent } from './routes/preview-plan/preview-plan.component'
 import { UpdatePlanResolveService } from './resolvers/update-plan-resolve.service'
 import { ResetDataSharingResolveService } from './resolvers/reset-data-sharing-resolve.service'
+import { ReuseUserGroupResolveService } from './resolvers/reuse-user-group-resolve.service'
 import { PageResolve } from '@sunbird-cb/utils'
 
 const routes: Routes = [
@@ -48,6 +49,7 @@ const routes: Routes = [
         resolve: {
           tpdsSvcReset: ResetDataSharingResolveService,
           contentData: UpdatePlanResolveService,
+          reusedUserGroup: ReuseUserGroupResolveService,
           pageData: PageResolve,
           configService: ConfigResolveService,
         },
@@ -86,6 +88,7 @@ const routes: Routes = [
   exports: [RouterModule],
   providers: [
     ConfigResolveService,
+    ReuseUserGroupResolveService,
   ],
 })
 export class TrainingPlanRoutingModule { }

@@ -1,0 +1,15 @@
+<div class="user-groups py-4 my-4 bg-white">
+  <div class="go-back ml-4">
+    <button matButton="text" class="ml-7" (click)="onGoBack()"><mat-icon>arrow_back</mat-icon>Back</button>
+  </div>
+  @if (accessSettingsParameters(); as accessConfig) {
+    <sb-uic-access-control
+      [config]="accessConfig"
+      [contentId]="''"
+      [content]="undefined"
+      [tempAccessControl]="tempSavedAccessControl"
+      (accessControlData)="getAccessControlData($event)"
+    >
+    </sb-uic-access-control>
+  }
+</div>
