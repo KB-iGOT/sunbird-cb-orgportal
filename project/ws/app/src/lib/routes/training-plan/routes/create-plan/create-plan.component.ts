@@ -2,6 +2,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
 import { TrainingPlanDataSharingService } from '../../services/training-plan-data-share.service'
+import { TrainingPlanContent } from '../../models/training-plan.model'
 /* tslint:disable */
 import _ from 'lodash'
 /* tslint:enable */
@@ -82,6 +83,15 @@ export class CreatePlanComponent implements OnInit, OnDestroy {
       if (aparYear) {
         this.tpdsSvc.trainingPlanStepperData['aparYear'] = aparYear
       }
+    }
+
+    // A group sent over from the reusable user groups list replaces whatever access control the
+    // plan was saved with, and the stepper opens straight on that step
+    const reusedAccessControl = this.route.snapshot.data['reusedUserGroup']
+    if (reusedAccessControl) {
+      this.tpdsSvc.trainingPlanStepperData['accessControl'] = reusedAccessControl
+      this.selectedTabData = TrainingPlanContent.TTabLabelKey.ADD_ACCESS_SETTINGS
+      this.nextTab = TrainingPlanContent.TTabLabelKey.ADD_ACCESS_SETTINGS
     }
 
     this.tpdsSvc.filterToggle.subscribe((data: any) => {

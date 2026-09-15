@@ -1,0 +1,123 @@
+<div class="user-groups my-4 bg-white">
+  @if (isLoading()) {
+    <div class="flex items-center mx-auto fixed-spinner">
+      <mat-spinner [diameter]="30" [strokeWidth]="3"></mat-spinner>
+    </div>
+  }
+
+  <div class="page-header flex justify-between items-center">
+    <span class="page-heading">{{ config()?.mainHeading }}</span>
+    @if (canCreate()) {
+      <button matButton="filled" class="create-btn" (click)="onCreate()">
+        {{ config()?.createButton?.label }}
+      </button>
+    }
+  </div>
+
+  @if (banner(); as roleBanner) {
+    <div class="role-banner flex gap-4">
+      <mat-icon class="banner-icon">{{ config()?.roleBanner?.icon }}</mat-icon>
+      <div>
+        <div class="banner-title">{{ roleBanner.title }}</div>
+        <div class="banner-description">{{ roleBanner.description }}</div>
+      </div>
+    </div>
+  }
+
+  <div class="table-container">
+    <mat-table
+      [dataSource]="dataSource"
+      matSort
+      [matSortActive]="sortBy()"
+      [matSortDirection]="sortOrder()"
+      matSortDisableClear
+      (matSortChange)="onSortChange($event)"
+    >
+      @for (col of config()?.table?.columns ?? []; track col.key) {
+        <ng-container [matColumnDef]="col.key">
+          <mat-header-cell *matHeaderCellDef [mat-sort-header]="col.key" [disabled]="!col.sortable">
+            {{ col.displayName }}
+          </mat-header-cell>
+
+          <mat-cell *matCellDef="let group">
+            @switch (col.type) {
+              @case ('title') {
+                <div class="group-title">
+                  <div class="group-name">{{ group?.name }}</div>
+                  <div class="group-meta">{{ conditionText(group) }}</div>
+                </div>
+              }
+              @case ('owner') {
+                <span class="group-owner">
+                  {{ group?.owner }}
+                  @if (group?.ownerRole) {
+                    ({{ group?.ownerRole }})
+                  }
+                </span>
+              }
+              @case ('reach') {
+                <div class="reach-cell flex items-center gap-2">
+                  @if (reachLoading()[group?.id]) {
+                    <mat-spinner [diameter]="18" [strokeWidth]="2"></mat-spinner>
+                  }
+
+                  @if (reachMap()[group?.id]; as reach) {
+                    <span class="reach-count">Total Count : {{ reach.count }}</span>
+                    <button
+                      matIconButton
+                      class="reach-refresh"
+                      aria-label="Refresh reach"
+                      [disabled]="reachLoading()[group?.id]"
+                      [matTooltip]="'Checked ' + (reach.checkedAt | date: 'd MMM y, h:mm a')"
+                      (click)="onCheckReach(group)"
+                    >
+                      <mat-icon>refresh</mat-icon>
+                    </button>
+                  } @else {
+                    <button matButton="outlined" class="outlined-btn" [disabled]="reachLoading()[group?.id]" (click)="onCheckReach(group)">
+                      <mat-icon>{{ config()?.table?.reachAction?.icon }}</mat-icon>
+                      {{ config()?.table?.reachAction?.label }}
+                    </button>
+                  }
+                </div>
+              }
+              @case ('actions') {
+                <div class="row-actions flex flex-wrap gap-2">
+                  @for (action of visibleRowActions(); track action.key) {
+                    <button matButton="outlined" class="outlined-btn" (click)="onRowAction(action, group)">
+                      @if (action.icon) {
+                        <mat-icon>{{ action.icon }}</mat-icon>
+                      }
+                      {{ action.label }}
+                    </button>
+                  }
+                </div>
+              }
+              @default {
+                <span>{{ group?.[col.key] }}</span>
+              }
+            }
+          </mat-cell>
+        </ng-container>
+      }
+
+      <mat-header-row *matHeaderRowDef="displayedColumns()"></mat-header-row>
+      <mat-row *matRowDef="let row; columns: displayedColumns()"></mat-row>
+    </mat-table>
+
+    @if (!groups().length && !isLoading()) {
+      <div class="empty-state">{{ config()?.table?.emptyStateText }}</div>
+    }
+  </div>
+
+  <div class="mt-4">
+    <mat-paginator
+      [length]="totalCount()"
+      [pageSize]="pageSize()"
+      [pageSizeOptions]="config()?.table?.pageSizeOptions ?? []"
+      [pageIndex]="pageIndex()"
+      (page)="onPageChange($event)"
+    >
+    </mat-paginator>
+  </div>
+</div>

@@ -1,0 +1,135 @@
+.user-groups {
+  padding: 24px 32px;
+}
+
+.fixed-spinner {
+  position: absolute;
+  top: 45%;
+  left: 45%;
+  z-index: 1000;
+}
+
+.page-header {
+  margin-bottom: 20px;
+}
+
+.page-heading {
+  /* stylelint-disable */
+  font: 700 26px Lato;
+  /* stylelint-enable */
+  color: rgb(0 0 0 / 87%);
+}
+
+.create-btn {
+  background-color: #1b4ca1 !important;
+  height: 40px;
+  padding: 0 20px;
+  border-radius: 4px;
+  color: #ffffff !important;
+  /* stylelint-disable */
+  font: 700 14px Lato;
+  /* stylelint-enable */
+}
+
+.role-banner {
+  padding: 16px 20px;
+  margin-bottom: 20px;
+  border: 1px solid #cde7d4;
+  border-radius: 4px;
+  background-color: #edf7f0;
+}
+
+.banner-icon {
+  color: #1d8a45;
+}
+
+.banner-title {
+  font-weight: 700;
+  color: rgb(0 0 0 / 87%);
+}
+
+.banner-description {
+  color: rgb(0 0 0 / 60%);
+}
+
+.table-container {
+  overflow-x: auto;
+  border: 1px solid rgb(0 0 0 / 12%);
+  border-radius: 4px;
+}
+
+.mat-header-cell {
+  font-weight: 700;
+  color: rgb(0 0 0 / 60%);
+  background-color: #f5f7fa;
+}
+
+.mat-header-row {
+  min-height: 48px;
+}
+
+.mat-row {
+  min-height: 76px;
+}
+
+.group-name {
+  font-weight: 700;
+  color: rgb(0 0 0 / 87%);
+}
+
+.group-meta {
+  font-size: 12px;
+  color: rgb(0 0 0 / 60%);
+}
+
+.outlined-btn {
+  height: 36px;
+  border-color: #1b4ca1 !important;
+  border-radius: 4px;
+  color: #1b4ca1 !important;
+  /* stylelint-disable */
+  font: 700 13px Lato;
+  /* stylelint-enable */
+}
+
+.row-actions {
+  padding: 8px 0;
+}
+
+.empty-state {
+  padding: 32px;
+  color: rgb(0 0 0 / 60%);
+  text-align: center;
+}
+
+::ng-deep .mat-column-name {
+  flex: 0 0 40% !important;
+  width: 40% !important;
+}
+
+::ng-deep .mat-column-estimatedOfficers {
+  flex: 0 0 18% !important;
+  width: 18% !important;
+}
+
+::ng-deep .mat-column-owner {
+  flex: 0 0 20% !important;
+  width: 20% !important;
+}
+
+::ng-deep .mat-column-actions {
+  flex: 0 0 22% !important;
+  width: 22% !important;
+}
+
+.reach-count {
+  /* stylelint-disable */
+  font: 700 14px Lato;
+  /* stylelint-enable */
+  color: rgb(0 0 0 / 87%);
+  white-space: nowrap;
+}
+
+.reach-refresh {
+  color: #1b4ca1;
+}
