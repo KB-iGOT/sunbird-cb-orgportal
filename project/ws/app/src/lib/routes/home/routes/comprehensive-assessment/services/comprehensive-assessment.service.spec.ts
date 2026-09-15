@@ -119,6 +119,12 @@ describe('ComprehensiveAssessmentService', () => {
         orgName: '',
         // two of the three contents are marked mandatory, they are the gating set
         gatingCourseCount: 2,
+        // the courses travel with the row, the linkage is written from them
+        contentList: [
+          { identifier: 'do-1', mandatory: true },
+          { identifier: 'do-2', mandatory: false },
+          { identifier: 'do-3', mandatory: true },
+        ],
         hasActiveAssessment: false,
         isYearClosed: false,
       }])
@@ -175,7 +181,8 @@ describe('ComprehensiveAssessmentService', () => {
       service.getPlanIdsWithLiveAssessment('org-1').subscribe()
 
       const req = httpMock.expectOne(CONTENT_SEARCH_URL)
-      expect(req.request.body.request.fields).toEqual(['identifier', 'aparPlanId'])
+      expect(req.request.body.request.fields)
+        .toEqual(['identifier', 'aparPlanId', 'trainingPlan_v1'])
       expect(req.request.body.request.filters.status).toEqual(['Live'])
       expect(req.request.body.request.filters.createdFor).toEqual(['org-1'])
       req.flush({ result: { content: [] } })
@@ -188,8 +195,9 @@ describe('ComprehensiveAssessmentService', () => {
       httpMock.expectOne(CONTENT_SEARCH_URL).flush({
         result: {
           content: [
-            { identifier: 'ca-1', aparPlanId: 'plan-1' },
+            { identifier: 'ca-1', trainingPlan_v1: { identifier: 'plan-1', contentList: [] } },
             { identifier: 'ca-2' },
+            // linked before the linkage was written onto it, the flat key still answers
             { identifier: 'ca-3', aparPlanId: 'plan-3' },
           ],
         },
@@ -222,10 +230,39 @@ describe('ComprehensiveAssessmentService', () => {
       endDate: '2027-03-31T00:00:00.000Z',
       orgName: 'Department of Personnel & Training',
       gatingCourseCount: 2,
+      contentList: [
+        { identifier: 'do-1', mandatory: true },
+        { identifier: 'do-2', mandatory: false },
+        { identifier: 'do-3', mandatory: true },
+      ],
     }
+
+    /** The linkage the platform reads the unlock rule off. */
+    it('should write the plan and the courses it gates as the training plan link', () => {
+      expect(service.buildPlanMetadata(linkedPlan).trainingPlan_v1).toEqual({
+        identifier: 'plan-1',
+        contentList: [
+          { identifier: 'do-1', mandatory: true },
+          { identifier: 'do-2', mandatory: false },
+          { identifier: 'do-3', mandatory: true },
+        ],
+      })
+    })
+
+    /** Whatever else a plan's course carries, the linkage keeps the two fields it needs. */
+    it('should keep the course list down to the identifier and the gating flag', () => {
+      const plan = {
+        ...linkedPlan,
+        contentList: [{ identifier: 'do-1', mandatory: true, name: 'Ethics', duration: 3600 }],
+      } as any
+
+      expect(service.buildPlanMetadata(plan).trainingPlan_v1.contentList)
+        .toEqual([{ identifier: 'do-1', mandatory: true }])
+    })
 
     it('should write the linked plan onto the content under the apar keys', () => {
       expect(service.buildPlanMetadata(linkedPlan)).toEqual({
+        trainingPlan_v1: expect.any(Object),
         aparPlanId: 'plan-1',
         aparPlanName: 'APAR 2026-27 — Section Officer & Under Secretary',
         aparYear: '2026-27',
@@ -238,6 +275,7 @@ describe('ComprehensiveAssessmentService', () => {
 
     it('should clear every key when no plan is linked', () => {
       expect(service.buildPlanMetadata(null)).toEqual({
+        trainingPlan_v1: { identifier: '', contentList: [] },
         aparPlanId: '',
         aparPlanName: '',
         aparYear: '',
@@ -249,6 +287,60 @@ describe('ComprehensiveAssessmentService', () => {
 
     it('should read the linked plan back off a saved assessment', () => {
       expect(service.readPlanMetadata(service.buildPlanMetadata(linkedPlan))).toEqual(linkedPlan)
+    })
+
+    /**
+     * The linkage is written as an object, but a content schema that types the field as a
+     * String hands it back serialised.
+     */
+    it('should read a linkage the api serialised', () => {
+      const content = {
+        ...service.buildPlanMetadata(linkedPlan),
+        trainingPlan_v1: JSON.stringify({
+          identifier: 'plan-1',
+          contentList: [{ identifier: 'do-1', mandatory: true }],
+        }),
+      }
+
+      const linked = service.readPlanMetadata(content)
+
+      expect(linked && linked.id).toBe('plan-1')
+      expect(linked && linked.contentList).toEqual([{ identifier: 'do-1', mandatory: true }])
+    })
+
+    it('should fall back to the display copies when the linkage cannot be read', () => {
+      const content = { ...service.buildPlanMetadata(linkedPlan), trainingPlan_v1: '{ not json' }
+
+      const linked = service.readPlanMetadata(content)
+
+      expect(linked && linked.id).toBe('plan-1')
+      expect(linked && linked.contentList).toEqual([])
+      // nothing left to count them from, so the stored number is what answers
+      expect(linked && linked.gatingCourseCount).toBe(2)
+    })
+
+    /** The course list is the live answer, the stored count only a copy of it. */
+    it('should count the gating courses off the linkage rather than the stored count', () => {
+      const content = {
+        ...service.buildPlanMetadata(linkedPlan),
+        aparGatingCourseCount: '99',
+      }
+
+      const linked = service.readPlanMetadata(content)
+
+      expect(linked && linked.gatingCourseCount).toBe(2)
+    })
+
+    it('should read a plan linked before the linkage was written onto it', () => {
+      const linked = service.readPlanMetadata({
+        aparPlanId: 'plan-1',
+        aparPlanName: 'APAR 2026-27',
+        aparGatingCourseCount: '3',
+      })
+
+      expect(linked && linked.id).toBe('plan-1')
+      expect(linked && linked.contentList).toEqual([])
+      expect(linked && linked.gatingCourseCount).toBe(3)
     })
 
     it('should read no plan while the assessment carries no plan id', () => {

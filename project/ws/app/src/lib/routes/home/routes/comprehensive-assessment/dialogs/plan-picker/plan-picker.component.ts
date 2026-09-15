@@ -178,6 +178,8 @@ export class PlanPickerComponent implements OnInit, OnDestroy {
       endDate: plan.endDate,
       orgName: plan.orgName,
       gatingCourseCount: plan.gatingCourseCount,
+      // the courses travel with the plan, the unlock rule is written from them
+      contentList: plan.contentList || [],
     }
     this.dialogRef.close(linkedPlan)
   }

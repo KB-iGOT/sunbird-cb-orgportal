@@ -38,6 +38,11 @@ describe('CreateAssessmentComponent', () => {
     endDate: '2027-03-31T00:00:00.000Z',
     orgName: 'Department of Personnel & Training',
     gatingCourseCount: 2,
+    contentList: [
+      { identifier: 'do-1', mandatory: true },
+      { identifier: 'do-2', mandatory: false },
+      { identifier: 'do-3', mandatory: true },
+    ],
   }
 
   const content = (overrides: any = {}) => ({

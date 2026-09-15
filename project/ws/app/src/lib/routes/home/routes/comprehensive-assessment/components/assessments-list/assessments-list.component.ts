@@ -12,6 +12,12 @@ import { ConfirmDialogComponent } from '../../../../../workallocation-v2/compone
 
 const TAB_LIVE = 'live'
 const TAB_DRAFT = 'draft'
+/**
+ * Roles the dashboard offers Edit to. Every other action is open to anyone who can reach
+ * the dashboard at all, which is what the requirement holds behind a role and what it does
+ * not. `configService.userRoles` is the lowercased set the init service builds on login.
+ */
+const EDIT_ROLES = ['mdo_leader']
 
 @Component({
   selector: 'ws-app-assessments-list',
@@ -58,7 +64,14 @@ export class AssessmentsListComponent implements OnInit, OnDestroy {
     this.getAssessments()
   }
 
+  /** Deny by default: an unresolved role set is not a reason to offer Edit. */
+  private canEdit(): boolean {
+    const roles: Set<string> | null = _.get(this.activatedRoute, 'snapshot.data.configService.userRoles', null)
+    return !!roles && _.some(EDIT_ROLES, (role: string) => roles.has(role))
+  }
+
   private configureTab() {
+    const canEdit = this.canEdit()
     const nameColumn: comprehensiveAssessmentList.columnData = {
       displayName: 'Assessment Name',
       key: 'name',
@@ -93,11 +106,12 @@ export class AssessmentsListComponent implements OnInit, OnDestroy {
         showPagination: true,
         noDataMessage: 'There are no draft assessments.',
       }
-      this.menuItems = [
-        { btnText: 'Edit', action: 'edit', icon: 'edit' },
+      this.menuItems = _.compact([
+        { btnText: 'View', action: 'view', icon: 'visibility' },
+        canEdit ? { btnText: 'Edit', action: 'edit', icon: 'edit' } : null,
         { btnText: 'Publish', action: 'publish', icon: 'publish' },
         { btnText: 'Delete', action: 'delete', icon: 'delete_outline' },
-      ]
+      ])
       return
     }
 
@@ -113,11 +127,10 @@ export class AssessmentsListComponent implements OnInit, OnDestroy {
       showPagination: true,
       noDataMessage: 'There are no live assessments.',
     }
-    this.menuItems = [
+    this.menuItems = _.compact([
       { btnText: 'View', action: 'view', icon: 'visibility' },
-      { btnText: 'Edit', action: 'edit', icon: 'edit' },
-      { btnText: 'Delete', action: 'delete', icon: 'delete_outline' },
-    ]
+      canEdit ? { btnText: 'Edit', action: 'edit', icon: 'edit' } : null,
+    ])
   }
 
   getAssessments() {
