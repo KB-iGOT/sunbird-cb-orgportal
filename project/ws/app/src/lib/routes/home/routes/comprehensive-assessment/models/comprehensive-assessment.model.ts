@@ -8,7 +8,7 @@
  * consumption library already accepts either value, so this is the only line to change.
  */
 export const CONTENT_PRIMARY_CATEGORY = 'Standalone Assessment'
-export const CONTENT_COURSE_CATEGORY = 'Standalone Assessment'
+export const CONTENT_COURSE_CATEGORY = 'Comprehensive Assessment'
 export const COLLECTION_MIME_TYPE = 'application/vnd.ekstep.content-collection'
 export const QUESTIONSET_MIME_TYPE = 'application/vnd.sunbird.questionset'
 export const QUESTIONSET_PRIMARY_CATEGORY = 'Course Assessment'
@@ -111,13 +111,13 @@ export namespace aparPlan {
    * The linkage itself: the plan and the courses it gates, written as one object so the
    * unlock rule can be read off the assessment without going back to the plan for it.
    */
-  export const TRAINING_PLAN_KEY = 'trainingPlan_v1'
+  export const TRAINING_PLAN_KEY = 'trainingPlan_v2'
 
   /**
-   * Keys the values derived from the plan are denormalised to on the assessment
-   * collection. The linkage above is what the platform reads; these are the display copies
-   * the dashboard columns and the reopened builder are served from, since neither can join
-   * back to the plan through a content search. A rename only has to happen here.
+   * Keys the plan used to be denormalised to on the assessment collection, beside the
+   * linkage. Nothing writes them any more - the linkage above carries the plan - but the
+   * dashboard columns and the reopened builder still read them, so an assessment saved
+   * while they were written keeps answering for its plan. A rename only happens here.
    */
   export const METADATA = {
     planId: 'aparPlanId',
@@ -134,7 +134,7 @@ export namespace aparPlan {
     mandatory: boolean
   }
 
-  /** The shape `trainingPlan_v1` holds on the assessment content. */
+  /** The shape `trainingPlan_v2` holds on the assessment content. */
   export interface ITrainingPlanLink {
     identifier: string
     contentList: IPlanContent[]
