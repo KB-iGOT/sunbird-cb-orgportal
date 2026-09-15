@@ -261,20 +261,14 @@ export class ComprehensiveAssessmentService {
   }
 
   /**
-   * The linked plan as it is written onto the assessment content: the linkage the platform
-   * reads the unlock rule from, and the display copies the dashboard and the reopened
-   * builder are served from, which a content search cannot join back to the plan for.
+   * The linked plan as it is written onto the assessment content. The linkage is the whole
+   * of it: the plan used to be denormalised to a set of flat `apar*` keys beside it, and
+   * those are no longer written. They are still read - see `readPlanMetadata` - so an
+   * assessment saved with them opens the way it always did.
    */
   buildPlanMetadata(plan: aparPlan.ILinkedPlan | null): any {
     return {
       [aparPlan.TRAINING_PLAN_KEY]: this.buildTrainingPlanLink(plan),
-      [aparPlan.METADATA.planId]: _.get(plan, 'id', ''),
-      [aparPlan.METADATA.planName]: _.get(plan, 'name', ''),
-      [aparPlan.METADATA.reportingYear]: _.get(plan, 'planYear', ''),
-      [aparPlan.METADATA.windowEndDate]: _.get(plan, 'endDate', ''),
-      [aparPlan.METADATA.owningOrg]: _.get(plan, 'orgName', ''),
-      // the content schema types the numeric extras as String, a number fails validation
-      [aparPlan.METADATA.gatingCourseCount]: String(_.get(plan, 'gatingCourseCount', 0)),
     }
   }
 
@@ -286,7 +280,11 @@ export class ComprehensiveAssessmentService {
     }
   }
 
-  /** The linked plan read back off a saved assessment, null while none is linked. */
+  /**
+   * The linked plan read back off a saved assessment, null while none is linked. The
+   * linkage answers for the plan; the flat `apar*` keys are only what an assessment saved
+   * before they stopped being written still has to be read from.
+   */
   readPlanMetadata(content: any): aparPlan.ILinkedPlan | null {
     const link = this.readTrainingPlanLink(content)
     const id = _.get(link, 'identifier', '') || _.get(content, aparPlan.METADATA.planId, '')

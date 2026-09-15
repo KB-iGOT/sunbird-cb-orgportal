@@ -122,7 +122,9 @@ describe('CreateAssessmentComponent', () => {
     afterClosed = new Subject<any>()
     assessmentSvc = {
       readPlanMetadata: jest.fn().mockReturnValue(linkedPlan),
-      buildPlanMetadata: jest.fn().mockReturnValue({ aparPlanId: 'plan-1' }),
+      buildPlanMetadata: jest.fn().mockReturnValue({
+        [aparPlan.TRAINING_PLAN_KEY]: { identifier: 'plan-1', contentList: [] },
+      }),
       getLinkedAssessmentId: jest.fn().mockReturnValue(''),
       updateContent: jest.fn().mockReturnValue(of({ result: { versionKey: 'v2' } })),
       getContentHierarchy: jest.fn().mockReturnValue(of({ result: { content: content() } })),
@@ -704,7 +706,7 @@ describe('CreateAssessmentComponent', () => {
         purpose: '<p>the outcome</p>',
         appIcon: 'icon.png',
         posterImage: 'icon.png',
-        aparPlanId: 'plan-1',
+        [aparPlan.TRAINING_PLAN_KEY]: { identifier: 'plan-1', contentList: [] },
       }))
     })
 
