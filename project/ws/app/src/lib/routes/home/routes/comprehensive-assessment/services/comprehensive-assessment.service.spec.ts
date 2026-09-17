@@ -5,12 +5,12 @@ import { TestBed } from '@angular/core/testing'
 import { aparPlan } from '../models/comprehensive-assessment.model'
 import { ComprehensiveAssessmentService } from './comprehensive-assessment.service'
 
-const PLAN_SEARCH_URL = 'apis/proxies/v8/cbplan/v3/search'
+const PLAN_SEARCH_URL = 'apis/proxies/v8/cbplan/v4/search'
 const CONTENT_SEARCH_URL = 'apis/proxies/v8/sunbirdigot/v4/search'
 /** The key the linkage is written under, read off the model so a version bump is one edit. */
 const LINK_KEY = aparPlan.TRAINING_PLAN_KEY
 
-/** One row as the cbplan v3 search hands it back. */
+/** One row as the cbplan v4 search hands it back. */
 const planRow = (overrides: any = {}) => ({
   id: 'plan-1',
   name: 'APAR 2026-27 — Section Officer & Under Secretary',
@@ -35,7 +35,6 @@ describe('ComprehensiveAssessmentService', () => {
   let httpMock: HttpTestingController
 
   const searchParams = {
-    rootOrgId: 'org-1',
     planYear: '2026-27',
     searchString: '',
     pageIndex: 0,
@@ -66,32 +65,60 @@ describe('ComprehensiveAssessmentService', () => {
   })
 
   describe('searchAparPlans', () => {
-    it('should post the filter the cbplan v3 search expects', () => {
+    it('should post the query the cbplan v4 search expects', () => {
       service.searchAparPlans(searchParams).subscribe()
 
       const req = httpMock.expectOne(PLAN_SEARCH_URL)
       expect(req.request.method).toBe('POST')
       expect(req.request.body).toEqual({
-        filter: {
-          status: ['Live'],
-          orgIdList: ['org-1'],
-          isApar: true,
-          planYear: '2026-27',
+        request: {
+          query: {
+            bool: {
+              must: [
+                { term: { 'status.keyword': 'Live' } },
+                { term: { 'planYear.keyword': '2026-27' } },
+              ],
+              must_not: [{ exists: { field: aparPlan.LINKED_ASSESSMENT_FIELD } }],
+            },
+          },
+          pageNumber: 0,
+          pageSize: 20,
+          searchString: '',
+          applyOrgIdFilter: true,
+          orderBy: 'createdAt',
+          orderDirection: 'desc',
         },
-        pageNumber: 0,
-        pageSize: 20,
-        searchString: '',
-        orderBy: 'createdAt',
-        orderDirection: 'desc',
       })
       req.flush(planSearchResponse([]))
     })
 
-    it('should leave planYear off the filter while the list is not narrowed to one year', () => {
+    /** The api is the one that knows, the picker no longer works it out from a second search. */
+    it('should ask the search to leave out a plan another assessment already holds', () => {
+      service.searchAparPlans(searchParams).subscribe()
+
+      const req = httpMock.expectOne(PLAN_SEARCH_URL)
+      expect(req.request.body.request.query.bool.must_not).toEqual([
+        { exists: { field: 'caLinkedId' } },
+      ])
+      req.flush(planSearchResponse([]))
+    })
+
+    it('should scope the search to the org without naming it', () => {
+      service.searchAparPlans(searchParams).subscribe()
+
+      const req = httpMock.expectOne(PLAN_SEARCH_URL)
+      expect(req.request.body.request.applyOrgIdFilter).toBe(true)
+      expect(JSON.stringify(req.request.body)).not.toContain('orgIdList')
+      req.flush(planSearchResponse([]))
+    })
+
+    it('should leave planYear off the query while the list is not narrowed to one year', () => {
       service.searchAparPlans({ ...searchParams, planYear: aparPlan.ALL_YEARS }).subscribe()
 
       const req = httpMock.expectOne(PLAN_SEARCH_URL)
-      expect(req.request.body.filter.planYear).toBeUndefined()
+      expect(req.request.body.request.query.bool.must).toEqual([
+        { term: { 'status.keyword': 'Live' } },
+      ])
       req.flush(planSearchResponse([]))
     })
 
@@ -99,9 +126,9 @@ describe('ComprehensiveAssessmentService', () => {
       service.searchAparPlans({ ...searchParams, searchString: 'section officer' }).subscribe()
 
       const req = httpMock.expectOne(PLAN_SEARCH_URL)
-      expect(req.request.body.searchString).toBe('section officer')
-      expect(req.request.body.orderBy).toBeUndefined()
-      expect(req.request.body.orderDirection).toBeUndefined()
+      expect(req.request.body.request.searchString).toBe('section officer')
+      expect(req.request.body.request.orderBy).toBeUndefined()
+      expect(req.request.body.request.orderDirection).toBeUndefined()
       req.flush(planSearchResponse([]))
     })
 

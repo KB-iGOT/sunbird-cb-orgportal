@@ -82,15 +82,15 @@ export class AssessmentsListComponent implements OnInit, OnDestroy {
     }
 
     /**
-     * The linked plan and the three values derived from it. The assessment owns none of
+     * The linked plan and the two values derived from it. The assessment owns none of
      * them — they are read back off the plan metadata written when the plan was linked —
      * but the dashboard is where an admin tells two assessments of the same name apart.
+     * Status is not among them: the tab the row is listed on is its status.
      */
     const planColumns: comprehensiveAssessmentList.columnData[] = [
       { displayName: 'Linked APAR Plan', key: 'planName', cellType: 'text', cellClass: 'text-overflow-elipse' },
       { displayName: 'Reporting Year', key: 'reportingYear', cellType: 'text' },
       { displayName: 'Assessment Window', key: 'assessmentWindow', cellType: 'text' },
-      { displayName: 'Status', key: 'status', cellType: 'status' },
     ]
 
     if (this.pathUrl === TAB_DRAFT) {
@@ -99,9 +99,7 @@ export class AssessmentsListComponent implements OnInit, OnDestroy {
           nameColumn,
           ...planColumns,
           { displayName: 'Created By', key: 'creator', cellType: 'text' },
-          { displayName: 'Duration', key: 'durationDisplay', cellType: 'text' },
           { displayName: 'Created On', key: 'createdOn', cellType: 'date' },
-          { displayName: 'Last Updated On', key: 'lastUpdatedOn', cellType: 'date' },
         ],
         showSearchBox: true,
         showPagination: true,
@@ -121,7 +119,6 @@ export class AssessmentsListComponent implements OnInit, OnDestroy {
         nameColumn,
         ...planColumns,
         { displayName: 'Created By', key: 'creator', cellType: 'text' },
-        { displayName: 'Duration', key: 'durationDisplay', cellType: 'text' },
         { displayName: 'Published On', key: 'lastPublishedOn', cellType: 'date' },
       ],
       showSearchBox: true,

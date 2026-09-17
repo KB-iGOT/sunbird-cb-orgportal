@@ -28,6 +28,10 @@ export class TrainingPlanDashboardService {
   }
 
   getTrainingPlansV4(req: any): Observable<any> {
-    return this.http.post<any>(API_END_POINTS.CBP_PLAN_LIST_V3, req)
+    let request = {
+
+    "request": req
   }
-}
+    return this.http.post<any>(API_END_POINTS.CBP_PLAN_LIST_V4, request)
+  }
+} 

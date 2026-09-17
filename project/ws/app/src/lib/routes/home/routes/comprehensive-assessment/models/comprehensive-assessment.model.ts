@@ -110,6 +110,13 @@ export namespace aparPlan {
   /** Value the reporting year filter carries while it is not narrowed to one year. */
   export const ALL_YEARS = 'all'
 
+  /**
+   * The assessment a plan is already held by, written onto the plan itself. The picker asks
+   * the search for the plans that do not carry it, so a plan cannot be linked to a second
+   * assessment - it is the api side of what the picker used to work out for itself.
+   */
+  export const LINKED_ASSESSMENT_FIELD = 'caLinkedId'
+
   /** A Live APAR plan, flattened off the cbplan search row for the picker table. */
   export interface IPlanRow {
     id: string

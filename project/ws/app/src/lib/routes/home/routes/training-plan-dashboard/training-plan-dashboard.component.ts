@@ -135,7 +135,8 @@ export class TrainingPlanDashboardComponent implements OnInit, AfterViewInit {
       },
       pageNumber: this.pageIndex,
       pageSize: this.limit,
-      searchString: searchString
+      searchString: searchString,
+        "applyOrgIdFilter": true
     }
 
     if (this.selectedAparYear) {

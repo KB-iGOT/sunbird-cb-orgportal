@@ -244,6 +244,42 @@ describe('AssessmentsTableComponent', () => {
     })
   })
 
+  describe('the row thumbnail', () => {
+    it('should show the thumbnail a row carries', () => {
+      expect(component.hasThumbnail({ appIcon: 'icon.png' }, 'appIcon')).toBe(true)
+    })
+
+    it('should fall back for a row that has no thumbnail', () => {
+      expect(component.hasThumbnail({ appIcon: '' }, 'appIcon')).toBe(false)
+      expect(component.hasThumbnail({}, 'appIcon')).toBe(false)
+    })
+
+    /** A url that 404s renders as a broken image, so the row falls back once it fails. */
+    it('should fall back for a thumbnail that cannot be loaded', () => {
+      const row = { appIcon: 'gone.png' }
+
+      component.onThumbnailError(row, 'appIcon')
+
+      expect(component.hasThumbnail(row, 'appIcon')).toBe(false)
+    })
+
+    it('should leave the rows that load alone', () => {
+      component.onThumbnailError({ appIcon: 'gone.png' }, 'appIcon')
+
+      expect(component.hasThumbnail({ appIcon: 'icon.png' }, 'appIcon')).toBe(true)
+    })
+
+    it('should give a thumbnail another chance when the rows are reloaded', () => {
+      const row = { appIcon: 'gone.png' }
+      component.onThumbnailError(row, 'appIcon')
+
+      component.data = [row]
+      component.ngOnChanges(changes('data'))
+
+      expect(component.hasThumbnail(row, 'appIcon')).toBe(true)
+    })
+  })
+
   describe('getButtonsToShow', () => {
     beforeEach(() => {
       component.menuItems = menuItems

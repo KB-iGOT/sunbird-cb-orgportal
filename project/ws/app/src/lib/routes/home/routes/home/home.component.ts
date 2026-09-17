@@ -46,6 +46,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   subscription: Subscription
   containerCustomCls = false
   isExternalTrainingDetail = false
+  hideLeftMenu = false
 
   @HostListener('window:scroll', ['$event'])
   handleScroll() {
@@ -81,6 +82,10 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
         const urlData = _.get(this.activeRoute, 'snapshot._routerState.url')
         this.containerCustomCls = urlData && urlData.includes('odcs-mapping') ? true : false
         this.isExternalTrainingDetail = urlData && urlData.includes('/external-trainings') && (urlData.includes('/details') || urlData.includes('/batches'))
+        // The assessment builder is a page of its own - it carries its own steps, its own
+        // back link and a form that is not left half filled, so it keeps the left menu off.
+        // Create, edit and preview are all the same route, only the query params differ.
+        this.hideLeftMenu = !!urlData && urlData.includes('/comprehensive-assessment/edit')
 
         if (this.containerCustomCls) {
           document.getElementsByTagName('body')[0].classList.add('custom-height-odcs')

@@ -121,20 +121,18 @@ describe('AssessmentsListComponent', () => {
       component.ngOnInit()
 
       expect(component.tableData.columns.map((column: any) => column.key))
-        .toEqual(['name', 'planName', 'reportingYear', 'assessmentWindow', 'status',
-          'creator', 'durationDisplay', 'lastPublishedOn'])
+        .toEqual(['name', 'planName', 'reportingYear', 'assessmentWindow', 'creator', 'lastPublishedOn'])
       expect(component.menuItems.map((item: any) => item.action)).toEqual(['view', 'edit'])
       expect(component.tableData.noDataMessage).toBe('There are no live assessments.')
     })
 
-    it('should show the draft timestamps and the publish action on the draft tab', () => {
+    it('should show when it was created and the publish action on the draft tab', () => {
       component = build('draft')
 
       component.ngOnInit()
 
       expect(component.tableData.columns.map((column: any) => column.key))
-        .toEqual(['name', 'planName', 'reportingYear', 'assessmentWindow', 'status',
-          'creator', 'durationDisplay', 'createdOn', 'lastUpdatedOn'])
+        .toEqual(['name', 'planName', 'reportingYear', 'assessmentWindow', 'creator', 'createdOn'])
       expect(component.menuItems.map((item: any) => item.action))
         .toEqual(['view', 'edit', 'publish', 'delete'])
       expect(component.tableData.noDataMessage).toBe('There are no draft assessments.')
@@ -169,12 +167,11 @@ describe('AssessmentsListComponent', () => {
     it('should list the linked plan and everything derived from it on either tab', () => {
       component.ngOnInit()
 
-      const planColumns = component.tableData.columns.slice(1, 5)
+      const planColumns = component.tableData.columns.slice(1, 4)
       expect(planColumns).toEqual([
         { displayName: 'Linked APAR Plan', key: 'planName', cellType: 'text', cellClass: 'text-overflow-elipse' },
         { displayName: 'Reporting Year', key: 'reportingYear', cellType: 'text' },
         { displayName: 'Assessment Window', key: 'assessmentWindow', cellType: 'text' },
-        { displayName: 'Status', key: 'status', cellType: 'status' },
       ])
     })
 

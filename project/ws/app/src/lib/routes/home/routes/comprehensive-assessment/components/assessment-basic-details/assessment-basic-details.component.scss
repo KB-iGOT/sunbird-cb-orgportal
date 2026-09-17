@@ -101,8 +101,22 @@
   }
 }
 
+/* A validation message, and the flow's only red text. These sit outside their
+   mat-form-field - the control keeps its own box - so they carry none of the
+   subscript styling and state all of it here. The theme bundle colours every
+   caption from `.theme-igot.day-mode .mat-caption`, which outranks a
+   component-scoped class, so the class is not used on them: the message would
+   render in body text and read as a hint rather than an error. */
 .mat-error-text {
+  display: block;
   color: $ca-error;
+  font: $ca-font-meta;
+
+  /* mat-error carries `mat-mdc-form-field-bottom-align`, whose ::before reserves
+     a 16px line meant for the subscript row of a form field it is not inside. */
+  &::before {
+    content: none;
+  }
 }
 
 .form-lable {
@@ -132,10 +146,6 @@
 
   ::ng-deep .ck.ck-powered-by {
     display: none !important;
-  }
-
-  .mat-error-text {
-    color: $ca-error;
   }
 }
 

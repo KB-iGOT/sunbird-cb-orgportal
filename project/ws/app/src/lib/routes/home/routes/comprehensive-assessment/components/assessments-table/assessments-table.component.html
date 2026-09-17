@@ -21,8 +21,13 @@
                 </mat-header-cell>
                 <mat-cell *matCellDef="let element" class="imageCell flex flex-row items-center gap-2">
                   <ng-container *ngIf="col.imageKey">
-                    <div class="imageDiv">
-                      <img class="cellImage" [src]="element[col.imageKey] | pipePublicURL" alt="assessment icon">
+                    <div class="imageDiv flex items-center justify-center">
+                      <img *ngIf="hasThumbnail(element, col.imageKey); else noThumbnail" class="cellImage"
+                        [src]="element[col.imageKey] | pipePublicURL" alt="assessment icon"
+                        (error)="onThumbnailError(element, col.imageKey)">
+                      <ng-template #noThumbnail>
+                        <mat-icon class="thumbnail-icon">image</mat-icon>
+                      </ng-template>
                     </div>
                   </ng-container>
                   <span [matTooltip]="element[col.key]" [ngClass]="col.cellClass" class="table-cell-text">
@@ -32,10 +37,10 @@
               </ng-container>
 
               <ng-container *ngSwitchCase="'text'">
-                <mat-header-cell *matHeaderCellDef mat-sort-header class="table-header-text">
+                <mat-header-cell *matHeaderCellDef mat-sort-header class="table-header-text table-text-cell">
                   {{col.displayName}}
                 </mat-header-cell>
-                <mat-cell *matCellDef="let element">
+                <mat-cell *matCellDef="let element" class="table-text-cell">
                   <span [matTooltip]="element[col.key]" [ngClass]="col.cellClass" class="table-cell-text">
                     {{element[col.key]}}
                   </span>

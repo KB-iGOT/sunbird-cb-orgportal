@@ -42,6 +42,9 @@ export class AssessmentsTableComponent implements OnInit, OnChanges {
   showPagination = true
   noDataMessage = 'No data found'
 
+  /** Thumbnail urls that failed to load, so their rows keep the placeholder instead. */
+  private brokenThumbnails = new Set<string>()
+
   ngOnInit() {
     this.searchControl.valueChanges
       .pipe(debounceTime(500))
@@ -60,6 +63,7 @@ export class AssessmentsTableComponent implements OnInit, OnChanges {
     }
     if (changes.data) {
       this.dataSource.data = this.data || []
+      this.brokenThumbnails.clear()
       // MatSort only exists once the table has rendered, which is a tick after the data lands
       setTimeout(() => this.attachSort(), 0)
     }
@@ -93,6 +97,16 @@ export class AssessmentsTableComponent implements OnInit, OnChanges {
       const value = _.get(row, sortHeaderId, '')
       return typeof value === 'string' ? value.toLowerCase() : value
     }
+  }
+
+  /** A row without a thumbnail, or with one that cannot be loaded, shows the placeholder instead. */
+  hasThumbnail(row: any, imageKey: string): boolean {
+    const url = _.get(row, imageKey, '')
+    return !!url && !this.brokenThumbnails.has(url)
+  }
+
+  onThumbnailError(row: any, imageKey: string) {
+    this.brokenThumbnails.add(_.get(row, imageKey, ''))
   }
 
   /** A row can suppress individual actions by listing them on `buttonsToHide`. */

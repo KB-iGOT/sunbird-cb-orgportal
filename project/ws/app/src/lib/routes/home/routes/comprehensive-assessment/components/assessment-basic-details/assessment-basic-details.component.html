@@ -42,7 +42,7 @@
       </ng-container>
     </div>
 
-    <mat-error class="mat-caption mat-error-text" *ngIf="showValidationMsg('linkedPlan','required')">
+    <mat-error class="mat-error-text" *ngIf="showValidationMsg('linkedPlan','required')">
       Link an APAR plan, the reporting year and access criteria are read from it
     </mat-error>
   </div>
@@ -78,7 +78,7 @@
       </ng-container>
     </div>
 
-    <mat-error class="mat-caption mat-error-text" *ngIf="showValidationMsg('assessmentName','required')">
+    <mat-error class="mat-error-text" *ngIf="showValidationMsg('assessmentName','required')">
       Assessment name is mandatory
     </mat-error>
   </div>
@@ -96,7 +96,7 @@
           <mat-option *ngFor="let level of knowledgeLevels" [value]="level">{{level}}</mat-option>
         </mat-select>
       </mat-form-field>
-      <mat-error class="mat-caption mat-error-text" *ngIf="showValidationMsg('difficultyLevel','required')">
+      <mat-error class="mat-error-text" *ngIf="showValidationMsg('difficultyLevel','required')">
         Knowledge level is mandatory
       </mat-error>
     </div>
@@ -108,7 +108,7 @@
           <mat-option *ngFor="let license of licenses" [value]="license">{{license}}</mat-option>
         </mat-select>
       </mat-form-field>
-      <mat-error class="mat-caption mat-error-text" *ngIf="showValidationMsg('license','required')">
+      <mat-error class="mat-error-text" *ngIf="showValidationMsg('license','required')">
         License is mandatory
       </mat-error>
     </div>
@@ -127,7 +127,7 @@
           [maxlength]="keywordMaxLength" [disabled]="openMode === 'view'" #keywordInput
           (keydown.enter)="addKeyword(keywordInput, $event)" (blur)="addKeyword(keywordInput)">
       </div>
-      <mat-error class="mat-caption mat-error-text" *ngIf="showValidationMsg('keywords','required')">
+      <mat-error class="mat-error-text" *ngIf="showValidationMsg('keywords','required')">
         Add at least one keyword
       </mat-error>
     </div>
@@ -139,10 +139,10 @@
     </div>
     <ckeditor [editor]="ckEditor" formControlName="description" [config]="getConfig()"
       (ready)="onEditorReady($event)" (focus)="onEditorFocus()"></ckeditor>
-    <mat-error class="mat-caption mat-error-text" *ngIf="showValidationMsg('description','required')">
+    <mat-error class="mat-error-text" *ngIf="showValidationMsg('description','required')">
       Description is mandatory
     </mat-error>
-    <mat-error class="mat-caption mat-error-text" *ngIf="showValidationMsg('description','maxlength')">
+    <mat-error class="mat-error-text" *ngIf="showValidationMsg('description','maxlength')">
       Maximum {{descriptionMaxLength}} characters are allowed
     </mat-error>
     <span class="editor-count flex justify-end">{{descriptionLength}}/{{descriptionMaxLength}}</span>
@@ -156,10 +156,10 @@
     </div>
     <ckeditor [editor]="ckEditor" formControlName="learningOutcome" [config]="getConfig()"
       (ready)="onEditorReady($event)" (focus)="onEditorFocus()"></ckeditor>
-    <mat-error class="mat-caption mat-error-text" *ngIf="showValidationMsg('learningOutcome','required')">
+    <mat-error class="mat-error-text" *ngIf="showValidationMsg('learningOutcome','required')">
       Learning outcome is mandatory
     </mat-error>
-    <mat-error class="mat-caption mat-error-text" *ngIf="showValidationMsg('learningOutcome','maxlength')">
+    <mat-error class="mat-error-text" *ngIf="showValidationMsg('learningOutcome','maxlength')">
       Maximum {{learningOutcomeMaxLength}} characters are allowed
     </mat-error>
     <span class="editor-count flex justify-end">{{learningOutcomeLength}}/{{learningOutcomeMaxLength}}</span>

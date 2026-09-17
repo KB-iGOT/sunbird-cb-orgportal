@@ -22,9 +22,9 @@ const API_END_POINTS = {
   QUESTIONSET_READ: (questionSetId: string) => `apis/proxies/v8/questionset/v1/read/${questionSetId}`,
   PUBLISH_QUESTIONSET: (questionSetId: string) => `apis/proxies/v8/ca/questionset/v1/publish/${questionSetId}`,
   CONTENT_SEARCH: 'apis/proxies/v8/sunbirdigot/v4/search',
-  PUBLISH_ASSESSMENT: (contentId: string) => `apis/proxies/v8/ca/v1/publish/${contentId}`,
+  PUBLISH_ASSESSMENT: (contentId: string) => `apis/proxies/v8/action/ca/v1/publish/${contentId}`,
   RETIRE_CONTENT: (contentId: string) => `apis/proxies/v8/action/content/v3/retire/${contentId}`,
-  APAR_PLAN_SEARCH: 'apis/proxies/v8/cbplan/v3/search',
+  APAR_PLAN_SEARCH: 'apis/proxies/v8/cbplan/v4/search',
 }
 
 const STORAGE_URL_TO_REPLACE = 'https://storage.googleapis.com/igot'
@@ -187,35 +187,41 @@ export class ComprehensiveAssessmentService {
   //#region (apar plan apis)
 
   /**
-   * Live APAR plans of the org, one page at a time. `isApar` is not a filter the search
-   * accepts, so plans with APAR assignment off are dropped here instead: the count stays the
-   * one the api reports, a page can therefore render fewer rows than the paginator counts.
+   * Live APAR plans of the org, one page at a time. The v4 search is asked in the query
+   * language it takes, and it is the search that leaves out a plan another assessment
+   * already holds - `applyOrgIdFilter` scopes it to the caller's org, so no org id is named.
+   *
+   * `isApar` is not part of the query, so plans with APAR assignment off are dropped here
+   * instead: the count stays the one the api reports, a page can therefore render fewer
+   * rows than the paginator counts.
    *
    * Only an explicit `false` drops a plan. A row carrying no `isApar` at all is a field the
    * search did not project, not a plan with the toggle off, and dropping those would empty
    * the picker against an api that is otherwise answering correctly.
    */
   searchAparPlans(params: {
-    rootOrgId: string,
     planYear: string,
     searchString: string,
     pageIndex: number,
     pageSize: number
   }): Observable<{ plans: aparPlan.IPlanRow[], count: number }> {
-    const filter: any = {
-      status: [comprehensiveAssessmentList.STATUS_LIVE],
-      orgIdList: [params.rootOrgId],
-        "isApar": true
-    }
+    const must: any[] = [{ term: { 'status.keyword': comprehensiveAssessmentList.STATUS_LIVE } }]
     if (params.planYear && params.planYear !== aparPlan.ALL_YEARS) {
-      filter.planYear = params.planYear
+      must.push({ term: { 'planYear.keyword': params.planYear } })
     }
 
     const request: any = {
-      filter,
+      query: {
+        bool: {
+          must,
+          // a plan an assessment already holds is not offered for a second one
+          must_not: [{ exists: { field: aparPlan.LINKED_ASSESSMENT_FIELD } }],
+        },
+      },
       pageNumber: params.pageIndex,
       pageSize: params.pageSize,
       searchString: params.searchString || '',
+      applyOrgIdFilter: true,
     }
     // the api orders by relevance while a search is on, the browsed list by newest first
     if (!params.searchString) {
@@ -223,7 +229,7 @@ export class ComprehensiveAssessmentService {
       request.orderDirection = 'desc'
     }
 
-    return this.http.post<any>(API_END_POINTS.APAR_PLAN_SEARCH, request).pipe(
+    return this.http.post<any>(API_END_POINTS.APAR_PLAN_SEARCH, { request }).pipe(
       map((res: any) => ({
         plans: _.map(
           _.filter(_.get(res, 'result.result.data', []), (plan: any) => _.get(plan, 'isApar') !== false),

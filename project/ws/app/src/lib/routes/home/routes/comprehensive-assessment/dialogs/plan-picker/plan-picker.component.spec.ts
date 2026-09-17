@@ -82,11 +82,11 @@ describe('PlanPickerComponent', () => {
       expect(component.showLoader).toBe(false)
     })
 
-    it('should ask for the Live plans of the org before any filter is applied', () => {
+    /** The org is the caller's, the search takes it off the session rather than the picker. */
+    it('should ask for the Live plans before any filter is applied', () => {
       component.ngOnInit()
 
       expect(assessmentSvc.searchAparPlans).toHaveBeenCalledWith({
-        rootOrgId: 'org-1',
         planYear: aparPlan.ALL_YEARS,
         searchString: '',
         pageIndex: 0,
