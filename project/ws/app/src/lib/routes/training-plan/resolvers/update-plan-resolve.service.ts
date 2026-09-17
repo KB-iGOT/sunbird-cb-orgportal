@@ -1,18 +1,20 @@
 import { Injectable } from '@angular/core'
 import { ActivatedRouteSnapshot } from '@angular/router'
-import { Observable, of } from 'rxjs'
+import { Observable, forkJoin, of } from 'rxjs'
 import { TrainingPlanService } from '../services/traininig-plan.service'
 import { map, switchMap, catchError } from 'rxjs/operators'
 /* tslint:disable */
 import _ from 'lodash'
 /* tslint:enable */
 import { InitService } from '../../../../../../../../src/app/services/init.service'
+import { ReusableUserGroupsService } from '../../reusable-user-groups/services/reusable-user-groups.service'
 import { environment } from '../../../../../../../../src/environments/environment'
 @Injectable()
 export class UpdatePlanResolveService {
   constructor(
     private tpSvc: TrainingPlanService,
     private initService: InitService,
+    private userGroupsSvc: ReusableUserGroupsService,
   ) { }
   resolve(
     _route: ActivatedRouteSnapshot
@@ -24,7 +26,48 @@ export class UpdatePlanResolveService {
       map((_res: any) => {
         return _res.result.content
       }),
-      switchMap((content: any) => this.addContentDetails(content))
+      switchMap((content: any) => this.addContentDetails(content)),
+      switchMap((content: any) => this.addUserGroup(content))
+    )
+  }
+
+  private addUserGroup(content: any): Observable<any> {
+    const contextData = (typeof content?.contextData === 'string')
+      ? JSON.parse(content.contextData)
+      : content?.contextData
+    const savedAccessControl = _.get(contextData, 'accessControl')
+    const userGroupIds: string[] = (_.get(savedAccessControl, 'userGroups') || [])
+      .map((group: any) => _.get(group, 'userGroupId'))
+      .filter((userGroupId: any) => !!userGroupId)
+    if (!userGroupIds.length) {
+      return of(content)
+    }
+
+    // One read per group, the plan can be tied to more than one of them
+    const reads: Observable<any>[] = userGroupIds.map((userGroupId: string) =>
+      this.userGroupsSvc.fetchUserGroup(userGroupId).pipe(catchError(() => of(null))))
+
+    return forkJoin(reads).pipe(
+      map((responses: any[]) => {
+        const userGroups = responses
+          .map((res: any) => _.get(res, 'result'))
+          .filter((result: any) => !!_.get(result, 'usergroupid'))
+          .map((result: any) => ({
+            userGroupId: result.usergroupid,
+            userGroupName: result.usergroupname,
+            userGroupCriteriaList: result.criteria || [],
+          }))
+        if (userGroups.length) {
+          content.resolvedAccessControl = {
+            userGroups,
+            version: _.get(savedAccessControl, 'version') || 1,
+          }
+        }
+        return content
+      }),
+      // A group that cannot be read leaves the plan opening on an empty access control step rather
+      // than failing the route
+      catchError(() => of(content))
     )
   }
 

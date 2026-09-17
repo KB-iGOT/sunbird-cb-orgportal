@@ -13,6 +13,7 @@ export interface ITrainingPlanContent {
 })
 export class TrainingPlanDataSharingService {
   clearFilter = new Subject()
+  saveAccessControlAndContinue = new Subject<void>()
   trainingPlanCategoryChangeEvent = new Subject()
   isContentChanged = false
   moderatedCourseSelectStatus = new Subject()
@@ -46,6 +47,13 @@ export class TrainingPlanDataSharingService {
   }
   constructor() {
 
+  }
+
+  getAccessControlUserGroupIds(): string[] {
+    const userGroups = this.trainingPlanStepperData?.accessControl?.userGroups || []
+    return userGroups
+      .map((group: any) => group?.userGroupId)
+      .filter((userGroupId: any) => !!userGroupId)
   }
 
   /** Adds the content to the selection, the complete content is kept for the summary and the dialog */
