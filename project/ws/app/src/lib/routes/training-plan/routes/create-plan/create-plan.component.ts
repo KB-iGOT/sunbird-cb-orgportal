@@ -71,7 +71,11 @@ export class CreatePlanComponent implements OnInit, OnDestroy {
       this.tpdsSvc.trainingPlanStepperData['status'] = contentData.status
       this.tpdsSvc.trainingPlanStepperData['isApar'] = contentData.isApar
       this.tpdsSvc.trainingPlanStepperData['aparYear'] = contentData.planYear
-      if (typeof contentData.contextData === 'string') {
+      if (contentData.resolvedAccessControl) {
+        // The plan only stores the id of its group, the resolver read the group itself so the step
+        // opens on the conditions it was saved with
+        this.tpdsSvc.trainingPlanStepperData['accessControl'] = contentData.resolvedAccessControl
+      } else if (typeof contentData.contextData === 'string') {
         const contextData = JSON.parse(contentData.contextData)
         this.tpdsSvc.trainingPlanStepperData['accessControl'] = contextData.accessControl
       } else {

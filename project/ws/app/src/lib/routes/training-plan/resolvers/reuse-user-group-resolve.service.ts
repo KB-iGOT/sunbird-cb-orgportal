@@ -22,6 +22,8 @@ export class ReuseUserGroupResolveService {
         }
         return {
           version: 1,
+          // Picked from the saved list, so this id is one the server issued
+          userGroupId: result.usergroupid,
           userGroups: [
             {
               userGroupId: result.usergroupid,
