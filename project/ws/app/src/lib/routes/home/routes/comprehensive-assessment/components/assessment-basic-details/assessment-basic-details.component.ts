@@ -38,9 +38,11 @@ export class AssessmentBasicDetailsComponent {
   /** Duration in seconds, derived from the question set built in step 2. */
   @Input() duration = 0
 
-  descriptionMinLength = comprehensiveAssessment.DESCRIPTION_MIN_LENGTH
   descriptionMaxLength = comprehensiveAssessment.DESCRIPTION_MAX_LENGTH
   learningOutcomeMaxLength = comprehensiveAssessment.LEARNING_OUTCOME_MAX_LENGTH
+  keywordMaxLength = comprehensiveAssessment.KEYWORD_MAX_LENGTH
+  knowledgeLevels = comprehensiveAssessment.KNOWLEDGE_LEVELS
+  licenses = comprehensiveAssessment.LICENSES
 
   ckEditor = ClassicEditor
   ckEditorConfig: EditorConfig = {}
@@ -110,6 +112,19 @@ export class AssessmentBasicDetailsComponent {
   get planWindowDisplay(): string {
     const endDate = _.get(this.linkedPlan, 'endDate', '')
     return endDate ? (this.datePipe.transform(endDate, 'dd MMM, yyyy') || '') : ''
+  }
+
+  /**
+   * The access criteria the plan carries, as the chip on the plan card reads it. A plan with
+   * no gating course says so in words: `0 gating course(s)` read as a value that had failed
+   * to load rather than a plan that is open from the start.
+   */
+  get gatingDisplay(): string {
+    const count = _.get(this.linkedPlan, 'gatingCourseCount', 0)
+    if (!count) {
+      return 'No gating courses'
+    }
+    return `Unlocks after ${count} gating ${count === 1 ? 'course' : 'courses'}`
   }
 
   /**
@@ -196,6 +211,38 @@ export class AssessmentBasicDetailsComponent {
 
   get descriptionLength(): number {
     return richTextLength(_.get(this.assessmentDetails, 'controls.description.value', ''))
+  }
+
+  get keywords(): string[] {
+    return _.get(this.assessmentDetails, 'controls.keywords.value', []) || []
+  }
+
+  /**
+   * Keywords are held as the array the content platform stores, so each one is added on
+   * Enter or on leaving the field. A repeat is dropped rather than refused - the keyword
+   * is already there, which is what the author was after.
+   */
+  addKeyword(input: HTMLInputElement, event?: Event): void {
+    if (event) {
+      event.preventDefault()
+    }
+    const keyword = (input.value || '').trim()
+    input.value = ''
+    if (!keyword || this.keywords.includes(keyword)) {
+      return
+    }
+    this.patchKeywords([...this.keywords, keyword])
+  }
+
+  removeKeyword(keyword: string): void {
+    this.patchKeywords(this.keywords.filter((existing: string) => existing !== keyword))
+  }
+
+  private patchKeywords(keywords: string[]): void {
+    this.assessmentDetails.patchValue({ keywords })
+    // the field is mandatory, so emptying it has to report itself without a visit first
+    this.assessmentDetails.controls['keywords'].markAsTouched()
+    this.assessmentDetails.updateValueAndValidity()
   }
 
   get learningOutcomeLength(): number {

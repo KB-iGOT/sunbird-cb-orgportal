@@ -250,10 +250,17 @@ describe('ComprehensiveAssessmentService', () => {
       aparGatingCourseCount: '2',
     }
 
-    /** The linkage the platform reads the unlock rule off. */
+    /**
+     * The linkage the platform reads the unlock rule off, and the only place the plan
+     * itself is held now that the flat copies are no longer written.
+     */
     it('should write the plan and the courses it gates as the training plan link', () => {
       expect(service.buildPlanMetadata(linkedPlan)[LINK_KEY]).toEqual({
         identifier: 'plan-1',
+        name: 'APAR 2026-27 — Section Officer & Under Secretary',
+        planYear: '2026-27',
+        endDate: '2027-03-31T00:00:00.000Z',
+        orgName: 'Department of Personnel & Training',
         contentList: [
           { identifier: 'do-1', mandatory: true },
           { identifier: 'do-2', mandatory: false },
@@ -291,19 +298,15 @@ describe('ComprehensiveAssessmentService', () => {
 
     it('should clear the linkage when no plan is linked', () => {
       expect(service.buildPlanMetadata(null)).toEqual({
-        [LINK_KEY]: { identifier: '', contentList: [] },
+        [LINK_KEY]: {
+          identifier: '', name: '', planYear: '', endDate: '', orgName: '', contentList: [],
+        },
       })
     })
 
+    /** Everything the reopened builder and the dashboard show comes back off the linkage. */
     it('should read the plan back off the linkage the save wrote', () => {
-      expect(service.readPlanMetadata(service.buildPlanMetadata(linkedPlan))).toEqual({
-        ...linkedPlan,
-        // the linkage carries the plan and the courses it gates, never the display copies
-        name: '',
-        planYear: '',
-        endDate: '',
-        orgName: '',
-      })
+      expect(service.readPlanMetadata(service.buildPlanMetadata(linkedPlan))).toEqual(linkedPlan)
     })
 
     /** Nothing writes the flat copies any more, but an assessment carrying them still reads. */
@@ -418,11 +421,89 @@ describe('ComprehensiveAssessmentService', () => {
     })
 
     it('should publish a draft naming who published it', () => {
-      service.publishAssessment('do-1', 'user-1').subscribe()
+      service.publishAssessment('do-1', 'user-1', 'org-1').subscribe()
 
-      const req = httpMock.expectOne('apis/proxies/v8/action/content/v3/publish/do-1')
+      const req = httpMock.expectOne('apis/proxies/v8/ca/v1/publish/do-1')
       expect(req.request.body).toEqual({ request: { content: { lastPublishedBy: 'user-1' } } })
       req.flush({})
+    })
+
+    /**
+     * The `ca` routes answer against the org the publish is made for rather than reading it
+     * off the session, so every call of the publish flow names it in the header.
+     */
+    it('should name the org the publish is made for on every call of the flow', () => {
+      service.publishAssessment('do-1', 'user-1', 'org-1').subscribe()
+      service.publishQuestionSet('qs-1', 'org-1').subscribe()
+      service.getQuestionSetStatus('qs-1', 'org-1').subscribe()
+
+      const requests = [
+        httpMock.expectOne('apis/proxies/v8/ca/v1/publish/do-1'),
+        httpMock.expectOne('apis/proxies/v8/ca/questionset/v1/publish/qs-1'),
+        httpMock.expectOne('apis/proxies/v8/questionset/v1/read/qs-1'),
+      ]
+
+      requests.forEach((req: any) => {
+        expect(req.request.headers.get('x-authenticated-user-orgid')).toBe('org-1')
+        req.flush({})
+      })
+    })
+
+    /** An empty header says less than no header at all, so none is sent. */
+    it('should send no org header while the org is not known', () => {
+      service.publishQuestionSet('qs-1', '').subscribe()
+
+      const req = httpMock.expectOne('apis/proxies/v8/ca/questionset/v1/publish/qs-1')
+      expect(req.request.headers.has('x-authenticated-user-orgid')).toBe(false)
+      req.flush({})
+    })
+
+    /** The first of the two publishes: the assessment can only follow its question set. */
+    it('should publish the question set the assessment holds', () => {
+      service.publishQuestionSet('qs-1', 'org-1').subscribe()
+
+      const req = httpMock.expectOne('apis/proxies/v8/ca/questionset/v1/publish/qs-1')
+      expect(req.request.method).toBe('POST')
+      expect(req.request.body).toEqual({ request: { questionset: {} } })
+      req.flush({})
+    })
+
+    /** The draft copy answers Draft however far along the publish is, so it is not read. */
+    it('should read the status off the published copy of the question set', () => {
+      let status = ''
+      service.getQuestionSetStatus('qs-1', 'org-1').subscribe((res: string) => status = res)
+
+      const req = httpMock.expectOne('apis/proxies/v8/questionset/v1/read/qs-1')
+      expect(req.request.method).toBe('GET')
+      req.flush({ result: { questionset: { identifier: 'qs-1', status: 'Live' } } })
+
+      expect(status).toBe('Live')
+    })
+
+    it('should read the status whichever casing the api answers under', () => {
+      let status = ''
+      service.getQuestionSetStatus('qs-1', 'org-1').subscribe((res: string) => status = res)
+
+      httpMock.expectOne('apis/proxies/v8/questionset/v1/read/qs-1')
+        .flush({ result: { questionSet: { status: 'Processing' } } })
+
+      expect(status).toBe('Processing')
+    })
+
+    /** The live copy does not exist until the publish finishes, and a 404 is not a failure. */
+    it('should report no status rather than fail when the read errors', () => {
+      let status: string | undefined
+      let errored = false
+      service.getQuestionSetStatus('qs-1', 'org-1').subscribe({
+        next: (res: string) => status = res,
+        error: () => errored = true,
+      })
+
+      httpMock.expectOne('apis/proxies/v8/questionset/v1/read/qs-1')
+        .flush('not found', { status: 404, statusText: 'Not Found' })
+
+      expect(errored).toBe(false)
+      expect(status).toBe('')
     })
 
     it('should retire a content, the delete the api offers', () => {
@@ -585,6 +666,30 @@ describe('ComprehensiveAssessmentService', () => {
 
       expect(service.getLinkedAssessmentId(collection)).toBe('qs-1')
       expect(service.getLinkedAssessmentId({ children: [] })).toBe('')
+    })
+
+    /** What the publish dialog lists, so the admin sees by name what is about to go Live. */
+    it('should list the question sets the assessment holds, named and with their status', () => {
+      const collection = {
+        children: [
+          { identifier: 'do-2', name: 'A handout', mimeType: 'application/pdf', status: 'Live' },
+          {
+            identifier: 'qs-1',
+            name: 'APAR assessment question set',
+            mimeType: 'application/vnd.sunbird.questionset',
+            status: 'Draft',
+          },
+        ],
+      }
+
+      expect(service.getLinkedResources(collection)).toEqual([
+        { identifier: 'qs-1', name: 'APAR assessment question set', status: 'Draft' },
+      ])
+    })
+
+    it('should list nothing for a collection carrying no question set', () => {
+      expect(service.getLinkedResources({ children: [] })).toEqual([])
+      expect(service.getLinkedResources(null)).toEqual([])
     })
 
     it('should generate the 16 digit numeric code sunbird expects', () => {

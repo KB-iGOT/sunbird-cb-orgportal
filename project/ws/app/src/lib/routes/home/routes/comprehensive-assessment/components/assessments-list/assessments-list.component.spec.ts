@@ -20,7 +20,18 @@ describe('AssessmentsListComponent', () => {
   const userProfile = { rootOrgId: 'org-1', userId: 'user-1' }
   /** A window a year out, so the publish guard lets the row through unless a test says otherwise. */
   const openWindow = new Date(Date.now() + (365 * 24 * 60 * 60 * 1000)).toISOString()
-  const row = { identifier: 'do_123', name: 'APAR assessment', aparPlanEndDate: openWindow }
+  // the window is resolved onto the row by the service, off the plan the assessment carries
+  const row = {
+    identifier: 'do_123',
+    name: 'APAR assessment',
+    [comprehensiveAssessmentList.WINDOW_END_KEY]: openWindow,
+  }
+  /** The listing is served by a search, so the children come from a hierarchy read. */
+  const collection = {
+    identifier: 'do_123',
+    name: 'APAR assessment',
+    children: [{ identifier: 'qs-1', name: 'Question set', mimeType: 'application/vnd.sunbird.questionset' }],
+  }
 
   /**
    * The tab is taken off the child route the tab link points at, the roles off the same
@@ -48,6 +59,7 @@ describe('AssessmentsListComponent', () => {
     assessmentSvc = {
       searchAssessments: jest.fn().mockReturnValue(of({ content: [row], count: 1 })),
       publishAssessment: jest.fn().mockReturnValue(of({})),
+      getContentHierarchy: jest.fn().mockReturnValue(of({ result: { content: collection } })),
       retireAssessment: jest.fn().mockReturnValue(of({})),
       isWindowOpen: jest.fn().mockReturnValue(true),
     }
@@ -327,31 +339,47 @@ describe('AssessmentsListComponent', () => {
       component.ngOnInit()
     })
 
-    it('should ask before publishing', () => {
+    /**
+     * Publishing is two publishes, the question set first - the dialog walks both of them,
+     * so the row action hands over to it rather than publishing the assessment itself.
+     */
+    it('should open the publish dialog on the assessment being published', () => {
       component.onActionClick({ action: 'publish', rows: row })
 
       expect(dialog.open).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({
-        data: expect.objectContaining({
-          message: 'Are you sure you want to publish this assessment?',
-        }),
+        disableClose: true,
+        data: expect.objectContaining({ collection, userProfile }),
       }))
       expect(assessmentSvc.publishAssessment).not.toHaveBeenCalled()
     })
 
-    it('should publish once the user confirms', () => {
+    /** The row comes off a search, which answers only the fields it projects - not children. */
+    it('should read the hierarchy for the resources the row does not carry', () => {
       component.onActionClick({ action: 'publish', rows: row })
 
-      afterClosed.next(true)
-
-      expect(assessmentSvc.publishAssessment).toHaveBeenCalledWith('do_123', 'user-1')
+      expect(assessmentSvc.getContentHierarchy).toHaveBeenCalledWith('do_123')
     })
 
-    it('should leave the assessment alone when the user backs out', () => {
+    it('should say why the assessment could not be read rather than open the dialog', () => {
+      assessmentSvc.getContentHierarchy.mockReturnValue(
+        throwError(() => ({ error: { message: 'the assessment could not be read' } }))
+      )
+
       component.onActionClick({ action: 'publish', rows: row })
 
+      expect(dialog.open).not.toHaveBeenCalled()
+      expect(matSnackBar.open).toHaveBeenCalledWith('the assessment could not be read')
+      expect(loaderService.changeLoaderState).toHaveBeenLastCalledWith(false)
+    })
+
+    it('should leave the list as it is when the dialog is closed part way through', () => {
+      assessmentSvc.searchAssessments.mockClear()
+
+      component.onActionClick({ action: 'publish', rows: row })
       afterClosed.next(false)
 
-      expect(assessmentSvc.publishAssessment).not.toHaveBeenCalled()
+      expect(matSnackBar.open).not.toHaveBeenCalledWith('Assessment published successfully')
+      expect(assessmentSvc.searchAssessments).not.toHaveBeenCalled()
     })
 
     /**
@@ -363,7 +391,8 @@ describe('AssessmentsListComponent', () => {
 
       component.publishAssessment(row)
 
-      expect(assessmentSvc.publishAssessment).not.toHaveBeenCalled()
+      expect(dialog.open).not.toHaveBeenCalled()
+      expect(assessmentSvc.getContentHierarchy).not.toHaveBeenCalled()
       expect(matSnackBar.open).toHaveBeenCalledWith(comprehensiveAssessmentList.WINDOW_CLOSED_MESSAGE)
       expect(loaderService.changeLoaderState).not.toHaveBeenCalled()
     })
@@ -375,31 +404,18 @@ describe('AssessmentsListComponent', () => {
     })
 
     /** Publishing moves the row out of the Draft tab, so the tab is reloaded. */
-    it('should reload the tab once the assessment is published', () => {
+    it('should reload the tab once the dialog reports the assessment published', () => {
       assessmentSvc.searchAssessments.mockClear()
 
       component.publishAssessment(row)
+      afterClosed.next(true)
 
       expect(matSnackBar.open).toHaveBeenCalledWith('Assessment published successfully')
       expect(assessmentSvc.searchAssessments).toHaveBeenCalledTimes(1)
-      expect(loaderService.changeLoaderState).toHaveBeenLastCalledWith(false)
-    })
-
-    it('should report why the publish failed and keep the list as it is', () => {
-      assessmentSvc.publishAssessment.mockReturnValue(
-        throwError(() => ({ error: { message: 'questions are missing' } }))
-      )
-      assessmentSvc.searchAssessments.mockClear()
-
-      component.publishAssessment(row)
-
-      expect(matSnackBar.open).toHaveBeenCalledWith('questions are missing')
-      expect(assessmentSvc.searchAssessments).not.toHaveBeenCalled()
-      expect(loaderService.changeLoaderState).toHaveBeenLastCalledWith(false)
     })
 
     it('should fall back to a readable message when the failure carries none', () => {
-      assessmentSvc.publishAssessment.mockReturnValue(throwError(() => ({})))
+      assessmentSvc.getContentHierarchy.mockReturnValue(throwError(() => ({})))
 
       component.publishAssessment(row)
 

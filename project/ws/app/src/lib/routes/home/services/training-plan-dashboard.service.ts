@@ -6,6 +6,7 @@ const API_END_POINTS = {
   CBP_PLAN_LIST: '/apis/proxies/v8/cbplan/v1/list',
   CBP_PLAN_LIST_V2: '/apis/proxies/v8/cbplan/v2/search',
   CBP_PLAN_LIST_V3: '/apis/proxies/v8/cbplan/v3/search',
+  CBP_PLAN_LIST_V4: '/apis/proxies/v8/cbplan/v4/search',
 }
 
 @Injectable({
@@ -23,6 +24,10 @@ export class TrainingPlanDashboardService {
   }
 
   getTrainingPlansV3(req: any): Observable<any> {
+    return this.http.post<any>(API_END_POINTS.CBP_PLAN_LIST_V3, req)
+  }
+
+  getTrainingPlansV4(req: any): Observable<any> {
     return this.http.post<any>(API_END_POINTS.CBP_PLAN_LIST_V3, req)
   }
 }

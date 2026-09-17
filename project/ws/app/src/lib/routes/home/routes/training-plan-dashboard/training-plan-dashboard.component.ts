@@ -147,7 +147,7 @@ export class TrainingPlanDashboardComponent implements OnInit, AfterViewInit {
       payload.orderDirection = "desc"
     }
 
-    this.trainingDashboardSvc.getTrainingPlansV3(payload).subscribe({
+    this.trainingDashboardSvc.getTrainingPlansV4(payload).subscribe({
       next: (response: any) => {
         if (response.params?.status === 'success') {
           this.completeDataRes = response?.result?.result?.data || []

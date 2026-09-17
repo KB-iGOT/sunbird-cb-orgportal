@@ -1,0 +1,51 @@
+<div class="publish-resource">
+  <div class="dialog-head flex flex-between items-center">
+    <p class="dialog-title">List of resources</p>
+    <!-- a resource goes Live on its own once published, so checking again is always offered -->
+    <button mat-stroked-button class="refresh-button" type="button" [disabled]="isBusy"
+      (click)="recheckStatus()">
+      <mat-icon>refresh</mat-icon>
+      <span>Refresh</span>
+    </button>
+  </div>
+
+  <div class="note">
+    <span class="note-label">Note:</span> Every resource has to be
+    <span class="note-strong">Live</span> before the assessment can be published. One that is still
+    publishing goes Live on its own, so Refresh to check it again.
+  </div>
+
+  <div class="resource-table">
+    <div class="table-row table-head">
+      <span class="col-name">Name</span>
+      <span class="col-status">Status</span>
+    </div>
+    <div class="table-row" *ngFor="let resource of resources">
+      <span class="col-name" [matTooltip]="resource.name" matTooltipClass="new-toolTip"
+        matTooltipPosition="above">{{ resource.name }}</span>
+      <span class="col-status">
+        <span class="status-chip" [ngClass]="isLive(resource) ? 'status-live' : 'status-draft'">
+          {{ resource.status || 'Draft' }}
+        </span>
+      </span>
+    </div>
+    <div class="table-row empty" *ngIf="!resources.length">
+      This assessment holds no resource to publish
+    </div>
+  </div>
+
+  <div class="stage-message" *ngIf="message" [class.error-message]="isError">
+    <mat-spinner *ngIf="isBusy && !countdown" diameter="16"></mat-spinner>
+    <span>{{ message }}</span>
+    <span class="countdown" *ngIf="countdown">checking in {{ countdown }}s</span>
+  </div>
+
+  <div class="action-btns flex justify-center items-center gap-4">
+    <button mat-stroked-button class="cancel-button" type="button" [disabled]="isBusy"
+      (click)="close()">Close</button>
+    <button mat-flat-button class="action-button" type="button" *ngIf="!canPublishAssessment"
+      [disabled]="isPublishResourceDisabled" (click)="publishResource()">Publish Resource</button>
+    <button mat-flat-button class="action-button" type="button" *ngIf="canPublishAssessment"
+      [disabled]="isBusy" (click)="publishAssessment()">Publish Assessment</button>
+  </div>
+</div>

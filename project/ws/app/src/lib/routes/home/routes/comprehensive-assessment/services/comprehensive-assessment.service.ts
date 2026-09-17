@@ -7,7 +7,8 @@ import * as _ from 'lodash'
 import { environment } from '../../../../../../../../../../src/environments/environment'
 import {
   COLLECTION_MIME_TYPE, CONTENT_COURSE_CATEGORY, CONTENT_PRIMARY_CATEGORY, DEFAULT_ACCESS_SETTING,
-  DEFAULT_FRAMEWORK, DEFAULT_LICENSE, QUESTIONSET_MIME_TYPE, aparPlan, comprehensiveAssessmentList,
+  DEFAULT_FRAMEWORK, DEFAULT_LICENSE, QUESTIONSET_MIME_TYPE, aparPlan, comprehensiveAssessment,
+  comprehensiveAssessmentList,
 } from '../models/comprehensive-assessment.model'
 
 const API_END_POINTS = {
@@ -17,13 +18,21 @@ const API_END_POINTS = {
   UPDATE_CONTENT: (contentId: string) => `apis/proxies/v8/action/content/v3/update/${contentId}`,
   CONTENT_HIERARCHY_UPDATE: 'apis/proxies/v8/action/content/v3/hierarchy/update',
   QUESTIONSET_HIERARCHY_EDIT: (questionSetId: string) => `apis/proxies/v8/questionset/v1/hierarchy/${questionSetId}?mode=edit`,
+  // no `mode=edit`: the published copy, the only one that can answer whether it is Live
+  QUESTIONSET_READ: (questionSetId: string) => `apis/proxies/v8/questionset/v1/read/${questionSetId}`,
+  PUBLISH_QUESTIONSET: (questionSetId: string) => `apis/proxies/v8/ca/questionset/v1/publish/${questionSetId}`,
   CONTENT_SEARCH: 'apis/proxies/v8/sunbirdigot/v4/search',
-  PUBLISH_CONTENT: (contentId: string) => `apis/proxies/v8/action/content/v3/publish/${contentId}`,
+  PUBLISH_ASSESSMENT: (contentId: string) => `apis/proxies/v8/ca/v1/publish/${contentId}`,
   RETIRE_CONTENT: (contentId: string) => `apis/proxies/v8/action/content/v3/retire/${contentId}`,
   APAR_PLAN_SEARCH: 'apis/proxies/v8/cbplan/v3/search',
 }
 
 const STORAGE_URL_TO_REPLACE = 'https://storage.googleapis.com/igot'
+/**
+ * The org the publish is made for. The `ca` routes answer against it rather than reading it
+ * off the session, so every call of the publish flow carries the user's root org in it.
+ */
+const ORG_ID_HEADER = 'x-authenticated-user-orgid'
 
 @Injectable()
 export class ComprehensiveAssessmentService {
@@ -122,11 +131,16 @@ export class ComprehensiveAssessmentService {
     )
   }
 
-  /** Moves a draft collection to Live. */
-  publishAssessment(contentId: string, userId: string): Observable<any> {
-    return this.http.post<any>(API_END_POINTS.PUBLISH_CONTENT(contentId), {
-      request: { content: { lastPublishedBy: userId } },
-    })
+  /**
+   * Moves a draft collection to Live. The second of the two publishes: the question set it
+   * holds has to be Live first, see `publishQuestionSet`.
+   */
+  publishAssessment(contentId: string, userId: string, rootOrgId: string): Observable<any> {
+    return this.http.post<any>(
+      API_END_POINTS.PUBLISH_ASSESSMENT(contentId),
+      { request: { content: { lastPublishedBy: userId } } },
+      this.orgHeader(rootOrgId)
+    )
   }
 
   /** Retire is the delete the content api offers, the row leaves every status tab. */
@@ -137,6 +151,30 @@ export class ComprehensiveAssessmentService {
   //#endregion
 
   //#region (question set apis)
+
+  /** The first of the two publishes: the question set the assessment holds goes Live. */
+  publishQuestionSet(questionSetId: string, rootOrgId: string): Observable<any> {
+    return this.http.post<any>(
+      API_END_POINTS.PUBLISH_QUESTIONSET(questionSetId),
+      { request: { questionset: {} } },
+      this.orgHeader(rootOrgId)
+    )
+  }
+
+  /**
+   * The status of the published question set. The draft read answers `Draft` however far
+   * along the publish is, so the live copy is the only one worth asking. It does not exist
+   * until the publish finishes, so a read that fails is reported as `not Live yet` rather
+   * than as an error - the caller offers the publish again, it never blocks on this.
+   */
+  getQuestionSetStatus(questionSetId: string, rootOrgId: string): Observable<string> {
+    return this.http.get<any>(API_END_POINTS.QUESTIONSET_READ(questionSetId), this.orgHeader(rootOrgId)).pipe(
+      // the read answers under `questionset`, the hierarchy under `questionSet`
+      map((res: any) => _.get(res, 'result.questionset.status', '') ||
+        _.get(res, 'result.questionSet.status', '')),
+      catchError(() => of(''))
+    )
+  }
 
   getQuestionSetHierarchy(questionSetId: string): Observable<any> {
     return this.http.get<any>(API_END_POINTS.QUESTIONSET_HIERARCHY_EDIT(questionSetId)).pipe(
@@ -272,10 +310,18 @@ export class ComprehensiveAssessmentService {
     }
   }
 
-  /** The plan and the courses it gates, each carrying the flag the unlock is read off. */
+  /**
+   * The plan and the courses it gates, each carrying the flag the unlock is read off. The
+   * plan's own values travel with it: nothing else on the assessment holds them any more,
+   * and neither the reopened builder nor the dashboard can join back to the plan for them.
+   */
   private buildTrainingPlanLink(plan: aparPlan.ILinkedPlan | null): aparPlan.ITrainingPlanLink {
     return {
       identifier: _.get(plan, 'id', ''),
+      name: _.get(plan, 'name', ''),
+      planYear: _.get(plan, 'planYear', ''),
+      endDate: _.get(plan, 'endDate', ''),
+      orgName: _.get(plan, 'orgName', ''),
       contentList: this.readContentList(plan),
     }
   }
@@ -295,10 +341,12 @@ export class ComprehensiveAssessmentService {
     return {
       id,
       contentList,
-      name: _.get(content, aparPlan.METADATA.planName, ''),
-      planYear: _.get(content, aparPlan.METADATA.reportingYear, ''),
-      endDate: _.get(content, aparPlan.METADATA.windowEndDate, ''),
-      orgName: _.get(content, aparPlan.METADATA.owningOrg, ''),
+      // the linkage answers for the plan, the flat copies only for an assessment saved
+      // while they were still written
+      name: _.get(link, 'name', '') || _.get(content, aparPlan.METADATA.planName, ''),
+      planYear: _.get(link, 'planYear', '') || _.get(content, aparPlan.METADATA.reportingYear, ''),
+      endDate: _.get(link, 'endDate', '') || _.get(content, aparPlan.METADATA.windowEndDate, ''),
+      orgName: _.get(link, 'orgName', '') || _.get(content, aparPlan.METADATA.owningOrg, ''),
       // the course list is what says how many are gating, the stored count is only what an
       // assessment linked before the list was written onto it still has to answer from
       gatingCourseCount: contentList.length
@@ -333,6 +381,7 @@ export class ComprehensiveAssessmentService {
 
   /** Shapes a search hit into the flat, display ready row the listing table renders. */
   private toListRow(row: any): any {
+    const plan = this.readPlanMetadata(row)
     return {
       ...row,
       createdOn: this.toDisplayDate(_.get(row, 'createdOn')),
@@ -341,10 +390,12 @@ export class ComprehensiveAssessmentService {
       creator: _.get(row, 'creator', '') || '-',
       durationDisplay: this.toDisplayDuration(Number(_.get(row, 'duration', 0)) || 0),
       // The plan and everything derived from it are read off the assessment rather than
-      // fetched again, they are written onto it when the plan is linked
-      planName: _.get(row, aparPlan.METADATA.planName, '') || '-',
-      reportingYear: _.get(row, aparPlan.METADATA.reportingYear, '') || '-',
-      assessmentWindow: this.toDisplayDate(_.get(row, aparPlan.METADATA.windowEndDate)) || '-',
+      // fetched again, they travel with the linkage written onto it
+      planName: _.get(plan, 'name', '') || '-',
+      reportingYear: _.get(plan, 'planYear', '') || '-',
+      assessmentWindow: this.toDisplayDate(_.get(plan, 'endDate', '')) || '-',
+      // the publish guard reads the window off the row rather than going back to the plan
+      [comprehensiveAssessmentList.WINDOW_END_KEY]: _.get(plan, 'endDate', ''),
     }
   }
 
@@ -467,6 +518,28 @@ export class ComprehensiveAssessmentService {
     const children = _.get(collection, 'children', [])
     const questionSet = _.find(children, (child: any) => _.get(child, 'mimeType', '') === QUESTIONSET_MIME_TYPE)
     return _.get(questionSet, 'identifier', '')
+  }
+
+  /**
+   * The resources the assessment holds, listed for the publish dialog. A comprehensive
+   * assessment carries the one question set built in step 2, but the collection is read for
+   * all of them so the dialog lists whatever is actually there.
+   */
+  getLinkedResources(collection: any): comprehensiveAssessment.ILinkedResource[] {
+    const questionSets = _.filter(
+      _.get(collection, 'children', []),
+      (child: any) => _.get(child, 'mimeType', '') === QUESTIONSET_MIME_TYPE
+    )
+    return _.map(questionSets, (child: any) => ({
+      identifier: _.get(child, 'identifier', ''),
+      name: _.get(child, 'name', ''),
+      status: _.get(child, 'status', ''),
+    }))
+  }
+
+  /** Nothing is sent for an org that is not known, rather than an empty header. */
+  private orgHeader(rootOrgId: string): { headers?: { [header: string]: string } } {
+    return rootOrgId ? { headers: { [ORG_ID_HEADER]: rootOrgId } } : {}
   }
 
   /** Sunbird expects a 16 digit numeric code on create. */

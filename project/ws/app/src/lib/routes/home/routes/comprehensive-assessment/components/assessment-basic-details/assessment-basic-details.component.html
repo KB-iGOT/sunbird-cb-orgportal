@@ -4,42 +4,43 @@
     Basic Details
   </div>
 
+  <!-- The plan and the name are one pair: same plate, same height, same two lines, so the
+       eye reads down one text column instead of two that start a plate's width apart. -->
   <div class="flex flex-column gap-2">
     <span class="form-lable required">Linked APAR Plan</span>
 
-    <div class="linked-plan-row flex items-center gap-3 px-3 py-2">
-      <mat-icon class="plan-icon">assignment_turned_in</mat-icon>
+    <div class="detail-card flex items-center gap-3 px-4 py-3">
+      <div class="card-plate flex justify-center items-center">
+        <mat-icon class="plate-icon">assignment_turned_in</mat-icon>
+      </div>
 
-      <div class="flex flex-column gap-1 linked-plan-text">
+      <div class="flex flex-column gap-1 detail-card-text">
         <ng-container *ngIf="linkedPlan; else noLinkedPlan">
-          <span class="plan-name" [matTooltip]="linkedPlan.name" matTooltipClass="new-toolTip"
-            matTooltipPosition="above">{{linkedPlan.name}}</span>
-          <span class="plan-meta">
-            {{linkedPlan.planYear}}<ng-container *ngIf="planWindowDisplay"> &middot; due {{planWindowDisplay}}</ng-container>
-          </span>
+          <span class="card-title" [matTooltip]="linkedPlan.name" matTooltipClass="new-toolTip"
+            matTooltipPosition="above">{{linkedPlan.name || 'Linked plan'}}</span>
+          <div class="card-meta-row flex items-center gap-2">
+            <span class="card-meta">{{linkedPlan.planYear}}<ng-container *ngIf="planWindowDisplay"> &middot; due
+                {{planWindowDisplay}}</ng-container><ng-container *ngIf="linkedPlan.orgName"> &middot;
+                {{linkedPlan.orgName}}</ng-container></span>
+            <span class="card-chip flex items-center gap-1" matTooltip="Access criteria read from the linked plan"
+              matTooltipClass="new-toolTip" matTooltipPosition="above">
+              <mat-icon>{{linkedPlan.gatingCourseCount ? 'lock_outline' : 'lock_open'}}</mat-icon>
+              {{gatingDisplay}}
+            </span>
+          </div>
         </ng-container>
         <ng-template #noLinkedPlan>
-          <span class="plan-placeholder">
-            No plan linked yet &mdash; the reporting year and access criteria have nowhere to come from
-          </span>
+          <span class="card-title placeholder">No plan linked yet</span>
+          <span class="card-meta">The reporting year and access criteria are read from the plan</span>
         </ng-template>
       </div>
 
       <ng-container *ngIf="openMode !== 'view'">
-        <button type="button" mat-stroked-button class="choose-plan" (click)="openPlanPicker()">
+        <button type="button" mat-stroked-button class="card-action" (click)="openPlanPicker()">
           {{ linkedPlan ? 'Change' : 'Choose' }}
         </button>
       </ng-container>
     </div>
-
-    <ng-container *ngIf="linkedPlan">
-      <span class="plan-derived" *ngIf="linkedPlan.orgName">
-        Access criteria inherited from: {{linkedPlan.orgName}}
-      </span>
-      <span class="plan-derived">
-        Unlocks after {{linkedPlan.gatingCourseCount}} gating course(s) completed
-      </span>
-    </ng-container>
 
     <mat-error class="mat-caption mat-error-text" *ngIf="showValidationMsg('linkedPlan','required')">
       Link an APAR plan, the reporting year and access criteria are read from it
@@ -47,31 +48,32 @@
   </div>
 
   <div class="flex flex-column gap-2">
-    <div class="basic-info-row flex items-center gap-3 px-3 py-2">
-      <div class="app-icon-thumb flex justify-center items-center">
+    <span class="form-lable required">Assessment Name</span>
+
+    <div class="detail-card flex items-center gap-3 px-4 py-3">
+      <div class="card-plate flex justify-center items-center">
         <ng-container *ngIf="appIcon; else noAppIcon">
           <img [src]="appIcon | pipePublicURL" alt="assessment icon">
         </ng-container>
         <ng-template #noAppIcon>
-          <mat-icon class="app-icon-placeholder">image</mat-icon>
+          <mat-icon class="plate-icon">image</mat-icon>
         </ng-template>
       </div>
 
-      <div class="flex flex-column gap-1 basic-info-text">
-        <span class="form-lable required">Assessment Name</span>
-        <ng-container *ngIf="assessmentName; else noAssessmentName">
-          <span class="assessment-name-value" [matTooltip]="assessmentName" matTooltipClass="new-toolTip"
-            matTooltipPosition="above">{{assessmentName}}</span>
-        </ng-container>
+      <div class="flex flex-column gap-1 detail-card-text">
+        <span class="card-title" *ngIf="assessmentName; else noAssessmentName" [matTooltip]="assessmentName"
+          matTooltipClass="new-toolTip" matTooltipPosition="above">{{assessmentName}}</span>
         <ng-template #noAssessmentName>
-          <span class="assessment-name-placeholder">Assessment name and image are not added yet</span>
+          <span class="card-title placeholder">No name added yet</span>
         </ng-template>
+        <div class="card-meta-row flex items-center gap-2">
+          <span class="card-meta">Name and image the learner sees on the assessment</span>
+        </div>
       </div>
 
       <ng-container *ngIf="openMode !== 'view'">
-        <button type="button" mat-icon-button class="edit-basic-info" matTooltip="Edit name and image"
-          (click)="openBasicInfoDialog()">
-          <mat-icon>edit</mat-icon>
+        <button type="button" mat-stroked-button class="card-action" (click)="openBasicInfoDialog()">
+          Edit
         </button>
       </ng-container>
     </div>
@@ -79,6 +81,56 @@
     <mat-error class="mat-caption mat-error-text" *ngIf="showValidationMsg('assessmentName','required')">
       Assessment name is mandatory
     </mat-error>
+  </div>
+
+  <div class="classification flex flex-column gap-4">
+    <div class="assessment-header">
+      Classification
+    </div>
+
+    <div class="flex flex-column gap-1 assessment-form">
+      <span class="form-lable required">Knowledge level</span>
+      <span class="field-hint">Learner's knowledge level expected</span>
+      <mat-form-field appearance="outline" class="w-full">
+        <mat-select formControlName="difficultyLevel" placeholder="Select the knowledge level">
+          <mat-option *ngFor="let level of knowledgeLevels" [value]="level">{{level}}</mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-error class="mat-caption mat-error-text" *ngIf="showValidationMsg('difficultyLevel','required')">
+        Knowledge level is mandatory
+      </mat-error>
+    </div>
+
+    <div class="flex flex-column gap-1 assessment-form">
+      <span class="form-lable required">License</span>
+      <mat-form-field appearance="outline" class="w-full">
+        <mat-select formControlName="license" placeholder="Select the license">
+          <mat-option *ngFor="let license of licenses" [value]="license">{{license}}</mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-error class="mat-caption mat-error-text" *ngIf="showValidationMsg('license','required')">
+        License is mandatory
+      </mat-error>
+    </div>
+
+    <div class="flex flex-column gap-1">
+      <span class="form-lable required">Keywords</span>
+      <div class="keywords-box flex items-center flex-wrap gap-2 px-3 py-2">
+        <span class="keyword-chip flex items-center gap-1" *ngFor="let keyword of keywords">
+          {{keyword}}
+          <button type="button" class="keyword-remove flex items-center" *ngIf="openMode !== 'view'"
+            [attr.aria-label]="'Remove ' + keyword" (click)="removeKeyword(keyword)">
+            <mat-icon>cancel</mat-icon>
+          </button>
+        </span>
+        <input class="keyword-input flex-grow" type="text" placeholder="Search Keywords"
+          [maxlength]="keywordMaxLength" [disabled]="openMode === 'view'" #keywordInput
+          (keydown.enter)="addKeyword(keywordInput, $event)" (blur)="addKeyword(keywordInput)">
+      </div>
+      <mat-error class="mat-caption mat-error-text" *ngIf="showValidationMsg('keywords','required')">
+        Add at least one keyword
+      </mat-error>
+    </div>
   </div>
 
   <div class="flex flex-column gap-2 rich-text-field">
@@ -89,9 +141,6 @@
       (ready)="onEditorReady($event)" (focus)="onEditorFocus()"></ckeditor>
     <mat-error class="mat-caption mat-error-text" *ngIf="showValidationMsg('description','required')">
       Description is mandatory
-    </mat-error>
-    <mat-error class="mat-caption mat-error-text" *ngIf="showValidationMsg('description','minlength')">
-      Minimum characters left to create {{ descriptionMinLength - descriptionLength }}
     </mat-error>
     <mat-error class="mat-caption mat-error-text" *ngIf="showValidationMsg('description','maxlength')">
       Maximum {{descriptionMaxLength}} characters are allowed
