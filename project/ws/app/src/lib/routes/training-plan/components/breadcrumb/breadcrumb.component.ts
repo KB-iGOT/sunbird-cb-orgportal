@@ -66,13 +66,17 @@ export class BreadcrumbComponent implements OnInit {
       //   this.changeToNextTab.emit(TrainingPlanContent.TTabLabelKey.ADD_TIMELINE)
       //   break
       case TrainingPlanContent.TTabLabelKey.ADD_ACCESS_SETTINGS:
-        this.changeToNextTab.emit(TrainingPlanContent.TTabLabelKey.ADD_TIMELINE)
+        this.leaveAccessSettings()
         break
       case TrainingPlanContent.TTabLabelKey.ADD_TIMELINE:
         this.createPlanDraftView()
         break
     }
 
+  }
+
+  private leaveAccessSettings() {
+    this.tpdsSvc.saveAccessControlAndContinue.next()
   }
 
   changeTabFromBreadCrumb(_item: string) {
@@ -207,34 +211,14 @@ export class BreadcrumbComponent implements OnInit {
   }
 
   generateRequestPayload(trainingPlanStepperData: any, type: string): any {
-    // let orgScope = "Single" // Default value
-    const userGroups = trainingPlanStepperData.accessControl?.userGroups || []
-
-    // let hasMultipleCriteriaValues = false
-    // let hasRootOrgId = false
-    let userRootOrgId = this.configSvc?.userProfile?.rootOrgId || this.configSvc?.unMappedUser?.rootOrgId || ''
-    let isCCA = this.configSvc?.orgReadData?.isCCA || false
-    for (const group of userGroups) {
-      const criteriaList = group.userGroupCriteriaList || []
-      // Check if an organisation criteria exists. A L0 MDO covering its whole ministry / state
-      // stores it as ministryOrStateId, that is already an organisation scope
-      let rootOrgIdCriteria = criteriaList.find((criteria: any) =>
-        criteria.criteriaKey === "rootOrgId" || criteria.criteriaKey === "ministryOrStateId")
-
-      if (!rootOrgIdCriteria && !isCCA) {
-        // If rootOrgId criteria doesn't exist, add it
-        criteriaList.push({
-          criteriaKey: "rootOrgId",
-          criteriaValue: [userRootOrgId]
-        })
-      }
-
-      // Check for multiple criteria values
-      // for (const criteria of criteriaList) {
-      //   if (criteria.criteriaValue && criteria.criteriaValue.length > 1) {
-      //     // hasMultipleCriteriaValues = true
-      //   }
-      // }
+    const userRootOrgId = this.configSvc?.userProfile?.rootOrgId || this.configSvc?.unMappedUser?.rootOrgId || ''
+    // The plan is saved against the id of each of its user groups, the conditions live on the
+    // groups themselves. Only ids the server issued, never one the access control step minted
+    const accessControl = {
+      userGroups: (trainingPlanStepperData?.accessControl?.userGroups || [])
+        .filter((group: any) => !!group?.userGroupId)
+        .map((group: any) => ({ userGroupId: group.userGroupId })),
+      version: trainingPlanStepperData?.accessControl?.version || 1,
     }
 
     // Set orgScope based on conditions
@@ -250,12 +234,7 @@ export class BreadcrumbComponent implements OnInit {
           comment: trainingPlanStepperData?.comment ?? 'cbPlanId1 is created',
           contentList: this.tpdsSvc.buildContentListPayload(trainingPlanStepperData?.contentList),
           contentType: trainingPlanStepperData?.contentType || "Course",
-          contextData: {
-            accessControl: {
-              userGroups: userGroups,
-              version: trainingPlanStepperData?.accessControl?.version || 1
-            }
-          },
+          contextData: { accessControl },
           endDate: trainingPlanStepperData?.endDate,
           isApar: trainingPlanStepperData?.isApar,
           name: trainingPlanStepperData?.name,
@@ -271,12 +250,7 @@ export class BreadcrumbComponent implements OnInit {
           orgIdList: [userRootOrgId],
           contentList: this.tpdsSvc.buildContentListPayload(trainingPlanStepperData?.contentList),
           contentType: trainingPlanStepperData?.contentType || "Course",
-          contextData: {
-            accessControl: {
-              userGroups: userGroups,
-              version: trainingPlanStepperData?.accessControl?.version || 1
-            }
-          },
+          contextData: { accessControl },
           endDate: trainingPlanStepperData?.endDate,
           isApar: trainingPlanStepperData?.isApar,
           name: trainingPlanStepperData?.name,
@@ -375,7 +349,7 @@ export class BreadcrumbComponent implements OnInit {
 
   checkIfValid() {
     if (this.tpdsSvc.getContentList().length === 0 ||
-      !this.tpdsSvc.trainingPlanStepperData.accessControl ||
+      !this.tpdsSvc.getAccessControlUserGroupIds().length ||
       !this.tpdsSvc.trainingPlanStepperData.endDate
     ) {
       return true

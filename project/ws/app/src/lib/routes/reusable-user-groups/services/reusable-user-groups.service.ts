@@ -7,6 +7,7 @@ import {
   IUserGroupReadResponse,
   IUserGroupSearchRequest,
   IUserGroupSearchResponse,
+  IUserGroupUpdateRequest,
   IUserSearchCountResponse,
 } from '../interface/reusable-user-groups.interface'
 
@@ -14,6 +15,7 @@ const API_ENDPOINTS = {
   SEARCH: '/apis/proxies/v8/usergroup/v1/search',
   READ: '/apis/proxies/v8/usergroup/v1/read',
   CREATE: '/apis/proxies/v8/usergroup/v1/create',
+  UPDATE: '/apis/proxies/v8/usergroup/v1/update',
   USER_SEARCH: '/apis/proxies/v8/user/v1/search',
 }
 
@@ -31,6 +33,11 @@ export class ReusableUserGroupsService {
 
   createUserGroup(request: IUserGroupCreateRequest): Observable<IUserGroupCreateResponse> {
     return this.http.post<IUserGroupCreateResponse>(API_ENDPOINTS.CREATE, { request })
+  }
+
+  /** The update api is a PATCH, the same verb the access control step uses. */
+  updateUserGroup(request: IUserGroupUpdateRequest): Observable<IUserGroupCreateResponse> {
+    return this.http.patch<IUserGroupCreateResponse>(API_ENDPOINTS.UPDATE, { request })
   }
 
   fetchUserCount(filters: Record<string, any>): Observable<IUserSearchCountResponse> {

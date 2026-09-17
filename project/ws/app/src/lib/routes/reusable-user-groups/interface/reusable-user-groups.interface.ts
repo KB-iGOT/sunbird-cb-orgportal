@@ -89,6 +89,11 @@ export interface IUserGroupCreateRequest {
   criteria: IUserGroupCriteria[]
 }
 
+/** Same body as a create, with the id of the group being rewritten. */
+export interface IUserGroupUpdateRequest extends IUserGroupCreateRequest {
+  userGroupId: string
+}
+
 export interface IUserGroupCreateResponse {
   responseCode?: string
   result?: IUserGroupReadResult
