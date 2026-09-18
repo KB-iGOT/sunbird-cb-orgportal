@@ -9,57 +9,27 @@
   }
 }
 
-.linked-plan-row {
+// Both cards carry the same box, the same plate and the same two lines, so the plan and the
+// name read as one pair and line up with the full width fields under them. The plan used to
+// sit behind a bare icon and the name behind a 48px thumbnail, so their titles started a
+// plate's width apart, and the plan's third line left the two cards ragged.
+.detail-card {
   @include ca-inset-row;
 
+  box-sizing: border-box;
   width: 100%;
-  max-width: 620px;
-  min-height: 64px;
+  min-height: 76px;
 
-  .plan-icon {
-    flex: 0 0 auto;
-    color: $ca-text-muted;
-  }
-
-  .linked-plan-text {
+  .detail-card-text {
     flex: 1 1 auto;
     min-width: 0;
   }
 
-  .plan-name {
-    font: $ca-font-title;
-    color: $ca-text;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  .plan-meta,
-  .plan-placeholder {
-    font: $ca-font-meta;
-    color: $ca-text-muted;
-  }
-
-  .choose-plan {
-    @include ca-button-secondary;
-
+  // One plate for the plan's icon and for the assessment's thumbnail, so each card's title
+  // starts at the same x whatever is sitting in it.
+  .card-plate {
     flex: 0 0 auto;
-  }
-}
-
-.plan-derived {
-  font: $ca-font-meta;
-  color: $ca-text-muted;
-}
-
-.basic-info-row {
-  @include ca-inset-row;
-
-  width: 460px;
-  min-height: 72px;
-
-  .app-icon-thumb {
-    flex: 0 0 auto;
+    box-sizing: border-box;
     height: 48px;
     width: 48px;
     overflow: hidden;
@@ -73,42 +43,80 @@
       object-fit: cover;
     }
 
-    .app-icon-placeholder {
+    .plate-icon {
       color: $ca-text-muted;
-      font-size: 24px;
-      height: 24px;
-      width: 24px;
     }
   }
 
-  .basic-info-text {
-    flex: 1 1 auto;
-    min-width: 0;
-  }
-
-  .assessment-name-value {
+  .card-title {
     font: $ca-font-title;
     color: $ca-text;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+
+    &.placeholder {
+      color: $ca-text-muted;
+      font: $ca-font-body;
+    }
   }
 
-  .assessment-name-placeholder {
+  // The sentence and the chip share the second line, so the card stays two lines tall
+  // whatever the plan carries: the sentence gives way to an ellipsis, the chip does not.
+  .card-meta-row {
+    min-width: 0;
+  }
+
+  .card-meta {
     font: $ca-font-meta;
     color: $ca-text-muted;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
-  /* The one accent inside a row: it is the control the user clicks. */
-  .edit-basic-info {
+  // The same chip as the keywords below, so the gating rule reads as a fact carried by the
+  // plan rather than a third line of prose.
+  .card-chip {
     flex: 0 0 auto;
-    color: $ca-primary;
-    pointer-events: all;
+    border-radius: $ca-radius-pill;
+    background-color: $ca-surface-selected;
+    color: $ca-text-muted;
+    font: $ca-font-meta;
+    padding: 2px 10px 2px 8px;
+    white-space: nowrap;
+
+    .mat-icon {
+      width: 14px;
+      height: 14px;
+      font-size: 14px;
+      line-height: 14px;
+    }
+  }
+
+  .card-action {
+    @include ca-button-secondary;
+
+    flex: 0 0 auto;
   }
 }
 
+/* A validation message, and the flow's only red text. These sit outside their
+   mat-form-field - the control keeps its own box - so they carry none of the
+   subscript styling and state all of it here. The theme bundle colours every
+   caption from `.theme-igot.day-mode .mat-caption`, which outranks a
+   component-scoped class, so the class is not used on them: the message would
+   render in body text and read as a hint rather than an error. */
 .mat-error-text {
+  display: block;
   color: $ca-error;
+  font: $ca-font-meta;
+
+  /* mat-error carries `mat-mdc-form-field-bottom-align`, whose ::before reserves
+     a 16px line meant for the subscript row of a form field it is not inside. */
+  &::before {
+    content: none;
+  }
 }
 
 .form-lable {
@@ -138,10 +146,6 @@
 
   ::ng-deep .ck.ck-powered-by {
     display: none !important;
-  }
-
-  .mat-error-text {
-    color: $ca-error;
   }
 }
 
@@ -204,4 +208,54 @@
   width: 20px;
   height: 20px;
   font-size: 20px;
+}
+
+.classification {
+  .field-hint {
+    font: $ca-font-meta;
+    color: $ca-text-muted;
+  }
+}
+
+.keywords-box {
+  @include ca-inset-row;
+
+  background-color: transparent;
+  min-height: 48px;
+
+  .keyword-chip {
+    border-radius: $ca-radius-pill;
+    background-color: $ca-surface-selected;
+    color: $ca-text;
+    font: $ca-font-meta;
+    padding: 4px 8px 4px 12px;
+  }
+
+  .keyword-remove {
+    border: 0;
+    background: transparent;
+    padding: 0;
+    cursor: pointer;
+    color: $ca-text-muted;
+
+    .mat-icon {
+      width: 16px;
+      height: 16px;
+      font-size: 16px;
+      line-height: 16px;
+    }
+  }
+
+  .keyword-input {
+    border: 0;
+    outline: 0;
+    min-width: 160px;
+    font: $ca-font-body;
+    color: $ca-text;
+    background: transparent;
+
+    &::placeholder {
+      color: $ca-text-muted;
+    }
+  }
 }

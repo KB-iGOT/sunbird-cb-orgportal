@@ -1055,6 +1055,7 @@ export class UserCardComponent implements OnInit, OnChanges, AfterViewChecked, A
   // for approval & rejection
   onClickHandleWorkflow(field: any, action: string) {
 
+    const previousAction = field.action
     field.action = action
     const req = {
       action,
@@ -1096,7 +1097,9 @@ export class UserCardComponent implements OnInit, OnChanges, AfterViewChecked, A
             this.actionList.push(req)
           }
         } else {
-          dialogRef.close()
+          // Cancelled: clear the selection so 'Reject' can be picked again
+          field.action = previousAction
+          this.clearApprovalSelection(field)
         }
       })
     }
@@ -1206,6 +1209,14 @@ export class UserCardComponent implements OnInit, OnChanges, AfterViewChecked, A
       }
     })
 
+  }
+
+  clearApprovalSelection(field: any) {
+    const controlName = field.label === 'Group' ? 'approveGroup' : 'approveDesignation'
+    const control = this.approveUserDataForm.get(controlName)
+    if (control) {
+      control.setValue('')
+    }
   }
 
   validateText(text: any) {

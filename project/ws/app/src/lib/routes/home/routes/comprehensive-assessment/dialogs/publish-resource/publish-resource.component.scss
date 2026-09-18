@@ -1,0 +1,153 @@
+@import 'ws-vars';
+@import '../../assessment-theme';
+
+.publish-resource {
+  padding: 24px;
+
+  .dialog-head {
+    margin-bottom: 16px;
+  }
+
+  .dialog-title {
+    font: $ca-font-section;
+    color: $ca-text;
+    margin: 0;
+  }
+
+  .refresh-button {
+    @include ca-button-secondary;
+
+    gap: 6px;
+
+    .mat-icon {
+      width: 18px;
+      height: 18px;
+      font-size: 18px;
+      line-height: 18px;
+    }
+  }
+
+  .note {
+    border-radius: $ca-radius-control;
+    background-color: $ca-surface;
+    color: $ca-text-muted;
+    font: $ca-font-body;
+    padding: 12px 16px;
+    margin-bottom: 16px;
+  }
+
+  .note-label,
+  .note-strong {
+    color: $ca-primary;
+    font-weight: 700;
+  }
+
+  .resource-table {
+    border: 1px solid $ca-border;
+    border-radius: $ca-radius-control;
+    overflow: hidden;
+  }
+
+  .table-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+
+    & + .table-row {
+      border-top: 1px solid $ca-border;
+    }
+
+    &.empty {
+      justify-content: center;
+      color: $ca-text-muted;
+      font: $ca-font-meta;
+    }
+  }
+
+  .table-head {
+    background-color: $ca-surface;
+    color: $ca-text;
+    font: $ca-font-title;
+  }
+
+  .col-name {
+    flex: 1 1 auto;
+    min-width: 0;
+    font: $ca-font-body;
+    color: $ca-text;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .table-head .col-name,
+  .table-head .col-status {
+    font: $ca-font-title;
+  }
+
+  .col-status {
+    flex: 0 0 140px;
+  }
+
+  .status-chip {
+    display: inline-block;
+    border-radius: $ca-radius-pill;
+    font: $ca-font-meta;
+    padding: 2px 12px;
+
+    &.status-live {
+      background-color: $ca-status-live-surface;
+      color: $ca-status-live-text;
+    }
+
+    &.status-draft {
+      background-color: $ca-status-draft-surface;
+      color: $ca-status-draft-text;
+    }
+  }
+
+  .plan-table {
+    margin-top: 16px;
+  }
+
+  /* Sits where the plan's own status is, so what is wrong and what to do are read together. */
+  .change-plan-button {
+    @include ca-button-secondary;
+
+    flex: 0 0 auto;
+    min-width: 88px;
+    height: 28px;
+  }
+
+  .stage-message {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font: $ca-font-meta;
+    color: $ca-text-muted;
+    margin-top: 16px;
+
+    &.error-message {
+      color: $ca-error;
+    }
+
+    .countdown {
+      color: $ca-text;
+      font-weight: 700;
+    }
+  }
+
+  .action-btns {
+    margin-top: 24px;
+  }
+
+  .cancel-button {
+    @include ca-button-secondary;
+  }
+
+  .action-button {
+    @include ca-button-primary;
+  }
+}

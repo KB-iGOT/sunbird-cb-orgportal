@@ -9,6 +9,7 @@ import { comprehensiveAssessmentList } from '../../models/comprehensive-assessme
 import { ComprehensiveAssessmentService } from '../../services/comprehensive-assessment.service'
 import { LoaderService } from '../../../../../../../../../../../src/app/services/loader.service'
 import { ConfirmDialogComponent } from '../../../../../workallocation-v2/components/confirm-dialog/confirm-dialog.component'
+import { PublishResourceComponent } from '../../dialogs/publish-resource/publish-resource.component'
 
 const TAB_LIVE = 'live'
 const TAB_DRAFT = 'draft'
@@ -81,15 +82,15 @@ export class AssessmentsListComponent implements OnInit, OnDestroy {
     }
 
     /**
-     * The linked plan and the three values derived from it. The assessment owns none of
+     * The linked plan and the two values derived from it. The assessment owns none of
      * them — they are read back off the plan metadata written when the plan was linked —
      * but the dashboard is where an admin tells two assessments of the same name apart.
+     * Status is not among them: the tab the row is listed on is its status.
      */
     const planColumns: comprehensiveAssessmentList.columnData[] = [
       { displayName: 'Linked APAR Plan', key: 'planName', cellType: 'text', cellClass: 'text-overflow-elipse' },
       { displayName: 'Reporting Year', key: 'reportingYear', cellType: 'text' },
       { displayName: 'Assessment Window', key: 'assessmentWindow', cellType: 'text' },
-      { displayName: 'Status', key: 'status', cellType: 'status' },
     ]
 
     if (this.pathUrl === TAB_DRAFT) {
@@ -98,9 +99,7 @@ export class AssessmentsListComponent implements OnInit, OnDestroy {
           nameColumn,
           ...planColumns,
           { displayName: 'Created By', key: 'creator', cellType: 'text' },
-          { displayName: 'Duration', key: 'durationDisplay', cellType: 'text' },
           { displayName: 'Created On', key: 'createdOn', cellType: 'date' },
-          { displayName: 'Last Updated On', key: 'lastUpdatedOn', cellType: 'date' },
         ],
         showSearchBox: true,
         showPagination: true,
@@ -120,7 +119,6 @@ export class AssessmentsListComponent implements OnInit, OnDestroy {
         nameColumn,
         ...planColumns,
         { displayName: 'Created By', key: 'creator', cellType: 'text' },
-        { displayName: 'Duration', key: 'durationDisplay', cellType: 'text' },
         { displayName: 'Published On', key: 'lastPublishedOn', cellType: 'date' },
       ],
       showSearchBox: true,
@@ -186,10 +184,7 @@ export class AssessmentsListComponent implements OnInit, OnDestroy {
         this.navigateToAssessment(rowData, 'edit')
         break
       case 'publish':
-        this.confirmAndRun(
-          'Are you sure you want to publish this assessment?',
-          () => this.publishAssessment(rowData)
-        )
+        this.publishAssessment(rowData)
         break
       case 'delete':
         this.confirmAndRun(
@@ -231,26 +226,50 @@ export class AssessmentsListComponent implements OnInit, OnDestroy {
     })
   }
 
+  /**
+   * Publishing is two publishes - the question set the assessment holds goes Live first,
+   * and only then the assessment itself. The dialog walks both of them, and it lists what
+   * it is about to publish, so the hierarchy is read for the children the row does not
+   * carry: the listing is served by a search, which only answers the fields it projects.
+   */
   publishAssessment(rowData: any) {
     if (!this.assessmentSvc.isWindowOpen(_.get(rowData, comprehensiveAssessmentList.WINDOW_END_KEY))) {
       this.openSnackBar(comprehensiveAssessmentList.WINDOW_CLOSED_MESSAGE)
       return
     }
     this.loaderService.changeLoaderState(true)
-    this.assessmentSvc.publishAssessment(
-      _.get(rowData, 'identifier', ''),
-      _.get(this.userProfile, 'userId', '')
-    ).subscribe({
-      next: () => {
+    this.assessmentSvc.getContentHierarchy(_.get(rowData, 'identifier', '')).subscribe({
+      next: (res: any) => {
         this.loaderService.changeLoaderState(false)
-        this.openSnackBar('Assessment published successfully')
-        // publishing moves the row out of the Draft tab, so the current list is reloaded
-        this.getAssessments()
+        this.openPublishDialog(_.get(res, 'result.content', rowData))
       },
       error: (error: HttpErrorResponse) => {
         this.loaderService.changeLoaderState(false)
         this.openSnackBar(_.get(error, 'error.message', 'Unable to publish the assessment, please try again'))
       },
+    })
+  }
+
+  private openPublishDialog(collection: any) {
+    const dialogRef = this.dialog.open(PublishResourceComponent, {
+      width: '600px',
+      height: 'auto',
+      autoFocus: false,
+      disableClose: true,
+      panelClass: 'publish-resource-dialog',
+      data: { collection, userProfile: this.userProfile },
+    })
+    dialogRef.afterClosed().subscribe((published: boolean) => {
+      if (published) {
+        this.openSnackBar('Assessment published successfully')
+        // the assessment has left this tab for the Live one, and the platform is still
+        // finishing the publish - so the Live tab is opened once it has had its seconds
+        this.loaderService.changeLoaderState(true)
+        setTimeout(() => {
+          this.loaderService.changeLoaderState(false)
+          this.router.navigate(['/app/home/comprehensive-assessment', TAB_LIVE])
+        },         comprehensiveAssessmentList.PUBLISH_SETTLE_MS)
+      }
     })
   }
 

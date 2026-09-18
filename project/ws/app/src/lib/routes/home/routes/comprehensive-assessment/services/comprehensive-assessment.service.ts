@@ -7,7 +7,8 @@ import * as _ from 'lodash'
 import { environment } from '../../../../../../../../../../src/environments/environment'
 import {
   COLLECTION_MIME_TYPE, CONTENT_COURSE_CATEGORY, CONTENT_PRIMARY_CATEGORY, DEFAULT_ACCESS_SETTING,
-  DEFAULT_FRAMEWORK, DEFAULT_LICENSE, QUESTIONSET_MIME_TYPE, aparPlan, comprehensiveAssessmentList,
+  DEFAULT_FRAMEWORK, DEFAULT_LICENSE, QUESTIONSET_MIME_TYPE, aparPlan, comprehensiveAssessment,
+  comprehensiveAssessmentList,
 } from '../models/comprehensive-assessment.model'
 
 const API_END_POINTS = {
@@ -17,13 +18,22 @@ const API_END_POINTS = {
   UPDATE_CONTENT: (contentId: string) => `apis/proxies/v8/action/content/v3/update/${contentId}`,
   CONTENT_HIERARCHY_UPDATE: 'apis/proxies/v8/action/content/v3/hierarchy/update',
   QUESTIONSET_HIERARCHY_EDIT: (questionSetId: string) => `apis/proxies/v8/questionset/v1/hierarchy/${questionSetId}?mode=edit`,
+  // no `mode=edit`: the published copy, the only one that can answer whether it is Live
+  QUESTIONSET_READ: (questionSetId: string) => `apis/proxies/v8/questionset/v1/read/${questionSetId}`,
+  PUBLISH_QUESTIONSET: (questionSetId: string) => `apis/proxies/v8/ca/questionset/v1/publish/${questionSetId}`,
   CONTENT_SEARCH: 'apis/proxies/v8/sunbirdigot/v4/search',
-  PUBLISH_CONTENT: (contentId: string) => `apis/proxies/v8/action/content/v3/publish/${contentId}`,
+  PUBLISH_ASSESSMENT: (contentId: string) => `apis/proxies/v8/action/ca/v1/publish/${contentId}`,
   RETIRE_CONTENT: (contentId: string) => `apis/proxies/v8/action/content/v3/retire/${contentId}`,
-  APAR_PLAN_SEARCH: 'apis/proxies/v8/cbplan/v3/search',
+  APAR_PLAN_SEARCH: 'apis/proxies/v8/cbplan/v4/search',
+  APAR_PLAN_UPDATE: 'apis/proxies/v8/cbplan/v4/update',
 }
 
 const STORAGE_URL_TO_REPLACE = 'https://storage.googleapis.com/igot'
+/**
+ * The org the publish is made for. The `ca` routes answer against it rather than reading it
+ * off the session, so every call of the publish flow carries the user's root org in it.
+ */
+const ORG_ID_HEADER = 'x-authenticated-user-orgid'
 
 @Injectable()
 export class ComprehensiveAssessmentService {
@@ -122,11 +132,16 @@ export class ComprehensiveAssessmentService {
     )
   }
 
-  /** Moves a draft collection to Live. */
-  publishAssessment(contentId: string, userId: string): Observable<any> {
-    return this.http.post<any>(API_END_POINTS.PUBLISH_CONTENT(contentId), {
-      request: { content: { lastPublishedBy: userId } },
-    })
+  /**
+   * Moves a draft collection to Live. The second of the two publishes: the question set it
+   * holds has to be Live first, see `publishQuestionSet`.
+   */
+  publishAssessment(contentId: string, userId: string, rootOrgId: string): Observable<any> {
+    return this.http.post<any>(
+      API_END_POINTS.PUBLISH_ASSESSMENT(contentId),
+      { request: { content: { lastPublishedBy: userId } } },
+      this.orgHeader(rootOrgId)
+    )
   }
 
   /** Retire is the delete the content api offers, the row leaves every status tab. */
@@ -137,6 +152,30 @@ export class ComprehensiveAssessmentService {
   //#endregion
 
   //#region (question set apis)
+
+  /** The first of the two publishes: the question set the assessment holds goes Live. */
+  publishQuestionSet(questionSetId: string, rootOrgId: string): Observable<any> {
+    return this.http.post<any>(
+      API_END_POINTS.PUBLISH_QUESTIONSET(questionSetId),
+      { request: { questionset: {} } },
+      this.orgHeader(rootOrgId)
+    )
+  }
+
+  /**
+   * The status of the published question set. The draft read answers `Draft` however far
+   * along the publish is, so the live copy is the only one worth asking. It does not exist
+   * until the publish finishes, so a read that fails is reported as `not Live yet` rather
+   * than as an error - the caller offers the publish again, it never blocks on this.
+   */
+  getQuestionSetStatus(questionSetId: string, rootOrgId: string): Observable<string> {
+    return this.http.get<any>(API_END_POINTS.QUESTIONSET_READ(questionSetId), this.orgHeader(rootOrgId)).pipe(
+      // the read answers under `questionset`, the hierarchy under `questionSet`
+      map((res: any) => _.get(res, 'result.questionset.status', '') ||
+        _.get(res, 'result.questionSet.status', '')),
+      catchError(() => of(''))
+    )
+  }
 
   getQuestionSetHierarchy(questionSetId: string): Observable<any> {
     return this.http.get<any>(API_END_POINTS.QUESTIONSET_HIERARCHY_EDIT(questionSetId)).pipe(
@@ -149,34 +188,31 @@ export class ComprehensiveAssessmentService {
   //#region (apar plan apis)
 
   /**
-   * Live APAR plans of the org, one page at a time. `isApar` is not a filter the search
-   * accepts, so plans with APAR assignment off are dropped here instead: the count stays the
-   * one the api reports, a page can therefore render fewer rows than the paginator counts.
+   * Live APAR plans of the org, one page at a time. The v4 search is asked in the query
+   * language it takes, and it is the search that leaves out a plan another assessment
+   * already holds - `applyOrgIdFilter` scopes it to the caller's org, so no org id is named.
+   *
+   * `isApar` is not part of the query, so plans with APAR assignment off are dropped here
+   * instead: the count stays the one the api reports, a page can therefore render fewer
+   * rows than the paginator counts.
    *
    * Only an explicit `false` drops a plan. A row carrying no `isApar` at all is a field the
    * search did not project, not a plan with the toggle off, and dropping those would empty
    * the picker against an api that is otherwise answering correctly.
    */
   searchAparPlans(params: {
-    rootOrgId: string,
     planYear: string,
     searchString: string,
     pageIndex: number,
     pageSize: number
   }): Observable<{ plans: aparPlan.IPlanRow[], count: number }> {
-    const filter: any = {
-      status: [comprehensiveAssessmentList.STATUS_LIVE],
-      orgIdList: [params.rootOrgId],
-        "isApar": true
-    }
+    const must: any[] = [{ term: { 'status.keyword': comprehensiveAssessmentList.STATUS_LIVE } }]
     if (params.planYear && params.planYear !== aparPlan.ALL_YEARS) {
-      filter.planYear = params.planYear
+      must.push({ term: { 'planYear.keyword': params.planYear } })
     }
 
     const request: any = {
-      filter,
-      pageNumber: params.pageIndex,
-      pageSize: params.pageSize,
+      ...this.buildPlanSearchRequest(must, params.pageIndex, params.pageSize),
       searchString: params.searchString || '',
     }
     // the api orders by relevance while a search is on, the browsed list by newest first
@@ -185,7 +221,7 @@ export class ComprehensiveAssessmentService {
       request.orderDirection = 'desc'
     }
 
-    return this.http.post<any>(API_END_POINTS.APAR_PLAN_SEARCH, request).pipe(
+    return this.http.post<any>(API_END_POINTS.APAR_PLAN_SEARCH, { request }).pipe(
       map((res: any) => ({
         plans: _.map(
           _.filter(_.get(res, 'result.result.data', []), (plan: any) => _.get(plan, 'isApar') !== false),
@@ -194,6 +230,75 @@ export class ComprehensiveAssessmentService {
         count: _.get(res, 'result.result.totalCount', 0),
       }))
     )
+  }
+
+  /**
+   * A v4 plan search, in the query language it takes. Every search of the flow asks for the
+   * plans no assessment holds yet - `caLinkedId` is what an assessment writes onto the plan
+   * it takes - and is scoped to the caller's org by the api rather than by a named org id.
+   */
+  private buildPlanSearchRequest(must: any[], pageNumber: number, pageSize: number): any {
+    return {
+      query: {
+        bool: {
+          must,
+          // a plan an assessment already holds is not offered for a second one
+          must_not: [{ exists: { field: aparPlan.LINKED_ASSESSMENT_FIELD } }],
+        },
+      },
+      pageNumber,
+      pageSize,
+      applyOrgIdFilter: true,
+    }
+  }
+
+  /**
+   * Whether the plan the assessment holds can still be published against: the same search
+   * the picker is filled from, narrowed to the one plan. It answers with the plan while the
+   * plan is Live and free, and with nothing once another assessment has taken it - which is
+   * the case the publish has to stop, since the picker only guards the moment of linking.
+   */
+  isPlanAvailable(planId: string): Observable<boolean> {
+    if (!planId) {
+      return of(false)
+    }
+    const request = this.buildPlanSearchRequest(
+      [
+        { term: { 'status.keyword': comprehensiveAssessmentList.STATUS_LIVE } },
+        { term: { 'id.keyword': planId } },
+      ],
+      0,
+      aparPlan.PAGE_SIZE
+    )
+
+    return this.http.post<any>(API_END_POINTS.APAR_PLAN_SEARCH, { request }).pipe(
+      map((res: any) => !!_.get(res, 'result.result.data', []).length)
+    )
+  }
+
+  /**
+   * Writes the linked plan onto the assessment on its own. The publish dialog changes the
+   * plan without the builder's form behind it, so only the linkage and the version key are
+   * sent - the rest of the content is not the dialog's to know, let alone to overwrite.
+   */
+  updateLinkedPlan(contentId: string, versionKey: string, plan: aparPlan.ILinkedPlan): Observable<any> {
+    return this.updateContent(contentId, {
+      versionKey,
+      ...this.buildPlanMetadata(plan),
+    })
+  }
+
+  /**
+   * The other half of the linkage, written once the assessment is Live: the plan is told
+   * which assessment holds it, and every search of the flow leaves it out from then on.
+   */
+  linkPlanToAssessment(planId: string, contentId: string): Observable<any> {
+    return this.http.post<any>(API_END_POINTS.APAR_PLAN_UPDATE, {
+      request: {
+        id: planId,
+        [aparPlan.LINKED_ASSESSMENT_FIELD]: contentId,
+      },
+    })
   }
 
   /**
@@ -272,10 +377,18 @@ export class ComprehensiveAssessmentService {
     }
   }
 
-  /** The plan and the courses it gates, each carrying the flag the unlock is read off. */
+  /**
+   * The plan and the courses it gates, each carrying the flag the unlock is read off. The
+   * plan's own values travel with it: nothing else on the assessment holds them any more,
+   * and neither the reopened builder nor the dashboard can join back to the plan for them.
+   */
   private buildTrainingPlanLink(plan: aparPlan.ILinkedPlan | null): aparPlan.ITrainingPlanLink {
     return {
       identifier: _.get(plan, 'id', ''),
+      name: _.get(plan, 'name', ''),
+      planYear: _.get(plan, 'planYear', ''),
+      endDate: _.get(plan, 'endDate', ''),
+      orgName: _.get(plan, 'orgName', ''),
       contentList: this.readContentList(plan),
     }
   }
@@ -295,10 +408,12 @@ export class ComprehensiveAssessmentService {
     return {
       id,
       contentList,
-      name: _.get(content, aparPlan.METADATA.planName, ''),
-      planYear: _.get(content, aparPlan.METADATA.reportingYear, ''),
-      endDate: _.get(content, aparPlan.METADATA.windowEndDate, ''),
-      orgName: _.get(content, aparPlan.METADATA.owningOrg, ''),
+      // the linkage answers for the plan, the flat copies only for an assessment saved
+      // while they were still written
+      name: _.get(link, 'name', '') || _.get(content, aparPlan.METADATA.planName, ''),
+      planYear: _.get(link, 'planYear', '') || _.get(content, aparPlan.METADATA.reportingYear, ''),
+      endDate: _.get(link, 'endDate', '') || _.get(content, aparPlan.METADATA.windowEndDate, ''),
+      orgName: _.get(link, 'orgName', '') || _.get(content, aparPlan.METADATA.owningOrg, ''),
       // the course list is what says how many are gating, the stored count is only what an
       // assessment linked before the list was written onto it still has to answer from
       gatingCourseCount: contentList.length
@@ -333,6 +448,7 @@ export class ComprehensiveAssessmentService {
 
   /** Shapes a search hit into the flat, display ready row the listing table renders. */
   private toListRow(row: any): any {
+    const plan = this.readPlanMetadata(row)
     return {
       ...row,
       createdOn: this.toDisplayDate(_.get(row, 'createdOn')),
@@ -341,10 +457,12 @@ export class ComprehensiveAssessmentService {
       creator: _.get(row, 'creator', '') || '-',
       durationDisplay: this.toDisplayDuration(Number(_.get(row, 'duration', 0)) || 0),
       // The plan and everything derived from it are read off the assessment rather than
-      // fetched again, they are written onto it when the plan is linked
-      planName: _.get(row, aparPlan.METADATA.planName, '') || '-',
-      reportingYear: _.get(row, aparPlan.METADATA.reportingYear, '') || '-',
-      assessmentWindow: this.toDisplayDate(_.get(row, aparPlan.METADATA.windowEndDate)) || '-',
+      // fetched again, they travel with the linkage written onto it
+      planName: _.get(plan, 'name', '') || '-',
+      reportingYear: _.get(plan, 'planYear', '') || '-',
+      assessmentWindow: this.toDisplayDate(_.get(plan, 'endDate', '')) || '-',
+      // the publish guard reads the window off the row rather than going back to the plan
+      [comprehensiveAssessmentList.WINDOW_END_KEY]: _.get(plan, 'endDate', ''),
     }
   }
 
@@ -467,6 +585,28 @@ export class ComprehensiveAssessmentService {
     const children = _.get(collection, 'children', [])
     const questionSet = _.find(children, (child: any) => _.get(child, 'mimeType', '') === QUESTIONSET_MIME_TYPE)
     return _.get(questionSet, 'identifier', '')
+  }
+
+  /**
+   * The resources the assessment holds, listed for the publish dialog. A comprehensive
+   * assessment carries the one question set built in step 2, but the collection is read for
+   * all of them so the dialog lists whatever is actually there.
+   */
+  getLinkedResources(collection: any): comprehensiveAssessment.ILinkedResource[] {
+    const questionSets = _.filter(
+      _.get(collection, 'children', []),
+      (child: any) => _.get(child, 'mimeType', '') === QUESTIONSET_MIME_TYPE
+    )
+    return _.map(questionSets, (child: any) => ({
+      identifier: _.get(child, 'identifier', ''),
+      name: _.get(child, 'name', ''),
+      status: _.get(child, 'status', ''),
+    }))
+  }
+
+  /** Nothing is sent for an org that is not known, rather than an empty header. */
+  private orgHeader(rootOrgId: string): { headers?: { [header: string]: string } } {
+    return rootOrgId ? { headers: { [ORG_ID_HEADER]: rootOrgId } } : {}
   }
 
   /** Sunbird expects a 16 digit numeric code on create. */

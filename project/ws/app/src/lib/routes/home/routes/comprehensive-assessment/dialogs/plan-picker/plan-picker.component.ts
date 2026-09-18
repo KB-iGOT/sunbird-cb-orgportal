@@ -87,7 +87,6 @@ export class PlanPickerComponent implements OnInit, OnDestroy {
     }
     this.showLoader = true
     this.planSubscription = this.assessmentSvc.searchAparPlans({
-      rootOrgId: this.rootOrgId,
       planYear: this.selectedYear,
       searchString: this.searchKey,
       pageIndex: this.pageIndex,

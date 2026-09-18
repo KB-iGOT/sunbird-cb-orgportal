@@ -57,6 +57,9 @@ describe('AssessmentBasicDetailsComponent', () => {
     assessmentName: new FormControl(values.assessmentName ?? '', [Validators.required]),
     description: new FormControl(values.description ?? ''),
     learningOutcome: new FormControl(values.learningOutcome ?? ''),
+    difficultyLevel: new FormControl(values.difficultyLevel ?? '', [Validators.required]),
+    license: new FormControl(values.license ?? 'CC BY 4.0', [Validators.required]),
+    keywords: new FormControl(values.keywords ?? [], [Validators.required]),
     appIcon: new FormControl(values.appIcon ?? ''),
   })
 
@@ -73,9 +76,14 @@ describe('AssessmentBasicDetailsComponent', () => {
   })
 
   it('should carry the lengths the counters and the errors are read off', () => {
-    expect(component.descriptionMinLength).toBe(comprehensiveAssessment.DESCRIPTION_MIN_LENGTH)
     expect(component.descriptionMaxLength).toBe(comprehensiveAssessment.DESCRIPTION_MAX_LENGTH)
     expect(component.learningOutcomeMaxLength).toBe(comprehensiveAssessment.LEARNING_OUTCOME_MAX_LENGTH)
+    expect(component.keywordMaxLength).toBe(comprehensiveAssessment.KEYWORD_MAX_LENGTH)
+  })
+
+  it('should offer the classification values the content platform takes', () => {
+    expect(component.knowledgeLevels).toEqual(['Beginner', 'Intermediate', 'Advanced'])
+    expect(component.licenses).toContain('CC BY 4.0')
   })
 
   describe('the editor config', () => {
@@ -127,6 +135,24 @@ describe('AssessmentBasicDetailsComponent', () => {
       component.assessmentDetails = form({ linkedPlan: { ...linkedPlan, endDate: '' } })
 
       expect(component.planWindowDisplay).toBe('')
+    })
+
+    it('should count the gating courses the plan carries', () => {
+      component.assessmentDetails = form({ linkedPlan })
+
+      expect(component.gatingDisplay).toBe('Unlocks after 2 gating courses')
+    })
+
+    it('should read a single gating course in the singular', () => {
+      component.assessmentDetails = form({ linkedPlan: { ...linkedPlan, gatingCourseCount: 1 } })
+
+      expect(component.gatingDisplay).toBe('Unlocks after 1 gating course')
+    })
+
+    it('should say a plan with no gating course is open rather than counting to zero', () => {
+      component.assessmentDetails = form({ linkedPlan: { ...linkedPlan, gatingCourseCount: 0 } })
+
+      expect(component.gatingDisplay).toBe('No gating courses')
     })
   })
 
@@ -267,6 +293,64 @@ describe('AssessmentBasicDetailsComponent', () => {
       component.assessmentDetails = form({ description: '<p>&nbsp;</p>' })
 
       expect(component.descriptionLength).toBe(0)
+    })
+  })
+
+  describe('keywords', () => {
+    const keywordInput = (value: string) => ({ value } as HTMLInputElement)
+
+    it('should add what was typed and clear the field for the next one', () => {
+      const input = keywordInput('NFCS')
+
+      component.addKeyword(input)
+
+      expect(component.keywords).toEqual(['NFCS'])
+      expect(input.value).toBe('')
+    })
+
+    it('should trim what was typed', () => {
+      component.addKeyword(keywordInput('  NFCS  '))
+
+      expect(component.keywords).toEqual(['NFCS'])
+    })
+
+    it('should add nothing for an empty field', () => {
+      component.addKeyword(keywordInput('   '))
+
+      expect(component.keywords).toEqual([])
+    })
+
+    /** The keyword is already there, which is what the author was after. */
+    it('should drop a repeat rather than list it twice', () => {
+      component.addKeyword(keywordInput('NFCS'))
+      component.addKeyword(keywordInput('NFCS'))
+
+      expect(component.keywords).toEqual(['NFCS'])
+    })
+
+    it('should keep Enter from submitting the form around it', () => {
+      const event = { preventDefault: jest.fn() } as any
+
+      component.addKeyword(keywordInput('NFCS'), event)
+
+      expect(event.preventDefault).toHaveBeenCalled()
+    })
+
+    it('should remove the keyword asked for and leave the rest', () => {
+      component.addKeyword(keywordInput('NFCS'))
+      component.addKeyword(keywordInput('APAR'))
+
+      component.removeKeyword('NFCS')
+
+      expect(component.keywords).toEqual(['APAR'])
+    })
+
+    /** The field is mandatory, so emptying it has to show as an error straight away. */
+    it('should mark the field touched so an empty list reports itself', () => {
+      component.addKeyword(keywordInput('NFCS'))
+      component.removeKeyword('NFCS')
+
+      expect(component.showValidationMsg('keywords', 'required')).toBe(true)
     })
   })
 

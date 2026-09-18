@@ -13,12 +13,14 @@ import * as _ from 'lodash'
 import {
   comprehensiveAssessment,
   comprehensiveAssessmentList,
+  DEFAULT_LICENSE,
   noSpecialCharAssessment,
 } from '../../models/comprehensive-assessment.model'
 import { richTextValidator } from '../../models/rich-text.validator'
 import { ComprehensiveAssessmentService } from '../../services/comprehensive-assessment.service'
 import { LoaderService } from '../../../../../../../../../../../src/app/services/loader.service'
 import { ConfirmDialogComponent } from '../../../../../workallocation-v2/components/confirm-dialog/confirm-dialog.component'
+import { PublishResourceComponent } from '../../dialogs/publish-resource/publish-resource.component'
 
 /** A section of the question set: the questions it promised against the ones it holds. */
 interface ISectionCount {
@@ -89,11 +91,15 @@ export class CreateAssessmentComponent implements OnInit {
         Validators.pattern(noSpecialCharAssessment),
       ]),
       description: new FormControl('', [
-        richTextValidator(comprehensiveAssessment.DESCRIPTION_MIN_LENGTH, comprehensiveAssessment.DESCRIPTION_MAX_LENGTH),
+        richTextValidator(0, comprehensiveAssessment.DESCRIPTION_MAX_LENGTH),
       ]),
       learningOutcome: new FormControl('', [
         richTextValidator(0, comprehensiveAssessment.LEARNING_OUTCOME_MAX_LENGTH),
       ]),
+      // classification: what the platform holds as difficultyLevel, license and keywords
+      difficultyLevel: new FormControl('', [Validators.required]),
+      license: new FormControl(DEFAULT_LICENSE, [Validators.required]),
+      keywords: new FormControl([], [Validators.required]),
       // the thumbnail is optional, an assessment can go live without one
       appIcon: new FormControl(''),
     })
@@ -148,6 +154,9 @@ export class CreateAssessmentComponent implements OnInit {
       assessmentName: _.get(this.contentDetails, 'name', ''),
       description: _.get(this.contentDetails, 'description', ''),
       learningOutcome: _.get(this.contentDetails, 'purpose', ''),
+      difficultyLevel: _.get(this.contentDetails, 'difficultyLevel', ''),
+      license: _.get(this.contentDetails, 'license', '') || DEFAULT_LICENSE,
+      keywords: _.get(this.contentDetails, 'keywords', []) || [],
       appIcon: _.get(this.contentDetails, 'appIcon', ''),
     })
     this.assessmentDetailsForm.updateValueAndValidity()
@@ -408,6 +417,17 @@ export class CreateAssessmentComponent implements OnInit {
     })
   }
 
+  /**
+   * The duration as the question set currently holds it, for the saves that are not already
+   * behind a step check. One that cannot be read leaves the duration the content has.
+   */
+  private readLinkedDuration(): Observable<any> {
+    if (!this.linkedAssessmentId) {
+      return of(null)
+    }
+    return this.readQuestionSet().pipe(catchError(() => of(null)))
+  }
+
   /** Reads the question set back, mirroring the duration it is currently configured with. */
   private readQuestionSet(): Observable<any> {
     return this.assessmentSvc.getQuestionSetHierarchy(this.linkedAssessmentId).pipe(
@@ -474,6 +494,9 @@ export class CreateAssessmentComponent implements OnInit {
       purpose: formValues.learningOutcome || '',
       appIcon: formValues.appIcon,
       posterImage: formValues.appIcon,
+      difficultyLevel: formValues.difficultyLevel || '',
+      license: formValues.license || DEFAULT_LICENSE,
+      keywords: formValues.keywords || [],
       // the content schema types duration as a String, a number fails validation
       duration: String(this.duration || 0),
       ...this.assessmentSvc.buildPlanMetadata(formValues.linkedPlan),
@@ -485,7 +508,11 @@ export class CreateAssessmentComponent implements OnInit {
       return
     }
     this.loaderService.changeLoaderState(true)
-    this.assessmentSvc.updateContent(this.contentId, this.getContentUpdateBody()).subscribe({
+    // the duration lives on the question set and the collection only mirrors it, so it is
+    // read back first - step 2 can have changed it since it was last mirrored
+    this.readLinkedDuration().pipe(
+      switchMap(() => this.assessmentSvc.updateContent(this.contentId, this.getContentUpdateBody()))
+    ).subscribe({
       next: (res: any) => {
         this.syncVersionKey(res)
         this.openSnackBar('Assessment details saved successfully')
@@ -535,52 +562,67 @@ export class CreateAssessmentComponent implements OnInit {
         this.openSnackBar(comprehensiveAssessmentList.WINDOW_CLOSED_MESSAGE)
         return
       }
-      this.confirmPublish()
+      this.openPublishDialog()
     })
   }
 
-  private confirmPublish() {
-    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
-      width: '500px',
-      height: 'auto',
-      autoFocus: false,
-      data: {
-        dialogType: 'warning',
-        icon: { iconName: 'error_outline', iconClass: 'warning-icon' },
-        message: 'Are you sure you want to publish this assessment?',
-        buttonsList: [
-          { btnAction: false, displayText: 'No', btnClass: 'btn-outline-primary' },
-          { btnAction: true, displayText: 'Yes', btnClass: 'successBtn' },
-        ],
-      },
-    })
-    dialogRef.afterClosed().subscribe((btnAction: any) => {
-      if (btnAction) {
-        this.runPublish()
-      }
-    })
-  }
-
-  /** The draft is saved first, so what goes Live is what the preview just showed. */
-  private runPublish() {
+  /**
+   * The draft is saved before the dialog opens, so what goes Live is what the preview just
+   * showed - and so the dialog lists the resources as they were last saved. The two
+   * publishes themselves belong to the dialog, which closes true once the assessment is
+   * Live and leaves everything as it was if the admin backs out part way through.
+   */
+  private openPublishDialog() {
     this.loaderService.changeLoaderState(true)
-    this.persistContent().pipe(
-      switchMap(() => this.assessmentSvc.publishAssessment(
-        this.contentId,
-        _.get(this.userProfile, 'userId', '')
-      ))
-    ).subscribe({
+    this.persistContent().subscribe({
       next: () => {
         this.loaderService.changeLoaderState(false)
-        this.openSnackBar('Assessment published successfully')
-        // a published assessment belongs to the Live tab, whichever tab it was opened from
-        this.pathUrl = 'live'
-        this.navigateBack()
+        const dialogRef = this.dialog.open(PublishResourceComponent, {
+          width: '600px',
+          height: 'auto',
+          autoFocus: false,
+          disableClose: true,
+          panelClass: 'publish-resource-dialog',
+          data: { collection: this.contentDetails, userProfile: this.userProfile },
+        })
+        dialogRef.afterClosed().subscribe((published: boolean) => {
+          if (published) {
+            this.openSnackBar('Assessment published successfully')
+            // a published assessment belongs to the Live tab, whichever tab it was opened from
+            this.pathUrl = 'live'
+            // the platform is still finishing the publish, so the tab is opened once it has
+            // had its seconds - the loader stays up for them rather than the builder sitting
+            // there looking as though nothing happened
+            this.loaderService.changeLoaderState(true)
+            setTimeout(() => {
+              this.loaderService.changeLoaderState(false)
+              this.navigateBack()
+            },         comprehensiveAssessmentList.PUBLISH_SETTLE_MS)
+            return
+          }
+          // the dialog can have linked another plan on the way out, which leaves the form
+          // and the version key here answering for an assessment that has moved on
+          this.reloadContent()
+        })
       },
       error: (error: HttpErrorResponse) => {
         this.loaderService.changeLoaderState(false)
-        this.openSnackBar(_.get(error, 'error.message', 'Unable to publish the assessment, please try again'))
+        this.openSnackBar(_.get(error, 'error.message', 'Unable to save the assessment, please try again'))
       },
+    })
+  }
+  /**
+   * Reads the assessment back and patches the form from it. Nothing is lost by it: the draft
+   * is saved before the publish dialog opens, so what the api holds is what the form held.
+   */
+  private reloadContent() {
+    this.assessmentSvc.getContentHierarchy(this.contentId).subscribe((res: any) => {
+      const content = _.get(res, 'result.content')
+      if (content) {
+        this.contentDetails = content
+        this.previewContent = content
+        this.patchAssessmentDetails()
+      }
     })
   }
   //#endregion

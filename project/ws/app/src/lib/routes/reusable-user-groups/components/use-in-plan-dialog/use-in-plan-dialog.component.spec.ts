@@ -29,7 +29,7 @@ const searchResponse = {
 describe('UseInPlanDialogComponent', () => {
   let component: UseInPlanDialogComponent
   let fixture: ComponentFixture<UseInPlanDialogComponent>
-  let getTrainingPlansV3: jest.Mock
+  let getTrainingPlansV4: jest.Mock
   let close: jest.Mock
 
   const createComponent = () => {
@@ -40,7 +40,7 @@ describe('UseInPlanDialogComponent', () => {
       providers: [
         { provide: MatDialogRef, useValue: { close } },
         { provide: MAT_DIALOG_DATA, useValue: { groupId: 'g1', groupName: 'DS & above' } },
-        { provide: TrainingPlanDashboardService, useValue: { getTrainingPlansV3 } },
+        { provide: TrainingPlanDashboardService, useValue: { getTrainingPlansV4 } },
         { provide: AparYearService, useValue: { getCurrentAparYear: () => '2026-27' } },
         { provide: ConfigurationsService, useValue: { userProfile: { rootOrgId: 'org-1' } } },
       ],
@@ -52,7 +52,7 @@ describe('UseInPlanDialogComponent', () => {
 
   beforeEach(() => {
     close = jest.fn()
-    getTrainingPlansV3 = jest.fn(() => of(searchResponse))
+    getTrainingPlansV4 = jest.fn(() => of(searchResponse))
     createComponent()
   })
 
@@ -61,7 +61,7 @@ describe('UseInPlanDialogComponent', () => {
   })
 
   it('should search the draft plans of the logged in org on open', () => {
-    expect(getTrainingPlansV3).toHaveBeenCalledWith({
+    expect(getTrainingPlansV4).toHaveBeenCalledWith({
       filter: { status: ['draft'], orgIdList: ['org-1'], planYear: '2026-27' },
       pageNumber: 0,
       pageSize: 5,
@@ -93,7 +93,7 @@ describe('UseInPlanDialogComponent', () => {
     component.onPageChange({ pageIndex: 1, pageSize: 5, length: 1 })
     component.onReportingYearChange('2025-26')
     expect(component.pageIndex()).toBe(0)
-    expect(getTrainingPlansV3).toHaveBeenLastCalledWith(
+    expect(getTrainingPlansV4).toHaveBeenLastCalledWith(
       expect.objectContaining({
         filter: { status: ['draft'], orgIdList: ['org-1'], planYear: '2025-26' },
       }),
@@ -102,13 +102,13 @@ describe('UseInPlanDialogComponent', () => {
 
   it('should request the next page', () => {
     component.onPageChange({ pageIndex: 1, pageSize: 10, length: 20 })
-    expect(getTrainingPlansV3).toHaveBeenLastCalledWith(
+    expect(getTrainingPlansV4).toHaveBeenLastCalledWith(
       expect.objectContaining({ pageNumber: 1, pageSize: 10 }),
     )
   })
 
   it('should clear the rows when the search fails', () => {
-    getTrainingPlansV3 = jest.fn(() => of({ params: { status: 'failed' } }))
+    getTrainingPlansV4 = jest.fn(() => of({ params: { status: 'failed' } }))
     createComponent()
     expect(component.plans()).toEqual([])
     expect(component.totalCount()).toBe(0)

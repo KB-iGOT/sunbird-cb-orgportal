@@ -5,12 +5,13 @@ import { TestBed } from '@angular/core/testing'
 import { aparPlan } from '../models/comprehensive-assessment.model'
 import { ComprehensiveAssessmentService } from './comprehensive-assessment.service'
 
-const PLAN_SEARCH_URL = 'apis/proxies/v8/cbplan/v3/search'
+const PLAN_SEARCH_URL = 'apis/proxies/v8/cbplan/v4/search'
 const CONTENT_SEARCH_URL = 'apis/proxies/v8/sunbirdigot/v4/search'
+const PLAN_UPDATE_URL = 'apis/proxies/v8/cbplan/v4/update'
 /** The key the linkage is written under, read off the model so a version bump is one edit. */
 const LINK_KEY = aparPlan.TRAINING_PLAN_KEY
 
-/** One row as the cbplan v3 search hands it back. */
+/** One row as the cbplan v4 search hands it back. */
 const planRow = (overrides: any = {}) => ({
   id: 'plan-1',
   name: 'APAR 2026-27 — Section Officer & Under Secretary',
@@ -35,7 +36,6 @@ describe('ComprehensiveAssessmentService', () => {
   let httpMock: HttpTestingController
 
   const searchParams = {
-    rootOrgId: 'org-1',
     planYear: '2026-27',
     searchString: '',
     pageIndex: 0,
@@ -66,32 +66,60 @@ describe('ComprehensiveAssessmentService', () => {
   })
 
   describe('searchAparPlans', () => {
-    it('should post the filter the cbplan v3 search expects', () => {
+    it('should post the query the cbplan v4 search expects', () => {
       service.searchAparPlans(searchParams).subscribe()
 
       const req = httpMock.expectOne(PLAN_SEARCH_URL)
       expect(req.request.method).toBe('POST')
       expect(req.request.body).toEqual({
-        filter: {
-          status: ['Live'],
-          orgIdList: ['org-1'],
-          isApar: true,
-          planYear: '2026-27',
+        request: {
+          query: {
+            bool: {
+              must: [
+                { term: { 'status.keyword': 'Live' } },
+                { term: { 'planYear.keyword': '2026-27' } },
+              ],
+              must_not: [{ exists: { field: aparPlan.LINKED_ASSESSMENT_FIELD } }],
+            },
+          },
+          pageNumber: 0,
+          pageSize: 20,
+          searchString: '',
+          applyOrgIdFilter: true,
+          orderBy: 'createdAt',
+          orderDirection: 'desc',
         },
-        pageNumber: 0,
-        pageSize: 20,
-        searchString: '',
-        orderBy: 'createdAt',
-        orderDirection: 'desc',
       })
       req.flush(planSearchResponse([]))
     })
 
-    it('should leave planYear off the filter while the list is not narrowed to one year', () => {
+    /** The api is the one that knows, the picker no longer works it out from a second search. */
+    it('should ask the search to leave out a plan another assessment already holds', () => {
+      service.searchAparPlans(searchParams).subscribe()
+
+      const req = httpMock.expectOne(PLAN_SEARCH_URL)
+      expect(req.request.body.request.query.bool.must_not).toEqual([
+        { exists: { field: 'caLinkedId' } },
+      ])
+      req.flush(planSearchResponse([]))
+    })
+
+    it('should scope the search to the org without naming it', () => {
+      service.searchAparPlans(searchParams).subscribe()
+
+      const req = httpMock.expectOne(PLAN_SEARCH_URL)
+      expect(req.request.body.request.applyOrgIdFilter).toBe(true)
+      expect(JSON.stringify(req.request.body)).not.toContain('orgIdList')
+      req.flush(planSearchResponse([]))
+    })
+
+    it('should leave planYear off the query while the list is not narrowed to one year', () => {
       service.searchAparPlans({ ...searchParams, planYear: aparPlan.ALL_YEARS }).subscribe()
 
       const req = httpMock.expectOne(PLAN_SEARCH_URL)
-      expect(req.request.body.filter.planYear).toBeUndefined()
+      expect(req.request.body.request.query.bool.must).toEqual([
+        { term: { 'status.keyword': 'Live' } },
+      ])
       req.flush(planSearchResponse([]))
     })
 
@@ -99,9 +127,9 @@ describe('ComprehensiveAssessmentService', () => {
       service.searchAparPlans({ ...searchParams, searchString: 'section officer' }).subscribe()
 
       const req = httpMock.expectOne(PLAN_SEARCH_URL)
-      expect(req.request.body.searchString).toBe('section officer')
-      expect(req.request.body.orderBy).toBeUndefined()
-      expect(req.request.body.orderDirection).toBeUndefined()
+      expect(req.request.body.request.searchString).toBe('section officer')
+      expect(req.request.body.request.orderBy).toBeUndefined()
+      expect(req.request.body.request.orderDirection).toBeUndefined()
       req.flush(planSearchResponse([]))
     })
 
@@ -178,6 +206,76 @@ describe('ComprehensiveAssessmentService', () => {
     })
   })
 
+  /** The publish time check: the picker only guards the moment a plan is linked. */
+  describe('isPlanAvailable', () => {
+    it('should ask the same search for the one plan, still free and still Live', () => {
+      service.isPlanAvailable('plan-1').subscribe()
+
+      const req = httpMock.expectOne(PLAN_SEARCH_URL)
+      expect(req.request.body).toEqual({
+        request: {
+          query: {
+            bool: {
+              must: [
+                { term: { 'status.keyword': 'Live' } },
+                { term: { 'id.keyword': 'plan-1' } },
+              ],
+              must_not: [{ exists: { field: 'caLinkedId' } }],
+            },
+          },
+          pageNumber: 0,
+          pageSize: aparPlan.PAGE_SIZE,
+          applyOrgIdFilter: true,
+        },
+      })
+      req.flush(planSearchResponse([]))
+    })
+
+    it('should answer that the plan is free while the search still returns it', () => {
+      let available: boolean | undefined
+
+      service.isPlanAvailable('plan-1').subscribe((res: boolean) => available = res)
+      httpMock.expectOne(PLAN_SEARCH_URL).flush(planSearchResponse([planRow()]))
+
+      expect(available).toBe(true)
+    })
+
+    /** Another assessment has taken it, or it is no longer Live - either way it is gone. */
+    it('should answer that the plan is taken when the search returns nothing', () => {
+      let available: boolean | undefined
+
+      service.isPlanAvailable('plan-1').subscribe((res: boolean) => available = res)
+      httpMock.expectOne(PLAN_SEARCH_URL).flush(planSearchResponse([]))
+
+      expect(available).toBe(false)
+    })
+
+    it('should answer without asking at all for an assessment holding no plan', () => {
+      let available: boolean | undefined
+
+      service.isPlanAvailable('').subscribe((res: boolean) => available = res)
+
+      expect(available).toBe(false)
+      httpMock.expectNone(PLAN_SEARCH_URL)
+    })
+  })
+
+  describe('linkPlanToAssessment', () => {
+    it('should write the assessment onto the plan it was published against', () => {
+      service.linkPlanToAssessment('plan-1', 'do_123').subscribe()
+
+      const req = httpMock.expectOne(PLAN_UPDATE_URL)
+      expect(req.request.method).toBe('POST')
+      expect(req.request.body).toEqual({
+        request: {
+          id: 'plan-1',
+          caLinkedId: 'do_123',
+        },
+      })
+      req.flush({})
+    })
+  })
+
   describe('getPlanIdsWithLiveAssessment', () => {
     it('should ask the content search for the plan id of every Live assessment', () => {
       service.getPlanIdsWithLiveAssessment('org-1').subscribe()
@@ -250,10 +348,17 @@ describe('ComprehensiveAssessmentService', () => {
       aparGatingCourseCount: '2',
     }
 
-    /** The linkage the platform reads the unlock rule off. */
+    /**
+     * The linkage the platform reads the unlock rule off, and the only place the plan
+     * itself is held now that the flat copies are no longer written.
+     */
     it('should write the plan and the courses it gates as the training plan link', () => {
       expect(service.buildPlanMetadata(linkedPlan)[LINK_KEY]).toEqual({
         identifier: 'plan-1',
+        name: 'APAR 2026-27 — Section Officer & Under Secretary',
+        planYear: '2026-27',
+        endDate: '2027-03-31T00:00:00.000Z',
+        orgName: 'Department of Personnel & Training',
         contentList: [
           { identifier: 'do-1', mandatory: true },
           { identifier: 'do-2', mandatory: false },
@@ -291,19 +396,15 @@ describe('ComprehensiveAssessmentService', () => {
 
     it('should clear the linkage when no plan is linked', () => {
       expect(service.buildPlanMetadata(null)).toEqual({
-        [LINK_KEY]: { identifier: '', contentList: [] },
+        [LINK_KEY]: {
+          identifier: '', name: '', planYear: '', endDate: '', orgName: '', contentList: [],
+        },
       })
     })
 
+    /** Everything the reopened builder and the dashboard show comes back off the linkage. */
     it('should read the plan back off the linkage the save wrote', () => {
-      expect(service.readPlanMetadata(service.buildPlanMetadata(linkedPlan))).toEqual({
-        ...linkedPlan,
-        // the linkage carries the plan and the courses it gates, never the display copies
-        name: '',
-        planYear: '',
-        endDate: '',
-        orgName: '',
-      })
+      expect(service.readPlanMetadata(service.buildPlanMetadata(linkedPlan))).toEqual(linkedPlan)
     })
 
     /** Nothing writes the flat copies any more, but an assessment carrying them still reads. */
@@ -418,11 +519,89 @@ describe('ComprehensiveAssessmentService', () => {
     })
 
     it('should publish a draft naming who published it', () => {
-      service.publishAssessment('do-1', 'user-1').subscribe()
+      service.publishAssessment('do-1', 'user-1', 'org-1').subscribe()
 
-      const req = httpMock.expectOne('apis/proxies/v8/action/content/v3/publish/do-1')
+      const req = httpMock.expectOne('apis/proxies/v8/ca/v1/publish/do-1')
       expect(req.request.body).toEqual({ request: { content: { lastPublishedBy: 'user-1' } } })
       req.flush({})
+    })
+
+    /**
+     * The `ca` routes answer against the org the publish is made for rather than reading it
+     * off the session, so every call of the publish flow names it in the header.
+     */
+    it('should name the org the publish is made for on every call of the flow', () => {
+      service.publishAssessment('do-1', 'user-1', 'org-1').subscribe()
+      service.publishQuestionSet('qs-1', 'org-1').subscribe()
+      service.getQuestionSetStatus('qs-1', 'org-1').subscribe()
+
+      const requests = [
+        httpMock.expectOne('apis/proxies/v8/ca/v1/publish/do-1'),
+        httpMock.expectOne('apis/proxies/v8/ca/questionset/v1/publish/qs-1'),
+        httpMock.expectOne('apis/proxies/v8/questionset/v1/read/qs-1'),
+      ]
+
+      requests.forEach((req: any) => {
+        expect(req.request.headers.get('x-authenticated-user-orgid')).toBe('org-1')
+        req.flush({})
+      })
+    })
+
+    /** An empty header says less than no header at all, so none is sent. */
+    it('should send no org header while the org is not known', () => {
+      service.publishQuestionSet('qs-1', '').subscribe()
+
+      const req = httpMock.expectOne('apis/proxies/v8/ca/questionset/v1/publish/qs-1')
+      expect(req.request.headers.has('x-authenticated-user-orgid')).toBe(false)
+      req.flush({})
+    })
+
+    /** The first of the two publishes: the assessment can only follow its question set. */
+    it('should publish the question set the assessment holds', () => {
+      service.publishQuestionSet('qs-1', 'org-1').subscribe()
+
+      const req = httpMock.expectOne('apis/proxies/v8/ca/questionset/v1/publish/qs-1')
+      expect(req.request.method).toBe('POST')
+      expect(req.request.body).toEqual({ request: { questionset: {} } })
+      req.flush({})
+    })
+
+    /** The draft copy answers Draft however far along the publish is, so it is not read. */
+    it('should read the status off the published copy of the question set', () => {
+      let status = ''
+      service.getQuestionSetStatus('qs-1', 'org-1').subscribe((res: string) => status = res)
+
+      const req = httpMock.expectOne('apis/proxies/v8/questionset/v1/read/qs-1')
+      expect(req.request.method).toBe('GET')
+      req.flush({ result: { questionset: { identifier: 'qs-1', status: 'Live' } } })
+
+      expect(status).toBe('Live')
+    })
+
+    it('should read the status whichever casing the api answers under', () => {
+      let status = ''
+      service.getQuestionSetStatus('qs-1', 'org-1').subscribe((res: string) => status = res)
+
+      httpMock.expectOne('apis/proxies/v8/questionset/v1/read/qs-1')
+        .flush({ result: { questionSet: { status: 'Processing' } } })
+
+      expect(status).toBe('Processing')
+    })
+
+    /** The live copy does not exist until the publish finishes, and a 404 is not a failure. */
+    it('should report no status rather than fail when the read errors', () => {
+      let status: string | undefined
+      let errored = false
+      service.getQuestionSetStatus('qs-1', 'org-1').subscribe({
+        next: (res: string) => status = res,
+        error: () => errored = true,
+      })
+
+      httpMock.expectOne('apis/proxies/v8/questionset/v1/read/qs-1')
+        .flush('not found', { status: 404, statusText: 'Not Found' })
+
+      expect(errored).toBe(false)
+      expect(status).toBe('')
     })
 
     it('should retire a content, the delete the api offers', () => {
@@ -585,6 +764,30 @@ describe('ComprehensiveAssessmentService', () => {
 
       expect(service.getLinkedAssessmentId(collection)).toBe('qs-1')
       expect(service.getLinkedAssessmentId({ children: [] })).toBe('')
+    })
+
+    /** What the publish dialog lists, so the admin sees by name what is about to go Live. */
+    it('should list the question sets the assessment holds, named and with their status', () => {
+      const collection = {
+        children: [
+          { identifier: 'do-2', name: 'A handout', mimeType: 'application/pdf', status: 'Live' },
+          {
+            identifier: 'qs-1',
+            name: 'APAR assessment question set',
+            mimeType: 'application/vnd.sunbird.questionset',
+            status: 'Draft',
+          },
+        ],
+      }
+
+      expect(service.getLinkedResources(collection)).toEqual([
+        { identifier: 'qs-1', name: 'APAR assessment question set', status: 'Draft' },
+      ])
+    })
+
+    it('should list nothing for a collection carrying no question set', () => {
+      expect(service.getLinkedResources({ children: [] })).toEqual([])
+      expect(service.getLinkedResources(null)).toEqual([])
     })
 
     it('should generate the 16 digit numeric code sunbird expects', () => {

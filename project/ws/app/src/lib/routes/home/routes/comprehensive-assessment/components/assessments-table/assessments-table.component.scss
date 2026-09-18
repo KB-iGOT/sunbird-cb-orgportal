@@ -22,22 +22,48 @@
   }
 }
 
+/* Every column states the width it needs to stay readable, and the table is at
+   least the sum of those - `min-content` reads it off the columns themselves, so a
+   tab with fewer of them does not scroll before it has to. The page scrolls to the
+   rest: ten columns sharing whatever the window gives them is how the draft tab
+   ended up two characters wide a column at 150% zoom. */
+.table-container {
+  overflow-x: auto;
+}
+
+.responsiveTable {
+  min-width: min-content;
+}
+
 .imageCell {
   min-width: 260px;
 }
 
+.table-text-cell {
+  min-width: 120px;
+}
+
+/* The plate is drawn by the container, so a row with no thumbnail keeps the
+   same box as one that has it - only its contents change. */
 .imageDiv {
   flex: 0 0 auto;
+  box-sizing: border-box;
   width: 72px;
   height: 46px;
+  overflow: hidden;
+  border-radius: $ca-radius-control;
+  border: 1px solid $ca-border;
+  background-color: #FFFFFF;
 }
 
 .cellImage {
-  width: 72px;
-  height: 46px;
+  width: 100%;
+  height: 100%;
   object-fit: cover;
-  border-radius: $ca-radius-control;
-  border: 1px solid $ca-border;
+}
+
+.thumbnail-icon {
+  color: $ca-text-muted;
 }
 
 .table-cell-text {
