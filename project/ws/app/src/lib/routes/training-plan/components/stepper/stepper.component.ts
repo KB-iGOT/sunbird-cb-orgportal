@@ -2,7 +2,7 @@ import {
   AfterViewInit, Component, DestroyRef, EventEmitter, Input, OnChanges, OnInit, Output, ViewChild,
 } from '@angular/core'
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
-import { Observable, forkJoin } from 'rxjs'
+import { Observable, forkJoin, of } from 'rxjs'
 import { TrainingPlanContent } from '../../models/training-plan.model'
 import { ActivatedRoute } from '@angular/router'
 import { TrainingPlanDataSharingService } from '../../services/training-plan-data-share.service'
@@ -37,7 +37,7 @@ export class StepperComponent implements OnInit, OnChanges, AfterViewInit {
   tempSavedAccessControl: any
 
   @ViewChild(AccessControlComponent) private accessControlRef?: AccessControlComponent
-  private isMovingOnAfterSave = false
+  private savedGroupSnapshots = new Map<string, string>()
 
   constructor(
     private route: ActivatedRoute,
@@ -49,7 +49,6 @@ export class StepperComponent implements OnInit, OnChanges, AfterViewInit {
   ngOnInit() {
     const configSvc = this.route.snapshot.data?.configService
     this.accessSettingsParameters = this.route.snapshot.data?.pageData?.data
-
 
     if (this.accessSettingsParameters) {
       this.accessSettingsParameters.userConfig = {
@@ -66,104 +65,11 @@ export class StepperComponent implements OnInit, OnChanges, AfterViewInit {
       this.isContentLive = true
     }
 
+    this.rememberSavedGroups(this.tempSavedAccessControl?.userGroups)
     this.setUserGroupContext(this.tpdsSvc.getAccessControlUserGroupIds()[0])
     this.tpdsSvc.saveAccessControlAndContinue
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => this.saveAccessControlThenMoveOn())
-  }
-
-  private async saveAccessControlThenMoveOn() {
-    debugger
-    if (!this.accessControlRef) {
-      return
-    }
-
-    const payload = await this.accessControlRef.processRequestCreation()
-    // processRequestCreation drops a group that has no condition on it, so a shorter list than the
-    // step is showing means one of them is still empty
-    const groups = payload?.accessControl?.userGroups || []
-    if (!groups.length || groups.length !== (this.accessControlRef.userGroup?.length || 0)) {
-      this.accessControlRef.callSnackbar('Please add at least one condition with a selection.', 'error')
-      return
-    }
-
-    this.isMovingOnAfterSave = true
-    // One call per group, the api takes a single group at a time
-    forkJoin(groups.map((group: any) => this.saveOneUserGroup(group)))
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: (responses: any[]) => {
-          const userGroups = responses
-            .map((response: any) => ({ userGroupId: response?.result?.usergroupid as string }))
-            .filter((group: any) => !!group.userGroupId)
-          this.isMovingOnAfterSave = false
-          this.keepSavedIdsOnForm(responses)
-
-          if (userGroups.length !== groups.length) {
-            this.accessControlRef?.callSnackbar('Could not save every user group, Please try again.', 'error')
-            return
-          }
-
-          this.tempSavedAccessControl = {
-            userGroups,
-            version: this.tempSavedAccessControl?.version || 1,
-          }
-          this.tpdsSvc.trainingPlanStepperData.accessControl = this.tempSavedAccessControl
-          this.checkForaddAccessSettings(false)
-          this.addAccessSettingDisable = false
-          this.tabChangeToTimeline(false)
-        },
-        error: () => {
-          this.isMovingOnAfterSave = false
-          this.accessControlRef?.callSnackbar('Could not save the user groups, Please try again.', 'error')
-        },
-      })
-  }
-
-  private keepSavedIdsOnForm(responses: any[]) {
-    responses.forEach((response: any, index: number) => {
-      const userGroupId = response?.result?.usergroupid
-      if (userGroupId) {
-        this.accessControlRef?.userGroup?.at(index)?.get('savedUserGroupId')
-          ?.setValue(userGroupId, { emitEvent: false })
-      }
-    })
-  }
-
-  /** A group the api already knows is rewritten, one it does not is created. */
-  private saveOneUserGroup(group: any): Observable<any> {
-    const request = {
-      criteria: group.userGroupCriteriaList,
-      userGroupName: group.userGroupName,
-    }
-    return group.userGroupId
-      ? this.userGroupsSvc.updateUserGroup({ ...request, userGroupId: group.userGroupId })
-      : this.userGroupsSvc.createUserGroup(request)
-  }
-
-  private setUserGroupContext(userGroupId?: string) {
-    if (!this.accessSettingsParameters) {
-      return
-    }
-    this.accessSettingsParameters.context = {
-      userGroupId,
-      type: this.accessSettingsParameters.context?.type || 'training-plan',
-    }
-  }
-
-  private readSavedUserGroupId(_event: any): string {
-    if (_event?.userGroupId) {
-      return _event.userGroupId
-    }
-    const saved = _event?.result || _event?.userGroup
-    if (!saved) {
-      return ''
-    }
-    if (Array.isArray(saved)) {
-      return saved[0]?.userGroupId || saved[0]?.usergroupid || ''
-    }
-    return saved.usergroupid || saved.userGroupId ||
-      saved.accessControl?.userGroups?.[0]?.userGroupId || ''
   }
 
   ngAfterViewInit() {
@@ -202,7 +108,6 @@ export class StepperComponent implements OnInit, OnChanges, AfterViewInit {
   }
 
   tabSelected(_event: any) {
-    this.isMovingOnAfterSave = false
     this.tabIndexValue = _event.index
     const tempData = _event.tab.textLabel
     this.selectedTabType.emit(tempData)
@@ -251,11 +156,9 @@ export class StepperComponent implements OnInit, OnChanges, AfterViewInit {
       return
     }
 
-    this.isMovingOnAfterSave = false
-    this.tempSavedAccessControl = {
-      ..._event?.userGroup?.accessControl,
-      userGroupId: this.tempSavedAccessControl?.userGroupId,
-    }
+    // The step reports its groups carrying whichever ids it holds, an empty one for a group that
+    // has never been saved
+    this.tempSavedAccessControl = { ..._event?.userGroup?.accessControl }
     this.tpdsSvc.trainingPlanStepperData.accessControl = this.tempSavedAccessControl
     if (this.tempSavedAccessControl?.userGroups?.length) {
       this.checkForaddAccessSettings(false)
@@ -267,22 +170,130 @@ export class StepperComponent implements OnInit, OnChanges, AfterViewInit {
 
   }
 
-  private handleUserGroupSaved(_event: any) {
-    const userGroupId = this.readSavedUserGroupId(_event)
-    if (userGroupId) {
-      this.tempSavedAccessControl = { ...(this.tempSavedAccessControl || {}), userGroupId }
-      this.tpdsSvc.trainingPlanStepperData.accessControl = this.tempSavedAccessControl
-      // Any later save on this plan updates that group rather than creating another
-      this.setUserGroupContext(userGroupId)
-      this.checkForaddAccessSettings(false)
-      this.addAccessSettingDisable = false
+  /** Re-reads the step after one of its groups was saved from its own button. */
+  private async handleUserGroupSaved(_event: any) {
+    if (!this.accessControlRef) {
+      return
+    }
+    const payload = await this.accessControlRef.processRequestCreation()
+    const userGroups = payload?.accessControl?.userGroups || []
+    if (!userGroups.length) {
+      return
     }
 
-    if (this.isMovingOnAfterSave) {
-      this.isMovingOnAfterSave = false
+    this.tempSavedAccessControl = {
+      userGroups,
+      version: this.tempSavedAccessControl?.version || 1,
+    }
+    this.rememberSavedGroups(userGroups)
+    this.tpdsSvc.trainingPlanStepperData.accessControl = this.tempSavedAccessControl
+    this.setUserGroupContext(this.tpdsSvc.getAccessControlUserGroupIds()[0])
+    this.checkForaddAccessSettings(false)
+    this.addAccessSettingDisable = false
+  }
+
+
+  private async saveAccessControlThenMoveOn() {
+    if (!this.accessControlRef) {
+      return
+    }
+
+    const payload = await this.accessControlRef.processRequestCreation()
+    const groups = payload?.accessControl?.userGroups || []
+    if (!groups.length || groups.length !== (this.accessControlRef.userGroup?.length || 0)) {
+      this.accessControlRef.callSnackbar('Please add at least one condition with a selection.', 'error')
+      return
+    }
+
+    forkJoin(groups.map((group: any) => this.saveOneUserGroup(group)))
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (responses: any[]) => {
+          this.keepSavedIdsOnForm(responses)
+
+          const savedIds = responses.map((response: any) => response?.result?.usergroupid)
+          if (savedIds.some((userGroupId: any) => !userGroupId)) {
+            this.accessControlRef?.callSnackbar('Could not save every user group, Please try again.', 'error')
+            return
+          }
+
+          const userGroups = groups.map((group: any, index: number) => ({
+            ...group,
+            userGroupId: savedIds[index],
+          }))
+          this.tempSavedAccessControl = {
+            userGroups,
+            version: this.tempSavedAccessControl?.version || 1,
+          }
+          this.rememberSavedGroups(userGroups)
+          this.tpdsSvc.trainingPlanStepperData.accessControl = this.tempSavedAccessControl
+          this.checkForaddAccessSettings(false)
+          this.addAccessSettingDisable = false
+          this.tabChangeToTimeline(false)
+        },
+        error: () => {
+          this.accessControlRef?.callSnackbar('Could not save the user groups, Please try again.', 'error')
+        },
+      })
+  }
+
+  private keepSavedIdsOnForm(responses: any[]) {
+    responses.forEach((response: any, index: number) => {
+      const userGroupId = response?.result?.usergroupid
       if (userGroupId) {
-        this.tabChangeToTimeline(false)
+        this.accessControlRef?.userGroup?.at(index)?.get('savedUserGroupId')
+          ?.setValue(userGroupId, { emitEvent: false })
       }
+    })
+  }
+
+  /** Creates an unknown group, rewrites a changed one, and leaves an untouched one alone. */
+  private saveOneUserGroup(group: any): Observable<any> {
+    const request = {
+      criteria: group.userGroupCriteriaList,
+      userGroupName: group.userGroupName,
+    }
+    if (!group.userGroupId) {
+      return this.userGroupsSvc.createUserGroup(request)
+    }
+    if (!this.hasUserGroupChanged(group)) {
+      return of({ result: { usergroupid: group.userGroupId } })
+    }
+    return this.userGroupsSvc.updateUserGroup({ ...request, userGroupId: group.userGroupId })
+  }
+
+  private hasUserGroupChanged(group: any): boolean {
+    const saved = this.savedGroupSnapshots.get(group.userGroupId)
+    return !saved || saved !== this.snapshotOf(group)
+  }
+
+  private rememberSavedGroups(userGroups: any[] = []) {
+    (userGroups || []).forEach((group: any) => {
+      if (group?.userGroupId) {
+        this.savedGroupSnapshots.set(group.userGroupId, this.snapshotOf(group))
+      }
+    })
+  }
+
+  private snapshotOf(group: any): string {
+    const criteria = (group?.userGroupCriteriaList || [])
+      .map((item: any) => ({
+        criteriaKey: item?.criteriaKey,
+        criteriaValue: Array.isArray(item?.criteriaValue)
+          ? [...item.criteriaValue].map(String).sort()
+          : item?.criteriaValue,
+      }))
+      .sort((left: any, right: any) => `${left.criteriaKey}`.localeCompare(`${right.criteriaKey}`))
+    return JSON.stringify({ criteria, name: group?.userGroupName || '' })
+  }
+
+  private setUserGroupContext(userGroupId?: string) {
+    if (!this.accessSettingsParameters) {
+      return
+    }
+    this.accessSettingsParameters.context = {
+      userGroupId,
+      type: this.accessSettingsParameters.context?.type || 'training-plan',
     }
   }
 }
