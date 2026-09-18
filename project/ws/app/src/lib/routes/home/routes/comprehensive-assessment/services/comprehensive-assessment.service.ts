@@ -208,7 +208,7 @@ export class ComprehensiveAssessmentService {
   }): Observable<{ plans: aparPlan.IPlanRow[], count: number }> {
     const must: any[] = [
       { term: { 'status.keyword': comprehensiveAssessmentList.STATUS_LIVE } },
-      { term: { 'isApar.keyword': true } },
+      { term: { 'isApar': true } },
     ]
     if (params.planYear && params.planYear !== aparPlan.ALL_YEARS) {
       must.push({ term: { 'planYear.keyword': params.planYear } })
