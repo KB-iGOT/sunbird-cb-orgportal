@@ -1,15 +1,19 @@
 import { AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms'
 
-/** Character count of a rich text value, ignoring the markup CKEditor adds around it. */
-export function richTextLength(value: any): number {
+/** The text of a rich text value, without the markup CKEditor wraps around it. */
+export function richTextToPlainText(value: any): string {
   if (!value) {
-    return 0
+    return ''
   }
   return String(value)
     .replace(/<[^>]*>/g, '')
     .replace(/&nbsp;/gi, ' ')
     .trim()
-    .length
+}
+
+/** Character count of a rich text value, ignoring the markup CKEditor adds around it. */
+export function richTextLength(value: any): number {
+  return richTextToPlainText(value).length
 }
 
 /**

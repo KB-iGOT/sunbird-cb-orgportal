@@ -34,7 +34,7 @@ describe('TrainingPlanDashboardComponent', () => {
         }
         // 'failed' keeps the subscribe on the short path, the table rendering is covered elsewhere
         trainingDashboardSvc = {
-            getTrainingPlansV3: jest.fn().mockReturnValue(of({ params: { status: 'failed' } })),
+            getTrainingPlansV4: jest.fn().mockReturnValue(of({ params: { status: 'failed' } })),
         }
         loaderService = { changeLoaderState: jest.fn() }
         trainingPlanService = {}
@@ -69,7 +69,7 @@ describe('TrainingPlanDashboardComponent', () => {
     })
 
     describe('getTrainingPlanCBP payload', () => {
-        const payloadOf = () => trainingDashboardSvc.getTrainingPlansV3.mock.calls[0][0]
+        const payloadOf = () => trainingDashboardSvc.getTrainingPlansV4.mock.calls[0][0]
 
         it('should send the selected year as planYear inside the filter', async () => {
             component.selectedAparYear = '2025-26'

@@ -2,6 +2,16 @@
 @import '../../assessment-theme';
 
 ::ng-deep .create-comprehensive-assessment-dialog {
+  /* The dialog asks for 1016x480 and takes less where there is less to take.
+     MatDialog writes its default `max-width: 80vw` inline on the pane, which at
+     150% zoom is narrower than the 1016 this layout used to insist on: the surface
+     is `overflow-y: auto`, which makes the x axis scroll too, so the dialog grew a
+     sideways scrollbar and cut the card on the right off. Stated against the
+     viewport instead, it shrinks with the zoom rather than overflowing it. */
+  width: 1016px;
+  max-width: calc(100vw - 32px) !important;
+  max-height: calc(100vh - 32px);
+
   .mat-form-field-appearance-outline .mat-form-field-infix {
     padding: 5px 0px 10px;
   }
@@ -43,13 +53,22 @@
   line-height: 24.38px;
 }
 
-.height-480 {
-  height: 480px !important;
+.create-cont {
+  box-sizing: border-box;
+  width: 100%;
+  height: 480px;
 }
 
-.create-cont {
-  height: 451px;
-  width: 1016px !important;
+/* The two columns of the dialog. Neither may push the row wider than the pane, and
+   a flex child does exactly that by default rather than shrink past its content, so
+   both are told they may. The card column is the card plus the inset around it. */
+.assessment-input-wrapper {
+  min-width: 0;
+}
+
+.upload-wrapper {
+  flex: 0 1 432px;
+  min-width: 0;
 }
 
 /* Both take the shared width, so Cancel and Create read as one pair. */
@@ -74,7 +93,10 @@
 
   .upload-card {
     padding: 0;
+    box-sizing: border-box;
     width: 350px;
+    /* its own margins, so the card narrows with the column instead of spilling out */
+    max-width: calc(100% - 82px);
     margin: 47px 41px 48px 41px;
     border-radius: $ca-radius-card;
 

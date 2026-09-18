@@ -61,7 +61,7 @@ export class UseInPlanDialogComponent implements OnInit {
 
   fetchPlans() {
     this.isLoading.set(true)
-    this.trainingPlanSvc.getTrainingPlansV3(this.buildPayload())
+    this.trainingPlanSvc.getTrainingPlansV4(this.buildPayload())
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (res: any) => {

@@ -30,6 +30,7 @@ import { AssessmentsListComponent } from './components/assessments-list/assessme
 import { AssessmentsTableComponent } from './components/assessments-table/assessments-table.component'
 import { BasicInfoComponent } from './dialogs/basic-info/basic-info.component'
 import { PlanPickerComponent } from './dialogs/plan-picker/plan-picker.component'
+import { PublishResourceComponent } from './dialogs/publish-resource/publish-resource.component'
 import { ComprehensiveAssessmentService } from './services/comprehensive-assessment.service'
 import { AssessmentResolverService } from './services/assessment-resolver'
 import { ComponentSharedModule } from '../../../workallocation-v2/components/component-shared.module'
@@ -46,6 +47,7 @@ import { PipePublicURLModule } from '@sunbird-cb/utils-v2'
     AssessmentsTableComponent,
     BasicInfoComponent,
     PlanPickerComponent,
+    PublishResourceComponent,
   ],
   imports: [
     CommonModule,

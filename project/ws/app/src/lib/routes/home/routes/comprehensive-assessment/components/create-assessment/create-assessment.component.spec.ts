@@ -48,9 +48,12 @@ describe('CreateAssessmentComponent', () => {
   const content = (overrides: any = {}) => ({
     identifier: 'do_123',
     name: 'APAR comprehensive assessment',
-    description: `<p>${'d'.repeat(comprehensiveAssessment.DESCRIPTION_MIN_LENGTH)}</p>`,
+    description: '<p>A comprehensive assessment of the APAR reporting year</p>',
     purpose: '<p>the outcome</p>',
     appIcon: 'icon.png',
+    difficultyLevel: 'Advanced',
+    license: 'CC BY 4.0',
+    keywords: ['NFCS'],
     duration: '2400',
     versionKey: 'v1',
     ...overrides,
@@ -83,8 +86,11 @@ describe('CreateAssessmentComponent', () => {
     component.assessmentDetailsForm.patchValue({
       linkedPlan,
       assessmentName: 'APAR comprehensive assessment',
-      description: `<p>${'d'.repeat(comprehensiveAssessment.DESCRIPTION_MIN_LENGTH)}</p>`,
+      description: '<p>A comprehensive assessment of the APAR reporting year</p>',
       learningOutcome: '<p>the outcome</p>',
+      difficultyLevel: 'Advanced',
+      license: 'CC BY 4.0',
+      keywords: ['NFCS'],
       appIcon: 'icon.png',
     })
   }
@@ -131,6 +137,8 @@ describe('CreateAssessmentComponent', () => {
       getQuestionSetHierarchy: jest.fn().mockReturnValue(of(questionSet())),
       linkAssessmentToCollection: jest.fn().mockReturnValue(of({})),
       publishAssessment: jest.fn().mockReturnValue(of({})),
+      publishQuestionSet: jest.fn().mockReturnValue(of({})),
+      getQuestionSetStatus: jest.fn().mockReturnValue(of('Live')),
       isWindowOpen: jest.fn().mockReturnValue(true),
     }
     router = { url: '/app/home/comprehensive-assessment/edit/do_123', navigate: jest.fn() }
@@ -180,6 +188,30 @@ describe('CreateAssessmentComponent', () => {
       component.assessmentDetailsForm.get('description')?.setValue('<p>&nbsp;</p>')
 
       expect(component.assessmentDetailsForm.get('description')?.hasError('required')).toBe(true)
+    })
+
+    /** Both are rich text, so it is the text inside the markup that is measured. */
+    it('should refuse a description longer than the platform takes', () => {
+      const description = component.assessmentDetailsForm.get('description')
+
+      description?.setValue(`<p>${'d'.repeat(comprehensiveAssessment.DESCRIPTION_MAX_LENGTH)}</p>`)
+      expect(description?.valid).toBe(true)
+
+      description?.setValue(`<p>${'d'.repeat(comprehensiveAssessment.DESCRIPTION_MAX_LENGTH + 1)}</p>`)
+      expect(description?.hasError('maxlength')).toBe(true)
+    })
+
+    it('should refuse a learning outcome that only holds editor markup', () => {
+      component.assessmentDetailsForm.get('learningOutcome')?.setValue('<p>&nbsp;</p>')
+
+      expect(component.assessmentDetailsForm.get('learningOutcome')?.hasError('required')).toBe(true)
+    })
+
+    it('should refuse an assessment with no classification', () => {
+      expect(component.assessmentDetailsForm.get('difficultyLevel')?.hasError('required')).toBe(true)
+      expect(component.assessmentDetailsForm.get('keywords')?.hasError('required')).toBe(true)
+      // the license is seeded, an assessment is never authored without one
+      expect(component.assessmentDetailsForm.get('license')?.value).toBe('CC BY 4.0')
     })
 
     it('should be valid once every field is filled in', () => {
@@ -820,6 +852,42 @@ describe('CreateAssessmentComponent', () => {
       expect(component.contentDetails.versionKey).toBe('v2')
     })
 
+    /**
+     * The duration is authored on the question set of step 2 and the collection only
+     * mirrors it, so a save made straight after step 2 has to read it back first.
+     */
+    it('should send the duration the question set currently holds', () => {
+      component.linkedAssessmentId = 'do_456'
+      assessmentSvc.getQuestionSetHierarchy.mockReturnValue(of({ ...questionSet(), expectedDuration: 5400 }))
+
+      component.saveAndExit()
+
+      expect(assessmentSvc.getQuestionSetHierarchy).toHaveBeenCalledWith('do_456')
+      expect(assessmentSvc.updateContent).toHaveBeenCalledWith('do_123',
+        expect.objectContaining({ duration: '5400' }))
+    })
+
+    it('should save with the duration already known when the question set cannot be read', () => {
+      component.linkedAssessmentId = 'do_456'
+      component.duration = 1800
+      assessmentSvc.getQuestionSetHierarchy.mockReturnValue(throwError(() => ({})))
+
+      component.saveAndExit()
+
+      expect(assessmentSvc.updateContent).toHaveBeenCalledWith('do_123',
+        expect.objectContaining({ duration: '1800' }))
+    })
+
+    it('should save without reading a question set while none is linked', () => {
+      component.linkedAssessmentId = ''
+      assessmentSvc.getQuestionSetHierarchy.mockClear()
+
+      component.saveAndExit()
+
+      expect(assessmentSvc.getQuestionSetHierarchy).not.toHaveBeenCalled()
+      expect(assessmentSvc.updateContent).toHaveBeenCalled()
+    })
+
     it('should refuse to save an incomplete step 1', () => {
       component.assessmentDetailsForm.patchValue({ linkedPlan: null })
 
@@ -908,47 +976,111 @@ describe('CreateAssessmentComponent', () => {
       expect(component.canPublish).toBe(false)
     })
 
-    it('should ask before publishing', () => {
+    it('should hand the publish to the dialog that walks the two of them through', () => {
       component.publishAssessment()
 
       expect(dialog.open).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({
-        data: expect.objectContaining({
-          message: 'Are you sure you want to publish this assessment?',
-        }),
+        disableClose: true,
+        data: expect.objectContaining({ collection: expect.anything(), userProfile }),
       }))
-      expect(assessmentSvc.publishAssessment).not.toHaveBeenCalled()
     })
 
     /** The draft is saved first, so what goes Live is what the preview just showed. */
-    it('should save the draft and publish once the user confirms', () => {
+    it('should save the draft before the dialog lists what it holds', () => {
       component.publishAssessment()
-
-      afterClosed.next(true)
 
       expect(assessmentSvc.updateContent).toHaveBeenCalled()
-      expect(assessmentSvc.publishAssessment).toHaveBeenCalledWith('do_123', 'user-1')
+      expect(dialog.open).toHaveBeenCalled()
     })
 
-    it('should leave the draft alone when the user backs out', () => {
+    /** Both publishes belong to the dialog, the builder sends neither itself. */
+    it('should publish nothing itself', () => {
       component.publishAssessment()
+      afterClosed.next(true)
 
-      afterClosed.next(false)
-
+      expect(assessmentSvc.publishQuestionSet).not.toHaveBeenCalled()
       expect(assessmentSvc.publishAssessment).not.toHaveBeenCalled()
     })
 
-    it('should return to the Live tab once the assessment is published', () => {
+    /**
+     * The platform is still finishing the publish when the dialog closes, so the Live tab is
+     * opened once it has had its seconds - it would otherwise list everything but this one.
+     */
+    it('should return to the Live tab once the platform has had its seconds', () => {
+      jest.useFakeTimers()
       component.publishAssessment()
 
       afterClosed.next(true)
 
       expect(matSnackBar.open).toHaveBeenCalledWith('Assessment published successfully')
+      expect(router.navigate).not.toHaveBeenCalled()
+
+      jest.advanceTimersByTime(comprehensiveAssessmentList.PUBLISH_SETTLE_MS)
+
       expect(router.navigate).toHaveBeenCalledWith(['/app/home/comprehensive-assessment', 'live'])
+      jest.useRealTimers()
+    })
+
+    it('should hold the loader up for the wait rather than leave the builder looking idle', () => {
+      jest.useFakeTimers()
+      component.publishAssessment()
+
+      afterClosed.next(true)
+
+      expect(loaderService.changeLoaderState).toHaveBeenLastCalledWith(true)
+
+      jest.advanceTimersByTime(comprehensiveAssessmentList.PUBLISH_SETTLE_MS)
+
+      expect(loaderService.changeLoaderState).toHaveBeenLastCalledWith(false)
+      jest.useRealTimers()
+    })
+
+    it('should stay on the builder when the dialog is closed part way through', () => {
+      component.publishAssessment()
+
+      afterClosed.next(false)
+
+      expect(matSnackBar.open).not.toHaveBeenCalledWith('Assessment published successfully')
+      expect(router.navigate).not.toHaveBeenCalled()
+    })
+
+    /**
+     * The dialog can link another plan on its way out, so the form and the version key are
+     * read back rather than left answering for an assessment that has moved on.
+     */
+    it('should read the assessment back when the dialog is closed unpublished', () => {
+      component.publishAssessment()
+      assessmentSvc.getContentHierarchy.mockClear()
+
+      afterClosed.next(false)
+
+      expect(assessmentSvc.getContentHierarchy).toHaveBeenCalledWith(component.contentId)
+    })
+
+    it('should not read it back once the assessment is published, it is leaving anyway', () => {
+      component.publishAssessment()
+      assessmentSvc.getContentHierarchy.mockClear()
+
+      afterClosed.next(true)
+
+      expect(assessmentSvc.getContentHierarchy).not.toHaveBeenCalled()
+    })
+
+    it('should say why the draft could not be saved rather than open the dialog', () => {
+      assessmentSvc.updateContent.mockReturnValue(
+        throwError(() => ({ error: { message: 'the version key is stale' } }))
+      )
+
+      component.publishAssessment()
+
+      expect(dialog.open).not.toHaveBeenCalled()
+      expect(matSnackBar.open).toHaveBeenCalledWith('the version key is stale')
+      expect(loaderService.changeLoaderState).toHaveBeenLastCalledWith(false)
     })
 
     /**
      * The window belongs to the linked plan and only the plan can correct it, so it is
-     * checked here rather than sending a publish that can only be rejected.
+     * checked here rather than opening a dialog on a publish that can only be rejected.
      */
     it('should refuse to publish once the assessment window has ended', () => {
       assessmentSvc.isWindowOpen.mockReturnValue(false)
@@ -956,7 +1088,6 @@ describe('CreateAssessmentComponent', () => {
       component.publishAssessment()
 
       expect(dialog.open).not.toHaveBeenCalled()
-      expect(assessmentSvc.publishAssessment).not.toHaveBeenCalled()
       expect(matSnackBar.open).toHaveBeenCalledWith(comprehensiveAssessmentList.WINDOW_CLOSED_MESSAGE)
     })
 
@@ -971,7 +1102,7 @@ describe('CreateAssessmentComponent', () => {
 
       component.publishAssessment()
 
-      expect(assessmentSvc.publishAssessment).not.toHaveBeenCalled()
+      expect(dialog.open).not.toHaveBeenCalled()
     })
 
     it('should refuse to publish before a question set is created', () => {
@@ -979,30 +1110,8 @@ describe('CreateAssessmentComponent', () => {
 
       component.publishAssessment()
 
-      expect(assessmentSvc.publishAssessment).not.toHaveBeenCalled()
+      expect(dialog.open).not.toHaveBeenCalled()
       expect(matSnackBar.open).toHaveBeenCalledWith('Please create the assessment before moving ahead')
-    })
-
-    it('should stay on the builder and say why the publish failed', () => {
-      assessmentSvc.publishAssessment.mockReturnValue(
-        throwError(() => ({ error: { message: 'question bank is short of 8 questions' } }))
-      )
-
-      component.publishAssessment()
-      afterClosed.next(true)
-
-      expect(matSnackBar.open).toHaveBeenCalledWith('question bank is short of 8 questions')
-      expect(router.navigate).not.toHaveBeenCalled()
-      expect(loaderService.changeLoaderState).toHaveBeenLastCalledWith(false)
-    })
-
-    it('should fall back to a readable message when the failure carries none', () => {
-      assessmentSvc.publishAssessment.mockReturnValue(throwError(() => ({})))
-
-      component.publishAssessment()
-      afterClosed.next(true)
-
-      expect(matSnackBar.open).toHaveBeenCalledWith('Unable to publish the assessment, please try again')
     })
   })
 
