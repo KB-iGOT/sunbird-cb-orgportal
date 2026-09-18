@@ -86,6 +86,7 @@ describe('ComprehensiveAssessmentService', () => {
             bool: {
               must: [
                 { term: { 'status.keyword': 'Live' } },
+                { term: { 'isApar.keyword': true } },
                 { term: { 'planYear.keyword': '2026-27' } },
               ],
               must_not: [{ exists: { field: aparPlan.LINKED_ASSESSMENT_FIELD } }],
@@ -128,7 +129,19 @@ describe('ComprehensiveAssessmentService', () => {
       const req = httpMock.expectOne(PLAN_SEARCH_URL)
       expect(req.request.body.request.query.bool.must).toEqual([
         { term: { 'status.keyword': 'Live' } },
+        { term: { 'isApar.keyword': true } },
       ])
+      req.flush(planSearchResponse([]))
+    })
+
+    /** The picker is an APAR plan picker, so the api is asked for those alone. */
+    it('should ask the search for the plans APAR assignment is on for', () => {
+      service.searchAparPlans(searchParams).subscribe()
+
+      const req = httpMock.expectOne(PLAN_SEARCH_URL)
+      expect(req.request.body.request.query.bool.must).toContainEqual({
+        term: { 'isApar.keyword': true },
+      })
       req.flush(planSearchResponse([]))
     })
 

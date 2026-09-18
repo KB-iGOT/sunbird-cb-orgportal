@@ -193,13 +193,12 @@ export class ComprehensiveAssessmentService {
    * language it takes, and it is the search that leaves out a plan another assessment
    * already holds - `applyOrgIdFilter` scopes it to the caller's org, so no org id is named.
    *
-   * `isApar` is not part of the query, so plans with APAR assignment off are dropped here
-   * instead: the count stays the one the api reports, a page can therefore render fewer
-   * rows than the paginator counts.
-   *
-   * Only an explicit `false` drops a plan. A row carrying no `isApar` at all is a field the
-   * search did not project, not a plan with the toggle off, and dropping those would empty
-   * the picker against an api that is otherwise answering correctly.
+   * A plan with APAR assignment off is asked out by the query itself. The local drop below it
+   * stays as a backstop, for an api answering with more than it was asked for: only an explicit
+   * `false` drops a plan there, since a row carrying no `isApar` at all is a field the search
+   * did not project rather than a plan with the toggle off, and dropping those would empty the
+   * picker against an api that is otherwise answering correctly. Whatever it drops, the count
+   * stays the one the api reports, so a page can render fewer rows than the paginator counts.
    */
   searchAparPlans(params: {
     planYear: string,
@@ -207,7 +206,10 @@ export class ComprehensiveAssessmentService {
     pageIndex: number,
     pageSize: number
   }): Observable<{ plans: aparPlan.IPlanRow[], count: number }> {
-    const must: any[] = [{ term: { 'status.keyword': comprehensiveAssessmentList.STATUS_LIVE } }]
+    const must: any[] = [
+      { term: { 'status.keyword': comprehensiveAssessmentList.STATUS_LIVE } },
+      { term: { 'isApar.keyword': true } },
+    ]
     if (params.planYear && params.planYear !== aparPlan.ALL_YEARS) {
       must.push({ term: { 'planYear.keyword': params.planYear } })
     }
