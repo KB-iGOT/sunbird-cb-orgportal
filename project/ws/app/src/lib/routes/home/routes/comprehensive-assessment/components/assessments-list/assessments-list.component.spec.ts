@@ -400,15 +400,37 @@ describe('AssessmentsListComponent', () => {
       expect(assessmentSvc.isWindowOpen).toHaveBeenCalledWith(openWindow)
     })
 
-    /** Publishing moves the row out of the Draft tab, so the tab is reloaded. */
-    it('should reload the tab once the dialog reports the assessment published', () => {
-      assessmentSvc.searchAssessments.mockClear()
+    /**
+     * Publishing moves the row out of the Draft tab, and the platform is still finishing the
+     * publish when the dialog closes - so the Live tab is opened once it has had its seconds.
+     */
+    it('should open the Live tab once the platform has had its seconds', () => {
+      jest.useFakeTimers()
 
       component.publishAssessment(row)
       afterClosed.next(true)
 
       expect(matSnackBar.open).toHaveBeenCalledWith('Assessment published successfully')
-      expect(assessmentSvc.searchAssessments).toHaveBeenCalledTimes(1)
+      expect(router.navigate).not.toHaveBeenCalled()
+
+      jest.advanceTimersByTime(comprehensiveAssessmentList.PUBLISH_SETTLE_MS)
+
+      expect(router.navigate).toHaveBeenCalledWith(['/app/home/comprehensive-assessment', 'live'])
+      jest.useRealTimers()
+    })
+
+    it('should hold the loader up for the wait rather than leave the tab looking idle', () => {
+      jest.useFakeTimers()
+
+      component.publishAssessment(row)
+      afterClosed.next(true)
+
+      expect(loaderService.changeLoaderState).toHaveBeenLastCalledWith(true)
+
+      jest.advanceTimersByTime(comprehensiveAssessmentList.PUBLISH_SETTLE_MS)
+
+      expect(loaderService.changeLoaderState).toHaveBeenLastCalledWith(false)
+      jest.useRealTimers()
     })
 
     it('should fall back to a readable message when the failure carries none', () => {

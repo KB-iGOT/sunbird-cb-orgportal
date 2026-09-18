@@ -25,6 +25,7 @@ const API_END_POINTS = {
   PUBLISH_ASSESSMENT: (contentId: string) => `apis/proxies/v8/action/ca/v1/publish/${contentId}`,
   RETIRE_CONTENT: (contentId: string) => `apis/proxies/v8/action/content/v3/retire/${contentId}`,
   APAR_PLAN_SEARCH: 'apis/proxies/v8/cbplan/v4/search',
+  APAR_PLAN_UPDATE: 'apis/proxies/v8/cbplan/v4/update',
 }
 
 const STORAGE_URL_TO_REPLACE = 'https://storage.googleapis.com/igot'
@@ -211,17 +212,8 @@ export class ComprehensiveAssessmentService {
     }
 
     const request: any = {
-      query: {
-        bool: {
-          must,
-          // a plan an assessment already holds is not offered for a second one
-          must_not: [{ exists: { field: aparPlan.LINKED_ASSESSMENT_FIELD } }],
-        },
-      },
-      pageNumber: params.pageIndex,
-      pageSize: params.pageSize,
+      ...this.buildPlanSearchRequest(must, params.pageIndex, params.pageSize),
       searchString: params.searchString || '',
-      applyOrgIdFilter: true,
     }
     // the api orders by relevance while a search is on, the browsed list by newest first
     if (!params.searchString) {
@@ -238,6 +230,75 @@ export class ComprehensiveAssessmentService {
         count: _.get(res, 'result.result.totalCount', 0),
       }))
     )
+  }
+
+  /**
+   * A v4 plan search, in the query language it takes. Every search of the flow asks for the
+   * plans no assessment holds yet - `caLinkedId` is what an assessment writes onto the plan
+   * it takes - and is scoped to the caller's org by the api rather than by a named org id.
+   */
+  private buildPlanSearchRequest(must: any[], pageNumber: number, pageSize: number): any {
+    return {
+      query: {
+        bool: {
+          must,
+          // a plan an assessment already holds is not offered for a second one
+          must_not: [{ exists: { field: aparPlan.LINKED_ASSESSMENT_FIELD } }],
+        },
+      },
+      pageNumber,
+      pageSize,
+      applyOrgIdFilter: true,
+    }
+  }
+
+  /**
+   * Whether the plan the assessment holds can still be published against: the same search
+   * the picker is filled from, narrowed to the one plan. It answers with the plan while the
+   * plan is Live and free, and with nothing once another assessment has taken it - which is
+   * the case the publish has to stop, since the picker only guards the moment of linking.
+   */
+  isPlanAvailable(planId: string): Observable<boolean> {
+    if (!planId) {
+      return of(false)
+    }
+    const request = this.buildPlanSearchRequest(
+      [
+        { term: { 'status.keyword': comprehensiveAssessmentList.STATUS_LIVE } },
+        { term: { 'id.keyword': planId } },
+      ],
+      0,
+      aparPlan.PAGE_SIZE
+    )
+
+    return this.http.post<any>(API_END_POINTS.APAR_PLAN_SEARCH, { request }).pipe(
+      map((res: any) => !!_.get(res, 'result.result.data', []).length)
+    )
+  }
+
+  /**
+   * Writes the linked plan onto the assessment on its own. The publish dialog changes the
+   * plan without the builder's form behind it, so only the linkage and the version key are
+   * sent - the rest of the content is not the dialog's to know, let alone to overwrite.
+   */
+  updateLinkedPlan(contentId: string, versionKey: string, plan: aparPlan.ILinkedPlan): Observable<any> {
+    return this.updateContent(contentId, {
+      versionKey,
+      ...this.buildPlanMetadata(plan),
+    })
+  }
+
+  /**
+   * The other half of the linkage, written once the assessment is Live: the plan is told
+   * which assessment holds it, and every search of the flow leaves it out from then on.
+   */
+  linkPlanToAssessment(planId: string, contentId: string): Observable<any> {
+    return this.http.post<any>(API_END_POINTS.APAR_PLAN_UPDATE, {
+      request: {
+        id: planId,
+        [aparPlan.LINKED_ASSESSMENT_FIELD]: contentId,
+      },
+    })
   }
 
   /**

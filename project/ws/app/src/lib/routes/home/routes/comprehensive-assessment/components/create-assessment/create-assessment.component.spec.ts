@@ -1002,13 +1002,37 @@ describe('CreateAssessmentComponent', () => {
       expect(assessmentSvc.publishAssessment).not.toHaveBeenCalled()
     })
 
-    it('should return to the Live tab once the dialog reports the assessment published', () => {
+    /**
+     * The platform is still finishing the publish when the dialog closes, so the Live tab is
+     * opened once it has had its seconds - it would otherwise list everything but this one.
+     */
+    it('should return to the Live tab once the platform has had its seconds', () => {
+      jest.useFakeTimers()
       component.publishAssessment()
 
       afterClosed.next(true)
 
       expect(matSnackBar.open).toHaveBeenCalledWith('Assessment published successfully')
+      expect(router.navigate).not.toHaveBeenCalled()
+
+      jest.advanceTimersByTime(comprehensiveAssessmentList.PUBLISH_SETTLE_MS)
+
       expect(router.navigate).toHaveBeenCalledWith(['/app/home/comprehensive-assessment', 'live'])
+      jest.useRealTimers()
+    })
+
+    it('should hold the loader up for the wait rather than leave the builder looking idle', () => {
+      jest.useFakeTimers()
+      component.publishAssessment()
+
+      afterClosed.next(true)
+
+      expect(loaderService.changeLoaderState).toHaveBeenLastCalledWith(true)
+
+      jest.advanceTimersByTime(comprehensiveAssessmentList.PUBLISH_SETTLE_MS)
+
+      expect(loaderService.changeLoaderState).toHaveBeenLastCalledWith(false)
+      jest.useRealTimers()
     })
 
     it('should stay on the builder when the dialog is closed part way through', () => {
@@ -1018,6 +1042,28 @@ describe('CreateAssessmentComponent', () => {
 
       expect(matSnackBar.open).not.toHaveBeenCalledWith('Assessment published successfully')
       expect(router.navigate).not.toHaveBeenCalled()
+    })
+
+    /**
+     * The dialog can link another plan on its way out, so the form and the version key are
+     * read back rather than left answering for an assessment that has moved on.
+     */
+    it('should read the assessment back when the dialog is closed unpublished', () => {
+      component.publishAssessment()
+      assessmentSvc.getContentHierarchy.mockClear()
+
+      afterClosed.next(false)
+
+      expect(assessmentSvc.getContentHierarchy).toHaveBeenCalledWith(component.contentId)
+    })
+
+    it('should not read it back once the assessment is published, it is leaving anyway', () => {
+      component.publishAssessment()
+      assessmentSvc.getContentHierarchy.mockClear()
+
+      afterClosed.next(true)
+
+      expect(assessmentSvc.getContentHierarchy).not.toHaveBeenCalled()
     })
 
     it('should say why the draft could not be saved rather than open the dialog', () => {

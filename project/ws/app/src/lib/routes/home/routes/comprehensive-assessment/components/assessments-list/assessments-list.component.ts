@@ -262,8 +262,13 @@ export class AssessmentsListComponent implements OnInit, OnDestroy {
     dialogRef.afterClosed().subscribe((published: boolean) => {
       if (published) {
         this.openSnackBar('Assessment published successfully')
-        // publishing moves the row out of the Draft tab, so the current list is reloaded
-        this.getAssessments()
+        // the assessment has left this tab for the Live one, and the platform is still
+        // finishing the publish - so the Live tab is opened once it has had its seconds
+        this.loaderService.changeLoaderState(true)
+        setTimeout(() => {
+          this.loaderService.changeLoaderState(false)
+          this.router.navigate(['/app/home/comprehensive-assessment', TAB_LIVE])
+        },         comprehensiveAssessmentList.PUBLISH_SETTLE_MS)
       }
     })
   }

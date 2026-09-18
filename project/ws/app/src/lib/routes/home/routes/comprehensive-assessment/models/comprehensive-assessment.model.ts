@@ -152,6 +152,14 @@ export namespace comprehensiveAssessmentList {
   export const STATUS_DRAFT = 'Draft'
   export const DEFAULT_PAGE_SIZE = 20
 
+  /**
+   * What the platform is given to finish a publish before the Live tab is opened on it. The
+   * publish call answers as soon as it is taken, and the search indexes the assessment a
+   * moment after that - opening the tab straight away lists everything but what was just
+   * published, which reads as the publish having failed.
+   */
+  export const PUBLISH_SETTLE_MS = 10000
+
   /** Where the window end sits on a listing row, resolved from the plan the row carries. */
   export const WINDOW_END_KEY = 'windowEndDate'
   export const WINDOW_CLOSED_MESSAGE =

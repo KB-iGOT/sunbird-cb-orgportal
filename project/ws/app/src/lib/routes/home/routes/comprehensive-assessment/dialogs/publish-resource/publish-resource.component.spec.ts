@@ -1,5 +1,8 @@
+import { MatDialog } from '@angular/material/dialog'
 import { of, throwError } from 'rxjs'
+import { aparPlan } from '../../models/comprehensive-assessment.model'
 import { ComprehensiveAssessmentService } from '../../services/comprehensive-assessment.service'
+import { PlanPickerComponent } from '../plan-picker/plan-picker.component'
 import { PublishResourceComponent } from './publish-resource.component'
 
 /** The ten seconds the dialog waits before it reads the status back. */
@@ -9,18 +12,37 @@ describe('PublishResourceComponent', () => {
   let component: PublishResourceComponent
   let dialogRef: any
   let assessmentSvc: any
+  let dialog: any
+  /** What the plan picker hands back when the admin picks one from the publish dialog. */
+  let pickedPlan: aparPlan.ILinkedPlan | null
 
   const userProfile = { userId: 'user-1', rootOrgId: 'org-1' }
   const questionSet = { identifier: 'qs-1', name: 'APAR assessment question set', status: 'Draft' }
+  /** The plan the assessment holds, as the service reads it off the linkage. */
+  const linkedPlan = { id: 'plan-1', name: 'APAR 2026-27 — Section Officer' }
 
   const collection = () => ({
     identifier: 'do_123',
     name: 'APAR comprehensive assessment',
+    versionKey: 'v1',
     children: [{ ...questionSet, mimeType: 'application/vnd.sunbird.questionset' }],
   })
 
+  /** The plan a run of the picker comes back with, `pickedPlan` being what it hands over. */
+  const newPlan = (): aparPlan.ILinkedPlan => ({
+    id: 'plan-2',
+    name: 'APAR 2026-27 — Deputy Secretary',
+    planYear: '2026-27',
+    endDate: '2027-03-31T00:00:00.000Z',
+    orgName: 'DoPT',
+    gatingCourseCount: 1,
+    contentList: [{ identifier: 'do-1', mandatory: true }],
+  })
+
   const build = (data: any = { collection: collection(), userProfile }) =>
-    new PublishResourceComponent(dialogRef, data, assessmentSvc as ComprehensiveAssessmentService)
+    new PublishResourceComponent(
+      dialogRef, data, assessmentSvc as ComprehensiveAssessmentService, dialog as MatDialog
+    )
 
   /** Publishes, then moves the clock on so the status read behind the wait runs. */
   const publishAndWait = (seconds: number = WAIT_SECONDS) => {
@@ -32,11 +54,17 @@ describe('PublishResourceComponent', () => {
 
   beforeEach(() => {
     dialogRef = { close: jest.fn() }
+    pickedPlan = newPlan()
+    dialog = { open: jest.fn(() => ({ afterClosed: () => of(pickedPlan) })) }
     assessmentSvc = {
       getLinkedResources: jest.fn().mockReturnValue([{ ...questionSet }]),
       publishQuestionSet: jest.fn().mockReturnValue(of({})),
       getQuestionSetStatus: jest.fn().mockReturnValue(of('Live')),
       publishAssessment: jest.fn().mockReturnValue(of({})),
+      readPlanMetadata: jest.fn().mockReturnValue(linkedPlan),
+      isPlanAvailable: jest.fn().mockReturnValue(of(true)),
+      linkPlanToAssessment: jest.fn().mockReturnValue(of({})),
+      updateLinkedPlan: jest.fn().mockReturnValue(of({ result: { versionKey: 'v2' } })),
     }
     component = build()
   })
@@ -141,7 +169,8 @@ describe('PublishResourceComponent', () => {
       expect(component.stage).toBe('live')
       expect(component.canPublishAssessment).toBe(true)
       expect(component.resources[0].status).toBe('Live')
-      expect(component.message).toBe('The resource is live, the assessment can now be published')
+      expect(component.message)
+        .toBe('The resource is live and the plan is free, the assessment can now be published')
     })
 
     /**
@@ -371,6 +400,266 @@ describe('PublishResourceComponent', () => {
       component.publishAssessment()
 
       expect(assessmentSvc.publishAssessment).not.toHaveBeenCalled()
+    })
+  })
+
+  /**
+   * A plan is linked in the builder and published from here, and the two can be days apart.
+   * The publish is the last point at which the plan can still be found to be gone.
+   */
+  describe('the linked plan', () => {
+    it('should name the plan the assessment holds from the moment it opens', () => {
+      expect(component.planName).toBe('APAR 2026-27 — Section Officer')
+      expect(component.isPlanFree).toBeNull()
+      expect(component.planStatusText).toBe('Not checked yet')
+    })
+
+    it('should check the plan once every resource is Live', () => {
+      publishAndWait()
+
+      expect(assessmentSvc.isPlanAvailable).toHaveBeenCalledWith('plan-1')
+      expect(component.isPlanFree).toBe(true)
+      expect(component.planStatusText).toBe('Available')
+      expect(component.stage).toBe('live')
+    })
+
+    /** Nothing is checked while there is still a resource to publish. */
+    it('should leave the plan alone while a resource is not Live yet', () => {
+      assessmentSvc.getQuestionSetStatus.mockReturnValue(of('Processing'))
+
+      publishAndWait()
+
+      expect(assessmentSvc.isPlanAvailable).not.toHaveBeenCalled()
+    })
+
+    it('should check the plan of an assessment that opens with its resource already Live', () => {
+      assessmentSvc.getLinkedResources.mockReturnValue([{ ...questionSet, status: 'Live' }])
+      component = build()
+
+      component.ngOnInit()
+
+      expect(assessmentSvc.isPlanAvailable).toHaveBeenCalledWith('plan-1')
+      expect(component.stage).toBe('live')
+    })
+
+    /** The search answers with nothing once another assessment has taken the plan. */
+    it('should refuse the publish when the plan is no longer available', () => {
+      assessmentSvc.isPlanAvailable.mockReturnValue(of(false))
+
+      publishAndWait()
+
+      expect(component.stage).toBe('planTaken')
+      expect(component.isPlanTaken).toBe(true)
+      expect(component.isPlanFree).toBe(false)
+      expect(component.planStatusText).toBe('Not available')
+      expect(component.canPublishAssessment).toBe(false)
+      expect(component.isError).toBe(true)
+    })
+
+    /** The resource publish is done, so the offer stays the assessment publish - disabled. */
+    it('should keep offering the assessment publish rather than the resource one', () => {
+      assessmentSvc.isPlanAvailable.mockReturnValue(of(false))
+
+      publishAndWait()
+
+      expect(component.resourcesLive).toBe(true)
+    })
+
+    it('should not publish an assessment whose plan is taken', () => {
+      assessmentSvc.isPlanAvailable.mockReturnValue(of(false))
+      publishAndWait()
+
+      component.publishAssessment()
+
+      expect(assessmentSvc.publishAssessment).not.toHaveBeenCalled()
+    })
+
+    it('should check the plan again on a refresh', () => {
+      assessmentSvc.isPlanAvailable.mockReturnValue(of(false))
+      publishAndWait()
+      assessmentSvc.isPlanAvailable.mockReturnValue(of(true))
+
+      component.recheckStatus()
+
+      expect(component.stage).toBe('live')
+      expect(component.canPublishAssessment).toBe(true)
+    })
+
+    /** The publish itself answers for the plan, so a lookup that fails does not block it. */
+    it('should leave the publish open when the plan cannot be checked at all', () => {
+      assessmentSvc.isPlanAvailable.mockReturnValue(throwError(() => ({})))
+
+      publishAndWait()
+
+      expect(component.stage).toBe('live')
+      expect(component.isPlanFree).toBeNull()
+      expect(component.isError).toBe(false)
+    })
+  })
+
+  /**
+   * A plan that has gone while the assessment sat in draft is changed from here: sending the
+   * admin back through the builder to pick another one would lose the publish they are in.
+   */
+  describe('changing the plan from the publish dialog', () => {
+    /** Everything below starts from the plan having been found gone. */
+    beforeEach(() => {
+      assessmentSvc.isPlanAvailable.mockReturnValue(of(false))
+      publishAndWait()
+      assessmentSvc.isPlanAvailable.mockReturnValue(of(true))
+    })
+
+    it('should offer the change only once the plan is known to be gone', () => {
+      expect(component.canChangePlan).toBe(true)
+
+      assessmentSvc.isPlanAvailable.mockReturnValue(of(true))
+      component.recheckStatus()
+
+      expect(component.canChangePlan).toBe(false)
+    })
+
+    it('should open the picker on the plan the assessment holds', () => {
+      component.changePlan()
+
+      expect(dialog.open).toHaveBeenCalledWith(PlanPickerComponent, expect.objectContaining({
+        data: { userProfile, selectedPlanId: 'plan-1' },
+      }))
+    })
+
+    it('should write the picked plan onto the assessment', () => {
+      component.changePlan()
+
+      expect(assessmentSvc.updateLinkedPlan).toHaveBeenCalledWith('do_123', 'v1', pickedPlan)
+      expect(component.planName).toBe('APAR 2026-27 — Deputy Secretary')
+    })
+
+    /** Checked rather than taken on trust, so one guard answers for every plan. */
+    it('should check the picked plan and open the publish', () => {
+      component.changePlan()
+
+      expect(assessmentSvc.isPlanAvailable).toHaveBeenLastCalledWith('plan-2')
+      expect(component.stage).toBe('live')
+      expect(component.canPublishAssessment).toBe(true)
+      expect(component.isPlanFree).toBe(true)
+    })
+
+    it('should publish against the plan that was picked, not the one that was taken', () => {
+      component.changePlan()
+
+      component.publishAssessment()
+
+      expect(assessmentSvc.linkPlanToAssessment).toHaveBeenCalledWith('plan-2', 'do_123')
+    })
+
+    /** A content update answers with a new version key, and a stale one fails the next. */
+    it('should carry the new version key into a second change', () => {
+      component.changePlan()
+      assessmentSvc.isPlanAvailable.mockReturnValue(of(false))
+      component.recheckStatus()
+
+      component.changePlan()
+
+      expect(assessmentSvc.updateLinkedPlan).toHaveBeenLastCalledWith('do_123', 'v2', pickedPlan)
+    })
+
+    it('should leave everything as it was when the picker is closed with nothing', () => {
+      pickedPlan = null
+
+      component.changePlan()
+
+      expect(assessmentSvc.updateLinkedPlan).not.toHaveBeenCalled()
+      expect(component.stage).toBe('planTaken')
+    })
+
+    it('should stay on the taken plan and say why the change did not save', () => {
+      assessmentSvc.updateLinkedPlan.mockReturnValue(
+        throwError(() => ({ error: { params: { errmsg: 'versionKey mismatch' } } }))
+      )
+
+      component.changePlan()
+
+      expect(component.stage).toBe('planTaken')
+      expect(component.isError).toBe(true)
+      expect(component.message).toBe('versionKey mismatch')
+      expect(component.canPublishAssessment).toBe(false)
+    })
+
+    it('should not open the picker for a plan that is still free', () => {
+      component.recheckStatus()
+
+      component.changePlan()
+
+      expect(dialog.open).not.toHaveBeenCalled()
+    })
+  })
+
+  /** The plan is told which assessment holds it, so no other assessment is offered it. */
+  describe('linking the plan to the published assessment', () => {
+    beforeEach(() => {
+      publishAndWait()
+    })
+
+    it('should link the plan once the assessment is published', () => {
+      component.publishAssessment()
+
+      expect(assessmentSvc.linkPlanToAssessment).toHaveBeenCalledWith('plan-1', 'do_123')
+      expect(dialogRef.close).toHaveBeenCalledWith(true)
+    })
+
+    it('should link only after the publish, never before it', () => {
+      assessmentSvc.publishAssessment.mockReturnValue(throwError(() => ({})))
+
+      component.publishAssessment()
+
+      expect(assessmentSvc.linkPlanToAssessment).not.toHaveBeenCalled()
+    })
+
+    /**
+     * The assessment is Live by here, so publishing again would be wrong - the linkage is
+     * the only thing left, and it is what the retry sends.
+     */
+    it('should offer the linking again when only that failed', () => {
+      assessmentSvc.linkPlanToAssessment.mockReturnValue(throwError(() => ({})))
+
+      component.publishAssessment()
+
+      expect(component.stage).toBe('linkFailed')
+      expect(component.isLinkFailed).toBe(true)
+      expect(component.isError).toBe(true)
+      expect(component.message).toBe('The assessment is published, but the APAR plan was not linked to it')
+      expect(dialogRef.close).not.toHaveBeenCalled()
+    })
+
+    it('should send the linkage alone on the retry', () => {
+      assessmentSvc.linkPlanToAssessment.mockReturnValue(throwError(() => ({})))
+      component.publishAssessment()
+      assessmentSvc.linkPlanToAssessment.mockReturnValue(of({}))
+
+      component.linkPlan()
+
+      expect(assessmentSvc.publishAssessment).toHaveBeenCalledTimes(1)
+      expect(dialogRef.close).toHaveBeenCalledWith(true)
+    })
+
+    /** Backing out of a failed linkage still leaves an assessment that was published. */
+    it('should report the publish when the dialog is closed after a failed linkage', () => {
+      assessmentSvc.linkPlanToAssessment.mockReturnValue(throwError(() => ({})))
+      component.publishAssessment()
+
+      component.close()
+
+      expect(dialogRef.close).toHaveBeenCalledWith(true)
+    })
+
+    it('should close on the publish alone when the assessment holds no plan', () => {
+      assessmentSvc.readPlanMetadata.mockReturnValue(null)
+      component = build()
+      publishAndWait()
+
+      component.publishAssessment()
+
+      expect(assessmentSvc.linkPlanToAssessment).not.toHaveBeenCalled()
+      expect(dialogRef.close).toHaveBeenCalledWith(true)
     })
   })
 

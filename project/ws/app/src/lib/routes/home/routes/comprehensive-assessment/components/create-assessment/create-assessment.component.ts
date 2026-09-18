@@ -590,14 +590,39 @@ export class CreateAssessmentComponent implements OnInit {
             this.openSnackBar('Assessment published successfully')
             // a published assessment belongs to the Live tab, whichever tab it was opened from
             this.pathUrl = 'live'
-            this.navigateBack()
+            // the platform is still finishing the publish, so the tab is opened once it has
+            // had its seconds - the loader stays up for them rather than the builder sitting
+            // there looking as though nothing happened
+            this.loaderService.changeLoaderState(true)
+            setTimeout(() => {
+              this.loaderService.changeLoaderState(false)
+              this.navigateBack()
+            },         comprehensiveAssessmentList.PUBLISH_SETTLE_MS)
+            return
           }
+          // the dialog can have linked another plan on the way out, which leaves the form
+          // and the version key here answering for an assessment that has moved on
+          this.reloadContent()
         })
       },
       error: (error: HttpErrorResponse) => {
         this.loaderService.changeLoaderState(false)
         this.openSnackBar(_.get(error, 'error.message', 'Unable to save the assessment, please try again'))
       },
+    })
+  }
+  /**
+   * Reads the assessment back and patches the form from it. Nothing is lost by it: the draft
+   * is saved before the publish dialog opens, so what the api holds is what the form held.
+   */
+  private reloadContent() {
+    this.assessmentSvc.getContentHierarchy(this.contentId).subscribe((res: any) => {
+      const content = _.get(res, 'result.content')
+      if (content) {
+        this.contentDetails = content
+        this.previewContent = content
+        this.patchAssessmentDetails()
+      }
     })
   }
   //#endregion

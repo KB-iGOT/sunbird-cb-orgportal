@@ -34,6 +34,27 @@
     </div>
   </div>
 
+  <!-- The other thing that has to be ready before the assessment can go Live. A plan that
+       has been taken since it was linked is changed here rather than back in the builder. -->
+  <div class="resource-table plan-table">
+    <div class="table-row table-head">
+      <span class="col-name">Linked APAR plan</span>
+      <span class="col-status">Status</span>
+    </div>
+    <div class="table-row">
+      <span class="col-name" [matTooltip]="planName" matTooltipClass="new-toolTip"
+        matTooltipPosition="above">{{ planName || 'No plan linked' }}</span>
+      <span class="col-status">
+        <span class="status-chip" [ngClass]="isPlanFree ? 'status-live' : 'status-draft'">
+          {{ planStatusText }}
+        </span>
+      </span>
+      <!-- a plan that has gone is changed here, the picker only offers the ones still free -->
+      <button mat-stroked-button class="change-plan-button" type="button" *ngIf="isPlanTaken"
+        [disabled]="!canChangePlan" (click)="changePlan()">Choose</button>
+    </div>
+  </div>
+
   <div class="stage-message" *ngIf="message" [class.error-message]="isError">
     <mat-spinner *ngIf="isBusy && !countdown" diameter="16"></mat-spinner>
     <span>{{ message }}</span>
@@ -43,9 +64,14 @@
   <div class="action-btns flex justify-center items-center gap-4">
     <button mat-stroked-button class="cancel-button" type="button" [disabled]="isBusy"
       (click)="close()">Close</button>
-    <button mat-flat-button class="action-button" type="button" *ngIf="!canPublishAssessment"
+    <button mat-flat-button class="action-button" type="button" *ngIf="!resourcesLive"
       [disabled]="isPublishResourceDisabled" (click)="publishResource()">Publish Resource</button>
-    <button mat-flat-button class="action-button" type="button" *ngIf="canPublishAssessment"
-      [disabled]="isBusy" (click)="publishAssessment()">Publish Assessment</button>
+    <!-- the plan check sits between the two publishes, so the offer stays the assessment
+         publish while it runs and while a taken plan is what is holding it up -->
+    <button mat-flat-button class="action-button" type="button" *ngIf="resourcesLive && !isLinkFailed"
+      [disabled]="!canPublishAssessment" (click)="publishAssessment()">Publish Assessment</button>
+    <!-- the assessment is already Live by here, only the linkage back to the plan is left -->
+    <button mat-flat-button class="action-button" type="button" *ngIf="isLinkFailed"
+      (click)="linkPlan()">Retry Linking Plan</button>
   </div>
 </div>

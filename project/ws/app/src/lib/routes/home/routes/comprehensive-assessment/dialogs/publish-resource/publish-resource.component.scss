@@ -107,6 +107,19 @@
     }
   }
 
+  .plan-table {
+    margin-top: 16px;
+  }
+
+  /* Sits where the plan's own status is, so what is wrong and what to do are read together. */
+  .change-plan-button {
+    @include ca-button-secondary;
+
+    flex: 0 0 auto;
+    min-width: 88px;
+    height: 28px;
+  }
+
   .stage-message {
     display: flex;
     align-items: center;
