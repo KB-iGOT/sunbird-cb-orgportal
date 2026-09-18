@@ -26,6 +26,7 @@ const API_END_POINTS = {
   RETIRE_CONTENT: (contentId: string) => `apis/proxies/v8/action/content/v3/retire/${contentId}`,
   APAR_PLAN_SEARCH: 'apis/proxies/v8/cbplan/v4/search',
   APAR_PLAN_UPDATE: 'apis/proxies/v8/cbplan/v4/update',
+  APAR_PLAN_READ: (planId: string) => `apis/proxies/v8/cbplan/v4/read/${planId}`,
 }
 
 const STORAGE_URL_TO_REPLACE = 'https://storage.googleapis.com/igot'
@@ -192,13 +193,12 @@ export class ComprehensiveAssessmentService {
    * language it takes, and it is the search that leaves out a plan another assessment
    * already holds - `applyOrgIdFilter` scopes it to the caller's org, so no org id is named.
    *
-   * `isApar` is not part of the query, so plans with APAR assignment off are dropped here
-   * instead: the count stays the one the api reports, a page can therefore render fewer
-   * rows than the paginator counts.
-   *
-   * Only an explicit `false` drops a plan. A row carrying no `isApar` at all is a field the
-   * search did not project, not a plan with the toggle off, and dropping those would empty
-   * the picker against an api that is otherwise answering correctly.
+   * A plan with APAR assignment off is asked out by the query itself. The local drop below it
+   * stays as a backstop, for an api answering with more than it was asked for: only an explicit
+   * `false` drops a plan there, since a row carrying no `isApar` at all is a field the search
+   * did not project rather than a plan with the toggle off, and dropping those would empty the
+   * picker against an api that is otherwise answering correctly. Whatever it drops, the count
+   * stays the one the api reports, so a page can render fewer rows than the paginator counts.
    */
   searchAparPlans(params: {
     planYear: string,
@@ -206,7 +206,10 @@ export class ComprehensiveAssessmentService {
     pageIndex: number,
     pageSize: number
   }): Observable<{ plans: aparPlan.IPlanRow[], count: number }> {
-    const must: any[] = [{ term: { 'status.keyword': comprehensiveAssessmentList.STATUS_LIVE } }]
+    const must: any[] = [
+      { term: { 'status.keyword': comprehensiveAssessmentList.STATUS_LIVE } },
+      { term: { 'isApar.keyword': true } },
+    ]
     if (params.planYear && params.planYear !== aparPlan.ALL_YEARS) {
       must.push({ term: { 'planYear.keyword': params.planYear } })
     }
@@ -253,27 +256,31 @@ export class ComprehensiveAssessmentService {
   }
 
   /**
-   * Whether the plan the assessment holds can still be published against: the same search
-   * the picker is filled from, narrowed to the one plan. It answers with the plan while the
-   * plan is Live and free, and with nothing once another assessment has taken it - which is
-   * the case the publish has to stop, since the picker only guards the moment of linking.
+   * Whether this assessment can still be published against the plan it holds. The plan is
+   * read rather than searched for, and `caLinkedId` on it is the whole answer: nothing holds
+   * the plan, this assessment holds it, or another one has taken it since it was linked.
+   *
+   * The picker only guards the moment of linking, which can be days before the publish.
    */
-  isPlanAvailable(planId: string): Observable<boolean> {
+  isPlanAvailable(planId: string, contentId: string): Observable<boolean> {
     if (!planId) {
       return of(false)
     }
-    const request = this.buildPlanSearchRequest(
-      [
-        { term: { 'status.keyword': comprehensiveAssessmentList.STATUS_LIVE } },
-        { term: { 'id.keyword': planId } },
-      ],
-      0,
-      aparPlan.PAGE_SIZE
+    return this.http.get<any>(API_END_POINTS.APAR_PLAN_READ(planId)).pipe(
+      map((res: any) => {
+        const heldBy = _.get(this.readPlanResponse(res), aparPlan.LINKED_ASSESSMENT_FIELD, '') || ''
+        return !heldBy || heldBy === contentId
+      })
     )
+  }
 
-    return this.http.post<any>(API_END_POINTS.APAR_PLAN_SEARCH, { request }).pipe(
-      map((res: any) => !!_.get(res, 'result.result.data', []).length)
-    )
+  /**
+   * The plan out of a read. `api.cb.plan.v4.read.byId` answers under `result.content`, which
+   * is not where the search answers (`result.result.data`) - reading the wrong one finds no
+   * `caLinkedId` at all, and a plan another assessment holds then passes as free.
+   */
+  private readPlanResponse(res: any): any {
+    return _.get(res, 'result.content', {}) || {}
   }
 
   /**
@@ -566,6 +573,9 @@ export class ComprehensiveAssessmentService {
           framework: DEFAULT_FRAMEWORK,
           mimeType: COLLECTION_MIME_TYPE,
           organisation: [_.get(userProfile, 'departmentName', '')],
+          // who the assessment is from, as the learner reads it off the card: the org of the
+          // admin creating it, which is the same name `organisation` carries
+          source: _.get(userProfile, 'departmentName', ''),
           isExternal: false,
           primaryCategory: CONTENT_PRIMARY_CATEGORY,
           courseCategory: CONTENT_COURSE_CATEGORY,

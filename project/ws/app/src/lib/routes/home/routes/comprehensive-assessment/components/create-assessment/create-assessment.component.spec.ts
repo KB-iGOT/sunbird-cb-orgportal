@@ -443,6 +443,58 @@ describe('CreateAssessmentComponent', () => {
       expect(loaderService.changeLoaderState).toHaveBeenLastCalledWith(false)
     })
 
+    /**
+     * Reopening a finished assessment and stepping through it wrote every field over itself,
+     * and took a new version key for it, on every Next.
+     */
+    describe('when the step changed nothing', () => {
+      beforeEach(() => {
+        // the form is patched from the content alone, which is the reopened assessment
+        component = build({ assessmentDetails: { data: content({ posterImage: 'icon.png' }) } })
+        withStepper()
+      })
+
+      it('should move on without saving', () => {
+        component.moveToNextForm()
+
+        expect(assessmentSvc.updateContent).not.toHaveBeenCalled()
+        expect(component.currentStepperIndex).toBe(1)
+        expect(loaderService.changeLoaderState).toHaveBeenLastCalledWith(false)
+      })
+
+      it('should still read the hierarchy the next step renders from', () => {
+        component.moveToNextForm()
+
+        expect(assessmentSvc.getContentHierarchy).toHaveBeenCalledWith('do_123')
+        expect(component.previewReady).toBe(true)
+      })
+
+      it('should save as soon as an authored field is edited', () => {
+        component.assessmentDetailsForm.patchValue({ assessmentName: 'A renamed assessment' })
+
+        component.moveToNextForm()
+
+        expect(assessmentSvc.updateContent).toHaveBeenCalledWith('do_123', expect.objectContaining({
+          name: 'A renamed assessment',
+        }))
+      })
+
+      /**
+       * The keyword box, the plan picker and the basic info dialog all patch their values
+       * in, which never marks a control dirty - so the values are what is compared.
+       */
+      it('should save a keyword added without the form being marked dirty', () => {
+        component.assessmentDetailsForm.patchValue({ keywords: ['NFCS', 'APAR'] })
+
+        component.moveToNextForm()
+
+        expect(component.assessmentDetailsForm.pristine).toBe(true)
+        expect(assessmentSvc.updateContent).toHaveBeenCalledWith('do_123', expect.objectContaining({
+          keywords: ['NFCS', 'APAR'],
+        }))
+      })
+    })
+
     it('should read the hierarchy back so the next step renders what was saved', () => {
       component.moveToNextForm()
 
