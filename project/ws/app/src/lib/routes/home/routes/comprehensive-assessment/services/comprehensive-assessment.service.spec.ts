@@ -86,7 +86,7 @@ describe('ComprehensiveAssessmentService', () => {
             bool: {
               must: [
                 { term: { 'status.keyword': 'Live' } },
-                { term: { 'isApar.keyword': true } },
+                { term: { 'isApar': true } },
                 { term: { 'planYear.keyword': '2026-27' } },
               ],
               must_not: [{ exists: { field: aparPlan.LINKED_ASSESSMENT_FIELD } }],
@@ -129,7 +129,7 @@ describe('ComprehensiveAssessmentService', () => {
       const req = httpMock.expectOne(PLAN_SEARCH_URL)
       expect(req.request.body.request.query.bool.must).toEqual([
         { term: { 'status.keyword': 'Live' } },
-        { term: { 'isApar.keyword': true } },
+        { term: { 'isApar': true } },
       ])
       req.flush(planSearchResponse([]))
     })
@@ -140,7 +140,7 @@ describe('ComprehensiveAssessmentService', () => {
 
       const req = httpMock.expectOne(PLAN_SEARCH_URL)
       expect(req.request.body.request.query.bool.must).toContainEqual({
-        term: { 'isApar.keyword': true },
+        term: { 'isApar': true },
       })
       req.flush(planSearchResponse([]))
     })
