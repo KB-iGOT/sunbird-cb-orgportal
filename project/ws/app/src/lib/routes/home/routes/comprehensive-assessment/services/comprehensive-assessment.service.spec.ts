@@ -8,6 +8,12 @@ import { ComprehensiveAssessmentService } from './comprehensive-assessment.servi
 const PLAN_SEARCH_URL = 'apis/proxies/v8/cbplan/v4/search'
 const CONTENT_SEARCH_URL = 'apis/proxies/v8/sunbirdigot/v4/search'
 const PLAN_UPDATE_URL = 'apis/proxies/v8/cbplan/v4/update'
+const PLAN_READ_URL = 'apis/proxies/v8/cbplan/v4/read/plan-1'
+/** A plan as the v4 read hands it back, `caLinkedId` naming the assessment that holds it. */
+const planReadResponse = (caLinkedId: any = null) => ({
+  params: { status: 'success' },
+  result: { result: { ...planRow(), caLinkedId } },
+})
 /** The key the linkage is written under, read off the model so a version bump is one edit. */
 const LINK_KEY = aparPlan.TRAINING_PLAN_KEY
 
@@ -206,57 +212,55 @@ describe('ComprehensiveAssessmentService', () => {
     })
   })
 
-  /** The publish time check: the picker only guards the moment a plan is linked. */
+  /**
+   * The publish time check: the picker only guards the moment a plan is linked, and the plan
+   * itself says which assessment holds it by then.
+   */
   describe('isPlanAvailable', () => {
-    it('should ask the same search for the one plan, still free and still Live', () => {
-      service.isPlanAvailable('plan-1').subscribe()
+    const availability = (response: any, contentId = 'do_123'): boolean | undefined => {
+      let available: boolean | undefined
+      service.isPlanAvailable('plan-1', contentId).subscribe((res: boolean) => available = res)
+      httpMock.expectOne(PLAN_READ_URL).flush(response)
+      return available
+    }
 
-      const req = httpMock.expectOne(PLAN_SEARCH_URL)
-      expect(req.request.body).toEqual({
-        request: {
-          query: {
-            bool: {
-              must: [
-                { term: { 'status.keyword': 'Live' } },
-                { term: { 'id.keyword': 'plan-1' } },
-              ],
-              must_not: [{ exists: { field: 'caLinkedId' } }],
-            },
-          },
-          pageNumber: 0,
-          pageSize: aparPlan.PAGE_SIZE,
-          applyOrgIdFilter: true,
-        },
-      })
-      req.flush(planSearchResponse([]))
+    it('should read the plan rather than search for it', () => {
+      service.isPlanAvailable('plan-1', 'do_123').subscribe()
+
+      const req = httpMock.expectOne(PLAN_READ_URL)
+      expect(req.request.method).toBe('GET')
+      httpMock.expectNone(PLAN_SEARCH_URL)
+      req.flush(planReadResponse())
     })
 
-    it('should answer that the plan is free while the search still returns it', () => {
-      let available: boolean | undefined
-
-      service.isPlanAvailable('plan-1').subscribe((res: boolean) => available = res)
-      httpMock.expectOne(PLAN_SEARCH_URL).flush(planSearchResponse([planRow()]))
-
-      expect(available).toBe(true)
+    it('should answer that a plan no assessment holds is free', () => {
+      expect(availability(planReadResponse(null))).toBe(true)
+      expect(availability(planReadResponse(''))).toBe(true)
+      expect(availability({ result: { result: planRow() } })).toBe(true)
     })
 
-    /** Another assessment has taken it, or it is no longer Live - either way it is gone. */
-    it('should answer that the plan is taken when the search returns nothing', () => {
-      let available: boolean | undefined
+    /** Reopening the publish on an assessment that already holds the plan. */
+    it('should answer that a plan this assessment holds is free to it', () => {
+      expect(availability(planReadResponse('do_123'))).toBe(true)
+    })
 
-      service.isPlanAvailable('plan-1').subscribe((res: boolean) => available = res)
-      httpMock.expectOne(PLAN_SEARCH_URL).flush(planSearchResponse([]))
+    it('should answer that a plan another assessment holds is taken', () => {
+      expect(availability(planReadResponse('do_999'))).toBe(false)
+    })
 
-      expect(available).toBe(false)
+    /** The envelope the read answers in is not the one the search answers in. */
+    it('should find the plan however the read wraps it', () => {
+      expect(availability({ result: { caLinkedId: 'do_999' } })).toBe(false)
+      expect(availability({ result: { result: { data: [{ caLinkedId: 'do_999' }] } } })).toBe(false)
     })
 
     it('should answer without asking at all for an assessment holding no plan', () => {
       let available: boolean | undefined
 
-      service.isPlanAvailable('').subscribe((res: boolean) => available = res)
+      service.isPlanAvailable('', 'do_123').subscribe((res: boolean) => available = res)
 
       expect(available).toBe(false)
-      httpMock.expectNone(PLAN_SEARCH_URL)
+      httpMock.expectNone(PLAN_READ_URL)
     })
   })
 

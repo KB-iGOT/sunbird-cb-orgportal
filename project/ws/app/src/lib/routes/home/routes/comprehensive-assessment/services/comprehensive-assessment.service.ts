@@ -26,6 +26,7 @@ const API_END_POINTS = {
   RETIRE_CONTENT: (contentId: string) => `apis/proxies/v8/action/content/v3/retire/${contentId}`,
   APAR_PLAN_SEARCH: 'apis/proxies/v8/cbplan/v4/search',
   APAR_PLAN_UPDATE: 'apis/proxies/v8/cbplan/v4/update',
+  APAR_PLAN_READ: (planId: string) => `apis/proxies/v8/cbplan/v4/read/${planId}`,
 }
 
 const STORAGE_URL_TO_REPLACE = 'https://storage.googleapis.com/igot'
@@ -253,27 +254,33 @@ export class ComprehensiveAssessmentService {
   }
 
   /**
-   * Whether the plan the assessment holds can still be published against: the same search
-   * the picker is filled from, narrowed to the one plan. It answers with the plan while the
-   * plan is Live and free, and with nothing once another assessment has taken it - which is
-   * the case the publish has to stop, since the picker only guards the moment of linking.
+   * Whether this assessment can still be published against the plan it holds. The plan is
+   * read rather than searched for, and `caLinkedId` on it is the whole answer: nothing holds
+   * the plan, this assessment holds it, or another one has taken it since it was linked.
+   *
+   * The picker only guards the moment of linking, which can be days before the publish.
    */
-  isPlanAvailable(planId: string): Observable<boolean> {
+  isPlanAvailable(planId: string, contentId: string): Observable<boolean> {
     if (!planId) {
       return of(false)
     }
-    const request = this.buildPlanSearchRequest(
-      [
-        { term: { 'status.keyword': comprehensiveAssessmentList.STATUS_LIVE } },
-        { term: { 'id.keyword': planId } },
-      ],
-      0,
-      aparPlan.PAGE_SIZE
+    return this.http.get<any>(API_END_POINTS.APAR_PLAN_READ(planId)).pipe(
+      map((res: any) => {
+        const heldBy = _.get(this.readPlanResponse(res), aparPlan.LINKED_ASSESSMENT_FIELD, '') || ''
+        return !heldBy || heldBy === contentId
+      })
     )
+  }
 
-    return this.http.post<any>(API_END_POINTS.APAR_PLAN_SEARCH, { request }).pipe(
-      map((res: any) => !!_.get(res, 'result.result.data', []).length)
-    )
+  /**
+   * The plan out of a read. The search answers under `result.result.data`, so a read is taken
+   * to answer with the plan itself under `result.result` - both, and a single row list, are
+   * unwrapped rather than the check reading `caLinkedId` off the wrong object and passing.
+   */
+  private readPlanResponse(res: any): any {
+    const result = _.get(res, 'result.result', null) || _.get(res, 'result', null) || {}
+    const plan = _.get(result, 'data', result)
+    return (_.isArray(plan) ? _.head(plan) : plan) || {}
   }
 
   /**
