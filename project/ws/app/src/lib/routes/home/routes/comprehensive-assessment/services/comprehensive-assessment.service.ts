@@ -566,6 +566,9 @@ export class ComprehensiveAssessmentService {
           framework: DEFAULT_FRAMEWORK,
           mimeType: COLLECTION_MIME_TYPE,
           organisation: [_.get(userProfile, 'departmentName', '')],
+          // who the assessment is from, as the learner reads it off the card: the org of the
+          // admin creating it, which is the same name `organisation` carries
+          source: _.get(userProfile, 'departmentName', ''),
           isExternal: false,
           primaryCategory: CONTENT_PRIMARY_CATEGORY,
           courseCategory: CONTENT_COURSE_CATEGORY,

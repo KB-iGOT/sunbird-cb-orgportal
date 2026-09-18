@@ -189,6 +189,14 @@
 }
 
 :host ::ng-deep .assessment-form {
+  /* Every mat-form-field reserves a row under itself for the hint or error it would carry.
+     The validation messages of this form are siblings of the field rather than its
+     subscript, so that row is always empty - and it is the whole of why the message under a
+     select sat further from it than the one under the keywords box beside it. */
+  .mat-mdc-form-field-subscript-wrapper {
+    display: none;
+  }
+
   .mat-form-field-appearance-outline .mat-form-field-infix {
     padding: 5px 0px 10px;
   }
