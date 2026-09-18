@@ -273,14 +273,12 @@ export class ComprehensiveAssessmentService {
   }
 
   /**
-   * The plan out of a read. The search answers under `result.result.data`, so a read is taken
-   * to answer with the plan itself under `result.result` - both, and a single row list, are
-   * unwrapped rather than the check reading `caLinkedId` off the wrong object and passing.
+   * The plan out of a read. `api.cb.plan.v4.read.byId` answers under `result.content`, which
+   * is not where the search answers (`result.result.data`) - reading the wrong one finds no
+   * `caLinkedId` at all, and a plan another assessment holds then passes as free.
    */
   private readPlanResponse(res: any): any {
-    const result = _.get(res, 'result.result', null) || _.get(res, 'result', null) || {}
-    const plan = _.get(result, 'data', result)
-    return (_.isArray(plan) ? _.head(plan) : plan) || {}
+    return _.get(res, 'result.content', {}) || {}
   }
 
   /**

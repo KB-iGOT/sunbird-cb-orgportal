@@ -9,10 +9,13 @@ const PLAN_SEARCH_URL = 'apis/proxies/v8/cbplan/v4/search'
 const CONTENT_SEARCH_URL = 'apis/proxies/v8/sunbirdigot/v4/search'
 const PLAN_UPDATE_URL = 'apis/proxies/v8/cbplan/v4/update'
 const PLAN_READ_URL = 'apis/proxies/v8/cbplan/v4/read/plan-1'
-/** A plan as the v4 read hands it back, `caLinkedId` naming the assessment that holds it. */
+/**
+ * A plan as `api.cb.plan.v4.read.byId` hands it back - under `result.content`, not where the
+ * search answers - with `caLinkedId` naming the assessment that holds it.
+ */
 const planReadResponse = (caLinkedId: any = null) => ({
   params: { status: 'success' },
-  result: { result: { ...planRow(), caLinkedId } },
+  result: { content: { ...planRow(), caLinkedId } },
 })
 /** The key the linkage is written under, read off the model so a version bump is one edit. */
 const LINK_KEY = aparPlan.TRAINING_PLAN_KEY
@@ -236,7 +239,7 @@ describe('ComprehensiveAssessmentService', () => {
     it('should answer that a plan no assessment holds is free', () => {
       expect(availability(planReadResponse(null))).toBe(true)
       expect(availability(planReadResponse(''))).toBe(true)
-      expect(availability({ result: { result: planRow() } })).toBe(true)
+      expect(availability({ result: { content: planRow() } })).toBe(true)
     })
 
     /** Reopening the publish on an assessment that already holds the plan. */
@@ -248,10 +251,18 @@ describe('ComprehensiveAssessmentService', () => {
       expect(availability(planReadResponse('do_999'))).toBe(false)
     })
 
-    /** The envelope the read answers in is not the one the search answers in. */
-    it('should find the plan however the read wraps it', () => {
-      expect(availability({ result: { caLinkedId: 'do_999' } })).toBe(false)
-      expect(availability({ result: { result: { data: [{ caLinkedId: 'do_999' }] } } })).toBe(false)
+    /**
+     * The read answers under `result.content` and the search under `result.result.data`. The
+     * regression: read for the search's envelope and every plan answers as free, because
+     * `caLinkedId` is not on the object being looked at.
+     */
+    it('should read caLinkedId off the plan the read actually answers with', () => {
+      expect(availability({ result: { content: { caLinkedId: 'do_999' } } })).toBe(false)
+    })
+
+    it('should treat a response carrying no plan as free rather than throw', () => {
+      expect(availability({ result: {} })).toBe(true)
+      expect(availability({})).toBe(true)
     })
 
     it('should answer without asking at all for an assessment holding no plan', () => {
