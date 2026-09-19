@@ -31,13 +31,9 @@ const PLAN_TAKEN_MESSAGE =
  *                 rather than by leaving for the Basic Details step and coming back
  *  `linkingPlan`- a plan has just been picked and is being written onto the assessment
  *  `publishing` - the assessment itself is being published
- *  `linking`    - the assessment is Live, the plan is being told which assessment holds it
- *  `linkFailed` - the assessment is Live but the plan was not told, so only that last call
- *                 is left to retry; publishing again would be wrong, it is already done
  */
 export type PublishStage =
-  'resource' | 'waiting' | 'recheck' | 'live' | 'planTaken' | 'linkingPlan' |
-  'publishing' | 'linking' | 'linkFailed'
+  'resource' | 'waiting' | 'recheck' | 'live' | 'planTaken' | 'linkingPlan' | 'publishing'
 
 /**
  * Publishing a comprehensive assessment is two publishes, and the second only works once
@@ -121,8 +117,7 @@ export class PublishResourceComponent implements OnInit {
 
   //#region (template helpers)
   get isBusy(): boolean {
-    return this.stage === 'waiting' || this.stage === 'publishing' ||
-      this.stage === 'linking' || this.stage === 'linkingPlan'
+    return this.stage === 'waiting' || this.stage === 'publishing' || this.stage === 'linkingPlan'
   }
 
   get canPublishAssessment(): boolean {
@@ -149,11 +144,6 @@ export class PublishResourceComponent implements OnInit {
    */
   get canChangePlan(): boolean {
     return this.isPlanTaken && !this.isBusy
-  }
-
-  /** The assessment is Live and only the linkage back to the plan is left to make. */
-  get isLinkFailed(): boolean {
-    return this.stage === 'linkFailed'
   }
 
   /** The publish landed, so what is left to do is look again rather than send it again. */
@@ -347,7 +337,11 @@ export class PublishResourceComponent implements OnInit {
   //#endregion
 
   //#region (publishing the assessment)
-  /** The second publish, open only once every resource has answered Live. */
+  /**
+   * The second publish, open only once every resource has answered Live. The publish api
+   * links the plan to the assessment itself, so nothing is left for the dialog to send
+   * once it answers - the publish landing is the whole of it.
+   */
   publishAssessment(): void {
     if (!this.canPublishAssessment) {
       return
@@ -355,7 +349,7 @@ export class PublishResourceComponent implements OnInit {
     this.stage = 'publishing'
     this.setMessage('Publishing the assessment')
     this.assessmentSvc.publishAssessment(this.contentId, this.userId, this.rootOrgId).subscribe({
-      next: () => this.linkPlan(),
+      next: () => this.dialogRef.close(true),
       error: (error: HttpErrorResponse) => {
         // the resources stay Live, so the assessment publish is still the open offer
         this.stage = 'live'
@@ -364,33 +358,9 @@ export class PublishResourceComponent implements OnInit {
     })
   }
 
-  /**
-   * The assessment is Live, so the plan is told which assessment holds it and stops being
-   * offered to any other. This is the only thing left to do, which is why a failure here
-   * retries the linkage alone - the publish behind it has already happened.
-   */
-  linkPlan(): void {
-    if (!this.planId) {
-      this.dialogRef.close(true)
-      return
-    }
-    this.stage = 'linking'
-    this.setMessage('Linking the APAR plan to the assessment')
-    this.assessmentSvc.linkPlanToAssessment(this.planId, this.contentId).subscribe({
-      next: () => this.dialogRef.close(true),
-      error: (error: HttpErrorResponse) => {
-        this.stage = 'linkFailed'
-        this.setMessage(
-          this.readError(error, 'The assessment is published, but the APAR plan was not linked to it'),
-          true
-        )
-      },
-    })
-  }
-
-  /** The publish is what the caller is told about, and by `linkFailed` it has happened. */
+  /** A publish closes the dialog on its own, so anything closed from here published nothing. */
   close(): void {
-    this.dialogRef.close(this.isLinkFailed)
+    this.dialogRef.close(false)
   }
   //#endregion
 

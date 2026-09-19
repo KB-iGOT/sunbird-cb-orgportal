@@ -68,10 +68,7 @@
       [disabled]="isPublishResourceDisabled" (click)="publishResource()">Publish Resource</button>
     <!-- the plan check sits between the two publishes, so the offer stays the assessment
          publish while it runs and while a taken plan is what is holding it up -->
-    <button mat-flat-button class="action-button" type="button" *ngIf="resourcesLive && !isLinkFailed"
+    <button mat-flat-button class="action-button" type="button" *ngIf="resourcesLive"
       [disabled]="!canPublishAssessment" (click)="publishAssessment()">Publish Assessment</button>
-    <!-- the assessment is already Live by here, only the linkage back to the plan is left -->
-    <button mat-flat-button class="action-button" type="button" *ngIf="isLinkFailed"
-      (click)="linkPlan()">Retry Linking Plan</button>
   </div>
 </div>

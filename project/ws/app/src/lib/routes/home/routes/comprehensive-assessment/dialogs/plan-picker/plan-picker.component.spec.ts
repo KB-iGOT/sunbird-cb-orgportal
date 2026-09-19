@@ -50,7 +50,6 @@ describe('PlanPickerComponent', () => {
     dialogRef = { close: jest.fn() }
     assessmentSvc = {
       searchAparPlans: jest.fn().mockReturnValue(of({ plans: [row()], count: 1 })),
-      getPlanIdsWithLiveAssessment: jest.fn().mockReturnValue(of([])),
     }
     aparYearSvc = {
       getAparYears: jest.fn().mockReturnValue(years),
@@ -94,13 +93,8 @@ describe('PlanPickerComponent', () => {
       })
     })
 
-    /**
-     * The flag lookup runs first and the list is loaded from inside it, so a lookup that
-     * resolves late or empty must still leave the picker with its plans.
-     */
-    it('should still list the plans when no assessment claims a plan yet', () => {
-      assessmentSvc.getPlanIdsWithLiveAssessment.mockReturnValue(of([]))
-
+    /** The search is the only call the picker makes, the list comes straight off it. */
+    it('should list the plans off the search alone', () => {
       component.ngOnInit()
 
       expect(assessmentSvc.searchAparPlans).toHaveBeenCalledTimes(1)
@@ -181,16 +175,31 @@ describe('PlanPickerComponent', () => {
   })
 
   describe('the already linked flag', () => {
-    it('should flag and lock a plan a Live assessment already points at', () => {
-      assessmentSvc.getPlanIdsWithLiveAssessment.mockReturnValue(of(['plan-1']))
+    /** The plan says what holds it, so the row the search answers with is the whole of it. */
+    it('should flag and lock a plan the search says an assessment holds', () => {
+      assessmentSvc.searchAparPlans.mockReturnValue(of({
+        plans: [row({ hasActiveAssessment: true })],
+        count: 1,
+      }))
 
       component.ngOnInit()
 
       expect(component.plans[0].hasActiveAssessment).toBe(true)
+      expect(component.isPlanSelectable(component.plans[0])).toBe(false)
+    })
+
+    it('should leave every plan the search lists unflagged', () => {
+      component.ngOnInit()
+
+      expect(component.plans[0].hasActiveAssessment).toBe(false)
+      expect(component.isPlanSelectable(component.plans[0])).toBe(true)
     })
 
     it('should leave the plan this assessment is already on selectable', () => {
-      assessmentSvc.getPlanIdsWithLiveAssessment.mockReturnValue(of(['plan-1']))
+      assessmentSvc.searchAparPlans.mockReturnValue(of({
+        plans: [row({ hasActiveAssessment: true })],
+        count: 1,
+      }))
       component = build({ selectedPlanId: 'plan-1' })
 
       component.ngOnInit()
@@ -315,11 +324,9 @@ describe('PlanPickerComponent', () => {
   describe('picking a plan', () => {
     beforeEach(() => {
       assessmentSvc.searchAparPlans.mockReturnValue(of({
-        plans: [row(), row({ id: 'plan-2' })],
+        plans: [row(), row({ id: 'plan-2', hasActiveAssessment: true })],
         count: 2,
       }))
-      // the flag is never sent by the search, the picker computes it off this lookup
-      assessmentSvc.getPlanIdsWithLiveAssessment.mockReturnValue(of(['plan-2']))
       component.ngOnInit()
     })
 

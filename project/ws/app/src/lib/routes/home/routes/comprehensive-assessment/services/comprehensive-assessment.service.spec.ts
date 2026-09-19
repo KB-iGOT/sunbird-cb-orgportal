@@ -6,8 +6,6 @@ import { aparPlan } from '../models/comprehensive-assessment.model'
 import { ComprehensiveAssessmentService } from './comprehensive-assessment.service'
 
 const PLAN_SEARCH_URL = 'apis/proxies/v8/cbplan/v4/search'
-const CONTENT_SEARCH_URL = 'apis/proxies/v8/sunbirdigot/v4/search'
-const PLAN_UPDATE_URL = 'apis/proxies/v8/cbplan/v4/update'
 const PLAN_READ_URL = 'apis/proxies/v8/cbplan/v4/read/plan-1'
 /**
  * A plan as `api.cb.plan.v4.read.byId` hands it back - under `result.content`, not where the
@@ -177,9 +175,22 @@ describe('ComprehensiveAssessmentService', () => {
           { identifier: 'do-2', mandatory: false },
           { identifier: 'do-3', mandatory: true },
         ],
+        // nothing holds the plan, which is what the search asked for
         hasActiveAssessment: false,
         isYearClosed: false,
       }])
+    })
+
+    /** The plan carries what holds it, so a row that slips through the filter still says so. */
+    it('should flag a row the search answers with a linked assessment on', () => {
+      let result: any
+      service.searchAparPlans(searchParams).subscribe((res: any) => result = res)
+
+      httpMock.expectOne(PLAN_SEARCH_URL).flush(planSearchResponse([
+        planRow({ [aparPlan.LINKED_ASSESSMENT_FIELD]: 'do_123' }),
+      ]))
+
+      expect(result.plans[0].hasActiveAssessment).toBe(true)
     })
 
     it('should not offer a plan with APAR assignment switched off', () => {
@@ -285,68 +296,6 @@ describe('ComprehensiveAssessmentService', () => {
 
       expect(available).toBe(false)
       httpMock.expectNone(PLAN_READ_URL)
-    })
-  })
-
-  describe('linkPlanToAssessment', () => {
-    it('should write the assessment onto the plan it was published against', () => {
-      service.linkPlanToAssessment('plan-1', 'do_123').subscribe()
-
-      const req = httpMock.expectOne(PLAN_UPDATE_URL)
-      expect(req.request.method).toBe('POST')
-      expect(req.request.body).toEqual({
-        request: {
-          id: 'plan-1',
-          caLinkedId: 'do_123',
-        },
-      })
-      req.flush({})
-    })
-  })
-
-  describe('getPlanIdsWithLiveAssessment', () => {
-    it('should ask the content search for the plan id of every Live assessment', () => {
-      service.getPlanIdsWithLiveAssessment('org-1').subscribe()
-
-      const req = httpMock.expectOne(CONTENT_SEARCH_URL)
-      expect(req.request.body.request.fields)
-        .toEqual(['identifier', 'aparPlanId', LINK_KEY])
-      expect(req.request.body.request.filters.status).toEqual(['Live'])
-      expect(req.request.body.request.filters.createdFor).toEqual(['org-1'])
-      req.flush({ result: { content: [] } })
-    })
-
-    it('should return the plan ids and drop the assessments carrying none', () => {
-      let planIds: string[] = []
-      service.getPlanIdsWithLiveAssessment('org-1').subscribe((res: string[]) => planIds = res)
-
-      httpMock.expectOne(CONTENT_SEARCH_URL).flush({
-        result: {
-          content: [
-            { identifier: 'ca-1', [LINK_KEY]: { identifier: 'plan-1', contentList: [] } },
-            { identifier: 'ca-2' },
-            // linked before the linkage was written onto it, the flat key still answers
-            { identifier: 'ca-3', aparPlanId: 'plan-3' },
-          ],
-        },
-      })
-
-      expect(planIds).toEqual(['plan-1', 'plan-3'])
-    })
-
-    /** The flag is an extra, it must never stop the picker from listing the plans. */
-    it('should resolve empty rather than fail when the search errors', () => {
-      let planIds: string[] | undefined
-      let errored = false
-      service.getPlanIdsWithLiveAssessment('org-1').subscribe({
-        next: (res: string[]) => planIds = res,
-        error: () => errored = true,
-      })
-
-      httpMock.expectOne(CONTENT_SEARCH_URL).flush('boom', { status: 500, statusText: 'Server Error' })
-
-      expect(errored).toBe(false)
-      expect(planIds).toEqual([])
     })
   })
 
@@ -632,11 +581,13 @@ describe('ComprehensiveAssessmentService', () => {
       expect(status).toBe('')
     })
 
+    /** The api retires a list, so the one assessment goes in the body as a list of one. */
     it('should retire a content, the delete the api offers', () => {
       service.retireAssessment('do-1').subscribe()
 
-      const req = httpMock.expectOne('apis/proxies/v8/action/content/v3/retire/do-1')
+      const req = httpMock.expectOne('apis/proxies/v8/v1/content/retire')
       expect(req.request.method).toBe('DELETE')
+      expect(req.request.body).toEqual({ request: { contentIds: ['do-1'] } })
       req.flush({})
     })
 

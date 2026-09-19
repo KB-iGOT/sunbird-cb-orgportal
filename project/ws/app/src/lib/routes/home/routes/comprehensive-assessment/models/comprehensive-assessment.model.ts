@@ -55,7 +55,9 @@ export namespace comprehensiveAssessment {
   export const NAME_MIN_LENGTH = 10
   export const NAME_MAX_LENGTH = 70
   /** The description is plain text, the learning outcome is authored as rich text. */
+  export const DESCRIPTION_MIN_LENGTH = 100
   export const DESCRIPTION_MAX_LENGTH = 1000
+  export const LEARNING_OUTCOME_MIN_LENGTH = 250
   export const LEARNING_OUTCOME_MAX_LENGTH = 2000
   export const KEYWORD_MAX_LENGTH = 50
 

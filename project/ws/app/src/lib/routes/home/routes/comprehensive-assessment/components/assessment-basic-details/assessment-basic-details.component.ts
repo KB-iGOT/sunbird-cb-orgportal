@@ -38,7 +38,9 @@ export class AssessmentBasicDetailsComponent {
   /** Duration in seconds, derived from the question set built in step 2. */
   @Input() duration = 0
 
+  descriptionMinLength = comprehensiveAssessment.DESCRIPTION_MIN_LENGTH
   descriptionMaxLength = comprehensiveAssessment.DESCRIPTION_MAX_LENGTH
+  learningOutcomeMinLength = comprehensiveAssessment.LEARNING_OUTCOME_MIN_LENGTH
   learningOutcomeMaxLength = comprehensiveAssessment.LEARNING_OUTCOME_MAX_LENGTH
   keywordMaxLength = comprehensiveAssessment.KEYWORD_MAX_LENGTH
   knowledgeLevels = comprehensiveAssessment.KNOWLEDGE_LEVELS

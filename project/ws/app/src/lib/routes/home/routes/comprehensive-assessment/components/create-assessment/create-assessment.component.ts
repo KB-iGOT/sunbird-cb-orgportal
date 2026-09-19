@@ -92,10 +92,16 @@ export class CreateAssessmentComponent implements OnInit {
         Validators.pattern(noSpecialCharAssessment),
       ]),
       description: new FormControl('', [
-        richTextValidator(0, comprehensiveAssessment.DESCRIPTION_MAX_LENGTH),
+        richTextValidator(
+          comprehensiveAssessment.DESCRIPTION_MIN_LENGTH,
+          comprehensiveAssessment.DESCRIPTION_MAX_LENGTH
+        ),
       ]),
       learningOutcome: new FormControl('', [
-        richTextValidator(0, comprehensiveAssessment.LEARNING_OUTCOME_MAX_LENGTH),
+        richTextValidator(
+          comprehensiveAssessment.LEARNING_OUTCOME_MIN_LENGTH,
+          comprehensiveAssessment.LEARNING_OUTCOME_MAX_LENGTH
+        ),
       ]),
       // classification: what the platform holds as difficultyLevel, license and keywords
       difficultyLevel: new FormControl('', [Validators.required]),
@@ -660,6 +666,11 @@ export class CreateAssessmentComponent implements OnInit {
   /**
    * Reads the assessment back and patches the form from it. Nothing is lost by it: the draft
    * is saved before the publish dialog opens, so what the api holds is what the form held.
+   *
+   * Patching the form is an edit as far as the form is concerned, and an edit stales the
+   * preview. Here it does not: the content being patched in is the one the api just
+   * answered with, and it is what the preview renders - so the preview is marked ready
+   * again after the patch, rather than leaving the step blank with nothing to bring it back.
    */
   private reloadContent() {
     this.assessmentSvc.getContentHierarchy(this.contentId).subscribe((res: any) => {
@@ -668,6 +679,8 @@ export class CreateAssessmentComponent implements OnInit {
         this.contentDetails = content
         this.previewContent = content
         this.patchAssessmentDetails()
+        this.previewReady = true
+        this.cdr.detectChanges()
       }
     })
   }

@@ -31,6 +31,12 @@ describe('CreateAssessmentComponent', () => {
 
   const userProfile = { rootOrgId: 'org-1', userId: 'user-1' }
 
+  /** Both rich text fields carry a minimum length, so every fixture has to clear it. */
+  const DESCRIPTION_HTML =
+    `<p>${'A comprehensive assessment of the APAR reporting year. '.repeat(3)}</p>`
+  const LEARNING_OUTCOME_HTML =
+    `<p>${'The officer can appraise the reporting year against the plan. '.repeat(5)}</p>`
+
   const linkedPlan: aparPlan.ILinkedPlan = {
     id: 'plan-1',
     name: 'APAR 2026-27 — Section Officer & Under Secretary',
@@ -48,8 +54,8 @@ describe('CreateAssessmentComponent', () => {
   const content = (overrides: any = {}) => ({
     identifier: 'do_123',
     name: 'APAR comprehensive assessment',
-    description: '<p>A comprehensive assessment of the APAR reporting year</p>',
-    purpose: '<p>the outcome</p>',
+    description: DESCRIPTION_HTML,
+    purpose: LEARNING_OUTCOME_HTML,
     appIcon: 'icon.png',
     difficultyLevel: 'Advanced',
     license: 'CC BY 4.0',
@@ -86,8 +92,8 @@ describe('CreateAssessmentComponent', () => {
     component.assessmentDetailsForm.patchValue({
       linkedPlan,
       assessmentName: 'APAR comprehensive assessment',
-      description: '<p>A comprehensive assessment of the APAR reporting year</p>',
-      learningOutcome: '<p>the outcome</p>',
+      description: DESCRIPTION_HTML,
+      learningOutcome: LEARNING_OUTCOME_HTML,
       difficultyLevel: 'Advanced',
       license: 'CC BY 4.0',
       keywords: ['NFCS'],
@@ -173,11 +179,14 @@ describe('CreateAssessmentComponent', () => {
       expect(component.assessmentDetailsForm.get('appIcon')?.valid).toBe(true)
     })
 
-    /** The learning outcome is capped but never demanded at a minimum length. */
-    it('should accept a short learning outcome and refuse an overlong one', () => {
+    /** The learning outcome is held to a floor as well as a cap. */
+    it('should refuse a learning outcome under the minimum and one over the cap', () => {
       const control = component.assessmentDetailsForm.get('learningOutcome')
 
-      control?.setValue('<p>ab</p>')
+      control?.setValue(`<p>${'a'.repeat(comprehensiveAssessment.LEARNING_OUTCOME_MIN_LENGTH - 1)}</p>`)
+      expect(control?.hasError('minlength')).toBe(true)
+
+      control?.setValue(`<p>${'a'.repeat(comprehensiveAssessment.LEARNING_OUTCOME_MIN_LENGTH)}</p>`)
       expect(control?.valid).toBe(true)
 
       control?.setValue(`<p>${'a'.repeat(comprehensiveAssessment.LEARNING_OUTCOME_MAX_LENGTH + 1)}</p>`)
@@ -199,6 +208,16 @@ describe('CreateAssessmentComponent', () => {
 
       description?.setValue(`<p>${'d'.repeat(comprehensiveAssessment.DESCRIPTION_MAX_LENGTH + 1)}</p>`)
       expect(description?.hasError('maxlength')).toBe(true)
+    })
+
+    it('should refuse a description shorter than the minimum', () => {
+      const description = component.assessmentDetailsForm.get('description')
+
+      description?.setValue(`<p>${'d'.repeat(comprehensiveAssessment.DESCRIPTION_MIN_LENGTH - 1)}</p>`)
+      expect(description?.hasError('minlength')).toBe(true)
+
+      description?.setValue(`<p>${'d'.repeat(comprehensiveAssessment.DESCRIPTION_MIN_LENGTH)}</p>`)
+      expect(description?.valid).toBe(true)
     })
 
     it('should refuse a learning outcome that only holds editor markup', () => {
@@ -277,7 +296,7 @@ describe('CreateAssessmentComponent', () => {
       expect(component.contentId).toBe('do_123')
       expect(component.assessmentDetailsForm.get('assessmentName')?.value)
         .toBe('APAR comprehensive assessment')
-      expect(component.assessmentDetailsForm.get('learningOutcome')?.value).toBe('<p>the outcome</p>')
+      expect(component.assessmentDetailsForm.get('learningOutcome')?.value).toBe(LEARNING_OUTCOME_HTML)
       expect(component.assessmentDetailsForm.get('appIcon')?.value).toBe('icon.png')
       expect(component.assessmentDetailsForm.get('linkedPlan')?.value).toEqual(linkedPlan)
     })
@@ -787,7 +806,7 @@ describe('CreateAssessmentComponent', () => {
       expect(body).toEqual(expect.objectContaining({
         versionKey: 'v1',
         name: 'APAR comprehensive assessment',
-        purpose: '<p>the outcome</p>',
+        purpose: LEARNING_OUTCOME_HTML,
         appIcon: 'icon.png',
         posterImage: 'icon.png',
         [aparPlan.TRAINING_PLAN_KEY]: { identifier: 'plan-1', contentList: [] },
@@ -1107,6 +1126,19 @@ describe('CreateAssessmentComponent', () => {
       afterClosed.next(false)
 
       expect(assessmentSvc.getContentHierarchy).toHaveBeenCalledWith(component.contentId)
+    })
+
+    /**
+     * The read back patches the form, and a patch stales the preview - which used to leave
+     * the preview step blank with nothing on it to bring the preview back.
+     */
+    it('should leave the preview rendered when the dialog is closed unpublished', () => {
+      component.publishAssessment()
+
+      afterClosed.next(false)
+
+      expect(component.previewReady).toBe(true)
+      expect(component.previewContent).toEqual(content())
     })
 
     it('should not read it back once the assessment is published, it is leaving anyway', () => {
