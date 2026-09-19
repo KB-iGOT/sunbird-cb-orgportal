@@ -83,13 +83,15 @@
               }
               @case ('actions') {
                 <div class="row-actions flex flex-wrap gap-2">
-                  @for (action of visibleRowActions(); track action.key) {
-                    <button matButton="outlined" class="outlined-btn" (click)="onRowAction(action, group)">
-                      @if (action.icon) {
-                        <mat-icon>{{ action.icon }}</mat-icon>
-                      }
-                      {{ action.label }}
-                    </button>
+                  @for (action of rowActionsFor(group); track action?.key) {
+                    @if (action?.enabled) {
+                      <button matButton="outlined" class="outlined-btn" (click)="onRowAction(action, group)">
+                        @if (action?.icon) {
+                          <mat-icon>{{ action?.icon }}</mat-icon>
+                        }
+                        {{ action?.label }}
+                      </button>
+                    }
                   }
                 </div>
               }

@@ -4,6 +4,7 @@ import { Observable } from 'rxjs'
 import {
   IUserGroupCreateRequest,
   IUserGroupCreateResponse,
+  IUserGroupDeleteResponse,
   IUserGroupReadResponse,
   IUserGroupSearchRequest,
   IUserGroupSearchResponse,
@@ -16,6 +17,7 @@ const API_ENDPOINTS = {
   READ: '/apis/proxies/v8/usergroup/v1/read',
   CREATE: '/apis/proxies/v8/usergroup/v1/create',
   UPDATE: '/apis/proxies/v8/usergroup/v1/update',
+  DELETE: '/apis/proxies/v8/usergroup/v1/delete',
   USER_SEARCH: '/apis/proxies/v8/user/v1/search',
 }
 
@@ -35,9 +37,12 @@ export class ReusableUserGroupsService {
     return this.http.post<IUserGroupCreateResponse>(API_ENDPOINTS.CREATE, { request })
   }
 
-  /** The update api is a PATCH, the same verb the access control step uses. */
   updateUserGroup(request: IUserGroupUpdateRequest): Observable<IUserGroupCreateResponse> {
     return this.http.patch<IUserGroupCreateResponse>(API_ENDPOINTS.UPDATE, { request })
+  }
+
+  deleteUserGroup(userGroupId: string): Observable<IUserGroupDeleteResponse> {
+    return this.http.delete<IUserGroupDeleteResponse>(`${API_ENDPOINTS.DELETE}/${userGroupId}`)
   }
 
   fetchUserCount(filters: Record<string, any>): Observable<IUserSearchCountResponse> {
