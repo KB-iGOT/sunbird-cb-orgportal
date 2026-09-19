@@ -10,7 +10,9 @@ export interface IUserGroupAction {
   key?: string
   label: string
   icon?: string
+  enabled?: boolean
   allowedRoles?: string[]
+  ownerOnlyRoles?: string[]
 }
 
 export interface IUserGroupsTableConfig {
@@ -97,6 +99,11 @@ export interface IUserGroupUpdateRequest extends IUserGroupCreateRequest {
 export interface IUserGroupCreateResponse {
   responseCode?: string
   result?: IUserGroupReadResult
+}
+
+export interface IUserGroupDeleteResponse {
+  responseCode?: string
+  result?: { response?: string }
 }
 
 export type TUserGroupCondition = IUserGroupCriteria | Record<string, string[]>
