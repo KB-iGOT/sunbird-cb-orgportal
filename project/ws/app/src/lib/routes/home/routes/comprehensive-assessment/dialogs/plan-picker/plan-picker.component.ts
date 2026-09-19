@@ -38,9 +38,6 @@ export class PlanPickerComponent implements OnInit, OnDestroy {
   selectedPlan: aparPlan.IPlanRow | null = null
   showLoader = false
 
-  private rootOrgId = ''
-  /** Plans a Live assessment already points at, read once before the first page. */
-  private linkedPlanIds: string[] = []
   private searchChange = new Subject<string>()
   private searchSubscription = new Subscription()
   private planSubscription!: Subscription
@@ -53,7 +50,6 @@ export class PlanPickerComponent implements OnInit, OnDestroy {
     private aparYearSvc: AparYearService,
     private matSnackBar: MatSnackBar
   ) {
-    this.rootOrgId = _.get(data, 'userProfile.rootOrgId', '')
     // reopening the picker on a linked assessment comes back with its plan already picked
     this.selectedPlanId = _.get(data, 'selectedPlanId', '')
   }
@@ -70,15 +66,7 @@ export class PlanPickerComponent implements OnInit, OnDestroy {
       this.pageIndex = 0
       this.getPlans()
     })
-    this.loadLinkedPlanIds()
-  }
-
-  /** The flag never fails the picker, an unresolved lookup only leaves the rows unflagged. */
-  private loadLinkedPlanIds() {
-    this.assessmentSvc.getPlanIdsWithLiveAssessment(this.rootOrgId).subscribe((planIds: string[]) => {
-      this.linkedPlanIds = planIds
-      this.getPlans()
-    })
+    this.getPlans()
   }
 
   getPlans() {
@@ -96,8 +84,9 @@ export class PlanPickerComponent implements OnInit, OnDestroy {
         this.showLoader = false
         this.plans = _.map(res.plans, (plan: aparPlan.IPlanRow) => ({
           ...plan,
-          // the plan this assessment is already on stays selectable, it is its own plan
-          hasActiveAssessment: _.includes(this.linkedPlanIds, plan.id) && plan.id !== this.selectedPlanId,
+          // what holds a plan is read off the plan itself, as the search answers it - the
+          // assessment this picker was opened from is not another assessment holding it
+          hasActiveAssessment: plan.hasActiveAssessment && plan.id !== this.selectedPlanId,
           isYearClosed: !this.isYearOpen(plan.planYear) && plan.id !== this.selectedPlanId,
         }))
         this.totalCount = res.count

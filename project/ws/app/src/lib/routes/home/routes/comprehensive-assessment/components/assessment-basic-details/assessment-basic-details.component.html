@@ -92,6 +92,9 @@
     <mat-error class="mat-error-text" *ngIf="showValidationMsg('description','required')">
       Description is mandatory
     </mat-error>
+    <mat-error class="mat-error-text" *ngIf="showValidationMsg('description','minlength')">
+      Minimum {{descriptionMinLength}} characters are required
+    </mat-error>
     <mat-error class="mat-error-text" *ngIf="showValidationMsg('description','maxlength')">
       Maximum {{descriptionMaxLength}} characters are allowed
     </mat-error>
@@ -108,6 +111,9 @@
       (ready)="onEditorReady($event)" (focus)="onEditorFocus()"></ckeditor>
     <mat-error class="mat-error-text" *ngIf="showValidationMsg('learningOutcome','required')">
       Learning outcome is mandatory
+    </mat-error>
+    <mat-error class="mat-error-text" *ngIf="showValidationMsg('learningOutcome','minlength')">
+      Minimum {{learningOutcomeMinLength}} characters are required
     </mat-error>
     <mat-error class="mat-error-text" *ngIf="showValidationMsg('learningOutcome','maxlength')">
       Maximum {{learningOutcomeMaxLength}} characters are allowed

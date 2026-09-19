@@ -63,7 +63,6 @@ describe('PublishResourceComponent', () => {
       publishAssessment: jest.fn().mockReturnValue(of({})),
       readPlanMetadata: jest.fn().mockReturnValue(linkedPlan),
       isPlanAvailable: jest.fn().mockReturnValue(of(true)),
-      linkPlanToAssessment: jest.fn().mockReturnValue(of({})),
       updateLinkedPlan: jest.fn().mockReturnValue(of({ result: { versionKey: 'v2' } })),
     }
     component = build()
@@ -548,7 +547,9 @@ describe('PublishResourceComponent', () => {
 
       component.publishAssessment()
 
-      expect(assessmentSvc.linkPlanToAssessment).toHaveBeenCalledWith('plan-2', 'do_123')
+      expect(assessmentSvc.updateLinkedPlan).toHaveBeenCalledWith('do_123', 'v1', pickedPlan)
+      expect(assessmentSvc.publishAssessment).toHaveBeenCalledWith('do_123', 'user-1', 'org-1')
+      expect(dialogRef.close).toHaveBeenCalledWith(true)
     })
 
     /** A content update answers with a new version key, and a stale one fails the next. */
@@ -593,61 +594,19 @@ describe('PublishResourceComponent', () => {
     })
   })
 
-  /** The plan is told which assessment holds it, so no other assessment is offered it. */
-  describe('linking the plan to the published assessment', () => {
+  /**
+   * The publish api links the plan to the assessment it published, so the publish landing
+   * is the end of it - the dialog has no linkage of its own left to send or to retry.
+   */
+  describe('what is left once the assessment is published', () => {
     beforeEach(() => {
       publishAndWait()
     })
 
-    it('should link the plan once the assessment is published', () => {
+    it('should close on the publish alone', () => {
       component.publishAssessment()
-
-      expect(assessmentSvc.linkPlanToAssessment).toHaveBeenCalledWith('plan-1', 'do_123')
-      expect(dialogRef.close).toHaveBeenCalledWith(true)
-    })
-
-    it('should link only after the publish, never before it', () => {
-      assessmentSvc.publishAssessment.mockReturnValue(throwError(() => ({})))
-
-      component.publishAssessment()
-
-      expect(assessmentSvc.linkPlanToAssessment).not.toHaveBeenCalled()
-    })
-
-    /**
-     * The assessment is Live by here, so publishing again would be wrong - the linkage is
-     * the only thing left, and it is what the retry sends.
-     */
-    it('should offer the linking again when only that failed', () => {
-      assessmentSvc.linkPlanToAssessment.mockReturnValue(throwError(() => ({})))
-
-      component.publishAssessment()
-
-      expect(component.stage).toBe('linkFailed')
-      expect(component.isLinkFailed).toBe(true)
-      expect(component.isError).toBe(true)
-      expect(component.message).toBe('The assessment is published, but the APAR plan was not linked to it')
-      expect(dialogRef.close).not.toHaveBeenCalled()
-    })
-
-    it('should send the linkage alone on the retry', () => {
-      assessmentSvc.linkPlanToAssessment.mockReturnValue(throwError(() => ({})))
-      component.publishAssessment()
-      assessmentSvc.linkPlanToAssessment.mockReturnValue(of({}))
-
-      component.linkPlan()
 
       expect(assessmentSvc.publishAssessment).toHaveBeenCalledTimes(1)
-      expect(dialogRef.close).toHaveBeenCalledWith(true)
-    })
-
-    /** Backing out of a failed linkage still leaves an assessment that was published. */
-    it('should report the publish when the dialog is closed after a failed linkage', () => {
-      assessmentSvc.linkPlanToAssessment.mockReturnValue(throwError(() => ({})))
-      component.publishAssessment()
-
-      component.close()
-
       expect(dialogRef.close).toHaveBeenCalledWith(true)
     })
 
@@ -658,8 +617,17 @@ describe('PublishResourceComponent', () => {
 
       component.publishAssessment()
 
-      expect(assessmentSvc.linkPlanToAssessment).not.toHaveBeenCalled()
       expect(dialogRef.close).toHaveBeenCalledWith(true)
+    })
+
+    /** A publish that failed leaves the offer standing, and closing reports no publish. */
+    it('should report no publish when it failed and the dialog is closed', () => {
+      assessmentSvc.publishAssessment.mockReturnValue(throwError(() => ({})))
+      component.publishAssessment()
+
+      component.close()
+
+      expect(dialogRef.close).toHaveBeenLastCalledWith(false)
     })
   })
 

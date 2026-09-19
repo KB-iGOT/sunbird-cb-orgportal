@@ -23,9 +23,8 @@ const API_END_POINTS = {
   PUBLISH_QUESTIONSET: (questionSetId: string) => `apis/proxies/v8/ca/questionset/v1/publish/${questionSetId}`,
   CONTENT_SEARCH: 'apis/proxies/v8/sunbirdigot/v4/search',
   PUBLISH_ASSESSMENT: (contentId: string) => `apis/proxies/v8/action/ca/v1/publish/${contentId}`,
-  RETIRE_CONTENT: (contentId: string) => `apis/proxies/v8/action/content/v3/retire/${contentId}`,
+  RETIRE_CONTENT: 'apis/proxies/v8/v1/content/retire',
   APAR_PLAN_SEARCH: 'apis/proxies/v8/cbplan/v4/search',
-  APAR_PLAN_UPDATE: 'apis/proxies/v8/cbplan/v4/update',
   APAR_PLAN_READ: (planId: string) => `apis/proxies/v8/cbplan/v4/read/${planId}`,
 }
 
@@ -145,9 +144,15 @@ export class ComprehensiveAssessmentService {
     )
   }
 
-  /** Retire is the delete the content api offers, the row leaves every status tab. */
+  /**
+   * Retire is the delete the content api offers, the row leaves every status tab. The api
+   * retires a list at a time and takes it in the body of the DELETE, so the one assessment
+   * being deleted is sent as a list of one.
+   */
   retireAssessment(contentId: string): Observable<any> {
-    return this.http.delete<any>(API_END_POINTS.RETIRE_CONTENT(contentId))
+    return this.http.delete<any>(API_END_POINTS.RETIRE_CONTENT, {
+      body: { request: { contentIds: [contentId] } },
+    })
   }
 
   //#endregion
@@ -295,52 +300,6 @@ export class ComprehensiveAssessmentService {
     })
   }
 
-  /**
-   * The other half of the linkage, written once the assessment is Live: the plan is told
-   * which assessment holds it, and every search of the flow leaves it out from then on.
-   */
-  linkPlanToAssessment(planId: string, contentId: string): Observable<any> {
-    return this.http.post<any>(API_END_POINTS.APAR_PLAN_UPDATE, {
-      request: {
-        id: planId,
-        [aparPlan.LINKED_ASSESSMENT_FIELD]: contentId,
-      },
-    })
-  }
-
-  /**
-   * Plans a Live assessment already points at. Two drafts may share a plan and only one of
-   * them can be published, so only the Live tab is read. The plan id has to be indexed for
-   * the search to return it: until it is, this resolves empty and no row is flagged, which
-   * leaves the publish time guard as the only check.
-   */
-  getPlanIdsWithLiveAssessment(rootOrgId: string): Observable<string[]> {
-    const request = {
-      locale: ['en'],
-      request: {
-        query: '',
-        limit: 200,
-        offset: 0,
-        fields: ['identifier', aparPlan.METADATA.planId, aparPlan.TRAINING_PLAN_KEY],
-        filters: {
-          status: [comprehensiveAssessmentList.STATUS_LIVE],
-          courseCategory: [CONTENT_COURSE_CATEGORY],
-          mimeType: [COLLECTION_MIME_TYPE],
-          createdFor: [rootOrgId],
-        },
-      },
-    }
-
-    return this.http.post<any>(API_END_POINTS.CONTENT_SEARCH, request).pipe(
-      map((res: any) => _.compact(_.map(
-        _.get(res, 'result.content', []),
-        (row: any) => _.get(this.readTrainingPlanLink(row), 'identifier', '') ||
-          _.get(row, aparPlan.METADATA.planId, '')
-      ))),
-      catchError(() => of([]))
-    )
-  }
-
   /** Shapes a cbplan search row into the row the picker table renders. */
   private toPlanRow(plan: any): aparPlan.IPlanRow {
     const endDate = _.get(plan, 'endDate', '')
@@ -353,8 +312,9 @@ export class ComprehensiveAssessmentService {
       orgName: _.get(plan, 'orgName', '') || _.get(plan, 'departmentName', ''),
       gatingCourseCount: this.countGatingCourses(plan),
       contentList: this.readContentList(plan),
-      // both flags are the picker's to work out, the search knows neither
-      hasActiveAssessment: false,
+      // the plan says for itself what holds it, the search asks for the ones nothing does
+      hasActiveAssessment: !!_.get(plan, aparPlan.LINKED_ASSESSMENT_FIELD, ''),
+      // the open years are the picker's to know, the search does not answer for them
       isYearClosed: false,
     }
   }
