@@ -160,6 +160,40 @@ describe('CreateUserGroupsComponent', () => {
     })
   })
 
+  describe('ownership of the group being edited', () => {
+    const editParams = { id: 'fb9ad925-355a-4349-8688-ce1720f6dfd5' }
+    const editAction = { key: 'edit', label: 'Edit', allowedRoles: ['mdo_leader', 'mdo_admin'] }
+    const ownerOnly = {
+      data: { accessSettingsUserGroups, table: { rowActions: [{ ...editAction, ownerOnlyRoles: ['mdo_admin'] }] } },
+    }
+    const unlimited = { data: { accessSettingsUserGroups, table: { rowActions: [editAction] } } }
+
+    const readAs = (createdby: string) => {
+      fetchUserGroup = jest.fn(() => of({ result: { ...readResponse.result, createdby } }))
+    }
+
+    it('should open the group the signed in admin created', () => {
+      readAs('user-1')
+      createComponent(ownerOnly, editParams)
+      expect(navigate).not.toHaveBeenCalled()
+      expect(component.accessSettingsParameters()).toBeDefined()
+    })
+
+    it('should send the admin back to the list from a group somebody else created', () => {
+      readAs('user-2')
+      createComponent(ownerOnly, editParams)
+      expect(navigate).toHaveBeenCalledWith(['/app/home/reusable-user-groups/list'])
+      expect(component.accessSettingsParameters()).toBeUndefined()
+    })
+
+    it('should leave an edit with no ownership limit open on any group', () => {
+      readAs('user-2')
+      createComponent(unlimited, editParams)
+      expect(navigate).not.toHaveBeenCalled()
+      expect(component.accessSettingsParameters()).toBeDefined()
+    })
+  })
+
   it('should not read a user group when there is no id in the route', () => {
     expect(fetchUserGroup).not.toHaveBeenCalled()
   })

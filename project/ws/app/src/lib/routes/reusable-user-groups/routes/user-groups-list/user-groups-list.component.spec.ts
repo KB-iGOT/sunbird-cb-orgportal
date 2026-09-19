@@ -2,7 +2,7 @@ import { NO_ERRORS_SCHEMA } from '@angular/core'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { MatDialog } from '@angular/material/dialog'
 import { MatSnackBar } from '@angular/material/snack-bar'
-import { ActivatedRoute } from '@angular/router'
+import { ActivatedRoute, Router } from '@angular/router'
 import { ConfigurationsService } from '@sunbird-cb/utils-v2'
 import { of, throwError } from 'rxjs'
 import { IUserGroupsConfig } from '../../interface/reusable-user-groups.interface'
@@ -25,9 +25,10 @@ const config = {
     ],
     reachAction: { key: 'reach', label: 'Check reach', icon: 'person_outline' },
     rowActions: [
-      { key: 'edit', label: 'Edit', allowedRoles: ['mdo_leader'] },
-      { key: 'restricted', label: 'Restricted', allowedRoles: ['spv_admin'] },
-      { key: 'use', label: 'Use' },
+      { enabled: true, key: 'edit', label: 'Edit', allowedRoles: ['mdo_leader', 'mdo_admin'], ownerOnlyRoles: ['mdo_admin'] },
+      { enabled: true, key: 'restricted', label: 'Restricted', allowedRoles: ['spv_admin'] },
+      { enabled: true, key: 'use', label: 'Use' },
+      { enabled: true, key: 'delete', label: 'Delete', allowedRoles: ['mdo_leader', 'mdo_admin'], ownerOnlyRoles: ['mdo_admin'] },
     ],
     conditionLabel: { singular: 'condition', plural: 'conditions' },
     emptyStateText: 'No user groups created yet.',
@@ -83,9 +84,13 @@ describe('UserGroupsListComponent', () => {
   let searchUserGroups: jest.Mock
   let fetchUserGroup: jest.Mock
   let createUserGroup: jest.Mock
+  let deleteUserGroup: jest.Mock
   let snackBarOpen: jest.Mock
   let snackBarFromComponent: jest.Mock
   let dialogOpen: jest.Mock
+  let navigate: jest.Mock
+  let userRoles: Set<string>
+  let userId: string
 
   const createComponent = () => {
     TestBed.resetTestingModule()
@@ -99,11 +104,12 @@ describe('UserGroupsListComponent', () => {
         },
         {
           provide: ConfigurationsService,
-          useValue: { userRoles: new Set(['mdo_leader']) },
+          useValue: { userRoles, userProfile: { userId } },
         },
-        { provide: ReusableUserGroupsService, useValue: { searchUserGroups, fetchUserGroup, createUserGroup } },
+        { provide: ReusableUserGroupsService, useValue: { searchUserGroups, fetchUserGroup, createUserGroup, deleteUserGroup } },
         { provide: MatSnackBar, useValue: { open: snackBarOpen, openFromComponent: snackBarFromComponent } },
         { provide: MatDialog, useValue: { open: dialogOpen } },
+        { provide: Router, useValue: { navigate } },
       ],
     })
     fixture = TestBed.createComponent(UserGroupsListComponent)
@@ -115,9 +121,13 @@ describe('UserGroupsListComponent', () => {
     searchUserGroups = jest.fn(() => of(searchResponse))
     fetchUserGroup = jest.fn(() => of(readResponse))
     createUserGroup = jest.fn(() => of(createResponse))
+    deleteUserGroup = jest.fn(() => of({ responseCode: 'OK' }))
     snackBarOpen = jest.fn()
     snackBarFromComponent = jest.fn()
     dialogOpen = jest.fn(() => ({ afterClosed: () => of(true) }))
+    navigate = jest.fn()
+    userRoles = new Set(['mdo_leader'])
+    userId = 'leader-1'
     createComponent()
   })
 
@@ -138,7 +148,49 @@ describe('UserGroupsListComponent', () => {
   })
 
   it('should hide row actions the user has no role for', () => {
-    expect(component.visibleRowActions().map(action => action.key)).toEqual(['edit', 'use'])
+    expect(component.visibleRowActions().map(action => action.key)).toEqual(['edit', 'use', 'delete'])
+  })
+
+  describe('ownership', () => {
+    const ownerId = 'c0915cee-df98-4391-917e-02ed9b07d54f'
+    const asAdmin = (id: string) => {
+      userRoles = new Set(['mdo_admin'])
+      userId = id
+      createComponent()
+    }
+
+    it('should let a leader edit a group somebody else created', () => {
+      expect(component.rowActionsFor(component.groups()[0]).map(action => action.key)).toEqual(['edit', 'use', 'delete'])
+    })
+
+    it('should let an admin edit the group they created', () => {
+      asAdmin(ownerId)
+      expect(component.rowActionsFor(component.groups()[0]).map(action => action.key)).toEqual(['edit', 'use', 'delete'])
+    })
+
+    it('should keep an admin off the edit of a group somebody else created', () => {
+      asAdmin('admin-2')
+      expect(component.rowActionsFor(component.groups()[0]).map(action => action.key)).toEqual(['use'])
+    })
+
+    it('should leave an admin who is also a leader editing every group', () => {
+      userRoles = new Set(['mdo_admin', 'mdo_leader'])
+      userId = 'admin-2'
+      createComponent()
+      expect(component.rowActionsFor(component.groups()[0]).map(action => action.key)).toEqual(['edit', 'use', 'delete'])
+    })
+
+    it('should keep an admin off the edit while the signed in id is unknown', () => {
+      userRoles = new Set(['mdo_admin'])
+      userId = ''
+      createComponent()
+      expect(component.rowActionsFor(component.groups()[0]).map(action => action.key)).toEqual(['use'])
+    })
+
+    it('should still offer an admin the create button', () => {
+      asAdmin('admin-2')
+      expect(component.canCreate()).toBe(true)
+    })
   })
 
   it('should pick the banner matching the user role', () => {
@@ -284,6 +336,84 @@ describe('UserGroupsListComponent', () => {
     })
   })
 
+  describe('delete', () => {
+    it('should ask for confirmation before deleting', () => {
+      component.deleteUserGroup(component.groups()[0])
+      expect(dialogOpen).toHaveBeenCalledWith(
+        expect.anything(),
+        expect.objectContaining({
+          data: expect.objectContaining({
+            message: 'Are you sure you want to delete "User Group API testing 10th September - Updated"?',
+          }),
+        }),
+      )
+    })
+
+    it('should delete nothing when the confirmation is declined', () => {
+      dialogOpen = jest.fn(() => ({ afterClosed: () => of(false) }))
+      createComponent()
+      component.deleteUserGroup(component.groups()[0])
+      expect(deleteUserGroup).not.toHaveBeenCalled()
+      expect(component.isLoading()).toBe(false)
+    })
+
+    it('should delete the confirmed group', () => {
+      component.deleteUserGroup(component.groups()[0])
+      expect(deleteUserGroup).toHaveBeenCalledWith('fb9ad925-355a-4349-8688-ce1720f6dfd5')
+    })
+
+    it('should refresh the list once the group is deleted', () => {
+      searchUserGroups.mockClear()
+      component.deleteUserGroup(component.groups()[0])
+      expect(searchUserGroups).toHaveBeenCalledTimes(1)
+      expect(component.isLoading()).toBe(false)
+      expect(snackBarFromComponent).toHaveBeenCalledWith(
+        expect.anything(),
+        expect.objectContaining({
+          data: { message: 'User Group API testing 10th September - Updated deleted', type: 'success' },
+        }),
+      )
+    })
+
+    it('should step back a page when the last row of the page goes', () => {
+      component.onPageChange({ pageIndex: 1, pageSize: 20, length: 21 })
+      component.deleteUserGroup(component.groups()[0])
+      expect(component.pageIndex()).toBe(0)
+      expect(searchUserGroups).toHaveBeenLastCalledWith(expect.objectContaining({ pageNumber: 0 }))
+    })
+
+    it('should stay on the first page when the only page empties', () => {
+      component.deleteUserGroup(component.groups()[0])
+      expect(component.pageIndex()).toBe(0)
+    })
+
+    it('should report what the api says it did', () => {
+      deleteUserGroup = jest.fn(() => of({ responseCode: 'OK', result: { response: 'User group archived successfully' } }))
+      createComponent()
+      component.deleteUserGroup(component.groups()[0])
+      expect(snackBarFromComponent).toHaveBeenCalledWith(
+        expect.anything(),
+        expect.objectContaining({ data: { message: 'User group archived successfully', type: 'success' } }),
+      )
+    })
+
+    it('should surface a failure to delete', () => {
+      deleteUserGroup = jest.fn(() => throwError(() => ({ error: { params: { errMsg: 'in use' } } })))
+      createComponent()
+      component.deleteUserGroup(component.groups()[0])
+      expect(component.isLoading()).toBe(false)
+      expect(snackBarFromComponent).toHaveBeenCalledWith(
+        expect.anything(),
+        expect.objectContaining({ data: { message: 'in use', type: 'error' } }),
+      )
+    })
+
+    it('should route the delete row action through the confirmation', () => {
+      component.onRowAction({ key: 'delete', label: 'Delete' }, component.groups()[0])
+      expect(deleteUserGroup).toHaveBeenCalledWith('fb9ad925-355a-4349-8688-ce1720f6dfd5')
+    })
+  })
+
   describe('use in a plan', () => {
     const plan = { id: 'P-2603', title: 'APAR 2026-27 — Bihar Administrative Service' }
 
@@ -300,27 +430,21 @@ describe('UserGroupsListComponent', () => {
       )
     })
 
-    it('should confirm once a plan is picked', () => {
+    it('should open the picked plan with the group attached', () => {
       dialogOpen = jest.fn(() => ({ afterClosed: () => of(plan) }))
       createComponent()
       component.useInPlan(component.groups()[0])
-      expect(snackBarFromComponent).toHaveBeenCalledWith(
-        expect.anything(),
-        expect.objectContaining({
-          data: {
-            message: '"User Group API testing 10th September - Updated" added to APAR 2026-27 — Bihar Administrative Service',
-            type: 'success',
-          },
-        }),
+      expect(navigate).toHaveBeenCalledWith(
+        ['app', 'training-plan', 'update-plan', 'P-2603'],
+        { queryParams: { userGroupId: 'fb9ad925-355a-4349-8688-ce1720f6dfd5' } },
       )
     })
 
     it('should do nothing when the dialog is cancelled', () => {
       dialogOpen = jest.fn(() => ({ afterClosed: () => of(undefined) }))
       createComponent()
-      snackBarFromComponent.mockClear()
       component.useInPlan(component.groups()[0])
-      expect(snackBarFromComponent).not.toHaveBeenCalled()
+      expect(navigate).not.toHaveBeenCalled()
     })
 
     it('should route the use row action through the dialog', () => {

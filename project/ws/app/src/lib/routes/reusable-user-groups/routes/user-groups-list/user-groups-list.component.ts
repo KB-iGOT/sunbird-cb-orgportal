@@ -22,6 +22,7 @@ import {
   IUserGroupsConfig,
 } from '../../interface/reusable-user-groups.interface'
 import { ReusableUserGroupsService } from '../../services/reusable-user-groups.service'
+import { isGroupOwner, isOwnerOnly, isRoleAllowed } from '../../utils/user-group-access'
 import { SnackbarComponent } from '@sunbird-cb/consumption'
 
 const DEFAULT_PAGE_SIZE = 20
@@ -57,6 +58,7 @@ export class UserGroupsListComponent implements OnInit {
   private readonly dialog = inject(MatDialog)
 
   private readonly userRoles = signal<Set<string>>(new Set<string>())
+  private readonly userId = signal('')
 
   readonly config = signal<IUserGroupsConfig | undefined>(undefined)
   readonly dataSource = new MatTableDataSource<IUserGroup>([])
@@ -90,6 +92,7 @@ export class UserGroupsListComponent implements OnInit {
   ngOnInit() {
     this.config.set(this.route?.parent?.snapshot.data['pageData']?.data)
     this.userRoles.set(this.configSvc.userRoles ?? new Set<string>())
+    this.userId.set(this.configSvc.userProfile?.userId ?? '')
     this.pageSize.set(this.config()?.table?.pageSize ?? DEFAULT_PAGE_SIZE)
     this.sortBy.set(this.config()?.search?.sortBy ?? DEFAULT_SORT_BY)
     this.sortOrder.set(this.config()?.search?.sortOrder ?? DEFAULT_SORT_ORDER)
@@ -97,11 +100,16 @@ export class UserGroupsListComponent implements OnInit {
   }
 
   isAllowed(allowedRoles?: string[]): boolean {
-    if (!allowedRoles?.length) {
-      return true
-    }
-    const roles = this.userRoles()
-    return allowedRoles.some(role => roles.has((role ?? '').toLowerCase()))
+    return isRoleAllowed(allowedRoles, this.userRoles())
+  }
+
+  isOwner(group: IUserGroup): boolean {
+    return isGroupOwner(group?.owner, this.userId())
+  }
+
+  rowActionsFor(group: IUserGroup): IUserGroupAction[] {
+    return this.visibleRowActions()
+      .filter(action => !isOwnerOnly(action, this.userRoles()) || this.isOwner(group))
   }
 
   conditionText(group: IUserGroup): string {
@@ -230,6 +238,9 @@ export class UserGroupsListComponent implements OnInit {
       case 'use':
         this.useInPlan(group)
         break
+      case 'delete':
+        this.deleteUserGroup(group)
+        break
       default:
         break
     }
@@ -249,7 +260,7 @@ export class UserGroupsListComponent implements OnInit {
   }
 
   copyUserGroup(group: IUserGroup): void {
-    this.confirmCopy(group)
+    this.confirm(`Are you sure you want to copy "${group.name}"?`)
       .pipe(
         filter(confirmed => !!confirmed),
         tap(() => this.isLoading.set(true)),
@@ -268,6 +279,30 @@ export class UserGroupsListComponent implements OnInit {
         error: (err: any) => {
           this.isLoading.set(false)
           this.callSnackbar(err?.error?.params?.errMsg ?? 'Unable to copy the user group', 'error')
+        },
+      })
+  }
+
+  deleteUserGroup(group: IUserGroup): void {
+    this.confirm(`Are you sure you want to delete "${group.name}"?`)
+      .pipe(
+        filter(confirmed => !!confirmed),
+        tap(() => this.isLoading.set(true)),
+        switchMap(() => this.userGroupsSvc.deleteUserGroup(group.id)),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe({
+        next: res => {
+          this.callSnackbar(res?.result?.response ?? `${group.name} deleted`, 'success')
+          // The last row of a page has gone, so step back rather than land on a page that no longer exists
+          if (this.groups().length === 1 && this.pageIndex() > 0) {
+            this.pageIndex.update(index => index - 1)
+          }
+          this.searchUserGroups()
+        },
+        error: (err: any) => {
+          this.isLoading.set(false)
+          this.callSnackbar(err?.error?.params?.errMsg ?? 'Unable to delete the user group', 'error')
         },
       })
   }
@@ -292,14 +327,14 @@ export class UserGroupsListComponent implements OnInit {
       })
   }
 
-  private confirmCopy(group: IUserGroup): Observable<any> {
+  private confirm(message: string): Observable<any> {
     return this.dialog.open(ConfirmDialogComponent, {
       width: '500px',
       minHeight: '210px',
       height: 'auto',
       autoFocus: false,
       data: {
-        message: `Are you sure you want to copy "${group.name}"?`,
+        message,
         dialogType: 'warning',
         icon: { iconName: 'error_outline', iconClass: 'warning-icon' },
         buttonsList: [
