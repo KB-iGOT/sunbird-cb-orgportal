@@ -13,8 +13,8 @@ const STATUS_CHECK_SECONDS = 10
 
 /** Said when the plan is gone and another has to be picked before the publish can go on. */
 const PLAN_TAKEN_MESSAGE =
-  'The linked APAR plan is no longer available - another assessment has taken it, or its cycle ' +
-  'has closed. Choose another plan to publish this assessment against.'
+  'The linked APAR plan is no longer available - another comprehensive assessment has taken it. ' +
+  'Choose another plan to publish this assessment against.'
 
 /**
  * What the dialog is offering at each point of the publish:
@@ -266,8 +266,8 @@ export class PublishResourceComponent implements OnInit {
   /**
    * The last thing between the assessment and going Live. A plan is linked in the builder
    * and published from here, and the two can be days apart - by then another assessment may
-   * have taken the plan, or its own cycle may have moved on. The search answers with the
-   * plan while it is still free, and with nothing once it is not.
+   * have taken the plan. The plan itself is read, and the assessment named on it is the
+   * answer: none, this one, or another one.
    *
    * A check that cannot be made is not treated as a plan that is taken: the publish is the
    * api's to refuse then, rather than this dialog's to block on a lookup that failed.
@@ -276,7 +276,7 @@ export class PublishResourceComponent implements OnInit {
     this.stage = 'waiting'
     this.countdown = 0
     this.setMessage('Checking the linked APAR plan')
-    this.assessmentSvc.isPlanAvailable(this.planId).subscribe({
+    this.assessmentSvc.isPlanAvailable(this.planId, this.contentId).subscribe({
       next: (isFree: boolean) => {
         this.isPlanFree = isFree
         if (isFree) {

@@ -11,6 +11,7 @@ import { Observable, of } from 'rxjs'
 import { catchError, map, switchMap, tap } from 'rxjs/operators'
 import * as _ from 'lodash'
 import {
+  aparPlan,
   comprehensiveAssessment,
   comprehensiveAssessmentList,
   DEFAULT_LICENSE,
@@ -267,11 +268,17 @@ export class CreateAssessmentComponent implements OnInit {
 
   /**
    * Saves the authored fields and reads the hierarchy back, so whatever the next step
-   * renders is the content the api actually holds rather than a local copy.
+   * renders is the content the api actually holds rather than a local copy. A step that
+   * changed nothing is not saved - the hierarchy is still read, it is what the next step
+   * renders from.
    */
   private persistContent(): Observable<any> {
-    return this.assessmentSvc.updateContent(this.contentId, this.getContentUpdateBody()).pipe(
-      tap((res: any) => this.syncVersionKey(res)),
+    const body = this.getContentUpdateBody()
+    const saved$ = this.isContentUnchanged(body)
+      ? of(null)
+      : this.assessmentSvc.updateContent(this.contentId, body).pipe(tap((res: any) => this.syncVersionKey(res)))
+
+    return saved$.pipe(
       switchMap(() => this.assessmentSvc.getContentHierarchy(this.contentId)),
       tap((res: any) => {
         const content = _.get(res, 'result.content')
@@ -281,6 +288,45 @@ export class CreateAssessmentComponent implements OnInit {
           this.previewReady = true
         }
       })
+    )
+  }
+
+  /**
+   * Whether the update would write anything the assessment does not already hold. Reopening
+   * one and stepping through it without an edit used to save every field over itself on
+   * every Next, and take a new version key for it each time.
+   *
+   * The form is the comparison rather than its pristine flag: the plan picker, the basic
+   * info dialog and the keyword box all patch their values in, which changes the assessment
+   * without ever marking a control dirty.
+   */
+  private isContentUnchanged(body: any): boolean {
+    if (!this.contentDetails) {
+      return false
+    }
+    const saved: any = {
+      name: _.get(this.contentDetails, 'name', ''),
+      description: _.get(this.contentDetails, 'description', ''),
+      purpose: _.get(this.contentDetails, 'purpose', ''),
+      appIcon: _.get(this.contentDetails, 'appIcon', ''),
+      posterImage: _.get(this.contentDetails, 'posterImage', ''),
+      difficultyLevel: _.get(this.contentDetails, 'difficultyLevel', ''),
+      license: _.get(this.contentDetails, 'license', ''),
+      keywords: _.get(this.contentDetails, 'keywords', []) || [],
+      // the content schema types duration as a String, so the saved copy is read as one
+      duration: String(Number(_.get(this.contentDetails, 'duration', 0)) || 0),
+    }
+    if (_.some(_.keys(saved), (key: string) => !_.isEqual(_.get(body, key), saved[key]))) {
+      return false
+    }
+    // the linkage is written as an object and a content schema that types it as a String
+    // hands it back serialised, so the two are read as the plan they carry rather than
+    // compared as whatever the api happened to return
+    return _.isEqual(
+      this.assessmentSvc.readPlanMetadata({
+        [aparPlan.TRAINING_PLAN_KEY]: _.get(body, aparPlan.TRAINING_PLAN_KEY),
+      }),
+      this.assessmentSvc.readPlanMetadata(this.contentDetails)
     )
   }
 

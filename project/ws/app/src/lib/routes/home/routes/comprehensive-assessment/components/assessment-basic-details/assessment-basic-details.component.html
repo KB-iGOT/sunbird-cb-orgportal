@@ -83,56 +83,6 @@
     </mat-error>
   </div>
 
-  <div class="classification flex flex-column gap-4">
-    <div class="assessment-header">
-      Classification
-    </div>
-
-    <div class="flex flex-column gap-1 assessment-form">
-      <span class="form-lable required">Knowledge level</span>
-      <span class="field-hint">Learner's knowledge level expected</span>
-      <mat-form-field appearance="outline" class="w-full">
-        <mat-select formControlName="difficultyLevel" placeholder="Select the knowledge level">
-          <mat-option *ngFor="let level of knowledgeLevels" [value]="level">{{level}}</mat-option>
-        </mat-select>
-      </mat-form-field>
-      <mat-error class="mat-error-text" *ngIf="showValidationMsg('difficultyLevel','required')">
-        Knowledge level is mandatory
-      </mat-error>
-    </div>
-
-    <div class="flex flex-column gap-1 assessment-form">
-      <span class="form-lable required">License</span>
-      <mat-form-field appearance="outline" class="w-full">
-        <mat-select formControlName="license" placeholder="Select the license">
-          <mat-option *ngFor="let license of licenses" [value]="license">{{license}}</mat-option>
-        </mat-select>
-      </mat-form-field>
-      <mat-error class="mat-error-text" *ngIf="showValidationMsg('license','required')">
-        License is mandatory
-      </mat-error>
-    </div>
-
-    <div class="flex flex-column gap-1">
-      <span class="form-lable required">Keywords</span>
-      <div class="keywords-box flex items-center flex-wrap gap-2 px-3 py-2">
-        <span class="keyword-chip flex items-center gap-1" *ngFor="let keyword of keywords">
-          {{keyword}}
-          <button type="button" class="keyword-remove flex items-center" *ngIf="openMode !== 'view'"
-            [attr.aria-label]="'Remove ' + keyword" (click)="removeKeyword(keyword)">
-            <mat-icon>cancel</mat-icon>
-          </button>
-        </span>
-        <input class="keyword-input flex-grow" type="text" placeholder="Search Keywords"
-          [maxlength]="keywordMaxLength" [disabled]="openMode === 'view'" #keywordInput
-          (keydown.enter)="addKeyword(keywordInput, $event)" (blur)="addKeyword(keywordInput)">
-      </div>
-      <mat-error class="mat-error-text" *ngIf="showValidationMsg('keywords','required')">
-        Add at least one keyword
-      </mat-error>
-    </div>
-  </div>
-
   <div class="flex flex-column gap-2 rich-text-field">
     <div class="form-lable required">
       Description
@@ -163,6 +113,57 @@
       Maximum {{learningOutcomeMaxLength}} characters are allowed
     </mat-error>
     <span class="editor-count flex justify-end">{{learningOutcomeLength}}/{{learningOutcomeMaxLength}}</span>
+  </div>
+
+  <div class="classification flex flex-column gap-4">
+    <div class="assessment-header">
+      Classification
+    </div>
+
+    <div class="flex flex-column gap-1 assessment-form">
+      <span class="form-lable required">Knowledge level</span>
+      <span class="field-hint">Learner's knowledge level expected</span>
+      <mat-form-field appearance="outline" class="w-full">
+        <mat-select formControlName="difficultyLevel" placeholder="Select the knowledge level">
+          <mat-option *ngFor="let level of knowledgeLevels" [value]="level">{{level}}</mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-error class="mat-error-text" *ngIf="showValidationMsg('difficultyLevel','required')">
+        Knowledge level is mandatory
+      </mat-error>
+    </div>
+
+  
+
+    <div class="flex flex-column gap-1">
+      <span class="form-lable required">Keywords</span>
+      <div class="keywords-box flex items-center flex-wrap gap-2 px-3 py-2">
+        <span class="keyword-chip flex items-center gap-1" *ngFor="let keyword of keywords">
+          {{keyword}}
+          <button type="button" class="keyword-remove flex items-center" *ngIf="openMode !== 'view'"
+            [attr.aria-label]="'Remove ' + keyword" (click)="removeKeyword(keyword)">
+            <mat-icon>cancel</mat-icon>
+          </button>
+        </span>
+        <input class="keyword-input flex-grow" type="text" placeholder="Search Keywords"
+          [maxlength]="keywordMaxLength" [disabled]="openMode === 'view'" #keywordInput
+          (keydown.enter)="addKeyword(keywordInput, $event)" (blur)="addKeyword(keywordInput)">
+      </div>
+      <mat-error class="mat-error-text" *ngIf="showValidationMsg('keywords','required')">
+        Add at least one keyword
+      </mat-error>
+    </div>
+      <div class="flex flex-column gap-1 assessment-form">
+      <span class="form-lable required">License</span>
+      <mat-form-field appearance="outline" class="w-full">
+        <mat-select formControlName="license" placeholder="Select the license">
+          <mat-option *ngFor="let license of licenses" [value]="license">{{license}}</mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-error class="mat-error-text" *ngIf="showValidationMsg('license','required')">
+        License is mandatory
+      </mat-error>
+    </div>
   </div>
 
   <div class="flex flex-column gap-2 assessment-form">

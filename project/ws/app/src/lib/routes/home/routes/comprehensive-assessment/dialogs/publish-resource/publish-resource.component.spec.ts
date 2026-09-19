@@ -417,7 +417,7 @@ describe('PublishResourceComponent', () => {
     it('should check the plan once every resource is Live', () => {
       publishAndWait()
 
-      expect(assessmentSvc.isPlanAvailable).toHaveBeenCalledWith('plan-1')
+      expect(assessmentSvc.isPlanAvailable).toHaveBeenCalledWith('plan-1', 'do_123')
       expect(component.isPlanFree).toBe(true)
       expect(component.planStatusText).toBe('Available')
       expect(component.stage).toBe('live')
@@ -438,12 +438,12 @@ describe('PublishResourceComponent', () => {
 
       component.ngOnInit()
 
-      expect(assessmentSvc.isPlanAvailable).toHaveBeenCalledWith('plan-1')
+      expect(assessmentSvc.isPlanAvailable).toHaveBeenCalledWith('plan-1', 'do_123')
       expect(component.stage).toBe('live')
     })
 
-    /** The search answers with nothing once another assessment has taken the plan. */
-    it('should refuse the publish when the plan is no longer available', () => {
+    /** The plan names the assessment holding it, and by then it can be a different one. */
+    it('should refuse the publish when another assessment holds the plan', () => {
       assessmentSvc.isPlanAvailable.mockReturnValue(of(false))
 
       publishAndWait()
@@ -537,7 +537,7 @@ describe('PublishResourceComponent', () => {
     it('should check the picked plan and open the publish', () => {
       component.changePlan()
 
-      expect(assessmentSvc.isPlanAvailable).toHaveBeenLastCalledWith('plan-2')
+      expect(assessmentSvc.isPlanAvailable).toHaveBeenLastCalledWith('plan-2', 'do_123')
       expect(component.stage).toBe('live')
       expect(component.canPublishAssessment).toBe(true)
       expect(component.isPlanFree).toBe(true)

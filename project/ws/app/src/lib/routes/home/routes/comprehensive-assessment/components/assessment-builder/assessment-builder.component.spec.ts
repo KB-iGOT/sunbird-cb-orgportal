@@ -1,6 +1,10 @@
 import { SimpleChange, SimpleChanges } from '@angular/core'
 import { LoaderService } from '../../../../../../../../../../../src/app/services/loader.service'
-import { CONTENT_COURSE_CATEGORY, QUESTIONSET_PRIMARY_CATEGORY } from '../../models/comprehensive-assessment.model'
+import {
+  CONTENT_COURSE_CATEGORY,
+  QUESTIONSET_CONTEXT_CATEGORY,
+  QUESTIONSET_PRIMARY_CATEGORY,
+} from '../../models/comprehensive-assessment.model'
 import { AssessmentBuilderComponent } from './assessment-builder.component'
 
 describe('AssessmentBuilderComponent', () => {
@@ -26,10 +30,18 @@ describe('AssessmentBuilderComponent', () => {
         identifier: '',
         primaryCategory: QUESTIONSET_PRIMARY_CATEGORY,
         courseCategory: CONTENT_COURSE_CATEGORY,
-        contextCategory: '',
+        contextCategory: QUESTIONSET_CONTEXT_CATEGORY,
         name: '',
         isReadOnly: false,
       })
+    })
+
+    /**
+     * A Live comprehensive assessment is a `Course Assessment` like any other, so this is
+     * what the consumption side has to tell it apart by - it used to go out empty.
+     */
+    it('should name the comprehensive assessment as the context the question set is in', () => {
+      expect(component.buildConfig().contextCategory).toBe('Comprehensive Assessment')
     })
 
     it('should carry the assessment the builder was opened on', () => {

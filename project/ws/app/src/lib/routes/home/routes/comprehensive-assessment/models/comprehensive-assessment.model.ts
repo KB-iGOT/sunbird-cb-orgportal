@@ -12,6 +12,14 @@ export const CONTENT_COURSE_CATEGORY = 'Comprehensive Assessment'
 export const COLLECTION_MIME_TYPE = 'application/vnd.ekstep.content-collection'
 export const QUESTIONSET_MIME_TYPE = 'application/vnd.sunbird.questionset'
 export const QUESTIONSET_PRIMARY_CATEGORY = 'Course Assessment'
+/**
+ * What the question set is written with as its `contextCategory`, and how the consumption
+ * side tells a comprehensive assessment from any other `Course Assessment` once it is Live.
+ * It has its own constant rather than borrowing `CONTENT_COURSE_CATEGORY`: that one is a
+ * placeholder waiting on a platform category and is meant to move, this is what is written
+ * onto the question set.
+ */
+export const QUESTIONSET_CONTEXT_CATEGORY = 'Comprehensive Assessment'
 export const DEFAULT_ACCESS_SETTING = 'allUsers'
 export const DEFAULT_FRAMEWORK = 'igot'
 export const DEFAULT_LICENSE = 'CC BY 4.0'
