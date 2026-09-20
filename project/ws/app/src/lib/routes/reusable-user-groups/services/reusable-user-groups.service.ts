@@ -45,11 +45,12 @@ export class ReusableUserGroupsService {
     return this.http.delete<IUserGroupDeleteResponse>(`${API_ENDPOINTS.DELETE}/${userGroupId}`)
   }
 
-  fetchUserCount(filters: Record<string, any>): Observable<IUserSearchCountResponse> {
+  fetchUserCount(filters: Record<string, any>, limit = 0): Observable<IUserSearchCountResponse> {
     return this.http.post<IUserSearchCountResponse>(API_ENDPOINTS.USER_SEARCH, {
       request: {
         filters,
         fields: ['identifier', 'rootOrgId', 'firstName'],
+        limit,
       },
     })
   }

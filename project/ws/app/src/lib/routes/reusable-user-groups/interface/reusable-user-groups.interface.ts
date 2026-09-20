@@ -13,6 +13,8 @@ export interface IUserGroupAction {
   enabled?: boolean
   allowedRoles?: string[]
   ownerOnlyRoles?: string[]
+  orgScoped?: boolean
+  disabledTooltip?: string
 }
 
 export interface IUserGroupsTableConfig {
@@ -57,6 +59,8 @@ export interface IUserGroupResult {
   updatedby?: string
   createddate?: string
   updateddate?: string
+  createdByName?: string
+  updatedByName?: string
 }
 
 export interface IUserGroupSearchResponse {
@@ -137,6 +141,8 @@ export interface IUserGroup {
   conditionCount: number
   criteria: TUserGroupCondition[]
   owner: string
+  ownerId: string
+  orgId: string
   ownerRole?: string
   status?: string
   updatedOn?: string

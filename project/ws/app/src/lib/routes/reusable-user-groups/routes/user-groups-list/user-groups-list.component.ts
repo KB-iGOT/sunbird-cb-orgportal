@@ -22,7 +22,7 @@ import {
   IUserGroupsConfig,
 } from '../../interface/reusable-user-groups.interface'
 import { ReusableUserGroupsService } from '../../services/reusable-user-groups.service'
-import { isGroupOwner, isOwnerOnly, isRoleAllowed } from '../../utils/user-group-access'
+import { canActOnGroup, isActionDisabled, isActionVisible, isGroupOwner, isRoleAllowed } from '../../utils/user-group-access'
 import { SnackbarComponent } from '@sunbird-cb/consumption'
 
 const DEFAULT_PAGE_SIZE = 20
@@ -59,6 +59,7 @@ export class UserGroupsListComponent implements OnInit {
 
   private readonly userRoles = signal<Set<string>>(new Set<string>())
   private readonly userId = signal('')
+  private readonly userOrgId = signal('')
 
   readonly config = signal<IUserGroupsConfig | undefined>(undefined)
   readonly dataSource = new MatTableDataSource<IUserGroup>([])
@@ -72,10 +73,9 @@ export class UserGroupsListComponent implements OnInit {
   readonly reachMap = signal<Record<string, IUserGroupReach>>({})
   readonly reachLoading = signal<Record<string, boolean>>({})
 
+  readonly viewer = computed(() => ({ roles: this.userRoles(), userId: this.userId(), orgId: this.userOrgId() }))
   readonly displayedColumns = computed(() => (this.config()?.table?.columns ?? []).map(column => column.key))
   readonly canCreate = computed(() => this.isAllowed(this.config()?.createButton?.allowedRoles))
-  readonly visibleRowActions = computed(() =>
-    (this.config()?.table?.rowActions ?? []).filter(action => this.isAllowed(action.allowedRoles)))
   readonly banner = computed<IRoleBanner | undefined>(() => {
     const roles = this.userRoles()
     const roleBanner = this.config()?.roleBanner
@@ -93,6 +93,7 @@ export class UserGroupsListComponent implements OnInit {
     this.config.set(this.route?.parent?.snapshot.data['pageData']?.data)
     this.userRoles.set(this.configSvc.userRoles ?? new Set<string>())
     this.userId.set(this.configSvc.userProfile?.userId ?? '')
+    this.userOrgId.set(this.configSvc.userProfile?.rootOrgId ?? '')
     this.pageSize.set(this.config()?.table?.pageSize ?? DEFAULT_PAGE_SIZE)
     this.sortBy.set(this.config()?.search?.sortBy ?? DEFAULT_SORT_BY)
     this.sortOrder.set(this.config()?.search?.sortOrder ?? DEFAULT_SORT_ORDER)
@@ -104,12 +105,24 @@ export class UserGroupsListComponent implements OnInit {
   }
 
   isOwner(group: IUserGroup): boolean {
-    return isGroupOwner(group?.owner, this.userId())
+    return isGroupOwner(group?.ownerId, this.userId())
   }
 
   rowActionsFor(group: IUserGroup): IUserGroupAction[] {
-    return this.visibleRowActions()
-      .filter(action => !isOwnerOnly(action, this.userRoles()) || this.isOwner(group))
+    return (this.config()?.table?.rowActions ?? [])
+      .filter(action => isActionVisible(action, group, this.viewer()))
+  }
+
+  isDisabled(action: IUserGroupAction, group: IUserGroup): boolean {
+    return isActionDisabled(action, group, this.viewer())
+  }
+
+  tooltipFor(action: IUserGroupAction, group: IUserGroup): string {
+    return this.isDisabled(action, group) ? action?.disabledTooltip ?? '' : ''
+  }
+
+  canAct(action: IUserGroupAction, group: IUserGroup): boolean {
+    return canActOnGroup(action, group, this.viewer())
   }
 
   conditionText(group: IUserGroup): string {
@@ -228,6 +241,10 @@ export class UserGroupsListComponent implements OnInit {
   }
 
   onRowAction(action: IUserGroupAction, group: IUserGroup) {
+    // The row may have been drawn before the roles landed, so the guard is repeated on the click
+    if (!this.canAct(action, group)) {
+      return
+    }
     switch (action.key) {
       case 'edit':
         this.router.navigate(['user-groups', group.id], { relativeTo: this.route.parent })
@@ -253,7 +270,9 @@ export class UserGroupsListComponent implements OnInit {
       name: result?.usergroupname,
       criteria,
       conditionCount: criteria.length,
-      owner: result?.createdby ?? '',
+      owner: result?.createdByName ?? '',
+      ownerId: result?.createdby ?? '',
+      orgId: result?.orgid ?? '',
       status: result?.status,
       updatedOn: result?.updateddate,
     }

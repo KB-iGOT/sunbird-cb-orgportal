@@ -25,7 +25,10 @@ const config = {
     ],
     reachAction: { key: 'reach', label: 'Check reach', icon: 'person_outline' },
     rowActions: [
-      { enabled: true, key: 'edit', label: 'Edit', allowedRoles: ['mdo_leader', 'mdo_admin'], ownerOnlyRoles: ['mdo_admin'] },
+      {
+        enabled: true, key: 'edit', label: 'Edit', allowedRoles: ['mdo_leader', 'mdo_admin'],
+        ownerOnlyRoles: ['mdo_admin'], disabledTooltip: 'Only an MDO Leader can edit this group.',
+      },
       { enabled: true, key: 'restricted', label: 'Restricted', allowedRoles: ['spv_admin'] },
       { enabled: true, key: 'use', label: 'Use' },
       { enabled: true, key: 'delete', label: 'Delete', allowedRoles: ['mdo_leader', 'mdo_admin'], ownerOnlyRoles: ['mdo_admin'] },
@@ -49,6 +52,7 @@ const searchResponse = {
         orgid: '01384674984551219213',
         status: 'active',
         createdby: 'c0915cee-df98-4391-917e-02ed9b07d54f',
+        createdByName: 'Asha Menon',
         updateddate: '2026-09-10T10:09:22.621872566Z',
       },
     ],
@@ -91,6 +95,7 @@ describe('UserGroupsListComponent', () => {
   let navigate: jest.Mock
   let userRoles: Set<string>
   let userId: string
+  let userOrgId: string
 
   const createComponent = () => {
     TestBed.resetTestingModule()
@@ -104,7 +109,7 @@ describe('UserGroupsListComponent', () => {
         },
         {
           provide: ConfigurationsService,
-          useValue: { userRoles, userProfile: { userId } },
+          useValue: { userRoles, userProfile: { userId, rootOrgId: userOrgId } },
         },
         { provide: ReusableUserGroupsService, useValue: { searchUserGroups, fetchUserGroup, createUserGroup, deleteUserGroup } },
         { provide: MatSnackBar, useValue: { open: snackBarOpen, openFromComponent: snackBarFromComponent } },
@@ -128,6 +133,7 @@ describe('UserGroupsListComponent', () => {
     navigate = jest.fn()
     userRoles = new Set(['mdo_leader'])
     userId = 'leader-1'
+    userOrgId = '01384674984551219213'
     createComponent()
   })
 
@@ -148,7 +154,7 @@ describe('UserGroupsListComponent', () => {
   })
 
   it('should hide row actions the user has no role for', () => {
-    expect(component.visibleRowActions().map(action => action.key)).toEqual(['edit', 'use', 'delete'])
+    expect(component.rowActionsFor(component.groups()[0]).map(action => action.key)).toEqual(['edit', 'use', 'delete'])
   })
 
   describe('ownership', () => {
@@ -168,8 +174,32 @@ describe('UserGroupsListComponent', () => {
       expect(component.rowActionsFor(component.groups()[0]).map(action => action.key)).toEqual(['edit', 'use', 'delete'])
     })
 
-    it('should keep an admin off the edit of a group somebody else created', () => {
+    it('should grey out, rather than hide, the edit of a group somebody else created', () => {
       asAdmin('admin-2')
+      const [group] = component.groups()
+      const actions = component.rowActionsFor(group)
+      expect(actions.map(action => action.key)).toEqual(['edit', 'use', 'delete'])
+      expect(actions.filter(action => component.isDisabled(action, group)).map(action => action.key))
+        .toEqual(['edit', 'delete'])
+      expect(component.canAct(actions[0], group)).toBe(false)
+    })
+
+    it('should name the role that can act in the tooltip of a greyed out action', () => {
+      asAdmin('admin-2')
+      const [group] = component.groups()
+      const [edit] = component.rowActionsFor(group)
+      expect(component.tooltipFor(edit, group)).toBe('Only an MDO Leader can edit this group.')
+    })
+
+    it('should leave the tooltip empty while the action is live', () => {
+      const [group] = component.groups()
+      const [edit] = component.rowActionsFor(group)
+      expect(component.tooltipFor(edit, group)).toBe('')
+    })
+
+    it('should drop the edit of a group belonging to another organisation', () => {
+      userOrgId = 'another-org'
+      createComponent()
       expect(component.rowActionsFor(component.groups()[0]).map(action => action.key)).toEqual(['use'])
     })
 
@@ -180,11 +210,12 @@ describe('UserGroupsListComponent', () => {
       expect(component.rowActionsFor(component.groups()[0]).map(action => action.key)).toEqual(['edit', 'use', 'delete'])
     })
 
-    it('should keep an admin off the edit while the signed in id is unknown', () => {
+    it('should grey out the edit while the signed in id is unknown', () => {
       userRoles = new Set(['mdo_admin'])
       userId = ''
       createComponent()
-      expect(component.rowActionsFor(component.groups()[0]).map(action => action.key)).toEqual(['use'])
+      const [group] = component.groups()
+      expect(component.isDisabled(component.rowActionsFor(group)[0], group)).toBe(true)
     })
 
     it('should still offer an admin the create button', () => {
@@ -212,7 +243,9 @@ describe('UserGroupsListComponent', () => {
     expect(group.id).toBe('fb9ad925-355a-4349-8688-ce1720f6dfd5')
     expect(group.name).toBe('User Group API testing 10th September - Updated')
     expect(group.conditionCount).toBe(2)
-    expect(group.owner).toBe('c0915cee-df98-4391-917e-02ed9b07d54f')
+    expect(group.owner).toBe('Asha Menon')
+    expect(group.ownerId).toBe('c0915cee-df98-4391-917e-02ed9b07d54f')
+    expect(group.orgId).toBe('01384674984551219213')
     expect(component.totalCount()).toBe(1)
     expect(component.dataSource.data.length).toBe(1)
   })
