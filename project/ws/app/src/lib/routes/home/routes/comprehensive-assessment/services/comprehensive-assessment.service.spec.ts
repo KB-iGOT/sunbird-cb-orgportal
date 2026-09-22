@@ -460,7 +460,8 @@ describe('ComprehensiveAssessmentService', () => {
   describe('content apis', () => {
     const userProfile = {
       userId: 'user-1',
-      userName: 'Manjula',
+      userName: 'manjula_k',
+      firstName: 'Manjula',
       rootOrgId: 'org-1',
       departmentName: 'Karnataka Postal Circle',
     }
@@ -499,7 +500,7 @@ describe('ComprehensiveAssessmentService', () => {
     it('should publish a draft naming who published it', () => {
       service.publishAssessment('do-1', 'user-1', 'org-1').subscribe()
 
-      const req = httpMock.expectOne('apis/proxies/v8/ca/v1/publish/do-1')
+      const req = httpMock.expectOne('apis/proxies/v8/action/ca/v1/publish/do-1')
       expect(req.request.body).toEqual({ request: { content: { lastPublishedBy: 'user-1' } } })
       req.flush({})
     })
@@ -514,7 +515,7 @@ describe('ComprehensiveAssessmentService', () => {
       service.getQuestionSetStatus('qs-1', 'org-1').subscribe()
 
       const requests = [
-        httpMock.expectOne('apis/proxies/v8/ca/v1/publish/do-1'),
+        httpMock.expectOne('apis/proxies/v8/action/ca/v1/publish/do-1'),
         httpMock.expectOne('apis/proxies/v8/ca/questionset/v1/publish/qs-1'),
         httpMock.expectOne('apis/proxies/v8/questionset/v1/read/qs-1'),
       ]
@@ -626,6 +627,86 @@ describe('ComprehensiveAssessmentService', () => {
       expect(content.posterImage).toBe('icon-url')
       expect(content.createdFor).toEqual(['org-1'])
       expect(content.creatorContacts[0].email).toBe('a@b.com')
+      req.flush({})
+    })
+
+    /**
+     * The whole field set the content api is given, pinned so a field cannot go missing
+     * unnoticed - `creatorContacts` in particular is what the platform records the author by.
+     */
+    it('should send every field the content api records an assessment by', () => {
+      service.createAssessmentCollection('A new assessment', 'icon-url', userProfile, 'a@b.com').subscribe()
+
+      const req = httpMock.expectOne('apis/proxies/v8/action/content/v3/create')
+
+      expect(Object.keys(req.request.body.request.content).sort()).toEqual([
+        'accessSetting', 'appIcon', 'code', 'contentType', 'courseCategory', 'createdBy',
+        'createdFor', 'creator', 'creatorContacts', 'creatorIDs', 'framework', 'isExternal',
+        'language', 'license', 'mimeType', 'name', 'organisation', 'ownershipType',
+        'posterImage', 'primaryCategory', 'source', 'versionKey',
+      ])
+      req.flush({})
+    })
+
+    it('should name the author in creatorContacts as well as on the content', () => {
+      service.createAssessmentCollection('A new assessment', '', userProfile, 'a@b.com').subscribe()
+
+      const req = httpMock.expectOne('apis/proxies/v8/action/content/v3/create')
+      const content = req.request.body.request.content
+
+      expect(content.creatorContacts).toEqual([{ id: 'user-1', name: 'Manjula', email: 'a@b.com' }])
+      expect(content.creator).toBe('Manjula')
+      expect(content.creatorIDs).toEqual(['user-1'])
+      expect(content.createdBy).toBe('user-1')
+      req.flush({})
+    })
+
+    /** The dialog reads the email off one profile, the create falls back to the other. */
+    it('should fall back to the profile email when the caller has none', () => {
+      service.createAssessmentCollection('A new assessment', '', { ...userProfile, email: 'p@b.com' }, '')
+        .subscribe()
+
+      const req = httpMock.expectOne('apis/proxies/v8/action/content/v3/create')
+
+      expect(req.request.body.request.content.creatorContacts[0].email).toBe('p@b.com')
+      req.flush({})
+    })
+
+    /** The given name is read under either spelling, depending on the read it came from. */
+    it('should name the author from a lowercased firstname', () => {
+      const named = { userId: 'user-1', firstname: 'Krisp', rootOrgId: 'org-1' }
+
+      service.createAssessmentCollection('A new assessment', '', named, 'a@b.com').subscribe()
+
+      const req = httpMock.expectOne('apis/proxies/v8/action/content/v3/create')
+      const content = req.request.body.request.content
+
+      expect(content.creator).toBe('Krisp')
+      expect(content.creatorContacts[0].name).toBe('Krisp')
+      req.flush({})
+    })
+
+    /** The two spellings are the same field, so a profile with both is not named twice. */
+    it('should pick one spelling rather than joining them', () => {
+      const named = { userId: 'user-1', firstName: 'Krisp', firstname: 'Krisp', rootOrgId: 'org-1' }
+
+      service.createAssessmentCollection('A new assessment', '', named, 'a@b.com').subscribe()
+
+      const req = httpMock.expectOne('apis/proxies/v8/action/content/v3/create')
+
+      expect(req.request.body.request.content.creator).toBe('Krisp')
+      req.flush({})
+    })
+
+    /** The login handle is not a name, so it is never what the assessment is authored by. */
+    it('should not fall back to the userName handle', () => {
+      const handleOnly = { userId: 'user-1', userName: 'manjula_k', rootOrgId: 'org-1' }
+
+      service.createAssessmentCollection('A new assessment', '', handleOnly, 'a@b.com').subscribe()
+
+      const req = httpMock.expectOne('apis/proxies/v8/action/content/v3/create')
+
+      expect(req.request.body.request.content.creator).toBe('')
       req.flush({})
     })
 
@@ -758,6 +839,28 @@ describe('ComprehensiveAssessmentService', () => {
       expect(result.content[0].appIcon)
         .toBe(`${(environment.domainName || '').replace(/\/$/, '')}` +
               '/assets/public/collection/do-1/artifact/icon.thumb.png')
+    })
+
+    /** The Live rows are drawn from the poster, so it needs the same rewrite the icon gets. */
+    it('should point the poster at the portal as well as the icon', () => {
+      let result: any
+      service.searchAssessments({
+        status: 'Live', rootOrgId: 'org-1', query: '', pageSize: 20, pageIndex: 0,
+      }).subscribe((res: any) => result = res)
+
+      httpMock.expectOne(searchUrl).flush({
+        result: {
+          count: 1,
+          content: [{
+            identifier: 'do-1',
+            posterImage: 'https://storage.googleapis.com/igot/collection/do-1/artifact/poster.png',
+          }],
+        },
+      })
+
+      expect(result.content[0].posterImage)
+        .toBe(`${(environment.domainName || '').replace(/\/$/, '')}` +
+              '/assets/public/collection/do-1/artifact/poster.png')
     })
 
     it('should leave a thumbnail the portal already serves alone', () => {

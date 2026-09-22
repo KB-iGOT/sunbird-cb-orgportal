@@ -310,14 +310,97 @@ describe('AssessmentsListComponent', () => {
       ])
     })
 
-    it('should carry the thumbnail on the name column of either tab', () => {
+    /**
+     * Publishing copies the assessment's appIcon somewhere that is not publicly readable, so
+     * a Live row is drawn from its poster and a draft from the icon it has always had. Each
+     * names the other as its fallback, for a row that only carries one of them.
+     */
+    it('should draw the live and retired thumbnails from the poster', () => {
+      component.ngOnInit()
+
+      expect(component.tableData.columns[0]).toEqual(expect.objectContaining({
+        key: 'name',
+        cellType: 'textImage',
+        imageKey: 'posterImage',
+        fallbackImageKey: 'appIcon',
+      }))
+
+      component = build('retired')
+      component.ngOnInit()
+
+      expect(component.tableData.columns[0]).toEqual(expect.objectContaining({
+        imageKey: 'posterImage',
+        fallbackImageKey: 'appIcon',
+      }))
+    })
+
+    it('should draw the draft thumbnail from the icon', () => {
+      component = build('draft')
+
       component.ngOnInit()
 
       expect(component.tableData.columns[0]).toEqual(expect.objectContaining({
         key: 'name',
         cellType: 'textImage',
         imageKey: 'appIcon',
+        fallbackImageKey: 'posterImage',
       }))
+    })
+  })
+
+  /**
+   * The column names the author, and the author reading their own row is told so rather than
+   * shown their own name back - the same way the training plan dashboard names its rows.
+   */
+  describe('naming the author of a row', () => {
+    const own = { identifier: 'do_own', createdBy: 'user-1', creator: 'Manjula' }
+    const someoneElses = { identifier: 'do_other', createdBy: 'user-2', creator: 'Sohith' }
+
+    const listWith = (rows: any[], roles: string[] = ['mdo_leader']) => {
+      assessmentSvc.searchAssessments.mockReturnValue(of({ content: rows, count: rows.length }))
+      component = build('live', roles)
+      component.ngOnInit()
+      return component.assessmentsList
+    }
+
+    it('should read You against the row the user wrote', () => {
+      const [ownRow] = listWith([own])
+
+      expect(ownRow.creator).toBe('You')
+    })
+
+    it('should leave the author of everyone else alone', () => {
+      const [otherRow] = listWith([someoneElses])
+
+      expect(otherRow.creator).toBe('Sohith')
+    })
+
+    /** Being able to work on every row does not make every row the user's own. */
+    it('should name only the user own row when both are listed', () => {
+      const [ownRow, otherRow] = listWith([own, someoneElses])
+
+      expect(ownRow.creator).toBe('You')
+      expect(otherRow.creator).toBe('Sohith')
+    })
+
+    /** An owner bound role reads You on its own row and keeps the whole menu on it. */
+    it('should name the row and leave its actions alone for an MDO admin', () => {
+      const [ownRow, otherRow] = listWith([own, someoneElses], ['mdo_admin'])
+
+      expect(ownRow.creator).toBe('You')
+      expect(ownRow.buttonsToHide).toBeUndefined()
+      expect(otherRow.creator).toBe('Sohith')
+      expect(otherRow.buttonsToHide).toEqual(['edit', 'publish', 'delete'])
+    })
+
+    it('should leave every row alone while the profile has no user id', () => {
+      component = build('live')
+      component.userProfile = {}
+      assessmentSvc.searchAssessments.mockReturnValue(of({ content: [own], count: 1 }))
+
+      component.getAssessments()
+
+      expect(component.assessmentsList[0].creator).toBe('Manjula')
     })
   })
 
@@ -618,13 +701,64 @@ describe('AssessmentsListComponent', () => {
       expect(assessmentSvc.retireAssessment).not.toHaveBeenCalled()
     })
 
-    it('should reload the tab once the assessment is deleted', () => {
-      assessmentSvc.searchAssessments.mockClear()
+    /**
+     * The retire is taken at once but the search drops the row a moment later, so the screen
+     * is held until the platform has caught up rather than listing a tab that still answers
+     * with the assessment just deleted.
+     */
+    it('should hold the screen while the platform catches up', () => {
+      jest.useFakeTimers()
+      const progress = { close: jest.fn() }
+      dialog.open.mockReturnValue(progress)
 
       component.deleteAssessment(row)
 
+      expect(dialog.open).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({
+        disableClose: true,
+        data: expect.objectContaining({ title: 'Deleting the assessment' }),
+      }))
+      // nothing has moved while the wait is on
+      expect(progress.close).not.toHaveBeenCalled()
+      expect(router.navigate).not.toHaveBeenCalled()
+
+      jest.advanceTimersByTime(comprehensiveAssessmentList.DELETE_SETTLE_MS)
+
+      expect(progress.close).toHaveBeenCalled()
       expect(matSnackBar.open).toHaveBeenCalledWith('Assessment deleted successfully')
-      expect(assessmentSvc.searchAssessments).toHaveBeenCalledTimes(1)
+      jest.useRealTimers()
+    })
+
+    /** The assessment has not gone, it has moved - so the tab holding it now is opened. */
+    it('should open the retired tab once the wait is over', () => {
+      jest.useFakeTimers()
+      dialog.open.mockReturnValue({ close: jest.fn() })
+
+      component.deleteAssessment(row)
+      jest.advanceTimersByTime(comprehensiveAssessmentList.DELETE_SETTLE_MS)
+
+      expect(router.navigate).toHaveBeenCalledWith(['/app/home/comprehensive-assessment', 'retired'])
+      jest.useRealTimers()
+    })
+
+    it('should not list the tab it is leaving, which still answers with the deleted row', () => {
+      jest.useFakeTimers()
+      dialog.open.mockReturnValue({ close: jest.fn() })
+      assessmentSvc.searchAssessments.mockClear()
+
+      component.deleteAssessment(row)
+      jest.advanceTimersByTime(comprehensiveAssessmentList.DELETE_SETTLE_MS)
+
+      expect(assessmentSvc.searchAssessments).not.toHaveBeenCalled()
+      jest.useRealTimers()
+    })
+
+    it('should not hold the screen when the delete failed', () => {
+      assessmentSvc.retireAssessment.mockReturnValue(throwError(() => ({})))
+      dialog.open.mockClear()
+
+      component.deleteAssessment(row)
+
+      expect(dialog.open).not.toHaveBeenCalled()
     })
 
     it('should report why the delete failed', () => {

@@ -139,8 +139,19 @@
     }
   }
 
+  /* The pair sits centred and each button is only as wide as its label. The primary used to
+     run most of the dialog, which is the theme bundle sizing `.mat-flat-button` from outside
+     this component - the same reason the colour below has to be stated as important. */
   .action-btns {
     margin-top: 24px;
+    justify-content: center;
+    flex-wrap: wrap;
+
+    .cancel-button,
+    .action-button {
+      flex: 0 0 auto;
+      width: auto !important;
+    }
   }
 
   .cancel-button {

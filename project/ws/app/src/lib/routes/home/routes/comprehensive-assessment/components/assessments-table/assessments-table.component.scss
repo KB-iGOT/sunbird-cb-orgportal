@@ -35,12 +35,16 @@
   min-width: min-content;
 }
 
+/* Kept to what the value actually needs rather than what reads comfortably: the widths
+   below are the difference between the Actions column sitting on the page and sitting
+   behind a horizontal scroll. A name or plan that outgrows its column is clamped to two
+   lines and says the rest in its tooltip. */
 .imageCell {
-  min-width: 260px;
+  min-width: 220px;
 }
 
 .table-text-cell {
-  min-width: 120px;
+  min-width: 96px;
 }
 
 /* The plate is drawn by the container, so a row with no thumbnail keeps the
@@ -86,16 +90,18 @@
   font: $ca-font-meta !important;
 }
 
+/* `22 Sep, 2026` and a sort arrow, nothing wider is ever put here */
 .table-date-cell {
-  flex: 0 0 130px;
+  flex: 0 0 108px;
 }
 
 .table-status-cell {
   flex: 0 0 110px;
 }
 
+/* One icon button, so it only has to be as wide as the `Actions` header */
 .table-menu-cell {
-  flex: 0 0 100px;
+  flex: 0 0 72px;
 }
 
 /* Status is the one place colour carries meaning rather than decoration, so

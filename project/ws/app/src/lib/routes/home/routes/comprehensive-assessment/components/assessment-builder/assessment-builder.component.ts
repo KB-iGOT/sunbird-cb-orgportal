@@ -46,7 +46,7 @@ export class AssessmentBuilderComponent implements OnChanges {
       // written onto the question set as it is created, and the only thing that tells a Live
       // comprehensive assessment from any other Course Assessment
       contextCategory: '',
-      name: this.assessmentName || '',
+      name:  '',
       isReadOnly: this.openMode === 'view',
     }
   }

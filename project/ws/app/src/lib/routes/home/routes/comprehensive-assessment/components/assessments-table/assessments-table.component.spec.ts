@@ -244,39 +244,119 @@ describe('AssessmentsTableComponent', () => {
     })
   })
 
+  /**
+   * The two tabs keep the image under different keys - a published assessment's appIcon is
+   * copied somewhere unreadable - so a column names the key it prefers and the one to fall
+   * back to, and the row is drawn from whichever actually answers.
+   */
   describe('the row thumbnail', () => {
-    it('should show the thumbnail a row carries', () => {
-      expect(component.hasThumbnail({ appIcon: 'icon.png' }, 'appIcon')).toBe(true)
+    /** The live column: poster first, icon behind it. */
+    const liveColumn: comprehensiveAssessmentList.columnData = {
+      displayName: 'Assessment Name', key: 'name', cellType: 'textImage',
+      imageKey: 'posterImage', fallbackImageKey: 'appIcon',
+    }
+    /** The draft column, the other way round. */
+    const draftColumn: comprehensiveAssessmentList.columnData = {
+      displayName: 'Assessment Name', key: 'name', cellType: 'textImage',
+      imageKey: 'appIcon', fallbackImageKey: 'posterImage',
+    }
+
+    it('should draw a live row from the poster it carries', () => {
+      const row = { posterImage: 'poster.png', appIcon: 'icon.png' }
+
+      expect(component.thumbnailUrl(row, liveColumn)).toBe('poster.png')
     })
 
-    it('should fall back for a row that has no thumbnail', () => {
-      expect(component.hasThumbnail({ appIcon: '' }, 'appIcon')).toBe(false)
-      expect(component.hasThumbnail({}, 'appIcon')).toBe(false)
+    it('should draw a draft row from its icon', () => {
+      const row = { posterImage: 'poster.png', appIcon: 'icon.png' }
+
+      expect(component.thumbnailUrl(row, draftColumn)).toBe('icon.png')
     })
 
-    /** A url that 404s renders as a broken image, so the row falls back once it fails. */
-    it('should fall back for a thumbnail that cannot be loaded', () => {
-      const row = { appIcon: 'gone.png' }
+    /** An assessment saved before the poster was written carries only the icon. */
+    it('should fall back to the other key when the preferred one is empty', () => {
+      expect(component.thumbnailUrl({ appIcon: 'icon.png' }, liveColumn)).toBe('icon.png')
+      expect(component.thumbnailUrl({ posterImage: 'poster.png' }, draftColumn)).toBe('poster.png')
+    })
 
-      component.onThumbnailError(row, 'appIcon')
+    it('should show the placeholder for a row carrying neither', () => {
+      expect(component.thumbnailUrl({}, liveColumn)).toBe('')
+      expect(component.thumbnailUrl({ posterImage: '', appIcon: '' }, liveColumn)).toBe('')
+    })
 
-      expect(component.hasThumbnail(row, 'appIcon')).toBe(false)
+    /** A url that 404s renders as a broken image, so the row moves on to its other key. */
+    it('should move on to the fallback once the preferred image fails', () => {
+      const row = { posterImage: 'gone.png', appIcon: 'icon.png' }
+
+      component.onThumbnailError('gone.png')
+
+      expect(component.thumbnailUrl(row, liveColumn)).toBe('icon.png')
+    })
+
+    it('should show the placeholder once both keys have failed', () => {
+      const row = { posterImage: 'gone.png', appIcon: 'also-gone.png' }
+
+      component.onThumbnailError('gone.png')
+      component.onThumbnailError('also-gone.png')
+
+      expect(component.thumbnailUrl(row, liveColumn)).toBe('')
     })
 
     it('should leave the rows that load alone', () => {
-      component.onThumbnailError({ appIcon: 'gone.png' }, 'appIcon')
+      component.onThumbnailError('gone.png')
 
-      expect(component.hasThumbnail({ appIcon: 'icon.png' }, 'appIcon')).toBe(true)
+      expect(component.thumbnailUrl({ posterImage: 'poster.png' }, liveColumn)).toBe('poster.png')
     })
 
     it('should give a thumbnail another chance when the rows are reloaded', () => {
-      const row = { appIcon: 'gone.png' }
-      component.onThumbnailError(row, 'appIcon')
+      const row = { posterImage: 'gone.png' }
+      component.onThumbnailError('gone.png')
 
       component.data = [row]
       component.ngOnChanges(changes('data'))
 
-      expect(component.hasThumbnail(row, 'appIcon')).toBe(true)
+      expect(component.thumbnailUrl(row, liveColumn)).toBe('gone.png')
+    })
+
+    it('should ignore an error raised with no url', () => {
+      component.onThumbnailError('')
+
+      expect(component.thumbnailUrl({ posterImage: 'poster.png' }, liveColumn)).toBe('poster.png')
+    })
+  })
+
+  /**
+   * The tooltip repeats the cell, so it is only worth showing where the cell could not show
+   * everything itself - a value that fits says the same thing twice.
+   */
+  describe('the cell tooltip', () => {
+    /** Poses a cell by the four measurements the check reads off it. */
+    const cell = (box: Partial<Record<'scrollHeight' | 'clientHeight' | 'scrollWidth' | 'clientWidth', number>>) =>
+      ({ scrollHeight: 0, clientHeight: 0, scrollWidth: 0, clientWidth: 0, ...box }) as HTMLElement
+
+    it('should stay off for a cell showing its text in full', () => {
+      const shown = cell({ scrollHeight: 18, clientHeight: 18, scrollWidth: 120, clientWidth: 120 })
+
+      expect(component.isTextTruncated(shown)).toBe(false)
+    })
+
+    /** The name and plan columns clamp to two lines, so they run out of room downwards. */
+    it('should come on for a name clamped to two lines', () => {
+      expect(component.isTextTruncated(cell({ scrollHeight: 54, clientHeight: 36 }))).toBe(true)
+    })
+
+    it('should come on for a value clipped sideways', () => {
+      expect(component.isTextTruncated(cell({ scrollWidth: 180, clientWidth: 96 }))).toBe(true)
+    })
+
+    /** Sub-pixel layout puts these a fraction apart on a zoomed page, which is not a clip. */
+    it('should ignore a sub-pixel difference', () => {
+      expect(component.isTextTruncated(cell({ scrollHeight: 37, clientHeight: 36 }))).toBe(false)
+      expect(component.isTextTruncated(cell({ scrollWidth: 97, clientWidth: 96 }))).toBe(false)
+    })
+
+    it('should stay off before the cell exists', () => {
+      expect(component.isTextTruncated(undefined as unknown as HTMLElement)).toBe(false)
     })
   })
 

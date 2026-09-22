@@ -427,6 +427,9 @@ export class ComprehensiveAssessmentService {
       // publicly readable - fetching one from storage answers 403 and the row falls back
       // to its placeholder. `toPublicUrl` is the same rewrite the upload does.
       appIcon: this.toPublicUrl(_.get(row, 'appIcon', '')),
+      // the listing draws Live rows from the poster, so it needs the same rewrite - left
+      // raw it is fetched straight off the bucket, which answers 403 for a published object
+      posterImage: this.toPublicUrl(_.get(row, 'posterImage', '')),
       durationDisplay: this.toDisplayDuration(Number(_.get(row, 'duration', 0)) || 0),
       // The plan and everything derived from it are read off the assessment rather than
       // fetched again, they travel with the linkage written onto it
@@ -486,7 +489,7 @@ export class ComprehensiveAssessmentService {
           code: this.generateCode(),
           contentType: 'Asset',
           createdBy: _.get(userProfile, 'userId', ''),
-          creator: _.get(userProfile, 'userName', ''),
+          creator: this.readCreatorName(userProfile),
           mimeType: file.type,
           mediaType: 'image',
           name: file.name,
@@ -517,7 +520,7 @@ export class ComprehensiveAssessmentService {
   /** Creates the assessment collection with the name and thumbnail captured in the dialog. */
   createAssessmentCollection(name: string, appIcon: string, userProfile: any, userEmail: string): Observable<any> {
     const userId = _.get(userProfile, 'userId', '')
-    const creator = _.get(userProfile, 'userName', '')
+    const creator = this.readCreatorName(userProfile)
     const request = {
       request: {
         content: {
@@ -582,6 +585,18 @@ export class ComprehensiveAssessmentService {
   /** Nothing is sent for an org that is not known, rather than an empty header. */
   private orgHeader(rootOrgId: string): { headers?: { [header: string]: string } } {
     return rootOrgId ? { headers: { [ORG_ID_HEADER]: rootOrgId } } : {}
+  }
+
+  /**
+   * The creator as the content api records them, on the content itself and in its contacts.
+   * The profile answers the given name under either spelling depending on which read it came
+   * from, so both are tried and the first that holds anything wins - they are the same field
+   * rather than two halves of a name, so one is picked instead of joining them. The login
+   * handle is deliberately not among them: `userName` is not what an assessment is authored by.
+   */
+  private readCreatorName(userProfile: any): string {
+    const firstName = _.get(userProfile, 'firstName', '') || _.get(userProfile, 'firstname', '')
+    return `${firstName || ''}`.trim()
   }
 
   /** Sunbird expects a 16 digit numeric code on create. */

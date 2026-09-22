@@ -1,0 +1,5 @@
+<div class="progress-dialog flex flex-column items-center">
+  <mat-spinner [diameter]="48"></mat-spinner>
+  <div class="progress-title">{{ data?.title }}</div>
+  <div class="progress-subtitle" *ngIf="data?.subTitle">{{ data?.subTitle }}</div>
+</div>

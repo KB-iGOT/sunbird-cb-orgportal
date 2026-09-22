@@ -172,6 +172,13 @@ export namespace comprehensiveAssessmentList {
    */
   export const PUBLISH_SETTLE_MS = 10000
 
+  /**
+   * The same grace for a delete. Retiring answers as soon as it is taken and the search drops
+   * the assessment a moment later, so listing a tab straight away still answers with the row
+   * that was just deleted - which reads as the delete having failed.
+   */
+  export const DELETE_SETTLE_MS = 10000
+
   /** Where the window end sits on a listing row, resolved from the plan the row carries. */
   export const WINDOW_END_KEY = 'windowEndDate'
   export const WINDOW_CLOSED_MESSAGE =
@@ -182,6 +189,8 @@ export namespace comprehensiveAssessmentList {
     key: string
     cellType: string
     imageKey?: string
+    /** Read when `imageKey` holds nothing, or when the image it named could not be loaded. */
+    fallbackImageKey?: string
     cellClass?: string
   }
 

@@ -21,10 +21,15 @@
             <span class="card-meta">{{linkedPlan.planYear}}<ng-container *ngIf="planWindowDisplay"> &middot; due
                 {{planWindowDisplay}}</ng-container><ng-container *ngIf="linkedPlan.orgName"> &middot;
                 {{linkedPlan.orgName}}</ng-container></span>
-            <span class="card-chip flex items-center gap-1" matTooltip="Access criteria read from the linked plan"
-              matTooltipClass="new-toolTip" matTooltipPosition="above">
+            <span class="card-chip flex items-center gap-1">
               <mat-icon>{{linkedPlan.gatingCourseCount ? 'lock_outline' : 'lock_open'}}</mat-icon>
-              {{gatingDisplay}}
+              <span>{{gatingDisplay}}</span>
+              <!-- The tooltip hangs off this icon rather than off the whole chip: the chip
+                   states the rule, the icon is the thing to point at to be told where it
+                   comes from. Focusable, so it can be reached without a mouse. -->
+              <mat-icon class="chip-info" matTooltip="Access criteria read from the linked plan"
+                matTooltipClass="new-toolTip" matTooltipPosition="above" tabindex="0"
+                aria-label="Where the access criteria come from">info_outline</mat-icon>
             </span>
           </div>
         </ng-container>
