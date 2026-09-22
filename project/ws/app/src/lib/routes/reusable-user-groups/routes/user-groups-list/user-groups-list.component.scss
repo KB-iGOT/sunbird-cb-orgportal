@@ -103,8 +103,8 @@
 }
 
 ::ng-deep .mat-column-name {
-  flex: 0 0 40% !important;
-  width: 40% !important;
+  flex: 0 0 35% !important;
+  width: 35% !important;
 }
 
 ::ng-deep .mat-column-estimatedOfficers {
@@ -118,8 +118,8 @@
 }
 
 ::ng-deep .mat-column-actions {
-  flex: 0 0 22% !important;
-  width: 22% !important;
+  flex: 0 0 27% !important;
+  width: 27% !important;
 }
 
 .reach-count {
@@ -132,4 +132,9 @@
 
 .reach-refresh {
   color: #1b4ca1;
+}
+
+.delete-btn {
+  color: #d12e2e !important;
+  border-color: #d12e2e !important;
 }

@@ -82,10 +82,18 @@
                 </div>
               }
               @case ('actions') {
-                <div class="row-actions flex flex-wrap gap-2">
+                <div class="row-actions flex flex-wrap gap-2" >
                   @for (action of rowActionsFor(group); track action?.key) {
                     @if (action?.enabled) {
-                      <button matButton="outlined" class="outlined-btn" (click)="onRowAction(action, group)">
+                      <button
+                        matButton="outlined"
+                        class="outlined-btn"
+                        [ngClass]="{ 'delete-btn': action?.key === 'delete' }"
+                        [disabled]="isDisabled(action, group)"
+                        disabledInteractive
+                        [matTooltip]="tooltipFor(action, group)"
+                        (click)="onRowAction(action, group)"
+                      >
                         @if (action?.icon) {
                           <mat-icon>{{ action?.icon }}</mat-icon>
                         }
