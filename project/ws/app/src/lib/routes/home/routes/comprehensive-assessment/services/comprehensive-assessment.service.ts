@@ -422,6 +422,11 @@ export class ComprehensiveAssessmentService {
       lastUpdatedOn: this.toDisplayDate(_.get(row, 'lastUpdatedOn')),
       lastPublishedOn: this.toDisplayDate(_.get(row, 'lastPublishedOn')),
       creator: _.get(row, 'creator', '') || '-',
+      // Served through the portal rather than straight off the bucket: a published
+      // assessment's thumbnail is copied under `/collection`, and those objects are not
+      // publicly readable - fetching one from storage answers 403 and the row falls back
+      // to its placeholder. `toPublicUrl` is the same rewrite the upload does.
+      appIcon: this.toPublicUrl(_.get(row, 'appIcon', '')),
       durationDisplay: this.toDisplayDuration(Number(_.get(row, 'duration', 0)) || 0),
       // The plan and everything derived from it are read off the assessment rather than
       // fetched again, they travel with the linkage written onto it

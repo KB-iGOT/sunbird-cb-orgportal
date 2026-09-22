@@ -454,6 +454,22 @@ describe('CreateAssessmentComponent', () => {
       expect(assessmentSvc.updateContent).not.toHaveBeenCalled()
     })
 
+    /**
+     * Next still walks the steps of a view only assessment to reach the preview, and the
+     * content api answers a write there with `Access denied`.
+     */
+    it('should move on without writing the content back in view mode', () => {
+      component = build({ assessmentDetails: { data: content() } },
+                        { mode: 'view', preview: 'true', editMode: 'true' })
+      withStepper()
+
+      component.moveToNextForm()
+
+      expect(assessmentSvc.updateContent).not.toHaveBeenCalled()
+      expect(assessmentSvc.getContentHierarchy).toHaveBeenCalled()
+      expect(component.currentStepperIndex).toBe(1)
+    })
+
     it('should save the step and move on', () => {
       component.moveToNextForm()
 

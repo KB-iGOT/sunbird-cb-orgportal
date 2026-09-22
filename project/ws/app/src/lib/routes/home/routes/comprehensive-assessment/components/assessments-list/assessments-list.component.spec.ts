@@ -115,14 +115,111 @@ describe('AssessmentsListComponent', () => {
     })
   })
 
+  /**
+   * The authoring actions are owner bound for an MDO admin and open to an MDO leader, and
+   * the table reads `buttonsToHide` to drop them for one row while the tab menu still
+   * carries them. View is never dropped, so the rest of the org stays readable.
+   */
+  describe('the rows an MDO admin may act on', () => {
+    const own = { identifier: 'do_own', createdBy: 'user-1' }
+    const someoneElses = { identifier: 'do_other', createdBy: 'user-2' }
+
+    const listFor = (roles: string[], path = 'draft') => {
+      assessmentSvc.searchAssessments.mockReturnValue(of({ content: [own, someoneElses], count: 2 }))
+      component = build(path, roles)
+      component.ngOnInit()
+      return component.assessmentsList
+    }
+
+    /** The tab menu less whatever the row hides, which is what the table renders. */
+    const actionsFor = (row: any) => component.menuItems
+      .map((item: any) => item.action)
+      .filter((action: string) => !(row.buttonsToHide || []).includes(action))
+
+    /** Their own draft keeps View, Edit, Publish and Delete; the rest of the org keeps View. */
+    it('should leave only view on the assessments an MDO admin did not author', () => {
+      const [ownRow, otherRow] = listFor(['mdo_admin'])
+
+      expect(ownRow.buttonsToHide).toBeUndefined()
+      expect(otherRow.buttonsToHide).toEqual(['edit', 'publish', 'delete'])
+    })
+
+    /** The requirement itself: what the table is left to render for each row. */
+    it('should leave an MDO admin the whole menu on their own draft and view on the rest', () => {
+      const [ownRow, otherRow] = listFor(['mdo_admin'])
+
+      expect(actionsFor(ownRow)).toEqual(['view', 'edit', 'publish', 'delete'])
+      expect(actionsFor(otherRow)).toEqual(['view'])
+    })
+
+    /** The live tab carries no publish, so the same rule leaves View, Edit and Delete. */
+    it('should leave an MDO admin their own live assessment to work on and view on the rest', () => {
+      const [ownRow, otherRow] = listFor(['mdo_admin'], 'live')
+
+      expect(actionsFor(ownRow)).toEqual(['view', 'edit', 'delete'])
+      expect(actionsFor(otherRow)).toEqual(['view'])
+    })
+
+    it('should leave an MDO leader the whole menu on every live assessment', () => {
+      const [ownRow, otherRow] = listFor(['mdo_leader'], 'live')
+
+      expect(actionsFor(ownRow)).toEqual(['view', 'edit', 'delete'])
+      expect(actionsFor(otherRow)).toEqual(['view', 'edit', 'delete'])
+    })
+
+    it('should leave every row editable for an MDO leader', () => {
+      const rows = listFor(['mdo_leader'])
+
+      expect(rows.map((listed: any) => listed.buttonsToHide)).toEqual([undefined, undefined])
+    })
+
+    /** The unbound role wins, an admin who is also a leader edits the whole org. */
+    it('should leave every row editable for an MDO admin who is also a leader', () => {
+      const rows = listFor(['mdo_admin', 'mdo_leader'])
+
+      expect(rows.map((listed: any) => listed.buttonsToHide)).toEqual([undefined, undefined])
+    })
+
+    /** Nothing to own against, so the owner bound author is left with no row to work on. */
+    it('should leave only view on every row while the user id is unresolved', () => {
+      assessmentSvc.searchAssessments.mockReturnValue(of({ content: [own, someoneElses], count: 2 }))
+      activatedRoute = {
+        snapshot: {
+          url: [{ path: 'draft' }],
+          data: { configService: { userProfile: {}, userRoles: new Set(['mdo_admin']) } },
+        },
+      }
+      component = new AssessmentsListComponent(
+        assessmentSvc, activatedRoute, router, dialog, matSnackBar, loaderService
+      )
+
+      component.ngOnInit()
+
+      expect(component.assessmentsList.map((listed: any) => listed.buttonsToHide))
+        .toEqual([['edit', 'publish', 'delete'], ['edit', 'publish', 'delete']])
+    })
+
+    /** A row already suppressing an action keeps it, the owner rule only adds to the list. */
+    it('should keep the actions a row already hides', () => {
+      assessmentSvc.searchAssessments.mockReturnValue(
+        of({ content: [{ ...someoneElses, buttonsToHide: ['delete'] }], count: 1 })
+      )
+      component = build('draft', ['mdo_admin'])
+
+      component.ngOnInit()
+
+      expect(component.assessmentsList[0].buttonsToHide).toEqual(['delete', 'edit', 'publish'])
+    })
+  })
+
   describe('the tab configuration', () => {
     /** A published assessment is viewed and edited, it is not deleted off the dashboard. */
-    it('should show published on and only view and edit on the live tab', () => {
+    it('should show published on and view, edit and delete on the live tab', () => {
       component.ngOnInit()
 
       expect(component.tableData.columns.map((column: any) => column.key))
         .toEqual(['name', 'planName', 'reportingYear', 'assessmentWindow', 'creator', 'lastPublishedOn'])
-      expect(component.menuItems.map((item: any) => item.action)).toEqual(['view', 'edit'])
+      expect(component.menuItems.map((item: any) => item.action)).toEqual(['view', 'edit', 'delete'])
       expect(component.tableData.noDataMessage).toBe('There are no live assessments.')
     })
 
@@ -139,20 +236,36 @@ describe('AssessmentsListComponent', () => {
     })
 
     /** Edit is the one action the requirement holds behind a role. */
-    it('should not offer edit to a user who is not an MDO leader', () => {
-      component = build('draft', ['mdo_admin'])
+    it('should not offer edit to a user holding neither editing role', () => {
+      component = build('draft', ['content_creator'])
 
       component.ngOnInit()
 
       expect(component.menuItems.map((item: any) => item.action)).toEqual(['view', 'publish', 'delete'])
     })
 
-    it('should not offer edit on the live tab either without the role', () => {
+    it('should not offer edit on the live tab either without an editing role', () => {
+      component = build('live', ['content_creator'])
+
+      component.ngOnInit()
+
+      expect(component.menuItems.map((item: any) => item.action)).toEqual(['view', 'delete'])
+    })
+
+    /** An MDO admin edits their own assessments, so the tab menu carries the action. */
+    it('should offer edit to an MDO admin on either tab', () => {
+      component = build('draft', ['mdo_admin'])
+
+      component.ngOnInit()
+
+      expect(component.menuItems.map((item: any) => item.action))
+        .toEqual(['view', 'edit', 'publish', 'delete'])
+
       component = build('live', ['mdo_admin'])
 
       component.ngOnInit()
 
-      expect(component.menuItems.map((item: any) => item.action)).toEqual(['view'])
+      expect(component.menuItems.map((item: any) => item.action)).toEqual(['view', 'edit', 'delete'])
     })
 
     /** A role set that never resolved is not a reason to offer an action that needs one. */
@@ -162,6 +275,28 @@ describe('AssessmentsListComponent', () => {
       component.ngOnInit()
 
       expect(component.menuItems.map((item: any) => item.action)).toEqual(['view', 'publish', 'delete'])
+    })
+
+    /** A retired assessment is kept for the record, so it is read and nothing else. */
+    it('should show when it was retired and view alone on the retired tab', () => {
+      component = build('retired')
+
+      component.ngOnInit()
+
+      expect(component.tableData.columns.map((column: any) => column.key))
+        .toEqual(['name', 'planName', 'reportingYear', 'assessmentWindow', 'creator', 'lastUpdatedOn'])
+      expect(component.menuItems.map((item: any) => item.action)).toEqual(['view'])
+      expect(component.tableData.noDataMessage).toBe('There are no retired assessments.')
+    })
+
+    it('should offer view alone on the retired tab whatever role the user holds', () => {
+      component = build('retired', ['mdo_leader'])
+      component.ngOnInit()
+      expect(component.menuItems.map((item: any) => item.action)).toEqual(['view'])
+
+      component = build('retired', ['mdo_admin'])
+      component.ngOnInit()
+      expect(component.menuItems.map((item: any) => item.action)).toEqual(['view'])
     })
 
     it('should list the linked plan and everything derived from it on either tab', () => {
@@ -206,6 +341,16 @@ describe('AssessmentsListComponent', () => {
 
       expect(assessmentSvc.searchAssessments).toHaveBeenCalledWith(
         expect.objectContaining({ status: comprehensiveAssessmentList.STATUS_DRAFT })
+      )
+    })
+
+    it('should ask for the Retired assessments on the retired tab', () => {
+      component = build('retired')
+
+      component.ngOnInit()
+
+      expect(assessmentSvc.searchAssessments).toHaveBeenCalledWith(
+        expect.objectContaining({ status: comprehensiveAssessmentList.STATUS_RETIRED })
       )
     })
 

@@ -23,7 +23,7 @@
                   <ng-container *ngIf="col.imageKey">
                     <div class="imageDiv flex items-center justify-center">
                       <img *ngIf="hasThumbnail(element, col.imageKey); else noThumbnail" class="cellImage"
-                        [src]="element[col.imageKey] | pipePublicURL" alt="assessment icon"
+                        [src]="element[col.imageKey]" alt="assessment icon"
                         (error)="onThumbnailError(element, col.imageKey)">
                       <ng-template #noThumbnail>
                         <mat-icon class="thumbnail-icon">image</mat-icon>

@@ -26,6 +26,11 @@ export class BreadcrumbComponent implements OnInit {
   editState = false
   isLiveContent = false
   contentData: any
+  /* tslint:disable */
+  // What is at stake, then what to do about it: the box reads as two paragraphs
+  noGatingCourseWarning = 'You haven\'t selected any mandatory contents yet. Contents marked as mandatory will need to be completed before the Comprehensive Assessment unlocks.'
+  noGatingCourseHint = 'Please review your selected contents and mark the relevant ones as mandatory, or continue without setting.'
+  /* tslint:enable */
   constructor(
     private router: Router,
     private activeRoute: ActivatedRoute,
@@ -60,7 +65,7 @@ export class BreadcrumbComponent implements OnInit {
         this.changeToNextTab.emit(TrainingPlanContent.TTabLabelKey.ADD_CONTENT)
         break
       case TrainingPlanContent.TTabLabelKey.ADD_CONTENT:
-        this.changeToNextTab.emit(TrainingPlanContent.TTabLabelKey.ADD_ACCESS_SETTINGS)
+        this.leaveAddContent()
         break
       // case TrainingPlanContent.TTabLabelKey.ADD_ASSIGNEE:
       //   this.changeToNextTab.emit(TrainingPlanContent.TTabLabelKey.ADD_TIMELINE)
@@ -73,6 +78,38 @@ export class BreadcrumbComponent implements OnInit {
         break
     }
 
+  }
+
+  /**
+   * The comprehensive assessment is gated by the mandatory courses of the plan, so an APAR plan
+   * that marks none is one whose CA unlocks the moment it reaches a Karmayogi. That is rarely what
+   * the author meant, so it is put to them before the step is left; they can still carry on.
+   * A plan with APAR off has no gating to speak of and goes straight through.
+   */
+  private leaveAddContent() {
+    const isApar = !!this.tpdsSvc.trainingPlanStepperData?.isApar
+    if (!isApar || this.tpdsSvc.getMandatoryContentCount() > 0) {
+      this.changeToNextTab.emit(TrainingPlanContent.TTabLabelKey.ADD_ACCESS_SETTINGS)
+      return
+    }
+    this.dialogRef = this.dialog.open(ConfirmationBoxComponent, {
+      disableClose: true,
+      data: {
+        type: 'warning',
+        icon: 'warning_amber',
+        title: 'No mandatory course selected',
+        subTitle: this.noGatingCourseWarning,
+        subTitle2: this.noGatingCourseHint,
+        primaryAction: 'Continue anyway',
+        secondaryAction: 'Go back',
+      },
+      autoFocus: false,
+    })
+    this.dialogRef.afterClosed().subscribe((_res: any) => {
+      if (_res === 'confirmed') {
+        this.changeToNextTab.emit(TrainingPlanContent.TTabLabelKey.ADD_ACCESS_SETTINGS)
+      }
+    })
   }
 
   private leaveAccessSettings() {

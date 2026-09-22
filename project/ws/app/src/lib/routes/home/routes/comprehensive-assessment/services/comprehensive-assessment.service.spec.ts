@@ -3,6 +3,7 @@ import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing'
 import { TestBed } from '@angular/core/testing'
 import { aparPlan } from '../models/comprehensive-assessment.model'
+import { environment } from 'src/environments/environment'
 import { ComprehensiveAssessmentService } from './comprehensive-assessment.service'
 
 const PLAN_SEARCH_URL = 'apis/proxies/v8/cbplan/v4/search'
@@ -731,6 +732,45 @@ describe('ComprehensiveAssessmentService', () => {
       // an unnamed creator reads as a dash rather than an empty cell
       expect(result.content[0].creator).toBe('-')
       expect(result.content[0].durationDisplay).toBe('1 hr 5 min')
+    })
+
+    /**
+     * A published assessment's thumbnail is copied under `/collection`, and those objects
+     * answer 403 when fetched straight off the bucket - the row has to point at the copy
+     * the portal serves.
+     */
+    it('should point a thumbnail at the portal rather than at the bucket', () => {
+      let result: any
+      service.searchAssessments({
+        status: 'Live', rootOrgId: 'org-1', query: '', pageSize: 20, pageIndex: 0,
+      }).subscribe((res: any) => result = res)
+
+      httpMock.expectOne(searchUrl).flush({
+        result: {
+          count: 1,
+          content: [{
+            identifier: 'do-1',
+            appIcon: 'https://storage.googleapis.com/igot/collection/do-1/artifact/icon.thumb.png',
+          }],
+        },
+      })
+
+      expect(result.content[0].appIcon)
+        .toBe(`${(environment.domainName || '').replace(/\/$/, '')}` +
+              '/assets/public/collection/do-1/artifact/icon.thumb.png')
+    })
+
+    it('should leave a thumbnail the portal already serves alone', () => {
+      let result: any
+      service.searchAssessments({
+        status: 'Live', rootOrgId: 'org-1', query: '', pageSize: 20, pageIndex: 0,
+      }).subscribe((res: any) => result = res)
+
+      httpMock.expectOne(searchUrl).flush({
+        result: { count: 1, content: [{ appIcon: '/assets/public/content/do-1/artifact/icon.png' }] },
+      })
+
+      expect(result.content[0].appIcon).toBe('/assets/public/content/do-1/artifact/icon.png')
     })
 
     it('should render a duration in the units it actually has', () => {

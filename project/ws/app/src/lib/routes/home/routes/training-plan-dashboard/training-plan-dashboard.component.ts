@@ -94,7 +94,6 @@ export class TrainingPlanDashboardComponent implements OnInit, AfterViewInit {
   // Filter and Search Methods
   filter(filter: string) {
     this.cachedActions = {}
-    this.fetchContentDone = false
     this.currentFilter = filter
     this.searchQuery = ''
     this.filterData('')
@@ -123,6 +122,11 @@ export class TrainingPlanDashboardComponent implements OnInit, AfterViewInit {
   // API Methods
   async getTrainingPlanCBP(type: string, searchString: string) {
     this.loaderService.changeLoaderState(true)
+    // The rows are emptied before the call, so the loading flag has to go down with them:
+    // left up, the emptied table reads as a finished fetch and the no-data message shows
+    // until the response lands. Set here rather than in the callers so searching, paging
+    // and changing the year all show the spinner the way switching tab does.
+    this.fetchContentDone = false
     this.completeDataRes = []
     this.trainingPlanData = []
     this.totalTrainingPlanCount = 0

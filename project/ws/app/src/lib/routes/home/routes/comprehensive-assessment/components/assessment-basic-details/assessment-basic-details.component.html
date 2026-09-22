@@ -16,8 +16,7 @@
 
       <div class="flex flex-column gap-1 detail-card-text">
         <ng-container *ngIf="linkedPlan; else noLinkedPlan">
-          <span class="card-title" [matTooltip]="linkedPlan.name" matTooltipClass="new-toolTip"
-            matTooltipPosition="above">{{linkedPlan.name || 'Linked plan'}}</span>
+          <span class="card-title">{{linkedPlan.name || 'Linked plan'}}</span>
           <div class="card-meta-row flex items-center gap-2">
             <span class="card-meta">{{linkedPlan.planYear}}<ng-container *ngIf="planWindowDisplay"> &middot; due
                 {{planWindowDisplay}}</ng-container><ng-container *ngIf="linkedPlan.orgName"> &middot;
@@ -61,8 +60,7 @@
       </div>
 
       <div class="flex flex-column gap-1 detail-card-text">
-        <span class="card-title" *ngIf="assessmentName; else noAssessmentName" [matTooltip]="assessmentName"
-          matTooltipClass="new-toolTip" matTooltipPosition="above">{{assessmentName}}</span>
+        <span class="card-title" *ngIf="assessmentName; else noAssessmentName">{{assessmentName}}</span>
         <ng-template #noAssessmentName>
           <span class="card-title placeholder">No name added yet</span>
         </ng-template>
@@ -152,7 +150,7 @@
           </button>
         </span>
         <input class="keyword-input flex-grow" type="text" placeholder="Search Keywords"
-          [maxlength]="keywordMaxLength" [disabled]="openMode === 'view'" #keywordInput
+          [attr.maxlength]="keywordMaxLength" [disabled]="openMode === 'view'" #keywordInput
           (keydown.enter)="addKeyword(keywordInput, $event)" (blur)="addKeyword(keywordInput)">
       </div>
       <mat-error class="mat-error-text" *ngIf="showValidationMsg('keywords','required')">

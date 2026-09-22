@@ -276,11 +276,13 @@ export class CreateAssessmentComponent implements OnInit {
    * Saves the authored fields and reads the hierarchy back, so whatever the next step
    * renders is the content the api actually holds rather than a local copy. A step that
    * changed nothing is not saved - the hierarchy is still read, it is what the next step
-   * renders from.
+   * renders from. Neither is a view only assessment: Next still walks its steps to reach
+   * the preview, but nothing was authored to write back, and the content api answers a
+   * write there with `ERR_TOKEN_INVALID` rather than with the content the step needs.
    */
   private persistContent(): Observable<any> {
     const body = this.getContentUpdateBody()
-    const saved$ = this.isContentUnchanged(body)
+    const saved$ = this.openMode === 'view' || this.isContentUnchanged(body)
       ? of(null)
       : this.assessmentSvc.updateContent(this.contentId, body).pipe(tap((res: any) => this.syncVersionKey(res)))
 

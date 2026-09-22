@@ -13,12 +13,25 @@ import { PublishResourceComponent } from '../../dialogs/publish-resource/publish
 
 const TAB_LIVE = 'live'
 const TAB_DRAFT = 'draft'
+const TAB_RETIRED = 'retired'
 /**
  * Roles the dashboard offers Edit to. Every other action is open to anyone who can reach
  * the dashboard at all, which is what the requirement holds behind a role and what it does
  * not. `configService.userRoles` is the lowercased set the init service builds on login.
  */
 const EDIT_ROLES = ['mdo_leader']
+/**
+ * Roles that are offered the authoring actions on their own assessments only. The menu
+ * carries them and the rows they did not author drop them, so an MDO admin works on what
+ * they created and can do no more than read the rest of the org's assessments. Holding an
+ * `EDIT_ROLES` role as well wins - that one is not owner bound.
+ */
+const EDIT_OWN_ROLES = ['mdo_admin']
+/**
+ * What an owner bound role keeps only on the assessments it authored. View is deliberately
+ * not among them: someone else's assessment stays readable, it just cannot be worked on.
+ */
+const OWNER_BOUND_ACTIONS = ['edit', 'publish', 'delete']
 
 @Component({
   selector: 'ws-app-assessments-list',
@@ -35,9 +48,13 @@ export class AssessmentsListComponent implements OnInit, OnDestroy {
   assessmentsList: any[] = []
   showLoader = false
   searchKey = ''
-  /** `live` or `draft`, taken from the child route the tab links to. */
+  /** `live`, `draft` or `retired`, taken from the child route the tab links to. */
   pathUrl = TAB_LIVE
   userProfile: any
+  /** Every action on every row of the org, resolved off the roles once the config is in. */
+  private canEditAny = false
+  /** The authoring actions on the rows this user wrote, and View alone on the others. */
+  private canEditOwn = false
   private searchSubscription!: Subscription
   //#endregion
 
@@ -54,6 +71,7 @@ export class AssessmentsListComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.pathUrl = _.get(this.activatedRoute, 'snapshot.url[0].path', TAB_LIVE)
     this.userProfile = _.get(this.activatedRoute, 'snapshot.data.configService.userProfile')
+    this.resolveEditAccess()
     this.configureTab()
     this.paginationDetails = {
       startIndex: 0,
@@ -66,13 +84,16 @@ export class AssessmentsListComponent implements OnInit, OnDestroy {
   }
 
   /** Deny by default: an unresolved role set is not a reason to offer Edit. */
-  private canEdit(): boolean {
+  private resolveEditAccess() {
     const roles: Set<string> | null = _.get(this.activatedRoute, 'snapshot.data.configService.userRoles', null)
-    return !!roles && _.some(EDIT_ROLES, (role: string) => roles.has(role))
+    const hasRole = (role: string) => !!roles && roles.has(role)
+    this.canEditAny = _.some(EDIT_ROLES, hasRole)
+    // an owner bound role adds nothing to a user who can already edit every row
+    this.canEditOwn = !this.canEditAny && _.some(EDIT_OWN_ROLES, hasRole)
   }
 
   private configureTab() {
-    const canEdit = this.canEdit()
+    const canEdit = this.canEditAny || this.canEditOwn
     const nameColumn: comprehensiveAssessmentList.columnData = {
       displayName: 'Assessment Name',
       key: 'name',
@@ -92,6 +113,29 @@ export class AssessmentsListComponent implements OnInit, OnDestroy {
       { displayName: 'Reporting Year', key: 'reportingYear', cellType: 'text' },
       { displayName: 'Assessment Window', key: 'assessmentWindow', cellType: 'text' },
     ]
+
+    /**
+     * A retired assessment is what a delete leaves behind, kept for the record. It is read
+     * and nothing more - no role opens it for editing, publishing or deleting again - so the
+     * menu is built without consulting `canEdit` at all.
+     */
+    if (this.pathUrl === TAB_RETIRED) {
+      this.tableData = {
+        columns: [
+          nameColumn,
+          ...planColumns,
+          { displayName: 'Created By', key: 'creator', cellType: 'text' },
+          // the retire is the last thing that can happen to an assessment, so the last
+          // update it carries is when it was retired
+          { displayName: 'Retired On', key: 'lastUpdatedOn', cellType: 'date' },
+        ],
+        showSearchBox: true,
+        showPagination: true,
+        noDataMessage: 'There are no retired assessments.',
+      }
+      this.menuItems = [{ btnText: 'View', action: 'view', icon: 'visibility' }]
+      return
+    }
 
     if (this.pathUrl === TAB_DRAFT) {
       this.tableData = {
@@ -128,7 +172,20 @@ export class AssessmentsListComponent implements OnInit, OnDestroy {
     this.menuItems = _.compact([
       { btnText: 'View', action: 'view', icon: 'visibility' },
       canEdit ? { btnText: 'Edit', action: 'edit', icon: 'edit' } : null,
+      { btnText: 'Delete', action: 'delete', icon: 'delete_outline' },
     ])
+  }
+
+  /** The content status the tab lists, the tab path being the only thing that says which. */
+  private statusForTab(): string {
+    switch (this.pathUrl) {
+      case TAB_DRAFT:
+        return comprehensiveAssessmentList.STATUS_DRAFT
+      case TAB_RETIRED:
+        return comprehensiveAssessmentList.STATUS_RETIRED
+      default:
+        return comprehensiveAssessmentList.STATUS_LIVE
+    }
   }
 
   getAssessments() {
@@ -137,9 +194,7 @@ export class AssessmentsListComponent implements OnInit, OnDestroy {
     }
     this.showLoader = true
     this.searchSubscription = this.assessmentSvc.searchAssessments({
-      status: this.pathUrl === TAB_DRAFT
-        ? comprehensiveAssessmentList.STATUS_DRAFT
-        : comprehensiveAssessmentList.STATUS_LIVE,
+      status: this.statusForTab(),
       rootOrgId: _.get(this.userProfile, 'rootOrgId', ''),
       query: this.searchKey,
       pageSize: _.get(this.paginationDetails, 'pageSize', comprehensiveAssessmentList.DEFAULT_PAGE_SIZE),
@@ -147,7 +202,7 @@ export class AssessmentsListComponent implements OnInit, OnDestroy {
     }).subscribe({
       next: (res: { content: any[], count: number }) => {
         this.showLoader = false
-        this.assessmentsList = res.content
+        this.assessmentsList = _.map(res.content, (assessment: any) => this.applyRowAccess(assessment))
         this.paginationDetails = { ...this.paginationDetails, totalCount: res.count }
       },
       error: (error: HttpErrorResponse) => {
@@ -156,6 +211,28 @@ export class AssessmentsListComponent implements OnInit, OnDestroy {
         this.openSnackBar(_.get(error, 'error.message', 'Unable to load the assessments, please try again'))
       },
     })
+  }
+
+  /**
+   * An owner bound author keeps the whole menu on the assessments they wrote - on the draft
+   * tab that is View, Edit, Publish and Delete - and every other row of the org is left with
+   * View. `buttonsToHide` is what the table reads to drop actions for one row, so the menu
+   * stays configured once for the tab rather than per row.
+   */
+  private applyRowAccess(assessment: any): any {
+    if (!this.canEditOwn || this.isOwner(assessment)) {
+      return assessment
+    }
+    return {
+      ...assessment,
+      buttonsToHide: _.union(_.get(assessment, 'buttonsToHide', []), OWNER_BOUND_ACTIONS),
+    }
+  }
+
+  /** `createdBy` is the user id the assessment was authored by, as the search answers it. */
+  private isOwner(assessment: any): boolean {
+    const userId = _.get(this.userProfile, 'userId', '')
+    return !!userId && _.get(assessment, 'createdBy', '') === userId
   }
   //#endregion
 

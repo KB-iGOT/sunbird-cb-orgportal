@@ -93,3 +93,63 @@
     top: -45px;
     right: -10px;
  }
+/* The warning box: an amber badge, the fact in the title, the consequence underneath, and the
+   actions set off by a rule so the reader lands on the text before the buttons. */
+.warning-container {
+    width: 520px;
+    padding: 32px 32px 8px 32px;
+    position: relative;
+}
+
+.warning-icon-badge {
+    width: 56px;
+    height: 56px;
+    margin: 0 auto;
+    border-radius: 50%;
+    background: rgba(217, 130, 0, 0.12);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.warning-icon {
+    font-size: 32px;
+    height: 32px;
+    width: 32px;
+    color: #d98200;
+}
+
+.warning-title {
+    margin-top: 20px;
+    color: rgba(0, 0, 0, 0.87);
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 26px;
+    letter-spacing: 0.12px;
+    text-align: center;
+}
+
+.warning-subtitle {
+    margin-top: 12px;
+    color: rgba(0, 0, 0, 0.6);
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 22px;
+    letter-spacing: 0.25px;
+    text-align: center;
+}
+
+.warning-action {
+    justify-content: center;
+    margin-top: 28px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.warning-btn {
+    min-width: 120px;
+    height: 40px;
+    line-height: 40px;
+    border-radius: 4px;
+    font-weight: 600;
+}

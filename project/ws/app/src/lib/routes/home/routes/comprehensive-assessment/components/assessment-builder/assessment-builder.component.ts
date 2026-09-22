@@ -3,7 +3,6 @@ import { LoaderService } from '../../../../../../../../../../../src/app/services
 import {
   comprehensiveAssessment,
   CONTENT_COURSE_CATEGORY,
-  QUESTIONSET_CONTEXT_CATEGORY,
   QUESTIONSET_PRIMARY_CATEGORY,
 } from '../../models/comprehensive-assessment.model'
 
@@ -46,7 +45,7 @@ export class AssessmentBuilderComponent implements OnChanges {
       courseCategory: CONTENT_COURSE_CATEGORY,
       // written onto the question set as it is created, and the only thing that tells a Live
       // comprehensive assessment from any other Course Assessment
-      contextCategory: QUESTIONSET_CONTEXT_CATEGORY,
+      contextCategory: '',
       name: this.assessmentName || '',
       isReadOnly: this.openMode === 'view',
     }

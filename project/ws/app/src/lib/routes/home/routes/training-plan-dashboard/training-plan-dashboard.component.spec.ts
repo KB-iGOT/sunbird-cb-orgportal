@@ -5,7 +5,7 @@ import { LoaderService } from '../../../../../../../../../src/app/services/loade
 import { TrainingPlanService } from '../../../training-plan/services/traininig-plan.service'
 import { MatDialog } from '@angular/material/dialog'
 import { MatSnackBar } from '@angular/material/snack-bar'
-import { of } from 'rxjs'
+import { Subject, of } from 'rxjs'
 import { TrainingPlanDashboardComponent } from './training-plan-dashboard.component'
 import { AparYearService } from '../../../../common/apar-year-select/apar-year.service'
 
@@ -68,6 +68,51 @@ describe('TrainingPlanDashboardComponent', () => {
         expect(component.selectedAparYear).toBe('2026-27')
     })
 
+    /**
+     * The rows are emptied before the call goes out, so an emptied table with the loading flag
+     * still up reads as a finished fetch and shows the no-data message until the response
+     * lands. Every path that reloads the list has to put the flag back down.
+     */
+    describe('the loading state while a reload is in flight', () => {
+        /** A call that has not answered yet, so the in-flight state can be read. */
+        const pendingResponse = () => {
+            const response = new Subject<any>()
+            trainingDashboardSvc.getTrainingPlansV4.mockReturnValue(response.asObservable())
+            return response
+        }
+
+        const expectLoadingUntilAnswered = (reload: () => void) => {
+            component.fetchContentDone = true
+            const response = pendingResponse()
+
+            reload()
+
+            expect(component.fetchContentDone).toBe(false)
+            expect(component.trainingPlanData).toEqual([])
+
+            response.next({ params: { status: 'failed' } })
+
+            expect(component.fetchContentDone).toBe(true)
+        }
+
+        it('should show the loader while a search is in flight', () => {
+            expectLoadingUntilAnswered(() => component.searchTrainingPlan('induction'))
+        })
+
+        it('should show the loader while a page change is in flight', () => {
+            expectLoadingUntilAnswered(() => component.onPaginateChange({ pageIndex: 1, pageSize: 20 }))
+        })
+
+        it('should show the loader while a year change is in flight', () => {
+            component.selectedAparYear = '2026-27'
+            expectLoadingUntilAnswered(() => component.changeAparYear('2025-26'))
+        })
+
+        it('should show the loader while a tab change is in flight', () => {
+            expectLoadingUntilAnswered(() => component.filter('draft'))
+        })
+    })
+
     describe('getTrainingPlanCBP payload', () => {
         const payloadOf = () => trainingDashboardSvc.getTrainingPlansV4.mock.calls[0][0]
 
@@ -85,6 +130,7 @@ describe('TrainingPlanDashboardComponent', () => {
                 pageNumber: 0,
                 pageSize: 20,
                 searchString: '',
+                applyOrgIdFilter: true,
                 orderBy: 'createdAt',
                 orderDirection: 'desc',
             })
