@@ -13,8 +13,7 @@ const STATUS_CHECK_SECONDS = 10
 
 /** Said when the plan is gone and another has to be picked before the publish can go on. */
 const PLAN_TAKEN_MESSAGE =
-  'The linked APAR plan is no longer available - another comprehensive assessment has taken it. ' +
-  'Choose another plan to publish this assessment against.'
+  'The linked APAR plan is no longer available because another comprehensive assessment has already been linked to it. Please choose another plan to publish this assessment.'
 
 /**
  * What the dialog is offering at each point of the publish:

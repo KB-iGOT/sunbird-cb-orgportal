@@ -1,0 +1,22 @@
+@import '../../assessment-theme';
+
+.progress-dialog {
+  padding: 32px 24px 28px 24px;
+  text-align: center;
+}
+
+.progress-title {
+  margin-top: 20px;
+  color: $ca-text;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 26px;
+}
+
+.progress-subtitle {
+  margin-top: 10px;
+  color: $ca-text-muted;
+  font-size: 14px;
+  line-height: 22px;
+  max-width: 360px;
+}

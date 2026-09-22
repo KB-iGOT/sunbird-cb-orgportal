@@ -99,14 +99,46 @@ export class AssessmentsTableComponent implements OnInit, OnChanges {
     }
   }
 
-  /** A row without a thumbnail, or with one that cannot be loaded, shows the placeholder instead. */
-  hasThumbnail(row: any, imageKey: string): boolean {
-    const url = _.get(row, imageKey, '')
-    return !!url && !this.brokenThumbnails.has(url)
+  /**
+   * Whether the cell had to clip what it holds, which is the only case a tooltip says
+   * anything the row is not already showing. The clamped columns run out of room downwards
+   * - two lines, then the ellipsis - and the plain ones sideways, so both are measured.
+   *
+   * Asked per change detection rather than once, so the answer follows the column as the
+   * window is resized or the page zoomed. It only reads layout, never writes it, so the
+   * measurements come off the same clean layout pass the table has already had.
+   */
+  isTextTruncated(cell: HTMLElement): boolean {
+    if (!cell) {
+      return false
+    }
+    // sub-pixel rounding puts these a fraction apart on a zoomed page, which is not a clip
+    return (cell.scrollHeight - cell.clientHeight) > 1 || (cell.scrollWidth - cell.clientWidth) > 1
   }
 
-  onThumbnailError(row: any, imageKey: string) {
-    this.brokenThumbnails.add(_.get(row, imageKey, ''))
+  /**
+   * The url this row's thumbnail is drawn from. The column names the key it prefers and the
+   * one to fall back to - the two tabs keep the image under different keys - and the first
+   * that holds a url which has not already failed wins. An empty answer is the placeholder.
+   *
+   * A url that fails is remembered, so the next pass through here moves on to the fallback:
+   * the img re-renders against the other key rather than the row going straight to the
+   * placeholder because one of its two images happened to be unreadable.
+   */
+  thumbnailUrl(row: any, column: comprehensiveAssessmentList.columnData): string {
+    const keys = _.compact([_.get(column, 'imageKey'), _.get(column, 'fallbackImageKey')])
+    const usable = _.find(keys, (key: string) => {
+      const url = _.get(row, key, '')
+      return !!url && !this.brokenThumbnails.has(url)
+    })
+    return usable ? _.get(row, usable, '') : ''
+  }
+
+  /** The url that could not be loaded, so the row moves on to its other key. */
+  onThumbnailError(url: string) {
+    if (url) {
+      this.brokenThumbnails.add(url)
+    }
   }
 
   /** A row can suppress individual actions by listing them on `buttonsToHide`. */

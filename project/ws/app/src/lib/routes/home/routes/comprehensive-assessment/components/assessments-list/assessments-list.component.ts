@@ -10,6 +10,7 @@ import { ComprehensiveAssessmentService } from '../../services/comprehensive-ass
 import { LoaderService } from '../../../../../../../../../../../src/app/services/loader.service'
 import { ConfirmDialogComponent } from '../../../../../workallocation-v2/components/confirm-dialog/confirm-dialog.component'
 import { PublishResourceComponent } from '../../dialogs/publish-resource/publish-resource.component'
+import { ProgressDialogComponent } from '../../dialogs/progress-dialog/progress-dialog.component'
 
 const TAB_LIVE = 'live'
 const TAB_DRAFT = 'draft'
@@ -92,15 +93,33 @@ export class AssessmentsListComponent implements OnInit, OnDestroy {
     this.canEditOwn = !this.canEditAny && _.some(EDIT_OWN_ROLES, hasRole)
   }
 
-  private configureTab() {
-    const canEdit = this.canEditAny || this.canEditOwn
-    const nameColumn: comprehensiveAssessmentList.columnData = {
+  /**
+   * The thumbnail is read off a different key depending on the tab. Both are written at
+   * creation, but publishing copies the assessment's `appIcon` under `/collection`, where the
+   * object is not publicly readable - so a Live row is drawn from `posterImage`, which keeps
+   * the url it was uploaded with, and a draft from the `appIcon` it has always had.
+   *
+   * Each names the other as its fallback rather than trusting one of them: an assessment
+   * created before the poster was written carries only an icon, and the table falls through
+   * to whichever key actually answers.
+   */
+  private buildNameColumn(): comprehensiveAssessmentList.columnData {
+    const isDraft = this.pathUrl === TAB_DRAFT
+    return {
       displayName: 'Assessment Name',
       key: 'name',
       cellType: 'textImage',
-      imageKey: 'appIcon',
+      imageKey: isDraft ? 'appIcon' : 'posterImage',
+      // the other key, never the same one - the fallback is what a row carrying only one of
+      // them is drawn from
+      fallbackImageKey: isDraft ? 'posterImage' : 'appIcon',
       cellClass: 'text-overflow-elipse',
     }
+  }
+
+  private configureTab() {
+    const canEdit = this.canEditAny || this.canEditOwn
+    const nameColumn = this.buildNameColumn()
 
     /**
      * The linked plan and the two values derived from it. The assessment owns none of
@@ -202,7 +221,8 @@ export class AssessmentsListComponent implements OnInit, OnDestroy {
     }).subscribe({
       next: (res: { content: any[], count: number }) => {
         this.showLoader = false
-        this.assessmentsList = _.map(res.content, (assessment: any) => this.applyRowAccess(assessment))
+        this.assessmentsList = _.map(res.content,
+                                     (assessment: any) => this.applyRowAccess(this.nameOwnRow(assessment)))
         this.paginationDetails = { ...this.paginationDetails, totalCount: res.count }
       },
       error: (error: HttpErrorResponse) => {
@@ -219,6 +239,19 @@ export class AssessmentsListComponent implements OnInit, OnDestroy {
    * View. `buttonsToHide` is what the table reads to drop actions for one row, so the menu
    * stays configured once for the tab rather than per row.
    */
+  /**
+   * The Created By column names the author, and an author reading a row they wrote is told so
+   * rather than shown their own name back. Kept apart from the access rules below: whether the
+   * row is the user's own decides what it is called here and what can be done to it there, and
+   * a user who may work on every row still reads `You` against their own.
+   */
+  private nameOwnRow(assessment: any): any {
+    if (!this.isOwner(assessment)) {
+      return assessment
+    }
+    return { ...assessment, creator: 'You' }
+  }
+
   private applyRowAccess(assessment: any): any {
     if (!this.canEditOwn || this.isOwner(assessment)) {
       return assessment
@@ -355,8 +388,7 @@ export class AssessmentsListComponent implements OnInit, OnDestroy {
     this.assessmentSvc.retireAssessment(_.get(rowData, 'identifier', '')).subscribe({
       next: () => {
         this.loaderService.changeLoaderState(false)
-        this.openSnackBar('Assessment deleted successfully')
-        this.getAssessments()
+        this.waitForDeleteToSettle()
       },
       error: (error: HttpErrorResponse) => {
         this.loaderService.changeLoaderState(false)
@@ -365,6 +397,30 @@ export class AssessmentsListComponent implements OnInit, OnDestroy {
     })
   }
   //#endregion
+
+  /**
+   * Retiring answers as soon as it is taken, but the search drops the assessment a moment
+   * later - listing a tab straight away still answers with the row that was just deleted,
+   * which reads as the delete having failed. So the screen is held for as long as the
+   * platform needs, saying what is happening, and the Retired tab is opened on it after:
+   * the assessment has not gone anywhere, it has moved there.
+   */
+  private waitForDeleteToSettle() {
+    const dialogRef = this.dialog.open(ProgressDialogComponent, {
+      width: '440px',
+      disableClose: true,
+      autoFocus: false,
+      data: {
+        title: 'Deleting the assessment',
+        subTitle: 'This takes a few seconds. The Retired tab opens on it once it is done.',
+      },
+    })
+    setTimeout(() => {
+      dialogRef.close()
+      this.openSnackBar('Assessment deleted successfully')
+      this.router.navigate(['/app/home/comprehensive-assessment', TAB_RETIRED])
+    },         comprehensiveAssessmentList.DELETE_SETTLE_MS)
+  }
 
   private openSnackBar(message: string) {
     this.matSnackBar.open(message)

@@ -22,15 +22,16 @@
                 <mat-cell *matCellDef="let element" class="imageCell flex flex-row items-center gap-2">
                   <ng-container *ngIf="col.imageKey">
                     <div class="imageDiv flex items-center justify-center">
-                      <img *ngIf="hasThumbnail(element, col.imageKey); else noThumbnail" class="cellImage"
-                        [src]="element[col.imageKey]" alt="assessment icon"
-                        (error)="onThumbnailError(element, col.imageKey)">
+                      <img *ngIf="thumbnailUrl(element, col) as thumbnail; else noThumbnail" class="cellImage"
+                        [src]="thumbnail" alt="assessment icon" (error)="onThumbnailError(thumbnail)">
                       <ng-template #noThumbnail>
                         <mat-icon class="thumbnail-icon">image</mat-icon>
                       </ng-template>
                     </div>
                   </ng-container>
-                  <span [matTooltip]="element[col.key]" [ngClass]="col.cellClass" class="table-cell-text">
+                  <span #nameText [matTooltip]="element[col.key]"
+                    [matTooltipDisabled]="!isTextTruncated(nameText)" [ngClass]="col.cellClass"
+                    class="table-cell-text">
                     {{element[col.key]}}
                   </span>
                 </mat-cell>
@@ -41,7 +42,9 @@
                   {{col.displayName}}
                 </mat-header-cell>
                 <mat-cell *matCellDef="let element" class="table-text-cell">
-                  <span [matTooltip]="element[col.key]" [ngClass]="col.cellClass" class="table-cell-text">
+                  <span #cellText [matTooltip]="element[col.key]"
+                    [matTooltipDisabled]="!isTextTruncated(cellText)" [ngClass]="col.cellClass"
+                    class="table-cell-text">
                     {{element[col.key]}}
                   </span>
                 </mat-cell>

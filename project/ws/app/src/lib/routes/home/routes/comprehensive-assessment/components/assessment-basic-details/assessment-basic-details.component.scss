@@ -92,6 +92,17 @@
       font-size: 14px;
       line-height: 14px;
     }
+
+    /* The one icon in the chip that is there to be pointed at, so it answers to the cursor */
+    .chip-info {
+      cursor: pointer;
+      opacity: 0.65;
+
+      &:hover,
+      &:focus {
+        opacity: 1;
+      }
+    }
   }
 
   .card-action {
