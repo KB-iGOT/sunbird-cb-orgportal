@@ -48,6 +48,17 @@ const routes: Routes = [
           configService: ConfigResolveService,
         },
       },
+      {
+        path: 'retired',
+        component: AssessmentsListComponent,
+        data: {
+          pageId: 'app/home/comprehensive-assessment/retired',
+          module: 'comprehensive-assessment',
+        },
+        resolve: {
+          configService: ConfigResolveService,
+        },
+      },
     ],
   },
   {

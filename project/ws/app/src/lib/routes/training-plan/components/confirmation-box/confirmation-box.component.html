@@ -73,3 +73,21 @@
         <button mat-button class="primary" type="button">{{data?.primaryAction}}</button>
     </div>
 </div>
+
+<!-- A warning the plan author has to read before going on. One button when there is nothing left
+     to decide, two when the plan can still be sent on the way it is. -->
+<div class="warning-container" *ngIf="data?.type === 'warning'">
+    <div class="warning-icon-badge">
+        <mat-icon class="warning-icon">{{data?.icon || 'warning_amber'}}</mat-icon>
+    </div>
+    <div class="warning-title">{{data?.title}}</div>
+    <div class="warning-subtitle" *ngIf="data?.subTitle">{{data?.subTitle}}</div>
+    <div class="warning-subtitle" *ngIf="data?.subTitle2">{{data?.subTitle2}}</div>
+    <div mat-dialog-actions class="warning-action">
+        <button mat-button class="cancel warning-btn" type="button" *ngIf="data?.secondaryAction"
+            [mat-dialog-close]="data?.secondaryAction">{{data?.secondaryAction}}</button>
+        <button mat-button class="primary warning-btn" type="button"
+            [ngClass]="{'margin-left-m': data?.secondaryAction}"
+            (click)="performAction(data)">{{data?.primaryAction}}</button>
+    </div>
+</div>

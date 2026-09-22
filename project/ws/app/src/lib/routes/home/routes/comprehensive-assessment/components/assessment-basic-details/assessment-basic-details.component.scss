@@ -225,9 +225,15 @@
   }
 }
 
+/* One row tall, the same 48px as the duration row below it, and it grows only once the
+   chips have filled a line and wrapped onto the next. The height is stated on the box
+   rather than left to the input: `box-sizing` keeps the 48 the height the row renders at
+   instead of what the padding is added to, and the input is given a line of its own
+   height so the global `input { line-height: inherit }` reset cannot stretch the row. */
 .keywords-box {
   @include ca-inset-row;
 
+  box-sizing: border-box;
   background-color: transparent;
   min-height: 48px;
 
@@ -259,6 +265,9 @@
     outline: 0;
     min-width: 160px;
     font: $ca-font-body;
+    /* after the shorthand, which resets `line-height` to normal on its way past */
+    height: 24px;
+    line-height: 24px;
     color: $ca-text;
     background: transparent;
 

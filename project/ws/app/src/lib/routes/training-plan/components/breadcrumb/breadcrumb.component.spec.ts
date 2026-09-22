@@ -47,6 +47,8 @@ describe('BreadcrumbComponent', () => {
                 endDate: null
             },
             getContentList: () => mockTpdsSvc.trainingPlanStepperData.contentList || [],
+            getMandatoryContentCount: () => (mockTpdsSvc.trainingPlanStepperData.contentList || [])
+                .filter((item: any) => !!(item && item.mandatory)).length,
             // The plan content list is sent as { identifier, mandatory } entries
             buildContentListPayload: (contentList: any[]) => (contentList || []).map((item: any) => (
                 (typeof item === 'string')
@@ -140,6 +142,52 @@ describe('BreadcrumbComponent', () => {
 
             component.nextStep()
 
+            expect(component.changeToNextTab.emit)
+                .toHaveBeenCalledWith(TrainingPlanContent.TTabLabelKey.ADD_ACCESS_SETTINGS)
+        })
+
+        // An APAR plan with no gating course is one whose comprehensive assessment unlocks straight
+        // away, so the step is not left until the author has been told
+        it('should warn before leaving ADD_CONTENT when an APAR plan gates nothing', () => {
+            mockTpdsSvc.trainingPlanStepperData.isApar = true
+            mockTpdsSvc.trainingPlanStepperData.contentList = [{ identifier: 'do_1', mandatory: false }]
+            component.selectedTab = TrainingPlanContent.TTabLabelKey.ADD_CONTENT
+            component.changeToNextTab = { emit: jest.fn() } as any
+
+            component.nextStep()
+
+            expect(mockDialog.open).toHaveBeenCalledWith(
+                expect.anything(),
+                expect.objectContaining({
+                    data: expect.objectContaining({ type: 'warning' }),
+                })
+            )
+            // the mocked box answers 'confirmed', the author carried on
+            expect(component.changeToNextTab.emit)
+                .toHaveBeenCalledWith(TrainingPlanContent.TTabLabelKey.ADD_ACCESS_SETTINGS)
+        })
+
+        it('should stay on ADD_CONTENT when the gating warning is dismissed', () => {
+            mockDialogRef.afterClosed = jest.fn().mockReturnValue(of('Go back'))
+            mockTpdsSvc.trainingPlanStepperData.isApar = true
+            mockTpdsSvc.trainingPlanStepperData.contentList = [{ identifier: 'do_1', mandatory: false }]
+            component.selectedTab = TrainingPlanContent.TTabLabelKey.ADD_CONTENT
+            component.changeToNextTab = { emit: jest.fn() } as any
+
+            component.nextStep()
+
+            expect(component.changeToNextTab.emit).not.toHaveBeenCalled()
+        })
+
+        it('should leave ADD_CONTENT without warning when an APAR plan gates something', () => {
+            mockTpdsSvc.trainingPlanStepperData.isApar = true
+            mockTpdsSvc.trainingPlanStepperData.contentList = [{ identifier: 'do_1', mandatory: true }]
+            component.selectedTab = TrainingPlanContent.TTabLabelKey.ADD_CONTENT
+            component.changeToNextTab = { emit: jest.fn() } as any
+
+            component.nextStep()
+
+            expect(mockDialog.open).not.toHaveBeenCalled()
             expect(component.changeToNextTab.emit)
                 .toHaveBeenCalledWith(TrainingPlanContent.TTabLabelKey.ADD_ACCESS_SETTINGS)
         })

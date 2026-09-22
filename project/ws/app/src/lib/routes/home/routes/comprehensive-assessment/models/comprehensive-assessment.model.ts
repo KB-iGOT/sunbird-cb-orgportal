@@ -160,6 +160,8 @@ export namespace comprehensiveAssessmentList {
   /** Status values the listing tabs map onto, as indexed by the composite search. */
   export const STATUS_LIVE = 'Live'
   export const STATUS_DRAFT = 'Draft'
+  /** What the content api leaves behind on a delete - see `retireAssessment`. */
+  export const STATUS_RETIRED = 'Retired'
   export const DEFAULT_PAGE_SIZE = 20
 
   /**

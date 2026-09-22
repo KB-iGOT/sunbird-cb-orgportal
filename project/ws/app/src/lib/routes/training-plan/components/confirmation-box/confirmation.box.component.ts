@@ -23,7 +23,9 @@ export class ConfirmationBoxComponent implements OnInit {
   }
 
   performAction(data: any) {
-    if (data && data.type === 'conformation') {
+    // A warning is acknowledged the same way a confirmation is, the caller decides whether that
+    // answer carries the plan on to the next step or only closes the box
+    if (data && (data.type === 'conformation' || data.type === 'warning')) {
       this.dialogRef.close('confirmed')
     } else {
       this.dialogRef.close()
