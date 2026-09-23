@@ -29,12 +29,14 @@ import { Subject, of } from 'rxjs'
 import { aparPlan, comprehensiveAssessment } from '../../models/comprehensive-assessment.model'
 import { BasicInfoComponent } from '../../dialogs/basic-info/basic-info.component'
 import { PlanPickerComponent } from '../../dialogs/plan-picker/plan-picker.component'
+import { ComprehensiveAssessmentService } from '../../services/comprehensive-assessment.service'
 import { AssessmentBasicDetailsComponent } from './assessment-basic-details.component'
 
 describe('AssessmentBasicDetailsComponent', () => {
   let component: AssessmentBasicDetailsComponent
   let dialog: any
   let afterClosed: Subject<any>
+  let comprehensiveAssessmentService: any
 
   const userProfile = { rootOrgId: 'org-1', userId: 'user-1' }
 
@@ -66,7 +68,12 @@ describe('AssessmentBasicDetailsComponent', () => {
   beforeEach(() => {
     afterClosed = new Subject<any>()
     dialog = { open: jest.fn().mockReturnValue({ afterClosed: () => afterClosed.asObservable() }) }
-    component = new AssessmentBasicDetailsComponent(dialog as MatDialog, new DatePipe('en-IN'))
+    comprehensiveAssessmentService = { toPublicUrl: jest.fn((url: string) => `public:${url}`) }
+    component = new AssessmentBasicDetailsComponent(
+      dialog as MatDialog,
+      new DatePipe('en-IN'),
+      comprehensiveAssessmentService as ComprehensiveAssessmentService,
+    )
     component.assessmentDetails = form()
     component.userProfile = userProfile
   })
@@ -420,6 +427,22 @@ describe('AssessmentBasicDetailsComponent', () => {
 
     it('should stay quiet for a field that is not on the form', () => {
       expect(component.showValidationMsg('notAField', 'required')).toBe(false)
+    })
+  })
+
+  describe('getPublicUrl', () => {
+    it('should hand the image url to the service and return its public rewrite', () => {
+      const url = 'https://storage.googleapis.com/bucket/content/do-1/artifact/icon.png'
+
+      expect(component.getPublicUrl(url)).toBe(`public:${url}`)
+      expect(comprehensiveAssessmentService.toPublicUrl).toHaveBeenCalledWith(url)
+    })
+
+    it('should pass an empty url through to the service untouched', () => {
+      comprehensiveAssessmentService.toPublicUrl.mockReturnValue('')
+
+      expect(component.getPublicUrl('')).toBe('')
+      expect(comprehensiveAssessmentService.toPublicUrl).toHaveBeenCalledWith('')
     })
   })
 })
