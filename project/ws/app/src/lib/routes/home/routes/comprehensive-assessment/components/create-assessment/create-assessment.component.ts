@@ -155,6 +155,7 @@ export class CreateAssessmentComponent implements OnInit {
   }
 
   patchAssessmentDetails() {
+    const thumbnail = this.contentDetails?.status?.toLowerCase() === 'live' ? this.contentDetails?.posterImage : this.contentDetails?.appIcon
     this.contentId = _.get(this.contentDetails, 'identifier', '')
     this.assessmentDetailsForm.patchValue({
       linkedPlan: this.assessmentSvc.readPlanMetadata(this.contentDetails),
@@ -164,7 +165,7 @@ export class CreateAssessmentComponent implements OnInit {
       difficultyLevel: _.get(this.contentDetails, 'difficultyLevel', ''),
       license: _.get(this.contentDetails, 'license', '') || DEFAULT_LICENSE,
       keywords: _.get(this.contentDetails, 'keywords', []) || [],
-      appIcon: _.get(this.contentDetails, 'appIcon', ''),
+      appIcon: thumbnail || ''
     })
     this.assessmentDetailsForm.updateValueAndValidity()
 
@@ -573,7 +574,7 @@ export class CreateAssessmentComponent implements OnInit {
         setTimeout(() => {
           this.loaderService.changeLoaderState(false)
           this.navigateBack()
-        },         1000)
+        }, 1000)
       },
       error: (error: HttpErrorResponse) => {
         this.loaderService.changeLoaderState(false)
@@ -651,7 +652,7 @@ export class CreateAssessmentComponent implements OnInit {
             setTimeout(() => {
               this.loaderService.changeLoaderState(false)
               this.navigateBack()
-            },         comprehensiveAssessmentList.PUBLISH_SETTLE_MS)
+            }, comprehensiveAssessmentList.PUBLISH_SETTLE_MS)
             return
           }
           // the dialog can have linked another plan on the way out, which leaves the form

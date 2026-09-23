@@ -57,7 +57,7 @@
     <div class="detail-card flex items-center gap-3 px-4 py-3">
       <div class="card-plate flex justify-center items-center">
         <ng-container *ngIf="appIcon; else noAppIcon">
-          <img [src]="getPublicUrl(appIcon)" alt="assessment icon">
+          <img [src]="appIcon | pipePublicURL" alt="assessment icon">
         </ng-container>
         <ng-template #noAppIcon>
           <mat-icon class="plate-icon">image</mat-icon>
