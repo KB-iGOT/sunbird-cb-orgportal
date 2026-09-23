@@ -23,6 +23,7 @@ import { aparPlan, comprehensiveAssessment } from '../../models/comprehensive-as
 import { richTextLength } from '../../models/rich-text.validator'
 import { BasicInfoComponent } from '../../dialogs/basic-info/basic-info.component'
 import { PlanPickerComponent } from '../../dialogs/plan-picker/plan-picker.component'
+import { ComprehensiveAssessmentService } from '../../services/comprehensive-assessment.service'
 
 @Component({
   selector: 'ws-app-assessment-basic-details',
@@ -51,7 +52,8 @@ export class AssessmentBasicDetailsComponent {
 
   constructor(
     private dialog: MatDialog,
-    private datePipe: DatePipe
+    private datePipe: DatePipe,
+    private comprehensiveAssessmentservice: ComprehensiveAssessmentService,
   ) {
     this.ckEditorConfig = {
       toolbar: {
@@ -281,4 +283,7 @@ export class AssessmentBasicDetailsComponent {
     return !!(control && control.touched && control.invalid && control.hasError(validationType))
   }
 
+  getPublicUrl(imageUrl: string): string {
+    return this.comprehensiveAssessmentservice.toPublicUrl(imageUrl)
+  }
 }
