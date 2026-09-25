@@ -158,6 +158,10 @@ export class AssessmentBasicDetailsComponent {
     return _.get(this.assessmentDetails, 'controls.appIcon.value', '')
   }
 
+  get creatorLogo(): string {
+    return _.get(this.assessmentDetails, 'controls.creatorLogo.value', '')
+  }
+
   get assessmentName(): string {
     return _.get(this.assessmentDetails, 'controls.assessmentName.value', '')
   }
@@ -175,6 +179,7 @@ export class AssessmentBasicDetailsComponent {
         userProfile: this.userProfile,
         assessmentName: this.assessmentName,
         appIcon: this.appIcon,
+        creatorLogo: this.creatorLogo,
       },
     })
 
@@ -185,6 +190,7 @@ export class AssessmentBasicDetailsComponent {
       this.assessmentDetails.patchValue({
         assessmentName: _.get(updated, 'assessmentName', ''),
         appIcon: _.get(updated, 'appIcon', ''),
+        creatorLogo: _.get(updated, 'creatorLogo', ''),
       })
       this.assessmentDetails.updateValueAndValidity()
     })

@@ -29,14 +29,12 @@ import { Subject, of } from 'rxjs'
 import { aparPlan, comprehensiveAssessment } from '../../models/comprehensive-assessment.model'
 import { BasicInfoComponent } from '../../dialogs/basic-info/basic-info.component'
 import { PlanPickerComponent } from '../../dialogs/plan-picker/plan-picker.component'
-import { ComprehensiveAssessmentService } from '../../services/comprehensive-assessment.service'
 import { AssessmentBasicDetailsComponent } from './assessment-basic-details.component'
 
 describe('AssessmentBasicDetailsComponent', () => {
   let component: AssessmentBasicDetailsComponent
   let dialog: any
   let afterClosed: Subject<any>
-  let comprehensiveAssessmentService: any
 
   const userProfile = { rootOrgId: 'org-1', userId: 'user-1' }
 
@@ -63,16 +61,15 @@ describe('AssessmentBasicDetailsComponent', () => {
     license: new FormControl(values.license ?? 'CC BY 4.0', [Validators.required]),
     keywords: new FormControl(values.keywords ?? [], [Validators.required]),
     appIcon: new FormControl(values.appIcon ?? ''),
+    creatorLogo: new FormControl(values.creatorLogo ?? ''),
   })
 
   beforeEach(() => {
     afterClosed = new Subject<any>()
     dialog = { open: jest.fn().mockReturnValue({ afterClosed: () => afterClosed.asObservable() }) }
-    comprehensiveAssessmentService = { toPublicUrl: jest.fn((url: string) => `public:${url}`) }
     component = new AssessmentBasicDetailsComponent(
       dialog as MatDialog,
       new DatePipe('en-IN'),
-      comprehensiveAssessmentService as ComprehensiveAssessmentService,
     )
     component.assessmentDetails = form()
     component.userProfile = userProfile
@@ -204,7 +201,7 @@ describe('AssessmentBasicDetailsComponent', () => {
 
   describe('openBasicInfoDialog', () => {
     beforeEach(() => {
-      component.assessmentDetails = form({ assessmentName: 'APAR assessment', appIcon: 'icon.png' })
+      component.assessmentDetails = form({ assessmentName: 'APAR assessment', appIcon: 'icon.png', creatorLogo: 'logo.png' })
     })
 
     it('should reuse the create dialog in edit mode on the current values', () => {
@@ -217,6 +214,7 @@ describe('AssessmentBasicDetailsComponent', () => {
           mode: 'edit',
           assessmentName: 'APAR assessment',
           appIcon: 'icon.png',
+          creatorLogo: 'logo.png',
         },
       }))
     })
@@ -224,10 +222,11 @@ describe('AssessmentBasicDetailsComponent', () => {
     it('should patch the name and the image the dialog hands back', () => {
       component.openBasicInfoDialog()
 
-      afterClosed.next({ assessmentName: 'Renamed assessment', appIcon: 'new-icon.png' })
+      afterClosed.next({ assessmentName: 'Renamed assessment', appIcon: 'new-icon.png', creatorLogo: 'new-logo.png' })
 
       expect(component.assessmentName).toBe('Renamed assessment')
       expect(component.appIcon).toBe('new-icon.png')
+      expect(component.creatorLogo).toBe('new-logo.png')
     })
 
     it('should keep the current values when the dialog is cancelled', () => {
@@ -237,6 +236,7 @@ describe('AssessmentBasicDetailsComponent', () => {
 
       expect(component.assessmentName).toBe('APAR assessment')
       expect(component.appIcon).toBe('icon.png')
+      expect(component.creatorLogo).toBe('logo.png')
     })
   })
 
@@ -427,22 +427,6 @@ describe('AssessmentBasicDetailsComponent', () => {
 
     it('should stay quiet for a field that is not on the form', () => {
       expect(component.showValidationMsg('notAField', 'required')).toBe(false)
-    })
-  })
-
-  describe('getPublicUrl', () => {
-    it('should hand the image url to the service and return its public rewrite', () => {
-      const url = 'https://storage.googleapis.com/bucket/content/do-1/artifact/icon.png'
-
-      expect(component.getPublicUrl(url)).toBe(`public:${url}`)
-      expect(comprehensiveAssessmentService.toPublicUrl).toHaveBeenCalledWith(url)
-    })
-
-    it('should pass an empty url through to the service untouched', () => {
-      comprehensiveAssessmentService.toPublicUrl.mockReturnValue('')
-
-      expect(component.getPublicUrl('')).toBe('')
-      expect(comprehensiveAssessmentService.toPublicUrl).toHaveBeenCalledWith('')
     })
   })
 })

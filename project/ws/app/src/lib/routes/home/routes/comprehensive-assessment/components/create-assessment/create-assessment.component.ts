@@ -107,8 +107,9 @@ export class CreateAssessmentComponent implements OnInit {
       difficultyLevel: new FormControl('', [Validators.required]),
       license: new FormControl(DEFAULT_LICENSE, [Validators.required]),
       keywords: new FormControl([], [Validators.required]),
-      // the thumbnail is optional, an assessment can go live without one
-      appIcon: new FormControl(''),
+      // the thumbnail is mandatory, the logo is optional
+      appIcon: new FormControl('', [Validators.required]),
+      creatorLogo: new FormControl(''),
     })
 
     // any edit invalidates the saved copy the preview step renders
@@ -165,7 +166,8 @@ export class CreateAssessmentComponent implements OnInit {
       difficultyLevel: _.get(this.contentDetails, 'difficultyLevel', ''),
       license: _.get(this.contentDetails, 'license', '') || DEFAULT_LICENSE,
       keywords: _.get(this.contentDetails, 'keywords', []) || [],
-      appIcon: thumbnail || ''
+      appIcon: thumbnail || '',
+      creatorLogo: _.get(this.contentDetails, 'creatorLogo', ''),
     })
     this.assessmentDetailsForm.updateValueAndValidity()
 
@@ -319,6 +321,7 @@ export class CreateAssessmentComponent implements OnInit {
       purpose: _.get(this.contentDetails, 'purpose', ''),
       appIcon: _.get(this.contentDetails, 'appIcon', ''),
       posterImage: _.get(this.contentDetails, 'posterImage', ''),
+      creatorLogo: _.get(this.contentDetails, 'creatorLogo', ''),
       difficultyLevel: _.get(this.contentDetails, 'difficultyLevel', ''),
       license: _.get(this.contentDetails, 'license', ''),
       keywords: _.get(this.contentDetails, 'keywords', []) || [],
@@ -549,6 +552,7 @@ export class CreateAssessmentComponent implements OnInit {
       purpose: formValues.learningOutcome || '',
       appIcon: formValues.appIcon,
       posterImage: formValues.appIcon,
+      creatorLogo: formValues.creatorLogo || '',
       difficultyLevel: formValues.difficultyLevel || '',
       license: formValues.license || DEFAULT_LICENSE,
       keywords: formValues.keywords || [],
