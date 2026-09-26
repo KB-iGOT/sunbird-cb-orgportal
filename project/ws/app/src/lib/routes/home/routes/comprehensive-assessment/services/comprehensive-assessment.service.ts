@@ -13,9 +13,11 @@ import {
 
 const API_END_POINTS = {
   CREATE_CONTENT: 'apis/proxies/v8/action/content/v3/create',
+  CREATE_ASSESSMENT_CONTENT: 'apis/proxies/v8/action/content/ca/v1/create',
   UPLOAD_CONTENT: 'apis/proxies/v8/upload/action/content/v3/upload',
   CONTENT_HIERARCHY_EDIT: (contentId: string) => `apis/proxies/v8/action/content/v3/hierarchy/${contentId}?mode=edit`,
   UPDATE_CONTENT: (contentId: string) => `apis/proxies/v8/action/content/v3/update/${contentId}`,
+  UPDATE_ASSESSMENT_CONTENT: (contentId: string) => `apis/proxies/v8/action/content/ca/v1/update/${contentId}`,
   CONTENT_HIERARCHY_UPDATE: 'apis/proxies/v8/action/content/v3/hierarchy/update',
   QUESTIONSET_HIERARCHY_EDIT: (questionSetId: string) => `apis/proxies/v8/questionset/v1/hierarchy/${questionSetId}?mode=edit`,
   // no `mode=edit`: the published copy, the only one that can answer whether it is Live
@@ -58,7 +60,7 @@ export class ComprehensiveAssessmentService {
   }
 
   updateContent(contentId: string, content: any): Observable<any> {
-    return this.http.patch<any>(API_END_POINTS.UPDATE_CONTENT(contentId), { request: { content } })
+    return this.http.patch<any>(API_END_POINTS.UPDATE_ASSESSMENT_CONTENT(contentId), { request: { content } })
   }
 
   /**
@@ -557,7 +559,7 @@ export class ComprehensiveAssessmentService {
         },
       },
     }
-    return this.createContent(request)
+    return this.http.post<any>(API_END_POINTS.CREATE_ASSESSMENT_CONTENT, request)
   }
 
   /** Picks the question set linked to the collection, if any. */
