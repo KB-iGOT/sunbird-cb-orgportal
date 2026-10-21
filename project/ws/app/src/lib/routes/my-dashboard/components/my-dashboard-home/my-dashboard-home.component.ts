@@ -14,8 +14,11 @@ const endpoint = {
   lookerProDashboard: 'apis/proxies/v8/looker/dashboard',
 }
 const DEFAULT_LOOKER_EMBED_URL = '/embed/dashboards/7'
-const MINISTRY_LOOKER_EMBED_URLS: { [ministryOrStateId: string]: string } = {
-  '01358338771259392049': '/embed/dashboards/up_dashboard::up_dashboard',
+const MINISTRY_LOOKER_DASHBOARDS: { [ministryOrStateId: string]: { embedUrl: string, userModels: string[] } } = {
+  '01358338771259392049': {
+    embedUrl: '/embed/dashboards/up_dashboard::up_dashboard',
+    userModels: ['up_dashboard'],
+  },
 }
 @Component({
     selector: 'ws-app-my-dashboard-home',
@@ -154,11 +157,11 @@ export class MyDashboardHomeComponent implements OnInit {
     //   userId = '91d6d08a-8c23-4cc4-9e59-652fd292d426'
     // }
     const ministryOrStateId = _.get(this.userData, 'profileDetails.ministryOrStateId')
-    const embedUrl = MINISTRY_LOOKER_EMBED_URLS[ministryOrStateId] || DEFAULT_LOOKER_EMBED_URL
+    const ministryDashboard = MINISTRY_LOOKER_DASHBOARDS[ministryOrStateId]
     /* tslint:disable */
-    const requestPayload = {
+    const requestPayload: any = {
       request: {
-        embedUrl,
+        embedUrl: ministryDashboard ? ministryDashboard.embedUrl : DEFAULT_LOOKER_EMBED_URL,
         userAttributes: {
           roles: this.userData.roles,
           orgId: this.userData.rootOrgId,
@@ -166,6 +169,9 @@ export class MyDashboardHomeComponent implements OnInit {
           firstName: this.userData && this.userData.firstName ? this.userData.firstName : userId
         },
       },
+    }
+    if (ministryDashboard) {
+      requestPayload.request.userModels = ministryDashboard.userModels
     }
     const url = `${endpoint.lookerProDashboard}`
     this.mdoService.getDashboardData(url, requestPayload).subscribe(data => {
