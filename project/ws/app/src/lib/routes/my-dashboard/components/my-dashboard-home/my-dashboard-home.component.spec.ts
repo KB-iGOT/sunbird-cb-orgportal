@@ -146,6 +146,38 @@ describe('MyDashboardHomeComponent', () => {
             expect(component.lookerDashboardDetail).toBe(mockLookerResponse.signedUrl)
             expect(reloadIframeSpy).toHaveBeenCalled()
         })
+
+        it('should use ministry specific embedUrl when ministryOrStateId is mapped', () => {
+            jest.spyOn(component, 'reloadIframeWithNewUser').mockImplementation()
+
+            component.userData = {
+                ...mockUserData,
+                profileDetails: {
+                    ministryOrStateId: '01358338771259392049'
+                }
+            }
+
+            component.showDashboard()
+
+            const payload = mdoServiceMock.getDashboardData.mock.calls[0][1]
+            expect(payload.request.embedUrl).toBe('/embed/dashboards/up_dashboard::up_dashboard')
+        })
+
+        it('should fall back to default embedUrl when ministryOrStateId is not mapped', () => {
+            jest.spyOn(component, 'reloadIframeWithNewUser').mockImplementation()
+
+            component.userData = {
+                ...mockUserData,
+                profileDetails: {
+                    ministryOrStateId: 'unmapped-ministry-id'
+                }
+            }
+
+            component.showDashboard()
+
+            const payload = mdoServiceMock.getDashboardData.mock.calls[0][1]
+            expect(payload.request.embedUrl).toBe('/embed/dashboards/7')
+        })
     })
 
     describe('showTempDashboard', () => {
