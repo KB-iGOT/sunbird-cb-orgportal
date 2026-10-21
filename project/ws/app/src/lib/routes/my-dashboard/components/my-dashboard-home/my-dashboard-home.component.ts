@@ -13,6 +13,10 @@ const endpoint = {
   orgRead: '/apis/proxies/v8/org/v1/read',
   lookerProDashboard: 'apis/proxies/v8/looker/dashboard',
 }
+const DEFAULT_LOOKER_EMBED_URL = '/embed/dashboards/7'
+const MINISTRY_LOOKER_EMBED_URLS: { [ministryOrStateId: string]: string } = {
+  '01358338771259392049': '/embed/dashboards/up_dashboard::up_dashboard',
+}
 @Component({
     selector: 'ws-app-my-dashboard-home',
     templateUrl: './my-dashboard-home.component.html',
@@ -149,10 +153,12 @@ export class MyDashboardHomeComponent implements OnInit {
     // } else if (this.userData && this.userData.rootOrgId === '01376822290813747263') {
     //   userId = '91d6d08a-8c23-4cc4-9e59-652fd292d426'
     // }
+    const ministryOrStateId = _.get(this.userData, 'profileDetails.ministryOrStateId')
+    const embedUrl = MINISTRY_LOOKER_EMBED_URLS[ministryOrStateId] || DEFAULT_LOOKER_EMBED_URL
     /* tslint:disable */
     const requestPayload = {
       request: {
-        embedUrl: '/embed/dashboards/7',
+        embedUrl,
         userAttributes: {
           roles: this.userData.roles,
           orgId: this.userData.rootOrgId,
