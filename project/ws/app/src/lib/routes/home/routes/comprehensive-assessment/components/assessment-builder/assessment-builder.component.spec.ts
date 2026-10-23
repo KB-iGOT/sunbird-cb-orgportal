@@ -1,7 +1,6 @@
 import { SimpleChange, SimpleChanges } from '@angular/core'
 import { LoaderService } from '../../../../../../../../../../../src/app/services/loader.service'
 import {
-  CONTENT_COURSE_CATEGORY,
   QUESTIONSET_CONTEXT_CATEGORY,
   QUESTIONSET_PRIMARY_CATEGORY,
 } from '../../models/comprehensive-assessment.model'
@@ -29,7 +28,6 @@ describe('AssessmentBuilderComponent', () => {
       expect(component.config).toEqual({
         identifier: '',
         primaryCategory: QUESTIONSET_PRIMARY_CATEGORY,
-        courseCategory: CONTENT_COURSE_CATEGORY,
         contextCategory: QUESTIONSET_CONTEXT_CATEGORY,
         name: '',
         isReadOnly: false,
@@ -87,24 +85,19 @@ describe('AssessmentBuilderComponent', () => {
   })
 
   describe('what the settings step is told', () => {
-    /** The primary category cannot tell a comprehensive assessment apart, the course one can. */
-    it('should name the course category, so the settings step knows what it is', () => {
-      expect(component.buildConfig().courseCategory).toBe(CONTENT_COURSE_CATEGORY)
-    })
-
-    /** The title is given in step 1, the settings step seeds it rather than asking again. */
-    it('should carry the name the assessment was created with', () => {
+    it('should not pass the assessment name on to the settings step', () => {
       component.assessmentName = 'APAR comprehensive assessment'
 
-      expect(component.buildConfig().name).toBe('APAR comprehensive assessment')
+      expect(component.buildConfig().name).toBe('')
     })
 
     it('should rebuild the config when the name changes', () => {
+      const existing = component.config
       component.assessmentName = 'Renamed'
 
       component.ngOnChanges(change('assessmentName'))
 
-      expect(component.config.name).toBe('Renamed')
+      expect(component.config).not.toBe(existing)
     })
   })
 
