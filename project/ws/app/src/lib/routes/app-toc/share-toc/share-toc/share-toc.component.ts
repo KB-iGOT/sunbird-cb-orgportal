@@ -130,8 +130,8 @@ export class ShareTocComponent implements OnInit {
           input.value = ''
         }
         this.userCtrl.setValue('')
-        const el: any = document.getElementsByClassName('mat-chip-list-wrapper')
-        if (el != null) {
+        const el: any = document.getElementsByClassName('mdc-evolution-chip-set__chips')
+        if (el[0]) {
           setTimeout(() => {
             el[0].scrollTop = el[0].scrollHeight
           }, 200)

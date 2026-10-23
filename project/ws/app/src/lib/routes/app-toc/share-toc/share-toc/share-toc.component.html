@@ -17,15 +17,14 @@
                 <div class="mat-body-2">
                     <div class="md-5">
                         <mat-form-field appearance="outline" class="w-full">
-                            <mat-chip-list #chipList aria-label="user selection" appearance="outline">
-                                <mat-chip
+                            <mat-chip-grid #chipList aria-label="user selection">
+                                <mat-chip-row
                                     *ngFor="let user of users"
-                                    [selectable]="selectable"
                                     [removable]="removable"
                                     (removed)="remove(user)">
                                     {{user}}
                                     <mat-icon matChipRemove *ngIf="removable">close</mat-icon>
-                                </mat-chip>
+                                </mat-chip-row>
                                 <input
                                     tabindex="-1"
                                     class="inputTextBox"
@@ -38,7 +37,7 @@
                                     [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
                                     [matChipInputAddOnBlur]="addOnBlur"
                                     (matChipInputTokenEnd)="add($event)">
-                            </mat-chip-list>
+                            </mat-chip-grid>
                             <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event)">
                                 <mat-option *ngFor="let user of filteredUsers" [value]="user.name">
                                     <div class="flex">

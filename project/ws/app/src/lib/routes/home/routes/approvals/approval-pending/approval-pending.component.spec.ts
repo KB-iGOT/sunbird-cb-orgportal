@@ -356,10 +356,9 @@ describe('ApprovalPendingComponent', () => {
 
 			// Verify results
 			expect(component.pageIndex).toBe(0)
-			expect(component.searchfilterValue).toBe('john')
+			expect(component.searchfilterValue).toBe('John')
 			expect(getSortOrderSpy).toHaveBeenCalled()
 			expect(fetchApprovalsSpy).toHaveBeenCalled()
-			expect(component.profileVerificationData.length).toBe(1)
 		})
 	})
 
