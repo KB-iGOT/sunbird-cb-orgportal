@@ -1,5 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
+import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { of } from 'rxjs';
+import { commonTestingProviders, stubPipes } from '@test/helpers/testing-providers';
 import { TrainingPlanDashboardviewComponent } from './training-plan-dashboardview.component';
 
 describe('TrainingPlanDashboardviewComponent', () => {
@@ -8,7 +11,10 @@ describe('TrainingPlanDashboardviewComponent', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [TrainingPlanDashboardviewComponent]
+      declarations: [TrainingPlanDashboardviewComponent, ...stubPipes()],
+      providers: [...commonTestingProviders()],
+      // Shallow smoke test: child components in the template are not declared here.
+      schemas: [NO_ERRORS_SCHEMA]
     });
     fixture = TestBed.createComponent(TrainingPlanDashboardviewComponent);
     component = fixture.componentInstance;
@@ -17,5 +23,23 @@ describe('TrainingPlanDashboardviewComponent', () => {
 
   it('should create', () => {
     expect(component).toBeTruthy();
+  });
+
+  describe('showDashboard', () => {
+    let getDashboardData: jest.Mock;
+    const mockUserData = { userId: 'user-1', roles: ['MDO_ADMIN'], rootOrgId: 'org-1', firstName: 'Test' };
+
+    beforeEach(() => {
+      getDashboardData = jest.fn().mockReturnValue(of({}));
+      (component as any).mdoService = { getDashboardData };
+    });
+
+    it('should request the default dashboard', () => {
+      component.userData = mockUserData;
+
+      component.showDashboard();
+
+      expect(getDashboardData.mock.calls[0][1].request.embedUrl).toBe('/embed/dashboards/10');
+    });
   });
 });

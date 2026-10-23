@@ -3,7 +3,7 @@
   <span class="margin-left-xs">Notifications</span>
   <span class="spacer"></span>
   <button [hidden]="fetchStatus === 'fetching'" mat-icon-button title="re-check notifications" (click)="initiate()"
-    type="button"="re check notifications" aria-label="refresh notifications">
+    type="button" aria-label="refresh notifications">
     <mat-icon>refresh</mat-icon>
   </button>
 </mat-toolbar>
@@ -48,26 +48,6 @@
         <div *ngIf="sharedPlaylists.length > 2" class="text-right">
           <a mat-button [routerLink]="'/app/playlist/notification'">View
             More</a>
-        </div>
-      </div>
-      <mat-divider></mat-divider>
-      <div *ngIf="sharedGoals.length" class="py-3">
-        <h2 class="mat-title mb-2">Shared Goals</h2>
-        <a mat-list-item [routerLink]="'/app/goals/notification'"
-          *ngFor="let sharedGoal of sharedGoals | pipeLimitTo: 2; trackBy: goalTrackBy">
-          <mat-icon matListIcon class="notification-icon">adjust</mat-icon>
-          <h4 matLine>{{ sharedGoal.name }}</h4>
-          <p matLine>
-            <ng-container>Shared by: </ng-container>
-            <span> {{ sharedGoal.sharedBy }}</span>
-          </p>
-          <p matLine>
-            <ng-container>Shared on: </ng-container>
-            <span> {{ sharedGoal.sharedOn | date }}</span>
-          </p>
-        </a>
-        <div *ngIf="sharedGoals.length > 2" class="text-right">
-          <a mat-button [routerLink]="'/app/goals/notification'">View More</a>
         </div>
       </div>
     </mat-nav-list>

@@ -38,8 +38,10 @@ describe('ApprovalPendingComponent', () => {
 
 		// Mock approvals service
 		mockApprService = {
-			getApprovalsList: jest.fn(),
-			handleWorkflow: jest.fn()
+			// The component subscribes to both, so they need an observable by default.
+			// Individual tests still override these with their own payloads.
+			getApprovalsList: jest.fn().mockReturnValue(of({ result: { count: 0, data: [] } })),
+			handleWorkflow: jest.fn().mockReturnValue(of({}))
 		} as unknown as jest.Mocked<ApprovalsService>
 
 		// Mock activated route with parent data
@@ -163,7 +165,8 @@ describe('ApprovalPendingComponent', () => {
 				ReportsVideoComponent,
 				expect.objectContaining({
 					data: {
-						videoLink: 'https://www.youtube.com/embed/tgbNymZ7vqY?autoplay=1&mute=1',
+						// karmYogiPath is '' under the mocked environment
+						videoLink: '/assets/public/content/guide-videos/MDO-User.mp4',
 					},
 					disableClose: true,
 					width: '50%',
@@ -196,7 +199,7 @@ describe('ApprovalPendingComponent', () => {
 				if (key === 'profileverificationOffset') return '1'
 				return null
 			})
-			component.currentFilter = 'transfers'
+			component.currentFilter = 'profileverification'
 			const retrieveCachedApprovalsSpy = jest.spyOn(component, 'retrieveCachedApprovals')
 
 			// Call filter with same value

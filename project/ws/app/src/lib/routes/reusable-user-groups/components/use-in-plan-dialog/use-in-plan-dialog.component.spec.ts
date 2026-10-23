@@ -31,6 +31,7 @@ describe('UseInPlanDialogComponent', () => {
   let fixture: ComponentFixture<UseInPlanDialogComponent>
   let getTrainingPlansV4: jest.Mock
   let close: jest.Mock
+  let userRoles: Set<string>
 
   const createComponent = () => {
     TestBed.resetTestingModule()
@@ -42,7 +43,7 @@ describe('UseInPlanDialogComponent', () => {
         { provide: MAT_DIALOG_DATA, useValue: { groupId: 'g1', groupName: 'DS & above' } },
         { provide: TrainingPlanDashboardService, useValue: { getTrainingPlansV4 } },
         { provide: AparYearService, useValue: { getCurrentAparYear: () => '2026-27' } },
-        { provide: ConfigurationsService, useValue: { userProfile: { rootOrgId: 'org-1', userId: 'user-1' } } },
+        { provide: ConfigurationsService, useValue: { userProfile: { rootOrgId: 'org-1', userId: 'user-1' }, userRoles } },
       ],
     })
     fixture = TestBed.createComponent(UseInPlanDialogComponent)
@@ -52,6 +53,8 @@ describe('UseInPlanDialogComponent', () => {
 
   beforeEach(() => {
     close = jest.fn()
+    // userRoles are stored lowercased
+    userRoles = new Set(['mdo_admin'])
     getTrainingPlansV4 = jest.fn(() => of(searchResponse))
     createComponent()
   })
@@ -69,6 +72,18 @@ describe('UseInPlanDialogComponent', () => {
       orderBy: 'createdAt',
       orderDirection: 'desc',
     })
+  })
+
+  it('should search every draft plan of the org for a user who is not an MDO admin', () => {
+    userRoles = new Set(['mdo_leader'])
+    getTrainingPlansV4.mockClear()
+    createComponent()
+
+    expect(getTrainingPlansV4).toHaveBeenCalledWith(
+      expect.objectContaining({
+        filter: { status: ['draft'], orgIdList: ['org-1'], planYear: '2026-27' },
+      }),
+    )
   })
 
   it('should map the response onto the table rows', () => {

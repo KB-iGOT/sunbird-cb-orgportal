@@ -207,7 +207,7 @@ describe('BasicInfoComponent', () => {
     it('should refuse a file that is not an image', () => {
       component.onFileSelected([imageFile({ type: 'application/pdf', name: 'brief.pdf' })])
 
-      expect(matSnackBar.open).toHaveBeenCalledWith('Only PNG and JPEG files are supported')
+      expect(matSnackBar.open).toHaveBeenCalledWith('Only PNG, JPG and JPEG files are supported')
       expect(component.imagePath).toBeUndefined()
       expect(component.imgURL).toBeNull()
     })
@@ -215,21 +215,21 @@ describe('BasicInfoComponent', () => {
     it('should refuse an image in any other format', () => {
       component.onFileSelected([imageFile({ type: 'image/webp', name: 'icon.webp' })])
 
-      expect(matSnackBar.open).toHaveBeenCalledWith('Only PNG and JPEG files are supported')
+      expect(matSnackBar.open).toHaveBeenCalledWith('Only PNG, JPG and JPEG files are supported')
       expect(component.imagePath).toBeUndefined()
     })
 
     it('should refuse a file the browser reports no type for', () => {
       component.onFileSelected([jpegFile({ type: '' })])
 
-      expect(matSnackBar.open).toHaveBeenCalledWith('Only PNG and JPEG files are supported')
+      expect(matSnackBar.open).toHaveBeenCalledWith('Only PNG, JPG and JPEG files are supported')
       expect(component.imagePath).toBeUndefined()
     })
 
     it('should refuse a file whose name is not a png, jpg or jpeg', () => {
       component.onFileSelected([jpegFile({ name: 'icon.webp' })])
 
-      expect(matSnackBar.open).toHaveBeenCalledWith('Only PNG and JPEG files are supported')
+      expect(matSnackBar.open).toHaveBeenCalledWith('Only PNG, JPG and JPEG files are supported')
       expect(component.imagePath).toBeUndefined()
     })
 
@@ -277,21 +277,21 @@ describe('BasicInfoComponent', () => {
     it('should refuse a file that is not an image', () => {
       component.onLogoSelected([imageFile({ type: 'application/pdf', name: 'brief.pdf' })])
 
-      expect(matSnackBar.open).toHaveBeenCalledWith('Only PNG and JPEG files are supported')
+      expect(matSnackBar.open).toHaveBeenCalledWith('Only PNG, JPG and JPEG files are supported')
       expect(component.logoPath).toBeUndefined()
     })
 
     it('should refuse an image in any other format', () => {
       component.onLogoSelected([imageFile({ type: 'image/webp', name: 'logo.webp' })])
 
-      expect(matSnackBar.open).toHaveBeenCalledWith('Only PNG and JPEG files are supported')
+      expect(matSnackBar.open).toHaveBeenCalledWith('Only PNG, JPG and JPEG files are supported')
       expect(component.logoPath).toBeUndefined()
     })
 
     it('should refuse a file the browser reports no type for', () => {
       component.onLogoSelected([imageFile({ type: '' })])
 
-      expect(matSnackBar.open).toHaveBeenCalledWith('Only PNG and JPEG files are supported')
+      expect(matSnackBar.open).toHaveBeenCalledWith('Only PNG, JPG and JPEG files are supported')
       expect(component.logoPath).toBeUndefined()
     })
 
