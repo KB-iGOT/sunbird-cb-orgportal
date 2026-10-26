@@ -238,17 +238,6 @@ describe('MentorManageComponent', () => {
         expect(component.getMentorUsers).toHaveBeenCalledWith('test-query')
     })
 
-    it('should check if user editing is allowed', () => {
-        component.isMdoAdmin = true
-
-        expect(component.showEditUser(['PUBLIC'])).toBe(true)
-        expect(component.showEditUser([])).toBe(true)
-
-        component.isMdoAdmin = false
-
-        expect(component.showEditUser(['ADMIN'])).toBe(true)
-    })
-
     it('should fetch all verified users', () => {
         // Set rootOrgId manually for this test
         component.rootOrgId = 'test-root-org'

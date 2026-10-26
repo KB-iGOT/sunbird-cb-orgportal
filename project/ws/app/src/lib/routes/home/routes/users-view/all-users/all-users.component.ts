@@ -157,17 +157,6 @@ export class AllUsersComponent implements OnInit, OnDestroy {
     this.getUsers(query, this.currentFilter)
   }
 
-  showEditUser(roles: any): boolean {
-    if (this.isMdoAdmin) {
-      if (roles && roles.length > 0) {
-        return true
-        //   return (roles.includes('PUBLIC') && roles.length === 1)
-      }
-      // return false
-    }
-    return true
-  }
-
   blockedUsers() {
     const blockedUsersData: any[] = []
     if (this.usersData && this.usersData.content && this.usersData.content.length > 0) {
@@ -236,7 +225,7 @@ export class AllUsersComponent implements OnInit, OnDestroy {
             roles: _.join(_.map((org.roles || []), i => `<li>${i}</li>`), ''),
             orgId: user.rootOrgId,
             orgName: user.rootOrgName,
-            allowEditUser: this.showEditUser(org.roles),
+            allowEditUser: true,
           })
         })
       }

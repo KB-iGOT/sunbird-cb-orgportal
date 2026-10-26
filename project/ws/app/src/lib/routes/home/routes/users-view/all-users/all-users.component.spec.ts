@@ -154,20 +154,6 @@ describe('AllUsersComponent', () => {
         })
     })
 
-    describe('showEditUser', () => {
-        it('should return true when user is MDO_ADMIN and roles exist', () => {
-            component.isMdoAdmin = true
-            const result = component.showEditUser(['USER'])
-            expect(result).toBe(true)
-        })
-
-        it('should return true if user is not an MDO_ADMIN', () => {
-            component.isMdoAdmin = false
-            const result = component.showEditUser(['USER'])
-            expect(result).toBe(true)
-        })
-    })
-
     describe('openVideoPopup', () => {
         it('should open dialog with ReportsVideoComponent', () => {
             component.openVideoPopup()
