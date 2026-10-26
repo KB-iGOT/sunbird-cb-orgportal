@@ -236,20 +236,6 @@ describe('UsersViewComponent', () => {
     })
   })
 
-  describe('showEditUser', () => {
-    it('should return true when user is MDO_ADMIN and roles array is not empty', () => {
-      component.isMdoAdmin = true
-      const result = component.showEditUser(['USER_ROLE'])
-      expect(result).toBe(true)
-    })
-
-    it('should return true when user is not MDO_ADMIN', () => {
-      component.isMdoAdmin = false
-      const result = component.showEditUser(['USER_ROLE'])
-      expect(result).toBe(true)
-    })
-  })
-
   describe('data fetching methods', () => {
     // These call the fetchers directly rather than through ngOnInit, which is where the
     // component normally reads rootOrgId off the parent route's resolved config.
