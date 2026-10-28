@@ -14,8 +14,9 @@ const endpoint = {
   lookerProDashboard: 'apis/proxies/v8/looker/dashboard',
 }
 const DEFAULT_LOOKER_EMBED_URL = '/embed/dashboards/7'
+const UP_MINISTRY_OR_STATE_ID = '01358338771259392049'
 const MINISTRY_LOOKER_DASHBOARDS: { [ministryOrStateId: string]: { embedUrl: string, userModels: string[] } } = {
-  '01358338771259392049': {
+  [UP_MINISTRY_OR_STATE_ID]: {
     embedUrl: '/embed/dashboards/up_dashboard::up_dashboard',
     userModels: ['up_dashboard'],
   },
@@ -51,6 +52,7 @@ export class MyDashboardHomeComponent implements OnInit {
   lookerDashboardDetail: any
   userData: any
   showLookerProDashboard = false
+  isUpDashboard = false
   @ViewChild('lookerIframe', { static: false }) lookerIframe!: ElementRef
   ngOnInit() {
     // if (this.router.url.includes('/app/my-dashboard-temp/temp')) {
@@ -158,6 +160,7 @@ export class MyDashboardHomeComponent implements OnInit {
     // }
     const ministryOrStateId = _.get(this.userData, 'profileDetails.ministryOrStateId')
     const ministryDashboard = MINISTRY_LOOKER_DASHBOARDS[ministryOrStateId]
+    this.isUpDashboard = ministryOrStateId === UP_MINISTRY_OR_STATE_ID
     /* tslint:disable */
     const requestPayload: any = {
       request: {
