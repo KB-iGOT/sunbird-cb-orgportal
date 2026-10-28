@@ -175,7 +175,7 @@ export class PracticeService {
       identifier,
       title,
     }
-    quizWithAnswers.questions.map(question => {
+    quizWithAnswers.questions.forEach(question => {
       if (
         question.questionType === undefined ||
         question.questionType === 'mcq-mca' ||
@@ -254,9 +254,9 @@ export class PracticeService {
   }
 
   sanitizeAssessmentSubmitRequest(requestData: NSPractice.IQuizSubmitRequest): NSPractice.IQuizSubmitRequest {
-    requestData.questions.map(question => {
+    requestData.questions.forEach(question => {
       question.question = ''
-      question.options.map(option => {
+      question.options.forEach(option => {
         option.hint = ''
         option.text = question.questionType === 'ftb' || question.questionType === 'mtf' ? option.text : ''
       })

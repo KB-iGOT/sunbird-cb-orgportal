@@ -113,11 +113,6 @@ export class CommunityManageComponent {
             this.getReportedIssueList(discussionId).subscribe()  // Refresh the data
             // this.snackbar.open('Reported issues updated successfully!', 'Close', { duration: 3000 })
           }
-          (err: any) => {
-            this.snackbar.open('Unable to fetch Report, due to some error!', err)
-            // tslint:disable-next-line
-            console.log(err)
-          }
         })
       }
     })
@@ -146,11 +141,6 @@ export class CommunityManageComponent {
           this.showOnPlatform(discussId, type)
 
         }
-        (err: any) => {
-          this.snackbar.open('Something went wrong!', 'Close', { duration: 3000 })
-          // tslint:disable-next-line
-          console.log(err)
-        }
       })
     }
 
@@ -170,10 +160,6 @@ export class CommunityManageComponent {
       confirmDialog.afterClosed().subscribe((response: any) => {
         if (response) {
           this.hideContent(discussId, type)
-        } (err: any) => {
-          this.snackbar.open('Something went wrong!', 'Close', { duration: 3000 })
-          // tslint:disable-next-line
-          console.log(err)
         }
       })
     }
@@ -360,8 +346,6 @@ export class CommunityManageComponent {
         // tslint:disable-next-line
         console.log(res, 'response====')
         // return res
-      } (err: any) => {
-        this.snackbar.open(err, 'Close', { duration: 3000 })
       }
 
     })
@@ -382,9 +366,6 @@ export class CommunityManageComponent {
         this.getReplyFilterItems()
         // tslint:disable-next-line
         console.log(res, 'response====')
-      }
-      (err: any) => {
-        this.snackbar.open(err, 'Close', { duration: 3000 })
       }
     })
   }

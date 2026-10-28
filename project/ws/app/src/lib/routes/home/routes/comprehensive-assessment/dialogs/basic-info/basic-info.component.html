@@ -81,13 +81,13 @@
               <mat-icon class="assessment-icon mr-2">assignment</mat-icon>
               <span class="text-sm">Comprehensive Assessment</span>
             </div>
-            <div class="input-assessment mb-4">
+            <div id="basic-info-assessment-name" class="input-assessment mb-4">
               <ng-container *ngIf="assessmentName?.value">
-                <label class="custome-title" #tooltip="matTooltip" [matTooltip]="assessmentName?.value"
+                <label for="basic-info-assessment-name" class="custome-title" #tooltip="matTooltip" [matTooltip]="assessmentName?.value"
                   matTooltipClass="new-toolTip" matTooltipPosition="above">{{assessmentName?.value}}</label>
               </ng-container>
               <ng-container *ngIf="!assessmentName?.value">
-                <label class="custome-title">Assessment Name</label>
+                <label for="basic-info-assessment-name" class="custome-title">Assessment Name</label>
               </ng-container>
             </div>
             <div class="flex flex-row gap-4 items-center">

@@ -76,8 +76,8 @@
       </mat-form-field>
     </div>
 
-    <div class="margin-bottom-m">
-      <label class="flex mat-subheading-2 required">Description of the requested content</label>
+    <div id="add-content-description" class="margin-bottom-m">
+      <label for="add-content-description" class="flex mat-subheading-2 required">Description of the requested content</label>
       <textarea class="full-width margin-top-xs" formControlName="contentdescription" id="" cols="30" rows="4"
         tabindex="-1"></textarea>
       <mat-error *ngIf="contentForm.controls['contentdescription'].touched &&

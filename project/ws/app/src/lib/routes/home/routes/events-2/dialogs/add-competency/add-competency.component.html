@@ -24,11 +24,11 @@
               'active': theme.selected,
               'disableChip': theme.preSelected
             }" (click)="selectTheme(i)">
-            <label class="theme-name">
+            <label for="add-competency-theme-{{i}}" class="theme-name">
               {{ theme.name }}
             </label>
 
-            <mat-checkbox [checked]="theme.selected" [disabled]="theme.preSelected" [disableRipple]="true"
+            <mat-checkbox id="add-competency-theme-{{i}}" [checked]="theme.selected" [disabled]="theme.preSelected" [disableRipple]="true"
               (click)="$event.stopPropagation();selectTheme(i)">
             </mat-checkbox>
           </div>
@@ -39,7 +39,7 @@
     <ng-container *ngIf="selectedThemesList?.length">
       <div class="mt-8 px-5">
         <div class="themes-header">Add Sub Themes</div>
-        <ng-container *ngFor="let selectedTheme of selectedThemesList ">
+        <ng-container *ngFor="let selectedTheme of selectedThemesList; let j = index ">
           <div class="themes-header mt-5">{{selectedTheme.name}}</div>
           <div class="themes-container mt-2">
             <ng-container *ngFor="let subTheme of selectedTheme.associations; let i = index">
@@ -47,10 +47,10 @@
     'active': subTheme.selected,
     'disableChip': subTheme.preSelected
   }" (click)="selectSubTheme(subTheme, selectedTheme)">
-                <label class="theme-name">
+                <label for="add-competency-sub-theme-{{j}}-{{i}}" class="theme-name">
                   {{ subTheme.name }}
                 </label>
-                <mat-checkbox [disableRipple]="true" [ngClass]="subTheme?.selected ? 'check-box-selected':''"
+                <mat-checkbox id="add-competency-sub-theme-{{j}}-{{i}}" [disableRipple]="true" [ngClass]="subTheme?.selected ? 'check-box-selected':''"
                   [checked]="subTheme?.selected"
                   (click)="$event.stopPropagation();selectSubTheme(subTheme, selectedTheme)"
                   [disabled]="subTheme?.preSelected"></mat-checkbox>
