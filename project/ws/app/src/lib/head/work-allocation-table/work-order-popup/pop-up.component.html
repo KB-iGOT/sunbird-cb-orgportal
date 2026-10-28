@@ -17,7 +17,7 @@
         </div>
     </div>
     <div class="max-margin mat-subheading-1" *ngIf="this.dataSource.data.length>0">
-        <label>Copy from a published work order (optional)</label>
+        <label for="pop-up-published-work-orders">Copy from a published work order (optional)</label>
         <ng-container>
             <div class="custom-table-nav container-balanced margin-top-xl margin-bottom-xl">
 
@@ -33,7 +33,7 @@
         </ng-container>
     </div>
     <!-- </mat-form-field> -->
-    <mat-table #table matSort [ngStyle]="{'height': bodyHeight}" [matSortActive]="tableData!.sortColumn"
+    <mat-table id="pop-up-published-work-orders" #table matSort [ngStyle]="{'height': bodyHeight}" [matSortActive]="tableData!.sortColumn"
         [matSortDirection]="tableData!.sortState" [dataSource]="dataSource"
         class=" example-table table1 responsiveTable" *ngIf="this.dataSource.data.length>0">
         <ng-container matColumnDef="{{col.key}}" *ngFor="let col of tableData!.columns">

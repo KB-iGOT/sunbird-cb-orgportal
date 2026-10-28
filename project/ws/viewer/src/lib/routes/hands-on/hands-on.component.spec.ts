@@ -128,7 +128,7 @@ describe('HandsOnComponent', () => {
         })
 
         it('should raise unload event', async () => {
-            await component.ngOnDestroy()
+            await (component as any).saveProgressAndCleanUp()
             expect(mockEventSvc.dispatchEvent).toHaveBeenCalledWith(
                 expect.objectContaining({
                     eventType: WsEvents.WsEventType.Telemetry,

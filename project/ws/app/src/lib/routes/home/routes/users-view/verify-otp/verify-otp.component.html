@@ -1,9 +1,9 @@
 <div class="verify-otp-dialog">
   <form [formGroup]="otpSelectionForm" class="mobile-wrapper" *ngIf="!otpTypeSelected">
-    <label class="mat-title-1 font-bold" aria-label="Send OTP to">Send OTP to </label>
+    <label for="verify-otp-type" class="mat-title-1 font-bold" aria-label="Send OTP to">Send OTP to </label>
     <div class="margin-bottom-l margin-top-m">
       <!-- <mat-radio-group aria-label="Select an option" formControlName='otpType' #otpType (change)="radioChange($event)"> -->
-      <mat-radio-group aria-label="Select an option" formControlName='otpType' #otpType>
+      <mat-radio-group id="verify-otp-type" aria-label="Select an option" formControlName='otpType' #otpType>
         <mat-radio-button [value]="'email'" color="accent" class="radio-btn margin-right-xl">Email</mat-radio-button>
         <mat-radio-button [value]="'phone'" color="accent" class="radio-btn">Mobile</mat-radio-button>
       </mat-radio-group>

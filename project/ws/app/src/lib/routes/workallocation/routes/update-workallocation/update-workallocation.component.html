@@ -325,8 +325,8 @@
         <!-- right sidebar -->
         <div class="flex-1 similar-sidebar">
             <ng-container id="changelog">
-                <div>
-                    <label class="change-log-text margin-top-l margin-bottom-l margin-left-m margin-right-m">Similar
+                <div id="update-workallocation-similar-items">
+                    <label for="update-workallocation-similar-items" class="change-log-text margin-top-l margin-bottom-l margin-left-m margin-right-m">Similar
                         items</label>
                     <div class="w-full similarUsersList" *ngIf="similarRoles && similarRoles.length > 0">
                         <div class="suser-card" *ngFor="let role of similarRoles">
@@ -361,12 +361,12 @@
                         </div>
                     </div>
                     <div id="loader"></div>
-                    <div class="no-request-text margin-m">
-                        <label *ngIf="!similarPositions && !similarActivities && !similarRoles">System will recommend
+                    <div id="update-workallocation-similar-msg" class="no-request-text margin-m">
+                        <label for="update-workallocation-similar-msg" *ngIf="!similarPositions && !similarActivities && !similarRoles">System will recommend
                             similar items to avoid duplication</label>
-                        <label *ngIf="nosimilarRoles && similarRoles.length === 0">No roles found</label>
-                        <label *ngIf="nosimilarPositions && similarPositions.length === 0">No position found</label>
-                        <label *ngIf="nosimilarActivities && similarActivities.length === 0">No activity found</label>
+                        <label for="update-workallocation-similar-msg" *ngIf="nosimilarRoles && similarRoles.length === 0">No roles found</label>
+                        <label for="update-workallocation-similar-msg" *ngIf="nosimilarPositions && similarPositions.length === 0">No position found</label>
+                        <label for="update-workallocation-similar-msg" *ngIf="nosimilarActivities && similarActivities.length === 0">No activity found</label>
                     </div>
                 </div>
             </ng-container>
