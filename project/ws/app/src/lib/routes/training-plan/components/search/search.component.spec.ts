@@ -6,6 +6,9 @@ jest.mock('@sunbird-cb/collection', () => ({
     ContentStripMultipleService: jest.fn(),
     WidgetContentService: jest.fn()
 }))
+jest.mock('../../../../../../../../../src/environments/environment', () => ({
+    environment: { compentencyVersionKey: 'v6' },
+}))
 
 import { SearchComponent } from './search.component'
 import { of, Subject } from 'rxjs'
@@ -122,7 +125,7 @@ describe('SearchComponent', () => {
 
         mockInitService = {
             configSvc: {
-                competency: {
+                compentency: {
                     v6: {
                         vKey: 'competencies_v6',
                         vCompetencyArea: 'competencyArea',
@@ -131,11 +134,6 @@ describe('SearchComponent', () => {
                     }
                 }
             }
-        };
-
-        // Set up environment
-        (global as any).environment = {
-            compentencyVersionKey: 'v6'
         }
 
         // Create component
@@ -150,6 +148,7 @@ describe('SearchComponent', () => {
         // Initialize component
         component.from = 'content'
         component.selectedDropDownValue = 'Course'
+        component.compentencyKey = mockInitService.configSvc.compentency.v6
     })
 
     it('should create the component', () => {
@@ -162,7 +161,7 @@ describe('SearchComponent', () => {
             component.ngOnInit()
 
             // Assert
-            expect(component.compentencyKey).toBe(mockInitService.configSvc.competency.v6)
+            expect(component.compentencyKey).toBe(mockInitService.configSvc.compentency.v6)
 
             // Test content page change subscription
             const pageData = { pageIndex: 5, pageSize: 10 }
@@ -305,7 +304,6 @@ describe('SearchComponent', () => {
 
     describe('getContent', () => {
         beforeEach(() => {
-            component.compentencyKey = mockInitService.configSvc.competency.v6
             jest.spyOn(mockTpdsSvc.moderatedCourseSelectStatus, 'next')
             jest.spyOn(mockTpdsSvc.clearFilter, 'next')
             jest.spyOn(component.handleApiData, 'emit')
@@ -320,14 +318,62 @@ describe('SearchComponent', () => {
             expect(mockTrainingPlanService.getAllContent).toHaveBeenCalledWith(expect.objectContaining({
                 request: expect.objectContaining({
                     secureSettings: false,
-                    filters: expect.objectContaining({
-                        primaryCategory: ['Course']
-                    }),
+                    filters: {
+                        courseCategory: ['Course'],
+                        isScrom: { ne: true },
+                        organisation: [],
+                        'competencies_v6.competencyArea': [],
+                        'competencies_v6.competencyTheme': [],
+                        'competencies_v6.competencySubTheme': [],
+                    },
                     offset: 0,
                     limit: 20,
                     query: ''
                 })
             }))
+        })
+
+        it('should exclude SCORM content for every content category', () => {
+            const categories = ['Course', 'Standalone Assessment', 'Program', 'Blended program', 'Curated program', 'Moderated Course']
+
+            categories.forEach(category => component.getContent(category))
+
+            expect(mockTrainingPlanService.getAllContent).toHaveBeenCalledTimes(categories.length)
+            mockTrainingPlanService.getAllContent.mock.calls.forEach(([req]: any[]) => {
+                expect(req.request.filters.isScrom).toEqual({ ne: true })
+            })
+        })
+
+        it('should keep the SCORM filter when provider and competency filters are applied', () => {
+            component.getContent('Course', { providers: ['provider1'] })
+
+            expect(mockTrainingPlanService.getAllContent).toHaveBeenCalledWith(expect.objectContaining({
+                request: expect.objectContaining({
+                    filters: expect.objectContaining({
+                        isScrom: { ne: true },
+                        organisation: ['provider1'],
+                    })
+                })
+            }))
+        })
+
+        it('should keep the SCORM filter when searching by text', () => {
+            component.searchText = 'search query'
+
+            component.getContent('Course')
+
+            expect(mockTrainingPlanService.getAllContent).toHaveBeenCalledWith(expect.objectContaining({
+                request: expect.objectContaining({
+                    filters: expect.objectContaining({ isScrom: { ne: true } }),
+                    query: 'search query'
+                })
+            }))
+        })
+
+        it('should not call the API when no content type is given', () => {
+            component.getContent('')
+
+            expect(mockTrainingPlanService.getAllContent).not.toHaveBeenCalled()
         })
 
         it('should handle moderated course type correctly', () => {
@@ -340,7 +386,8 @@ describe('SearchComponent', () => {
                 request: expect.objectContaining({
                     secureSettings: true,
                     filters: expect.objectContaining({
-                        primaryCategory: ['Course']
+                        courseCategory: ['Moderated Course'],
+                        isScrom: { ne: true }
                     })
                 })
             }))
@@ -370,12 +417,9 @@ describe('SearchComponent', () => {
         it('should clear filters when searchText is present', () => {
             // Arrange
             component.searchText = 'search query'
-            const filterObj = {
-                providers: ['provider1']
-            }
 
             // Act
-            component.getContent('Course', filterObj)
+            component.getContent('Course')
 
             // Assert
             expect(mockTpdsSvc.clearFilter.next).toHaveBeenCalledWith({ from: 'content', status: true })
@@ -391,26 +435,50 @@ describe('SearchComponent', () => {
             }))
         })
 
+        it('should clear searchText when a filter object is applied', () => {
+            // Arrange
+            component.searchText = 'search query'
+
+            // Act
+            component.getContent('Course', { providers: ['provider1'] })
+
+            // Assert
+            expect(component.searchText).toBe('')
+            expect(mockTpdsSvc.clearFilter.next).not.toHaveBeenCalled()
+            expect(mockTrainingPlanService.getAllContent).toHaveBeenCalledWith(expect.objectContaining({
+                request: expect.objectContaining({
+                    filters: expect.objectContaining({ organisation: ['provider1'] }),
+                    query: ''
+                })
+            }))
+        })
+
         it('should update trainingPlanContentData and emit event on success', () => {
             // Arrange
-            mockTpdsSvc.trainingPlanContentData = {
-                data: {
-                    content: [
-                        { identifier: 'existing1', name: 'Existing 1', selected: true }
-                    ]
-                }
-            }
+            mockTrainingPlanService.getAllContent.mockReturnValue(of({
+                count: 3,
+                content: [
+                    { identifier: 'content1', name: 'Content 1' },
+                    { identifier: 'content1', name: 'Content 1 duplicate' },
+                    { identifier: 'content2', name: 'Content 2' }
+                ]
+            }))
 
             // Act
             component.getContent('Course')
 
             // Assert
-            expect(_.concat).toHaveBeenCalled()
             expect(_.uniqBy).toHaveBeenCalled()
             expect(mockTpdsSvc.trainingPlanContentData).toEqual({
                 category: 'Course',
-                data: expect.anything(),
-                count: 2
+                data: {
+                    count: 3,
+                    content: [
+                        { identifier: 'content1', name: 'Content 1' },
+                        { identifier: 'content2', name: 'Content 2' }
+                    ]
+                },
+                count: 3
             })
             expect(component.handleApiData.emit).toHaveBeenCalledWith(true)
             expect(mockLoadingService.changeLoaderState).toHaveBeenCalledWith(false)
@@ -464,12 +532,9 @@ describe('SearchComponent', () => {
         it('should clear filters when searchText is present', () => {
             // Arrange
             component.searchText = 'search query'
-            const filterObj = {
-                designation: ['des1']
-            }
 
             // Act
-            component.getCustomUsers('CustomUser', filterObj)
+            component.getCustomUsers('CustomUser')
 
             // Assert
             expect(mockTpdsSvc.clearFilter.next).toHaveBeenCalledWith({ from: 'assignee', status: true })
