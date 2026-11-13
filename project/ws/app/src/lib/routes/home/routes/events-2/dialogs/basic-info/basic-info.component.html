@@ -93,13 +93,13 @@
                 Event
               </span>
             </div>
-            <div class="input-event mb-4">
+            <div id="event-basic-info-name-preview" class="input-event mb-4">
               <ng-container *ngIf="eventForm?.get('eventName') && eventForm.get('eventName').value">
-                <label class="custome-title" #tooltip="matTooltip" [matTooltip]="eventForm.get('eventName').value"
+                <label for="event-basic-info-name-preview" class="custome-title" #tooltip="matTooltip" [matTooltip]="eventForm.get('eventName').value"
                   matTooltipClass="new-toolTip" matTooltipPosition="above">{{eventForm.get('eventName').value}}</label>
               </ng-container>
               <ng-container *ngIf="!(eventForm?.get('eventName') && eventForm.get('eventName').value)">
-                <label class="custome-title">Event Name</label>
+                <label for="event-basic-info-name-preview" class="custome-title">Event Name</label>
               </ng-container>
             </div>
             <div class="flex flex-row gap-4 items-center">

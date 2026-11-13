@@ -168,7 +168,7 @@ describe('BatchDetailsComponent', () => {
 
     it('should initialize with correct values', async () => {
         jest.spyOn(component, 'getNewRequestsList').mockImplementation()
-        await component.ngOnInit()
+        await (component as any).loadUserDetails()
 
         expect(component.programID).toBe('test-program-123')
         expect(component.batchID).toBe('test-batch-123')

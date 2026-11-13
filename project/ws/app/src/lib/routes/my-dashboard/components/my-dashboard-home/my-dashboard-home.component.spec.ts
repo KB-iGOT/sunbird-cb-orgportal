@@ -162,6 +162,7 @@ describe('MyDashboardHomeComponent', () => {
             const payload = mdoServiceMock.getDashboardData.mock.calls[0][1]
             expect(payload.request.embedUrl).toBe('/embed/dashboards/up_dashboard::up_dashboard')
             expect(payload.request.userModels).toEqual(['up_dashboard'])
+            expect(component.isUpDashboard).toBe(true)
         })
 
         it('should fall back to default embedUrl when ministryOrStateId is not mapped', () => {
@@ -179,6 +180,7 @@ describe('MyDashboardHomeComponent', () => {
             const payload = mdoServiceMock.getDashboardData.mock.calls[0][1]
             expect(payload.request.embedUrl).toBe('/embed/dashboards/7')
             expect(payload.request.userModels).toBeUndefined()
+            expect(component.isUpDashboard).toBe(false)
         })
     })
 

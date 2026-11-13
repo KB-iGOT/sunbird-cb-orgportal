@@ -13,15 +13,15 @@
       <div class="new-mobile margin-top-l">
         <div class="flex flex-wrap mobile-break">
           <div class="w-full profile-cols-full bg-grey" *ngIf="needApprovalList.length>0">
-            <ng-container *ngFor="let field of needApprovalList">
+            <ng-container *ngFor="let field of needApprovalList; let i = index">
               <div class="appr-label" *ngIf="field.fieldKey !== 'verifiedKarmayogi'">
-                <label class="appr-text-label">{{field.label}}</label>
+                <label for="needs-approval-field-{{i}}" class="appr-text-label">{{field.label}}</label>
               </div>
               <div [class.mt-4]="field.fieldKey === 'verifiedKarmayogi'">
                 <span [hidden]="field.fieldKey === 'verifiedKarmayogi'">
-                  <input type="text" class="appr-text-field" [value]="field.value">
+                  <input id="needs-approval-field-{{i}}" type="text" class="appr-text-field" [value]="field.value">
                 </span>
-                <label class="appr-text-label mt-2" *ngIf="field.fieldKey === 'verifiedKarmayogi'">{{field.label}}
+                <label for="needs-approval-field-{{i}}" class="appr-text-label mt-2" *ngIf="field.fieldKey === 'verifiedKarmayogi'">{{field.label}}
                 </label>
                 <button mat-icon-button aria-label="Reject" id="reject" (click)="onClickHandleWorkflow(field,'REJECT')">
                   <mat-icon class="reject">close</mat-icon>
@@ -46,14 +46,14 @@
           <!--needApprovalList.length <= 0-->
           <div class="w-full profile-cols-full bg-grey" *ngIf="false">
             <ng-container>
-              <div class="appr-label" *ngIf="changeLog">
-                <label class="field-key">{{changeLog.fieldKey}}</label>
-                <label class="field-name">{{changeLog.fieldName}}</label>
-                <label class="field-name">Changed from {{changeLog.fromVal}} to {{changeLog.toVal}}</label>
-                <label class="change-date">15/12/2020 18:31</label>
+              <div id="needs-approval-change-log" class="appr-label" *ngIf="changeLog">
+                <label for="needs-approval-change-log" class="field-key">{{changeLog.fieldKey}}</label>
+                <label for="needs-approval-change-log" class="field-name">{{changeLog.fieldName}}</label>
+                <label for="needs-approval-change-log" class="field-name">Changed from {{changeLog.fromVal}} to {{changeLog.toVal}}</label>
+                <label for="needs-approval-change-log" class="change-date">15/12/2020 18:31</label>
               </div>
-              <div class="appr-label">
-                <label class="no-request-text">Currently there are no items pending approval</label>
+              <div id="needs-approval-no-items" class="appr-label">
+                <label for="needs-approval-no-items" class="no-request-text">Currently there are no items pending approval</label>
               </div>
             </ng-container>
           </div>

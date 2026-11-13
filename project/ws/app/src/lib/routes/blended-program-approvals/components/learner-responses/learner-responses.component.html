@@ -34,8 +34,8 @@
         </div>
         <div class="flex flex-row margin-top-m">
           <div class="md:w-1/3">
-            <label class="view-text-label">Group</label>
-            <p>
+            <label for="lr-group" class="view-text-label">Group</label>
+            <p id="lr-group">
               {{(userData?.profileDetails && userData?.profileDetails?.professionalDetails &&
               userData?.profileDetails?.professionalDetails[0]?.group) ?
               userData?.profileDetails?.professionalDetails[0]?.group : '-'}}
@@ -52,8 +52,8 @@
             </p>
           </div>
           <div class="md:w-1/2">
-            <label class="view-text-label">Designation</label>
-            <p>
+            <label for="lr-designation" class="view-text-label">Designation</label>
+            <p id="lr-designation">
               {{(userData?.profileDetails && userData?.profileDetails?.professionalDetails &&
               userData?.profileDetails?.professionalDetails[0]?.designation) ?
               userData?.profileDetails?.professionalDetails[0]?.designation : '-'}}
@@ -80,23 +80,23 @@
 
         <div class="flex flex-row margin-top-m">
           <div class="md:w-1/4">
-            <label class="view-text-label">Email</label>
-            <p class="word-wrap">
+            <label for="lr-email" class="view-text-label">Email</label>
+            <p id="lr-email" class="word-wrap">
               {{(userData?.profileDetails && userData?.profileDetails?.personalDetails) ?
               userData?.profileDetails?.personalDetails?.primaryEmail : '-'}}
             </p>
           </div>
 
           <div class="md:w-1/4">
-            <label class="view-text-label">Mobile Number</label>
-            <p>
+            <label for="lr-mobile" class="view-text-label">Mobile Number</label>
+            <p id="lr-mobile">
               +91 {{(userData?.profileDetails && userData?.profileDetails?.personalDetails) ?
               userData?.profileDetails?.personalDetails?.mobile : '-'}}
             </p>
           </div>
           <div class="md:w-1/4">
-            <label class="view-text-label">Date of Birth</label>
-            <p>
+            <label for="lr-dob" class="view-text-label">Date of Birth</label>
+            <p id="lr-dob">
               {{(userData?.profileDetails && userData?.profileDetails?.personalDetails &&
               userData?.profileDetails?.personalDetails?.dob)
               ? (getDateFromText(userData?.profileDetails?.personalDetails?.dob) | date: 'd MMM yyyy')
@@ -104,8 +104,8 @@
             </p>
           </div>
           <div class="md:w-1/4">
-            <label class="view-text-label">Gender</label>
-            <p>
+            <label for="lr-gender" class="view-text-label">Gender</label>
+            <p id="lr-gender">
               {{(userData?.profileDetails && userData?.profileDetails?.personalDetails &&
               userData?.profileDetails?.personalDetails?.gender)
               ? userData?.profileDetails?.personalDetails?.gender
@@ -116,8 +116,8 @@
         </div>
         <div class="flex flex-row margin-top-m">
           <div class="md:w-1/4">
-            <label class="view-text-label">Employee ID</label>
-            <p>
+            <label for="lr-employee-id" class="view-text-label">Employee ID</label>
+            <p id="lr-employee-id">
               {{(userData?.profileDetails && userData?.profileDetails?.employmentDetails &&
               userData?.profileDetails?.employmentDetails?.employeeCode)
               ? userData?.profileDetails?.employmentDetails?.employeeCode
@@ -125,8 +125,8 @@
             </p>
           </div>
           <div class="md:w-1/4">
-            <label class="view-text-label">Mother Tongue</label>
-            <p>
+            <label for="lr-mother-tongue" class="view-text-label">Mother Tongue</label>
+            <p id="lr-mother-tongue">
               {{(userData?.profileDetails && userData?.profileDetails?.personalDetails &&
               userData?.profileDetails?.personalDetails?.domicileMedium)
               ? userData?.profileDetails?.personalDetails?.domicileMedium
@@ -134,8 +134,8 @@
             </p>
           </div>
           <div class="md:w-1/4">
-            <label class="view-text-label">Category</label>
-            <p>
+            <label for="lr-category" class="view-text-label">Category</label>
+            <p id="lr-category">
               {{(userData?.profileDetails && userData?.profileDetails?.personalDetails &&
               userData?.profileDetails?.personalDetails?.category)
               ? userData?.profileDetails?.personalDetails?.category
@@ -143,8 +143,8 @@
             </p>
           </div>
           <div class="md:w-1/4">
-            <label class="view-text-label">Office Pin Code</label>
-            <p>
+            <label for="lr-office-pincode" class="view-text-label">Office Pin Code</label>
+            <p id="lr-office-pincode">
               {{(userData?.profileDetails && userData?.profileDetails?.employmentDetails &&
               userData?.profileDetails?.employmentDetails?.pinCode)
               ? userData?.profileDetails?.employmentDetails?.pinCode
@@ -155,8 +155,8 @@
 
         <div class="flex flex-row margin-top-m">
           <div class="md:w-1/4">
-            <label class="view-text-label">eHRMS ID/External System ID</label>
-            <p>
+            <label for="lr-external-id" class="view-text-label">eHRMS ID/External System ID</label>
+            <p id="lr-external-id">
               {{(userData?.profileDetails && userData?.profileDetails?.additionalProperties &&
               userData?.profileDetails?.additionalProperties?.externalSystemId)
               ? userData?.profileDetails?.additionalProperties?.externalSystemId
@@ -164,8 +164,8 @@
             </p>
           </div>
           <div class="md:w-1/4">
-            <label class="view-text-label">Date of Retirement</label>
-            <p>
+            <label for="lr-retirement-date" class="view-text-label">Date of Retirement</label>
+            <p id="lr-retirement-date">
               {{(userData?.profileDetails && userData?.profileDetails?.additionalProperties &&
               userData?.profileDetails?.additionalProperties?.externalSystemDor)
               ? userData?.profileDetails?.additionalProperties?.externalSystemDor
@@ -173,8 +173,8 @@
             </p>
           </div>
           <div class="md:w-1/4">
-            <label class="view-text-label">Tags</label>
-            <p>
+            <label for="lr-tags" class="view-text-label">Tags</label>
+            <p id="lr-tags">
               {{(userData?.profileDetails && userData?.profileDetails?.additionalProperties &&
               userData?.profileDetails?.additionalProperties?.tag?.length)
               ? userData?.profileDetails?.additionalProperties?.tag.join(", ")
@@ -186,22 +186,22 @@
         <!-- Cader Related Code-->
         <div class="flex flex-row margin-top-m">
           <div class="md:w-1/4">
-            <label class="view-text-label">Are you a Cadre Employee?</label>
-            <p *ngIf="userData?.profileDetails?.hasOwnProperty('cadreDetails')">
+            <label for="lr-cadre-employee" class="view-text-label">Are you a Cadre Employee?</label>
+            <p id="lr-cadre-employee" *ngIf="userData?.profileDetails?.hasOwnProperty('cadreDetails')">
               {{userData?.profileDetails?.cadreDetails?.civilServiceType ? 'Yes': 'No'}}</p>
-            <p *ngIf="!(userData?.profileDetails?.hasOwnProperty('cadreDetails'))">-</p>
+            <p id="lr-cadre-employee" *ngIf="!(userData?.profileDetails?.hasOwnProperty('cadreDetails'))">-</p>
           </div>
 
           <div class="md:w-1/4" *ngIf="userData?.profileDetails?.cadreDetails?.civilServiceType">
-            <label class="view-text-label">Type of Civil Service</label>
-            <p>{{userData?.profileDetails?.cadreDetails?.civilServiceType ?
+            <label for="lr-civil-service-type" class="view-text-label">Type of Civil Service</label>
+            <p id="lr-civil-service-type">{{userData?.profileDetails?.cadreDetails?.civilServiceType ?
               userData?.profileDetails?.cadreDetails?.civilServiceType: '-'}}</p>
 
           </div>
 
           <div class="md:w-1/4" *ngIf="userData?.profileDetails?.cadreDetails?.civilServiceType">
-            <label class="view-text-label">Service</label>
-            <p>{{userData?.profileDetails?.cadreDetails?.civilServiceName ?
+            <label for="lr-service" class="view-text-label">Service</label>
+            <p id="lr-service">{{userData?.profileDetails?.cadreDetails?.civilServiceName ?
               userData?.profileDetails?.cadreDetails?.civilServiceName: '-'}}</p>
 
           </div>
@@ -210,8 +210,8 @@
                           userData?.profileDetails?.cadreDetails?.civilServiceName.trim() === 'Indian Police Service (IPS)' ||
                           userData?.profileDetails?.cadreDetails?.civilServiceName.trim() === 'Indian Forest Service (IFoS)')
                           ">
-            <label class="view-text-label">Cadre</label>
-            <p>{{userData?.profileDetails?.cadreDetails?.cadreName ? userData?.profileDetails?.cadreDetails?.cadreName:
+            <label for="lr-cadre" class="view-text-label">Cadre</label>
+            <p id="lr-cadre">{{userData?.profileDetails?.cadreDetails?.cadreName ? userData?.profileDetails?.cadreDetails?.cadreName:
               '-'}}
             </p>
 
@@ -219,8 +219,8 @@
         </div>
         <div class="flex flex-row margin-top-m">
           <div class="md:w-1/4" *ngIf="userData?.profileDetails?.cadreDetails?.civilServiceType">
-            <label class="view-text-label">Batch</label>
-            <p>{{userData?.profileDetails?.cadreDetails?.cadreBatch ?
+            <label for="lr-batch" class="view-text-label">Batch</label>
+            <p id="lr-batch">{{userData?.profileDetails?.cadreDetails?.cadreBatch ?
               userData?.profileDetails?.cadreDetails?.cadreBatch:
               '-'}}
             </p>
@@ -228,8 +228,8 @@
           </div>
 
           <div class="md:w-1/2" *ngIf="userData?.profileDetails?.cadreDetails?.civilServiceType">
-            <label class="view-text-label">Cadre Controlling Authority</label>
-            <p>{{userData?.profileDetails?.cadreDetails?.cadreControllingAuthorityName ?
+            <label for="lr-cadre-authority" class="view-text-label">Cadre Controlling Authority</label>
+            <p id="lr-cadre-authority">{{userData?.profileDetails?.cadreDetails?.cadreControllingAuthorityName ?
               userData?.profileDetails?.cadreDetails?.cadreControllingAuthorityName: '-'}}</p>
 
           </div>
@@ -240,12 +240,12 @@
 
     <div class="flex flex-row margin-top-m repsonse-pannel" *ngIf="surveyGroup || surevyDesignation">
       <div class="md:w-1/3" *ngIf="surveyGroup">
-        <label class="view-text-label">Group (filled during enrollment)</label>
-        <p>{{surveyGroup}}</p>
+        <label for="lr-survey-group" class="view-text-label">Group (filled during enrollment)</label>
+        <p id="lr-survey-group">{{surveyGroup}}</p>
       </div>
       <div class="md:w-1/3" *ngIf="surevyDesignation">
-        <label class="view-text-label">Designation (filled during enrollment)</label>
-        <p>{{surevyDesignation}}</p>
+        <label for="lr-survey-designation" class="view-text-label">Designation (filled during enrollment)</label>
+        <p id="lr-survey-designation">{{surevyDesignation}}</p>
       </div>
     </div>
 

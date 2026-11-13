@@ -58,7 +58,7 @@
       <div class="custom-fields-table flex flex-column gap-4">
         <div class="table-container">
           <mat-table #table mat-table matSort class="mt-2" [dataSource]=" dataSource">
-            <ng-container matColumnDef="{{col.key}}" *ngFor="let col of tableData!.columns">
+            <ng-container matColumnDef="{{col.key}}" *ngFor="let col of tableData!.columns; let colIdx = index">
               <mat-header-cell *matHeaderCellDef mat-sort-header class=".h-400-r-14-l color-60"> {{col.displayName}}
               </mat-header-cell>
               <mat-cell *matCellDef="let element">
@@ -76,13 +76,13 @@
                 <span class="h-400-r-14-l color-87 textclass w-full" *ngIf="col.key === 'preview'">
                   <div *ngIf="element.isEnabled">
                     <div class="filedTextbox py-2 w-full" *ngIf="element?.type === 'text'">
-                      <label>
+                      <label for="forms-list-preview-{{colIdx}}-{{element.rowIndex}}">
                         <div class="flex flex-middle pb-1">
                           <span i18n class="margin-remove flex">{{element?.fieldName}}</span>
                         </div>
                       </label>
                       <mat-form-field appearance="outline" class="w-full">
-                        <input type="text" class="input-text" matInput [placeholder]="element.fieldName"
+                        <input id="forms-list-preview-{{colIdx}}-{{element.rowIndex}}" type="text" class="input-text" matInput [placeholder]="element.fieldName"
                           [name]="element.attributeName" [pattern]="element.validation" [required]="element.isMandatory"
                           [formControl]="getFormControl(element)" />
                         <mat-error class="mt-2"
