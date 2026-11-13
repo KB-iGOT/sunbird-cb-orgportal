@@ -1,14 +1,17 @@
 import { SimpleChange, SimpleChanges } from '@angular/core'
+import { of } from 'rxjs'
 import { LoaderService } from '../../../../../../../../../../../src/app/services/loader.service'
 import {
   QUESTIONSET_CONTEXT_CATEGORY,
   QUESTIONSET_PRIMARY_CATEGORY,
 } from '../../models/comprehensive-assessment.model'
+import { ComprehensiveAssessmentService } from '../../services/comprehensive-assessment.service'
 import { AssessmentBuilderComponent } from './assessment-builder.component'
 
 describe('AssessmentBuilderComponent', () => {
   let component: AssessmentBuilderComponent
   let loaderService: any
+  let assessmentSvc: any
 
   const change = (key: string): SimpleChanges => ({
     [key]: new SimpleChange('', 'new', false),
@@ -16,7 +19,11 @@ describe('AssessmentBuilderComponent', () => {
 
   beforeEach(() => {
     loaderService = { changeLoaderState: jest.fn() }
-    component = new AssessmentBuilderComponent(loaderService as LoaderService)
+    assessmentSvc = { getRefContent: jest.fn().mockReturnValue(of([])) }
+    component = new AssessmentBuilderComponent(
+      loaderService as LoaderService,
+      assessmentSvc as ComprehensiveAssessmentService
+    )
   })
 
   it('should create a instance of component', () => {
@@ -31,6 +38,7 @@ describe('AssessmentBuilderComponent', () => {
         contextCategory: QUESTIONSET_CONTEXT_CATEGORY,
         name: '',
         isReadOnly: false,
+        aiQuestionsGen: { enable: true, refContent: [] },
       })
     })
 
@@ -54,6 +62,85 @@ describe('AssessmentBuilderComponent', () => {
 
       component.openMode = 'edit'
       expect(component.buildConfig().isReadOnly).toBe(false)
+    })
+  })
+
+  describe('the reference content of AI question generation', () => {
+    const named = [
+      { identifier: 'do_course_1', name: 'Course one', courseCategory: 'Course' },
+      { identifier: 'do_course_2', name: 'Course two', courseCategory: 'Program' },
+    ]
+
+    it('should ask the search for the identifiers of the linked plan courses', () => {
+      component.contentList = [
+        { identifier: 'do_course_1', mandatory: true },
+        { identifier: '', mandatory: true },
+        { identifier: 'do_course_2', mandatory: false },
+      ]
+
+      component.ngOnChanges(change('contentList'))
+
+      expect(assessmentSvc.getRefContent).toHaveBeenCalledWith(['do_course_1', 'do_course_2'])
+    })
+
+    it('should ask for no course while no plan is linked', () => {
+      component.contentList = null
+
+      component.ngOnChanges(change('contentList'))
+
+      expect(assessmentSvc.getRefContent).toHaveBeenCalledWith([])
+    })
+
+    it('should hand the named courses to AI question generation', () => {
+      assessmentSvc.getRefContent.mockReturnValue(of(named))
+      component.contentList = [{ identifier: 'do_course_1', mandatory: true }]
+
+      component.ngOnChanges(change('contentList'))
+
+      expect(component.config.aiQuestionsGen).toEqual({ enable: true, refContent: named })
+    })
+
+    /** The library writes the question set categories back onto the config it was handed. */
+    it('should keep the config already handed down, only swapping what AI generation reads', () => {
+      const existing = component.config
+      existing.primaryCategory = 'Written back by the library'
+      assessmentSvc.getRefContent.mockReturnValue(of(named))
+
+      component.ngOnChanges(change('contentList'))
+
+      expect(component.config).toBe(existing)
+      expect(component.config.primaryCategory).toBe('Written back by the library')
+      expect(component.config.aiQuestionsGen.refContent).toEqual(named)
+    })
+
+    it('should keep the named courses when the config is rebuilt', () => {
+      assessmentSvc.getRefContent.mockReturnValue(of(named))
+      component.ngOnChanges(change('contentList'))
+      component.assessmentId = 'do_123'
+
+      component.ngOnChanges(change('assessmentId'))
+
+      expect(component.config.aiQuestionsGen.refContent).toEqual(named)
+    })
+
+    it('should drop a search still running when the plan courses change again', () => {
+      const unsubscribe = jest.fn()
+      assessmentSvc.getRefContent.mockReturnValueOnce({ subscribe: () => ({ unsubscribe }) })
+      component.ngOnChanges(change('contentList'))
+
+      component.ngOnChanges(change('contentList'))
+
+      expect(unsubscribe).toHaveBeenCalled()
+    })
+
+    it('should drop a search still running when the builder is left', () => {
+      const unsubscribe = jest.fn()
+      assessmentSvc.getRefContent.mockReturnValueOnce({ subscribe: () => ({ unsubscribe }) })
+      component.ngOnChanges(change('contentList'))
+
+      component.ngOnDestroy()
+
+      expect(unsubscribe).toHaveBeenCalled()
     })
   })
 
