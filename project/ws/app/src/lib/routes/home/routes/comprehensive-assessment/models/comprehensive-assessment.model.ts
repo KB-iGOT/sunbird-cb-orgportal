@@ -37,7 +37,27 @@ export namespace comprehensiveAssessment {
     /** Seeds the settings title, so the name given in step 1 is not typed a second time. */
     name: string
     isReadOnly: boolean
+    aiQuestionsGen: IAiQuestionsGenConfig
   }
+
+  /** Turns on AI question generation, `refContent` being the courses it drafts from. */
+  export interface IAiQuestionsGenConfig {
+    enable: boolean
+    refContent: IRefContent[]
+  }
+
+  /**
+   * One course of the linked plan as AI question generation is handed it. The plan only
+   * carries the identifier, the search fills in the rest.
+   */
+  export interface IRefContent {
+    identifier: string
+    name: string
+    courseCategory: string
+  }
+
+  /** What the search is asked for on each course of the linked plan. */
+  export const REF_CONTENT_FIELDS = ['name', 'identifier', 'courseCategory']
 
   /**
    * A resource the assessment holds - the question set built in step 2. The publish dialog

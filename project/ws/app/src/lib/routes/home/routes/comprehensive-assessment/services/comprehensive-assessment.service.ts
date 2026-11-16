@@ -24,6 +24,7 @@ const API_END_POINTS = {
   QUESTIONSET_READ: (questionSetId: string) => `apis/proxies/v8/questionset/v1/read/${questionSetId}`,
   PUBLISH_QUESTIONSET: (questionSetId: string) => `apis/proxies/v8/ca/questionset/v1/publish/${questionSetId}`,
   CONTENT_SEARCH: 'apis/proxies/v8/sunbirdigot/v4/search',
+  REF_CONTENT_SEARCH: 'apis/proxies/v8/sunbirdigot/search',
   PUBLISH_ASSESSMENT: (contentId: string) => `apis/proxies/v8/action/ca/v1/publish/${contentId}`,
   RETIRE_CONTENT: 'apis/proxies/v8/v1/content/ca/retire',
   APAR_PLAN_SEARCH: 'apis/proxies/v8/cbplan/v4/search',
@@ -131,6 +132,40 @@ export class ComprehensiveAssessmentService {
         content: _.map(_.get(res, 'result.content', []), (row: any) => this.toListRow(row)),
         count: _.get(res, 'result.count', 0),
       }))
+    )
+  }
+
+  /**
+   * The linked plan's courses as AI question generation is handed them, in the plan's order.
+   * The plan only carries identifiers, so the search fills in the name and category of each.
+   * A course the search does not answer for keeps its identifier, and so does every course
+   * when the search fails - the builder still opens, only without the names.
+   */
+  getRefContent(identifiers: string[]): Observable<comprehensiveAssessment.IRefContent[]> {
+    const ids: string[] = _.uniq(_.compact(identifiers))
+    if (!ids.length) {
+      return of([])
+    }
+    const request = {
+      request: {
+        secureSettings: false,
+        filters: { identifier: ids },
+        offset: 0,
+        // every course of the plan in one page, however many it gates
+        limit: ids.length,
+        query: '',
+        fields: comprehensiveAssessment.REF_CONTENT_FIELDS,
+      },
+    }
+
+    return this.http.post<any>(API_END_POINTS.REF_CONTENT_SEARCH, request).pipe(
+      map((res: any) => _.keyBy(_.get(res, 'result.content', []) || [], 'identifier')),
+      catchError(() => of({} as { [identifier: string]: any })),
+      map((found: { [identifier: string]: any }) => _.map(ids, (identifier: string) => ({
+        identifier,
+        name: _.get(found, [identifier, 'name'], '') || '',
+        courseCategory: _.get(found, [identifier, 'courseCategory'], '') || '',
+      })))
     )
   }
 

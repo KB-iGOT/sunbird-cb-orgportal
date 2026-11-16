@@ -2,12 +2,13 @@ import { DatePipe } from '@angular/common'
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing'
 import { TestBed } from '@angular/core/testing'
-import { aparPlan } from '../models/comprehensive-assessment.model'
+import { aparPlan, comprehensiveAssessment } from '../models/comprehensive-assessment.model'
 import { environment } from 'src/environments/environment'
 import { ComprehensiveAssessmentService } from './comprehensive-assessment.service'
 
 const PLAN_SEARCH_URL = 'apis/proxies/v8/cbplan/v4/search'
 const PLAN_READ_URL = 'apis/proxies/v8/cbplan/v4/read/plan-1'
+const REF_CONTENT_SEARCH_URL = 'apis/proxies/v8/sunbirdigot/search'
 /**
  * A plan as `api.cb.plan.v4.read.byId` hands it back - under `result.content`, not where the
  * search answers - with `caLinkedId` naming the assessment that holds it.
@@ -71,6 +72,79 @@ describe('ComprehensiveAssessmentService', () => {
 
   it('should be created', () => {
     expect(service).toBeTruthy()
+  })
+
+  describe('getRefContent', () => {
+    const searchResponse = (content: any[]) => ({ result: { count: content.length, content } })
+
+    it('should search the plan courses by identifier for their name and category', () => {
+      service.getRefContent(['do-1', 'do-2']).subscribe()
+
+      const req = httpMock.expectOne(REF_CONTENT_SEARCH_URL)
+      expect(req.request.method).toBe('POST')
+      expect(req.request.body).toEqual({
+        request: {
+          secureSettings: false,
+          filters: { identifier: ['do-1', 'do-2'] },
+          offset: 0,
+          limit: 2,
+          query: '',
+          fields: comprehensiveAssessment.REF_CONTENT_FIELDS,
+        },
+      })
+      req.flush(searchResponse([]))
+    })
+
+    it('should name each course in the order the plan holds them', () => {
+      let result: any
+      service.getRefContent(['do-1', 'do-2']).subscribe(res => result = res)
+
+      httpMock.expectOne(REF_CONTENT_SEARCH_URL).flush(searchResponse([
+        { identifier: 'do-2', name: 'Course two', courseCategory: 'Program', extra: 'dropped' },
+        { identifier: 'do-1', name: 'Course one', courseCategory: 'Course' },
+      ]))
+
+      expect(result).toEqual([
+        { identifier: 'do-1', name: 'Course one', courseCategory: 'Course' },
+        { identifier: 'do-2', name: 'Course two', courseCategory: 'Program' },
+      ])
+    })
+
+    it('should keep the identifier of a course the search does not answer for', () => {
+      let result: any
+      service.getRefContent(['do-1', 'do-2']).subscribe(res => result = res)
+
+      httpMock.expectOne(REF_CONTENT_SEARCH_URL).flush(searchResponse([
+        { identifier: 'do-1', name: 'Course one', courseCategory: 'Course' },
+      ]))
+
+      expect(result[1]).toEqual({ identifier: 'do-2', name: '', courseCategory: '' })
+    })
+
+    it('should keep every identifier when the search fails', () => {
+      let result: any
+      service.getRefContent(['do-1']).subscribe(res => result = res)
+
+      httpMock.expectOne(REF_CONTENT_SEARCH_URL).flush('boom', { status: 500, statusText: 'Server Error' })
+
+      expect(result).toEqual([{ identifier: 'do-1', name: '', courseCategory: '' }])
+    })
+
+    it('should ask once for a course the plan lists twice, and never for an empty one', () => {
+      service.getRefContent(['do-1', '', 'do-1']).subscribe()
+
+      const req = httpMock.expectOne(REF_CONTENT_SEARCH_URL)
+      expect(req.request.body.request.filters.identifier).toEqual(['do-1'])
+      req.flush(searchResponse([]))
+    })
+
+    it('should not call the search while the plan has no course', () => {
+      let result: any
+      service.getRefContent([]).subscribe(res => result = res)
+
+      httpMock.expectNone(REF_CONTENT_SEARCH_URL)
+      expect(result).toEqual([])
+    })
   })
 
   describe('searchAparPlans', () => {
