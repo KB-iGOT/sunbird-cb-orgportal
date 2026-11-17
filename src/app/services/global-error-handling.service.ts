@@ -29,9 +29,9 @@ function errorText(error: any): string {
       parts.push(current)
       break
     }
-    parts.push(current.name || '', current.message || '')
+    parts.push(current.name ?? '', current.message ?? '')
     // Angular wraps unhandled promise rejections; native errors chain through `cause`
-    current = current.rejection || current.originalError || current.cause
+    current = current.rejection ?? current.originalError ?? current.cause
   }
   return parts.filter(part => part).join(' ') || String(error)
 }
@@ -49,7 +49,7 @@ function reloadAttemptedRecently(): boolean {
   try {
     const stamp = Number(sessionStorage.getItem(RELOAD_FLAG))
     return !!stamp && Date.now() - stamp < RELOAD_GUARD_WINDOW_MS
-  } catch (e) {
+  } catch {
     // With storage blocked the attempt cannot be recorded and a reload would repeat for ever,
     // so treat it as already attempted and let the user decide
     return true
@@ -60,14 +60,14 @@ function reloadAttemptedRecently(): boolean {
 function reloadPastCache(): void {
   try {
     sessionStorage.setItem(RELOAD_FLAG, String(Date.now()))
-  } catch (e) {
+  } catch {
     // Nothing to record the attempt in, reloadAttemptedRecently() already fails safe
   }
   try {
     const url = new URL(window.location.href)
     url.searchParams.set(RELOAD_PARAM, String(Date.now()))
     window.location.replace(url.toString())
-  } catch (e) {
+  } catch {
     window.location.reload()
   }
 }
@@ -79,7 +79,7 @@ export class GlobalErrorHandlingService implements ErrorHandler {
 
   // Injector rather than MatDialog directly: ErrorHandler is built early, and asking for
   // Material eagerly here risks a DI cycle at bootstrap
-  constructor(private injector: Injector) { }
+  constructor(private readonly injector: Injector) { }
 
   handleError(error: any): void {
     if (isChunkLoadError(error)) {
@@ -150,7 +150,7 @@ export function clearChunkReloadFlag(): void {
     if (!stamp || Date.now() - stamp >= RELOAD_GUARD_WINDOW_MS) {
       sessionStorage.removeItem(RELOAD_FLAG)
     }
-  } catch (e) {
+  } catch {
     // sessionStorage is unavailable
   }
   try {
@@ -159,7 +159,7 @@ export function clearChunkReloadFlag(): void {
       url.searchParams.delete(RELOAD_PARAM)
       window.history.replaceState(window.history.state, '', url.toString())
     }
-  } catch (e) {
+  } catch {
     // Leaving the param in the URL is harmless
   }
 }
