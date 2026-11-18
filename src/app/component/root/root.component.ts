@@ -33,6 +33,7 @@ import {
   AuthKeycloakService,
 } from '@sunbird-cb/utils-v2'
 import { delay, first } from 'rxjs/operators'
+import { clearChunkReloadFlag } from '../../services/global-error-handling.service'
 import { MobileAppsService } from '../../services/mobile-apps.service'
 import { RootService } from './root.service'
 import { SwUpdate } from '@angular/service-worker'
@@ -106,6 +107,7 @@ export class RootComponent implements OnInit, AfterViewInit {
     }
   }
   ngOnInit() {
+    clearChunkReloadFlag()
     try {
       this.isInIframe = window.self !== window.top
     } catch (_ex) {
