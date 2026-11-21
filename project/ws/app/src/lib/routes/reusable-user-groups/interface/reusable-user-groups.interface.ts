@@ -39,6 +39,8 @@ export interface IUserGroupsConfig {
   roleBanner: { icon: string, roles: IRoleBanner[], default: IRoleBanner }
   search: { filters: Record<string, any>, sortBy: string, sortOrder: 'asc' | 'desc' }
   table: IUserGroupsTableConfig
+  /** Access settings config of the create / edit page; crossOrgReachServices are the services (IPS, IFoS, CHS) counted across every organisation */
+  accessSettingsUserGroups?: { crossOrgReachServices?: string[], [key: string]: any }
 }
 
 export interface IUserGroupSearchRequest {

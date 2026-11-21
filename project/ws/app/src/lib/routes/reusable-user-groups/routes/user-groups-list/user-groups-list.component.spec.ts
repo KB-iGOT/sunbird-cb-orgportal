@@ -609,6 +609,33 @@ describe('UserGroupsListComponent', () => {
       expect(fetchUserCount).toHaveBeenCalledWith({ rootOrgId: [userOrgId], status: 1 })
     })
 
+    describe('cross organisation reach services', () => {
+      beforeEach(() => {
+        component.config.set({
+          ...config,
+          accessSettingsUserGroups: { crossOrgReachServices: ['Indian Police Service (IPS)', 'Indian Forest Service (IFoS)'] },
+        } as any)
+      })
+
+      it('should count a group of only a cross organisation service across every organisation', () => {
+        component.onCheckReach(withCriteria([{ criteriaKey: 'service', criteriaValue: ['indian police service (ips)'] }]))
+        expect(fetchUserCount).toHaveBeenCalledWith({
+          'profileDetails.cadreDetails.civilServiceName': ['indian police service (ips)'],
+          status: 1,
+        })
+      })
+
+      it('should keep the own organisation when another service is selected with it', () => {
+        component.onCheckReach(withCriteria([{ criteriaKey: 'service', criteriaValue: ['Indian Police Service (IPS)', 'DANICS'] }]))
+        expect(fetchUserCount.mock.calls[0][0].rootOrgId).toEqual([userOrgId])
+      })
+
+      it('should keep the own organisation for any other service', () => {
+        component.onCheckReach(withCriteria([{ criteriaKey: 'service', criteriaValue: ['Indian Railway Service'] }]))
+        expect(fetchUserCount.mock.calls[0][0].rootOrgId).toEqual([userOrgId])
+      })
+    })
+
     describe('every organisation selected by a CCA', () => {
       beforeEach(() => {
         isCCA = true
