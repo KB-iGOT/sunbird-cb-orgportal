@@ -257,7 +257,13 @@ export class UserGroupsListComponent implements OnInit {
     // A non CCA count stays inside the logged in organisation unless the group names its own,
     // or the whole ministry / state it sits under, a CCA counts across every organisation
     const namesOrganisationScope = filters['rootOrgId']?.length || filters['profileDetails.ministryOrStateId']?.length
-    if (!isCCA && !namesOrganisationScope && this.configSvc.userProfile?.rootOrgId) {
+    // A group of only cross organisation services (IPS, IFoS, CHS) is counted across every organisation too
+    const crossOrgReachServices = (this.config()?.accessSettingsUserGroups?.crossOrgReachServices ?? [])
+      .map(serviceName => serviceName.toLowerCase())
+    const selectedServices: string[] = filters['profileDetails.cadreDetails.civilServiceName'] ?? []
+    const hasOnlyCrossOrgReachServices = selectedServices.length > 0
+      && selectedServices.every(serviceName => crossOrgReachServices.includes(String(serviceName).toLowerCase()))
+    if (!isCCA && !namesOrganisationScope && !hasOnlyCrossOrgReachServices && this.configSvc.userProfile?.rootOrgId) {
       filters['rootOrgId'] = [this.configSvc.userProfile.rootOrgId]
     }
 
