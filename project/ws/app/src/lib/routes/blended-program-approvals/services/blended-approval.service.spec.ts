@@ -294,4 +294,32 @@ describe('BlendedApporvalService', () => {
             expect(httpClientSpy.get).toHaveBeenCalledWith('/apis/proxies/v8/forms/v2/getFormById?formId=form-123')
         })
     })
+
+    describe('getBatchList', () => {
+        it('should call POST with the correct URL and request body', () => {
+            const reqBody = {
+                request: {
+                    filters: { courseId: 'do_123' },
+                    sort_by: { createdDate: 'desc' },
+                    offset: 0,
+                    limit: 500,
+                },
+            }
+            const mockResponse = {
+                result: {
+                    response: {
+                        content: [{ batchId: 'batch-1', courseId: 'do_123', endDate: '2099-12-31' }],
+                    },
+                },
+            }
+
+            httpClientSpy.post.mockReturnValue(of(mockResponse))
+
+            service.getBatchList(reqBody).subscribe(response => {
+                expect(response).toEqual(mockResponse)
+            })
+
+            expect(httpClientSpy.post).toHaveBeenCalledWith('apis/proxies/v8/learner/course/v1/batch/list', reqBody)
+        })
+    })
 })

@@ -31,39 +31,7 @@ export class BatchListComponent implements OnInit {
           titles: [{ title: 'Blended programs', url: '/app/home/blended-approvals' },
           { title: this.programData.name, url: 'none' }],
         }
-        if (this.programData.batches) {
-          const today = moment(new Date())
-          this.programData.batches.forEach((b: any) => {
-            // b.newrequestsCount = this.getNewRequestsList(b.batchId)
-            const allowedBatch = today.isSameOrBefore(moment(b.endDate || new Date()), 'day')
-            const archivedBatch = today.isAfter(moment(b.endDate || new Date()), 'day')
-            if (allowedBatch) {
-              this.batchesList.push(b)
-            } else if (archivedBatch) {
-              this.arcBatchList.push(b)
-            }
-            const request = {
-              serviceName: 'blendedprogram',
-              applicationStatus: 'SEND_FOR_MDO_APPROVAL',
-              applicationIds: [b.batchId],
-              limit: 100,
-              offset: 0,
-              deptName: this.userProfile.channel,
-            }
-            // b.newrequestsCount = Math.floor(Math.random() * (100 - 0 + 0)) + 0
-            b.learnersCount = 0
-            this.bpService.getRequests(request).subscribe((resnew: any) => {
-              if (resnew && resnew.result && resnew.result.data && resnew.result.data.length > 0) {
-                b.newrequestsCount = resnew.result.data.length
-              }
-            })
-            this.bpService.getLearners(b.batchId, this.userProfile.channel).subscribe((r: any) => {
-              if (r && r.length > 0) {
-                b.learnersCount = r.length
-              }
-            })
-          })
-        }
+        this.fetchAndPopulateBatches(this.programID)
       }
     } else if (this.programID) {
       this.getBPDetails(this.programID)
@@ -84,41 +52,53 @@ export class BatchListComponent implements OnInit {
           titles: [{ title: 'Blended programs', url: '/app/home/blended-approvals' },
           { title: this.programData.name, url: 'none' }],
         }
-
-        if (this.programData.batches) {
-          const today = moment(new Date())
-          this.programData.batches.forEach((b: any) => {
-            const allowedBatch = today.isSameOrBefore(moment(b.endDate || new Date()), 'day')
-            const archivedBatch = today.isAfter(moment(b.endDate || new Date()), 'day')
-            // b.newrequestsCount = this.getNewRequestsList(b.batchId)
-            if (allowedBatch) {
-              this.batchesList.push(b)
-            } else if (archivedBatch) {
-              this.arcBatchList.push(b)
-            }
-            const request = {
-              serviceName: 'blendedprogram',
-              applicationStatus: 'SEND_FOR_MDO_APPROVAL',
-              applicationIds: [b.batchId],
-              limit: 100,
-              offset: 0,
-              deptName: this.userProfile.channel,
-            }
-            b.learnersCount = 0
-            // b.newrequestsCount = Math.floor(Math.random() * (100 - 0 + 0)) + 0
-            this.bpService.getRequests(request).subscribe((resnew: any) => {
-              if (resnew && resnew.result && resnew.result.data && resnew.result.data.length > 0) {
-                b.newrequestsCount = resnew.result.data.length
-              }
-            })
-            this.bpService.getLearners(b.batchId, this.userProfile.channel).subscribe((r: any) => {
-              if (r && r.length > 0) {
-                b.learnersCount = r.length
-              }
-            })
-          })
-        }
+        this.fetchAndPopulateBatches(programID)
       }
+    })
+  }
+
+  fetchAndPopulateBatches(programID: any) {
+    const req = {
+      request: {
+        filters: {
+          courseId: programID,
+        },
+        sort_by: { createdDate: 'desc' },
+        offset: 0,
+        limit: 500,
+      },
+    }
+    this.bpService.getBatchList(req).subscribe((res: any) => {
+      const batches = (res && res.result && res.result.response && res.result.response.content) || []
+      const today = moment(new Date())
+      batches.forEach((b: any) => {
+        const allowedBatch = today.isSameOrBefore(moment(b.endDate || new Date()), 'day')
+        const archivedBatch = today.isAfter(moment(b.endDate || new Date()), 'day')
+        if (allowedBatch) {
+          this.batchesList.push(b)
+        } else if (archivedBatch) {
+          this.arcBatchList.push(b)
+        }
+        const request = {
+          serviceName: 'blendedprogram',
+          applicationStatus: 'SEND_FOR_MDO_APPROVAL',
+          applicationIds: [b.batchId],
+          limit: 100,
+          offset: 0,
+          deptName: this.userProfile.channel,
+        }
+        b.learnersCount = 0
+        this.bpService.getRequests(request).subscribe((resnew: any) => {
+          if (resnew && resnew.result && resnew.result.data && resnew.result.data.length > 0) {
+            b.newrequestsCount = resnew.result.data.length
+          }
+        })
+        this.bpService.getLearners(b.batchId, this.userProfile.channel).subscribe((r: any) => {
+          if (r && r.length > 0) {
+            b.learnersCount = r.length
+          }
+        })
+      })
     })
   }
 

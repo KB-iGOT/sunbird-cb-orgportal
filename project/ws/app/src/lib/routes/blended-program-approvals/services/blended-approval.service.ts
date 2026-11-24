@@ -9,6 +9,7 @@ const API_END_POINTS = {
   UPDATE_REQUEST: '/apis/proxies/v8/workflow/blendedprogram/update/mdo',
   // GET_PROGRAM_DETAILS: '/apis/proxies/v8/action/content/v3/hierarchy',
   GET_PROGRAM_DETAILS: '/apis/proxies/v8/action/content/v3/read',
+  BATCH_LIST: 'apis/proxies/v8/learner/course/v1/batch/list',
   GET_LERANERS: '/apis/protected/v8/cohorts/course/getUsersForBatch',
   GET_REQUESTS: '/apis/proxies/v8/workflow/blendedprogram/search',
   GET_SEARCH_LIST: '/apis/proxies/v8/workflow/blendedprogram/searchV2/mdo',
@@ -134,5 +135,9 @@ export class BlendedApporvalService {
 
   inviteUserToBatch(data: any): Observable<any> {
     return this.http.post<any>(API_END_POINTS.INVITE_USERS, data)
+  }
+
+  getBatchList(req: any): Observable<any> {
+    return this.http.post<any>(API_END_POINTS.BATCH_LIST, req)
   }
 }
