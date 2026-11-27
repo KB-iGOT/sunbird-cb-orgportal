@@ -109,14 +109,14 @@
 
   <div class="flex flex-column gap-2 rich-text-field">
     <div class="form-lable required flex flex-middle gap-1">
-      Learning Outcome
+      Instructions
       <mat-icon class="cursor-pointer info-icon"
         matTooltip="What the learner is expected to be able to do after taking this assessment.">info_outline</mat-icon>
     </div>
     <ckeditor [editor]="ckEditor" formControlName="learningOutcome" [config]="getConfig()"
       (ready)="onEditorReady($event)" (focus)="onEditorFocus()"></ckeditor>
     <mat-error class="mat-error-text" *ngIf="showValidationMsg('learningOutcome','required')">
-      Learning outcome is mandatory
+      Instructions are mandatory
     </mat-error>
     <mat-error class="mat-error-text" *ngIf="showValidationMsg('learningOutcome','minlength')">
       Minimum {{learningOutcomeMinLength}} characters are required
